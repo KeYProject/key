@@ -3,11 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
@@ -80,7 +76,7 @@ public class RuleIndependentData {
         String[] columns = new String[] { "System.currentTimeMillis()", "computeCostPercentage",
             "instantiateAppPercentage" };
         String description = "Percentages of how much time computeCost() and instantiateApp() take "
-            + "in overall applyStrategy() execution.";
+                + "in overall applyStrategy() execution.";
         try (DataRecordingTable table =
             new DataRecordingTable(percentageOverTimeFile, columns, description)) {
             table.writeRow(System.currentTimeMillis(), ccPercentage, iaPercentage);

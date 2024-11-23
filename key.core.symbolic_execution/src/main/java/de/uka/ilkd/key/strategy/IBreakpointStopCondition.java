@@ -18,14 +18,16 @@ public interface IBreakpointStopCondition extends StopCondition {
     /**
      * Adds a new {@link IBreakpoint}.
      *
-     * @param breakpoint The {@link IBreakpoint} to add.
+     * @param breakpoint
+     *        The {@link IBreakpoint} to add.
      */
     void addBreakpoint(IBreakpoint breakpoint);
 
     /**
      * Removes an {@link IBreakpoint}.
      *
-     * @param breakpoint The {@link IBreakpoint} to remove.
+     * @param breakpoint
+     *        The {@link IBreakpoint} to remove.
      */
     void removeBreakpoint(IBreakpoint breakpoint);
 

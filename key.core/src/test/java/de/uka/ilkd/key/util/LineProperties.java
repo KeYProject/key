@@ -3,19 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.*;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * An infrastructure to read string to string maps from files.
@@ -46,16 +38,12 @@ public class LineProperties {
             if (line.startsWith("###")) {
                 if (lastKey != null) {
                     String str = sb.toString().trim();
-                    if (str.length() > 0) {
-                        map.put(lastKey, str);
-                    }
+                    if (str.length() > 0) { map.put(lastKey, str); }
                 }
                 sb.setLength(0);
 
                 lastKey = line.substring(3).trim();
-                if (lastKey.endsWith(":")) {
-                    lastKey = lastKey.substring(0, lastKey.length() - 1);
-                }
+                if (lastKey.endsWith(":")) { lastKey = lastKey.substring(0, lastKey.length() - 1); }
             } else {
                 sb.append(line).append("\n");
             }
@@ -63,9 +51,7 @@ public class LineProperties {
 
         if (lastKey != null) {
             String str = sb.toString().trim();
-            if (str.length() > 0) {
-                map.put(lastKey, str);
-            }
+            if (str.length() > 0) { map.put(lastKey, str); }
         }
 
     }
@@ -88,9 +74,7 @@ public class LineProperties {
 
     public List<String> getLines(String key) {
         String str = get(key);
-        if (str == null) {
-            return Collections.emptyList();
-        }
+        if (str == null) { return Collections.emptyList(); }
         return Arrays.asList(str.split("\n"));
     }
 

@@ -27,9 +27,7 @@ public class OnlyInScopeOfQuantifiersFeature extends BinaryTacletAppFeature {
         final PIOPathIterator it = pos.iterator();
         while (it.next() != -1) {
             final Term subterm = it.getSubTerm();
-            if (!(subterm.op() instanceof Quantifier)) {
-                return false;
-            }
+            if (!(subterm.op() instanceof Quantifier)) { return false; }
         }
 
         return true;

@@ -28,9 +28,12 @@ public class SquigglyUnderlinePainter implements Highlighter.HighlightPainter {
     /**
      * Creates a new SquigglyUnderlinePainter.
      *
-     * @param highlightColor the color of the line
-     * @param squiggleSize the size (width) of a single arc of the painter
-     * @param lineWidth the line width of the squiggle (1 works best)
+     * @param highlightColor
+     *        the color of the line
+     * @param squiggleSize
+     *        the size (width) of a single arc of the painter
+     * @param lineWidth
+     *        the line width of the squiggle (1 works best)
      */
     public SquigglyUnderlinePainter(Color highlightColor, int squiggleSize, float lineWidth) {
         this.highlightColor = highlightColor;
@@ -41,16 +44,12 @@ public class SquigglyUnderlinePainter implements Highlighter.HighlightPainter {
     @Override
     public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
         // don't render if empty
-        if (offs0 == offs1) {
-            return;
-        }
+        if (offs0 == offs1) { return; }
 
         if (bounds != null) {
             try {
                 g.setColor(highlightColor);
-                if (g instanceof Graphics2D) {
-                    ((Graphics2D) g).setStroke(stroke);
-                }
+                if (g instanceof Graphics2D) { ((Graphics2D) g).setStroke(stroke); }
                 TextUI mapper = c.getUI();
                 Rectangle p0 = mapper.modelToView(c, offs0);
                 Rectangle p1 = mapper.modelToView(c, offs1);

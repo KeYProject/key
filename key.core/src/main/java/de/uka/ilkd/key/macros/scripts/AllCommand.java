@@ -29,14 +29,10 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
     @Override
     protected void execute(Map<String, String> args) throws ScriptException, InterruptedException {
         String wrappedCmdname = args.get("#2");
-        if (wrappedCmdname == null) {
-            throw new ScriptException("Missing command to apply onAll to");
-        }
+        if (wrappedCmdname == null) { throw new ScriptException("Missing command to apply onAll to"); }
 
         ProofScriptCommand<?> command = ProofScriptEngine.getCommand(wrappedCmdname);
-        if (command == null) {
-            throw new ScriptException("Unknown command: " + wrappedCmdname);
-        }
+        if (command == null) { throw new ScriptException("Unknown command: " + wrappedCmdname); }
 
         HashMap<String, String> newArgs = rearrangeArgs(args);
 
@@ -53,9 +49,7 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
         for (Entry<String, String> en : args.entrySet()) {
             if (en.getKey().matches("#[0-9]+")) {
                 int no = Integer.parseInt(en.getKey().substring(1));
-                if (no != 1) {
-                    newArgs.put("#" + (no - 1), en.getValue());
-                }
+                if (no != 1) { newArgs.put("#" + (no - 1), en.getValue()); }
             } else {
                 newArgs.put(en.getKey(), en.getValue());
             }
@@ -78,17 +72,10 @@ public class AllCommand extends AbstractCommand<Map<String, String>> {
     }
 
     private boolean isBelow(Goal g, Node above) {
-        if (above == null) {
-            return true;
-        }
+        if (above == null) { return true; }
 
         Node node = g.node();
-        while (node != null) {
-            if (node == above) {
-                return true;
-            }
-            node = node.parent();
-        }
+        while (node != null) { if (node == above) { return true; } node = node.parent(); }
 
         return false;
     }

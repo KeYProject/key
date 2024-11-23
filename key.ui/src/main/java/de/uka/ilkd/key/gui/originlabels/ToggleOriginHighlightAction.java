@@ -23,7 +23,8 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
     /**
      * Create a new action.
      *
-     * @param mainWindow the main window.
+     * @param mainWindow
+     *        the main window.
      */
     public ToggleOriginHighlightAction(MainWindow mainWindow) {
         super(mainWindow);
@@ -35,7 +36,7 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
         setMenuPath("Origin Tracking");
         setName("Highlight Origins");
         setTooltip("When moving the mouse over a term in the sequent view,"
-            + "highlight its origin in the source view.");
+                + "highlight its origin in the source view.");
         putValue(KeyAction.CHECKBOX, true);
 
         ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().addPropertyChangeListener(

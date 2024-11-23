@@ -95,9 +95,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JComboBox<T> comboBox = new JComboBox<>(elements);
         comboBox.addActionListener(e -> {
             try {
-                if (validator != null) {
-                    validator.validate((T) comboBox.getSelectedItem());
-                }
+                if (validator != null) { validator.validate((T) comboBox.getSelectedItem()); }
                 demarkComponentAsErrornous(comboBox);
             } catch (Exception ex) {
                 markComponentAsErrornous(comboBox, ex.getMessage());
@@ -136,9 +134,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JTextField textField = new JTextField(file);
         textField.addActionListener(e -> {
             try {
-                if (validator != null) {
-                    validator.validate(textField.getText());
-                }
+                if (validator != null) { validator.validate(textField.getText()); }
                 demarkComponentAsErrornous(textField);
             } catch (Exception ex) {
                 markComponentAsErrornous(textField, ex.getMessage());
@@ -181,12 +177,18 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     /**
      * Adds a new combobox to the panel.
      *
-     * @param title label of the combo box
-     * @param info help text
-     * @param selectionIndex which item to initially select
-     * @param validator validator
-     * @param items the items
-     * @param <T> the type of the items
+     * @param title
+     *        label of the combo box
+     * @param info
+     *        help text
+     * @param selectionIndex
+     *        which item to initially select
+     * @param validator
+     *        validator
+     * @param items
+     *        the items
+     * @param <T>
+     *        the type of the items
      * @return the combo box
      */
     protected <T> JComboBox<T> addComboBox(String title, String info, int selectionIndex,
@@ -195,9 +197,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         comboBox.setSelectedIndex(selectionIndex);
         comboBox.addActionListener(e -> {
             try {
-                if (validator != null) {
-                    validator.validate((T) comboBox.getSelectedItem());
-                }
+                if (validator != null) { validator.validate((T) comboBox.getSelectedItem()); }
                 demarkComponentAsErrornous(comboBox);
             } catch (Exception ex) {
                 markComponentAsErrornous(comboBox, ex.getMessage());
@@ -284,15 +284,22 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * text
      * field), otherwise the {@link Validator} will fail.
      *
-     * @param title the title of the text field
-     * @param min the minimum value that can be entered
-     * @param max the maximum value that can be entered
-     * @param step the step size used when changing the entered value using the JSpinner's arrow
+     * @param title
+     *        the title of the text field
+     * @param min
+     *        the minimum value that can be entered
+     * @param max
+     *        the maximum value that can be entered
+     * @param step
+     *        the step size used when changing the entered value using the JSpinner's arrow
      *        buttons
-     * @param info arbitrary information about the text field
-     * @param validator a validator for checking the entered values
+     * @param info
+     *        arbitrary information about the text field
+     * @param validator
+     *        a validator for checking the entered values
      * @return the created JSpinner
-     * @param <T> the class of the minimum value
+     * @param <T>
+     *        the class of the minimum value
      */
     protected <T extends Number & Comparable<T>> JSpinner addNumberField(String title, T min,
             Comparable<T> max, Number step, String info, final Validator<Number> validator) {
@@ -340,11 +347,11 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     /**
      * Creates an empty validator instance.
      *
-     * @param <T> arbitrary
+     * @param <T>
+     *        arbitrary
      * @return non-null
      */
     protected <T> Validator<T> emptyValidator() {
-        return s -> {
-        };
+        return s -> {};
     }
 }

@@ -47,9 +47,7 @@ public class ArrayUtilTest {
     private <T extends @Nullable Object> void assertArray(T[] current, T... expected) {
         assertNotNull(current);
         assertEquals(current.length, expected.length);
-        for (int i = 0; i < current.length; i++) {
-            assertEquals(current[i], expected[i]);
-        }
+        for (int i = 0; i < current.length; i++) { assertEquals(current[i], expected[i]); }
     }
 
     /**
@@ -152,16 +150,16 @@ public class ArrayUtilTest {
     /**
      * Makes sure that the given array contains all values.
      *
-     * @param array The array.
-     * @param expectedValues The expected values.
+     * @param array
+     *        The array.
+     * @param expectedValues
+     *        The expected values.
      */
     @SuppressWarnings("unchecked")
     protected <T> void assertArrayEquals(T[] array, T... expectedValues) {
         assertNotNull(array);
         assertEquals(expectedValues.length, array.length);
-        for (int i = 0; i < expectedValues.length; i++) {
-            assertEquals(expectedValues[i], array[i]);
-        }
+        for (int i = 0; i < expectedValues.length; i++) { assertEquals(expectedValues[i], array[i]); }
     }
 
     /**

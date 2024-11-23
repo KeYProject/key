@@ -70,7 +70,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     @Override
     public String getDescription() {
         return "Applies specificed macro --if it is applicable anywhere on"
-            + "the sequent-- either directly or on the first applicable" + "position found.";
+                + "the sequent-- either directly or on the first applicable" + "position found.";
     }
 
     @Override

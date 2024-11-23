@@ -43,7 +43,8 @@ public final class GenericSort extends SortImpl {
     /**
      * creates a generic sort
      *
-     * @param ext supersorts of this sort, which have to be either concrete sorts or plain generic
+     * @param ext
+     *        supersorts of this sort, which have to be either concrete sorts or plain generic
      *        sorts (i.e. not collection sorts of generic sorts)
      */
     public GenericSort(Name name, ImmutableSet<Sort> ext, ImmutableSet<Sort> oneOf,
@@ -73,9 +74,7 @@ public final class GenericSort extends SortImpl {
             s = it.next();
             if (s instanceof ArraySort) {
                 t = ((ArraySort) s).elementSort();
-                while (t instanceof ArraySort) {
-                    t = ((ArraySort) t).elementSort();
-                }
+                while (t instanceof ArraySort) { t = ((ArraySort) t).elementSort(); }
                 if (t instanceof GenericSort) {
                     throw new GenericSupersortException(
                         "Illegal supersort " + s + " for generic sort " + name(), s);
@@ -113,13 +112,9 @@ public final class GenericSort extends SortImpl {
         while (it.hasNext()) {
             ss = it.next();
             if (ss instanceof GenericSort) {
-                if (!((GenericSort) ss).checkNonGenericSupersorts(p_s)) {
-                    return false;
-                }
+                if (!((GenericSort) ss).checkNonGenericSupersorts(p_s)) { return false; }
             } else {
-                if (!p_s.extendsTrans(ss)) {
-                    return false;
-                }
+                if (!p_s.extendsTrans(ss)) { return false; }
             }
         }
 

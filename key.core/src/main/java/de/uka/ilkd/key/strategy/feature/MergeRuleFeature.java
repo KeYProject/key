@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -32,9 +32,7 @@ public class MergeRuleFeature implements Feature {
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         final Term t = pos.subTerm();
-        if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) {
-            return TopRuleAppCost.INSTANCE;
-        }
+        if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) { return TopRuleAppCost.INSTANCE; }
 
         return JavaTools.getActiveStatement(
             TermBuilder.goBelowUpdates(t).javaBlock()) instanceof MergePointStatement

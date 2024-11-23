@@ -48,9 +48,12 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * Translates the replace and add pattern of a goal template to: find=replace->add <br>
      * Use this method if you want to translate a taclet, where the find pattern is a term.
      *
-     * @param template contains the replace and add pattern that are to be translated.
-     * @param find the find pattern of the taclet, already translated.
-     * @param services TODO
+     * @param template
+     *        contains the replace and add pattern that are to be translated.
+     * @param find
+     *        the find pattern of the taclet, already translated.
+     * @param services
+     *        TODO
      * @return translation
      */
     private Term translateReplaceAndAddTerm(TacletGoalTemplate template, Term find,
@@ -62,12 +65,8 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
         }
         Term add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
-        if (add == null) {
-            add = TacletSections.ADD.getDefaultValue(services);
-        }
-        if (replace == null) {
-            replace = TacletSections.REPLACE.getDefaultValue(services);
-        }
+        if (add == null) { add = TacletSections.ADD.getDefaultValue(services); }
+        if (replace == null) { replace = TacletSections.REPLACE.getDefaultValue(services); }
 
         return tb.imp(tb.equals(find, replace), add);
     }
@@ -76,11 +75,15 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * Translates the replace and add pattern of a goal template to: (find<->replace)->add<br>
      * Use this method if you want to translate a taclet, where the find pattern is a formula.
      *
-     * @param template contains the replace and add pattern that are to be translated.
-     * @param find the find pattern of the taclet, already translated.
-     * @param polarity a value between -1 and 1. describes the expected polarity of the find clause
+     * @param template
+     *        contains the replace and add pattern that are to be translated.
+     * @param find
+     *        the find pattern of the taclet, already translated.
+     * @param polarity
+     *        a value between -1 and 1. describes the expected polarity of the find clause
      *        (-1 antecedent, 0 both, +1 succedent)
-     * @param services TODO
+     * @param services
+     *        TODO
      * @return translation
      */
     private Term translateReplaceAndAddFormula(TacletGoalTemplate template, Term find, int polarity,
@@ -94,15 +97,11 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
         Term add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
-        if (add == null) {
-            add = TacletSections.ADD.getDefaultValue(services);
-        }
-        if (replace == null) {
-            replace = TacletSections.REPLACE.getDefaultValue(services);
-        }
+        if (add == null) { add = TacletSections.ADD.getDefaultValue(services); }
+        if (replace == null) { replace = TacletSections.REPLACE.getDefaultValue(services); }
 
-        assert polarity == 0 || add == TacletSections.ADD.getDefaultValue(services)
-                : "add() commands not allowed in polarity rules (syntactically forbidden)";
+        assert polarity == 0 || add == TacletSections.ADD
+                .getDefaultValue(services) : "add() commands not allowed in polarity rules (syntactically forbidden)";
 
         return tb.imp(translateEquivalence(find, replace, polarity, services), add);
 
@@ -131,12 +130,8 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
                 : TacletSections.ADD.getDefaultValue(services);
         Term rep = replace == null ? TacletSections.REPLACE.getDefaultValue(services)
                 : translate(replace, services);
-        if (add == null) {
-            add = TacletSections.ADD.getDefaultValue(services);
-        }
-        if (rep == null) {
-            rep = TacletSections.REPLACE.getDefaultValue(services);
-        }
+        if (add == null) { add = TacletSections.ADD.getDefaultValue(services); }
+        if (rep == null) { rep = TacletSections.REPLACE.getDefaultValue(services); }
         return tb.or(rep, add);
     }
 
@@ -156,9 +151,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
         // translate the find pattern.
         if (taclet instanceof FindTaclet findTaclet) {
-            if (getFindFromTaclet(findTaclet) != null) {
-                find = getFindFromTaclet(findTaclet);
-            }
+            if (getFindFromTaclet(findTaclet) != null) { find = getFindFromTaclet(findTaclet); }
         }
 
         // translate the replace and add patterns of the taclet.
@@ -197,9 +190,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
 
         if (taclet instanceof AntecTaclet || taclet instanceof SuccTaclet) {
-            if (taclet instanceof AntecTaclet) {
-                find = tb.not(find);
-            }
+            if (taclet instanceof AntecTaclet) { find = tb.not(find); }
             return tb.imp(tb.and(list), tb.or(find, assum));
         }
         return tb.imp(tb.and(list), assum);
@@ -211,7 +202,8 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      * Originally, this simply calls {@link FindTaclet#find()}. Overriding classes may choose to
      * garnish the result with additional information.
      *
-     * @param findTaclet a non-null taclet instance
+     * @param findTaclet
+     *        a non-null taclet instance
      * @return the find clause of the argument
      */
     protected Term getFindFromTaclet(FindTaclet findTaclet) {

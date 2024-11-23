@@ -59,9 +59,7 @@ public class SettingsUi extends JPanel {
                     lbl = (JLabel) super.getTreeCellRendererComponent(tree, panel.getDescription(),
                         sel, expanded, leaf, row, hasFocus);
 
-                    if (node.isLeaf()) {
-                        lbl.setIcon(panel.getIcon());
-                    }
+                    if (node.isLeaf()) { lbl.setIcon(panel.getIcon()); }
                     lbl.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
                     if (!txtSearch.getText().isEmpty() && panel.contains(txtSearch.getText())) {
                         lbl.setBackground(Color.black);
@@ -130,7 +128,8 @@ public class SettingsUi extends JPanel {
     /**
      * Configure the settings providers to display. Calculates the maximum width of the settings UI.
      *
-     * @param providers settings providers
+     * @param providers
+     *        settings providers
      * @return maximum width of the dialog
      */
     public int setSettingsProvider(List<SettingsProvider> providers) {
@@ -141,23 +140,16 @@ public class SettingsUi extends JPanel {
         getPaths(new TreePath(treeModel.getPathToRoot(root)), list);
         list.forEach(treeSettingsPanels::expandPath);
 
-        if (!providers.isEmpty()) {
-            setSettingsPanel(providers.get(0).getPanel(mainWindow));
-        }
+        if (!providers.isEmpty()) { setSettingsPanel(providers.get(0).getPanel(mainWindow)); }
         // determine optimal dialog width
-        if (calculatedWidth != 0) {
-            return calculatedWidth;
-        }
+        if (calculatedWidth != 0) { return calculatedWidth; }
         int w = providers.stream().flatMap(x -> {
             // collect all children providers
             List<SettingsProvider> all = new ArrayList<>();
             List<SettingsProvider> q = List.of(x);
             while (!q.isEmpty()) {
                 List<SettingsProvider> newQ = new ArrayList<>();
-                for (var provider : q) {
-                    all.add(provider);
-                    newQ.addAll(provider.getChildren());
-                }
+                for (var provider : q) { all.add(provider); newQ.addAll(provider.getChildren()); }
                 q = newQ;
             }
             return all.stream();
@@ -196,9 +188,7 @@ public class SettingsUi extends JPanel {
         nodes.offer((SettingsTreeNode) treeModel.getRoot());
         while (!nodes.isEmpty()) {
             SettingsTreeNode cur = nodes.poll();
-            if (cur.provider == provider) {
-                return cur;
-            }
+            if (cur.provider == provider) { return cur; }
             nodes.addAll(cur.children);
         }
         return null;

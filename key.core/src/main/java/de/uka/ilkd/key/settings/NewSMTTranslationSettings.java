@@ -38,7 +38,8 @@ public class NewSMTTranslationSettings extends AbstractSettings {
     /**
      * Creates a new settings objects by copying the entries from the argument.
      *
-     * @param toCopy a non-null settings object to take entries from
+     * @param toCopy
+     *        a non-null settings object to take entries from
      */
     public NewSMTTranslationSettings(NewSMTTranslationSettings toCopy) {
         map.putAll(toCopy.map);
@@ -62,17 +63,13 @@ public class NewSMTTranslationSettings extends AbstractSettings {
     public void readSettings(Properties props) {
         for (Object k : props.keySet()) {
             String key = k.toString();
-            if (key.startsWith(PREFIX)) {
-                map.put(key.substring(PREFIX.length()), props.getProperty(key));
-            }
+            if (key.startsWith(PREFIX)) { map.put(key.substring(PREFIX.length()), props.getProperty(key)); }
         }
     }
 
     @Override
     public void writeSettings(Properties props) {
-        for (Entry<String, String> en : map.entrySet()) {
-            props.put(PREFIX + en.getKey(), en.getValue());
-        }
+        for (Entry<String, String> en : map.entrySet()) { props.put(PREFIX + en.getKey(), en.getValue()); }
     }
 
     @Override
@@ -90,9 +87,7 @@ public class NewSMTTranslationSettings extends AbstractSettings {
     @Override
     public void writeSettings(Configuration props) {
         var newSmt = props.getOrCreateSection("NewSMT");
-        for (Entry<String, String> en : map.entrySet()) {
-            newSmt.set(en.getKey(), en.getValue());
-        }
+        for (Entry<String, String> en : map.entrySet()) { newSmt.set(en.getKey(), en.getValue()); }
     }
 
 
@@ -108,7 +103,8 @@ public class NewSMTTranslationSettings extends AbstractSettings {
     /**
      * Retrieve a single value from the underlying hashmap
      *
-     * @param key the key to look up
+     * @param key
+     *        the key to look up
      * @return the value for the key, null if not present
      */
     public String get(String key) {
@@ -118,8 +114,10 @@ public class NewSMTTranslationSettings extends AbstractSettings {
     /**
      * Set a key-value-pair. All listeners are informed after the internal hashmap has been updated.
      *
-     * @param key the non-null key to set
-     * @param value the non-null value to set
+     * @param key
+     *        the non-null key to set
+     * @param value
+     *        the non-null value to set
      * @return the value that was in the map prior to the call (see {@link Map#put(Object, Object)}.
      */
     public String put(String key, String value) {

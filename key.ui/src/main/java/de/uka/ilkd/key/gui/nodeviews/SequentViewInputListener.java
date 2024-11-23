@@ -112,20 +112,14 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
 
     @Override
     public void mouseExited(MouseEvent e) {
-        if (sequentView.refreshHighlightning) {
-            sequentView.disableHighlights();
-        }
+        if (sequentView.refreshHighlightning) { sequentView.disableHighlights(); }
 
-        if (sequentView.isInUserSelectionHighlight(null)) {
-            highlightOriginInSourceView(null);
-        }
+        if (sequentView.isInUserSelectionHighlight(null)) { highlightOriginInSourceView(null); }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (!sequentView.isMainSequentView()) {
-            return;
-        }
+        if (!sequentView.isMainSequentView()) { return; }
 
         if (SwingUtilities.isMiddleMouseButton(e)
                 || e.isControlDown() && SwingUtilities.isLeftMouseButton(e)) {
@@ -152,7 +146,8 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
     /**
      * Highlights the origin of the term at the specified position.
      *
-     * @param pos the position of the term whose origin should be highlighted.
+     * @param pos
+     *        the position of the term whose origin should be highlighted.
      */
     public void highlightOriginInSourceView(PosInSequent pos) {
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin()) {
@@ -165,9 +160,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
         originHighlights.forEach(sourceView::removeHighlight);
         originHighlights.clear();
 
-        if (pos == null || pos.getPosInOccurrence() == null) {
-            return;
-        }
+        if (pos == null || pos.getPosInOccurrence() == null) { return; }
 
         FileOrigin origin;
         Set<FileOrigin> subtermOrigins;
@@ -211,7 +204,8 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
     /**
      * Show info about the term at the specified point in the status line.
      *
-     * @param p a point.
+     * @param p
+     *        a point.
      */
     protected void showTermInfo(Point p) {
         MainWindow mainWindow = sequentView.getMainWindow();

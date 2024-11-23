@@ -62,9 +62,7 @@ class UniTrigger implements Trigger {
         ImmutableSet<Substitution> newSubs = DefaultImmutableSet.nil();
         if (t.freeVars().size() > 0 || t.op() instanceof Quantifier) {
             newSubs = Matching.twoSidedMatching(this, t, services);
-        } else if (!onlyUnify) {
-            newSubs = Matching.basicMatching(this, t);
-        }
+        } else if (!onlyUnify) { newSubs = Matching.basicMatching(this, t); }
         return newSubs;
     }
 
@@ -74,9 +72,7 @@ class UniTrigger implements Trigger {
     }
 
     public boolean equals(Object arg0) {
-        if (!(arg0 instanceof UniTrigger a)) {
-            return false;
-        }
+        if (!(arg0 instanceof UniTrigger a)) { return false; }
         return a.trigger.equals(trigger);
     }
 
@@ -110,9 +106,7 @@ class UniTrigger implements Trigger {
 
         for (Substitution subst1 : substs) {
             final Substitution subst = subst1;
-            if (containsLoop(subst)) {
-                return false;
-            }
+            if (containsLoop(subst)) { return false; }
         }
         return true;
     }
@@ -122,11 +116,7 @@ class UniTrigger implements Trigger {
      */
     private static boolean containsLoop(Substitution subst) {
         final Iterator<QuantifiableVariable> it = subst.getVarMap().keyIterator();
-        while (it.hasNext()) {
-            if (containsLoop(subst.getVarMap(), it.next())) {
-                return true;
-            }
-        }
+        while (it.hasNext()) { if (containsLoop(subst.getVarMap(), it.next())) { return true; } }
         return false;
     }
 
@@ -139,9 +129,7 @@ class UniTrigger implements Trigger {
         ImmutableList<Term> fringe = ImmutableSLList.nil();
         Term checkForCycle = varMap.get(var);
 
-        if (checkForCycle.op() == var) {
-            return false;
-        }
+        if (checkForCycle.op() == var) { return false; }
 
         while (true) {
             for (QuantifiableVariable quantifiableVariable : checkForCycle.freeVars()) {
@@ -149,23 +137,17 @@ class UniTrigger implements Trigger {
                 if (!body.contains(termVar)) {
                     final Term termVarterm = varMap.get(termVar);
                     if (termVarterm != null) {
-                        if (termVarterm.freeVars().contains(var)) {
-                            return true;
-                        }
+                        if (termVarterm.freeVars().contains(var)) { return true; }
                         fringe = fringe.prepend(termVarterm);
                     }
 
-                    if (termVar == var) {
-                        return true;
-                    }
+                    if (termVar == var) { return true; }
 
                     body = body.prepend(termVar);
                 }
             }
 
-            if (fringe.isEmpty()) {
-                return false;
-            }
+            if (fringe.isEmpty()) { return false; }
 
             checkForCycle = fringe.head();
             fringe = fringe.tail();

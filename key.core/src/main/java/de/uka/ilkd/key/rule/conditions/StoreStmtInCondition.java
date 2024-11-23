@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -42,9 +42,7 @@ public class StoreStmtInCondition implements VariableCondition {
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
-        if (svInst.getInstantiation(storeInSV) != null) {
-            return matchCond;
-        }
+        if (svInst.getInstantiation(storeInSV) != null) { return matchCond; }
 
         final LightweightSyntacticalReplaceVisitor replVisitor = //
             new LightweightSyntacticalReplaceVisitor(svInst, services);

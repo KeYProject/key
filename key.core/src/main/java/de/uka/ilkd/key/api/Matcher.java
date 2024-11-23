@@ -36,7 +36,8 @@ public class Matcher {
     /**
      * Creates a new matcher for the given proof and environment.
      *
-     * @param api reference to proof api in order to get access to the key environment
+     * @param api
+     *        reference to proof api in order to get access to the key environment
      */
     public Matcher(ProofApi api) {
         this.api = api;
@@ -47,10 +48,13 @@ public class Matcher {
      * containing matching results from where the information about instantiated schema variables
      * can be extracted. If no match was possible the list is exmpt.
      *
-     * @param pattern a string representation of the pattern sequent against which the current
+     * @param pattern
+     *        a string representation of the pattern sequent against which the current
      *        sequent should be matched
-     * @param currentSeq current concrete sequent
-     * @param assignments variables appearing in the pattern as schemavariables with their
+     * @param currentSeq
+     *        current concrete sequent
+     * @param assignments
+     *        variables appearing in the pattern as schemavariables with their
      *        corresponding type in KeY
      * @return List of VariableAssignments (possibly empty if no match was found)
      */
@@ -87,9 +91,7 @@ public class Matcher {
 
             SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];
             int i = 0;
-            for (SequentFormula fm : patternSeq) {
-                patternArray[i++] = fm;
-            }
+            for (SequentFormula fm : patternSeq) { patternArray[i++] = fm; }
 
 
             Queue<SearchNode> queue = new LinkedList<>();
@@ -134,7 +136,8 @@ public class Matcher {
     /**
      * Extract the matching results from each SearchNode and tranform these to Variable Assigments
      *
-     * @param sn SearchNode
+     * @param sn
+     *        SearchNode
      * @return VariableAssigments containing the assignments fo matching results to schemavariables
      */
     private VariableAssignments extractAssignments(SearchNode sn, VariableAssignments assignments) {
@@ -153,7 +156,8 @@ public class Matcher {
     /**
      * Adds the variables of VariableAssignments to the namespace
      *
-     * @param assignments VariabelAssignments containing variable names and types
+     * @param assignments
+     *        VariabelAssignments containing variable names and types
      */
     private void buildNameSpace(VariableAssignments assignments, Services services) {
         String decalarations = buildDecls(assignments);
@@ -164,7 +168,8 @@ public class Matcher {
     /**
      * Builds a string that is used to create a new schemavariable declaration for the matchpattern
      *
-     * @param assignments varaiables appearing as schema varaibels in the match pattern and their
+     * @param assignments
+     *        varaiables appearing as schema varaibels in the match pattern and their
      *        types (in KeY)
      * @return a String representing the declaration part of a taclet for teh matchpattern
      */
@@ -187,7 +192,8 @@ public class Matcher {
     /**
      * Parse the declaration string for the current pattern and add the variables to the namespace
      *
-     * @param s declaration part of a taclet
+     * @param s
+     *        declaration part of a taclet
      */
     public void parseDecls(String s, Services services) {
         try {

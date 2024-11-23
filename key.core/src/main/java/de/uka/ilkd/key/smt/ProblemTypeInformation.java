@@ -10,9 +10,9 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.Field;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
@@ -116,7 +116,7 @@ public class ProblemTypeInformation {
      */
     public Set<String> getFieldsForSort(Sort s) {
         Set<String> result = new HashSet<>();
-        result.add(Util.processName("java.lang.Object::<created>"));
+        result.add(Util.processName("java.lang.Object::#$created"));
 
         JavaInfo info = services.getJavaInfo();
 
@@ -125,15 +125,12 @@ public class ProblemTypeInformation {
         if (kjt != null && kjt.getJavaType() instanceof ClassDeclaration c) {
 
             for (KeYJavaType sp : info.getAllSupertypes(kjt)) {
-                if (!sp.equals(kjt)) {
-                    result.addAll(getFieldsForSort(sp.getSort()));
-                }
+                if (!sp.equals(kjt)) { result.addAll(getFieldsForSort(sp.getSort())); }
             }
 
             for (Field f : info.getAllFields(c)) {
 
                 String name = f.getFullName();
-                // name = name.replace("::", "::$");
                 name = Util.processName(name);
                 result.add(name);
 
@@ -176,9 +173,7 @@ public class ProblemTypeInformation {
 
         StringBuilder s = new StringBuilder(Long.toBinaryString(val));
 
-        while (s.length() < 3) {
-            s.insert(0, "0");
-        }
+        while (s.length() < 3) { s.insert(0, "0"); }
 
         return s.toString();
 

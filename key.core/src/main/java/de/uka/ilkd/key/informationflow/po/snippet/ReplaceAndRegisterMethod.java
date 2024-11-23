@@ -52,10 +52,10 @@ abstract class ReplaceAndRegisterMethod {
             Term poTerm = poVarsIt.next();
             if (origTerm != null && poTerm != null) {
                 assert poTerm.sort().equals(origTerm.sort())
-                        || poTerm.sort().extendsSorts().contains(origTerm.sort())
-                        : "mismatch of sorts: orignal term " + origTerm + ", sort "
-                            + origTerm.sort() + "; replacement term" + poTerm + ", sort "
-                            + poTerm.sort();
+                        || poTerm.sort().extendsSorts().contains(origTerm.sort()) : "mismatch of sorts: orignal term "
+                                + origTerm + ", sort "
+                                + origTerm.sort() + "; replacement term" + poTerm + ", sort "
+                                + poTerm.sort();
                 map.put(origTerm, poTerm);
             }
         }
@@ -77,17 +77,13 @@ abstract class ReplaceAndRegisterMethod {
     final InfFlowSpec replace(InfFlowSpec terms, StateVars origVars, StateVars poVars,
             TermBuilder tb) {
         ImmutableList<Term> resultPreExps = ImmutableSLList.nil();
-        for (Term t : terms.preExpressions) {
-            resultPreExps = resultPreExps.append(replace(t, origVars, poVars, tb));
-        }
+        for (Term t : terms.preExpressions) { resultPreExps = resultPreExps.append(replace(t, origVars, poVars, tb)); }
         ImmutableList<Term> resultPostExps = ImmutableSLList.nil();
         for (Term t : terms.postExpressions) {
             resultPostExps = resultPostExps.append(replace(t, origVars, poVars, tb));
         }
         ImmutableList<Term> resultNewObjecs = ImmutableSLList.nil();
-        for (Term t : terms.newObjects) {
-            resultNewObjecs = resultNewObjecs.append(replace(t, origVars, poVars, tb));
-        }
+        for (Term t : terms.newObjects) { resultNewObjecs = resultNewObjecs.append(replace(t, origVars, poVars, tb)); }
         return new InfFlowSpec(resultPreExps, resultPostExps, resultNewObjecs);
     }
 
@@ -96,9 +92,7 @@ abstract class ReplaceAndRegisterMethod {
             StateVars poVars, TermBuilder tb) {
         final InfFlowSpec[] result = new InfFlowSpec[termss.size()];
         Iterator<InfFlowSpec> it = termss.iterator();
-        for (int i = 0; it.hasNext(); i++) {
-            result[i] = replace(it.next(), origVars, poVars, tb);
-        }
+        for (int i = 0; it.hasNext(); i++) { result[i] = replace(it.next(), origVars, poVars, tb); }
         return result;
     }
 
@@ -125,16 +119,12 @@ abstract class ReplaceAndRegisterMethod {
 
     final void register(ProgramVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
-        if (pv != null && progVarNames.lookup(pv.name()) == null) {
-            progVarNames.addSafely(pv);
-        }
+        if (pv != null && progVarNames.lookup(pv.name()) == null) { progVarNames.addSafely(pv); }
     }
 
 
     final void register(ImmutableList<ProgramVariable> pvs, Services services) {
-        for (ProgramVariable pv : pvs) {
-            register(pv, services);
-        }
+        for (ProgramVariable pv : pvs) { register(pv, services); }
     }
 
 
@@ -149,9 +139,7 @@ abstract class ReplaceAndRegisterMethod {
     static Term replaceQuantifiableVariables(Term term, Set<QuantifiableVariable> qvs,
             Services services) {
         Map<QuantifiableVariable, QuantifiableVariable> replaceMap = new LinkedHashMap<>();
-        for (QuantifiableVariable qv : qvs) {
-            replaceMap.put(qv, new LogicVariable(qv.name(), qv.sort()));
-        }
+        for (QuantifiableVariable qv : qvs) { replaceMap.put(qv, new LogicVariable(qv.name(), qv.sort())); }
         final OpReplacer op =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
         term = TermLabelManager.removeIrrelevantLabels(term, services.getTermFactory());
@@ -174,9 +162,7 @@ abstract class ReplaceAndRegisterMethod {
 
         @Override
         public void visit(Term visited) {
-            for (var boundVar : visited.boundVars()) {
-                vars.add(boundVar);
-            }
+            for (var boundVar : visited.boundVars()) { vars.add(boundVar); }
         }
 
         @Override
@@ -185,6 +171,8 @@ abstract class ReplaceAndRegisterMethod {
         @Override
         public void subtreeLeft(Term subtreeRoot) { /* nothing to do */ }
 
-        public Set<QuantifiableVariable> getResult() { return vars; }
+        public Set<QuantifiableVariable> getResult() {
+            return vars;
+        }
     }
 }

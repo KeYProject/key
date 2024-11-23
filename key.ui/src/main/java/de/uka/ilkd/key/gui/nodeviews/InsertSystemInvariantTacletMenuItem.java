@@ -31,9 +31,12 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
     /**
      * creates an instance of the insert hidden menu item
      *
-     * @param parent the JFrame with the parent frame
-     * @param notInfo the NotationInfo to be used for pretty printing the apps
-     * @param services the Services
+     * @param parent
+     *        the JFrame with the parent frame
+     * @param notInfo
+     *        the NotationInfo to be used for pretty printing the apps
+     * @param services
+     *        the Services
      */
     public InsertSystemInvariantTacletMenuItem(JFrame parent, NotationInfo notInfo,
             Services services) {
@@ -44,7 +47,8 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
      * determines the sequent with the formulas to be added or null if the given taclet is not
      * thought to be displayed by this component
      *
-     * @param t the Taclet
+     * @param t
+     *        the Taclet
      * @return the sequent with the formulas to be added or null
      */
     protected Sequent checkTaclet(Taclet t) {
@@ -54,9 +58,7 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
         }
 
         final ImmutableList<TacletGoalTemplate> goalTemplates = t.goalTemplates();
-        if (goalTemplates.size() != 1) {
-            return null;
-        }
+        if (goalTemplates.size() != 1) { return null; }
         return goalTemplates.head().sequent();
     }
 

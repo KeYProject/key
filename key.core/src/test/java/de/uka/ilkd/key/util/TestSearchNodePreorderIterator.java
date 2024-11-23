@@ -106,28 +106,25 @@ public class TestSearchNodePreorderIterator {
     /**
      * Starts at all {@link Node}s of the given proof tree a traversal.
      *
-     * @param root The root of the proof tree.
+     * @param root
+     *        The root of the proof tree.
      */
     protected void assertRoot(Node root) {
         // List children
         NodePreorderIterator iter = new NodePreorderIterator(root);
         ImmutableList<Node> childList = ImmutableSLList.nil();
-        while (iter.hasNext()) {
-            Node next = iter.next();
-            childList = childList.append(next);
-        }
+        while (iter.hasNext()) { Node next = iter.next(); childList = childList.append(next); }
         // Test each child
-        while (!childList.isEmpty()) {
-            assertPreorder(childList.head(), childList);
-            childList = childList.take(1);
-        }
+        while (!childList.isEmpty()) { assertPreorder(childList.head(), childList); childList = childList.take(1); }
     }
 
     /**
      * Tests a iteration starting at the given {@link Node}.
      *
-     * @param start The {@link Node} to start iteration.
-     * @param expectedChildList The expected previous {@link Node}s.
+     * @param start
+     *        The {@link Node} to start iteration.
+     * @param expectedChildList
+     *        The expected previous {@link Node}s.
      */
     protected void assertPreorder(Node start, ImmutableList<Node> expectedChildList) {
         SearchNodePreorderIterator iter = new SearchNodePreorderIterator(start);
@@ -144,8 +141,10 @@ public class TestSearchNodePreorderIterator {
     /**
      * Appends a new node to the given parent {@link Node}.
      *
-     * @param proof The {@link Proof} which forms the test model.
-     * @param parent The parent {@link Node} to add to.
+     * @param proof
+     *        The {@link Proof} which forms the test model.
+     * @param parent
+     *        The parent {@link Node} to add to.
      * @return The new created child {@link Node}.
      */
     protected Node appendNode(Proof proof, Node parent) {
@@ -157,7 +156,8 @@ public class TestSearchNodePreorderIterator {
     /**
      * Sets a new root {@link Node} on the proof.
      *
-     * @param proof The {@link Proof} to set root on.
+     * @param proof
+     *        The {@link Proof} to set root on.
      * @return The created root {@link Node}.
      */
     protected Node appendRoot(Proof proof) {

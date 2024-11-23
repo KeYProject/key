@@ -56,13 +56,13 @@ public final class TruthValueTracingUtil {
     /**
      * Forbid instances.
      */
-    private TruthValueTracingUtil() {
-    }
+    private TruthValueTracingUtil() {}
 
     /**
      * Checks if the given {@link SequentFormula} is a predicate.
      *
-     * @param sequentFormula The {@link SequentFormula} to check.
+     * @param sequentFormula
+     *        The {@link SequentFormula} to check.
      * @return {@code true} is predicate, {@code false} is something else.
      */
     public static boolean isPredicate(SequentFormula sequentFormula) {
@@ -72,7 +72,8 @@ public final class TruthValueTracingUtil {
     /**
      * Checks if the given {@link Term} is a predicate.
      *
-     * @param term The {@link Term} to check.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code true} is predicate, {@code false} is something else.
      */
     public static boolean isPredicate(Term term) {
@@ -82,7 +83,8 @@ public final class TruthValueTracingUtil {
     /**
      * Checks if the given {@link Operator} is a predicate.
      *
-     * @param operator The {@link Operator} to check.
+     * @param operator
+     *        The {@link Operator} to check.
      * @return {@code true} is predicate, {@code false} is something else.
      */
     public static boolean isPredicate(Operator operator) {
@@ -106,7 +108,8 @@ public final class TruthValueTracingUtil {
     /**
      * Checks if the given {@link Term} is a logical operator
      *
-     * @param term The {@link Term} to check.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code true} is logical operator, {@code false} is something else.
      */
     public static boolean isLogicOperator(Term term) {
@@ -120,8 +123,10 @@ public final class TruthValueTracingUtil {
     /**
      * Checks if the given {@link Operator} and its sub {@link Term}s specify a logical operator.
      *
-     * @param operator The {@link Operator}.
-     * @param subs The sub {@link Term}s.
+     * @param operator
+     *        The {@link Operator}.
+     * @param subs
+     *        The sub {@link Term}s.
      * @return {@code true} is logical operator, {@code false} is something else.
      */
     public static boolean isLogicOperator(Operator operator, ImmutableArray<Term> subs) {
@@ -136,7 +141,8 @@ public final class TruthValueTracingUtil {
     /**
      * Checks if the given {@link Term} is an if-then-else formula.
      *
-     * @param term The {@link Term} to check.
+     * @param term
+     *        The {@link Term} to check.
      * @return {@code true} is if-then-else formula, {@code false} is something else.
      */
     public static boolean isIfThenElseFormula(Term term) {
@@ -151,16 +157,16 @@ public final class TruthValueTracingUtil {
      * Checks if the given {@link Operator} and its sub {@link Term}s specify an if-then-else
      * formula.
      *
-     * @param operator The {@link Operator}.
-     * @param subs The sub {@link Term}s.
+     * @param operator
+     *        The {@link Operator}.
+     * @param subs
+     *        The sub {@link Term}s.
      * @return {@code true} is if-then-else formula, {@code false} is something else.
      */
     public static boolean isIfThenElseFormula(Operator operator, ImmutableArray<Term> subs) {
         if (operator == IfThenElse.IF_THEN_ELSE) {
             Sort[] sorts = new Sort[subs.size()];
-            for (int i = 0; i < sorts.length; i++) {
-                sorts[i] = subs.get(i).sort();
-            }
+            for (int i = 0; i < sorts.length; i++) { sorts[i] = subs.get(i).sort(); }
             Sort sort = operator.sort(sorts);
             return sort == JavaDLTheory.FORMULA;
         } else {
@@ -172,14 +178,19 @@ public final class TruthValueTracingUtil {
      * Evaluates the truth values in the subtree of the given {@link Node} for predicates labeled
      * with the given {@link TermLabel} name.
      *
-     * @param node The {@link Node} to start evaluation at.
-     * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param node
+     *        The {@link Node} to start evaluation at.
+     * @param termLabelName
+     *        The {@link Name} of the {@link TermLabel} to consider.
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
      * @return The result.
-     * @throws ProofInputException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
      */
     public static TruthValueTracingResult evaluate(Node node, Name termLabelName,
             boolean useUnicode, boolean usePrettyPrinting) throws ProofInputException {
@@ -203,9 +214,7 @@ public final class TruthValueTracingUtil {
             evaluateNode(node, useUnicode, usePrettyPrinting, next, childIndexOnParnt,
                 termLabelName, nodeResults, result, services);
             // Remove no longer needed child result of returned nodes
-            for (int i = 0; i < iterator.getReturnedParents(); i++) {
-                evaluationStack.removeFirst();
-            }
+            for (int i = 0; i < iterator.getReturnedParents(); i++) { evaluationStack.removeFirst(); }
         }
         return result;
     }
@@ -213,18 +222,28 @@ public final class TruthValueTracingUtil {
     /**
      * Evaluates the truth statuses changed from the parent {@link Node} to its child {@link Node}.
      *
-     * @param evaluationNode The {@link Node} where the truth status tracing started.
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param evaluationNode
+     *        The {@link Node} where the truth status tracing started.
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param child The current child {@link Node} to analyze.
-     * @param childIndexOnParent The index of the child {@link Node} on its parent {@link Node}.
-     * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
-     * @param nodeResult The to child {@link Node} related result {@link Map} to update.
-     * @param result The overall {@link TruthValueTracingResult} to update.
-     * @param services The {@link Services} to use.
-     * @throws ProofInputException Occurred exception.
+     * @param child
+     *        The current child {@link Node} to analyze.
+     * @param childIndexOnParent
+     *        The index of the child {@link Node} on its parent {@link Node}.
+     * @param termLabelName
+     *        The {@link Name} of the {@link TermLabel} to consider.
+     * @param nodeResult
+     *        The to child {@link Node} related result {@link Map} to update.
+     * @param result
+     *        The overall {@link TruthValueTracingResult} to update.
+     * @param services
+     *        The {@link Services} to use.
+     * @throws ProofInputException
+     *         Occurred exception.
      */
     private static void evaluateNode(
             final Node evaluationNode, final boolean useUnicode,
@@ -280,8 +299,7 @@ public final class TruthValueTracingUtil {
                 // Compare last PIO with PIO in child sequent (Attention: Child PIO is computed with
                 // help of the PIO of the OSS)
                 if (parentPio != null) {
-                    assert 1 == parent.childrenCount()
-                            : "Implementaton of the OneStepSimplifierRule has changed.";
+                    assert 1 == parent.childrenCount() : "Implementaton of the OneStepSimplifierRule has changed.";
                     PosInOccurrence childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(
                         parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(0));
                     updatePredicateResultBasedOnNewMinorIdsOSS(childPio, parentPio, termLabelName,
@@ -307,7 +325,8 @@ public final class TruthValueTracingUtil {
     /**
      * Checks if the {@link Taclet} is a closing rule.
      *
-     * @param taclet The {@link Taclet} to check.
+     * @param taclet
+     *        The {@link Taclet} to check.
      * @return {@code true} is closing, {@code false} is not closing.
      */
     private static boolean isClosingRule(Taclet taclet) {
@@ -317,9 +336,12 @@ public final class TruthValueTracingUtil {
     /**
      * Computes the occurrences of all involved {@link FormulaTermLabel}s.
      *
-     * @param sequent The {@link Sequent} on which the given {@link TacletApp} was applied.
-     * @param tacletApp The applied {@link TacletApp}.
-     * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
+     * @param sequent
+     *        The {@link Sequent} on which the given {@link TacletApp} was applied.
+     * @param tacletApp
+     *        The applied {@link TacletApp}.
+     * @param termLabelName
+     *        The {@link Name} of the {@link TermLabel} to consider.
      * @return The found {@link LabelOccurrence}s.
      */
     private static List<LabelOccurrence> findInvolvedLabels(
@@ -357,59 +379,68 @@ public final class TruthValueTracingUtil {
     /**
      * Utility class which specifies the occurrence of a {@link FormulaTermLabel}.
      *
-     * @param label        The {@link FormulaTermLabel}.
-     * @param inAntecedent {@code true} occurred in antecedent, {@code false} occurred in succedent.
+     * @param label
+     *        The {@link FormulaTermLabel}.
+     * @param inAntecedent
+     *        {@code true} occurred in antecedent, {@code false} occurred in succedent.
      * @author Martin Hentschel
      */
-        private record LabelOccurrence(FormulaTermLabel label, boolean inAntecedent) {
+    private record LabelOccurrence(FormulaTermLabel label, boolean inAntecedent) {
         /**
          * Constructor.
          *
-         * @param label        The {@link FormulaTermLabel}.
-         * @param inAntecedent {@code true} occurred in antecedent, {@code false} occurred in
-         *                     succedent.
+         * @param label
+         *        The {@link FormulaTermLabel}.
+         * @param inAntecedent
+         *        {@code true} occurred in antecedent, {@code false} occurred in
+         *        succedent.
          */
-        private LabelOccurrence {
+        private LabelOccurrence {}
+
+        /**
+         * Returns the {@link FormulaTermLabel}.
+         *
+         * @return The {@link FormulaTermLabel}.
+         */
+        @Override
+        public FormulaTermLabel label() {
+            return label;
         }
 
-            /**
-             * Returns the {@link FormulaTermLabel}.
-             *
-             * @return The {@link FormulaTermLabel}.
-             */
-            @Override
-            public FormulaTermLabel label() {
-                return label;
-            }
-
-            /**
-             * Checks if the label occurred in antecedent or succedent.
-             *
-             * @return {@code true} occurred in antecedent, {@code false} occurred in succedent.
-             */
-            @Override
-            public boolean inAntecedent() {
-                return inAntecedent;
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String toString() {
-                return label + (inAntecedent ? " in antecedent" : " in succedent");
-            }
+        /**
+         * Checks if the label occurred in antecedent or succedent.
+         *
+         * @return {@code true} occurred in antecedent, {@code false} occurred in succedent.
+         */
+        @Override
+        public boolean inAntecedent() {
+            return inAntecedent;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return label + (inAntecedent ? " in antecedent" : " in succedent");
+        }
+    }
 
     /**
      * Analyzes the given {@link TacletGoalTemplate}.
      *
-     * @param parent The current {@link Node} on which the rule was applied.
-     * @param tacletApp The {@link TacletApp}.
-     * @param tacletGoal The {@link TacletGoalTemplate}.
-     * @param labels The {@link FormulaTermLabel}s.
-     * @param services The {@link Services} to use.
-     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
+     * @param parent
+     *        The current {@link Node} on which the rule was applied.
+     * @param tacletApp
+     *        The {@link TacletApp}.
+     * @param tacletGoal
+     *        The {@link TacletGoalTemplate}.
+     * @param labels
+     *        The {@link FormulaTermLabel}s.
+     * @param services
+     *        The {@link Services} to use.
+     * @param results
+     *        The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void analyzeTacletGoal(
             Node parent, TacletApp tacletApp,
@@ -421,14 +452,10 @@ public final class TruthValueTracingUtil {
                 tacletApp, services);
             if (replaceTerm.op() == Junctor.TRUE) {
                 // Find term is replaced by true
-                for (LabelOccurrence occurrence : labels) {
-                    updatePredicateResult(occurrence.label(), true, results);
-                }
+                for (LabelOccurrence occurrence : labels) { updatePredicateResult(occurrence.label(), true, results); }
             } else if (replaceTerm.op() == Junctor.FALSE) {
                 // Find term is replaced by false
-                for (LabelOccurrence occurrence : labels) {
-                    updatePredicateResult(occurrence.label(), false, results);
-                }
+                for (LabelOccurrence occurrence : labels) { updatePredicateResult(occurrence.label(), false, results); }
             }
         }
     }
@@ -437,10 +464,14 @@ public final class TruthValueTracingUtil {
      * Updates the predicate results based on minor ID changes if available in case of
      * {@link OneStepSimplifier} usage.
      *
-     * @param childPio The child position
-     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-     * @param tb The {@link TermBuilder} to use.
-     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
+     * @param childPio
+     *        The child position
+     * @param termLabelName
+     *        The name of the {@link TermLabel} which is added to predicates.
+     * @param tb
+     *        The {@link TermBuilder} to use.
+     * @param results
+     *        The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void updatePredicateResultBasedOnNewMinorIdsOSS(
             final PosInOccurrence childPio,
@@ -468,12 +499,18 @@ public final class TruthValueTracingUtil {
     /**
      * Checks if new minor IDs are available in case of {@link OneStepSimplifier} usage.
      *
-     * @param onlyChangedChildSF The only changed {@link SequentFormula} in the child {@link Node}.
-     * @param term The {@link Term} contained in the child {@link Node} to check.
-     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-     * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
-     * @param tb The {@link TermBuilder} to use.
-     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
+     * @param onlyChangedChildSF
+     *        The only changed {@link SequentFormula} in the child {@link Node}.
+     * @param term
+     *        The {@link Term} contained in the child {@link Node} to check.
+     * @param termLabelName
+     *        The name of the {@link TermLabel} which is added to predicates.
+     * @param parentPio
+     *        The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
+     * @param tb
+     *        The {@link TermBuilder} to use.
+     * @param results
+     *        The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void checkForNewMinorIdsOSS(
             SequentFormula onlyChangedChildSF, Term term,
@@ -483,20 +520,22 @@ public final class TruthValueTracingUtil {
         if (label instanceof FormulaTermLabel) {
             Term replacement = checkForNewMinorIdsOSS(onlyChangedChildSF, (FormulaTermLabel) label,
                 parentPio.isInAntec(), tb);
-            if (replacement != null) {
-                updatePredicateResult((FormulaTermLabel) label, replacement, results);
-            }
+            if (replacement != null) { updatePredicateResult((FormulaTermLabel) label, replacement, results); }
         }
     }
 
     /**
      * Checks if new minor IDs are available in case of {@link OneStepSimplifier} usage.
      *
-     * @param onlyChangedChildSF The only changed {@link SequentFormula} in the child {@link Node}.
-     * @param label The {@link FormulaTermLabel} of interest.
-     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule
+     * @param onlyChangedChildSF
+     *        The only changed {@link SequentFormula} in the child {@link Node}.
+     * @param label
+     *        The {@link FormulaTermLabel} of interest.
+     * @param antecedentRuleApplication
+     *        {@code true} rule applied on antecedent, {@code false} rule
      *        applied on succedent.
-     * @param tb The {@link TermBuilder} to use.
+     * @param tb
+     *        The {@link TermBuilder} to use.
      * @return The computed instruction {@link Term} or {@code null} if not available.
      */
     private static Term checkForNewMinorIdsOSS(
@@ -520,10 +559,14 @@ public final class TruthValueTracingUtil {
     /**
      * Updates the predicate results based on minor ID changes if available.
      *
-     * @param childNode The child {@link Node}.
-     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-     * @param tb The {@link TermBuilder} to use.
-     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
+     * @param childNode
+     *        The child {@link Node}.
+     * @param termLabelName
+     *        The name of the {@link TermLabel} which is added to predicates.
+     * @param tb
+     *        The {@link TermBuilder} to use.
+     * @param results
+     *        The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void updatePredicateResultBasedOnNewMinorIds(
             final Node childNode,
@@ -565,12 +608,18 @@ public final class TruthValueTracingUtil {
     /**
      * Checks if new minor IDs are available.
      *
-     * @param childNode The child {@link Node}.
-     * @param term The {@link Term} contained in the child {@link Node} to check.
-     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-     * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
-     * @param tb The {@link TermBuilder} to use.
-     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
+     * @param childNode
+     *        The child {@link Node}.
+     * @param term
+     *        The {@link Term} contained in the child {@link Node} to check.
+     * @param termLabelName
+     *        The name of the {@link TermLabel} which is added to predicates.
+     * @param parentPio
+     *        The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
+     * @param tb
+     *        The {@link TermBuilder} to use.
+     * @param results
+     *        The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void checkForNewMinorIds(
             Node childNode, Term term, Name termLabelName,
@@ -579,20 +628,22 @@ public final class TruthValueTracingUtil {
         if (label instanceof FormulaTermLabel) {
             Term replacement =
                 checkForNewMinorIds(childNode, (FormulaTermLabel) label, parentPio.isInAntec(), tb);
-            if (replacement != null) {
-                updatePredicateResult((FormulaTermLabel) label, replacement, results);
-            }
+            if (replacement != null) { updatePredicateResult((FormulaTermLabel) label, replacement, results); }
         }
     }
 
     /**
      * Checks if new minor IDs are available.
      *
-     * @param childNode The child {@link Node}.
-     * @param label The {@link FormulaTermLabel} of interest.
-     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule
+     * @param childNode
+     *        The child {@link Node}.
+     * @param label
+     *        The {@link FormulaTermLabel} of interest.
+     * @param antecedentRuleApplication
+     *        {@code true} rule applied on antecedent, {@code false} rule
      *        applied on succedent.
-     * @param tb The {@link TermBuilder} to use.
+     * @param tb
+     *        The {@link TermBuilder} to use.
      * @return The computed instruction {@link Term} or {@code null} if not available.
      */
     private static Term checkForNewMinorIds(
@@ -615,10 +666,14 @@ public final class TruthValueTracingUtil {
     /**
      * Lists all label replacements in the given {@link SequentFormula}.
      *
-     * @param sf The {@link SequentFormula} to analyze.
-     * @param labelName The name of the {@link TermLabel} which is added to predicates.
-     * @param labelId The label ID of interest.
-     * @param resultToFill The result {@link List} to fill.
+     * @param sf
+     *        The {@link SequentFormula} to analyze.
+     * @param labelName
+     *        The name of the {@link TermLabel} which is added to predicates.
+     * @param labelId
+     *        The label ID of interest.
+     * @param resultToFill
+     *        The result {@link List} to fill.
      */
     private static void listLabelReplacements(
             final SequentFormula sf, final Name labelName,
@@ -631,9 +686,7 @@ public final class TruthValueTracingUtil {
 
             @Override
             public void visit(Term visited) {
-                if (hasLabelOfInterest(visited)) {
-                    resultToFill.add(visited);
-                }
+                if (hasLabelOfInterest(visited)) { resultToFill.add(visited); }
             }
 
             private boolean hasLabelOfInterest(Term visited) {
@@ -652,11 +705,15 @@ public final class TruthValueTracingUtil {
      * Computes the {@link Term} with the instruction how to compute the truth value based on the
      * found replacements.
      *
-     * @param antecedentReplacements The replacements found in the antecedent.
-     * @param succedentReplacements The replacements found in the succedent.
-     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule
+     * @param antecedentReplacements
+     *        The replacements found in the antecedent.
+     * @param succedentReplacements
+     *        The replacements found in the succedent.
+     * @param antecedentRuleApplication
+     *        {@code true} rule applied on antecedent, {@code false} rule
      *        applied on succedent.
-     * @param tb The {@link TermBuilder} to use.
+     * @param tb
+     *        The {@link TermBuilder} to use.
      * @return The computed instruction {@link Term} or {@code null} if not available.
      */
     private static Term computeInstructionTerm(
@@ -679,9 +736,12 @@ public final class TruthValueTracingUtil {
      * Updates the instruction {@link Term} for the given {@link FormulaTermLabel} in the result
      * {@link Map}.
      *
-     * @param label The {@link FormulaTermLabel} to update its instruction {@link Term}.
-     * @param instructionTerm The new instruction {@link Term} to set.
-     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
+     * @param label
+     *        The {@link FormulaTermLabel} to update its instruction {@link Term}.
+     * @param instructionTerm
+     *        The new instruction {@link Term} to set.
+     * @param results
+     *        The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void updatePredicateResult(
             FormulaTermLabel label, Term instructionTerm,
@@ -699,10 +759,13 @@ public final class TruthValueTracingUtil {
      * Updates the evaluation result for the given {@link FormulaTermLabel} in the result
      * {@link Map}.
      *
-     * @param label The {@link FormulaTermLabel} to update its instruction {@link Term}.
-     * @param evaluationResult {@code true} label evaluates at least once to true, {@code false}
+     * @param label
+     *        The {@link FormulaTermLabel} to update its instruction {@link Term}.
+     * @param evaluationResult
+     *        {@code true} label evaluates at least once to true, {@code false}
      *        label evaluates at least once to false.
-     * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
+     * @param results
+     *        The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void updatePredicateResult(
             FormulaTermLabel label, boolean evaluationResult,
@@ -742,7 +805,8 @@ public final class TruthValueTracingUtil {
         /**
          * Constructor.
          *
-         * @param evaluationResult {@code true} label evaluates at least once to true, {@code false}
+         * @param evaluationResult
+         *        {@code true} label evaluates at least once to true, {@code false}
          *        label evaluates at least once to false.
          */
         public MultiEvaluationResult(boolean evaluationResult) {
@@ -752,7 +816,8 @@ public final class TruthValueTracingUtil {
         /**
          * Constructor.
          *
-         * @param instructionTerm The instruction {@link Term}.
+         * @param instructionTerm
+         *        The instruction {@link Term}.
          */
         public MultiEvaluationResult(Term instructionTerm) {
             this(false, false, instructionTerm);
@@ -761,11 +826,14 @@ public final class TruthValueTracingUtil {
         /**
          * Constructor.
          *
-         * @param evaluatesToTrue {@code true} label evaluates at least once to true, {@code false}
+         * @param evaluatesToTrue
+         *        {@code true} label evaluates at least once to true, {@code false}
          *        label never evaluates to true.
-         * @param evaluatesToFalse {@code true} label evaluates at least once to false,
+         * @param evaluatesToFalse
+         *        {@code true} label evaluates at least once to false,
          *        {@code false} label never evaluates to false.
-         * @param instructionTerm The instruction {@link Term}.
+         * @param instructionTerm
+         *        The instruction {@link Term}.
          */
         public MultiEvaluationResult(boolean evaluatesToTrue, boolean evaluatesToFalse,
                 Term instructionTerm) {
@@ -807,7 +875,8 @@ public final class TruthValueTracingUtil {
          * Creates a new {@link MultiEvaluationResult} based on the current once but with an updated
          * evaluation result.
          *
-         * @param evaluationResult {@code true} label evaluates at least once to true, {@code false}
+         * @param evaluationResult
+         *        {@code true} label evaluates at least once to true, {@code false}
          *        label evaluates at least once to false.
          * @return The new created {@link MultiEvaluationResult}.
          */
@@ -823,7 +892,8 @@ public final class TruthValueTracingUtil {
          * Creates a new {@link MultiEvaluationResult} based on the current once but with an update
          * evaluates to true state.
          *
-         * @param newEvaluatesToTrue {@code true} label evaluates at least once to true,
+         * @param newEvaluatesToTrue
+         *        {@code true} label evaluates at least once to true,
          *        {@code false} label never evaluates to true.
          * @return The new created {@link MultiEvaluationResult}.
          */
@@ -835,7 +905,8 @@ public final class TruthValueTracingUtil {
          * Creates a new {@link MultiEvaluationResult} based on the current once but with an update
          * evaluates to false state.
          *
-         * @param newEvaluatesToFalse {@code true} label evaluates at least once to false,
+         * @param newEvaluatesToFalse
+         *        {@code true} label evaluates at least once to false,
          *        {@code false} label never evaluates to false.
          * @return The new created {@link MultiEvaluationResult}.
          */
@@ -847,7 +918,8 @@ public final class TruthValueTracingUtil {
          * Creates a new {@link MultiEvaluationResult} based on the current once but with an update
          * instruction term.
          *
-         * @param newInstructionTerm The new instruction {@link Term}.
+         * @param newInstructionTerm
+         *        The new instruction {@link Term}.
          * @return The new created {@link MultiEvaluationResult}.
          */
         public MultiEvaluationResult newInstructionTerm(Term newInstructionTerm) {
@@ -860,27 +932,30 @@ public final class TruthValueTracingUtil {
         @Override
         public String toString() {
             return "true=" + evaluatesToTrue + ", false=" + evaluatesToFalse + ", instruction="
-                + instructionTerm;
+                    + instructionTerm;
         }
 
         /**
          * Creates a pretty printed {@link String}.
          *
-         * @param services The {@link Services} to use.
+         * @param services
+         *        The {@link Services} to use.
          * @return The pretty printed {@link String}.
          */
         public String toPrettyString(Services services) {
             return "true=" + evaluatesToTrue + ", false=" + evaluatesToFalse
-                + (instructionTerm != null
-                        ? ", instruction:\n" + ProofSaver.printTerm(instructionTerm, services)
-                        : "");
+                    + (instructionTerm != null
+                            ? ", instruction:\n" + ProofSaver.printTerm(instructionTerm, services)
+                            : "");
         }
 
         /**
          * Computes the final truth value.
          *
-         * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
-         * @param results All available {@link MultiEvaluationResult}s.
+         * @param termLabelName
+         *        The {@link Name} of the {@link TermLabel} to consider.
+         * @param results
+         *        All available {@link MultiEvaluationResult}s.
          * @return The computed {@link TruthValue}.
          */
         public TruthValue evaluate(Name termLabelName, Map<String, MultiEvaluationResult> results) {
@@ -900,9 +975,12 @@ public final class TruthValueTracingUtil {
         /***
          * Computes the {@link TruthValue} of the given instruction {@link Term}.
          *
-         * @param term The instruction {@link Term} to evaluate.
-         * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
-         * @param results All available {@link MultiEvaluationResult}s.
+         * @param term
+         *        The instruction {@link Term} to evaluate.
+         * @param termLabelName
+         *        The {@link Name} of the {@link TermLabel} to consider.
+         * @param results
+         *        All available {@link MultiEvaluationResult}s.
          * @return The computed {@link TruthValue}.
          */
         private static TruthValue evaluateTerm(Term term, Name termLabelName,
@@ -911,9 +989,7 @@ public final class TruthValueTracingUtil {
             // Return direct label result if available
             if (label instanceof FormulaTermLabel) {
                 MultiEvaluationResult instruction = results.get(((FormulaTermLabel) label).getId());
-                if (instruction != null) {
-                    return instruction.evaluate(termLabelName, results);
-                }
+                if (instruction != null) { return instruction.evaluate(termLabelName, results); }
             }
             // If direct label result is not available try to compute it. (e.g. because of or/and
             // label was replaced by sequent top level formuals)
@@ -1015,12 +1091,11 @@ public final class TruthValueTracingUtil {
         /**
          * Adds a {@link BranchResult}.
          *
-         * @param result The {@link BranchResult} to add.
+         * @param result
+         *        The {@link BranchResult} to add.
          */
         public void addBranchResult(BranchResult result) {
-            if (result != null) {
-                branchResults.add(result);
-            }
+            if (result != null) { branchResults.add(result); }
         }
 
         /**
@@ -1054,27 +1129,38 @@ public final class TruthValueTracingUtil {
     /**
      * Represents the unmodifiable predicate results of a leaf {@link Node} ({@link Goal}).
      *
-     * @param results         All found results.
-     * @param leafNode        The leaf {@link Node}.
-     * @param condition       The condition under which the leaf {@link Node} is reached from the analyzed
-     *                        {@link Node}.
-     * @param conditionString The human readable condition under which the leaf {@link Node} is reached from the
-     *                        analyzed {@link Node}.
-     * @param termLabelName   The {@link Name} of the {@link TermLabel} to consider.
+     * @param results
+     *        All found results.
+     * @param leafNode
+     *        The leaf {@link Node}.
+     * @param condition
+     *        The condition under which the leaf {@link Node} is reached from the analyzed
+     *        {@link Node}.
+     * @param conditionString
+     *        The human readable condition under which the leaf {@link Node} is reached from the
+     *        analyzed {@link Node}.
+     * @param termLabelName
+     *        The {@link Name} of the {@link TermLabel} to consider.
      * @author Martin Hentschel
      */
-        public record BranchResult(Node leafNode, Map<String, MultiEvaluationResult> results, Term condition,
-                                   String conditionString, Name termLabelName) {
+    public record BranchResult(
+            Node leafNode, Map<String, MultiEvaluationResult> results, Term condition,
+            String conditionString, Name termLabelName) {
         /**
          * Constructor.
          *
-         * @param leafNode        The leaf {@link Node}.
-         * @param results         All found results.
-         * @param condition       The condition under which the leaf {@link Node} is reached from the
-         *                        analyzed {@link Node}.
-         * @param conditionString The human readable condition under which the leaf {@link Node} is
-         *                        reached from the analyzed {@link Node}.
-         * @param termLabelName   The {@link Name} of the {@link TermLabel} to consider.
+         * @param leafNode
+         *        The leaf {@link Node}.
+         * @param results
+         *        All found results.
+         * @param condition
+         *        The condition under which the leaf {@link Node} is reached from the
+         *        analyzed {@link Node}.
+         * @param conditionString
+         *        The human readable condition under which the leaf {@link Node} is
+         *        reached from the analyzed {@link Node}.
+         * @param termLabelName
+         *        The {@link Name} of the {@link TermLabel} to consider.
          */
         public BranchResult {
             assert leafNode != null;
@@ -1082,173 +1168,177 @@ public final class TruthValueTracingUtil {
             assert termLabelName != null;
         }
 
-            /**
-             * Returns all found results.
-             *
-             * @return All found results.
-             */
-            @Override
-            public Map<String, MultiEvaluationResult> results() {
-                return Collections.unmodifiableMap(results);
-            }
+        /**
+         * Returns all found results.
+         *
+         * @return All found results.
+         */
+        @Override
+        public Map<String, MultiEvaluationResult> results() {
+            return Collections.unmodifiableMap(results);
+        }
 
-            /**
-             * Returns the {@link MultiEvaluationResult} for the given {@link FormulaTermLabel}.
-             *
-             * @param termLabel The {@link FormulaTermLabel}.
-             * @return The found {@link MultiEvaluationResult} or {@code null} if not available.
-             */
-            public MultiEvaluationResult getResult(FormulaTermLabel termLabel) {
-                return termLabel != null ? results.get(termLabel.getId()) : null;
-            }
+        /**
+         * Returns the {@link MultiEvaluationResult} for the given {@link FormulaTermLabel}.
+         *
+         * @param termLabel
+         *        The {@link FormulaTermLabel}.
+         * @return The found {@link MultiEvaluationResult} or {@code null} if not available.
+         */
+        public MultiEvaluationResult getResult(FormulaTermLabel termLabel) {
+            return termLabel != null ? results.get(termLabel.getId()) : null;
+        }
 
-            /**
-             * Updates a result.
-             * <p>
-             * <b>Warning: </b> {@link BranchResult}s are considered to be unmodifiable. This means that
-             * an update of the result needs to be done before results are shown to the user by the UI.
-             *
-             * @param termLabel The {@link FormulaTermLabel} to update.
-             * @param result    The new result of the given {@link FormulaTermLabel}.
-             */
-            public void updateResult(FormulaTermLabel termLabel, MultiEvaluationResult result) {
-                if (termLabel != null) {
-                    results.put(termLabel.getId(), result);
-                }
-            }
+        /**
+         * Updates a result.
+         * <p>
+         * <b>Warning: </b> {@link BranchResult}s are considered to be unmodifiable. This means that
+         * an update of the result needs to be done before results are shown to the user by the UI.
+         *
+         * @param termLabel
+         *        The {@link FormulaTermLabel} to update.
+         * @param result
+         *        The new result of the given {@link FormulaTermLabel}.
+         */
+        public void updateResult(FormulaTermLabel termLabel, MultiEvaluationResult result) {
+            if (termLabel != null) { results.put(termLabel.getId(), result); }
+        }
 
-            /**
-             * Returns the condition under which the leaf {@link Node} is reached from the analyzed
-             * {@link Node}.
-             *
-             * @return The condition under which the leaf {@link Node} is reached from the analyzed
-             * {@link Node}.
-             */
-            @Override
-            public Term condition() {
-                return condition;
-            }
+        /**
+         * Returns the condition under which the leaf {@link Node} is reached from the analyzed
+         * {@link Node}.
+         *
+         * @return The condition under which the leaf {@link Node} is reached from the analyzed
+         *         {@link Node}.
+         */
+        @Override
+        public Term condition() {
+            return condition;
+        }
 
-            /**
-             * Returns the human readable condition under which the leaf {@link Node} is reached from
-             * the analyzed {@link Node}.
-             *
-             * @return The human readable condition under which the leaf {@link Node} is reached from
-             * the analyzed {@link Node}.
-             */
-            @Override
-            public String conditionString() {
-                return conditionString;
-            }
+        /**
+         * Returns the human readable condition under which the leaf {@link Node} is reached from
+         * the analyzed {@link Node}.
+         *
+         * @return The human readable condition under which the leaf {@link Node} is reached from
+         *         the analyzed {@link Node}.
+         */
+        @Override
+        public String conditionString() {
+            return conditionString;
+        }
 
-            /**
-             * Returns the {@link Name} of the {@link TermLabel} to consider.
-             *
-             * @return The {@link Name} of the {@link TermLabel} to consider.
-             */
-            @Override
-            public Name termLabelName() {
-                return termLabelName;
-            }
+        /**
+         * Returns the {@link Name} of the {@link TermLabel} to consider.
+         *
+         * @return The {@link Name} of the {@link TermLabel} to consider.
+         */
+        @Override
+        public Name termLabelName() {
+            return termLabelName;
+        }
 
-            /**
-             * Checks if the {@link Term} has a {@link TermLabel} with {@link Name}
-             * {@link #termLabelName ()}.
-             *
-             * @param term The {@link Term} to check.
-             * @return {@code true} has {@link TermLabel}, {@code false} do not has {@link TermLabel}.
-             */
-            public boolean hasPredicateLabel(Term term) {
-                return getPredicateLabel(term) != null;
-            }
+        /**
+         * Checks if the {@link Term} has a {@link TermLabel} with {@link Name}
+         * {@link #termLabelName ()}.
+         *
+         * @param term
+         *        The {@link Term} to check.
+         * @return {@code true} has {@link TermLabel}, {@code false} do not has {@link TermLabel}.
+         */
+        public boolean hasPredicateLabel(Term term) {
+            return getPredicateLabel(term) != null;
+        }
 
-            /**
-             * Returns the first {@link FormulaTermLabel} with {@link Name} {@link #termLabelName ()}.
-             *
-             * @param term The {@link Term}.
-             * @return The found {@link FormulaTermLabel} or {@code null} otherwise.
-             */
-            public FormulaTermLabel getPredicateLabel(Term term) {
-                TermLabel label = term.getLabel(termLabelName);
-                return label instanceof FormulaTermLabel ? (FormulaTermLabel) label : null;
-            }
+        /**
+         * Returns the first {@link FormulaTermLabel} with {@link Name} {@link #termLabelName ()}.
+         *
+         * @param term
+         *        The {@link Term}.
+         * @return The found {@link FormulaTermLabel} or {@code null} otherwise.
+         */
+        public FormulaTermLabel getPredicateLabel(Term term) {
+            TermLabel label = term.getLabel(termLabelName);
+            return label instanceof FormulaTermLabel ? (FormulaTermLabel) label : null;
+        }
 
-            /**
-             * Returns the leaf {@link Node}.
-             *
-             * @return The leaf {@link Node}.
-             */
-            @Override
-            public Node leafNode() {
-                return leafNode;
-            }
+        /**
+         * Returns the leaf {@link Node}.
+         *
+         * @return The leaf {@link Node}.
+         */
+        @Override
+        public Node leafNode() {
+            return leafNode;
+        }
 
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public String toString() {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Goal ");
-                sb.append(leafNode.serialNr());
-                sb.append("\n");
-                boolean afterFirst = false;
-                for (Entry<String, MultiEvaluationResult> entry : results.entrySet()) {
-                    if (afterFirst) {
-                        sb.append("\n");
-                    } else {
-                        afterFirst = true;
-                    }
-                    sb.append(entry.getKey());
-                    sb.append(" = ");
-                    sb.append(entry.getValue().evaluate(termLabelName, results));
-                    sb.append(" :: ");
-                    sb.append(entry.getValue());
-                }
-                return sb.toString();
-            }
-
-            /**
-             * Creates a pretty printed {@link String}.
-             *
-             * @return The pretty printed {@link String}.
-             */
-            public String toPrettyString() {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Goal ");
-                sb.append(leafNode.serialNr());
-                sb.append("\n");
-                boolean afterFirst = false;
-                for (Entry<String, MultiEvaluationResult> entry : results.entrySet()) {
-                    if (afterFirst) {
-                        sb.append("\n");
-                    } else {
-                        afterFirst = true;
-                    }
-                    sb.append(entry.getKey());
-                    sb.append(" = ");
-                    sb.append(entry.getValue().evaluate(termLabelName, results));
-                    sb.append(" :: ");
-                    sb.append(entry.getValue().toPrettyString(leafNode.proof().getServices()));
-                }
-                return sb.toString();
-            }
-
-            /**
-             * Evaluates the given {@link FormulaTermLabel}.
-             *
-             * @param termLabel The {@link FormulaTermLabel} to evaluate.
-             * @return The evaluation result.
-             */
-            public TruthValue evaluate(FormulaTermLabel termLabel) {
-                if (termLabel != null) {
-                    MultiEvaluationResult instruction = getResult(termLabel);
-                    return instruction != null ? instruction.evaluate(termLabelName, results) : null;
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Goal ");
+            sb.append(leafNode.serialNr());
+            sb.append("\n");
+            boolean afterFirst = false;
+            for (Entry<String, MultiEvaluationResult> entry : results.entrySet()) {
+                if (afterFirst) {
+                    sb.append("\n");
                 } else {
-                    return null;
+                    afterFirst = true;
                 }
+                sb.append(entry.getKey());
+                sb.append(" = ");
+                sb.append(entry.getValue().evaluate(termLabelName, results));
+                sb.append(" :: ");
+                sb.append(entry.getValue());
+            }
+            return sb.toString();
+        }
+
+        /**
+         * Creates a pretty printed {@link String}.
+         *
+         * @return The pretty printed {@link String}.
+         */
+        public String toPrettyString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Goal ");
+            sb.append(leafNode.serialNr());
+            sb.append("\n");
+            boolean afterFirst = false;
+            for (Entry<String, MultiEvaluationResult> entry : results.entrySet()) {
+                if (afterFirst) {
+                    sb.append("\n");
+                } else {
+                    afterFirst = true;
+                }
+                sb.append(entry.getKey());
+                sb.append(" = ");
+                sb.append(entry.getValue().evaluate(termLabelName, results));
+                sb.append(" :: ");
+                sb.append(entry.getValue().toPrettyString(leafNode.proof().getServices()));
+            }
+            return sb.toString();
+        }
+
+        /**
+         * Evaluates the given {@link FormulaTermLabel}.
+         *
+         * @param termLabel
+         *        The {@link FormulaTermLabel} to evaluate.
+         * @return The evaluation result.
+         */
+        public TruthValue evaluate(FormulaTermLabel termLabel) {
+            if (termLabel != null) {
+                MultiEvaluationResult instruction = getResult(termLabel);
+                return instruction != null ? instruction.evaluate(termLabelName, results) : null;
+            } else {
+                return null;
             }
         }
+    }
 
     /**
      * Represents the possible truth values.
@@ -1295,8 +1385,10 @@ public final class TruthValueTracingUtil {
         /**
          * Computes the {@code and} value.
          *
-         * @param left The left {@link TruthValue}.
-         * @param right The right {@link TruthValue}.
+         * @param left
+         *        The left {@link TruthValue}.
+         * @param right
+         *        The right {@link TruthValue}.
          * @return The computed {@code and} value.
          */
         public static TruthValue and(TruthValue left, TruthValue right) {
@@ -1324,8 +1416,10 @@ public final class TruthValueTracingUtil {
         /**
          * Computes the {@code imp} value.
          *
-         * @param left The left {@link TruthValue}.
-         * @param right The right {@link TruthValue}.
+         * @param left
+         *        The left {@link TruthValue}.
+         * @param right
+         *        The right {@link TruthValue}.
          * @return The computed {@code imp} value.
          */
         public static TruthValue imp(TruthValue left, TruthValue right) {
@@ -1335,8 +1429,10 @@ public final class TruthValueTracingUtil {
         /**
          * Computes the {@code or} value.
          *
-         * @param left The left {@link TruthValue}.
-         * @param right The right {@link TruthValue}.
+         * @param left
+         *        The left {@link TruthValue}.
+         * @param right
+         *        The right {@link TruthValue}.
          * @return The computed {@code or} value.
          */
         public static TruthValue or(TruthValue left, TruthValue right) {
@@ -1364,7 +1460,8 @@ public final class TruthValueTracingUtil {
         /**
          * Computes the {@code not} value.
          *
-         * @param value The {@link TruthValue}.
+         * @param value
+         *        The {@link TruthValue}.
          * @return The computed {@code not} value.
          */
         public static TruthValue not(TruthValue value) {
@@ -1380,8 +1477,10 @@ public final class TruthValueTracingUtil {
         /**
          * Computes the {@code eqv} value.
          *
-         * @param left The left {@link TruthValue}.
-         * @param right The right {@link TruthValue}.
+         * @param left
+         *        The left {@link TruthValue}.
+         * @param right
+         *        The right {@link TruthValue}.
          * @return The computed {@code not} value.
          */
         public static TruthValue eqv(TruthValue left, TruthValue right) {
@@ -1391,9 +1490,12 @@ public final class TruthValueTracingUtil {
         /**
          * Computes the {@code if-then-else} value.
          *
-         * @param conditionValue The condition value.
-         * @param thenValue The then value.
-         * @param elseValue The else value.
+         * @param conditionValue
+         *        The condition value.
+         * @param thenValue
+         *        The then value.
+         * @param elseValue
+         *        The else value.
          * @return The computed {@code if-then-else} value.
          */
         public static TruthValue ifThenElse(TruthValue conditionValue, TruthValue thenValue,

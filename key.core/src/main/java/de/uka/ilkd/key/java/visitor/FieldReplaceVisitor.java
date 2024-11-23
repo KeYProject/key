@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ArrayLengthReference;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ArrayLengthReference;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PrettyPrinter;
@@ -37,9 +37,7 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
         walk(root());
         final ExtList el = stack.peek();
         int i = 0;
-        while (!(el.get(i) instanceof ProgramElement)) {
-            i++;
-        }
+        while (!(el.get(i) instanceof ProgramElement)) { i++; }
         result = (ProgramElement) stack.peek().get(i);
     }
 
@@ -50,9 +48,7 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
     @Override
     public void performActionOnFieldReference(final FieldReference x) {
         final ExtList changeList = stack.peek();
-        if (changeList.getFirst() == CHANGED) {
-            changeList.removeFirst();
-        }
+        if (changeList.getFirst() == CHANGED) { changeList.removeFirst(); }
         changeList.removeFirstOccurrence(PositionInfo.class);
         if (x.getReferencePrefix() != null) {
             final Expression field = (Expression) changeList.get(1);
@@ -77,8 +73,8 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
             typeName = PrettyPrinter.getTypeNameForAccessMethods(typeName);
             addChild(new MethodReference(new ExtList(),
                 new ProgramElementName("_"
-                    + ((ProgramVariable) changeList.get(0)).getProgramElementName().getProgramName()
-                    + typeName),
+                        + ((ProgramVariable) changeList.get(0)).getProgramElementName().getProgramName()
+                        + typeName),
                 null));
         }
         changed();

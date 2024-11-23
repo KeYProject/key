@@ -7,7 +7,10 @@ import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -262,15 +265,9 @@ public class TestCollisionResolving {
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup(new Name("v"));
         SchemaVariable w0 = TacletForTests.getSchemaVariables().lookup(new Name("w0"));
         for (int i = 0; i < 3; i++) {
-            if (instModel.getValueAt(i, 0) == u) {
-                instModel.setValueAt("x", i, 1);
-            }
-            if (instModel.getValueAt(i, 0) == v) {
-                instModel.setValueAt("x", i, 1);
-            }
-            if (instModel.getValueAt(i, 0) == w0) {
-                instModel.setValueAt("f(x)", i, 1);
-            }
+            if (instModel.getValueAt(i, 0) == u) { instModel.setValueAt("x", i, 1); }
+            if (instModel.getValueAt(i, 0) == v) { instModel.setValueAt("x", i, 1); }
+            if (instModel.getValueAt(i, 0) == w0) { instModel.setValueAt("f(x)", i, 1); }
         }
         exceptionthrown = false;
         try {
@@ -279,18 +276,12 @@ public class TestCollisionResolving {
             exceptionthrown = true;
         }
         assertTrue(exceptionthrown, "As names of instantiations of VarSVs u and v in prefix of w0"
-            + "are equal, an exception should be thrown.");
+                + "are equal, an exception should be thrown.");
         // next attempt
         for (int i = 0; i < 3; i++) {
-            if (instModel.getValueAt(i, 0) == u) {
-                instModel.setValueAt("y", i, 1);
-            }
-            if (instModel.getValueAt(i, 0) == v) {
-                instModel.setValueAt("x", i, 1);
-            }
-            if (instModel.getValueAt(i, 0) == w0) {
-                instModel.setValueAt("f(x)", i, 1);
-            }
+            if (instModel.getValueAt(i, 0) == u) { instModel.setValueAt("y", i, 1); }
+            if (instModel.getValueAt(i, 0) == v) { instModel.setValueAt("x", i, 1); }
+            if (instModel.getValueAt(i, 0) == w0) { instModel.setValueAt("f(x)", i, 1); }
         }
         app = instModel.createTacletAppFromVarInsts();
 
@@ -346,12 +337,8 @@ public class TestCollisionResolving {
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup(new Name("v"));
         SchemaVariable w0 = TacletForTests.getSchemaVariables().lookup(new Name("w0"));
         for (int i = 1; i < 3; i++) {
-            if (instModel.getValueAt(i, 0) == v) {
-                instModel.setValueAt("x", i, 1);
-            }
-            if (instModel.getValueAt(i, 0) == w0) {
-                instModel.setValueAt("f(x)", i, 1);
-            }
+            if (instModel.getValueAt(i, 0) == v) { instModel.setValueAt("x", i, 1); }
+            if (instModel.getValueAt(i, 0) == w0) { instModel.setValueAt("f(x)", i, 1); }
         }
         exceptionthrown = false;
         try {
@@ -360,15 +347,11 @@ public class TestCollisionResolving {
             exceptionthrown = true;
         }
         assertTrue(exceptionthrown, "As names of x and instantiations of VarSV v in prefix of w0"
-            + "are equal, an exception should be thrown.");
+                + "are equal, an exception should be thrown.");
         // next attempt
         for (int i = 1; i < 3; i++) {
-            if (instModel.getValueAt(i, 0) == v) {
-                instModel.setValueAt("y", i, 1);
-            }
-            if (instModel.getValueAt(i, 0) == w0) {
-                instModel.setValueAt("f(x)", i, 1);
-            }
+            if (instModel.getValueAt(i, 0) == v) { instModel.setValueAt("y", i, 1); }
+            if (instModel.getValueAt(i, 0) == w0) { instModel.setValueAt("f(x)", i, 1); }
         }
         app = instModel.createTacletAppFromVarInsts();
         assertNotNull(app, "Correct instantiation input should be honored!");

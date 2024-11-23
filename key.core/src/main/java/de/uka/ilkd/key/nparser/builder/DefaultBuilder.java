@@ -10,11 +10,11 @@ import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.VariableDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -138,7 +138,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * looks up a function, (program) variable or static query of the given name varfunc_id and the
      * argument terms args in the namespaces and java info.
      *
-     * @param varfuncName the String with the symbols name
+     * @param varfuncName
+     *        the String with the symbols name
      */
     protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName, String sortName,
             Sort sort) {
@@ -150,11 +151,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
             };
 
-        for (Operator op : operators) {
-            if (op != null) {
-                return op;
-            }
-        }
+        for (Operator op : operators) { if (op != null) { return op; } }
 
         if (sort != null || sortName != null) {
             Name fqName =
@@ -166,11 +163,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                     functions().lookup(fqName),
                     AbstractTermTransformer.name2metaop(fqName.toString()) };
 
-            for (Operator op : operators) {
-                if (op != null) {
-                    return op;
-                }
-            }
+            for (Operator op : operators) { if (op != null) { return op; } }
 
             SortDependingFunction firstInstance =
                 SortDependingFunction.getFirstInstance(new Name(varfuncName), getServices());
@@ -178,10 +171,11 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 semanticError(ctx, "Could not find sort: %s", sortName);
             if (firstInstance != null) {
                 SortDependingFunction v = firstInstance.getInstanceFor(sort, getServices());
-                if (v != null) {
-                    return v;
-                }
+                if (v != null) { return v; }
             }
+            semanticError(ctx, "Could not find (program) variable or constant %s",
+                fqName.toString());
+            return null;
         }
         semanticError(ctx, "Could not find (program) variable or constant %s", varfuncName);
         return null;
@@ -282,9 +276,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         List<ParsableVariable> list = new ArrayList<>(ids.size());
         for (String id : ids) {
             ParsableVariable v = (ParsableVariable) lookup(new Name(id));
-            if (v == null) {
-                semanticError(ctx, "Variable " + id + " not declared.");
-            }
+            if (v == null) { semanticError(ctx, "Variable " + id + " not declared."); }
             list.add(v);
         }
         return list;
@@ -349,13 +341,9 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             primitiveName = PrimitiveType.JAVA_BIGINT.getName();
         }
         Sort s = lookupSort(primitiveName);
-        if (s == null) {
-            semanticError(ctx, "Could not find sort: %s", ctx.getText());
-        }
+        if (s == null) { semanticError(ctx, "Could not find sort: %s", ctx.getText()); }
 
-        if (!ctx.EMPTYBRACKETS().isEmpty()) {
-            return toArraySort(new Pair<>(s, t), ctx.EMPTYBRACKETS().size());
-        }
+        if (!ctx.EMPTYBRACKETS().isEmpty()) { return toArraySort(new Pair<>(s, t), ctx.EMPTYBRACKETS().size()); }
         return s;
     }
 
@@ -363,11 +351,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     public KeYJavaType visitKeyjavatype(KeYParser.KeyjavatypeContext ctx) {
         boolean array = false;
         StringBuilder type = new StringBuilder(visitSimple_ident_dots(ctx.simple_ident_dots()));
-        for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) {
-            array = true;
-            type.append("[]");
-        }
-        KeYJavaType kjt = getJavaInfo().getKeYJavaType(type.toString());
+        for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) { array = true; type.append("[]"); }
+
+        KeYJavaType kjt;
+        kjt = getJavaInfo().getKeYJavaType(type.toString());
 
         // expand to "java.lang"
         if (kjt == null) {
@@ -391,14 +378,10 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         // try as sort without Java type (neede e.g. for "Heap")
         if (kjt == null) {
             Sort sort = lookupSort(type.toString());
-            if (sort != null) {
-                kjt = new KeYJavaType(null, sort);
-            }
+            if (sort != null) { kjt = new KeYJavaType(null, sort); }
         }
 
-        if (kjt == null) {
-            semanticError(ctx, "Unknown type: " + type);
-        }
+        if (kjt == null) { semanticError(ctx, "Unknown type: " + type); }
 
         return kjt;
     }

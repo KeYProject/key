@@ -40,7 +40,8 @@ public class BoundUniquenessChecker {
     /**
      * adds <tt>term</tt> to the list of terms to include in the uniqueness check
      *
-     * @param term a Term
+     * @param term
+     *        a Term
      */
     public void addTerm(Term term) {
         terms = terms.prepend(term);
@@ -49,12 +50,11 @@ public class BoundUniquenessChecker {
     /**
      * adds all formulas in the sequent to the list of terms to include in the uniqueness check
      *
-     * @param seq the Sequent with the formulas to add
+     * @param seq
+     *        the Sequent with the formulas to add
      */
     public void addAll(Sequent seq) {
-        for (final SequentFormula cf : seq) {
-            terms = terms.prepend(cf.formula());
-        }
+        for (final SequentFormula cf : seq) { terms = terms.prepend(cf.formula()); }
     }
 
     // recursive helper
@@ -77,11 +77,7 @@ public class BoundUniquenessChecker {
 
         boundVars.addAll(localVars);
 
-        for (int i = 0, ar = t.arity(); i < ar; ++i) {
-            if (!correct(t.sub(i))) {
-                return false;
-            }
-        }
+        for (int i = 0, ar = t.arity(); i < ar; ++i) { if (!correct(t.sub(i))) { return false; } }
         return true;
     }
 
@@ -90,11 +86,7 @@ public class BoundUniquenessChecker {
      * returns true if any variable is bound at most once in the given set of terms
      */
     public boolean correct() {
-        for (final Term term : terms) {
-            if (!correct(term)) {
-                return false;
-            }
-        }
+        for (final Term term : terms) { if (!correct(term)) { return false; } }
         return true;
     }
 

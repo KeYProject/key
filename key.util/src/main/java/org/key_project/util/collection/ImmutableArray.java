@@ -28,10 +28,23 @@ public class ImmutableArray<S extends @Nullable Object>
         content = (S[]) new Object[0];
     }
 
+    public ImmutableArray(S s1) {
+        content = (S[]) new Object[] { s1 };
+    }
+
+    public ImmutableArray(S s1, S s2) {
+        content = (S[]) new Object[] { s1, s2 };
+    }
+
+    public ImmutableArray(S s1, S s2, S s3) {
+        content = (S[]) new Object[] { s1, s2, s3 };
+    }
+
     /**
      * creates a new <S>Array
      *
-     * @param arr the ProgrammElement array to wrap
+     * @param arr
+     *        the ProgrammElement array to wrap
      */
     @SuppressWarnings("unchecked")
     public ImmutableArray(S... arr) {
@@ -54,7 +67,8 @@ public class ImmutableArray<S extends @Nullable Object>
      * The order of elements is defined by the collection.
      * </p>
      *
-     * @param list a non-null collection (order is preserved)
+     * @param list
+     *        a non-null collection (order is preserved)
      */
     @SuppressWarnings("unchecked")
     public ImmutableArray(@NonNull Collection<? extends S> list) {
@@ -64,7 +78,8 @@ public class ImmutableArray<S extends @Nullable Object>
     /**
      * gets the element at the specified position
      *
-     * @param pos an int describing the position
+     * @param pos
+     *        an int describing the position
      * @return the element at pos
      */
     public final S get(int pos) {
@@ -81,7 +96,9 @@ public class ImmutableArray<S extends @Nullable Object>
     }
 
 
-    /** @return size of the array */
+    /**
+     * @return size of the array
+     */
     public int size() {
         return content.length;
     }
@@ -95,18 +112,15 @@ public class ImmutableArray<S extends @Nullable Object>
     }
 
     public boolean contains(S op) {
-        for (S el : content) {
-            if (Objects.equals(el, op)) {
-                return true;
-            }
-        }
+        for (S el : content) { if (Objects.equals(el, op)) { return true; } }
         return false;
     }
 
     /**
      * Convert the array to a Java array (O(n))
      *
-     * @throws ClassCastException if T is not a supertype of S
+     * @throws ClassCastException
+     *         if T is not a supertype of S
      */
     @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] array) {
@@ -129,9 +143,7 @@ public class ImmutableArray<S extends @Nullable Object>
 
     @Override
     public boolean equals(@Nullable Object o) {
-        if (o == this) {
-            return true;
-        }
+        if (o == this) { return true; }
 
         final @Nullable Object @Nullable [] cmp;
         if (o instanceof ImmutableArray) {
@@ -140,15 +152,9 @@ public class ImmutableArray<S extends @Nullable Object>
             return false;
         }
 
-        if (cmp.length != content.length) {
-            return false;
-        }
+        if (cmp.length != content.length) { return false; }
 
-        for (int i = 0; i < content.length; i++) {
-            if (!Objects.equals(content[i], cmp[i])) {
-                return false;
-            }
-        }
+        for (int i = 0; i < content.length; i++) { if (!Objects.equals(content[i], cmp[i])) { return false; } }
         return true;
     }
 
@@ -195,9 +201,7 @@ public class ImmutableArray<S extends @Nullable Object>
      */
     public ImmutableList<S> toImmutableList() {
         ImmutableList<S> ret = ImmutableSLList.nil();
-        for (S s : this) {
-            ret = ret.prepend(s);
-        }
+        for (S s : this) { ret = ret.prepend(s); }
         return ret.reverse();
     }
 
@@ -208,9 +212,7 @@ public class ImmutableArray<S extends @Nullable Object>
      */
     public List<S> toList() {
         List<S> result = new ArrayList<>();
-        for (S s : this) {
-            result.add(s);
-        }
+        for (S s : this) { result.add(s); }
         return result;
     }
 

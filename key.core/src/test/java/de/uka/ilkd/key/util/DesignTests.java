@@ -56,8 +56,7 @@ public class DesignTests {
     /**
      * Creates an instance used to test if design principles have been hurt.
      */
-    public DesignTests() {
-    }
+    public DesignTests() {}
 
     @BeforeEach
     public void setUp() {
@@ -70,7 +69,8 @@ public class DesignTests {
      * iterates through the directory structure starting at <code>topDir</code> and collects all
      * found classes.
      *
-     * @param path File giving the directory where to start the iteration
+     * @param path
+     *        File giving the directory where to start the iteration
      */
     public static ArrayList<Class<?>> getAllClasses(Path path, Path root) {
         ArrayList<Class<?>> acc = new ArrayList<>();
@@ -78,9 +78,7 @@ public class DesignTests {
             files.forEach(child -> {
                 var relative = root.relativize(child).toString();
                 var index = relative.indexOf(".class");
-                if (index == -1) {
-                    return;
-                }
+                if (index == -1) { return; }
 
                 var name = relative.toString().substring(0, index).replace(File.separatorChar, '.');
 
@@ -106,9 +104,7 @@ public class DesignTests {
         Iterator<Class<?>> it = badClasses.iterator();
         if (it.hasNext()) {
             sb.append("Bad classes:");
-            while (it.hasNext()) {
-                sb.append("\n").append(it.next());
-            }
+            while (it.hasNext()) { sb.append("\n").append(it.next()); }
         }
         return sb.toString();
     }
@@ -123,9 +119,7 @@ public class DesignTests {
         for (Class<?> allClass : allClasses) {
             if (allClass != Term.class && (Term.class).isAssignableFrom(allClass)) {
                 int mods = allClass.getModifiers();
-                if (Modifier.isProtected(mods) || Modifier.isPublic(mods)) {
-                    badClasses.add(allClass);
-                }
+                if (Modifier.isProtected(mods) || Modifier.isPublic(mods)) { badClasses.add(allClass); }
             }
         }
         if (badClasses.size() > 0) {
@@ -156,9 +150,7 @@ public class DesignTests {
                     || allClass.getPackage().getName().contains("key.strategy")) {
 
                 // exclude KeYMediator for the moment (contains some workarounds)
-                if (allClass.getName().contains("KeYMediator")) {
-                    continue;
-                }
+                if (allClass.getName().contains("KeYMediator")) { continue; }
 
                 for (Field f : allClass.getDeclaredFields()) {
                     if (java.awt.Component.class.isAssignableFrom(f.getType())) {
@@ -226,9 +218,7 @@ public class DesignTests {
     public void testHashCodeImplemented() {
         LinkedList<Class<?>> badClasses = new LinkedList<>();
         for (Class<?> clazz : allClasses) {
-            if (implementsEquals(clazz) && !implementsHashCode(clazz)) {
-                badClasses.add(clazz);
-            }
+            if (implementsEquals(clazz) && !implementsHashCode(clazz)) { badClasses.add(clazz); }
         }
         if (badClasses.size() > 0) {
             message = "Classes that override equals() must also override hashCode().\n";

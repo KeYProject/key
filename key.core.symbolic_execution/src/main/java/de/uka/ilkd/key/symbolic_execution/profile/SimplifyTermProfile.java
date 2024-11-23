@@ -51,8 +51,7 @@ public class SimplifyTermProfile extends JavaProfile {
     /**
      * Constructor.
      */
-    public SimplifyTermProfile() {
-    }
+    public SimplifyTermProfile() {}
 
     /**
      * {@inheritDoc}
@@ -108,9 +107,7 @@ public class SimplifyTermProfile extends JavaProfile {
      * @return The default instance for usage in the {@link Thread} of the user interface.
      */
     public static synchronized SimplifyTermProfile getDefaultInstance() {
-        if (defaultInstance == null) {
-            defaultInstance = new SimplifyTermProfile();
-        }
+        if (defaultInstance == null) { defaultInstance = new SimplifyTermProfile(); }
         return defaultInstance;
     }
 }

@@ -154,7 +154,7 @@ public class ProgressDialog extends JDialog {
         if (focusButton == null) {
             focusButton = new JButton("Focus goals");
             focusButton.setToolTipText("Focus open goals to the formulas required to close them"
-                + " (as specified by the SMT solver's unsat core)");
+                    + " (as specified by the SMT solver's unsat core)");
             focusButton.setEnabled(false);
             focusButton.addActionListener(e -> {
                 try {
@@ -189,9 +189,7 @@ public class ProgressDialog extends JDialog {
     }
 
     private JScrollPane getScrollPane() {
-        if (scrollPane == null) {
-            scrollPane = SwingUtil.createScrollPane(table);
-        }
+        if (scrollPane == null) { scrollPane = SwingUtil.createScrollPane(table); }
         return scrollPane;
     }
 
@@ -199,12 +197,8 @@ public class ProgressDialog extends JDialog {
         if (stopButton == null) {
             stopButton = new JButton("Stop");
             stopButton.addActionListener(e -> {
-                if (modus.equals(Modus.SOLVERS_DONE)) {
-                    listener.discardButtonClicked();
-                }
-                if (modus.equals(Modus.SOLVERS_RUNNING)) {
-                    listener.stopButtonClicked();
-                }
+                if (modus.equals(Modus.SOLVERS_DONE)) { listener.discardButtonClicked(); }
+                if (modus.equals(Modus.SOLVERS_RUNNING)) { listener.stopButtonClicked(); }
             });
         }
         return stopButton;
@@ -215,18 +209,12 @@ public class ProgressDialog extends JDialog {
         switch (modus) {
         case SOLVERS_DONE -> {
             stopButton.setText("Discard");
-            if (applyButton != null) {
-                applyButton.setEnabled(true);
-            }
-            if (focusButton != null) {
-                focusButton.setEnabled(true);
-            }
+            if (applyButton != null) { applyButton.setEnabled(true); }
+            if (focusButton != null) { focusButton.setEnabled(true); }
         }
         case SOLVERS_RUNNING -> {
             stopButton.setText("Stop");
-            if (applyButton != null) {
-                applyButton.setEnabled(false);
-            }
+            if (applyButton != null) { applyButton.setEnabled(false); }
         }
         }
     }
@@ -378,7 +366,9 @@ class ProgressTable extends JTable {
                 return data.getSelectedTextColor();
             }
 
-            protected Color getSelectionBackground() { return data.getTextColor(); }
+            protected Color getSelectionBackground() {
+                return data.getTextColor();
+            }
         });
 
     }
@@ -460,9 +450,7 @@ class ProgressTable extends JTable {
 
 
         TableCellRenderer renderer = col.getHeaderRenderer();
-        if (renderer == null) {
-            renderer = table.getTableHeader().getDefaultRenderer();
-        }
+        if (renderer == null) { renderer = table.getTableHeader().getDefaultRenderer(); }
         Component comp =
             renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
         width = comp.getPreferredSize().width;
@@ -483,9 +471,7 @@ class ProgressTable extends JTable {
 
 
     private ProgressPanel getProgressPanelEditor() {
-        if (progressPanelEditor == null) {
-            progressPanelEditor = new ProgressPanel();
-        }
+        if (progressPanelEditor == null) { progressPanelEditor = new ProgressPanel(); }
         return progressPanelEditor;
     }
 

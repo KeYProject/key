@@ -40,7 +40,8 @@ public class NodeChangeJournal implements GoalListener {
         DefaultImmutableMap.nilMap();
 
     /**
-     * @param p_goal the original goal/node
+     * @param p_goal
+     *        the original goal/node
      */
     public NodeChangeJournal(Proof p_proof, Goal p_goal) {
         proof = p_proof;
@@ -81,9 +82,7 @@ public class NodeChangeJournal implements GoalListener {
     public void sequentChanged(Goal source, SequentChangeInfo sci) {
         NodeChangesHolder nc = getChangeObj(source.node());
 
-        if (nc != null) {
-            nc.addSCI(sci);
-        }
+        if (nc != null) { nc.addSCI(sci); }
     }
 
 
@@ -101,9 +100,7 @@ public class NodeChangeJournal implements GoalListener {
             if (it.hasNext()) {
                 while (true) {
                     putChangeObj(it.next().node(), nc);
-                    if (!it.hasNext()) {
-                        break;
-                    }
+                    if (!it.hasNext()) { break; }
                     nc = (NodeChangesHolder) nc.clone();
                 }
             }

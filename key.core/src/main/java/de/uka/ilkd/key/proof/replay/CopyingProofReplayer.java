@@ -24,8 +24,10 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
     /**
      * Construct a new replayer.
      *
-     * @param originalProof proof to copy from
-     * @param proof proof to add steps to
+     * @param originalProof
+     *        proof to copy from
+     * @param proof
+     *        proof to add steps to
      */
     public CopyingProofReplayer(Proof originalProof, Proof proof) {
         super(originalProof, proof);
@@ -34,10 +36,14 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
     /**
      * Copy steps from <code>originalNode</code> to <code>newNode</code>
      *
-     * @param originalNode original proof
-     * @param newNode open goal in new proof
-     * @param skippedNodes nodes to skip when copying
-     * @throws IntermediateProofReplayer.BuiltInConstructionException on error
+     * @param originalNode
+     *        original proof
+     * @param newNode
+     *        open goal in new proof
+     * @param skippedNodes
+     *        nodes to skip when copying
+     * @throws IntermediateProofReplayer.BuiltInConstructionException
+     *         on error
      */
     public void copy(Node originalNode, Goal newNode, Set<Node> skippedNodes)
             throws IntermediateProofReplayer.BuiltInConstructionException {
@@ -56,24 +62,16 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
         while (!nodeQueue.isEmpty() && !queue.isEmpty()) {
             Node nextNode = nodeQueue.pop();
             Goal nextGoal = queue.pop();
-            for (int i = nextNode.childrenCount() - 1; i >= 0; i--) {
-                nodeQueue.addFirst(nextNode.child(i));
-            }
+            for (int i = nextNode.childrenCount() - 1; i >= 0; i--) { nodeQueue.addFirst(nextNode.child(i)); }
             // skip explicitly requested nodes
             if (skippedNodes.contains(nextNode)) {
-                if (!nextGoal.node().isClosed()) {
-                    queue.addFirst(nextGoal);
-                }
+                if (!nextGoal.node().isClosed()) { queue.addFirst(nextGoal); }
                 continue;
             }
             // skip nextNode if it is a closed goal
-            if (nextNode.getAppliedRuleApp() == null) {
-                continue;
-            }
+            if (nextNode.getAppliedRuleApp() == null) { continue; }
             ImmutableList<Goal> newGoals = reApplyRuleApp(nextNode, nextGoal);
-            for (Goal g : newGoals) {
-                queue.addFirst(g);
-            }
+            for (Goal g : newGoals) { queue.addFirst(g); }
         }
         newNode.proof().setMutedProofCloseEvents(false);
         newNode.proof().deregister(this, CopyingProofReplayer.class);

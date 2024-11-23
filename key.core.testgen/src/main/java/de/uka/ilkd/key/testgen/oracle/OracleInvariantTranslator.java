@@ -5,10 +5,10 @@ package de.uka.ilkd.key.testgen.oracle;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -66,13 +66,9 @@ public class OracleInvariantTranslator {
                     Term right = t.sub(1);
 
                     if (left.op().name().equals(inv.op().name())) {
-                        if (!right.equals(tb.tt())) {
-                            result = tb.and(result, right);
-                        }
+                        if (!right.equals(tb.tt())) { result = tb.and(result, right); }
                     } else if (right.op().name().equals(inv.op().name())) {
-                        if (!left.equals(tb.tt())) {
-                            result = tb.and(result, left);
-                        }
+                        if (!left.equals(tb.tt())) { result = tb.and(result, left); }
                     }
 
 

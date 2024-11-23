@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -57,9 +57,7 @@ public abstract class AbstractUserInterfaceControl
      */
     @Override
     public void addProverTaskListener(ProverTaskListener ptl) {
-        if (ptl != null) {
-            proverTaskListener.add(ptl);
-        }
+        if (ptl != null) { proverTaskListener.add(ptl); }
     }
 
     /**
@@ -67,49 +65,44 @@ public abstract class AbstractUserInterfaceControl
      */
     @Override
     public void removeProverTaskListener(ProverTaskListener ptl) {
-        if (ptl != null) {
-            proverTaskListener.remove(ptl);
-        }
+        if (ptl != null) { proverTaskListener.remove(ptl); }
     }
 
     /**
      * Fires the event {@link ProverTaskListener#taskStarted(TaskStartedInfo)} to all listener.
      *
-     * @param info the {@link TaskStartedInfo} containing general information about the task that is
+     * @param info
+     *        the {@link TaskStartedInfo} containing general information about the task that is
      *        just about to start
      */
     protected void fireTaskStarted(TaskStartedInfo info) {
         synchronized (proverTaskListener) {
-            for (ProverTaskListener l : proverTaskListener) {
-                l.taskStarted(info);
-            }
+            for (ProverTaskListener l : proverTaskListener) { l.taskStarted(info); }
         }
     }
 
     /**
      * Fires the event {@link ProverTaskListener#taskProgress(int)} to all listener.
      *
-     * @param position The current position.
+     * @param position
+     *        The current position.
      */
     protected void fireTaskProgress(int position) {
         synchronized (proverTaskListener) {
-            for (ProverTaskListener l : proverTaskListener) {
-                l.taskProgress(position);
-            }
+            for (ProverTaskListener l : proverTaskListener) { l.taskProgress(position); }
         }
     }
 
     /**
      * Fires the event {@link ProverTaskListener#taskFinished(TaskFinishedInfo)} to all listener.
      *
-     * @param info The {@link TaskFinishedInfo}.
+     * @param info
+     *        The {@link TaskFinishedInfo}.
      */
     protected void fireTaskFinished(TaskFinishedInfo info) {
         try {
             synchronized (proverTaskListener) {
-                for (ProverTaskListener l : proverTaskListener) {
-                    l.taskFinished(info);
-                }
+                for (ProverTaskListener l : proverTaskListener) { l.taskFinished(info); }
             }
         } catch (Exception e) {
             LOGGER.error("failed to fire task finished event ", e);
@@ -146,9 +139,12 @@ public abstract class AbstractUserInterfaceControl
     /**
      * registers the proof aggregate at the UI
      *
-     * @param proofOblInput the {@link ProofOblInput}
-     * @param proofList the {@link ProofAggregate}
-     * @param initConfig the {@link InitConfig} to be used
+     * @param proofOblInput
+     *        the {@link ProofOblInput}
+     * @param proofList
+     *        the {@link ProofAggregate}
+     * @param initConfig
+     *        the {@link InitConfig} to be used
      * @return the new {@link ProofEnvironment} where the {@link ProofAggregate} has been registered
      */
     protected abstract ProofEnvironment createProofEnvironmentAndRegisterProof(
@@ -195,9 +191,7 @@ public abstract class AbstractUserInterfaceControl
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {
-            if (info instanceof ProofMacroFinishedInfo) {
-                macroFinished((ProofMacroFinishedInfo) info);
-            }
+            if (info instanceof ProofMacroFinishedInfo) { macroFinished((ProofMacroFinishedInfo) info); }
         }
     }
 
@@ -205,8 +199,8 @@ public abstract class AbstractUserInterfaceControl
      * {@inheritDoc}
      */
     @Override
-    public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
-            File bootClassPath, List<File> includes, Properties poPropertiesToForce,
+    public AbstractProblemLoader load(Profile profile, Path file, List<Path> classPath,
+            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
             Consumer<Proof> callback) throws ProblemLoaderException {
         AbstractProblemLoader loader = null;
@@ -220,16 +214,12 @@ public abstract class AbstractUserInterfaceControl
             }
             return loader;
         } catch (ProblemLoaderException e) {
-            if (loader.getProof() != null) {
-                loader.getProof().dispose();
-            }
+            if (loader.getProof() != null) { loader.getProof().dispose(); }
             // rethrow that exception
             throw e;
         } catch (Throwable e) {
-            if (loader != null && loader.getProof() != null) {
-                loader.getProof().dispose();
-            }
-            throw new ProblemLoaderException(loader, e);
+            if (loader != null && loader.getProof() != null) { loader.getProof().dispose(); }
+            throw new ProblemLoaderException(loader, "Load failed", e);
         }
     }
 
@@ -242,7 +232,8 @@ public abstract class AbstractUserInterfaceControl
      * This method is used by nearly all Eclipse based product that uses KeY.
      * </p>
      *
-     * @param profile The {@link Profile} to use.
+     * @param profile
+     *        The {@link Profile} to use.
      * @return The instantiated {@link ProblemInitializer}.
      */
     protected ProblemInitializer createProblemInitializer(Profile profile) {
@@ -250,8 +241,7 @@ public abstract class AbstractUserInterfaceControl
     }
 
     @Override
-    public void loadingStarted(AbstractProblemLoader loader) {
-    }
+    public void loadingStarted(AbstractProblemLoader loader) {}
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,

@@ -27,8 +27,10 @@ public abstract class ScaleFeature implements Feature {
     /**
      * Create a feature that scales the result of the base feature.
      *
-     * @param f the base feature
-     * @param coeff the coefficient to be applied to the result of <code>f</code>
+     * @param f
+     *        the base feature
+     * @param coeff
+     *        the coefficient to be applied to the result of <code>f</code>
      */
     public static Feature createScaled(Feature f, double coeff) {
         return createAffine(f, coeff, 0);
@@ -38,9 +40,12 @@ public abstract class ScaleFeature implements Feature {
      * Create a feature that applies an affine transformation to the result of the base feature. The
      * transformation is described by a coefficient and an offset.
      *
-     * @param f the base feature
-     * @param coeff the coefficient to be applied to the result of <code>f</code>
-     * @param offset the offset to be added to the result of <code>f</code> (after multiplication
+     * @param f
+     *        the base feature
+     * @param coeff
+     *        the coefficient to be applied to the result of <code>f</code>
+     * @param offset
+     *        the offset to be added to the result of <code>f</code> (after multiplication
      *        with <code>coeff</code>)
      */
     public static Feature createAffine(Feature f, double coeff, long offset) {
@@ -51,19 +56,22 @@ public abstract class ScaleFeature implements Feature {
      * Create a feature that applies an affine transformation to the result of the base feature. The
      * transformation is described by two points in the domain and their images.
      *
-     * @param f the base feature
-     * @param dom0 point 0 in the domain
-     * @param dom1 point 1 in the domain
-     * @param img0 point 0 in the image
-     * @param img1 point 1 in the image
+     * @param f
+     *        the base feature
+     * @param dom0
+     *        point 0 in the domain
+     * @param dom1
+     *        point 1 in the domain
+     * @param img0
+     *        point 0 in the image
+     * @param img1
+     *        point 1 in the image
      */
     public static Feature createAffine(Feature f, RuleAppCost dom0, RuleAppCost dom1,
             RuleAppCost img0, RuleAppCost img1) {
         Debug.assertFalse(dom0.equals(dom1),
             "Two different points are needed to define the " + "affine transformation");
-        if (img0.equals(img1)) {
-            return ConstFeature.createConst(img0);
-        }
+        if (img0.equals(img1)) { return ConstFeature.createConst(img0); }
 
         // now the two points of the domain (resp. of the image) are distinct
 

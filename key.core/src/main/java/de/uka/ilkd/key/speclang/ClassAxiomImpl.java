@@ -7,8 +7,8 @@ package de.uka.ilkd.key.speclang;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -78,20 +78,12 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || this.getClass() != o.getClass()) {
-            return false;
-        }
+        if (o == null || this.getClass() != o.getClass()) { return false; }
         final ClassAxiomImpl other = (ClassAxiomImpl) o;
 
-        if (isStatic != other.isStatic) {
-            return false;
-        }
-        if (!name.equals(other.name)) {
-            return false;
-        }
-        if (!kjt.equals(other.kjt)) {
-            return false;
-        }
+        if (isStatic != other.isStatic) { return false; }
+        if (!name.equals(other.name)) { return false; }
+        if (!kjt.equals(other.kjt)) { return false; }
         if (originalSelfVar != null) {
             // not interested in names
             if (other.originalSelfVar == null) {
@@ -133,9 +125,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
             Services services) {
         ImmutableList<LocationVariable> replaceVars = ImmutableSLList.nil();
         replaceVars = replaceVars.append(services.getTypeConverter().getHeapLDT().getHeap());
-        if (!isStatic) {
-            replaceVars = replaceVars.append(originalSelfVar);
-        }
+        if (!isStatic) { replaceVars = replaceVars.append(originalSelfVar); }
         Term rep = services.getTermBuilder().convertToFormula(originalRep);
         TacletGenerator TG = TacletGenerator.getInstance();
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();

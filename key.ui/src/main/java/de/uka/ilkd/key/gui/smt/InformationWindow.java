@@ -76,9 +76,7 @@ public class InformationWindow extends JDialog {
         super(parent);
         this.setTitle(title);
         initModel(solver);
-        for (Information el : information) {
-            getTabbedPane().addTab(el.title, newTab(el));
-        }
+        for (Information el : information) { getTabbedPane().addTab(el.title, newTab(el)); }
 
         setSize(600, 500);
         this.getContentPane().add(getTabbedPane());
@@ -89,12 +87,8 @@ public class InformationWindow extends JDialog {
     }
 
     private void initModel(SMTSolver solver) {
-        if (solver.getType() != SolverTypes.Z3_CE_SOLVER) {
-            return;
-        }
-        if (solver.getSocket().getQuery() == null) {
-            return;
-        }
+        if (solver.getType() != SolverTypes.Z3_CE_SOLVER) { return; }
+        if (solver.getSocket().getQuery() == null) { return; }
 
         Model m = solver.getSocket().getQuery().getModel();
         this.model = m;
@@ -171,9 +165,7 @@ public class InformationWindow extends JDialog {
 
 
     private JTabbedPane getTabbedPane() {
-        if (tabbedPane == null) {
-            tabbedPane = new JTabbedPane();
-        }
+        if (tabbedPane == null) { tabbedPane = new JTabbedPane(); }
         return tabbedPane;
     }
 

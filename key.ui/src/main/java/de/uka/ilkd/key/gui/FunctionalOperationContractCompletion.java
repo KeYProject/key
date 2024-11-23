@@ -25,9 +25,7 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
 
         if (forced) {
             app = app.forceInstantiate(goal);
-            if (app.complete()) {
-                return app;
-            }
+            if (app.complete()) { return app; }
         }
 
         Instantiation inst = UseOperationContractRule

@@ -123,12 +123,8 @@ public class TacletAppIndex {
 
     private void createNewIndexCache() {
         indexCaches = new TermTacletAppIndexCacheSet(cache);
-        if (antecIndex != null) {
-            antecIndex.setIndexCache(indexCaches);
-        }
-        if (succIndex != null) {
-            succIndex.setIndexCache(indexCaches);
-        }
+        if (antecIndex != null) { antecIndex.setIndexCache(indexCaches); }
+        if (succIndex != null) { succIndex.setIndexCache(indexCaches); }
     }
 
     /**
@@ -188,7 +184,8 @@ public class TacletAppIndex {
     /**
      * returns the set of rule applications at the given position of the given sequent.
      *
-     * @param pos the PosInOccurrence to focus
+     * @param pos
+     *        the PosInOccurrence to focus
      */
     public ImmutableList<TacletApp> getTacletAppAt(PosInOccurrence pos, TacletFilter filter,
             Services services) {
@@ -199,8 +196,10 @@ public class TacletAppIndex {
     /**
      * creates TacletApps out of each single NoPosTacletApp object
      *
-     * @param tacletInsts the list of NoPosTacletApps the TacletApps are to be created from
-     * @param pos the PosInOccurrence to focus
+     * @param tacletInsts
+     *        the list of NoPosTacletApps the TacletApps are to be created from
+     * @param pos
+     *        the PosInOccurrence to focus
      * @return list of all created TacletApps
      */
     static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
@@ -209,9 +208,7 @@ public class TacletAppIndex {
         for (NoPosTacletApp tacletApp : tacletInsts) {
             if (tacletApp.taclet() instanceof FindTaclet) {
                 PosTacletApp newTacletApp = tacletApp.setPosInOccurrence(pos, services);
-                if (newTacletApp != null) {
-                    result = result.prepend(newTacletApp);
-                }
+                if (newTacletApp != null) { result = result.prepend(newTacletApp); }
             } else {
                 result = result.prepend(tacletApp);
             }
@@ -231,7 +228,8 @@ public class TacletAppIndex {
     /**
      * collects all NoFindTacletInstantiations
      *
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param services
+     *        the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      * @return list of all possible instantiations
      */
@@ -244,7 +242,8 @@ public class TacletAppIndex {
      * collects all RewriteTacletInstantiations in a subterm of the constrainedFormula described by
      * a PosInOccurrence. RewriteTaclets with wrong prefix are filtered out.
      *
-     * @param pos the PosInOccurrence to focus
+     * @param pos
+     *        the PosInOccurrence to focus
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos,
@@ -269,7 +268,8 @@ public class TacletAppIndex {
     /**
      * collects all FindTaclets with instantiations and position
      *
-     * @param pos the PosInOccurrence to focus
+     * @param pos
+     *        the PosInOccurrence to focus
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence pos, TacletFilter filter) {
@@ -281,8 +281,10 @@ public class TacletAppIndex {
      * returns the rule applications at the given PosInOccurrence and at all Positions below this.
      * The method calls getTacletAppAt for all the Positions below.
      *
-     * @param pos the position where to start from
-     * @param services the Services object encapsulating information about the java datastructures
+     * @param pos
+     *        the position where to start from
+     * @param services
+     *        the Services object encapsulating information about the java datastructures
      *        like (static)types etc.
      * @return the possible rule applications
      */
@@ -296,7 +298,8 @@ public class TacletAppIndex {
     /**
      * called if a formula has been replaced
      *
-     * @param sci SequentChangeInfo describing the change of the sequent
+     * @param sci
+     *        SequentChangeInfo describing the change of the sequent
      */
     public void sequentChanged(SequentChangeInfo sci) {
         if (sci.getOriginalSequent() != getSequent()) {
@@ -331,7 +334,8 @@ public class TacletAppIndex {
      * updates the internal caches after a new Taclet with instantiation information has been added
      * to the TacletIndex.
      *
-     * @param tacletApp the partially instantiated Taclet to add
+     * @param tacletApp
+     *        the partially instantiated Taclet to add
      */
     public void addedNoPosTacletApp(NoPosTacletApp tacletApp) {
         if (indexCaches.isRelevantTaclet(tacletApp.taclet())) {
@@ -348,9 +352,7 @@ public class TacletAppIndex {
         }
 
         if (tacletApp.taclet() instanceof NoFindTaclet) {
-            if (ruleFilter.filter(tacletApp.taclet())) {
-                newRuleListener.ruleAdded(tacletApp, null);
-            }
+            if (ruleFilter.filter(tacletApp.taclet())) { newRuleListener.ruleAdded(tacletApp, null); }
             return;
         }
 
@@ -364,7 +366,8 @@ public class TacletAppIndex {
      * updates the internal caches after a new Taclet with instantiation information has been added
      * to the TacletIndex.
      *
-     * @param tacletApps set of partially instantiated {@link Taclet}s to add
+     * @param tacletApps
+     *        set of partially instantiated {@link Taclet}s to add
      */
     public void addedNoPosTacletApps(Iterable<NoPosTacletApp> tacletApps) {
         for (TacletApp tacletApp : tacletApps) {
@@ -386,17 +389,13 @@ public class TacletAppIndex {
         final SetRuleFilter newTaclets = new SetRuleFilter();
         for (NoPosTacletApp tacletApp : tacletApps) {
             if (tacletApp.taclet() instanceof NoFindTaclet) {
-                if (ruleFilter.filter(tacletApp.taclet())) {
-                    newRuleListener.ruleAdded(tacletApp, null);
-                }
+                if (ruleFilter.filter(tacletApp.taclet())) { newRuleListener.ruleAdded(tacletApp, null); }
             } else {
                 newTaclets.addRuleToSet(tacletApp.taclet());
             }
         }
 
-        if (newTaclets.isEmpty()) {
-            return;
-        }
+        if (newTaclets.isEmpty()) { return; }
 
         updateIndices(newTaclets);
     }
@@ -407,7 +406,8 @@ public class TacletAppIndex {
      * updates the internal caches after a Taclet with instantiation information has been removed
      * from the TacletIndex.
      *
-     * @param tacletApp the partially instantiated Taclet to remove
+     * @param tacletApp
+     *        the partially instantiated Taclet to remove
      */
     public void removedNoPosTacletApp(NoPosTacletApp tacletApp) {
         if (indexCaches.isRelevantTaclet(tacletApp.taclet())) {
@@ -422,15 +422,13 @@ public class TacletAppIndex {
 
     public String toString() {
         return "TacletAppIndex with indexing, getting Taclets from" + " TacletIndex "
-            + tacletIndex;
+                + tacletIndex;
     }
 
     // helper because IList<NoPosTacletApp> is no IList<TacletApp>
     private static ImmutableList<TacletApp> prepend(ImmutableList<TacletApp> l1,
             ImmutableList<NoPosTacletApp> l2) {
-        for (NoPosTacletApp aL2 : l2) {
-            l1 = l1.prepend(aL2);
-        }
+        for (NoPosTacletApp aL2 : l2) { l1 = l1.prepend(aL2); }
         return l1;
     }
 
@@ -466,12 +464,8 @@ public class TacletAppIndex {
      * taclet app.
      */
     public void reportRuleApps(NewRuleListener l, Services services) {
-        if (antecIndex != null) {
-            antecIndex.reportRuleApps(l);
-        }
-        if (succIndex != null) {
-            succIndex.reportRuleApps(l);
-        }
+        if (antecIndex != null) { antecIndex.reportRuleApps(l); }
+        if (succIndex != null) { succIndex.reportRuleApps(l); }
 
         l.rulesAdded(getNoFindTaclet(TacletFilter.TRUE, services), null);
     }

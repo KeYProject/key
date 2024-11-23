@@ -4,8 +4,8 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
@@ -30,9 +30,7 @@ public final class SLTypeResolver extends SLExpressionResolver {
             throws SLTranslationException {
         try {
             KeYJavaType type = javaInfo.getTypeByClassName(name, specInClass);
-            if (type == null) {
-                throw new SLTranslationException("Type " + name + " not found.");
-            }
+            if (type == null) { throw new SLTranslationException("Type " + name + " not found."); }
             return new SLExpression(type);
         } catch (RuntimeException e) {
             try {
@@ -44,7 +42,7 @@ public final class SLTypeResolver extends SLExpressionResolver {
                             return new SLExpression(containingType);
                         }
                         ProgramVariable et = javaInfo.getAttribute(
-                            ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
+                            PipelineConstants.IMPLICIT_ENCLOSING_THIS, containingType);
                         if (et != null) {
                             containingType = et.getKeYJavaType();
                         } else {

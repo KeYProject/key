@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -57,9 +57,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
             MatchConditions matchCond, Services services) {
-        if (var != exprOrTypeSV) {
-            return matchCond;
-        }
+        if (var != exprOrTypeSV) { return matchCond; }
 
         Debug.assertTrue(svSubst instanceof Expression || svSubst instanceof TypeReference
                 || svSubst instanceof Term);
@@ -93,6 +91,6 @@ public final class JavaTypeToSortCondition implements VariableCondition {
     @Override
     public String toString() {
         return "\\hasSort(" + (elemSort ? "\\elemSort(" + exprOrTypeSV + ")" : exprOrTypeSV) + ", "
-            + sort + ")";
+                + sort + ")";
     }
 }

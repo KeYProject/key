@@ -26,12 +26,18 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
      * Create a new info object.
      * Make sure your source object is documented in {@link TaskFinishedInfo}!
      *
-     * @param source source object
-     * @param result task result
-     * @param proof the proof the task worked on
-     * @param time time the task took (milliseconds)
-     * @param appliedRules how many nodes were created
-     * @param closedGoals how many goals were closed
+     * @param source
+     *        source object
+     * @param result
+     *        task result
+     * @param proof
+     *        the proof the task worked on
+     * @param time
+     *        time the task took (milliseconds)
+     * @param appliedRules
+     *        how many nodes were created
+     * @param closedGoals
+     *        how many goals were closed
      */
     public DefaultTaskFinishedInfo(Object source, Object result, Proof proof, long time,
             int appliedRules, int closedGoals) {
@@ -76,22 +82,16 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     // display message for the status bar
     @Override
     public String toString() {
-        if (proof.isDisposed()) {
-            return "Proof disposed";
-        }
+        if (proof.isDisposed()) { return "Proof disposed"; }
         if (appliedRules != 0) {
             StringBuilder message = new StringBuilder();
             String timeString = (timeInMillis / 1000) + "." + ((timeInMillis % 1000) / 100);
 
             message.append("Strategy: Applied ").append(appliedRules).append(" rule");
-            if (appliedRules != 1) {
-                message.append("s");
-            }
+            if (appliedRules != 1) { message.append("s"); }
             message.append(" (").append(timeString).append(" sec), ");
             message.append(" closed ").append(closedGoals).append(" goal");
-            if (closedGoals != 1) {
-                message.append("s");
-            }
+            if (closedGoals != 1) { message.append("s"); }
             message.append(", ").append(proof.openGoals().size());
             message.append(" remaining");
             return message.toString();

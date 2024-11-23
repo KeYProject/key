@@ -17,9 +17,7 @@ public class Qualifier<T> implements TerminalSyntaxElement {
     }
 
     synchronized static <T> Qualifier<T> create(T qualifier) {
-        if (INSTANCES.containsKey(qualifier)) {
-            return (Qualifier<T>) INSTANCES.get(qualifier);
-        }
+        if (INSTANCES.containsKey(qualifier)) { return (Qualifier<T>) INSTANCES.get(qualifier); }
         var q = new Qualifier<>(qualifier);
         INSTANCES.put(qualifier, q);
         return q;

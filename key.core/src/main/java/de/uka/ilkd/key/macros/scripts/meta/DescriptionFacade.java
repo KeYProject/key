@@ -34,8 +34,7 @@ public final class DescriptionFacade {
      */
     private static Properties properties = null;
 
-    private DescriptionFacade() {
-    }
+    private DescriptionFacade() {}
 
     /**
      * Lazy loading of the properties.
@@ -59,7 +58,8 @@ public final class DescriptionFacade {
      * Looks up the documentation for the given command in the properties file. If no documentation
      * is available an empty string is returned.
      *
-     * @param cmd non-null proof script command
+     * @param cmd
+     *        non-null proof script command
      * @return a non-null string
      * @see ProofScriptCommand#getDocumentation()
      */
@@ -71,14 +71,13 @@ public final class DescriptionFacade {
      * Looks up the documentation for the given proof script argument. If no documentation is
      * available an empty string is returned.
      *
-     * @param arg non-null proof script argument
+     * @param arg
+     *        non-null proof script argument
      * @return a string or null, if {@code arg} is null or {@code arg.getCommand} returns null
      * @see ProofScriptArgument#getDocumentation()
      */
     public static String getDocumentation(ProofScriptArgument<?> arg) {
-        if (arg == null || arg.getCommand() == null) {
-            return null;
-        }
+        if (arg == null || arg.getCommand() == null) { return null; }
         String key = arg.getCommand().getName() + "." + arg.getName();
         return getString(key);
     }
@@ -86,7 +85,8 @@ public final class DescriptionFacade {
     /**
      * Helper function for look-ups in the property file.
      *
-     * @param key look up key
+     * @param key
+     *        look up key
      * @return a non-null string
      */
     private static String getString(String key) {

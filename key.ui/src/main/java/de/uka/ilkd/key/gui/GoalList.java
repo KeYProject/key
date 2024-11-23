@@ -93,9 +93,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         MouseListener ml = new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 setSelectedIndex(locationToIndex(e.getPoint()));
-                if (e.isPopupTrigger()) {
-                    popupMenu().show(e.getComponent(), e.getX(), e.getY());
-                }
+                if (e.isPopupTrigger()) { popupMenu().show(e.getComponent(), e.getX(), e.getY()); }
             }
 
             // Thanks to Windows nonsense
@@ -139,9 +137,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
      * set the KeYMediator
      */
     private void setMediator(KeYMediator m) {
-        if (mediator != null) {
-            unregister();
-        }
+        if (mediator != null) { unregister(); }
         mediator = m;
         register();
         selectingListModel.setProof(mediator.getSelectedProof());
@@ -180,9 +176,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
     private void goalChosen() {
         Goal goal = getSelectedValue();
-        if (goal != null) {
-            mediator.goalChosen(goal);
-        }
+        if (goal != null) { mediator.goalChosen(goal); }
     }
 
     /**
@@ -200,9 +194,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         if (mediator != null) {
             try {
                 final Goal selGoal = mediator.getSelectedGoal();
-                if (selGoal != null) {
-                    setSelectedValue(selGoal, true);
-                }
+                if (selGoal != null) { setSelectedValue(selGoal, true); }
             } catch (IllegalStateException e) {
                 // this exception occurs if no proof is loaded
                 // do nothing
@@ -268,9 +260,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
          */
         private void setProof(Proof p) {
             clear();
-            if (proof != null) {
-                proof.removeProofTreeListener(proofTreeListener);
-            }
+            if (proof != null) { proof.removeProofTreeListener(proofTreeListener); }
             proof = p;
             if (proof != null) {
                 proof.addProofTreeListener(proofTreeListener);
@@ -297,9 +287,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
         public void add(ImmutableList<Goal> g) {
             if (!g.isEmpty()) {
-                for (Goal aG : g) {
-                    goals.add(aG);
-                }
+                for (Goal aG : g) { goals.add(aG); }
                 fireIntervalAdded(this, goals.size() - g.size(), goals.size() - 1);
             }
         }
@@ -372,9 +360,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
              * invoked if the list of goals changed (goals were added, removed etc.)
              */
             public void proofGoalRemoved(ProofTreeEvent e) {
-                if (pruningInProcess) {
-                    return;
-                }
+                if (pruningInProcess) { return; }
                 remove(e.getGoal());
             }
 
@@ -382,9 +368,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
              * invoked if the current goal of the proof changed
              */
             public void proofGoalsAdded(ProofTreeEvent e) {
-                if (pruningInProcess) {
-                    return;
-                }
+                if (pruningInProcess) { return; }
                 add(e.getGoals());
             }
 
@@ -392,17 +376,13 @@ public class GoalList extends JList<Goal> implements TabPanel {
              * invoked if the current goal of the proof changed
              */
             public void proofGoalsChanged(ProofTreeEvent e) {
-                if (pruningInProcess) {
-                    return;
-                }
+                if (pruningInProcess) { return; }
                 clear();
                 add(e.getGoals());
             }
 
             public void proofStructureChanged(ProofTreeEvent e) {
-                if (pruningInProcess) {
-                    return;
-                }
+                if (pruningInProcess) { return; }
                 clear();
                 add(e.getSource().openGoals());
             }
@@ -426,7 +406,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 putValue(SHORT_DESCRIPTION,
                     g.isAutomatic()
                             ? "No automatic rules "
-                                + "will be applied when goal is set to interactive."
+                                    + "will be applied when goal is set to interactive."
                             : "Re-enable automatic rule application for this goal.");
                 putValue(SMALL_ICON,
                     g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : KEY_HOLE_PULL_DOWN_MENU);
@@ -445,9 +425,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             final Goal selectedObject = getSelectedValue();
             final ArrayList<Goal> selectedGoals = new ArrayList<>();
 
-            if (selectedObject != null) {
-                selectedGoals.add(selectedObject);
-            }
+            if (selectedObject != null) { selectedGoals.add(selectedObject); }
 
             return selectedGoals;
         }
@@ -496,9 +474,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
             for (int i = 0, sz = getModel().getSize(); i < sz; i++) {
                 final Goal o = getModel().getElementAt(i);
-                if (o != null && o != selectedObject) {
-                    selectedGoals.add(o);
-                }
+                if (o != null && o != selectedObject) { selectedGoals.add(o); }
             }
             return selectedGoals;
         }
@@ -517,9 +493,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         public void valueChanged(ListSelectionEvent e) {
             final int firstIndex = e.getFirstIndex();
             if (firstIndex >= 0 && firstIndex < GoalList.this.getModel().getSize()) {
-                if (mediator.getSelectedGoal() != GoalList.this.getSelectedValue()) {
-                    goalChosen();
-                }
+                if (mediator.getSelectedGoal() != GoalList.this.getSelectedValue()) { goalChosen(); }
             }
         }
     }
@@ -543,8 +517,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             setEnabled(true);
         }
 
-        public void shutDown(EventObject e) {
-        }
+        public void shutDown(EventObject e) {}
 
     }
 
@@ -615,9 +588,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         }
 
         public Goal getElementAt(int i) {
-            if (i < 0 || i >= getSize()) {
-                return null;
-            }
+            if (i < 0 || i >= getSize()) { return null; }
             return delegate.getElementAt(getDelegateIndex(i));
         }
 
@@ -668,9 +639,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
             for (int i = delegateBegin; i < delegateEnd; ++i) {
                 final Goal goal = delegate.getElementAt(i);
-                if (!isHiddenGoal(goal)) {
-                    entries.add(ind++, i);
-                }
+                if (!isHiddenGoal(goal)) { entries.add(ind++, i); }
             }
 
             return ind;
@@ -685,9 +654,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         private int removeInterval(int delegateBegin, int delegateEnd) {
             final int ind = delegatePosToMappingPos(delegateBegin);
 
-            while (ind != entries.size() && getDelegateIndex(ind) < delegateEnd) {
-                entries.remove(ind);
-            }
+            while (ind != entries.size() && getDelegateIndex(ind) < delegateEnd) { entries.remove(ind); }
 
             return ind;
         }
@@ -697,9 +664,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             // an usable algorithm for this purpose in the Java library?)
 
             for (int res = 0; res != entries.size(); ++res) {
-                if (getDelegateIndex(res) >= delegateIndex) {
-                    return res;
-                }
+                if (getDelegateIndex(res) >= delegateIndex) { return res; }
             }
             return entries.size();
         }
@@ -709,9 +674,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
          * amount
          */
         private void shiftTail(int begin, int amount) {
-            for (; begin != entries.size(); ++begin) {
-                entries.set(begin, getDelegateIndex(begin) + amount);
-            }
+            for (; begin != entries.size(); ++begin) { entries.set(begin, getDelegateIndex(begin) + amount); }
         }
 
         private int delegateSizeChange() {
@@ -746,9 +709,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 updateDelegateSize();
 
                 final int changeEnd = end - 1;
-                if (changeEnd >= begin) {
-                    fireContentsChanged(this, begin, changeEnd);
-                }
+                if (changeEnd >= begin) { fireContentsChanged(this, begin, changeEnd); }
             }
 
             public void intervalAdded(ListDataEvent e) {
@@ -760,9 +721,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
                 final int addBegin = end - (entries.size() - oldSize);
                 final int addEnd = end - 1;
-                if (addEnd >= addBegin) {
-                    fireIntervalAdded(this, addBegin, addEnd);
-                }
+                if (addEnd >= addBegin) { fireIntervalAdded(this, addBegin, addEnd); }
             }
 
             public void intervalRemoved(ListDataEvent e) {
@@ -773,9 +732,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 updateDelegateSize();
 
                 final int remEnd = begin + (oldSize - entries.size()) - 1;
-                if (remEnd >= begin) {
-                    fireIntervalRemoved(this, begin, remEnd);
-                }
+                if (remEnd >= begin) { fireIntervalRemoved(this, begin, remEnd); }
             }
         }
 

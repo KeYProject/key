@@ -58,23 +58,15 @@ public class TestTacletEquality {
             new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String tmp;
             while ((tmp = r.readLine()) != null) {
-                if (tmp.trim().isEmpty()) {
-                    continue;
-                }
-                if (tmp.startsWith("#")) {
-                    continue;
-                }
+                if (tmp.trim().isEmpty()) { continue; }
+                if (tmp.startsWith("#")) { continue; }
                 if (tmp.startsWith("== ")) {
                     StringBuilder expected = new StringBuilder();
                     int nameEnd = tmp.indexOf(' ', 4);
                     String name = tmp.substring(3, nameEnd + 1).trim();
                     while ((tmp = r.readLine()) != null) {
-                        if (tmp.trim().isEmpty()) {
-                            continue;
-                        }
-                        if (tmp.startsWith("#")) {
-                            continue;
-                        }
+                        if (tmp.trim().isEmpty()) { continue; }
+                        if (tmp.startsWith("#")) { continue; }
                         if (tmp.startsWith("---")) {
                             seq.add(Arguments.of(name, expected.toString()));
                             break;
@@ -94,8 +86,9 @@ public class TestTacletEquality {
         File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/gcd.closed.proof");
         if (initConfig == null) {
             ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
-            SingleThreadProblemLoader loader = new SingleThreadProblemLoader(file, null, null, null,
-                JavaProfile.getDefaultInstance(), true, control, false, null);
+            SingleThreadProblemLoader loader =
+                new SingleThreadProblemLoader(file.toPath(), null, null, null,
+                    JavaProfile.getDefaultInstance(), true, control, false, null);
             loader.load();
             initConfig = loader.getInitConfig();
             // uncomment the line, if you want to generate a new oracle file
@@ -151,9 +144,7 @@ public class TestTacletEquality {
 
     private Taclet findTaclet(String name) {
         if (cache.isEmpty()) {
-            for (Taclet taclet : initConfig.activatedTaclets()) {
-                cache.put(taclet.name().toString(), taclet);
-            }
+            for (Taclet taclet : initConfig.activatedTaclets()) { cache.put(taclet.name().toString(), taclet); }
         }
         return cache.get(name);
     }

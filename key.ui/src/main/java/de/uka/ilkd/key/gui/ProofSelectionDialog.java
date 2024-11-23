@@ -62,8 +62,10 @@ public final class ProofSelectionDialog extends JDialog {
     /**
      * Creates a new ProofSelectionDialog for the given proof
      *
-     * @param bundlePath the path of the proof bundle to load
-     * @throws IOException if the proof bundle can not be read
+     * @param bundlePath
+     *        the path of the proof bundle to load
+     * @throws IOException
+     *         if the proof bundle can not be read
      */
     private ProofSelectionDialog(Path bundlePath) throws IOException {
         super(MainWindow.getInstance(), "Choose proof to load", true);
@@ -93,9 +95,7 @@ public final class ProofSelectionDialog extends JDialog {
             dispose();
         });
         // disable "Ok" button if no proof was found
-        if (list.getModel().getSize() == 0) {
-            okButton.setEnabled(false);
-        }
+        if (list.getModel().getSize() == 0) { okButton.setEnabled(false); }
         buttonPanel.add(okButton);
         getRootPane().setDefaultButton(okButton);
 
@@ -116,9 +116,11 @@ public final class ProofSelectionDialog extends JDialog {
     /**
      * Creates a JList and fills it with the proofs found in the bundle.
      *
-     * @param bundlePath the path of the proof bundle
+     * @param bundlePath
+     *        the path of the proof bundle
      * @return the created JList
-     * @throws IOException if the proof bundle can not be read
+     * @throws IOException
+     *         if the proof bundle can not be read
      */
     private JList<Path> createAndFillList(Path bundlePath) throws IOException {
         // create a list of all *.proof files (only top level in bundle)
@@ -134,9 +136,7 @@ public final class ProofSelectionDialog extends JDialog {
 
         // show the list in a JList
         DefaultListModel<Path> model = new DefaultListModel<>();
-        for (Path p : proofs) {
-            model.addElement(p);
-        }
+        for (Path p : proofs) { model.addElement(p); }
         JList<Path> list = new JList<>(model);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
@@ -168,7 +168,8 @@ public final class ProofSelectionDialog extends JDialog {
     /**
      * Abbreviates the filename of the proof if it matches the usual KeY format.
      *
-     * @param proofPath the path (actually only the filename) of the proof
+     * @param proofPath
+     *        the path (actually only the filename) of the proof
      * @return the abbreviated proof name if it matches, the given path as String otherwise
      */
     private static String abbreviateProofPath(Path proofPath) {
@@ -199,7 +200,8 @@ public final class ProofSelectionDialog extends JDialog {
     /**
      * Shows the dialog with the given path and returns the filename of the proof to load.
      *
-     * @param bundlePath the path of the proof bundle
+     * @param bundlePath
+     *        the path of the proof bundle
      * @return the filename of the proof to load
      */
     private static Path showDialog(Path bundlePath) {
@@ -219,22 +221,22 @@ public final class ProofSelectionDialog extends JDialog {
     /**
      * Shows a dialog and allows the user to choose the proof to load from a bundle.
      *
-     * @param bundlePath the path of the proof bundle that is loaded
+     * @param bundlePath
+     *        the path of the proof bundle that is loaded
      * @return the path of the proof relative to the bundle (proofs are always top level, which
      *         means the returned path will only contains the filename of the proof file) or null if
      *         the given path does not denote a bundle
      */
     public static Path chooseProofToLoad(Path bundlePath) {
-        if (isProofBundle(bundlePath)) {
-            return showDialog(bundlePath);
-        }
+        if (isProofBundle(bundlePath)) { return showDialog(bundlePath); }
         return null;
     }
 
     /**
      * Checks if a path denotes a proof bundle.
      *
-     * @param path the path to check
+     * @param path
+     *        the path to check
      * @return true iff the path denotes a proof bundle
      */
     public static boolean isProofBundle(Path path) {

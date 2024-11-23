@@ -7,18 +7,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.Continue;
-import de.uka.ilkd.key.java.statement.LabelJumpStatement;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Return;
-import de.uka.ilkd.key.java.statement.Switch;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.statement.Break;
+import de.uka.ilkd.key.java.ast.statement.Continue;
+import de.uka.ilkd.key.java.ast.statement.LabelJumpStatement;
+import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.statement.Return;
+import de.uka.ilkd.key.java.ast.statement.Switch;
 
 public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
 
@@ -69,32 +69,18 @@ public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
 
     @Override
     protected void walk(final ProgramElement node) {
-        if (node instanceof LoopStatement || node instanceof Switch) {
-            loopAndSwitchCascadeDepth++;
-        }
-        if (node instanceof LabeledStatement) {
-            labels.push(((LabeledStatement) node).getLabel());
-        }
-        if (node instanceof MethodFrame) {
-            frames.push((MethodFrame) node);
-        }
+        if (node instanceof LoopStatement || node instanceof Switch) { loopAndSwitchCascadeDepth++; }
+        if (node instanceof LabeledStatement) { labels.push(((LabeledStatement) node).getLabel()); }
+        if (node instanceof MethodFrame) { frames.push((MethodFrame) node); }
         super.walk(node);
-        if (node instanceof MethodFrame) {
-            frames.pop();
-        }
-        if (node instanceof LabeledStatement) {
-            labels.pop();
-        }
-        if (node instanceof LoopStatement || node instanceof Switch) {
-            loopAndSwitchCascadeDepth--;
-        }
+        if (node instanceof MethodFrame) { frames.pop(); }
+        if (node instanceof LabeledStatement) { labels.pop(); }
+        if (node instanceof LoopStatement || node instanceof Switch) { loopAndSwitchCascadeDepth--; }
     }
 
     @Override
     protected void doAction(final ProgramElement node) {
-        if (node instanceof Break || node instanceof Continue || node instanceof Return) {
-            node.visit(this);
-        }
+        if (node instanceof Break || node instanceof Continue || node instanceof Return) { node.visit(this); }
     }
 
     @Override
@@ -104,16 +90,12 @@ public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
 
     @Override
     public void performActionOnBreak(final Break x) {
-        if (isJumpToOuterLabel(x)) {
-            breaks.add(x);
-        }
+        if (isJumpToOuterLabel(x)) { breaks.add(x); }
     }
 
     @Override
     public void performActionOnContinue(final Continue x) {
-        if (isJumpToOuterLabel(x)) {
-            continues.add(x);
-        }
+        if (isJumpToOuterLabel(x)) { continues.add(x); }
     }
 
     private boolean isJumpToOuterLabel(final LabelJumpStatement x) {
@@ -123,9 +105,7 @@ public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
 
     @Override
     public void performActionOnReturn(final Return x) {
-        if (frames.empty()) {
-            returns.add(x);
-        }
+        if (frames.empty()) { returns.add(x); }
     }
 
 }

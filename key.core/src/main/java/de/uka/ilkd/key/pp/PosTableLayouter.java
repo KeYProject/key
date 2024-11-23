@@ -33,9 +33,12 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
     /**
      * Creates a new layouter.
      *
-     * @param lineWidth the line width to use
-     * @param indentation the default indentation to use
-     * @param pure if true a position table will be generated
+     * @param lineWidth
+     *        the line width to use
+     * @param indentation
+     *        the default indentation to use
+     * @param pure
+     *        if true a position table will be generated
      */
     public PosTableLayouter(int lineWidth, int indentation, boolean pure) {
         super(pure ? new StringBackend<>() : new PosTableStringBackend(), lineWidth, indentation);
@@ -45,7 +48,8 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
     /**
      * Creates a new layouter that will not generate a position table.
      *
-     * @param lineWidth the line width to use
+     * @param lineWidth
+     *        the line width to use
      */
     public static PosTableLayouter pure(int lineWidth) {
         return new PosTableLayouter(lineWidth, INDENT, true);
@@ -61,7 +65,8 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
     /**
      * Creates a new layouter that will generate a position table.
      *
-     * @param lineWidth the line width to use
+     * @param lineWidth
+     *        the line width to use
      */
     public static PosTableLayouter positionTable(int lineWidth) {
         return new PosTableLayouter(lineWidth, INDENT, false);
@@ -91,9 +96,7 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
     }
 
     public void mark(MarkType type, int parameter) {
-        if (!pure) {
-            mark(new Mark(type, parameter));
-        }
+        if (!pure) { mark(new Mark(type, parameter)); }
     }
 
     protected void mark(MarkType type) {
@@ -181,7 +184,8 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
      * position table with the given number of rows. Subclasses may overwrite this method with an
      * empty body if position information is not needed there.
      *
-     * @param size the number of rows of the new position table
+     * @param size
+     *        the number of rows of the new position table
      */
     public void startTerm(int size) {
         mark(MarkType.MARK_START_TERM, size);
@@ -200,9 +204,7 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
      * information is not computed there.
      */
     public InitialPositionTable getInitialPositionTable() {
-        if (pure) {
-            return null;
-        }
+        if (pure) { return null; }
         return ((PosTableStringBackend) backend()).getInitialPositionTable();
     }
 
@@ -259,19 +261,18 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
         MARK_END_JAVA_BLOCK,
     }
 
-    public record Mark(MarkType type, int parameter) {
-    }
+    public record Mark(MarkType type, int parameter) {}
 
     /**
-         * Utility class for stack entries containing the position table and the position of the start
-         * of the subterm in the result.
-         */
-        private record StackEntry(PositionTable posTbl, int p) {
+     * Utility class for stack entries containing the position table and the position of the start
+     * of the subterm in the result.
+     */
+    private record StackEntry(PositionTable posTbl, int p) {
 
         int pos() {
-                return p;
-            }
+            return p;
         }
+    }
 
     /**
      * A {@link de.uka.ilkd.key.util.pp.Backend} which puts its result in a StringBuffer and builds

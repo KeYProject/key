@@ -88,14 +88,16 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
      * This constructor only exists to have uniform constructors for both the modular and the legacy
      * translation.
      *
-     * @param handlerNames not used by this translator!
-     * @param handlerOptions also not used by this translator
-     * @param preamble also also not used
+     * @param handlerNames
+     *        not used by this translator!
+     * @param handlerOptions
+     *        also not used by this translator
+     * @param preamble
+     *        also also not used
      */
     @SuppressWarnings("unused") // can be called via reflection
     public SmtLib2Translator(String[] handlerNames, String[] handlerOptions,
-            @Nullable String preamble) {
-    }
+            @Nullable String preamble) {}
 
     @Override
     protected StringBuilder buildCompleteText(StringBuilder formula,
@@ -127,16 +129,12 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         StringBuilder assump = createAssumptions(assumptions, assumptionBlocks);
 
         result.append("(assert(not \n");
-        if (assump.length() > 0) {
-            result.append("(=> ").append(assump);
-        }
+        if (assump.length() > 0) { result.append("(=> ").append(assump); }
         result.append("\n\n" + GAP + "; The formula to be proved:\n\n");
 
         result.append(formula);
 
-        if (assump.length() > 0) {
-            result.append("\n)" + GAP + "; End of imply.");
-        }
+        if (assump.length() > 0) { result.append("\n)" + GAP + "; End of imply."); }
         result.append("\n))" + GAP + "; End of assert.");
         result.append("\n\n(check-sat)");
 
@@ -192,9 +190,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
 
         if (!assumptions.isEmpty()) {
             assump.append("\n" + GAP + "; Other assumptions:\n");
-            for (StringBuilder s : assumptions) {
-                assump.append(s).append("\n");
-            }
+            for (StringBuilder s : assumptions) { assump.append(s).append("\n"); }
         }
         StringBuilder result = new StringBuilder();
         if (needsAnd) {
@@ -213,9 +209,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         StringBuilder temp = new StringBuilder();
         createPredicateDeclaration(temp, predicates, predicateBlocks);
         createFunctionDeclaration(temp, functions);
-        if (temp.length() > 0) {
-            result.append(temp);
-        }
+        if (temp.length() > 0) { result.append(temp); }
     }
 
     private void createFunctionDeclaration(StringBuilder result,
@@ -223,9 +217,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         // add the function declarations
         if (!functions.isEmpty()) {
             result.append(translateComment(1, "Function declarations\n"));
-            for (ArrayList<StringBuilder> function : functions) {
-                createFunctionDeclaration(function, false, result);
-            }
+            for (ArrayList<StringBuilder> function : functions) { createFunctionDeclaration(function, false, result); }
         }
     }
 
@@ -260,14 +252,10 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         // add other predicates
         if (!predicates.isEmpty()) {
             temp.append(translateComment(1, "Other predicates\n"));
-            for (ArrayList<StringBuilder> predicate : predicates) {
-                createFunctionDeclaration(predicate, true, temp);
-            }
+            for (ArrayList<StringBuilder> predicate : predicates) { createFunctionDeclaration(predicate, true, temp); }
         }
 
-        if (temp.length() > 0) {
-            result.append(temp);
-        }
+        if (temp.length() > 0) { result.append(temp); }
 
 
     }
@@ -279,10 +267,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         StringBuilder returnType = isPredicate ? BOOL : function.remove(function.size() - 1);
         result.append(name);
         result.append(" (");
-        for (StringBuilder s : function) {
-            result.append(s);
-            result.append(" ");
-        }
+        for (StringBuilder s : function) { result.append(s); result.append(" "); }
         result.append(") ");
         result.append(returnType);
         result.append(" )\n");
@@ -291,9 +276,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     private void createSortDeclaration(ArrayList<StringBuilder> types, StringBuilder result) {
         result.append("\n" + GAP + "; Declaration of sorts.\n");
         for (StringBuilder type : types) {
-            if (!(type == INTSTRING || type.compareTo(INTSTRING) == 0)) {
-                createSortDeclaration(type, result);
-            }
+            if (!(type == INTSTRING || type.compareTo(INTSTRING) == 0)) { createSortDeclaration(type, result); }
         }
     }
 
@@ -306,8 +289,10 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     /**
      * Translate a sort.
      *
-     * @param name the sorts name
-     * @param isIntVal true, if the sort should represent some kind of integer
+     * @param name
+     *        the sorts name
+     * @param isIntVal
+     *        true, if the sort should represent some kind of integer
      * @return Argument 1 of the return value is the sort used in var declarations, Argument2 is the
      *         sort used for type predicates
      */
@@ -612,9 +597,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
             toReturn.append("(");
             toReturn.append(name).append(" ");
 
-            for (StringBuilder arg : args) {
-                toReturn.append(arg).append(" ");
-            }
+            for (StringBuilder arg : args) { toReturn.append(arg).append(" "); }
             toReturn.append(")");
         }
         return toReturn;

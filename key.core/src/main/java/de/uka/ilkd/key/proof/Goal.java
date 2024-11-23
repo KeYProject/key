@@ -132,7 +132,8 @@ public final class Goal {
     /**
      * Checks if the {@link Goal} has applicable rules.
      *
-     * @param goal The {@link Goal} to check.
+     * @param goal
+     *        The {@link Goal} to check.
      * @return {@code true} has applicable rules, {@code false} no rules are applicable.
      */
     public static boolean hasApplicableRules(Goal goal) {
@@ -150,9 +151,7 @@ public final class Goal {
      * @return the strategy that determines automated rule applications for this goal
      */
     public Strategy getGoalStrategy() {
-        if (goalStrategy == null) {
-            goalStrategy = proof().getActiveStrategy();
-        }
+        if (goalStrategy == null) { goalStrategy = proof().getActiveStrategy(); }
         return goalStrategy;
     }
 
@@ -199,7 +198,8 @@ public final class Goal {
      * adds the listener l to the list of goal listeners. Attention: A listener added to this goal
      * will be taken over when splitting into subgoals.
      *
-     * @param l the GoalListener to be added
+     * @param l
+     *        the GoalListener to be added
      */
     public void addGoalListener(GoalListener l) {
         listeners.add(l);
@@ -210,7 +210,8 @@ public final class Goal {
      * removed from 'this' goal not from the other goals. (All goals can be accessed via proof
      * openGoals())
      *
-     * @param l the GoalListener to be removed
+     * @param l
+     *        the GoalListener to be removed
      */
     public void removeGoalListener(GoalListener l) {
         listeners.remove(l);
@@ -229,28 +230,23 @@ public final class Goal {
         ruleAppIndex.sequentChanged(sci);
         var time2 = System.nanoTime();
         PERF_UPDATE_RULE_APP_INDEX.getAndAdd(time2 - time1);
-        for (GoalListener listener : listeners) {
-            listener.sequentChanged(this, sci);
-        }
+        for (GoalListener listener : listeners) { listener.sequentChanged(this, sci); }
         PERF_UPDATE_LISTENERS.getAndAdd(System.nanoTime() - time2);
     }
 
     private void fireGoalReplaced(Goal goal, Node parent, ImmutableList<Goal> newGoals) {
-        for (GoalListener listener : listeners) {
-            listener.goalReplaced(goal, parent, newGoals);
-        }
+        for (GoalListener listener : listeners) { listener.goalReplaced(goal, parent, newGoals); }
     }
 
     private void fireAutomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
-        for (GoalListener listener : listeners) {
-            listener.automaticStateChanged(this, oldAutomatic, newAutomatic);
-        }
+        for (GoalListener listener : listeners) { listener.automaticStateChanged(this, oldAutomatic, newAutomatic); }
     }
 
     /**
      * set the node the goal is related to
      *
-     * @param p_node the Node in the proof tree to which this goal refers to
+     * @param p_node
+     *        the Node in the proof tree to which this goal refers to
      */
     private void setNode(Node p_node) {
         if (node().sequent() != p_node.sequent()) {
@@ -324,7 +320,8 @@ public final class Goal {
     /**
      * Sets the automatic status of this goal.
      *
-     * @param t the new status: true for automatic, false for interactive
+     * @param t
+     *        the new status: true for automatic, false for interactive
      */
     public void setEnabled(boolean t) {
         boolean oldAutomatic = automatic;
@@ -348,7 +345,8 @@ public final class Goal {
      * TODO: Check whether it is problematic when multiple child nodes of a node are linked; in this
      * case, the linkedNode field would be overwritten.
      *
-     * @param linkedGoal The goal that this goal is linked to.
+     * @param linkedGoal
+     *        The goal that this goal is linked to.
      */
     public void setLinkedGoal(final Goal linkedGoal) {
         this.linkedGoal = linkedGoal;
@@ -357,7 +355,8 @@ public final class Goal {
     /**
      * sets the sequent of the node
      *
-     * @param sci SequentChangeInfo containing the sequent to be set and describing the applied
+     * @param sci
+     *        SequentChangeInfo containing the sequent to be set and describing the applied
      *        changes to the sequent of the node currently pointed to by this goal
      */
     public void setSequent(SequentChangeInfo sci) {
@@ -378,8 +377,10 @@ public final class Goal {
      * adds a formula to the sequent before the given position and informs the rule application
      * index about this change
      *
-     * @param cf the SequentFormula to be added
-     * @param p PosInOccurrence encodes the position
+     * @param cf
+     *        the SequentFormula to be added
+     * @param p
+     *        PosInOccurrence encodes the position
      */
     public void addFormula(SequentFormula cf, PosInOccurrence p) {
         setSequent(sequent().addFormula(cf, p));
@@ -389,10 +390,13 @@ public final class Goal {
      * adds a formula to the antecedent or succedent of a sequent. Either at its front or back and
      * informs the rule application index about this change
      *
-     * @param cf the SequentFormula to be added
-     * @param inAntec boolean true(false) if SequentFormula has to be added to antecedent
+     * @param cf
+     *        the SequentFormula to be added
+     * @param inAntec
+     *        boolean true(false) if SequentFormula has to be added to antecedent
      *        (succedent)
-     * @param first boolean true if at the front, if false then cf is added at the back
+     * @param first
+     *        boolean true if at the front, if false then cf is added at the back
      */
     public void addFormula(SequentFormula cf, boolean inAntec, boolean first) {
         setSequent(sequent().addFormula(cf, inAntec, first));
@@ -402,8 +406,10 @@ public final class Goal {
      * replaces a formula at the given position and informs the rule application index about this
      * change
      *
-     * @param cf the SequentFormula replacing the old one
-     * @param p the PosInOccurrence encoding the position
+     * @param cf
+     *        the SequentFormula replacing the old one
+     * @param p
+     *        the PosInOccurrence encoding the position
      */
     public void changeFormula(SequentFormula cf, PosInOccurrence p) {
         setSequent(sequent().changeFormula(cf, p));
@@ -413,7 +419,8 @@ public final class Goal {
      * removes a formula at the given position from the sequent and informs the rule appliccation
      * index about this change
      *
-     * @param p PosInOccurrence encodes the position
+     * @param p
+     *        PosInOccurrence encodes the position
      */
     public void removeFormula(PosInOccurrence p) {
         setSequent(sequent().removeFormula(p));
@@ -423,7 +430,8 @@ public final class Goal {
      * puts the NoPosTacletApp to the set of TacletApps at the node of the goal and to the current
      * RuleAppIndex.
      *
-     * @param app the TacletApp
+     * @param app
+     *        the TacletApp
      */
     public void addNoPosTacletApp(NoPosTacletApp app) {
         node().addNoPosTacletApp(app);
@@ -434,8 +442,10 @@ public final class Goal {
      * creates a new TacletApp and puts it to the set of TacletApps at the node of the goal and to
      * the current RuleAppIndex.
      *
-     * @param rule the Taclet of the TacletApp to create
-     * @param insts the given instantiations of the TacletApp to be created
+     * @param rule
+     *        the Taclet of the TacletApp to create
+     * @param insts
+     *        the given instantiations of the TacletApp to be created
      */
     public void addTaclet(Taclet rule, SVInstantiations insts, boolean isAxiom) {
         NoPosTacletApp tacletApp =
@@ -467,7 +477,8 @@ public final class Goal {
      * <p>
      * The local symbols are reused. This is taken care of later.
      *
-     * @param node the new Node to which the goal is attached
+     * @param node
+     *        the new Node to which the goal is attached
      * @return Object the clone
      */
     @SuppressWarnings("unchecked")
@@ -500,7 +511,8 @@ public final class Goal {
      * puts a RuleApp to the list of the applied rule apps at this goal and stores it in the node of
      * the goal
      *
-     * @param app the applied rule app
+     * @param app
+     *        the applied rule app
      */
     public void addAppliedRuleApp(RuleApp app) {
         // Last app first makes inserting and searching faster
@@ -520,7 +532,8 @@ public final class Goal {
      * creates n new nodes as children of the referenced node and new n goals that have references
      * to these new nodes.
      *
-     * @param n number of goals to create
+     * @param n
+     *        number of goals to create
      * @return the list of new created goals.
      */
     public @NonNull ImmutableList<Goal> split(int n) {
@@ -549,9 +562,7 @@ public final class Goal {
             this.setNode(newNode[0]);
             goalList = goalList.prepend(this);
 
-            for (int i = 1; i < n; i++) {
-                goalList = goalList.prepend(clone(newNode[i]));
-            }
+            for (int i = 1; i < n; i++) { goalList = goalList.prepend(clone(newNode[i])); }
         }
 
         fireGoalReplaced(this, parent, goalList);
@@ -574,12 +585,8 @@ public final class Goal {
      */
     private void resetLocalSymbols() {
         NamespaceSet newNS = proof().getServices().getNamespaces().copyWithParent();
-        for (IProgramVariable pv : node.getLocalProgVars()) {
-            newNS.programVariables().add(pv);
-        }
-        for (JFunction op : node.getLocalFunctions()) {
-            newNS.functions().add(op);
-        }
+        for (IProgramVariable pv : node.getLocalProgVars()) { newNS.programVariables().add(pv); }
+        for (JFunction op : node.getLocalFunctions()) { newNS.functions().add(op); }
 
         localNamespaces = newNS.copyWithParent();
     }
@@ -590,7 +597,8 @@ public final class Goal {
      * This will also populate a {@link RuleAppInfo} object and fire the corresponding event.
      * The state of the proof is also updated.
      *
-     * @param ruleApp the rule app
+     * @param ruleApp
+     *        the rule app
      * @return new goal(s)
      */
     public ImmutableList<Goal> apply(final RuleApp ruleApp) {
@@ -615,9 +623,7 @@ public final class Goal {
             PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
         }
         // can be null when the taclet failed to apply (RuleAbortException)
-        if (goalList == null) {
-            return null;
-        }
+        if (goalList == null) { return null; }
 
         proof.getServices().saveNameRecorder(n);
 
@@ -692,7 +698,8 @@ public final class Goal {
      * <p>
      * The parameter is copied and stored locally.
      *
-     * @param ns a non-null set of namesspaces which applies to this goal.
+     * @param ns
+     *        a non-null set of namesspaces which applies to this goal.
      */
     public void makeLocalNamespacesFrom(NamespaceSet ns) {
         this.localNamespaces = ns.copyWithParent().copyWithParent();

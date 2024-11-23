@@ -169,9 +169,7 @@ class Printer<M> {
      */
     private void newLine() {
         back.newLine();
-        if (pos > 0) {
-            writeSpaces(pos);
-        }
+        if (pos > 0) { writeSpaces(pos); }
     }
 
     /** how many spaces */
@@ -181,10 +179,7 @@ class Printer<M> {
     private static final String spaces = " ".repeat(SPACES);
 
     private void writeSpaces(int n) {
-        while (n > SPACES) {
-            back.print(spaces);
-            n -= SPACES;
-        }
+        while (n > SPACES) { back.print(spaces); n -= SPACES; }
         back.print(spaces.substring(0, n));
     }
 }

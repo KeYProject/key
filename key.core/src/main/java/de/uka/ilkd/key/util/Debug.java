@@ -28,14 +28,11 @@ public final class Debug {
     /**
      * an assertion failure is thrown if isOK is evaluated to false
      *
-     * @param isOK boolean the assertion that is checked
+     * @param isOK
+     *        boolean the assertion that is checked
      */
     public static void assertTrue(boolean isOK) {
-        if (ENABLE_ASSERTION) {
-            if (!isOK) {
-                fail();
-            }
-        }
+        if (ENABLE_ASSERTION) { if (!isOK) { fail(); } }
     }
 
     public static void assertFalse(boolean isNotOK) {
@@ -46,49 +43,41 @@ public final class Debug {
      * an assertion failure is thrown if isOK is evaluated to false the text in message is handed
      * over to this exception
      *
-     * @param isOK boolean the assertion that is checked
-     * @param message String describes the failed assertion
+     * @param isOK
+     *        boolean the assertion that is checked
+     * @param message
+     *        String describes the failed assertion
      */
     public static void assertTrue(boolean isOK, String message) {
-        if (ENABLE_ASSERTION) {
-            if (!isOK) {
-                fail(message);
-            }
-        }
+        if (ENABLE_ASSERTION) { if (!isOK) { fail(message); } }
     }
 
     /**
      * an assertion failure is thrown if isOK is evaluated to false the text in message is handed
      * over to this exception
      *
-     * @param isOK boolean the assertion that is checked
-     * @param message String describes the failed assertion
+     * @param isOK
+     *        boolean the assertion that is checked
+     * @param message
+     *        String describes the failed assertion
      */
     public static void assertTrue(boolean isOK, String message, Object parameter) {
-        if (ENABLE_ASSERTION) {
-            if (!isOK) {
-                fail(message + ":" + parameter);
-            }
-        }
+        if (ENABLE_ASSERTION) { if (!isOK) { fail(message + ":" + parameter); } }
     }
 
     /**
      * an assertion failure is thrown if an iterable object is either null or contains the null
      * element.
      *
-     * @param iterable The iterable object to check
-     * @param message String describes the failed assertion
+     * @param iterable
+     *        The iterable object to check
+     * @param message
+     *        String describes the failed assertion
      */
     public static void assertDeepNonNull(Iterable<?> iterable, String message) {
         if (ENABLE_ASSERTION) {
-            if (iterable == null) {
-                fail("Null pointer: " + message);
-            }
-            for (Object object : iterable) {
-                if (object == null) {
-                    fail("Null element in collection:" + message);
-                }
-            }
+            if (iterable == null) { fail("Null pointer: " + message); }
+            for (Object object : iterable) { if (object == null) { fail("Null element in collection:" + message); } }
         }
     }
 
@@ -101,14 +90,10 @@ public final class Debug {
     }
 
     public static void fail(String message) {
-        if (ENABLE_ASSERTION) {
-            throw new AssertionFailure("\nAssertion failure: " + message);
-        }
+        if (ENABLE_ASSERTION) { throw new AssertionFailure("\nAssertion failure: " + message); }
     }
 
     public static void fail(String message, Object o) {
-        if (ENABLE_ASSERTION) {
-            throw new AssertionFailure("\nAssertion failure: " + message + ":" + o);
-        }
+        if (ENABLE_ASSERTION) { throw new AssertionFailure("\nAssertion failure: " + message + ":" + o); }
     }
 }

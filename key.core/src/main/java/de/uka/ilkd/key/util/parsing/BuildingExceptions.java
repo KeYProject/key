@@ -13,8 +13,21 @@ public class BuildingExceptions extends RuntimeException {
     private final List<BuildingIssue> errors;
 
     public BuildingExceptions(List<BuildingIssue> errors) {
-        super("Multiple errors occured");
+        super(formatMessage(errors));
         this.errors = errors;
+    }
+
+    private static String formatMessage(List<BuildingIssue> errors) {
+        var sb = new StringBuilder();
+        sb.append("Multiple errors occurred:");
+        for (BuildingIssue error : errors) {
+            sb.append(System.lineSeparator())
+                    .append(error.position())
+                    .append(": ")
+                    .append(error.message());
+        }
+
+        return sb.toString();
     }
 
     public List<BuildingIssue> getErrors() {

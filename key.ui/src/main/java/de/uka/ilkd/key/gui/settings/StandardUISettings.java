@@ -24,7 +24,7 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private static final String INFO_CLUTTER_RULESET =
         "Comma separated list of rule set names, containing clutter rules.";
     private static final String INFO_CLUTTER_RULE = "Comma separated listof clutter rules, \n"
-        + "which are rules with less priority in the taclet menu";
+            + "which are rules with less priority in the taclet menu";
     private static final String LOOK_AND_FEEL_INFO = """
             Look and feel used by KeY.
             'System' tries to mimic the default looks, 'Metal' is the Java default.
