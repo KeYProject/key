@@ -6,22 +6,6 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.*;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.zip.ZipFile;
-
-import de.uka.ilkd.key.java.Position;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.Consumer;
@@ -53,9 +37,6 @@ import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
-
-import org.antlr.runtime.MismatchedTokenException;
-import org.key_project.util.reflection.ClassLoaderUtil;
 
 import org.antlr.runtime.MismatchedTokenException;
 import org.jspecify.annotations.Nullable;
