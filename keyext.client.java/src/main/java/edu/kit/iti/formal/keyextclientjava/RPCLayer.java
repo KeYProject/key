@@ -2,13 +2,15 @@ package edu.kit.iti.formal.keyextclientjava;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.jspecify.annotations.Nullable;
 
 import java.io.*;
-import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 
 /**
  * @author Alexander Weigl
@@ -21,23 +23,20 @@ public final class RPCLayer {
 
     private final BufferedReader incoming;
     private final Writer outgoing;
-    private final Thread threadListener;
 
-    private ReentrantLock lockSend = new ReentrantLock();
+    private @Nullable Thread threadListener;
+    private @Nullable Thread threadMessageHandling;
 
     private final ConcurrentHashMap<String, Object> waiting = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, Object> responses = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, JsonObject> responses = new ConcurrentHashMap<>();
+    public final ArrayBlockingQueue<JsonObject> incomingMessages = new ArrayBlockingQueue<>(16);
 
-    private AtomicInteger idCounter = new AtomicInteger();
+    private final AtomicInteger idCounter = new AtomicInteger();
 
-    public Consumer<Object> allEventHandler = (o) -> {
-    };
 
     public RPCLayer(Reader incoming, Writer outgoing) {
         this.incoming = new BufferedReader(incoming);
         this.outgoing = outgoing;
-        threadListener = new Thread(this::listenForEvents);
-        threadListener.start();
     }
 
     public static RPCLayer startWithCLI(String jarFile) throws IOException {
@@ -48,51 +47,34 @@ public final class RPCLayer {
         return new RPCLayer(incoming, outgoing);
     }
 
-    private void listenForEvents() {
-        char[] buf = new char[4 * 1024];
+    public JsonObject waitForResponse(String id) throws InterruptedException {
+        var cond = waiting.get(id);
+        synchronized (cond) {
+            cond.wait();
+        }
+        var r = responses.get(id);
+        waiting.remove(id);
+        responses.remove(id);
+        return r;
+    }
+
+    public JsonObject callSync(String methodName, Object... args) {
+        var id = nextId();
+        waiting.put(id, new Object());
         try {
-            while (true) {
-                String length = incoming.readLine();
-                if (length == null) {
-                    break; // connection closed
-                }
-
-                if (!length.startsWith("Content-Length: ")) {
-                    break;//communication mismatch
-                }
-
-                int len = Integer.parseInt(length.substring(17));
-
-                if (buf.length <= len + 2) {//also read \r\n,
-                    buf = new char[len + 2]; //reallocate more
-                }
-
-                int count = incoming.read(buf);
-                assert count == buf.length;
-
-                var message = new String(buf, 0, count);
-                processIncomingMessage(message);
-            }
-        } catch (IOException e) {
+            sendAsync(id, methodName, args);
+            var response = waitForResponse(id);
+            return handleError(response);
+        } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void processIncomingMessage(String message) {
-        var simpleMap = gson.fromJson(message, Map.class);
-    }
-
-    public Object waitForResponse(String id) throws InterruptedException {
-        var cond = waiting.get(id);
-        cond.wait();
-        return responses.get(id);
-    }
-
-    public Object callSync(String methodName, Object... args) throws InterruptedException, IOException {
-        var id = nextId();
-        waiting.put(id, new Object());
-        sendAsync(id, methodName, args);
-        return waitForResponse(id);
+    private JsonObject handleError(JsonObject response) {
+        if (response.get("error") != null) {
+            throw new RuntimeException("Request did not succeed " + response.get("error"));
+        }
+        return response;
     }
 
     public void callAsync(String methodName, Object... args) throws IOException {
@@ -105,16 +87,126 @@ public final class RPCLayer {
     }
 
     private void sendAsync(String id, String methodName, Object[] args) throws IOException {
+        var json = JsonRPC.createRequest(id, methodName, args);
+        outgoing.write(JsonRPC.addHeader(json));
+        outgoing.flush();
+    }
+
+    public void start() {
+        threadListener = new Thread(new JsonStreamListener(incoming, incomingMessages));
+        threadMessageHandling = new Thread(this::handler);
+        threadListener.start();
+        threadMessageHandling.start();
+    }
+
+    private void handler() {
         try {
-            lockSend.lock();
-            var map = Map.of("id", id, "method", methodName, "args", args);
-            var json = gson.toJson(map);
-            outgoing.write("Content-Length: %d\r\n".formatted(json.length()));
-            outgoing.write(json);
-            outgoing.write("\r\n");
-            outgoing.flush();
-        } finally {
-            lockSend.unlock();
+            while (true) {
+                var obj = incomingMessages.poll(1, TimeUnit.MINUTES);
+                if (obj == null) {
+                    continue;
+                }
+                if (obj.get("id") != null) {
+                    var id = obj.get("id").getAsString();
+                    responses.put(id, obj); // store response
+                    var syncObj = waiting.get(id);
+
+                    synchronized (syncObj) {
+                        syncObj.notifyAll();
+                    }
+                } else {
+                    //TODO handle notification
+                    System.out.println("Notification received");
+                    System.out.println(obj);
+                }
+            }
+        } catch (InterruptedException ignored) {
+        }
+    }
+
+    public void dispose() {
+        if (threadListener != null) {
+            threadListener.interrupt();
+        }
+    }
+
+    public static class JsonStreamListener implements Runnable {
+        private final char[] CLENGTH = (JsonRPC.CONTENT_LENGTH + " ").toCharArray();
+        private final Reader incoming;
+        private final ArrayBlockingQueue<JsonObject> incomingMessageQueue;
+        /**
+         * Internal buffer for reading efficient.
+         */
+        private char[] buf = new char[4 * 1024];
+
+        public JsonStreamListener(Reader incoming, ArrayBlockingQueue<JsonObject> queue) {
+            this.incoming = new BufferedReader(incoming); // ensure bufferness
+            this.incomingMessageQueue = queue;
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (true) {
+                    final var message = readMessage();
+                    if (message == null) break;
+                    final var jsonObject = JsonParser.parseString(message).getAsJsonObject();
+                    incomingMessageQueue.add(jsonObject);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        protected void processIncomingMessage(String message) {
+
+        }
+
+
+        public @Nullable String readMessage() throws IOException {
+            expectedContentLength();
+            final var len = readLength() + 2; //also read \r\n,
+
+            if (len == 2) {// EOF reached
+                return null;
+            }
+
+            if (buf.length <= len) { //reallocate more if necessary
+                buf = new char[len];
+            }
+
+            int count = incoming.read(buf, 0, len);
+            assert count == len;
+            return new String(buf, 0, count).trim();
+        }
+
+        private int readLength() throws IOException {
+            int c;
+            int len = 0;
+            do {
+                c = incoming.read();
+                //if (Character.isWhitespace(c)) continue;
+                if (c == -1) return 0;
+                if (c == '\r' || c == '\n') break;
+                if (Character.isDigit(c)) {
+                    len = len * 10 + c - '0';
+                } else {
+                    throw new IllegalStateException("Expected: a digit, but got '%c'".formatted(c));
+                }
+            } while (c != -1);
+            c = incoming.read(); // consume the '\n'
+            assert c == '\n';
+            return len;
+        }
+
+        private void expectedContentLength() throws IOException {
+            for (var e : CLENGTH) {
+                int c = incoming.read();
+                if (c == -1) return;
+                if (e != c) {
+                    throw new IllegalStateException("Expected: '%c', but got '%c'".formatted(e, c));
+                }
+            }
         }
     }
 }

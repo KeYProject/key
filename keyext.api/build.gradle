@@ -8,6 +8,7 @@ plugins {
 }
 
 description "Verification server interface via JSON-RPC"
+mainClassName ="org.keyproject.key.api.StartServer"
 
 dependencies {
     api(project(":key.core"))
