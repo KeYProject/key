@@ -4,7 +4,6 @@
 package org.key_project.rusty.speclang;
 
 
-import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import org.key_project.logic.Term;
@@ -34,13 +33,11 @@ public interface FunctionalOperationContract extends OperationContract {
      * @param selfVar the self variable.
      * @param paramVars the list of parameter variables.
      * @param resultVar the result variable.
-     * @param atPreVars the map of old variables.
      * @param services the services object.
      * @return the post condition.
      */
     Term getPost(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
-            Map<ProgramVariable, ProgramVariable> atPreVars,
             Services services);
 
 

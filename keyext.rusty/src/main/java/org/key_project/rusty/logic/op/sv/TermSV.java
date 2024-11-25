@@ -7,6 +7,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
+import org.key_project.rusty.pp.Layouter;
 
 import org.jspecify.annotations.NonNull;
 
@@ -27,5 +28,11 @@ public class TermSV extends OperatorSV implements TerminalSyntaxElement {
     @Override
     public @NonNull String toString() {
         return toString(sort() + " term");
+    }
+
+    @Override
+    public void layout(Layouter<?> l) {
+        l.print("\\schemaVar \\term ").print(sort().name().toString()).print(" ")
+                .print(name().toString());
     }
 }

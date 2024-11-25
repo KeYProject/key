@@ -134,7 +134,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * @param freePosts the free/unchecked postcondition of the contract
      * @param axioms the class axioms of the method
      * @param modifiables the modifiable clause of the contract
-     * @param modifiables the free modifiable clause of the contract
+     * @param freeModifiables the free modifiable clause of the contract
      * @param accessibles the dependency clause of the contract
      * @param hasRealModifiable whether the contract has a modifiable set
      * @param hasRealFreeModifiable whether the contract has a free modifiable set

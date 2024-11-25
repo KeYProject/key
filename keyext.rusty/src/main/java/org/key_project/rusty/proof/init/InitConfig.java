@@ -15,11 +15,13 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.Choice;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.proof.Node;
 import org.key_project.rusty.proof.TacletIndex;
 import org.key_project.rusty.proof.io.consistency.FileRepo;
-import org.key_project.rusty.rule.BuiltInRule;
-import org.key_project.rusty.rule.RuleSet;
-import org.key_project.rusty.rule.Taclet;
+import org.key_project.rusty.proof.mgt.RuleJustification;
+import org.key_project.rusty.proof.mgt.RuleJustificationByAddRules;
+import org.key_project.rusty.proof.mgt.RuleJustificationInfo;
+import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.tacletbuilder.TacletBuilder;
 import org.key_project.rusty.settings.ProofSettings;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -34,6 +36,8 @@ public class InitConfig {
      * the services class allowing to access information about the underlying program model
      */
     private final Services services;
+
+    private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
     private ProofSettings settings;
 
@@ -263,6 +267,7 @@ public class InitConfig {
         ic.taclets = taclets;
         ic.fileRepo = fileRepo; // TODO: copy instead? delete via dispose method?
         ic.setActivatedChoices(activatedChoices);
+        ic.justifInfo = justifInfo.copy();
         return ic;
     }
 
@@ -321,6 +326,29 @@ public class InitConfig {
     }
 
     /**
+     * registers a rule with the given justification at the justification managing
+     * {@link RuleJustification} object of this environment.
+     */
+    public void registerRule(Rule r, RuleJustification j) {
+        justifInfo.addJustification(r, j);
+    }
+
+    public void registerRuleIntroducedAtNode(RuleApp r, Node node, boolean isAxiom) {
+        justifInfo.addJustification(r.rule(), new RuleJustificationByAddRules(node, isAxiom));
+    }
+
+    /**
+     * registers a list of rules with the given justification at the justification managing
+     * {@link RuleJustification} object of this environment. All rules of the list are given the
+     * same justification.
+     */
+    public void registerRules(Iterable<? extends Rule> s, RuleJustification j) {
+        for (Rule r : s) {
+            registerRule(r, j);
+        }
+    }
+
+    /**
      * Adds a default option for a category. It does override previous default choices.
      *
      * @return true if the default was successfully set
@@ -331,5 +359,9 @@ public class InitConfig {
             return true;
         }
         return false;
+    }
+
+    public RuleJustificationInfo getJustifInfo() {
+        return justifInfo;
     }
 }

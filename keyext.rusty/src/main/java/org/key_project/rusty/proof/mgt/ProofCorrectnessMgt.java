@@ -9,6 +9,7 @@ import java.util.Set;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.speclang.Contract;
+import org.key_project.util.collection.ImmutableList;
 
 public final class ProofCorrectnessMgt {
     private final Proof proof;
@@ -24,6 +25,28 @@ public final class ProofCorrectnessMgt {
     public ProofCorrectnessMgt(Proof p) {
         this.proof = p;
         this.specRepos = p.getServices().getSpecificationRepository();
+    }
+
+    // -------------------------------------------------------------------------
+    // internal methods
+    // -------------------------------------------------------------------------
+
+
+    private boolean allHaveMeasuredBy(ImmutableList<Contract> contracts) {
+        for (Contract contract : contracts) {
+            if (!contract.hasMby()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
+
+    public RuleJustification getJustification(RuleApp r) {
+        return proof.getInitConfig().getJustifInfo().getJustification(r, proof.getServices());
     }
 
     /**

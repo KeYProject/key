@@ -7,13 +7,13 @@ import java.util.function.UnaryOperator;
 
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.ast.fn.Function;
+import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableList;
 
 public interface OperationContract extends Contract {
     @Override
-    Function getTarget();
+    ProgramFunction getTarget();
 
     @Override
     OperationContract map(UnaryOperator<Term> op, Services services);

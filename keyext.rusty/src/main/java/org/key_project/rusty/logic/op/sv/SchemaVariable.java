@@ -4,6 +4,7 @@
 package org.key_project.rusty.logic.op.sv;
 
 import org.key_project.logic.Named;
+import org.key_project.rusty.pp.Layouter;
 
 /**
  * This interface represents the root of a schema variable hierarchy to be express termstructures
@@ -18,4 +19,11 @@ public interface SchemaVariable extends Named {
      *         the instantiation of the generic sort)
      */
     boolean isStrict();
+
+    /**
+     * Creates a parseable string representation of the declaration of the schema variable.
+     *
+     * @param l the layouter to use
+     */
+    void layout(Layouter<?> l);
 }

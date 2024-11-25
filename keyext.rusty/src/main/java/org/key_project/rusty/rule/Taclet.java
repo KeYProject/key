@@ -4,16 +4,19 @@
 package org.key_project.rusty.rule;
 
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.BoundVarsVisitor;
-import org.key_project.rusty.logic.ChoiceExpr;
-import org.key_project.rusty.logic.Sequent;
+import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.match.VMTacletMatcher;
+import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import org.key_project.rusty.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -492,5 +495,39 @@ public abstract class Taclet implements Rule {
 
     public ChoiceExpr getChoices() {
         return choices;
+    }
+
+    public Set<SchemaVariable> collectSchemaVars() {
+        Set<SchemaVariable> result = new LinkedHashSet<>();
+        OpCollector oc = new OpCollector();
+
+        // find, assumes
+        for (SchemaVariable sv : this.getIfFindVariables()) {
+            result.add(sv);
+        }
+
+        // add, replacewith
+        for (TacletGoalTemplate tgt : this.goalTemplates()) {
+            collectSchemaVarsHelper(tgt.sequent(), oc);
+            if (tgt instanceof AntecSuccTacletGoalTemplate astgt) {
+                collectSchemaVarsHelper(astgt.replaceWith(), oc);
+            } else if (tgt instanceof RewriteTacletGoalTemplate rwtgt) {
+                rwtgt.replaceWith().execPostOrder(oc);
+            }
+        }
+
+        for (Operator op : oc.ops()) {
+            if (op instanceof SchemaVariable sv) {
+                result.add(sv);
+            }
+        }
+
+        return result;
+    }
+
+    private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
+        for (SequentFormula cf : s) {
+            cf.formula().execPostOrder(oc);
+        }
     }
 }

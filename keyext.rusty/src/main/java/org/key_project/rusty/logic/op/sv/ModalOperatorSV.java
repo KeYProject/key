@@ -5,6 +5,7 @@ package org.key_project.rusty.logic.op.sv;
 
 import org.key_project.logic.Name;
 import org.key_project.rusty.logic.op.Modality;
+import org.key_project.rusty.pp.Layouter;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -47,4 +48,18 @@ public class ModalOperatorSV extends Modality.RustyModalityKind implements Schem
         return false;
     }
 
+    @Override
+    public void layout(Layouter<?> l) {
+        l.beginC(0).beginC().print("\\schemaVar \\modalOperator {").brk(0);
+        boolean first = true;
+        for (Modality.RustyModalityKind modality : modalities) {
+            if (!first) {
+                l.print(",").brk();
+            } else {
+                first = false;
+            }
+            l.print(modality.name().toString());
+        }
+        l.end().brk(0).print("}").end().print(" ").print(name().toString());
+    }
 }

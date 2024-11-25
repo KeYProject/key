@@ -7,6 +7,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
+import org.key_project.rusty.pp.Layouter;
 
 import org.jspecify.annotations.NonNull;
 
@@ -26,5 +27,16 @@ public class SkolemTermSV extends OperatorSV implements TerminalSyntaxElement {
     @Override
     public @NonNull String toString() {
         return toString(sort() + " skolem term");
+    }
+
+    @Override
+    public void layout(Layouter<?> l) {
+        l.print("\\schemaVar ");
+        if (sort() == RustyDLTheory.FORMULA) {
+            l.print("\\skolemFormula");
+        } else {
+            l.print("\\skolemTerm ").print(sort().name().toString());
+        }
+        l.print(" ").print(name().toString());
     }
 }

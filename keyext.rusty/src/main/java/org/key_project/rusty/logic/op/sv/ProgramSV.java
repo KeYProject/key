@@ -14,6 +14,7 @@ import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.ProgramConstruct;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
+import org.key_project.rusty.pp.Layouter;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.inst.ProgramList;
 import org.key_project.rusty.rule.inst.SVInstantiations;
@@ -206,5 +207,11 @@ public final class ProgramSV extends OperatorSV
     @Override
     public Type type(Services services) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void layout(Layouter<?> layouter) {
+        layouter.print("\\schemaVar \\program ").print(sort().declarationString()).print(" ")
+                .print(name().toString());
     }
 }

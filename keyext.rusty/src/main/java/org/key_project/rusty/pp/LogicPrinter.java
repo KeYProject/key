@@ -4,6 +4,7 @@
 package org.key_project.rusty.pp;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -16,8 +17,13 @@ import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.*;
 import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
+import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.inst.SVInstantiations;
+import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import org.key_project.rusty.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -129,6 +135,326 @@ public class LogicPrinter {
      */
     public void setInstantiation(SVInstantiations instantiations) {
         this.instantiations = instantiations;
+    }
+
+    /**
+     * Pretty-print a taclet. Line-breaks are taken care of. No instantiation is applied.
+     *
+     * @param taclet The Taclet to be pretty-printed.
+     */
+    public void printTaclet(Taclet taclet) {
+        // the last argument used to be false. Changed that - M.Ulbrich
+        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, true);
+    }
+
+    /**
+     * Pretty-print a taclet. Line-breaks are taken care of.
+     *
+     * @param taclet The Taclet to be pretty-printed.
+     * @param sv The instantiations of the SchemaVariables
+     * @param showWholeTaclet Should the find, varcond and heuristic part be pretty-printed?
+     * @param declareSchemaVars Should declarations for the schema variables used in the taclet be
+     *        pretty-printed?
+     */
+    public void printTaclet(Taclet taclet, SVInstantiations sv, boolean showWholeTaclet,
+            boolean declareSchemaVars) {
+        instantiations = sv;
+        quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
+
+        layouter.beginC();
+        if (showWholeTaclet) {
+            layouter.print(taclet.name().toString()).print(" {");
+        }
+        if (declareSchemaVars) {
+            Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
+            for (SchemaVariable schemaVar : schemaVars) {
+                layouter.nl();
+                schemaVar.layout(layouter);
+                layouter.print(";");
+            }
+            layouter.nl();
+        }
+        if (!(taclet.ifSequent().isEmpty())) {
+            printTextSequent(taclet.ifSequent(), "\\assumes");
+        }
+        if (showWholeTaclet) {
+            printFind(taclet);
+            if (taclet instanceof RewriteTaclet rt) {
+                printRewriteAttributes(rt);
+            }
+            printVarCond(taclet);
+        }
+        printGoalTemplates(taclet);
+        if (showWholeTaclet) {
+            // printHeuristics(taclet);
+            // printTriggers(taclet);
+        }
+        // printAttribs(taclet);
+        if (showWholeTaclet) {
+            printDisplayName(taclet);
+        }
+        if (showWholeTaclet) {
+            layouter.brk(1, -2).print("}");
+        }
+        layouter.end();
+        instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+        quantifiableVariablePrintMode = QuantifiableVariablePrintMode.NORMAL;
+    }
+
+    protected void printDisplayName(Taclet taclet) {
+        final String displayName = taclet.displayName();
+        if (displayName.equals(taclet.name().toString())) {
+            // this means there is no special display name
+            return;
+        }
+        layouter.nl().beginC().print("\\displayname " + '\"');
+        layouter.print(displayName);
+        layouter.print("" + '\"').end();
+    }
+
+    protected void printRewriteAttributes(RewriteTaclet taclet) {
+        final var applicationRestriction = taclet.getApplicationRestriction();
+        if ((applicationRestriction
+                .matches(RewriteTaclet.ApplicationRestriction.SAME_UPDATE_LEVEL))) {
+            layouter.nl().print("\\sameUpdateLevel");
+        }
+        if ((applicationRestriction
+                .matches(RewriteTaclet.ApplicationRestriction.IN_SEQUENT_STATE))) {
+            layouter.nl().print("\\inSequentState");
+        }
+        if ((applicationRestriction
+                .matches(RewriteTaclet.ApplicationRestriction.ANTECEDENT_POLARITY))) {
+            layouter.nl().print("\\antecedentPolarity");
+        }
+        if ((applicationRestriction
+                .matches(RewriteTaclet.ApplicationRestriction.SUCCEDENT_POLARITY))) {
+            layouter.nl().print("\\succedentPolarity");
+        }
+    }
+
+    protected void printVarCond(Taclet taclet) {
+        final ImmutableList<NewVarcond> varsNew = taclet.varsNew();
+        final ImmutableList<NewDependingOn> varsNewDependingOn = taclet.varsNewDependingOn();
+        final ImmutableList<NotFreeIn> varsNotFreeIn = taclet.varsNotFreeIn();
+        final ImmutableList<VariableCondition> variableConditions = taclet.getVariableConditions();
+
+        if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()
+                || !varsNewDependingOn.isEmpty()) {
+            layouter.nl().beginC().print("\\varcond(").brk(0);
+            boolean first = true;
+
+            for (NewDependingOn ndo : varsNewDependingOn) {
+                if (first) {
+                    first = false;
+                } else {
+                    layouter.print(",").brk();
+                }
+                printNewVarDepOnCond(ndo);
+            }
+
+            for (final NewVarcond nvc : varsNew) {
+                if (first) {
+                    first = false;
+                } else {
+                    layouter.print(",").brk();
+                }
+                printNewVarcond(nvc);
+            }
+
+            for (final NotFreeIn pair : varsNotFreeIn) {
+                if (first) {
+                    first = false;
+                } else {
+                    layouter.print(",").brk();
+                }
+                printNotFreeIn(pair);
+            }
+
+            for (final VariableCondition vc : variableConditions) {
+                if (first) {
+                    first = false;
+                } else {
+                    layouter.print(",").brk();
+                }
+                printVariableCondition(vc);
+            }
+            layouter.brk(0, -2).print(")").end();
+        }
+    }
+
+    private void printNewVarDepOnCond(NewDependingOn on) {
+        layouter.beginC(0);
+        layouter.print("\\new(");
+        printSchemaVariable(on.first());
+        layouter.print(",").brk();
+        layouter.print("\\dependingOn(");
+        printSchemaVariable(on.second());
+        layouter.brk(0, -2).print(")").brk();
+        layouter.brk(0, -2).print(")").end();
+    }
+
+    protected void printNewVarcond(NewVarcond sv) {
+        layouter.beginC();
+        layouter.print("\\new(");
+        printSchemaVariable(sv.getSchemaVariable());
+        layouter.print(",").brk();
+        layouter.print("\\typeof(").brk(0);
+        printSchemaVariable(sv.getPeerSchemaVariable());
+        layouter.brk(0, -2).print(")").brk(0);
+        layouter.brk(0, -2).print(")").end();
+    }
+
+    protected void printNotFreeIn(NotFreeIn sv) {
+        layouter.beginI(0).print("\\notFreeIn(").brk(0);
+        printSchemaVariable(sv.first());
+        layouter.print(",").brk();
+        printSchemaVariable(sv.second());
+        layouter.brk(0, -2).print(")").end();
+    }
+
+    protected void printVariableCondition(VariableCondition sv) {
+        layouter.print(sv.toString());
+    }
+
+    protected void printFind(Taclet taclet) {
+        if (!(taclet instanceof FindTaclet ft)) {
+            return;
+        }
+        layouter.nl().beginC().print("\\find(").brk(0);
+        if (taclet instanceof SuccTaclet) {
+            printSequentArrow();
+            layouter.brk();
+        }
+        layouter.beginRelativeC(1).ind();
+        printTerm(ft.find());
+        layouter.end();
+        if (taclet instanceof AntecTaclet) {
+            layouter.brk(1);
+            printSequentArrow();
+        }
+        layouter.brk(0, -2).print(")").end();
+    }
+
+    protected void printTextSequent(Sequent seq, String text) {
+        layouter.nl();
+
+        layouter.beginC().print(text).print("(").brk(0);
+        if (seq != null) {
+            printSequentInExistingBlock(seq);
+        }
+        layouter.brk(0, -2).print(")").end();
+    }
+
+    protected void printGoalTemplates(Taclet taclet) {
+        if (taclet.closeGoal()) {
+            layouter.nl().print("\\closegoal").brk();
+        }
+
+        for (final Iterator<TacletGoalTemplate> it = taclet.goalTemplates().reverse().iterator(); it
+                .hasNext();) {
+            printGoalTemplate(it.next());
+            if (it.hasNext()) {
+                layouter.print(";");
+            }
+        }
+    }
+
+    protected void printGoalTemplate(TacletGoalTemplate tgt) {
+        // layouter.beginC(0);
+        if (tgt.name() != null) {
+            if (!tgt.name().isEmpty()) {
+                layouter.nl().beginC().print("\"" + tgt.name() + "\"").print(":");
+            }
+
+        }
+        if (tgt instanceof AntecSuccTacletGoalTemplate astgt) {
+            printTextSequent(astgt.replaceWith(), "\\replacewith");
+        }
+        if (tgt instanceof RewriteTacletGoalTemplate rwtgt) {
+            printRewrite(rwtgt.replaceWith());
+        }
+
+        if (!(tgt.sequent().isEmpty())) {
+            printTextSequent(tgt.sequent(), "\\add");
+        }
+        if (!tgt.rules().isEmpty()) {
+            printRules(tgt.rules());
+        }
+        if (!tgt.addedProgVars().isEmpty()) {
+            layouter.nl();
+            printAddProgVars(tgt.addedProgVars());
+        }
+
+        if (tgt.name() != null) {
+            if (!tgt.name().isEmpty()) {
+                layouter.end();
+            }
+        }
+    }
+
+    protected void printRewrite(Term t) {
+        layouter.nl().beginC().print("\\replacewith(").brk(0);
+        printTerm(t);
+        layouter.brk(0, -2).print(")").end();
+    }
+
+    protected void printRules(ImmutableList<Taclet> rules) {
+        layouter.nl().beginC().print("\\addrules(");
+        SVInstantiations svi = instantiations;
+        for (Taclet rule : rules) {
+            layouter.nl();
+            printTaclet(rule, instantiations, true, false);
+            instantiations = svi;
+        }
+        layouter.brk(0, -2).print(")").end();
+    }
+
+    protected void printAddProgVars(ImmutableSet<SchemaVariable> apv) {
+        layouter.beginC().print("\\addprogvars(");
+        Iterator<SchemaVariable> it = apv.iterator();
+        if (it.hasNext()) {
+            layouter.brk();
+            while (true) {
+                SchemaVariable tgt = it.next();
+                printSchemaVariable(tgt);
+                if (it.hasNext()) {
+                    layouter.print(",").brk();
+                } else {
+                    break;
+                }
+            }
+        }
+        layouter.brk(0, -2).print(")").end();
+    }
+
+    protected void printSchemaVariable(SchemaVariable sv) {
+        Object o = getInstantiations().getInstantiation(sv);
+        if (o == null) {
+            if (sv instanceof ProgramSV psv) {
+                printProgramSV(psv);
+            } else {
+                printConstant(sv.name().toString());
+            }
+        } else {
+            if (o instanceof Term) {
+                printTerm((Term) o);
+            } else if (o instanceof RustyProgramElement pe) {
+                printProgramElement(pe);
+            } else {
+                // LOGGER.error("Unknown instantiation type of {}; class is ",
+                // o.getClass().getName());
+                printConstant(sv.name().toString());
+            }
+        }
+    }
+
+    /**
+     * Pretty-prints a ProgramSV.
+     *
+     * @param pe the ProgramSV to be pretty-printed.
+     */
+    public void printProgramSV(ProgramSV pe) {
+        printSourceElement(pe);
     }
 
     /**

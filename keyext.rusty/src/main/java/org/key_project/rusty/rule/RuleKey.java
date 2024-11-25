@@ -1,20 +1,18 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.rule;
-
-import de.uka.ilkd.key.logic.ChoiceExpr;
+package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
+import org.key_project.rusty.logic.ChoiceExpr;
 
 import org.jspecify.annotations.NonNull;
-
 
 /**
  * Provides a unique key for taclets based on a taclet's name and its taclet options. This class is
  * e.g. used by the parser which might encounter more than one taclet of the same name (but with
  * different taclet options).
- *
+ * <br>
  * One does not need to use this implementation (but can rely on a taclet's own
  * {@link Taclet#equals(Object)} and {@link Taclet#hashCode()} method.
  */
