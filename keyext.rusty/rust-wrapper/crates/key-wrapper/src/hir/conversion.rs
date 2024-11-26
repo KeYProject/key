@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, num::NonZero, ops::Deref};
 
 use rustc_hir as hir;
 use rustc_middle::ty::TyCtxt;
@@ -2062,7 +2062,10 @@ impl<'tcx> FromHir<'tcx, &rustc_middle::ty::Ty<'tcx>> for Ty {
                 ty: Box::new(ty.hir_into(tcx)),
                 r#mut: mut_to_bool(mutability),
             },
-            rustc_type_ir::TyKind::FnDef(did, args) => todo!("FnDef"),
+            rustc_type_ir::TyKind::FnDef(did, args) => Self::FnDef {
+                def_id: did.into(),
+                args: args.iter().map(|a| a.unpack().hir_into(tcx)).collect(),
+            },
             rustc_type_ir::TyKind::FnPtr(binder, fn_header) => todo!("FnPtr"),
             rustc_type_ir::TyKind::Dynamic(binders, _, dyn_kind) => todo!("Dyn"),
             rustc_type_ir::TyKind::Closure(_, _) => todo!("Closure"),
@@ -2176,10 +2179,125 @@ impl<'tcx> FromHir<'tcx, &rustc_middle::ty::Const<'tcx>> for Const {
             rustc_type_ir::ConstKind::Infer(infer_const) => todo!("Infer"),
             rustc_type_ir::ConstKind::Bound(debruijn_index, _) => todo!("Bound"),
             rustc_type_ir::ConstKind::Placeholder(_) => todo!("PlaceHolder"),
-            rustc_type_ir::ConstKind::Unevaluated(unevaluated_const) => todo!("Uneval"),
-            rustc_type_ir::ConstKind::Value(_, _) => todo!("Val"),
+            rustc_type_ir::ConstKind::Unevaluated(unevaluated_const) => {
+                Self::Unevaluated(unevaluated_const.hir_into(tcx))
+            }
+            rustc_type_ir::ConstKind::Value(ty, tree) => {
+                Self::Value((&ty).hir_into(tcx), (&tree).into())
+            }
             rustc_type_ir::ConstKind::Error(_) => Self::Error,
-            rustc_type_ir::ConstKind::Expr(e) => todo!("Expr"),
+            rustc_type_ir::ConstKind::Expr(e) => Self::Expr((&e).hir_into(tcx)),
+        }
+    }
+}
+
+impl<'tcx> FromHir<'tcx, rustc_type_ir::UnevaluatedConst<TyCtxt<'tcx>>> for UnevaluatedConst {
+    fn from_hir(value: rustc_type_ir::UnevaluatedConst<TyCtxt<'tcx>>, tcx: TyCtxt<'tcx>) -> Self {
+        Self {
+            def: (&value.def).into(),
+            args: value.args.deref().hir_into(tcx),
+        }
+    }
+}
+
+impl From<&rustc_middle::ty::ValTree<'_>> for ValTree {
+    fn from(value: &rustc_middle::ty::ValTree<'_>) -> Self {
+        match value {
+            rustc_middle::ty::ValTree::Leaf(scalar_int) => Self::Leaf(scalar_int.into()),
+            rustc_middle::ty::ValTree::Branch(trees) => {
+                Self::Branch(trees.into_iter().map(Into::into).collect())
+            }
+        }
+    }
+}
+
+impl From<&rustc_middle::ty::ScalarInt> for ScalarInt {
+    fn from(value: &rustc_middle::ty::ScalarInt) -> Self {
+        Self {
+            data: (*value).into(),
+            size: NonZero::new(value.size().bits() as u8).unwrap(),
+        }
+    }
+}
+
+impl<'tcx> FromHir<'tcx, &rustc_middle::ty::Expr<'tcx>> for ConstExpr {
+    fn from_hir(value: &rustc_middle::ty::Expr<'tcx>, tcx: TyCtxt<'tcx>) -> Self {
+        Self {
+            kind: value.kind.into(),
+            args: value.args().deref().hir_into(tcx),
+        }
+    }
+}
+
+impl From<rustc_middle::ty::ExprKind> for ConstExprKind {
+    fn from(value: rustc_middle::ty::ExprKind) -> Self {
+        match value {
+            rustc_middle::ty::ExprKind::Binop(bin_op) => Self::Binop(bin_op.into()),
+            rustc_middle::ty::ExprKind::UnOp(un_op) => Self::UnOp(un_op.into()),
+            rustc_middle::ty::ExprKind::FunctionCall => Self::FunctionCall,
+            rustc_middle::ty::ExprKind::Cast(cast_kind) => Self::Cast(cast_kind.into()),
+        }
+    }
+}
+
+impl From<rustc_middle::mir::BinOp> for BinOpKind {
+    fn from(value: rustc_middle::mir::BinOp) -> Self {
+        match value {
+            rustc_middle::mir::BinOp::Add => Self::Add,
+            rustc_middle::mir::BinOp::AddUnchecked => Self::Add,
+            rustc_middle::mir::BinOp::AddWithOverflow => Self::Add,
+            rustc_middle::mir::BinOp::Sub => Self::Sub,
+            rustc_middle::mir::BinOp::SubUnchecked => Self::Sub,
+            rustc_middle::mir::BinOp::SubWithOverflow => Self::Sub,
+            rustc_middle::mir::BinOp::Mul => Self::Mul,
+            rustc_middle::mir::BinOp::MulUnchecked => Self::Mul,
+            rustc_middle::mir::BinOp::MulWithOverflow => Self::Mul,
+            rustc_middle::mir::BinOp::Div => Self::Div,
+            rustc_middle::mir::BinOp::Rem => Self::Rem,
+            rustc_middle::mir::BinOp::BitXor => Self::BitXor,
+            rustc_middle::mir::BinOp::BitAnd => Self::BitAnd,
+            rustc_middle::mir::BinOp::BitOr => Self::BitOr,
+            rustc_middle::mir::BinOp::Shl => Self::Shl,
+            rustc_middle::mir::BinOp::ShlUnchecked => Self::Shl,
+            rustc_middle::mir::BinOp::Shr => Self::Shr,
+            rustc_middle::mir::BinOp::ShrUnchecked => Self::Shr,
+            rustc_middle::mir::BinOp::Eq => Self::Eq,
+            rustc_middle::mir::BinOp::Lt => Self::Lt,
+            rustc_middle::mir::BinOp::Le => Self::Le,
+            rustc_middle::mir::BinOp::Ne => Self::Ne,
+            rustc_middle::mir::BinOp::Ge => Self::Ge,
+            rustc_middle::mir::BinOp::Gt => Self::Gt,
+            rustc_middle::mir::BinOp::Cmp => todo!("Cmp"),
+            rustc_middle::mir::BinOp::Offset => todo!("Offset"),
+        }
+    }
+}
+
+impl From<rustc_middle::mir::UnOp> for UnOp {
+    fn from(value: rustc_middle::mir::UnOp) -> Self {
+        match value {
+            rustc_middle::mir::UnOp::Not => Self::Not,
+            rustc_middle::mir::UnOp::Neg => Self::Neg,
+            rustc_middle::mir::UnOp::PtrMetadata => todo!("PtrMetadata"),
+        }
+    }
+}
+
+impl From<rustc_middle::ty::abstract_const::CastKind> for CastKind {
+    fn from(value: rustc_middle::ty::abstract_const::CastKind) -> Self {
+        match value {
+            rustc_middle::ty::abstract_const::CastKind::As => Self::As,
+            rustc_middle::ty::abstract_const::CastKind::Use => Self::Use,
+        }
+    }
+}
+
+impl<'tcx> FromHir<'tcx, &rustc_middle::ty::GenericArg<'tcx>> for GenericTyArgKind {
+    fn from_hir(value: &rustc_middle::ty::GenericArg<'tcx>, tcx: TyCtxt<'tcx>) -> Self {
+        match value.unpack() {
+            rustc_type_ir::GenericArgKind::Lifetime(_) => todo!("Lifetime"),
+            rustc_type_ir::GenericArgKind::Type(ty) => Self::Type((&ty).hir_into(tcx)),
+            rustc_type_ir::GenericArgKind::Const(c) => Self::Const((&c).hir_into(tcx)),
         }
     }
 }
@@ -2220,7 +2338,7 @@ impl From<rustc_middle::ty::BoundVar> for BoundVar {
 }
 
 impl<'tcx> FromHir<'tcx, &rustc_middle::ty::BoundTyKind> for BoundTyKind {
-    fn from_hir(value: &rustc_middle::ty::BoundTyKind, tcx: TyCtxt<'tcx>) -> Self {
+    fn from_hir(value: &rustc_middle::ty::BoundTyKind, _: TyCtxt<'tcx>) -> Self {
         match value {
             rustc_middle::ty::BoundTyKind::Anon => Self::Anon,
             rustc_middle::ty::BoundTyKind::Param(def_id, symbol) => {

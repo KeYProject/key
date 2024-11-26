@@ -45,7 +45,7 @@ pub enum Ty {
     },
     FnDef {
         def_id: DefId,
-        args: Vec<GenericArg>,
+        args: Vec<GenericTyArgKind>,
     },
     FnPtr {
         binder: Binder<FnSigTys>,
@@ -170,7 +170,7 @@ pub struct ConstExpr {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ConstExprKind {
-    Binop(BinOp),
+    Binop(BinOpKind),
     UnOp(UnOp),
     FunctionCall,
     Cast(CastKind),
@@ -191,7 +191,7 @@ pub struct BoundVar(pub u32);
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct UnevaluatedConst {
     pub def: DefId,
-    pub args: GenericArgs,
+    pub args: Vec<GenericTyArgKind>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -202,8 +202,8 @@ pub enum ValTree {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ScalarInt {
-    data: u128,
-    size: NonZero<u8>,
+    pub data: u128,
+    pub size: NonZero<u8>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
