@@ -40,6 +40,10 @@ public class Crate implements RustyProgramElement {
         throw new RuntimeException("Shouldn't be called");
     }
 
+    public Mod getTopMod() {
+        return topMod;
+    }
+
     public Function getVerificationTarget() {
         return (Function) topMod.getItems()
                 .filter(i -> i instanceof Function fn

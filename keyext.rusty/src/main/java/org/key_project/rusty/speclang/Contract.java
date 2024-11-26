@@ -70,4 +70,6 @@ public interface Contract extends SpecificationElement {
 
     @Override
     Contract map(UnaryOperator<Term> op, Services services);
+
+    Contract setID(int newId);
 }

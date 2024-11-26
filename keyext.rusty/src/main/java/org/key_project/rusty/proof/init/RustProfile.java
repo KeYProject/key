@@ -5,7 +5,13 @@ package org.key_project.rusty.proof.init;
 
 
 import org.key_project.rusty.proof.io.RuleSourceFactory;
+import org.key_project.rusty.proof.mgt.AxiomJustification;
+import org.key_project.rusty.proof.mgt.ComplexRuleJustificationBySpec;
+import org.key_project.rusty.proof.mgt.RuleJustification;
 import org.key_project.rusty.rule.BuiltInRule;
+import org.key_project.rusty.rule.Rule;
+import org.key_project.rusty.rule.Taclet;
+import org.key_project.rusty.rule.UseOperationContractRule;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -45,5 +51,15 @@ public class RustProfile implements Profile {
 
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         return ImmutableSLList.nil();
+    }
+
+    @Override
+    public RuleJustification getJustification(Rule r) {
+        if (r == UseOperationContractRule.INSTANCE)
+            return new ComplexRuleJustificationBySpec();
+        if (r instanceof Taclet t)
+            return t.getRuleJustification();
+        else
+            return AxiomJustification.INSTANCE;
     }
 }

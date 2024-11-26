@@ -147,7 +147,7 @@ public class HirConverter {
         return switch (expr.kind()) {
             case ExprKind.BlockExpr e -> convertBlockExpr(e, ty);
             case ExprKind.LitExpr(var e) -> convertLitExpr(e, ty);
-            case ExprKind.Let(var l) -> convertLetExpr(l, ty);
+            case ExprKind.Let(var l) -> convertLetExpr(l);
             case ExprKind.If e -> convertIfExpr(e, ty);
             case ExprKind.DropTemps(var e) -> convertExpr(e);
             case ExprKind.Path(var e) -> convertPathExpr(e);
@@ -194,8 +194,7 @@ public class HirConverter {
         };
     }
 
-    private LetExpression convertLetExpr(org.key_project.rusty.parser.hir.expr.LetExpr let,
-            Type type) {
+    private LetExpression convertLetExpr(org.key_project.rusty.parser.hir.expr.LetExpr let) {
         var pat = convertPat(let.pat());
         var ty = let.ty() == null ? null : convertHirTy(let.ty());
         var init = convertExpr(let.init());

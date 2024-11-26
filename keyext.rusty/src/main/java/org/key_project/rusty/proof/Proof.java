@@ -340,4 +340,17 @@ public class Proof implements ProofObject<Goal>, Named {
     public NamespaceSet getNamespaces() {
         return getServices().getNamespaces();
     }
+
+    /**
+     * sets the variable, function, sort, heuristics namespaces
+     */
+    public void setNamespaces(NamespaceSet ns) {
+        getServices().setNamespaces(ns);
+        if (!root.leaf()) {
+            throw new IllegalStateException("Proof: ProgVars set too late");
+        }
+
+        Goal fstGoal = openGoals().head();
+        fstGoal.makeLocalNamespacesFrom(ns);
+    }
 }

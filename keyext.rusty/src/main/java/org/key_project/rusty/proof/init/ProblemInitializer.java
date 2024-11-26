@@ -8,13 +8,27 @@ import java.io.IOException;
 import java.util.*;
 
 import org.key_project.logic.Namespace;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.logic.NamespaceSet;
+import org.key_project.rusty.logic.SequentFormula;
+import org.key_project.rusty.logic.op.ElementaryUpdate;
+import org.key_project.rusty.logic.op.Modality;
+import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.proof.Goal;
+import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.ProofAggregate;
 import org.key_project.rusty.proof.io.*;
 import org.key_project.rusty.proof.io.consistency.FileRepo;
+import org.key_project.rusty.proof.mgt.AxiomJustification;
+import org.key_project.rusty.rule.BuiltInRule;
+import org.key_project.rusty.rule.Rule;
+import org.key_project.rusty.util.MiscTools;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -87,7 +101,7 @@ public final class ProblemInitializer {
 
         // configureTermLabelSupport(initConfig);
 
-        // read Java
+        // read Rust
         readRust(envInput, initConfig);
 
         // register function and predicate symbols defined by Java program
@@ -102,7 +116,6 @@ public final class ProblemInitializer {
         } else {
             throw new ProofInputException("Problem initialization without JavaInfo!");
         }
-
 
         // read envInput
         readEnvInput(envInput, initConfig);
@@ -285,7 +298,7 @@ public final class ProblemInitializer {
             po.readProblem();
             ProofAggregate pa = po.getPO();
             // final work
-            // setUpProofHelper(po, pa);
+            setUpProofHelper(pa);
 
             /*
              * if (Debug.ENABLE_DEBUG) {
@@ -301,6 +314,78 @@ public final class ProblemInitializer {
             throw e;
         } finally {
             // progressStopped(this);
+        }
+    }
+
+    private void setUpProofHelper(ProofAggregate pl) throws ProofInputException {
+        if (pl == null) {
+            throw new ProofInputException("No proof");
+        }
+
+        // register non-built-in rules
+        Proof[] proofs = pl.getProofs();
+        for (int i = 0; i < proofs.length; i++) {
+            proofs[i].getInitConfig().registerRules(proofs[i].getInitConfig().getTaclets(),
+                AxiomJustification.INSTANCE);
+            // setProgress(3 + i * proofs.length);
+            // register built in rules
+            Profile profile = proofs[i].getInitConfig().getProfile();
+            final ImmutableList<BuiltInRule> rules =
+                profile.getStandardRules().standardBuiltInRules();
+            int j = 0;
+            final int step = rules.size() != 0 ? (7 / rules.size()) : 0;
+            for (Rule r : rules) {
+                proofs[i].getInitConfig().registerRule(r, profile.getJustification(r));
+                // setProgress((++j) * step + 3 + i * proofs.length);
+            }
+            // if (step == 0) {
+            // setProgress(10 + i * proofs.length);
+            // }
+
+            // TODO: refactor Proof.setNamespaces() so this becomes unnecessary
+            proofs[i].setNamespaces(proofs[i].getNamespaces());
+            populateNamespaces(proofs[i]);
+        }
+    }
+
+    /**
+     * Ensures that the passed proof's namespaces contain all functions and program variables used
+     * in its root sequent.
+     */
+    private void populateNamespaces(Proof proof) {
+        final NamespaceSet namespaces = proof.getNamespaces();
+        final Goal rootGoal = proof.openGoals().head();
+        for (SequentFormula cf : proof.root().sequent()) {
+            populateNamespaces(cf.formula(), namespaces, rootGoal);
+        }
+    }
+
+    private void populateNamespaces(Term term, NamespaceSet namespaces, Goal rootGoal) {
+        for (int i = 0; i < term.arity(); i++) {
+            populateNamespaces(term.sub(i), namespaces, rootGoal);
+        }
+
+        if (term.op() instanceof Function f) {
+            namespaces.functions().add(f);
+        } else if (term.op() instanceof ProgramVariable pv) {
+            if (namespaces.programVariables().lookup(pv.name()) == null) {
+                rootGoal.addProgramVariable((ProgramVariable) term.op());
+            }
+        } else if (term.op() instanceof ElementaryUpdate eu) {
+            final ProgramVariable pv = (ProgramVariable) eu.lhs();
+            if (namespaces.programVariables().lookup(pv.name()) == null) {
+                rootGoal.addProgramVariable(pv);
+            }
+        } else if (term.op() instanceof Modality mod) {
+            final RustyProgramElement pe = mod.program().program();
+            final Services serv = rootGoal.proof().getServices();
+            final ImmutableSet<ProgramVariable> freeProgVars =
+                MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
+            for (ProgramVariable pv : freeProgVars) {
+                if (namespaces.programVariables().lookup(pv.name()) == null) {
+                    rootGoal.addProgramVariable(pv);
+                }
+            }
         }
     }
 

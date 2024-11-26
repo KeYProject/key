@@ -292,4 +292,15 @@ public final class Goal implements ProofGoal {
     public void addProgramVariable(ProgramVariable pv) {
         localNamespaces.programVariables().addSafely(pv);
     }
+
+    /**
+     * Update the local namespaces from a namespace set.
+     * <p>
+     * The parameter is copied and stored locally.
+     *
+     * @param ns a non-null set of namesspaces which applies to this goal.
+     */
+    public void makeLocalNamespacesFrom(NamespaceSet ns) {
+        this.localNamespaces = ns.copyWithParent().copyWithParent();
+    }
 }

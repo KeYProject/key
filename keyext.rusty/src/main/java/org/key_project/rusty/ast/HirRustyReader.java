@@ -16,11 +16,18 @@ import java.util.Comparator;
 import org.key_project.logic.Namespace;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.expr.BlockExpression;
+import org.key_project.rusty.ast.fn.Function;
+import org.key_project.rusty.ast.fn.FunctionParamPattern;
+import org.key_project.rusty.ast.pat.BindingPattern;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyBlock;
+import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.parser.hir.Crate;
+import org.key_project.rusty.speclang.ContractFactory;
+import org.key_project.rusty.speclang.ProgramVariableCollection;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -45,6 +52,10 @@ public class HirRustyReader {
     public RustyBlock readBlock(String block, Context context) {
         try {
             var fn = context.buildFunction(block, true);
+            {
+                // TODO: remove (it's only for tests)
+                fn += "pub fn my_add(a: u32, b: u32) -> u32 {a + b}";
+            }
             Path tmpDir = Files.createTempDirectory("KeYTempFileMod_" + block.hashCode());
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try (var s = Files.walk(tmpDir)) {
@@ -92,6 +103,28 @@ public class HirRustyReader {
             var converted = converter.convertCrate(crate);
             BlockExpression body = converted.getVerificationTarget().body();
             var es = (ExpressionStatement) body.getStatements().get(0);
+            {
+                // TODO: remove
+                var myAdd = (Function) converted.getTopMod().getItems().stream()
+                        .filter(
+                            i -> i instanceof Function f && f.name().toString().equals("my_add"))
+                        .findFirst().orElse(null);
+                assert myAdd != null;
+                var target = new ProgramFunction(myAdd,
+                    services.getRustInfo().getKeYRustyType(myAdd.returnType().type()));
+                services.getNamespaces().functions().add(target);
+                var factory = new ContractFactory(services);
+                var tb = services.getTermBuilder();
+                var pre = tb.tt();
+                var post = tb.tt();
+                var a = ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(0)).pattern())
+                        .pv();
+                var b = ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(0)).pattern())
+                        .pv();
+                var pvs = new ProgramVariableCollection(null, ImmutableList.of(a, b), null);
+                services.getSpecificationRepository().addContract(factory.func("my_add::contract_0",
+                    target, true, pre, null, post, null, pvs, true));
+            }
             return new RustyBlock(es.getExpression());
         } catch (IOException e) {
             throw new RuntimeException(e);

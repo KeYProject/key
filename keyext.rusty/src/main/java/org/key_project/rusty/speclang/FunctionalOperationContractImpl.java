@@ -10,7 +10,6 @@ import java.util.function.UnaryOperator;
 
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.TermBuilder;
 import org.key_project.rusty.logic.op.Modality;
@@ -27,7 +26,6 @@ import static org.key_project.rusty.util.Assert.assertSubSort;
 public class FunctionalOperationContractImpl implements FunctionalOperationContract {
     final String baseName;
     final String name;
-    final KeYRustyType krt;
     final ProgramFunction fn;
     final Modality.RustyModalityKind modalityKind;
     /**
@@ -62,18 +60,17 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     // constructors
     // -------------------------------------------------------------------------
 
-    FunctionalOperationContractImpl(String baseName, String name, KeYRustyType krt,
+    FunctionalOperationContractImpl(String baseName, String name,
             ProgramFunction fn, Modality.RustyModalityKind modalityKind,
-            Term pres, Term mby, Term posts, Term modifiables,
+            Term pre, Term mby, Term post, Term modifiables,
             ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar, Term globalDefs,
             int id, boolean toBeSaved,
             Services services) {
         assert !(name == null && baseName == null);
-        assert krt != null;
         assert fn != null;
         assert modalityKind != null;
-        assert pres != null;
-        assert posts != null;
+        assert pre != null;
+        assert post != null;
         assert globalDefs == null || globalDefs.sort() == RustyDLTheory.UPDATE;
         assert paramVars != null;
         assert paramVars.size() == fn.getNumParams();
@@ -83,11 +80,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.baseName = baseName;
         this.name = name;
         this.fn = fn;
-        this.krt = krt;
         this.modalityKind = modalityKind;
-        this.originalPre = pres;
+        this.originalPre = pre;
         this.originalMby = mby;
-        this.originalPost = posts;
+        this.originalPost = post;
         this.originalModifiable = modifiables;
         this.originalParamVars = paramVars;
         this.originalResultVar = resultVar;
@@ -104,7 +100,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         Term newModifiable = op.apply(originalModifiable);
         Term newGlobalDefs = op.apply(globalDefs);
 
-        return new FunctionalOperationContractImpl(baseName, name, krt, fn,
+        return new FunctionalOperationContractImpl(baseName, name, fn,
             modalityKind,
             newPres, newMby, newPost, newModifiable,
             originalParamVars, originalResultVar, newGlobalDefs,
@@ -275,5 +271,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
 
         return result;
+    }
+
+    @Override
+    public Contract setID(int newId) {
+        return new FunctionalOperationContractImpl(baseName, null, fn, modalityKind, originalPre,
+            originalMby, originalPost,
+            originalModifiable, originalParamVars, originalResultVar, globalDefs, newId, toBeSaved,
+            services);
     }
 }

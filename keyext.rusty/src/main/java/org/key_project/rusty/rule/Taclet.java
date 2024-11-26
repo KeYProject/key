@@ -14,6 +14,9 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
+import org.key_project.rusty.proof.mgt.AxiomJustification;
+import org.key_project.rusty.proof.mgt.LemmaJustification;
+import org.key_project.rusty.proof.mgt.RuleJustification;
 import org.key_project.rusty.rule.match.VMTacletMatcher;
 import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import org.key_project.rusty.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -528,6 +531,14 @@ public abstract class Taclet implements Rule {
     private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
         for (SequentFormula cf : s) {
             cf.formula().execPostOrder(oc);
+        }
+    }
+
+    public RuleJustification getRuleJustification() {
+        if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
+            return LemmaJustification.INSTANCE;
+        } else {
+            return AxiomJustification.INSTANCE;
         }
     }
 }

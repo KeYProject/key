@@ -193,7 +193,6 @@ public abstract class AbstractProblemLoader {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());
 
-
         if (proof != null) {
             if (callbackProofLoaded != null) {
                 callbackProofLoaded.accept(proof);
@@ -406,7 +405,6 @@ public abstract class AbstractProblemLoader {
      * @throws ProofInputException Occurred Exception.
      */
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
-
         ProofAggregate proofList =
             problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
