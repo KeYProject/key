@@ -215,6 +215,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     private void createLoopInvGen() {
         addSeparator();
         JMenuItem loopInvGeneration = add(new LoopInvGenMenuItem(mediator, getPos()));
+        if (!((LoopInvGenMenuItem) loopInvGeneration).isClickable()) {
+            loopInvGeneration.setEnabled(false);
+        }
     }
 
     private void addMacroMenu() {

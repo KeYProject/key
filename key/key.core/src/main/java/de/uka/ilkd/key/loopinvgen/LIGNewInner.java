@@ -7,57 +7,58 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.*;
+import java.util.Set;
 
 public class LIGNewInner extends AbstractLoopInvariantGenerator {
-	Set<Term> allDepPreds;
-	Set<Term> allCompPreds;
-	Term outerIndex;
-	public LIGNewInner(Sequent sequent, Services services, Set<Term> innerDepPreds, Set<Term> innerCompPreds) {
-		super(sequent, services);
-		this.allDepPreds = innerDepPreds;
-		this.allCompPreds = innerCompPreds;
-	}
+    Set<Term> allDepPreds;
+    Set<Term> allCompPreds;
+    Term outerIndex;
 
-	public LIGNewInner(Sequent sequent, Services services, Set<Term> innerDepPreds, Set<Term> innerCompPreds, Term outerIndex, Term innerIndex) {
-		super(sequent, services);
-		this.allDepPreds = innerDepPreds;
-		this.allCompPreds = innerCompPreds;
-		this.outerIndex =  outerIndex;
-		this.index = innerIndex;
-	}
+    public LIGNewInner(Sequent sequent, Services services, Set<Term> innerDepPreds, Set<Term> innerCompPreds) {
+        super(sequent, services);
+        this.allDepPreds = innerDepPreds;
+        this.allCompPreds = innerCompPreds;
+    }
 
-	@Override
-	public LoopInvariantGenerationResult generate() {
+    public LIGNewInner(Sequent sequent, Services services, Set<Term> innerDepPreds, Set<Term> innerCompPreds, Term outerIndex, Term innerIndex) {
+        super(sequent, services);
+        this.allDepPreds = innerDepPreds;
+        this.allCompPreds = innerCompPreds;
+        this.outerIndex = outerIndex;
+        this.index = innerIndex;
+    }
 
-		ImmutableList<Goal> goalsAfterShift ;
-		Goal currentGoal;
-		int itrNumber = -1;
-		Pair<Set<Term>, Set<Term>> refinedPreds;
+    @Override
+    public LoopInvariantGenerationResult generate() {
 
-		do {
-			itrNumber++;
-			System.out.println("Inner Iteration Number: " + itrNumber);
+        ImmutableList<Goal> goalsAfterShift;
+        Goal currentGoal;
+        int itrNumber = -1;
+        Pair<Set<Term>, Set<Term>> refinedPreds;
 
-			oldDepPreds.clear();
-			oldCompPreds.clear();
+        do {
+            itrNumber++;
+            System.out.println("Inner Iteration Number: " + itrNumber);
 
-			oldDepPreds.addAll(allDepPreds);
-			oldCompPreds.addAll(allCompPreds);
+            oldDepPreds.clear();
+            oldCompPreds.clear();
 
-			ImmutableList<Goal> goalsAfterUnwind = ruleApp.applyUnwindRule(services.getProof().openGoals());
+            oldDepPreds.addAll(allDepPreds);
+            oldCompPreds.addAll(allCompPreds);
+
+            ImmutableList<Goal> goalsAfterUnwind = ruleApp.applyUnwindRule(services.getProof().openGoals());
 //			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
 
-			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
+            goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 //			System.out.println("Goals After Shift:" + goalsAfterShift);
 
-			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
+            currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
 
-			PredicateRefiner pr = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds, outerIndex,
-					index, itrNumber, services);
-			refinedPreds = pr.refine();
-			allDepPreds = refinedPreds.first;
-			allCompPreds = refinedPreds.second;
+            PredicateRefiner pr = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds, outerIndex,
+                    index, itrNumber, services);
+            refinedPreds = pr.refine();
+            allDepPreds = refinedPreds.first;
+            allCompPreds = refinedPreds.second;
 
 
 //			HashMap<Term, List<Term>> locSets2predicates = new HashMap<>();
@@ -79,22 +80,22 @@ public class LIGNewInner extends AbstractLoopInvariantGenerator {
 //			}
 
 
-			for (Goal g : goalsAfterShift) {
-				if(g!=null)
-					abstractGoal(g, allCompPreds,allDepPreds);
-			}
-		} while ((!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds))|| itrNumber < 2);
+            for (Goal g : goalsAfterShift) {
+                if (g != null)
+                    abstractGoal(g, allCompPreds, allDepPreds);
+            }
+        } while ((!allCompPreds.equals(oldCompPreds) || !allDepPreds.equals(oldDepPreds)) || itrNumber < 2);
 
-		allDepPreds.addAll(allCompPreds);
+        allDepPreds.addAll(allCompPreds);
 
-		final PredicateSetCompressor compressor =
-				new PredicateSetCompressor(allDepPreds, currentGoal.sequent(), false, services);
-		allDepPreds = compressor.compress();
-		System.out.println("Compressd!");
+        final PredicateSetCompressor compressor =
+                new PredicateSetCompressor(allDepPreds, currentGoal.sequent(), false, services);
+        allDepPreds = compressor.compress();
+        System.out.println("Compressd!");
 
 
-		final LoopInvariantGenerationResult loopInv = new LoopInvariantGenerationResult(allDepPreds, itrNumber);
-		System.out.println("Inner loop inv is: " + loopInv);
-		return loopInv;
-	}
+        final LoopInvariantGenerationResult loopInv = new LoopInvariantGenerationResult(allDepPreds, itrNumber, services);
+        System.out.println("Inner loop inv is: " + loopInv);
+        return loopInv;
+    }
 }
