@@ -302,7 +302,9 @@ public class PosTacletApp extends TacletApp {
     }
 
     public boolean equalsModProofIrrelevancy(Object o) {
-        if (!(o instanceof TacletApp cmp ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(this, cmp) : false) || !(o instanceof PosTacletApp)) {
+        if (!(o instanceof TacletApp cmp
+                ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(this, cmp)
+                : false) || !(o instanceof PosTacletApp)) {
             return false;
         }
         PosInOccurrence posA = ((PosTacletApp) o).pos;
@@ -319,7 +321,7 @@ public class PosTacletApp extends TacletApp {
     public int hashCodeModProofIrrelevancy() {
         SequentFormula sf = (SequentFormula) pos.sequentFormula();
         return Objects.hash(EqualityModuloProofIrrelevancy.hashCodeModProofIrrelevancy(this),
-                EqualityModuloProofIrrelevancy.hashCodeModProofIrrelevancy(sf),
+            EqualityModuloProofIrrelevancy.hashCodeModProofIrrelevancy(sf),
             pos.posInTerm());
     }
 

@@ -473,8 +473,8 @@ public final class DependencyAnalyzer {
                 foundDupes
                         .computeIfAbsent(
                             new EqualsModProofIrrelevancyWrapper<>(proofNode.getAppliedRuleApp(),
-                                    EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy,
-                                    EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
+                                EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy,
+                                EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
                             _a -> new LinkedHashSet<>())
                         .add(t.annotation().getProofStep());
             });

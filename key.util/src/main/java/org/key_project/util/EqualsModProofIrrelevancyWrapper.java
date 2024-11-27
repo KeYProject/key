@@ -31,8 +31,8 @@ public class EqualsModProofIrrelevancyWrapper<T> {
      * @param inner object to wrap
      */
     public EqualsModProofIrrelevancyWrapper(T inner,
-                                            BiPredicate<T, T> equalityCmp,
-                                            ToIntFunction<T> hasher) {
+            BiPredicate<T, T> equalityCmp,
+            ToIntFunction<T> hasher) {
         this.inner = inner;
         this.equalityCmp = equalityCmp;
         this.hasher = hasher;

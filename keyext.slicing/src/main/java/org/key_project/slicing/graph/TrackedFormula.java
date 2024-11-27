@@ -9,9 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BranchLocation;
-
 import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
-import org.key_project.util.EqualsModProofIrrelevancy;
 
 /**
  * A sequent formula tracked by the dependency graph.
@@ -109,11 +107,15 @@ public class TrackedFormula extends GraphNode {
             return false;
         }
         TrackedFormula that = (TrackedFormula) o;
-        return inAntec == that.inAntec && ((Object) that.formula instanceof SequentFormula that1 ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(formula, that1) : false)
+        return inAntec == that.inAntec
+                && ((Object) that.formula instanceof SequentFormula that1
+                        ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(formula, that1)
+                        : false)
                 && Objects.equals(branchLocation, that.branchLocation);
     }
 
     public int hashCodeModProofIrrelevancy() {
-        return Objects.hash(inAntec, EqualityModuloProofIrrelevancy.hashCodeModProofIrrelevancy(formula), branchLocation);
+        return Objects.hash(inAntec,
+            EqualityModuloProofIrrelevancy.hashCodeModProofIrrelevancy(formula), branchLocation);
     }
 }
