@@ -15,6 +15,15 @@
 \proof {
     (branch "dummy ID"
         (rule "assignment" (formula "1"))
-
+        (rule "assignment" (formula "1") (term "1"))
+        (rule "sequentialToParallel2" (formula "1"))
+        (rule "simplifyUpdate3" (formula "1") (term "1,0"))
+        (builtin "useContract" (contract "my_add.my_contract.0") (formula "1") (term "1"))
+        (branch "Pre (my_add)"
+            (rule "assignment" (formula "1"))
+        )
+        (branch "Post (my_add)"
+            (rule "assignment" (formula "1"))
+        )
     )
 }

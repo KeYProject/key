@@ -5,29 +5,35 @@ package org.key_project.rusty.proof;
 
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.PosInOccurrence;
+import org.key_project.rusty.rule.IBuiltInRuleApp;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.TacletApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 public class RuleAppIndex {
-
     private final Goal goal;
 
     private final TacletIndex tacletIndex;
 
     private final TacletAppIndex tacletAppIndex;
 
-    public RuleAppIndex(TacletIndex tacletIndex, Goal goal, Services services) {
+    private final BuiltInRuleAppIndex builtInRuleAppIndex;
+
+    public RuleAppIndex(TacletIndex tacletIndex, BuiltInRuleAppIndex builtInRuleAppIndex, Goal goal,
+            Services services) {
         this.goal = goal;
         this.tacletIndex = tacletIndex;
+        this.builtInRuleAppIndex = builtInRuleAppIndex;
         tacletAppIndex = new TacletAppIndex(tacletIndex, goal, services);
     }
 
-    private RuleAppIndex(TacletIndex tacletIndex, Goal goal, TacletAppIndex tacletAppIndex) {
+    private RuleAppIndex(TacletIndex tacletIndex, BuiltInRuleAppIndex builtInRuleAppIndex,
+            Goal goal, TacletAppIndex tacletAppIndex) {
         this.goal = goal;
         this.tacletIndex = tacletIndex;
         this.tacletAppIndex = tacletAppIndex;
+        this.builtInRuleAppIndex = builtInRuleAppIndex;
     }
 
     /**
@@ -53,7 +59,7 @@ public class RuleAppIndex {
      */
     public RuleAppIndex copy(Goal goal) {
         TacletIndex copiedTacletIndex = tacletIndex.copy();
-        return new RuleAppIndex(copiedTacletIndex, goal,
+        return new RuleAppIndex(copiedTacletIndex, builtInRuleAppIndex().copy(), goal,
             tacletAppIndex.copyWith(copiedTacletIndex, goal));
     }
 
@@ -88,5 +94,20 @@ public class RuleAppIndex {
         result =
             result.prepend(tacletAppIndex.getTacletAppAtAndBelow(pos, services));
         return result;
+    }
+
+    /**
+     * returns the built-in rule application index for this ruleAppIndex.
+     */
+    public BuiltInRuleAppIndex builtInRuleAppIndex() {
+        return builtInRuleAppIndex;
+    }
+
+    /**
+     * returns a list of built-in rule applications applicable for the given goal, user defined
+     * constraint and position
+     */
+    public ImmutableList<IBuiltInRuleApp> getBuiltInRules(Goal g, PosInOccurrence pos) {
+        return builtInRuleAppIndex().getBuiltInRule(g, pos);
     }
 }

@@ -19,6 +19,7 @@ import org.key_project.rusty.ldt.LDTs;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.Counter;
+import org.key_project.rusty.proof.NameRecorder;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.init.Profile;
 import org.key_project.rusty.proof.mgt.SpecificationRepository;
@@ -31,6 +32,7 @@ public class Services implements LogicServices {
     private LDTs ldts;
     private RefSortManager mRefManager;
     private RustInfo rustInfo;
+    private NameRecorder nameRecorder;
 
     private final TermFactory tf;
     private final TermBuilder tb;
@@ -62,6 +64,7 @@ public class Services implements LogicServices {
         counters = new LinkedHashMap<>();
         mRefManager = new RefSortManager(this);
         rustInfo = new RustInfo(this);
+        nameRecorder = new NameRecorder();
     }
 
     public Services(Profile profile) {
@@ -82,6 +85,7 @@ public class Services implements LogicServices {
         this.caches = services.caches;
         this.specRepos = services.specRepos;
         rustInfo = services.rustInfo;
+        nameRecorder = services.nameRecorder;
     }
 
     public NamespaceSet getNamespaces() {
@@ -240,5 +244,9 @@ public class Services implements LogicServices {
         } else {
             return null;
         }
+    }
+
+    public NameRecorder getNameRecorder() {
+        return nameRecorder;
     }
 }

@@ -24,6 +24,16 @@ public class ContractFactory {
         this.tb = services.getTermBuilder();
     }
 
+    public static String generateContractName(String baseName, ProgramFunction target, int id) {
+        return generateContractTypeName(baseName, target) + "." + id;
+    }
+
+    public static String generateContractTypeName(String baseName, ProgramFunction target) {
+        final String fnName = target.name().toString();
+        // final String methodShortName = fnName.substring(startIndexShortName);
+        return fnName + "." + baseName;
+    }
+
     /**
      * Creates a new functional operation contract.
      *

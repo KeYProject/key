@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.hir;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.rusty.parser.hir.hirty.HirTy;
+
+import org.jspecify.annotations.Nullable;
 
 public interface QPath {
     record Resolved(@Nullable HirTy ty, Path<Res> path)implements QPath {}

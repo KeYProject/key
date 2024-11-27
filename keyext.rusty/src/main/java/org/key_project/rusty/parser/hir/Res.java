@@ -4,7 +4,8 @@
 package org.key_project.rusty.parser.hir;
 
 import org.key_project.rusty.parser.hir.hirty.PrimHirTy;
-//spotless:off
+
+// spotless:off
 public interface Res {
     record PrimTy(PrimHirTy ty) implements Res {
     }

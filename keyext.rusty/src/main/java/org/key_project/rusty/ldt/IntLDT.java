@@ -8,6 +8,8 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.abstraction.PrimitiveType;
+import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.expr.BinaryExpression;
 import org.key_project.rusty.ast.expr.IntegerLiteralExpression;
 import org.key_project.rusty.ast.expr.LiteralExpression;
@@ -38,6 +40,7 @@ public class IntLDT extends LDT {
     private final Function greaterThan;
     private final Function greaterOrEquals;
     private final Function lessOrEquals;
+    private final Function inU32;
 
     private final Term one;
     private final Term zero;
@@ -65,6 +68,8 @@ public class IntLDT extends LDT {
         greaterThan = addFunction(services, "gt");
         greaterOrEquals = addFunction(services, "geq");
         lessOrEquals = addFunction(services, "leq");
+
+        inU32 = addFunction(services, "inU32");
 
         // cache often used constants
         zero = makeDigit(0, services.getTermBuilder());
@@ -218,5 +223,12 @@ public class IntLDT extends LDT {
         case "neg" -> getNeg();
         default -> null;
         };
+    }
+
+    public Function getInBounds(Type ty) {
+        if (ty == PrimitiveType.U32) {
+            return inU32;
+        }
+        throw new IllegalArgumentException("inBounds for type " + ty + " missing");
     }
 }

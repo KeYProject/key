@@ -5,14 +5,19 @@ package org.key_project.rusty.logic;
 
 import java.util.Iterator;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.UpdateableOperator;
+import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ldt.IntLDT;
 import org.key_project.rusty.logic.op.*;
+import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -28,6 +33,13 @@ public class TermBuilder {
         this.tt = tf.createTerm(Junctor.TRUE);
         this.ff = tf.createTerm(Junctor.FALSE);
         this.services = services;
+    }
+
+    public static Term goBelowUpdates(Term term) {
+        while (term.op() instanceof UpdateApplication) {
+            term = UpdateApplication.getTarget(term);
+        }
+        return term;
     }
 
     public TermFactory tf() {
@@ -530,5 +542,104 @@ public class TermBuilder {
 
     public Term sharedRef(SharedRef instance, Term term) {
         return tf.createTerm(instance, term);
+    }
+
+    /**
+     * Creates a program variable for the result. Take care to register it in the namespaces.
+     */
+    public ProgramVariable resultVar(ProgramFunction fn, boolean makeNameUnique) {
+        return resultVar("result", fn, makeNameUnique);
+    }
+
+    /**
+     * Creates a program variable for the result with passed name. Take care to register it in the
+     * namespaces.
+     */
+    public ProgramVariable resultVar(String name, ProgramFunction fn, boolean makeNameUnique) {
+        name += "_" + fn.name();
+        return progVar(name,
+            services.getRustInfo().getKeYRustyType(fn.getFunction().returnType().type()),
+            makeNameUnique);
+    }
+
+    /**
+     * Creates a program variable for example for prestate variables. Take care to register it in
+     * the namespaces.
+     *
+     * @param baseName the base name to use
+     * @param krt the type of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a program variable for the given name and type
+     */
+    public ProgramVariable progVar(String baseName, KeYRustyType krt, boolean makeNameUnique) {
+        if (makeNameUnique) {
+            baseName = newName(baseName);
+        }
+        return new ProgramVariable(new Name(baseName), krt);
+    }
+
+    /**
+     * Returns an available name constructed by affixing a counter to the passed base name.
+     * <p>
+     * This method looks up the global {@link NamespaceSet} to check whether the {@link Name}s is
+     * free. This can be problematic, since {@link Namespace}s are now local to goals. Use
+     * {@link #newName(String, NamespaceSet)} to make sure that you have all the {@link Name}s you
+     * need available.
+     *
+     * @param baseName The base name (prefix) for the name to generate.
+     * @return An available name constructed by affixing a counter to the passed base name, or some
+     *         available free name (please consult comment above).
+     * @see #newName(String, NamespaceSet)
+     */
+    public String newName(String baseName) {
+        return newName(baseName, services.getNamespaces());
+    }
+
+    /**
+     * Returns an available name constructed by affixing a counter to the passed base name.
+     * <p>
+     * <p>
+     * Warning (DS): This method ignores the baseName if there are free name proposals. This can,
+     * for instance, cause troubles in loading proofs containing rule apps with more than one
+     * introduced (and saved) new name. In this case, the order of new names in the saved proof file
+     * matters (the first unused name is returned, regardless of the baseName).
+     *
+     * @param baseName The base name (prefix) for the name to generate.
+     * @param localNamespace The local {@link NamespaceSet} to check.
+     * @return An available name constructed by affixing a counter to the passed base name, or some
+     *         available free name (please consult comment above).
+     */
+    public String newName(String baseName, NamespaceSet localNamespace) {
+        final Name savedName = services.getNameRecorder().getProposal();
+        if (savedName != null) {
+            // CS: bugfix -- saving name proposals.
+            // getProposal() removes the name proposal form the name recorder,
+            // but we need to have it again for saving. Therefore, I appended
+            // the proposal at the end of the list again.
+            services.getNameRecorder().addProposal(savedName);
+
+            return savedName.toString();
+        }
+
+        int i = 0;
+        String result = baseName;
+        while (localNamespace.lookup(new Name(result)) != null) {
+            result = baseName + "_" + i++;
+        }
+
+        services.getNameRecorder().addProposal(new Name(result));
+
+        return result;
+    }
+
+    public Term reachableValue(Term t, KeYRustyType krt) {
+        assert t.sort().extendsTrans(krt.getSort()) || t.sort() instanceof ProgramSVSort;
+        final Sort s = t.sort() instanceof ProgramSVSort ? krt.getSort() : t.sort();
+        final var intLDT = services.getLDTs().getIntLDT();
+        if (s.extendsTrans(intLDT.targetSort())) {
+            return func(intLDT.getInBounds(krt.getRustyType()), t);
+        } else {
+            return tt();
+        }
     }
 }

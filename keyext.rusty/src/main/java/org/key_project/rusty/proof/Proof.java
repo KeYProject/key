@@ -93,12 +93,14 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     private Proof(String name, Sequent problem, TacletIndex tacletIndex,
+            BuiltInRuleIndex builtInRules,
             InitConfig initConfig) {
         this(new Name(name), initConfig);
 
         final var rootNode = new Node(this, problem);
         final var firstGoal =
-            new Goal(rootNode, tacletIndex, initConfig.getServices());
+            new Goal(rootNode, tacletIndex, new BuiltInRuleAppIndex(builtInRules),
+                initConfig.getServices());
         openGoals = openGoals.prepend(firstGoal);
         setRoot(rootNode);
     }
@@ -107,18 +109,13 @@ public class Proof implements ProofObject<Goal>, Named {
         this(name,
             Sequent.createSuccSequent(
                 new Semisequent(new SequentFormula(problem))),
-            initConfig.createTacletIndex(),
+            initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(),
             initConfig);
     }
 
     public Proof(Name name, Sequent problem, InitConfig initConfig) {
-        this(name, initConfig);
-        final var rootNode = new Node(this, problem);
-        final var firstGoal =
-            new Goal(rootNode, initConfig.createTacletIndex(),
-                initConfig.getServices());
-        openGoals = openGoals.prepend(firstGoal);
-        setRoot(rootNode);
+        this(name.toString(), problem, initConfig.createTacletIndex(),
+            initConfig.createBuiltInRuleIndex(), initConfig);
     }
 
     public Services getServices() {

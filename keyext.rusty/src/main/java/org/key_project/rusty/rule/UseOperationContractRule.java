@@ -9,18 +9,21 @@ import org.key_project.ncore.rules.RuleAbortException;
 import org.key_project.rusty.RustTools;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.fn.Function;
-import org.key_project.rusty.logic.PosInOccurrence;
-import org.key_project.rusty.logic.RustyBlock;
-import org.key_project.rusty.logic.RustyDLTheory;
-import org.key_project.rusty.logic.TermBuilder;
+import org.key_project.rusty.ast.stmt.ExpressionStatement;
+import org.key_project.rusty.ast.visitor.ProgramContextAdder;
+import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.UpdateApplication;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.rusty.proof.Goal;
+import org.key_project.rusty.proof.mgt.ComplexRuleJustificationBySpec;
+import org.key_project.rusty.proof.mgt.RuleJustificationBySpec;
+import org.key_project.rusty.rule.inst.ContextBlockExpressionInstantiation;
 import org.key_project.rusty.speclang.FunctionalOperationContract;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -290,14 +293,148 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, Services services) {
-        return null;
+    public ContractRuleApp createApp(PosInOccurrence pos, Services services) {
+        return new ContractRuleApp(this, pos);
+    }
+
+    public ContractRuleApp createApp(PosInOccurrence pos) {
+        return createApp(pos, null);
     }
 
     @Override
     public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
-        return null;
+        var services = goal.getOverlayServices();
+        // get instantiation
+        final Instantiation inst = instantiate(ruleApp.posInOccurrence().subTerm(), services);
+        final RustyBlock rb = inst.modality().program();
+        final TermBuilder tb = services.getTermBuilder();
+
+        final var contract =
+            (FunctionalOperationContract) ((AbstractContractRuleApp) ruleApp).getInstantiation();
+        assert contract.getTarget().equals(inst.fn);
+
+        // create variables for result
+        final ProgramVariable resultVar = computeResultVar(inst, services);
+        assert resultVar != null;
+        goal.addProgramVariable(resultVar);
+
+        final ImmutableList<Term> contractParams = inst.actualParams;
+        final Term contractResult = tb.var(resultVar);
+        // TODO: self
+        final Term globalDefs = contract.getGlobalDefs();
+        final Term originalPre = contract.getPre();
+        final Term pre = globalDefs == null ? originalPre : tb.apply(globalDefs, originalPre);
+        final Term originalPost = contract.getPost();
+        final Term post = globalDefs == null ? originalPost : tb.apply(globalDefs, originalPost);
+        final Term modifiable = contract.getModifiable();
+
+        final Term mby = contract.hasMby() ? contract.getMby() : null;
+
+        // split goal into two branches
+        final ImmutableList<Goal> result = goal.split(2);
+        final Goal preGoal = result.head();
+        final Goal postGoal = result.tail().head();
+
+        preGoal.setBranchLabel("Pre (" + contract.getTarget().name() + ")");
+        postGoal.setBranchLabel("Post (" + contract.getTarget().name() + ")");
+
+        // prepare common stuff for the three branches
+        Term reachableState = null;
+
+        Term postAssumption = post;
+
+        // create "Pre" branch
+        int i = 0;
+        for (Term arg : contractParams) {
+            final KeYRustyType argKRT = contract.getTarget().getParamType(i++);
+            final Term reachable = tb.reachableValue(arg, argKRT);
+            if (reachableState == null) {
+                reachableState = reachable;
+            } else {
+                reachableState = tb.and(reachableState, reachable);
+            }
+        }
+
+        // TODO: mby
+        final Term finalPreTerm = tb.apply(inst.u, tb.and(pre, reachableState));
+        preGoal.changeFormula(new SequentFormula(finalPreTerm), ruleApp.posInOccurrence());
+
+        // create "Post" branch
+        final ContextBlockExpression resultAssign;
+        if (inst.actualResult == null) {
+            resultAssign = new ContextBlockExpression(ImmutableList.of());
+        } else {
+            resultAssign = new ContextBlockExpression(ImmutableList.of(new ExpressionStatement(
+                new AssignmentExpression(inst.actualResult, resultVar), true)));
+        }
+        final BlockExpression postBE = replaceBlock(rb, resultAssign);
+        final RustyBlock postRustyBlock = new RustyBlock(postBE);
+        Modality modality = Modality.getModality(inst.modality.kind(), postRustyBlock);
+        final Term normalPost = tb.prog(modality.kind(), modality.program(), inst.progPost.sub(0));
+        postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost)),
+            ruleApp.posInOccurrence());
+        postGoal.addFormula(new SequentFormula(postAssumption), true, false);
+
+        // create justification
+        final RuleJustificationBySpec just = new RuleJustificationBySpec(contract);
+        final ComplexRuleJustificationBySpec cJust = (ComplexRuleJustificationBySpec) goal.proof()
+                .getInitConfig().getJustifInfo().getJustification(this);
+        cJust.add(ruleApp, just);
+
+        return result;
+    }
+
+    /**
+     * Computes the result variable for this instantiation.
+     *
+     * @param inst the instantiation for the operation contract rule
+     * @param services the services object
+     * @return the result variable
+     */
+    public static ProgramVariable computeResultVar(Instantiation inst, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        return tb.resultVar(inst.fn, true);
+    }
+
+    private static PosInProgram getPosInProgram(RustyBlock rb) {
+        var pe = rb.program();
+
+        var result = PosInProgram.TOP;
+
+        if (pe instanceof PossibleProgramPrefix currPrefix) {
+            final var prefix = currPrefix.getPrefixElements();
+            final int length = prefix.size();
+
+            // fail fast check
+            currPrefix = prefix.get(length - 1); // length -1 >= 0 as prefix array
+            // contains curPrefix as first element
+
+            pe = currPrefix.getFirstActiveChildPos().getProgram(currPrefix);
+
+            assert pe instanceof AssignmentExpression;
+
+            int i = length - 1;
+            do {
+                result = currPrefix.getFirstActiveChildPos().append(result);
+                i--;
+                if (i >= 0) {
+                    currPrefix = prefix.get(i);
+                }
+            } while (i >= 0);
+        } else {
+            assert pe instanceof AssignmentExpression;
+        }
+        return result;
+    }
+
+    public BlockExpression replaceBlock(RustyBlock rb, ContextBlockExpression replacement) {
+        PosInProgram pos = getPosInProgram(rb);
+        int lastPos = pos.last();
+        ContextBlockExpressionInstantiation cbei =
+            new ContextBlockExpressionInstantiation(pos, pos.up().down(lastPos + 1), rb.program());
+        return (BlockExpression) ProgramContextAdder.INSTANCE.start(rb.program(), replacement,
+            cbei);
     }
 
     @Override

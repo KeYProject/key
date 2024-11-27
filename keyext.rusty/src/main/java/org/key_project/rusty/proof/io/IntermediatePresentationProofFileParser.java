@@ -10,15 +10,10 @@ import java.util.List;
 import org.key_project.logic.Name;
 import org.key_project.rusty.logic.PosInTerm;
 import org.key_project.rusty.proof.Proof;
-import org.key_project.rusty.proof.io.intermediate.AppNodeIntermediate;
-import org.key_project.rusty.proof.io.intermediate.BranchNodeIntermediate;
-import org.key_project.rusty.proof.io.intermediate.NodeIntermediate;
-import org.key_project.rusty.proof.io.intermediate.TacletAppIntermediate;
+import org.key_project.rusty.proof.io.intermediate.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
-
-import static org.key_project.rusty.proof.io.IProofFileParser.ProofElementID.*;
 
 public class IntermediatePresentationProofFileParser implements IProofFileParser {
     /* + The proof object for storing meta information */
@@ -117,18 +112,18 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         }
         case KeY_SETTINGS -> // ProofSettings
             loadPreferences(str);
-        // case BUILT_IN_RULE -> { // BuiltIn rules
-        // {
-        // final AppNodeIntermediate newNode = new AppNodeIntermediate();
-        // currNode.addChild(newNode);
-        // currNode = newNode;
-        // }
-        // ruleInfo = new BuiltinRuleInformation(str);
-        // }
-        // case CONTRACT -> ((BuiltinRuleInformation) ruleInfo).currContract = str;
-        // case MODALITY ->
-        // // (additional information which can be used in external tools such as proof management)
-        // ((BuiltinRuleInformation) ruleInfo).currContractModality = str;
+        case BUILT_IN_RULE -> { // BuiltIn rules
+            {
+                final AppNodeIntermediate newNode = new AppNodeIntermediate();
+                currNode.addChild(newNode);
+                currNode = newNode;
+            }
+            ruleInfo = new BuiltinRuleInformation(str);
+        }
+        case CONTRACT -> ((BuiltinRuleInformation) ruleInfo).currContract = str;
+        case MODALITY ->
+            // (additional information which can be used in external tools such as proof management)
+            ((BuiltinRuleInformation) ruleInfo).currContractModality = str;
         // case ASSUMES_INST_BUILT_IN -> { // ifInst (for built in rules)
         // BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
         // if (builtinInfo.builtinIfInsts == null) {
@@ -204,10 +199,10 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             ((AppNodeIntermediate) currNode).setIntermediateRuleApp(constructTacletApp());
             ((AppNodeIntermediate) currNode).getIntermediateRuleApp().setLineNr(lineNr);
         }
-        // case BUILT_IN_RULE -> { // BuiltIn rules
-        // ((AppNodeIntermediate) currNode).setIntermediateRuleApp(constructBuiltInApp());
-        // ((AppNodeIntermediate) currNode).getIntermediateRuleApp().setLineNr(lineNr);
-        // }
+        case BUILT_IN_RULE -> { // BuiltIn rules
+            ((AppNodeIntermediate) currNode).setIntermediateRuleApp(constructBuiltInApp());
+            ((AppNodeIntermediate) currNode).getIntermediateRuleApp().setLineNr(lineNr);
+        }
         // case ASSUMES_INST_BUILT_IN -> { // ifInst (for built in rules)
         // BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
         // builtinInfo.builtinIfInsts =
@@ -248,6 +243,18 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     }
 
     /**
+     * @return An intermediate built-in rule application generated from previously parsed
+     *         information.
+     */
+    private BuiltInAppIntermediate constructBuiltInApp() {
+        BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
+        return new BuiltInAppIntermediate(builtinInfo.currRuleName,
+            new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+            builtinInfo.currContract, builtinInfo.currContractModality,
+            builtinInfo.builtinIfInsts, builtinInfo.currNewNames);
+    }
+
+    /**
      * Loads proof settings.
      *
      * @param preferences The preferences to load.
@@ -283,8 +290,6 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         public RuleInformation(String ruleName) {
             this.currRuleName = ruleName.trim();
         }
-
-        public abstract boolean isBuiltinInfo();
     }
 
     /**
@@ -302,9 +307,24 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             super(ruleName);
         }
 
-        @Override
-        public boolean isBuiltinInfo() {
-            return false;
+    }
+
+    /**
+     * Information about built-in rule applications.
+     *
+     * @author Dominic Scheurer
+     */
+    private static class BuiltinRuleInformation extends RuleInformation {
+        /* + Built-In Formula Information */
+        protected ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
+        protected int currIfInstFormula;
+        protected PosInTerm currIfInstPosInTerm;
+        /* > Method Contract */
+        protected String currContract = null;
+        protected String currContractModality = null;
+
+        public BuiltinRuleInformation(String ruleName) {
+            super(ruleName);
         }
     }
 

@@ -21,15 +21,11 @@ import org.key_project.rusty.parser.KeYIO;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.Node;
 import org.key_project.rusty.proof.Proof;
-import org.key_project.rusty.proof.io.intermediate.AppNodeIntermediate;
-import org.key_project.rusty.proof.io.intermediate.BranchNodeIntermediate;
-import org.key_project.rusty.proof.io.intermediate.NodeIntermediate;
-import org.key_project.rusty.proof.io.intermediate.TacletAppIntermediate;
+import org.key_project.rusty.proof.io.intermediate.*;
 import org.key_project.rusty.rule.*;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.rusty.speclang.Contract;
+import org.key_project.rusty.speclang.OperationContract;
+import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;
 
@@ -159,6 +155,26 @@ public class IntermediateProofReplayer {
                                 appInterm.getLineNr()
                                 + ", goal " + currGoal.getNode().getSerialNr() + ", rule "
                                 + appInterm.getRuleName() + NOT_APPLICABLE, e);
+                        }
+                    } else if (currInterm
+                            .getIntermediateRuleApp() instanceof BuiltInAppIntermediate bai) {
+                        try {
+                            IBuiltInRuleApp app = constructBuiltinApp(bai, currGoal);
+                            if (!app.complete()) {
+                                app = app.tryToInstantiate(currGoal);
+                            }
+                            currGoal.apply(app);
+
+                            final Iterator<Node> children = currNode.childrenIterator();
+                            LinkedList<NodeIntermediate> intermChildren =
+                                currInterm.getChildren();
+
+                            addChildren(children, intermChildren);
+                        } catch (BuiltInConstructionException | AssertionError
+                                | RuntimeException e) {
+                            reportError(ERROR_LOADING_PROOF_LINE + "Line "
+                                + bai.getLineNr() + ", goal " + currGoal.getNode().getSerialNr()
+                                + ", rule " + bai.getRuleName() + NOT_APPLICABLE, e);
                         }
                     }
                 }
@@ -329,6 +345,141 @@ public class IntermediateProofReplayer {
     }
 
     /**
+     * Constructs a built-in rule application from an intermediate one.
+     *
+     * @param currInterm The intermediate built-in application to create a "real" application for.
+     * @param currGoal The goal on which to apply the built-in app.
+     * @return The built-in application corresponding to the supplied intermediate representation.
+     * @throws BuiltInConstructionException In case of an error during construction.
+     */
+    private IBuiltInRuleApp constructBuiltinApp(BuiltInAppIntermediate currInterm, Goal currGoal)
+            throws BuiltInConstructionException {
+        final String ruleName = currInterm.getRuleName();
+        final int currFormula = currInterm.getPosInfo().first;
+        final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
+
+        Contract currContract = null;
+        ImmutableList<PosInOccurrence> builtinIfInsts = null;
+
+        // Load contracts, if applicable
+        if (currInterm.getContract() != null) {
+            currContract = proof.getServices().getSpecificationRepository()
+                    .getContractByName(currInterm.getContract());
+            if (currContract == null) {
+                final ProblemLoaderException e =
+                    new ProblemLoaderException(loader, "Error loading proof: contract \""
+                        + currInterm.getContract() + "\" not found.");
+                reportError(ERROR_LOADING_PROOF_LINE + ", goal " + currGoal.getNode().getSerialNr()
+                    + ", rule " + ruleName + NOT_APPLICABLE, e);
+            }
+        }
+
+        // Load ifInsts, if applicable
+        if (currInterm.getBuiltInIfInsts() != null) {
+            builtinIfInsts = ImmutableSLList.nil();
+            for (final Pair<Integer, PosInTerm> ifInstP : currInterm.getBuiltInIfInsts()) {
+                final int currIfInstFormula = ifInstP.first;
+                final PosInTerm currIfInstPosInTerm = ifInstP.second;
+
+                try {
+                    final PosInOccurrence ifInst = PosInOccurrence.findInSequent(currGoal.sequent(),
+                        currIfInstFormula, currIfInstPosInTerm);
+                    builtinIfInsts = builtinIfInsts.append(ifInst);
+                } catch (RuntimeException | AssertionError e) {
+                    reportError(
+                        ERROR_LOADING_PROOF_LINE + "Line " + currInterm.getLineNr() + ", goal "
+                            + currGoal.getNode().getSerialNr() + ", rule " + ruleName
+                            + NOT_APPLICABLE,
+                        e);
+                }
+            }
+        }
+
+        IBuiltInRuleApp ourApp = null;
+        PosInOccurrence pos = null;
+
+        if (currFormula != 0) { // otherwise we have no pos
+            try {
+                pos = PosInOccurrence.findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
+            } catch (RuntimeException e) {
+                throw new BuiltInConstructionException("Wrong position information.", e);
+            }
+        }
+
+        if (currContract != null) {
+            AbstractContractRuleApp contractApp = null;
+
+            BuiltInRule useContractRule;
+            if (currContract instanceof OperationContract) {
+                useContractRule = UseOperationContractRule.INSTANCE;
+                contractApp = (UseOperationContractRule.INSTANCE.createApp(pos))
+                        .setContract(currContract);
+            } else {
+                throw new UnsupportedOperationException("TODO: Dep contracts");
+                // useContractRule = UseDependencyContractRule.INSTANCE;
+                // contractApp = (((UseDependencyContractRule) useContractRule).createApp(pos))
+                // .setContract(currContract);
+                // // restore "step" if needed
+                // var depContractApp = ((UseDependencyContractApp) contractApp);
+                // if (depContractApp.step() == null) {
+                // contractApp = depContractApp.setStep(builtinIfInsts.head());
+                // }
+            }
+
+            if (contractApp.check(currGoal.proof().getServices()) == null) {
+                throw new BuiltInConstructionException("Cannot apply contract: " + currContract);
+            } else {
+                ourApp = contractApp;
+            }
+
+            currContract = null;
+            if (builtinIfInsts != null) {
+                ourApp = ourApp.setIfInsts(builtinIfInsts);
+                builtinIfInsts = null;
+            }
+            return ourApp;
+        }
+
+        final ImmutableSet<IBuiltInRuleApp> ruleApps = collectAppsForRule(ruleName, currGoal, pos);
+        if (ruleApps.size() != 1) {
+            if (ruleApps.isEmpty()) {
+                throw new BuiltInConstructionException(
+                    ruleName + " is missing. Most probably the binary "
+                        + "for this built-in rule is not in your path or "
+                        + "you do not have the permission to execute it.");
+            } else {
+                throw new BuiltInConstructionException(ruleName + ": found " + ruleApps.size()
+                    + " applications. Don't know what to do !\n" + "@ " + pos);
+            }
+        }
+        ourApp = ruleApps.iterator().next();
+        builtinIfInsts = null;
+        return ourApp;
+    }
+
+    /**
+     * Retrieves all registered applications at the given goal and position for the rule
+     * corresponding to the given ruleName.
+     *
+     * @param ruleName Name of the rule to find applications for.
+     * @param g Goal to search.
+     * @param pos Position of interest in the given goal.
+     * @return All matching rule applications at pos in g.
+     */
+    public static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g,
+            PosInOccurrence pos) {
+        ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.nil();
+
+        for (final IBuiltInRuleApp app : g.ruleAppIndex().getBuiltInRules(g, pos)) {
+            if (app.rule().name().toString().equals(ruleName)) {
+                result = result.add(app);
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * Instantiates schema variables in the given taclet application.
      *
      * @param app The taclet application to instantiate.
@@ -482,6 +633,25 @@ public class IntermediateProofReplayer {
         }
 
         TacletAppConstructionException(String s, Throwable cause) {
+            super(s, cause);
+        }
+    }
+
+    /**
+     * Signals an error during construction of a built-in rule app.
+     */
+    public static class BuiltInConstructionException extends Exception {
+        private static final long serialVersionUID = -735474220502290816L;
+
+        public BuiltInConstructionException(String s) {
+            super(s);
+        }
+
+        BuiltInConstructionException(Throwable cause) {
+            super(cause);
+        }
+
+        public BuiltInConstructionException(String s, Throwable cause) {
             super(s, cause);
         }
     }

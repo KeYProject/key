@@ -20,12 +20,12 @@ import org.jspecify.annotations.NonNull;
 public final class Function implements Item, Named {
     private final Name name;
     private final ImplicitSelfKind selfKind;
-    private final ImmutableArray<FunctionParam> params;
+    private ImmutableArray<FunctionParam> params;
     private final RustType returnType;
-    private  BlockExpression body;
+    private BlockExpression body;
 
     public Function(Name name, ImplicitSelfKind selfKind, ImmutableArray<FunctionParam> params,
-                    RustType returnType, BlockExpression body) {
+            RustType returnType, BlockExpression body) {
         this.name = name;
         this.selfKind = selfKind;
         this.params = params;
@@ -48,16 +48,21 @@ public final class Function implements Item, Named {
 
     @Override
     public @NonNull SyntaxElement getChild(int n) {
-        if (0 <= n && n < params.size()) return Objects.requireNonNull(params.get(n));
+        if (0 <= n && n < params.size())
+            return Objects.requireNonNull(params.get(n));
         n -= params.size();
-        if (n == 0) return returnType;
-        if (n == 1) return body;
+        if (n == 0)
+            return returnType;
+        if (n == 1)
+            return body;
         throw new IndexOutOfBoundsException("No child at index " + n);
     }
 
     @Override
     public String toString() {
-        return "fn " + name() + "(" + params.stream().map(Object::toString).collect(Collectors.joining(", ")) + ") -> " + returnType + " " + body;
+        return "fn " + name() + "("
+            + params.stream().map(Object::toString).collect(Collectors.joining(", ")) + ") -> "
+            + returnType + " " + body;
     }
 
     @Override
@@ -78,6 +83,10 @@ public final class Function implements Item, Named {
         return params;
     }
 
+    public void setParams(ImmutableArray<FunctionParam> params) {
+        this.params = params;
+    }
+
     public RustType returnType() {
         return returnType;
     }
@@ -87,13 +96,15 @@ public final class Function implements Item, Named {
     }
 
     public void setBody(BlockExpression body) {
-        this.body=body;
+        this.body = body;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
+        if (obj == this)
+            return true;
+        if (obj == null || obj.getClass() != this.getClass())
+            return false;
         var that = (Function) obj;
         return Objects.equals(this.name, that.name) &&
                 Objects.equals(this.selfKind, that.selfKind) &&

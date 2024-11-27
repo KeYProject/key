@@ -80,5 +80,17 @@ public class SpecificationRepository {
         if (contract instanceof FunctionalOperationContract foc) {
             operationContracts.put(target, getOperationContracts(target).add(foc));
         }
+        contractsByName.put(name, contract);
+    }
+
+    /**
+     * Returns the registered (atomic or combined) contract corresponding to the passed name, or
+     * null.
+     */
+    public Contract getContractByName(String name) {
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+        return contractsByName.get(name);
     }
 }

@@ -8,9 +8,7 @@ import java.util.Collection;
 import org.key_project.logic.op.Function;
 import org.key_project.ncore.proof.ProofGoal;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.NamespaceSet;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentChangeInfo;
+import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.RuleApp;
@@ -37,15 +35,18 @@ public final class Goal implements ProofGoal {
     /**
      * creates a new goal referencing the given node
      */
-    public Goal(Node node, TacletIndex tacletIndex, NamespaceSet localNamespace) {
+    public Goal(Node node, TacletIndex tacletIndex, BuiltInRuleAppIndex builtInRuleAppIndex,
+            NamespaceSet localNamespace) {
         this.node = node;
         this.localNamespaces = localNamespace;
-        ruleAppIndex = new RuleAppIndex(tacletIndex, this, node.proof().getServices());
+        ruleAppIndex =
+            new RuleAppIndex(tacletIndex, builtInRuleAppIndex, this, node.proof().getServices());
     }
 
-    public Goal(Node n, TacletIndex tacletIndex, Services services) {
+    public Goal(Node n, TacletIndex tacletIndex, BuiltInRuleAppIndex builtInRuleAppIndex,
+            Services services) {
         this.node = n;
-        this.ruleAppIndex = new RuleAppIndex(tacletIndex, this, services);
+        this.ruleAppIndex = new RuleAppIndex(tacletIndex, builtInRuleAppIndex, this, services);
         appliedRuleApps = ImmutableSLList.nil();
         localNamespaces =
             node.proof().getServices().getNamespaces().copyWithParent().copyWithParent();
@@ -302,5 +303,29 @@ public final class Goal implements ProofGoal {
      */
     public void makeLocalNamespacesFrom(NamespaceSet ns) {
         this.localNamespaces = ns.copyWithParent().copyWithParent();
+    }
+
+    /**
+     * adds a formula to the antecedent or succedent of a sequent. Either at its front or back and
+     * informs the rule application index about this change
+     *
+     * @param sf the SequentFormula to be added
+     * @param inAntec boolean true(false) if SequentFormula has to be added to antecedent
+     *        (succedent)
+     * @param first boolean true if at the front, if false then sf is added at the back
+     */
+    public void addFormula(SequentFormula sf, boolean inAntec, boolean first) {
+        setSequent(sequent().addFormula(sf, inAntec, first));
+    }
+
+    /**
+     * replaces a formula at the given position and informs the rule application index about this
+     * change
+     *
+     * @param sf the SequentFormula replacing the old one
+     * @param p the PosInOccurrence encoding the position
+     */
+    public void changeFormula(SequentFormula sf, PosInOccurrence p) {
+        setSequent(sequent().changeFormula(sf, p));
     }
 }

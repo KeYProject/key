@@ -78,7 +78,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.services = services;
         tb = services.getTermBuilder();
         this.baseName = baseName;
-        this.name = name;
+        this.name = name != null ? name : ContractFactory.generateContractName(baseName, fn, id);
         this.fn = fn;
         this.modalityKind = modalityKind;
         this.originalPre = pre;
@@ -211,6 +211,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public boolean toBeSaved() {
         return toBeSaved;
+    }
+
+    @Override
+    public Term getGlobalDefs() {
+        return globalDefs;
     }
 
     @Override

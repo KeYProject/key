@@ -22,7 +22,6 @@ import org.key_project.rusty.ast.pat.BindingPattern;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyBlock;
-import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.parser.hir.Crate;
 import org.key_project.rusty.speclang.ContractFactory;
@@ -110,8 +109,7 @@ public class HirRustyReader {
                             i -> i instanceof Function f && f.name().toString().equals("my_add"))
                         .findFirst().orElse(null);
                 assert myAdd != null;
-                var target = new ProgramFunction(myAdd,
-                    services.getRustInfo().getKeYRustyType(myAdd.returnType().type()));
+                var target = services.getRustInfo().getFunction(myAdd);
                 services.getNamespaces().functions().addSafely(target);
                 var factory = new ContractFactory(services);
                 var tb = services.getTermBuilder();
@@ -122,7 +120,7 @@ public class HirRustyReader {
                 var b = ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(0)).pattern())
                         .pv();
                 var pvs = new ProgramVariableCollection(null, ImmutableList.of(a, b), null);
-                services.getSpecificationRepository().addContract(factory.func("my_add::contract_0",
+                services.getSpecificationRepository().addContract(factory.func("my_contract",
                     target, true, pre, null, post, null, pvs, true));
             }
             return new RustyBlock(es.getExpression());

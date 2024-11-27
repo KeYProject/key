@@ -7,6 +7,7 @@ import java.util.function.UnaryOperator;
 
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.logic.op.IObserverFunction;
 
 /**
  * A contractual agreement about an ObserverFunction.
@@ -34,7 +35,7 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the contracted function symbol.
      */
-    Object getTarget();
+    IObserverFunction getTarget();
 
     /**
      * Tells whether the contract contains a measured_by clause.
@@ -72,4 +73,6 @@ public interface Contract extends SpecificationElement {
     Contract map(UnaryOperator<Term> op, Services services);
 
     Contract setID(int newId);
+
+    Term getGlobalDefs();
 }

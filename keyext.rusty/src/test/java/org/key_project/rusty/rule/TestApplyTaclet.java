@@ -11,10 +11,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.Quantifier;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.proof.Goal;
-import org.key_project.rusty.proof.Node;
-import org.key_project.rusty.proof.Proof;
-import org.key_project.rusty.proof.TacletIndex;
+import org.key_project.rusty.proof.*;
 import org.key_project.rusty.util.TacletForTests;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -59,8 +56,8 @@ public class TestApplyTaclet {
     }
 
     private Goal createGoal(Node n, TacletIndex tacletIndex) {
-        // final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
-        return new Goal(n, tacletIndex, n.proof().getServices());
+        final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
+        return new Goal(n, tacletIndex, birIndex, n.proof().getServices());
     }
 
     @BeforeEach

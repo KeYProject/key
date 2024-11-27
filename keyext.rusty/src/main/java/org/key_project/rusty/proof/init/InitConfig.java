@@ -15,6 +15,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.Choice;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.proof.BuiltInRuleIndex;
 import org.key_project.rusty.proof.Node;
 import org.key_project.rusty.proof.TacletIndex;
 import org.key_project.rusty.proof.io.consistency.FileRepo;
@@ -363,5 +364,9 @@ public class InitConfig {
 
     public RuleJustificationInfo getJustifInfo() {
         return justifInfo;
+    }
+
+    public BuiltInRuleIndex createBuiltInRuleIndex() {
+        return new BuiltInRuleIndex(builtInRules());
     }
 }

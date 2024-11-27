@@ -9,10 +9,7 @@ import java.io.IOException;
 import org.key_project.logic.Name;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.ProgramVariable;
-import org.key_project.rusty.proof.Goal;
-import org.key_project.rusty.proof.Node;
-import org.key_project.rusty.proof.Proof;
-import org.key_project.rusty.proof.TacletIndex;
+import org.key_project.rusty.proof.*;
 import org.key_project.rusty.proof.init.RustProfile;
 import org.key_project.rusty.proof.io.ProofSaver;
 import org.key_project.rusty.rule.NoPosTacletApp;
@@ -39,8 +36,8 @@ public class BasicTest {
     }
 
     private static Goal createGoal(Node n, TacletIndex tacletIndex) {
-        // final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
-        return new Goal(n, tacletIndex, n.proof().getServices());
+        final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
+        return new Goal(n, tacletIndex, birIndex, n.proof().getServices());
     }
 
     private static void applyRule(String name, PosInOccurrence pos, Proof proof) {

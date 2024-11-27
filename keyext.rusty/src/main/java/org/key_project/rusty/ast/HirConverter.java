@@ -61,7 +61,8 @@ public class HirConverter {
     /**
      * We first convert all functions except their bodies. Then we convert those later.
      */
-    private final Map<Function, org.key_project.rusty.parser.hir.item.Body> fnsToComplete = new HashMap();
+    private final Map<Function, org.key_project.rusty.parser.hir.item.Fn> fnsToComplete =
+        new HashMap();
 
     private ProgramVariable getPV(HirId id) {
         return Objects.requireNonNull(pvs.get(id), "Unknown variable " + id);
@@ -72,14 +73,30 @@ public class HirConverter {
     }
 
     public Crate convertCrate(org.key_project.rusty.parser.hir.Crate crate) {
+        Crate crate1 = new Crate(convertMod(crate.topMod()));
         for (var m : crate.types()) {
             var ty = convertTy(m.ty());
             types.put(m.hirId(), ty);
         }
-        Crate crate1 = new Crate(convertMod(crate.topMod()));
         for (var fn : fnsToComplete.keySet()) {
-            var body = fnsToComplete.get(fn);
-            fn.setBody((BlockExpression) convertExpr(body.value()));
+            var hirFn = fnsToComplete.get(fn);
+            boolean isCtxFn = fn.name().toString().equals(Context.TMP_FN_NAME);
+            int paramLength = hirFn.sig().decl().inputs().length;
+            int selfCount = 0;
+            if (hirFn.sig().decl().implicitSelf() != ImplicitSelfKind.None) {
+                selfCount++;
+            }
+            var params = new ArrayList<FunctionParam>(paramLength + selfCount);
+            for (int i = 0; i < paramLength; i++) {
+                var ty = hirFn.sig().decl().inputs()[i];
+                var pat = hirFn.body().params()[i].pat();
+                RustType type = convertHirTy(ty);
+                params.add(new FunctionParamPattern(convertPat(pat, isCtxFn), type,
+                    services.getRustInfo().getKeYRustyType(type.type())));
+            }
+            fn.setParams(new ImmutableArray<>(params));
+            fn.setBody((BlockExpression) convertExpr(hirFn.body().value()));
+            services.getRustInfo().registerFunction(fn);
         }
         return crate1;
     }
@@ -117,27 +134,12 @@ public class HirConverter {
     }
 
     private Function convertFn(Fn fn, String ident, LocalDefId id) {
-        boolean isCtxFn = ident.equals(Context.TMP_FN_NAME);
         var name = new Name(ident);
-        int paramLength = fn.sig().decl().inputs().length;
-        int selfCount = 0;
-        if (fn.sig().decl().implicitSelf() != ImplicitSelfKind.None) {
-            selfCount++;
-        }
-        var params = new ArrayList<FunctionParam>(paramLength + selfCount);
-        for (int i = 0; i < paramLength; i++) {
-            var ty = fn.sig().decl().inputs()[i];
-            var pat = fn.body().params()[i].pat();
-            RustType type = convertHirTy(ty);
-            params.add(new FunctionParamPattern(convertPat(pat, isCtxFn), type,
-                services.getRustInfo().getKeYRustyType(type.type())));
-        }
         var retTy = convertFnRetTy(fn.sig().decl().output());
         Function function = new Function(name, Function.ImplicitSelfKind.None,
-            new ImmutableArray<>(params), retTy, null);
-        services.getRustInfo().registerFunction(function);
+            null, retTy, null);
         localFns.put(id, function);
-        fnsToComplete.put(function, fn.body());
+        fnsToComplete.put(function, fn);
         return function;
     }
 
@@ -234,7 +236,7 @@ public class HirConverter {
         }
         if (path instanceof org.key_project.rusty.parser.hir.QPath.Resolved r) {
             var cPath = convertPath(r.path(), this::convertRes);
-            return new PathExpr(cPath,ty);
+            return new PathExpr(cPath, ty);
         }
         throw new IllegalArgumentException("Unknown path: " + path);
     }

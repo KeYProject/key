@@ -50,7 +50,7 @@ public class RustProfile implements Profile {
     }
 
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
-        return ImmutableSLList.nil();
+        return ImmutableSLList.<BuiltInRule>nil().prepend(UseOperationContractRule.INSTANCE);
     }
 
     @Override
