@@ -149,7 +149,9 @@ public final class ReferenceSearcher {
         for (SequentFormula sf : subset) {
             boolean found = false;
             for (SequentFormula sf2 : superset) {
-                if ((Object) sf instanceof SequentFormula that ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(sf2, that) : false) {
+                if ((Object) sf instanceof SequentFormula that
+                        ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(sf2, that)
+                        : false) {
                     found = true;
                     break;
                 }
