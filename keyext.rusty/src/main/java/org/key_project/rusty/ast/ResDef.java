@@ -7,7 +7,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.visitor.Visitor;
 
 //spotless:off
-public record ResDef() implements Res {
+public record ResDef(Def def) implements Res {
     @Override
     public void visit(Visitor v) {
 

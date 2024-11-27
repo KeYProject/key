@@ -49,6 +49,9 @@ public class ProofCollections {
         var choices = c.group("choices");
         choices.loadable("sub-no-check.proof");
 
+        var contracts = c.group("contracts");
+        contracts.loadable("use-contract.proof");
+
         return c;
     }
 }

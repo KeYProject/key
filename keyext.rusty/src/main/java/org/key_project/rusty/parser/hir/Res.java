@@ -4,15 +4,19 @@
 package org.key_project.rusty.parser.hir;
 
 import org.key_project.rusty.parser.hir.hirty.PrimHirTy;
-
+//spotless:off
 public interface Res {
-    record PrimTy(PrimHirTy ty) implements Res{}
+    record PrimTy(PrimHirTy ty) implements Res {
+    }
 
-    record Local(HirId id) implements Res{}
+    record Local(HirId id) implements Res {
+    }
 
-    record DefRes(Def def)implements Res{}
+    record DefRes(Def def) implements Res {
+    }
 
-    record Err() implements Res {}
+    record Err() implements Res {
+    }
 
     class Adapter extends HirAdapter<Res> {
         @Override
@@ -27,3 +31,4 @@ public interface Res {
         }
     }
 }
+//spotless:on

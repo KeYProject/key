@@ -112,7 +112,7 @@ public class HirRustyReader {
                 assert myAdd != null;
                 var target = new ProgramFunction(myAdd,
                     services.getRustInfo().getKeYRustyType(myAdd.returnType().type()));
-                services.getNamespaces().functions().add(target);
+                services.getNamespaces().functions().addSafely(target);
                 var factory = new ContractFactory(services);
                 var tb = services.getTermBuilder();
                 var pre = tb.tt();

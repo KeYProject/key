@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.hir;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.rusty.parser.hir.hirty.HirTy;
 
 public interface QPath {
-    record Resolved(HirTy ty, Path<Res> path)implements QPath {}
+    record Resolved(@Nullable HirTy ty, Path<Res> path)implements QPath {}
 
     class Adapter extends HirAdapter<QPath> {
         @Override

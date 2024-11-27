@@ -1,0 +1,20 @@
+\profile "Rust Profile";
+
+\programVariables {
+    u32 a, b, r;
+}
+
+\problem {
+    \<{
+        a = 1;
+        b = 3;
+        r = my_add(a, b);
+    }\> (r = 4)
+}
+
+\proof {
+    (branch "dummy ID"
+        (rule "assignment" (formula "1"))
+
+    )
+}

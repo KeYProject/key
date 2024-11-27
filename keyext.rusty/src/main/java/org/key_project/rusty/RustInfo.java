@@ -10,16 +10,17 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.ast.abstraction.*;
 import org.key_project.rusty.ast.fn.Function;
+import org.key_project.rusty.ast.ty.FnDefType;
 import org.key_project.rusty.logic.op.ProgramFunction;
 
 import org.jspecify.annotations.NonNull;
 
 public final class RustInfo {
-    private Map<Type, KeYRustyType> type2KRTCache;
-    private Set<KeYRustyType> allTypes = new LinkedHashSet<>();
-    private Set<ProgramFunction> allFunctions = new HashSet<>();
-    private Map<Function, ProgramFunction> fnToProgFn;
-    private Services services;
+    private final Map<Type, KeYRustyType> type2KRTCache;
+    private final Set<KeYRustyType> allTypes = new LinkedHashSet<>();
+    private final Set<ProgramFunction> allFunctions = new HashSet<>();
+    private final Map<Function, ProgramFunction> fnToProgFn;
+    private final Services services;
 
     public RustInfo(Services services) {
         this.services = services;
@@ -49,6 +50,11 @@ public final class RustInfo {
         if (type instanceof ReferenceType rt) {
             Sort sort = services.getMRefManager().getRefSort(rt.getSort(services), rt.isMut());
             var krt = new KeYRustyType(type, sort);
+            type2KRTCache.put(type, krt);
+            return krt;
+        }
+        if (type instanceof FnDefType ft) {
+            var krt = new KeYRustyType(ft);
             type2KRTCache.put(type, krt);
             return krt;
         }
@@ -99,11 +105,15 @@ public final class RustInfo {
     }
 
     public void registerFunction(Function function) {
-        if (!allFunctions.contains(function)) {
+        if (!fnToProgFn.containsKey(function)) {
             var pf = fnToProgFn.computeIfAbsent(function,
                 (fn) -> new ProgramFunction(fn, getKeYRustyType(fn.returnType().type())));
             allFunctions.add(pf);
         }
+    }
+
+    public ProgramFunction getFunction(Function function) {
+        return fnToProgFn.get(function);
     }
 
     /**

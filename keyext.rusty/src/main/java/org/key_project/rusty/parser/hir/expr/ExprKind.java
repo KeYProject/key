@@ -10,6 +10,8 @@ import org.key_project.rusty.parser.hir.Span;
 import org.jspecify.annotations.Nullable;
 
 public interface ExprKind {
+    record Call(Expr callee, Expr[]args) implements ExprKind {}
+
     record Binary(BinOp op, Expr left, Expr right) implements ExprKind {}
 
     record Unary(UnOp op, Expr expr) implements ExprKind {}
@@ -36,6 +38,7 @@ public interface ExprKind {
         @Override
         public Class<? extends ExprKind> getType(String tag) {
             return switch (tag) {
+                case "Call" -> Call.class;
                 case "Binary" -> Binary.class;
                 case "Unary" -> Unary.class;
                 case "Lit" -> LitExpr.class;

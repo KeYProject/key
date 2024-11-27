@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.op;
 
+import org.key_project.rusty.ast.Def;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
@@ -14,7 +15,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-public class ProgramFunction extends ObserverFunction implements RustyProgramElement {
+public class ProgramFunction extends ObserverFunction implements RustyProgramElement, Def {
     /**
      * The referenced function.
      */

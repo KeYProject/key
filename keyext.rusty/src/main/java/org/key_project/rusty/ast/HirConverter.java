@@ -21,8 +21,10 @@ import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.ty.*;
 import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.parser.hir.DefKind;
 import org.key_project.rusty.parser.hir.HirId;
 import org.key_project.rusty.parser.hir.Ident;
+import org.key_project.rusty.parser.hir.LocalDefId;
 import org.key_project.rusty.parser.hir.expr.BinOpKind;
 import org.key_project.rusty.parser.hir.expr.ExprKind;
 import org.key_project.rusty.parser.hir.expr.Lit;
@@ -55,6 +57,7 @@ public class HirConverter {
 
     private final Map<HirId, ProgramVariable> pvs = new HashMap<>();
     private final Map<HirId, Type> types = new HashMap<>();
+    private final Map<LocalDefId, Function> localFns = new HashMap<>();
 
     private ProgramVariable getPV(HirId id) {
         return Objects.requireNonNull(pvs.get(id), "Unknown variable " + id);
@@ -85,7 +88,7 @@ public class HirConverter {
         String ident = convertIdent(item.ident());
         return switch (item.kind()) {
             case org.key_project.rusty.parser.hir.item.Use use -> convertUse(use);
-            case Fn fn -> convertFn(fn, ident);
+            case Fn fn -> convertFn(fn, ident, item.ownerId().defId());
             case org.key_project.rusty.parser.hir.item.ExternCrate ec -> convertExternCrate(ec, ident);
             default -> throw new IllegalArgumentException("Unknown item: " + item);
         };
@@ -104,7 +107,7 @@ public class HirConverter {
         return new Use(path, kind);
     }
 
-    private Function convertFn(Fn fn, String ident) {
+    private Function convertFn(Fn fn, String ident, LocalDefId id) {
         boolean isCtxFn = ident.equals(Context.TMP_FN_NAME);
         var name = new Name(ident);
         int paramLength = fn.sig().decl().inputs().length;
@@ -125,6 +128,7 @@ public class HirConverter {
         Function function = new Function(name, Function.ImplicitSelfKind.None,
             new ImmutableArray<>(params), retTy, body);
         services.getRustInfo().registerFunction(function);
+        localFns.put(id, function);
         return function;
     }
 
@@ -145,7 +149,8 @@ public class HirConverter {
         var id = expr.hirId();
         var ty = Objects.requireNonNull(types.get(id), "No type for " + expr);
         return switch (expr.kind()) {
-            case ExprKind.BlockExpr e -> convertBlockExpr(e, ty);
+            case ExprKind.Call e -> convertCall(e);
+            case ExprKind.BlockExpr e -> convertBlockExpr(e);
             case ExprKind.LitExpr(var e) -> convertLitExpr(e, ty);
             case ExprKind.Let(var l) -> convertLetExpr(l);
             case ExprKind.If e -> convertIfExpr(e, ty);
@@ -160,7 +165,13 @@ public class HirConverter {
         };
     }
 
-    private BlockExpression convertBlockExpr(ExprKind.BlockExpr expr, Type type) {
+    private CallExpression convertCall(ExprKind.Call call) {
+        var callee = convertExpr(call.callee());
+        var args = Arrays.stream(call.args()).map(this::convertExpr).toList();
+        return new CallExpression(callee, new ImmutableArray<>(args));
+    }
+
+    private BlockExpression convertBlockExpr(ExprKind.BlockExpr expr) {
         var stmts = Arrays.stream(expr.block().stmts()).map(this::convertStmt).toList();
         var value = expr.block().expr() == null ? null : convertExpr(expr.block().expr());
         return new BlockExpression(ImmutableList.fromList(stmts), value);
@@ -211,6 +222,10 @@ public class HirConverter {
                 && r.path().segments().length == 1
                 && r.path().res() instanceof org.key_project.rusty.parser.hir.Res.Local lr) {
             return getPV(lr.id());
+        }
+        if (path instanceof org.key_project.rusty.parser.hir.QPath.Resolved r) {
+            var cPath = convertPath(r.path(), this::convertRes);
+
         }
         throw new IllegalArgumentException("Unknown path: " + path);
     }
@@ -382,9 +397,17 @@ public class HirConverter {
         return switch (res) {
             case org.key_project.rusty.parser.hir.Res.PrimTy(var ty) -> convertPrimHirType(ty);
             case org.key_project.rusty.parser.hir.Res.Local(var id) -> getPV(id);
-            case org.key_project.rusty.parser.hir.Res.DefRes(var def) -> new ResDef();
+            case org.key_project.rusty.parser.hir.Res.DefRes(var def) -> new ResDef(convertDef(def));
             case org.key_project.rusty.parser.hir.Res.Err e -> new ResErr();
             default -> throw new IllegalArgumentException("Unknown hirty type: " + res);
+        };
+    }
+
+    private Def convertDef(org.key_project.rusty.parser.hir.Def def) {
+        return switch (def.kind()) {
+            case DefKind.Fn f -> services.getRustInfo().getFunction(localFns.get(new LocalDefId(def.id().index())));
+            case DefKind.Mod m -> null;
+            default -> throw new IllegalArgumentException("Unknown def: " + def);
         };
     }
 
@@ -408,6 +431,11 @@ public class HirConverter {
                 case U128 -> PrimitiveType.U128;
             };
             case Ty.Ref(var t, var m) -> ReferenceType.get(convertTy(t), m);
+            case Ty.FnDef(var id) ->  {
+                assert id.krate() == 0 : "only local FnDef tys allowed";
+                var fn = localFns.get(new LocalDefId(id.index()));
+                yield new FnDefType(fn);
+            }
             case Ty.Tuple(var ts) -> TupleType.getInstance(Arrays.stream(ts).map(this::convertTy).toList());
             default -> throw new IllegalArgumentException("Unknown ty: " + ty);
         };

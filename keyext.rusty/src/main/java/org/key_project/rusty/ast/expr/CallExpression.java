@@ -8,6 +8,7 @@ import java.util.Objects;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.Type;
+import org.key_project.rusty.ast.ty.FnDefType;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.util.collection.ImmutableArray;
@@ -34,7 +35,7 @@ public class CallExpression implements Call {
             return callee;
         }
         --n;
-        return params.get(n);
+        return Objects.requireNonNull(params.get(n));
     }
 
     @Override
@@ -59,12 +60,14 @@ public class CallExpression implements Call {
 
     @Override
     public Type type(Services services) {
-        throw new UnsupportedOperationException();
+        var fnTy = (FnDefType) callee.type(services);
+        return fnTy.fn().returnType().type();
     }
 
     @Override
     public ProgramFunction function(Services services) {
-        return null;
+        var fnTy = (FnDefType) callee.type(services);
+        return services.getRustInfo().getFunction(fnTy.fn());
     }
 
     public Expr callee() {
@@ -90,5 +93,4 @@ public class CallExpression implements Call {
     public int hashCode() {
         return Objects.hash(callee, params);
     }
-
 }
