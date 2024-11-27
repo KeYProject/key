@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import java.util.Objects;
-
-import org.key_project.util.EqualsModProofIrrelevancy;
 
 
 /**

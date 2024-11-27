@@ -9,7 +9,6 @@ import de.uka.ilkd.key.pp.PrettyPrinter;
 
 import org.key_project.logic.Program;
 import org.key_project.logic.SyntaxElement;
-import org.key_project.util.EqualsModProofIrrelevancy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

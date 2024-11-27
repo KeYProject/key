@@ -25,7 +25,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;

@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import java.util.Objects;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.EqualsModProofIrrelevancy;
 
 /**
  * This class represents proper program variables, which are not program constants. See the

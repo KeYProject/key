@@ -6,9 +6,6 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
-
-import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
 
 
 /**

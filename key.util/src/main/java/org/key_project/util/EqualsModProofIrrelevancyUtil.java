@@ -27,34 +27,10 @@ public final class EqualsModProofIrrelevancyUtil {
      * @param b second array
      * @return whether they are equal (same length, equal elements)
      */
-    public static boolean compareArrays(EqualsModProofIrrelevancy[] a,
-            EqualsModProofIrrelevancy[] b) {
-        if (a == b) {
-            return true;
-        }
-
-        if (a.length != b.length) {
-            return false;
-        }
-
-        for (int i = 0; i < b.length; i++) {
-            if (!(b[i]).equalsModProofIrrelevancy(a[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Compare two arrays using the elements' {@link EqualsModProofIrrelevancy} implementation.
-     *
-     * @param a first array
-     * @param b second array
-     * @return whether they are equal (same length, equal elements)
-     */
-    public static boolean compareImmutableArrays(
-            ImmutableArray<? extends EqualsModProofIrrelevancy> a,
-            ImmutableArray<? extends EqualsModProofIrrelevancy> b) {
+    public static <T> boolean compareImmutableArrays(
+            ImmutableArray<T> a,
+            ImmutableArray<T> b,
+            BiPredicate<T, T> equalityPredicate) {
         if (a == b) {
             return true;
         }
@@ -64,7 +40,7 @@ public final class EqualsModProofIrrelevancyUtil {
         }
 
         for (int i = 0; i < b.size(); i++) {
-            if (!(b.get(i)).equalsModProofIrrelevancy(a.get(i))) {
+            if (!equalityPredicate.test(b.get(i), a.get(i))) {
                 return false;
             }
         }
@@ -78,7 +54,7 @@ public final class EqualsModProofIrrelevancyUtil {
      * @param iter iterable of elements
      * @return combined hashcode
      */
-    public static int hashCodeIterable(Iterable<? extends EqualsModProofIrrelevancy> iter) {
+    public static <T> int hashCodeIterable(Iterable<T> iter, ToIntFunction<T> hasher) {
         // adapted from Arrays.hashCode
         if (iter == null) {
             return 0;
@@ -86,8 +62,8 @@ public final class EqualsModProofIrrelevancyUtil {
 
         int result = 1;
 
-        for (EqualsModProofIrrelevancy element : iter) {
-            result = 31 * result + (element == null ? 0 : element.hashCodeModProofIrrelevancy());
+        for (T element : iter) {
+            result = 31 * result + (element == null ? 0 : hasher.applyAsInt(element));
         }
 
         return result;
@@ -103,7 +79,7 @@ public final class EqualsModProofIrrelevancyUtil {
      * @return whether they are equal (same length, equal elements)
      */
     public static <T> boolean compareImmutableLists(
-            ImmutableList<T> a, ImmutableList<T> b, BiPredicate<T,T> cmp) {
+            ImmutableList<T> a, ImmutableList<T> b, BiPredicate<T, T> cmp) {
         if (a == b || (a == null && b.size() == 0) || (b == null && a.size() == 0)) {
             return true;
         }

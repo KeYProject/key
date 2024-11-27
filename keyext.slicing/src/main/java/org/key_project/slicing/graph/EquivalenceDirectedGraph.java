@@ -33,8 +33,8 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
             if (v instanceof TrackedFormula tf) {
                 verticesModProof.computeIfAbsent(
                     new EqualsModProofIrrelevancyWrapper<>(tf,
-                            (t1,t2)->t1.equalsModProofIrrelevancy(t2),
-                            t->t.hashCodeModProofIrrelevancy()),
+                        (t1, t2) -> t1.equalsModProofIrrelevancy(t2),
+                        t -> t.hashCodeModProofIrrelevancy()),
                     _v -> new ArrayList<>()).add(v);
             }
             return true;
@@ -48,8 +48,8 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
         if (v instanceof TrackedFormula tf) {
             EqualsModProofIrrelevancyWrapper<?> wrapper =
                 new EqualsModProofIrrelevancyWrapper<>(tf,
-                        (t1,t2)->t1.equalsModProofIrrelevancy(t2),
-                        t->t.hashCodeModProofIrrelevancy());
+                    (t1, t2) -> t1.equalsModProofIrrelevancy(t2),
+                    t -> t.hashCodeModProofIrrelevancy());
             Collection<GraphNode> group = verticesModProof.get(wrapper);
             group.remove(v);
             if (group.isEmpty()) {
@@ -67,8 +67,8 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
         if (v instanceof TrackedFormula tf) {
             return verticesModProof
                     .get(new EqualsModProofIrrelevancyWrapper<>(tf,
-                            (t1,t2)->t1.equalsModProofIrrelevancy(t2),
-                            t->t.hashCodeModProofIrrelevancy()));
+                        (t1, t2) -> t1.equalsModProofIrrelevancy(t2),
+                        t -> t.hashCodeModProofIrrelevancy()));
         } else {
             return List.of(v);
         }
