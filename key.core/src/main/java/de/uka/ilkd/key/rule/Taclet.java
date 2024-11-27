@@ -76,7 +76,7 @@ import static org.key_project.util.Strings.formatAsList;
  * {@link de.uka.ilkd.key.rule.TacletApp TacletApp}
  * </p>
  */
-public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
+public abstract class Taclet implements Rule, Named {
 
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
@@ -159,8 +159,6 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
     /** Integer to cache the hashcode */
     private int hashcode = 0;
-    /** Integer to cache the hashcode */
-    private int hashcode2 = 0;
 
     private final Trigger trigger;
 
@@ -476,43 +474,6 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         return goalTemplates.equals(t2.goalTemplates);
     }
 
-    @Override
-    public boolean equalsModProofIrrelevancy(Object o) {
-        if (o == this)
-            return true;
-
-        if (o == null || o.getClass() != this.getClass()) {
-            return false;
-        }
-
-        final Taclet t2 = (Taclet) o;
-
-        if ((ifSequent == null && t2.ifSequent != null)
-                || (ifSequent != null && t2.ifSequent == null)) {
-            return false;
-        } else {
-            ImmutableList<SequentFormula> if1 = ifSequent.asList();
-            ImmutableList<SequentFormula> if2 = t2.ifSequent.asList();
-            while (!if1.isEmpty() && !if2.isEmpty()
-                    && if1.head().equalsModProofIrrelevancy(if2.head())) {
-                if1 = if1.tail();
-                if2 = if2.tail();
-            }
-            if (!if1.isEmpty() || !if2.isEmpty()) {
-                return false;
-            }
-        }
-
-        if (!choices.equals(t2.choices)) {
-            return false;
-        }
-
-        if (!goalTemplates.equals(t2.goalTemplates)) {
-            return false;
-        }
-
-        return true;
-    }
 
     @Override
     public int hashCode() {
@@ -523,17 +484,6 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             }
         }
         return hashcode;
-    }
-
-    @Override
-    public int hashCodeModProofIrrelevancy() {
-        if (hashcode2 == 0) {
-            hashcode2 = ifSequent.getFormulabyNr(1).hashCodeModProofIrrelevancy();
-            if (hashcode2 == 0) {
-                hashcode2 = -1;
-            }
-        }
-        return hashcode2;
     }
 
     /**

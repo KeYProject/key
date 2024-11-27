@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 import org.key_project.util.helper.FindResources;
 
 import org.junit.jupiter.api.Assertions;
@@ -50,7 +51,7 @@ class TestEqualsModProofIrrelevancy {
             for (int j = 1; j <= node1.sequent().size(); j++) {
                 SequentFormula sf1 = node1.sequent().getFormulabyNr(j);
                 SequentFormula sf2 = node2.sequent().getFormulabyNr(j);
-                Assertions.assertTrue(sf1.equalsModProofIrrelevancy(sf2));
+                Assertions.assertTrue((Object) sf2 instanceof SequentFormula that ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(sf1, that) : false);
             }
             if (node1.getAppliedRuleApp() != null) {
                 Assertions.assertTrue(

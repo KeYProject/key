@@ -13,7 +13,7 @@ import org.key_project.util.EqualsModProofIrrelevancy;
  * This interface represents objects representing an instantiation of one formula of the if-sequence
  * of a taclet.
  */
-public interface IfFormulaInstantiation extends EqualsModProofIrrelevancy {
+public interface IfFormulaInstantiation {
 
     /**
      * @return the cf this is pointing to
@@ -21,17 +21,4 @@ public interface IfFormulaInstantiation extends EqualsModProofIrrelevancy {
     SequentFormula getConstrainedFormula();
 
     String toString(Services services);
-
-    @Override
-    default boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof IfFormulaInstantiation that)) {
-            return false;
-        }
-        return getConstrainedFormula().equalsModProofIrrelevancy(that.getConstrainedFormula());
-    }
-
-    @Override
-    default int hashCodeModProofIrrelevancy() {
-        return getConstrainedFormula().hashCodeModProofIrrelevancy();
-    }
 }
