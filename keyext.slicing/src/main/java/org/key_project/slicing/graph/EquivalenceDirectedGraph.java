@@ -30,9 +30,11 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
     @Override
     public boolean addVertex(GraphNode v) {
         if (super.addVertex(v)) {
-            if (v instanceof EqualsModProofIrrelevancy) {
+            if (v instanceof TrackedFormula tf) {
                 verticesModProof.computeIfAbsent(
-                    new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v),
+                    new EqualsModProofIrrelevancyWrapper<>(tf,
+                            (t1,t2)->t1.equalsModProofIrrelevancy(t2),
+                            t->t.hashCodeModProofIrrelevancy()),
                     _v -> new ArrayList<>()).add(v);
             }
             return true;
@@ -43,9 +45,11 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
     @Override
     public void removeVertex(GraphNode v) {
         super.removeVertex(v);
-        if (v instanceof EqualsModProofIrrelevancy) {
+        if (v instanceof TrackedFormula tf) {
             EqualsModProofIrrelevancyWrapper<?> wrapper =
-                new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v);
+                new EqualsModProofIrrelevancyWrapper<>(tf,
+                        (t1,t2)->t1.equalsModProofIrrelevancy(t2),
+                        t->t.hashCodeModProofIrrelevancy());
             Collection<GraphNode> group = verticesModProof.get(wrapper);
             group.remove(v);
             if (group.isEmpty()) {
@@ -60,9 +64,11 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
      *         (according to {@link org.key_project.util.EqualsModProofIrrelevancy})
      */
     public Collection<GraphNode> getVerticesModProofIrrelevancy(GraphNode v) {
-        if (v instanceof EqualsModProofIrrelevancy) {
+        if (v instanceof TrackedFormula tf) {
             return verticesModProof
-                    .get(new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v));
+                    .get(new EqualsModProofIrrelevancyWrapper<>(tf,
+                            (t1,t2)->t1.equalsModProofIrrelevancy(t2),
+                            t->t.hashCodeModProofIrrelevancy()));
         } else {
             return List.of(v);
         }

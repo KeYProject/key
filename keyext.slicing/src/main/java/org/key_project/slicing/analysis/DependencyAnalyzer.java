@@ -28,6 +28,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
@@ -471,7 +472,9 @@ public final class DependencyAnalyzer {
                 }
                 foundDupes
                         .computeIfAbsent(
-                            new EqualsModProofIrrelevancyWrapper<>(proofNode.getAppliedRuleApp()),
+                            new EqualsModProofIrrelevancyWrapper<>(proofNode.getAppliedRuleApp(),
+                                    EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy,
+                                    EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
                             _a -> new LinkedHashSet<>())
                         .add(t.annotation().getProofStep());
             });

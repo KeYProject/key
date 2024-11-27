@@ -4,6 +4,7 @@
 package org.key_project.util;
 
 import java.util.Objects;
+import java.util.function.*;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -101,20 +102,18 @@ public final class EqualsModProofIrrelevancyUtil {
      * @param b second list
      * @return whether they are equal (same length, equal elements)
      */
-    public static boolean compareImmutableLists(
-            ImmutableList<? extends EqualsModProofIrrelevancy> a,
-            ImmutableList<? extends EqualsModProofIrrelevancy> b) {
+    public static <T> boolean compareImmutableLists(
+            ImmutableList<T> a, ImmutableList<T> b, BiPredicate<T,T> cmp) {
         if (a == b || (a == null && b.size() == 0) || (b == null && a.size() == 0)) {
             return true;
         }
         if (a == null || b == null || (a.size() != b.size())) {
             return false;
         }
-        ImmutableList<? extends EqualsModProofIrrelevancy> remainderToCompare = a;
+        ImmutableList<T> remainderToCompare = a;
         while (!remainderToCompare.isEmpty()) {
-            EqualsModProofIrrelevancy obj1 = remainderToCompare.head();
-            Object obj2 = b.head();
-            if (!(obj1).equalsModProofIrrelevancy(obj2)) {
+            final T obj1 = remainderToCompare.head();
+            if (!cmp.test(obj1, b.head())) {
                 return false;
             }
             remainderToCompare = remainderToCompare.tail();
@@ -131,16 +130,15 @@ public final class EqualsModProofIrrelevancyUtil {
      * @param list list of elements
      * @return combined hashcode
      */
-    public static int hashCodeImmutableList(
-            ImmutableList<? extends EqualsModProofIrrelevancy> list) {
+    public static <T> int hashCodeImmutableList(
+            ImmutableList<T> list, ToIntFunction<T> hasher) {
         if (list == null) {
             return 0;
         }
         var hashcode = Objects.hash(list.size());
         while (!list.isEmpty()) {
             if (list.head() != null) {
-                hashcode = Objects.hash(hashcode,
-                    (list.head()).hashCodeModProofIrrelevancy());
+                hashcode = Objects.hash(hashcode, hasher.applyAsInt(list.head()));
             }
             list = list.tail();
         }

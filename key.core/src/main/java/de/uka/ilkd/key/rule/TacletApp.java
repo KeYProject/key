@@ -26,7 +26,6 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;
@@ -43,7 +42,7 @@ import org.jspecify.annotations.Nullable;
  * the information is complete or at least sufficient (can be completed using meta variables)
  * complete, so that is can be applied.
  */
-public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
+public abstract class TacletApp implements RuleApp {
     public static final AtomicLong PERF_EXECUTE = new AtomicLong();
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
     public static final AtomicLong PERF_PRE = new AtomicLong();
@@ -179,6 +178,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
     public ImmutableList<IfFormulaInstantiation> ifFormulaInstantiations() {
         return ifInstantiations;
+    }
+
+    public boolean isUpdateContextFixed() {
+        return updateContextFixed;
     }
 
     /**
@@ -1219,38 +1222,4 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         return result;
     }
 
-    @Override
-    public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof TacletApp that)) {
-            return false;
-        }
-        if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(ifInstantiations,
-            that.ifInstantiations)) {
-            return false;
-        }
-        if (!instantiations.equalsModProofIrrelevancy(that.instantiations)) {
-            return false;
-        }
-        if (!matchConditions.equalsModProofIrrelevancy(that.matchConditions)) {
-            return false;
-        }
-        if ((missingVars != null || !that.missingVars.isEmpty())
-                && (!missingVars.isEmpty() || that.missingVars != null)
-                && !Objects.equals(missingVars, that.missingVars)) {
-            return false;
-        }
-        if (!taclet.equalsModProofIrrelevancy(that.taclet)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCodeModProofIrrelevancy() {
-        return Objects.hash(
-            EqualsModProofIrrelevancyUtil.hashCodeImmutableList(ifInstantiations),
-            instantiations, matchConditions.hashCodeModProofIrrelevancy(), missingVars,
-            updateContextFixed,
-            rule());
-    }
 }

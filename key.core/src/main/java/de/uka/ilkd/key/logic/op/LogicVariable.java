@@ -18,7 +18,7 @@ import org.key_project.util.EqualsModProofIrrelevancy;
  * The objects of this class represent logical variables, used e.g. for quantification.
  */
 public final class LogicVariable extends AbstractSortedOperator
-        implements QuantifiableVariable, ParsableVariable, EqualsModProofIrrelevancy {
+        implements QuantifiableVariable, ParsableVariable {
 
     public LogicVariable(Name name, Sort sort) {
         super(name, sort, true);
@@ -30,19 +30,6 @@ public final class LogicVariable extends AbstractSortedOperator
     @Override
     public String toString() {
         return name() + ":" + sort();
-    }
-
-    @Override
-    public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof LogicVariable that)) {
-            return false;
-        }
-        return name().equals(that.name()) && sort().equals(that.sort());
-    }
-
-    @Override
-    public int hashCodeModProofIrrelevancy() {
-        return Objects.hash(name(), sort());
     }
 
     @Override

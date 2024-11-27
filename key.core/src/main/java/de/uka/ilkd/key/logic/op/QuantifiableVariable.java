@@ -12,5 +12,5 @@ import org.key_project.util.EqualsModProofIrrelevancy;
  * operators).
  */
 public interface QuantifiableVariable extends org.key_project.logic.op.QuantifiableVariable,
-        ParsableVariable, SortedOperator, Operator, EqualsModProofIrrelevancy {
+        ParsableVariable, SortedOperator, Operator {
 }

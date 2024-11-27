@@ -5,15 +5,13 @@ package de.uka.ilkd.key.rule;
 
 
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.EqualsModProofIrrelevancy;
-
 
 
 /**
  * rule application with specific information how and where the rule has to be applied
  */
 public interface RuleApp
-        extends org.key_project.prover.rules.RuleApp, EqualsModProofIrrelevancy {
+        extends org.key_project.prover.rules.RuleApp {
 
     /**
      * returns the rule of this rule application

@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util;
 
+import java.util.function.BiPredicate;
+import java.util.function.ToIntFunction;
+
 /**
  * Wrapper around an object that implements {@link EqualsModProofIrrelevancy}.
  * Forwards calls to {@link #equals(Object)} and {@link #hashCode()} to
@@ -13,11 +16,13 @@ package org.key_project.util;
  * @author Arne Keller
  */
 @SuppressWarnings("nullness")
-public class EqualsModProofIrrelevancyWrapper<T extends EqualsModProofIrrelevancy> {
+public class EqualsModProofIrrelevancyWrapper<T> {
     /**
      * The wrapped object.
      */
     private final T inner;
+    private final BiPredicate<T, T> equalityCmp;
+    private final ToIntFunction<T> hasher;
 
     /**
      * Construct a new wrapper for the provided object. The provided object must implement
@@ -25,8 +30,12 @@ public class EqualsModProofIrrelevancyWrapper<T extends EqualsModProofIrrelevanc
      *
      * @param inner object to wrap
      */
-    public EqualsModProofIrrelevancyWrapper(T inner) {
+    public EqualsModProofIrrelevancyWrapper(T inner,
+                                            BiPredicate<T, T> equalityCmp,
+                                            ToIntFunction<T> hasher) {
         this.inner = inner;
+        this.equalityCmp = equalityCmp;
+        this.hasher = hasher;
     }
 
     @Override
@@ -40,11 +49,11 @@ public class EqualsModProofIrrelevancyWrapper<T extends EqualsModProofIrrelevanc
 
         EqualsModProofIrrelevancyWrapper<?> that = (EqualsModProofIrrelevancyWrapper<?>) o;
 
-        return inner != null ? inner.equalsModProofIrrelevancy(that.inner) : that.inner == null;
+        return inner != null ? equalityCmp.test(inner, (T) that.inner) : that.inner == null;
     }
 
     @Override
     public int hashCode() {
-        return inner != null ? inner.hashCodeModProofIrrelevancy() : 0;
+        return inner != null ? hasher.applyAsInt(inner) : 0;
     }
 }

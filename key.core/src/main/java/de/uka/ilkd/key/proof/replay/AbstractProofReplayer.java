@@ -21,22 +21,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleAppUtil;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.smt.SMTRuleApp;
@@ -242,7 +227,7 @@ public abstract class AbstractProofReplayer {
             // find the correct taclet
             for (NoPosTacletApp partialApp : currGoal.indexOfTaclets()
                     .getPartialInstantiatedApps()) {
-                if (partialApp.equalsModProofIrrelevancy(originalTacletApp)) {
+                if ((Object) originalTacletApp instanceof TacletApp cmp ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(partialApp, cmp) : false) {
                     ourApp = partialApp;
                     break;
                 }
@@ -343,7 +328,7 @@ public abstract class AbstractProofReplayer {
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()
                 : newSequent.succedent();
         for (SequentFormula newFormula : semiSeq.asList()) {
-            if (newFormula.equalsModProofIrrelevancy(oldFormula)) {
+            if ((Object) oldFormula instanceof SequentFormula that ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(newFormula, that) : false) {
                 return oldPos.replaceSequentFormula(newFormula);
             }
         }
