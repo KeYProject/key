@@ -4,6 +4,8 @@
 package de.uka.ilkd.key.rule.inst;
 
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * This is an abstract class that encapsulates an instantiation of a SchemaVariable. It is needed
  * because SchemaVariables can be instantiated as ProgramElements and as Terms according to their
@@ -13,14 +15,14 @@ package de.uka.ilkd.key.rule.inst;
  */
 public abstract class InstantiationEntry<E> {
 
-    private final E instantiation;
+    private final @NonNull E instantiation;
 
     /**
      * creates a new instantiation entry for the instantiation to be stored
      *
      * @param instantiation the instantiation to be stored
      */
-    InstantiationEntry(E instantiation) {
+    InstantiationEntry(@NonNull E instantiation) {
         assert instantiation != null : "An instantiation for a schemavariable cannot be null.";
         this.instantiation = instantiation;
     }
@@ -30,7 +32,7 @@ public abstract class InstantiationEntry<E> {
      *
      * @return the instantiation of the SchemaVariable
      */
-    public E getInstantiation() {
+    public @NonNull E getInstantiation() {
         return instantiation;
     }
 
