@@ -24,10 +24,23 @@ import org.key_project.util.collection.ImmutableMapEntry;
 
 import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
 
+/**
+ * Implements {@link de.uka.ilkd.key.logic.equality.EqualsModProperty} comparisons for
+ * non term classes.
+ */
 public class EqualityModuloProofIrrelevancy {
 
     // Dynamic dispatch on type of _this via reflection
 
+    /**
+     * dispatches to most specific equalsModProofIrrelevancy method using the runtime type of
+     * {@code _this}
+     *
+     * @param _this the first Object to be compared
+     * @param that the second Object to be compared
+     * @return true iff the {@code _this} object is equal modulo proof irrelevancy with the
+     *         {@code that} object
+     */
     public static boolean equalsModProofIrrelevancy(Object _this, Object that) {
         if (_this.getClass() == that.getClass()) {
             try {
@@ -46,6 +59,13 @@ public class EqualityModuloProofIrrelevancy {
         return false;
     }
 
+    /**
+     * dispatches to most specific hashCodeModProofIrrelevancy method using the runtime type of
+     * {@code obj}
+     *
+     * @param obj the Object whose hashCodeModProofIrrelevancy shall be computed
+     * @return the hashCodeModProofIrrelevancy of {@code obj}
+     */
     public static int hashCodeModProofIrrelevancy(Object obj) {
         try {
             var method = EqualityModuloProofIrrelevancy.class.getDeclaredMethod(
@@ -62,7 +82,180 @@ public class EqualityModuloProofIrrelevancy {
     }
 
 
+    // Operator
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first Operator
+     * @param that the second Operator
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(Operator _this, Operator that) {
+        if (_this == that) {
+            return true;
+        } else if (that == null || _this == null) {
+            return false;
+        } else if (_this.getClass() != that.getClass()) {
+            return false;
+        }
+
+        if (_this instanceof LogicVariable _thisLV) {
+            return equalsModProofIrrelevancy(_thisLV, (LogicVariable) that);
+        } else if (_this instanceof LocationVariable _thisLoc) {
+            return equalsModProofIrrelevancy(_thisLoc, (LocationVariable) that);
+        }
+
+        // assume name and arity uniquely identifies operator
+        return _this.arity() == that.arity() && _this.name().equals(that.name());
+    }
+
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param op the Operator for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
+    public static int hashCodeModProofIrrelevancy(Operator op) {
+        return Objects.hash(op.arity(), op.name());
+    }
+
+    // LocationVariable
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first LocationVariable
+     * @param that the second LocationVariable
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(LocationVariable _this, LocationVariable that) {
+        if (_this == that) {
+            return true;
+        } else if (that == null || _this == null) {
+            return false;
+        }
+        return Objects.equals(_this.getKeYJavaType(), that.getKeYJavaType())
+                && _this.isStatic() == that.isStatic()
+                && _this.isModel() == that.isModel()
+                && _this.isGhost() == that.isGhost()
+                && _this.isFinal() == that.isFinal()
+                && _this.sort().equals(that.sort())
+                && Objects.equals(_this.argSorts(), that.argSorts())
+                && _this.name().toString().equals(that.name().toString())
+                && _this.arity() == that.arity()
+                && Objects.equals(_this.whereToBind(), that.whereToBind())
+                && _this.isRigid() == that.isRigid();
+    }
+
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param loc the LocationVariable for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
+    public static int hashCodeModProofIrrelevancy(LocationVariable loc) {
+        return Objects.hash(loc.getKeYJavaType(), loc.isStatic(), loc.isModel(), loc.isGhost(),
+            loc.isFinal(), loc.sort(),
+            loc.argSorts(), loc.name().toString(), loc.arity(),
+            loc.whereToBind(), loc.isRigid());
+    }
+
+
+
+    // LogicVariable
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first LogicVariable
+     * @param that the second LogicVariable
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(LogicVariable _this, LogicVariable that) {
+        if (_this == that) {
+            return true;
+        } else if (that == null || _this == null) {
+            return false;
+        }
+        return _this.name().equals(that.name()) && _this.sort().equals(that.sort());
+    }
+
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param lv the {@link LogicVariable} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
+    public static int hashCodeModProofIrrelevancy(LogicVariable lv) {
+        return Objects.hash(lv.name(), lv.sort());
+    }
+
+
+    // JavaBlock
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first JavaBlock
+     * @param that the second JavaBlock
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(JavaBlock _this, JavaBlock that) {
+        if (_this == that) {
+            return true;
+        } else if (that == null || _this == null) {
+            return false;
+        }
+        // quite inefficient, but sufficient
+        // TODO: real comparison
+        return _this.toString().equals(that.toString());
+    }
+
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param jb the {@link JavaBlock} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
+    public static int hashCodeModProofIrrelevancy(JavaBlock jb) {
+        // TODO: real hashcode
+        return jb.toString().hashCode();
+    }
+
+    // SequentFormula
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first SequentFormula
+     * @param that the second SequentFormula
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(SequentFormula _this, SequentFormula that) {
+        if (_this == that) {
+            return true;
+        }
+        if (_this != null && that != null) {
+            return _this.formula().equalsModProperty(that.formula(), PROOF_IRRELEVANCY_PROPERTY);
+        }
+        return false;
+    }
+
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param sf the {@link SequentFormula} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
+    public static int hashCodeModProofIrrelevancy(SequentFormula sf) {
+        return sf.formula().hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY);
+    }
+
     // RuleApp
+
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first RuleApp
+     * @param that the second RuleApp
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
     public static boolean equalsModProofIrrelevancy(RuleApp _this, RuleApp that) {
         if (_this == that) {
             return true;
@@ -80,6 +273,12 @@ public class EqualityModuloProofIrrelevancy {
         }
     }
 
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param app the {@link RuleApp} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
     public static int hashCodeModProofIrrelevancy(RuleApp app) {
         if (app == null) {
             return 0;
@@ -92,19 +291,27 @@ public class EqualityModuloProofIrrelevancy {
     }
 
     // IBuiltInRuleApp
-    public static boolean equalsModProofIrrelevancy(IBuiltInRuleApp thisRule,
-            IBuiltInRuleApp thatRule) {
-        if (thisRule == thatRule) {
+
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first IBuiltInRuleApp
+     * @param that the second IBuiltInRuleApp
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(IBuiltInRuleApp _this,
+            IBuiltInRuleApp that) {
+        if (_this == that) {
             return true;
-        } else if (thisRule == null || thatRule == null) {
+        } else if (_this == null || that == null) {
             return false;
         }
-        if (!(Objects.equals(thisRule.rule(), thatRule.rule())
-                && Objects.equals(thisRule.getHeapContext(), thatRule.getHeapContext()))) {
+        if (!(Objects.equals(_this.rule(), that.rule())
+                && Objects.equals(_this.getHeapContext(), that.getHeapContext()))) {
             return false;
         }
-        ImmutableList<PosInOccurrence> ifInsts1 = thisRule.ifInsts();
-        ImmutableList<PosInOccurrence> ifInsts2 = thatRule.ifInsts();
+        ImmutableList<PosInOccurrence> ifInsts1 = _this.ifInsts();
+        ImmutableList<PosInOccurrence> ifInsts2 = that.ifInsts();
         if (ifInsts1.size() != ifInsts2.size()) {
             return false;
         }
@@ -115,9 +322,15 @@ public class EqualityModuloProofIrrelevancy {
             ifInsts1 = ifInsts1.tail();
             ifInsts2 = ifInsts2.tail();
         }
-        return thisRule.posInOccurrence().eqEquals(thatRule.posInOccurrence());
+        return _this.posInOccurrence().eqEquals(that.posInOccurrence());
     }
 
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param ruleApp the {@link IBuiltInRuleApp} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
     public static int hashCodeModProofIrrelevancy(IBuiltInRuleApp ruleApp) {
         var sf = (de.uka.ilkd.key.logic.SequentFormula) ruleApp.posInOccurrence().sequentFormula();
         return Objects.hash(ruleApp.rule(), ruleApp.getHeapContext(),
@@ -126,86 +339,14 @@ public class EqualityModuloProofIrrelevancy {
     }
 
 
-    // SequentFormula
-    public static boolean equalsModProofIrrelevancy(SequentFormula thisSF, SequentFormula thatSF) {
-        if (thisSF == thatSF) {
-            return true;
-        }
-        if (thisSF != null && thatSF != null) {
-            return thisSF.formula().equalsModProperty(thatSF.formula(), PROOF_IRRELEVANCY_PROPERTY);
-        }
-        return false;
-    }
-
-    public static int hashCodeModProofIrrelevancy(SequentFormula sf) {
-        return sf.formula().hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY);
-    }
-
     // Taclet
-
-    public static boolean equalsModProofIrrelevancy(TacletApp _this, TacletApp that) {
-        if (_this == that) {
-            return true;
-        } else if (_this == null || that == null) {
-            return false;
-        }
-
-        if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(_this.ifFormulaInstantiations(),
-            that.ifFormulaInstantiations(),
-            EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy)) {
-            return false;
-        }
-        if (!equalsModProofIrrelevancy(_this.instantiations, that.instantiations)) {
-            return false;
-        }
-        MatchConditions matchConditions = _this.matchConditions();
-        Object obj = that.matchConditions();
-        if (!EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(matchConditions,
-            (MatchConditions) obj)) {
-            return false;
-        }
-        final var missingVars = _this.uninstantiatedVars();
-        final var thatMissingVars = that.uninstantiatedVars();
-        if ((missingVars != null || !thatMissingVars.isEmpty())
-                && (!missingVars.isEmpty() || thatMissingVars != null)
-                && !Objects.equals(missingVars, thatMissingVars)) {
-            return false;
-        }
-        if (!equalsModProofIrrelevancy(_this.taclet(), that.taclet())) {
-            return false;
-        }
-        return true;
-    }
-
-    public static int hashCodeModProofIrrelevancy(TacletApp app) {
-        MatchConditions matchConditions = app.matchConditions();
-        return Objects.hash(
-            EqualsModProofIrrelevancyUtil.hashCodeImmutableList(app.ifFormulaInstantiations(),
-                EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
-            app.instantiations(),
-            EqualityModuloProofIrrelevancy.hashCodeModProofIrrelevancy(matchConditions),
-            app.uninstantiatedVars(),
-            app.isUpdateContextFixed(),
-            app.rule());
-    }
-
-    // MatchConditions
-    public static boolean equalsModProofIrrelevancy(MatchConditions _this, MatchConditions that) {
-        if (_this == that) {
-            return true;
-        } else if (_this == null || that == null) {
-            return false;
-        }
-        return equalsModProofIrrelevancy(_this.getInstantiations(), that.getInstantiations())
-                && _this.renameTable().equals(that.renameTable());
-    }
-
-    public static int hashCodeModProofIrrelevancy(MatchConditions mc) {
-        return Objects.hash(mc.getInstantiations(), mc.renameTable());
-    }
-
-
-    // Taclet
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first Taclet
+     * @param that the second Taclet
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
     public static boolean equalsModProofIrrelevancy(Taclet _this, Taclet that) {
         if (that == _this)
             return true;
@@ -234,109 +375,114 @@ public class EqualityModuloProofIrrelevancy {
             return false;
         }
 
-        if (!_this.goalTemplates().equals(that.goalTemplates())) {
-            return false;
-        }
-
-        return true;
+        return _this.goalTemplates().equals(that.goalTemplates());
     }
 
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param taclet the {@link Taclet} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
     public static int hashCodeModProofIrrelevancy(Taclet taclet) {
         return EqualityModuloProofIrrelevancy
                 .hashCodeModProofIrrelevancy(taclet.ifSequent().getFormulabyNr(1));
     }
 
 
+    // TacletApp
 
-    // LogicVariable
-
-    public static boolean equalsModProofIrrelevancy(LogicVariable _this, LogicVariable that) {
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first TacletApp
+     * @param that the second TacletApp
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(TacletApp _this, TacletApp that) {
         if (_this == that) {
             return true;
-        } else if (that == null || _this == null) {
+        } else if (_this == null || that == null) {
             return false;
         }
-        return _this.name().equals(that.name()) && _this.sort().equals(that.sort());
+
+        if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(_this.ifFormulaInstantiations(),
+            that.ifFormulaInstantiations(),
+            EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy)) {
+            return false;
+        }
+        if (!equalsModProofIrrelevancy(_this.instantiations, that.instantiations)) {
+            return false;
+        }
+        final MatchConditions matchConditions = _this.matchConditions();
+        if (!EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(matchConditions,
+            that.matchConditions())) {
+            return false;
+        }
+        final var missingVars = _this.uninstantiatedVars();
+        final var thatMissingVars = that.uninstantiatedVars();
+        if (!thatMissingVars.isEmpty()
+                && !missingVars.isEmpty()
+                && !Objects.equals(missingVars, thatMissingVars)) {
+            return false;
+        }
+        return equalsModProofIrrelevancy(_this.taclet(), that.taclet());
     }
 
-    public static int hashCodeModProofIrrelevancy(LogicVariable lv) {
-        return Objects.hash(lv.name(), lv.sort());
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param app the {@link TacletApp} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
+    public static int hashCodeModProofIrrelevancy(TacletApp app) {
+        MatchConditions matchConditions = app.matchConditions();
+        return Objects.hash(
+            EqualsModProofIrrelevancyUtil.hashCodeImmutableList(app.ifFormulaInstantiations(),
+                EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
+            app.instantiations(),
+            EqualityModuloProofIrrelevancy.hashCodeModProofIrrelevancy(matchConditions),
+            app.uninstantiatedVars(),
+            app.isUpdateContextFixed(),
+            app.rule());
     }
 
-
-    // JavaBlock
-
-    public static boolean equalsModProofIrrelevancy(JavaBlock _this, JavaBlock that) {
+    // MatchConditions
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first MatchConditions
+     * @param that the second MatchConditions
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
+    public static boolean equalsModProofIrrelevancy(MatchConditions _this, MatchConditions that) {
         if (_this == that) {
             return true;
-        } else if (that == null || _this == null) {
+        } else if (_this == null || that == null) {
             return false;
         }
-        // quite inefficient, but sufficient
-        // TODO: real comparison
-        return _this.toString().equals(that.toString());
+        return equalsModProofIrrelevancy(_this.getInstantiations(), that.getInstantiations())
+                && _this.renameTable().equals(that.renameTable());
     }
 
-    public static int hashCodeModProofIrrelevancy(JavaBlock jb) {
-        // TODO: real hashcode
-        return jb.toString().hashCode();
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param mc the {@link MatchConditions} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
+    public static int hashCodeModProofIrrelevancy(MatchConditions mc) {
+        return Objects.hash(mc.getInstantiations(), mc.renameTable());
     }
-
-    // LocationVariable
-    public static boolean equalsModProofIrrelevancy(LocationVariable _this, LocationVariable that) {
-        if (_this == that) {
-            return true;
-        } else if (that == null || _this == null) {
-            return false;
-        }
-        return Objects.equals(_this.getKeYJavaType(), that.getKeYJavaType())
-                && _this.isStatic() == that.isStatic()
-                && _this.isModel() == that.isModel()
-                && _this.isGhost() == that.isGhost()
-                && _this.isFinal() == that.isFinal()
-                && _this.sort().equals(that.sort())
-                && Objects.equals(_this.argSorts(), that.argSorts())
-                && _this.name().toString().equals(that.name().toString())
-                && _this.arity() == that.arity()
-                && Objects.equals(_this.whereToBind(), that.whereToBind())
-                && _this.isRigid() == that.isRigid();
-    }
-
-    public static int hashCodeModProofIrrelevancy(LocationVariable loc) {
-        return Objects.hash(loc.getKeYJavaType(), loc.isStatic(), loc.isModel(), loc.isGhost(),
-            loc.isFinal(), loc.sort(),
-            loc.argSorts(), loc.name().toString(), loc.arity(),
-            loc.whereToBind(), loc.isRigid());
-    }
-
-    // Operator
-
-    public static boolean equalsModProofIrrelevancy(Operator _this, Operator that) {
-        if (_this == that) {
-            return true;
-        } else if (that == null || _this == null) {
-            return false;
-        } else if (_this.getClass() != that.getClass()) {
-            return false;
-        }
-
-        if (_this instanceof LogicVariable _thisLV) {
-            return equalsModProofIrrelevancy(_thisLV, (LogicVariable) that);
-        } else if (_this instanceof LocationVariable _thisLoc) {
-            return equalsModProofIrrelevancy(_thisLoc, (LocationVariable) that);
-        }
-
-        // assume name and arity uniquely identifies operator
-        return _this.arity() == that.arity() && _this.name().equals(that.name());
-    }
-
-    public static int hashCodeModProofIrrelevancy(Operator op) {
-        return Objects.hash(op.arity(), op.name());
-    }
-
 
     // SVInstantiation
-
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first SVInstantiations
+     * @param that the second SVInstantiations
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
     public static boolean equalsModProofIrrelevancy(SVInstantiations _this,
             SVInstantiations that) {
         if (_this == that) {
@@ -355,7 +501,6 @@ public class EqualityModuloProofIrrelevancy {
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
             final Object inst = e.value().getInstantiation();
-            assert inst != null : "Illegal null instantiation.";
             if (inst instanceof Term instAsTerm) {
                 if (!instAsTerm.equalsModProperty(
                     that.getInstantiation(e.key()), PROOF_IRRELEVANCY_PROPERTY)) {
@@ -369,13 +514,25 @@ public class EqualityModuloProofIrrelevancy {
 
     }
 
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param svInst the {@link SVInstantiations} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
     public static int hashCodeModProofIrrelevancy(SVInstantiations svInst) {
         return Objects.hash(svInst.getUpdateContext(), svInst.getGenericSortConditions(),
             svInst.getExecutionContext()) + 13 * svInst.size(); // not used currently
     }
 
     // IFFormulaInstantiation
-
+    /**
+     * test for equality modulo proof irrelevancy for the given arguments
+     *
+     * @param _this the first IfFormulaInstantiation
+     * @param that the second IfFormulaInstantiation
+     * @return true if both arguments are equal modulo proof irrelevancy
+     */
     public static boolean equalsModProofIrrelevancy(IfFormulaInstantiation _this,
             IfFormulaInstantiation that) {
         if (_this == that) {
@@ -387,6 +544,12 @@ public class EqualityModuloProofIrrelevancy {
             _this.getConstrainedFormula(), that.getConstrainedFormula());
     }
 
+    /**
+     * computes the hash code modulo proof irrelevancy for the given argument
+     *
+     * @param ifInst the {@link IfFormulaInstantiation} for which to compute the hash
+     * @return the hash code modulo proof irrelevancy for the given argument
+     */
     public static int hashCodeModProofIrrelevancy(IfFormulaInstantiation ifInst) {
         return EqualityModuloProofIrrelevancy
                 .hashCodeModProofIrrelevancy(ifInst.getConstrainedFormula());

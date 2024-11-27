@@ -448,7 +448,7 @@ public abstract class TacletApp implements RuleApp {
      *
      * @return ImmutableSet<SchemaVariable> with SchemaVariables that have not been instantiated yet
      */
-    public ImmutableSet<SchemaVariable> uninstantiatedVars() {
+    public @NonNull ImmutableSet<SchemaVariable> uninstantiatedVars() {
         return calculateNonInstantiatedSV();
     }
 
