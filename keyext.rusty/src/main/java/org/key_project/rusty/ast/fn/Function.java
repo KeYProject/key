@@ -17,9 +17,22 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-// spotless:off
-public record Function(Name name, ImplicitSelfKind selfKind, ImmutableArray<FunctionParam> params,
-                       RustType returnType, BlockExpression body) implements Item, Named {
+public final class Function implements Item, Named {
+    private final Name name;
+    private final ImplicitSelfKind selfKind;
+    private final ImmutableArray<FunctionParam> params;
+    private final RustType returnType;
+    private  BlockExpression body;
+
+    public Function(Name name, ImplicitSelfKind selfKind, ImmutableArray<FunctionParam> params,
+                    RustType returnType, BlockExpression body) {
+        this.name = name;
+        this.selfKind = selfKind;
+        this.params = params;
+        this.returnType = returnType;
+        this.body = body;
+    }
+
     public enum ImplicitSelfKind {
         Imm,
         Mut,
@@ -51,5 +64,47 @@ public record Function(Name name, ImplicitSelfKind selfKind, ImmutableArray<Func
     public void visit(Visitor v) {
         throw new RuntimeException("TODO @ DD");
     }
+
+    @Override
+    public @NonNull Name name() {
+        return name;
+    }
+
+    public ImplicitSelfKind selfKind() {
+        return selfKind;
+    }
+
+    public ImmutableArray<FunctionParam> params() {
+        return params;
+    }
+
+    public RustType returnType() {
+        return returnType;
+    }
+
+    public BlockExpression body() {
+        return body;
+    }
+
+    public void setBody(BlockExpression body) {
+        this.body=body;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (Function) obj;
+        return Objects.equals(this.name, that.name) &&
+                Objects.equals(this.selfKind, that.selfKind) &&
+                Objects.equals(this.params, that.params) &&
+                Objects.equals(this.returnType, that.returnType) &&
+                Objects.equals(this.body, that.body);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, selfKind, params, returnType, body);
+    }
+
 }
-//spotless:on

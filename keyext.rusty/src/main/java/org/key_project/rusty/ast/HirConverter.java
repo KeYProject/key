@@ -58,6 +58,10 @@ public class HirConverter {
     private final Map<HirId, ProgramVariable> pvs = new HashMap<>();
     private final Map<HirId, Type> types = new HashMap<>();
     private final Map<LocalDefId, Function> localFns = new HashMap<>();
+    /**
+     * We first convert all functions except their bodies. Then we convert those later.
+     */
+    private final Map<Function, org.key_project.rusty.parser.hir.item.Body> fnsToComplete = new HashMap();
 
     private ProgramVariable getPV(HirId id) {
         return Objects.requireNonNull(pvs.get(id), "Unknown variable " + id);
@@ -72,7 +76,12 @@ public class HirConverter {
             var ty = convertTy(m.ty());
             types.put(m.hirId(), ty);
         }
-        return new Crate(convertMod(crate.topMod()));
+        Crate crate1 = new Crate(convertMod(crate.topMod()));
+        for (var fn : fnsToComplete.keySet()) {
+            var body = fnsToComplete.get(fn);
+            fn.setBody((BlockExpression) convertExpr(body.value()));
+        }
+        return crate1;
     }
 
     private String convertIdent(Ident ident) {
@@ -124,11 +133,11 @@ public class HirConverter {
                 services.getRustInfo().getKeYRustyType(type.type())));
         }
         var retTy = convertFnRetTy(fn.sig().decl().output());
-        var body = (BlockExpression) convertExpr(fn.body().value());
         Function function = new Function(name, Function.ImplicitSelfKind.None,
-            new ImmutableArray<>(params), retTy, body);
+            new ImmutableArray<>(params), retTy, null);
         services.getRustInfo().registerFunction(function);
         localFns.put(id, function);
+        fnsToComplete.put(function, fn.body());
         return function;
     }
 
@@ -155,7 +164,7 @@ public class HirConverter {
             case ExprKind.Let(var l) -> convertLetExpr(l);
             case ExprKind.If e -> convertIfExpr(e, ty);
             case ExprKind.DropTemps(var e) -> convertExpr(e);
-            case ExprKind.Path(var e) -> convertPathExpr(e);
+            case ExprKind.Path(var e) -> convertPathExpr(e, ty);
             case ExprKind.AddrOf e -> convertAddrOf(e);
             case ExprKind.Assign e -> convertAssign(e, ty);
             case ExprKind.AssignOp e -> convertAssignOp(e);
@@ -217,7 +226,7 @@ public class HirConverter {
             i.els() == null ? null : (ElseBranch) convertExpr(i.els()), type);
     }
 
-    private Expr convertPathExpr(org.key_project.rusty.parser.hir.QPath path) {
+    private Expr convertPathExpr(org.key_project.rusty.parser.hir.QPath path, Type ty) {
         if (path instanceof org.key_project.rusty.parser.hir.QPath.Resolved r
                 && r.path().segments().length == 1
                 && r.path().res() instanceof org.key_project.rusty.parser.hir.Res.Local lr) {
@@ -225,7 +234,7 @@ public class HirConverter {
         }
         if (path instanceof org.key_project.rusty.parser.hir.QPath.Resolved r) {
             var cPath = convertPath(r.path(), this::convertRes);
-
+            return new PathExpr(cPath,ty);
         }
         throw new IllegalArgumentException("Unknown path: " + path);
     }
