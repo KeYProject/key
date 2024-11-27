@@ -323,11 +323,12 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term contractResult = tb.var(resultVar);
         // TODO: self
         final Term globalDefs = contract.getGlobalDefs();
-        final Term originalPre = contract.getPre();
+        final Term originalPre = contract.getPre(null, contractParams, services);
         final Term pre = globalDefs == null ? originalPre : tb.apply(globalDefs, originalPre);
-        final Term originalPost = contract.getPost();
+        // TODO: replace result (and params?)
+        final Term originalPost = contract.getPost(null, contractParams, contractResult, services);
         final Term post = globalDefs == null ? originalPost : tb.apply(globalDefs, originalPost);
-        final Term modifiable = contract.getModifiable();
+        final Term modifiable = contract.getModifiable(null, contractParams, services);
 
         final Term mby = contract.hasMby() ? contract.getMby() : null;
 
@@ -342,7 +343,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         // prepare common stuff for the three branches
         Term reachableState = null;
 
-        Term postAssumption = post;
+        Term postAssumption = tb.apply(inst.u, post);
 
         // create "Pre" branch
         int i = 0;

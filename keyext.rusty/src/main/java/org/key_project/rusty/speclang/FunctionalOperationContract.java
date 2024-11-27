@@ -9,7 +9,6 @@ import java.util.function.UnaryOperator;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.Modality;
-import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -28,16 +27,26 @@ public interface FunctionalOperationContract extends OperationContract {
     Term getEnsures();
 
     /**
+     * Returns the precondition of the contract.
+     *
+     * @param selfTerm the self variable.
+     * @param paramTerms the list of parameter variables.
+     * @param services the services object.
+     * @return the precondition.
+     */
+    Term getPre(Term selfTerm, ImmutableList<Term> paramTerms, Services services);
+
+    /**
      * Returns the postcondition of the contract.
      *
-     * @param selfVar the self variable.
-     * @param paramVars the list of parameter variables.
-     * @param resultVar the result variable.
+     * @param selfTerm the self variable.
+     * @param paramTerms the list of parameter variables.
+     * @param resultTerm the result variable.
      * @param services the services object.
      * @return the post condition.
      */
-    Term getPost(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
+    Term getPost(Term selfTerm,
+            ImmutableList<Term> paramTerms, Term resultTerm,
             Services services);
 
 

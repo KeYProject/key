@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 
+import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.expr.BlockExpression;
@@ -113,13 +114,14 @@ public class HirRustyReader {
                 services.getNamespaces().functions().addSafely(target);
                 var factory = new ContractFactory(services);
                 var tb = services.getTermBuilder();
-                var pre = tb.tt();
-                var post = tb.tt();
                 var a = ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(0)).pattern())
                         .pv();
-                var b = ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(0)).pattern())
+                var b = ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(1)).pattern())
                         .pv();
-                var pvs = new ProgramVariableCollection(null, ImmutableList.of(a, b), null);
+                var result = new ProgramVariable(new Name("result"), a.getKeYRustyType());
+                var pre = tb.geq(tb.var(a), tb.zero());
+                var post = tb.equals(tb.var(result), tb.add(tb.var(a), tb.var(b)));
+                var pvs = new ProgramVariableCollection(null, ImmutableList.of(a, b), result);
                 services.getSpecificationRepository().addContract(factory.func("my_contract",
                     target, true, pre, null, post, null, pvs, true));
             }

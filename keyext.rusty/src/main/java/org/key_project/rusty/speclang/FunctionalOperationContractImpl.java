@@ -138,12 +138,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public Term getModifiable(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+    public Term getModifiable(Term selfVar, ImmutableList<Term> paramVars,
             Services services) {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        final Map<ProgramVariable, ProgramVariable> replaceMap =
+        final Map<Term, Term> replaceMap =
             getReplaceMap(selfVar, paramVars, null, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory());
@@ -161,13 +161,24 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public Term getPost(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar, Services services) {
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
+    public Term getPre(Term selfTerm, ImmutableList<Term> paramTerms, Services services) {
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        final Map<ProgramVariable, ProgramVariable> replaceMap =
-            getReplaceMap(selfVar, paramVars, resultVar, services);
+        final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, paramTerms, null, services);
+        final OpReplacer or =
+            new OpReplacer(replaceMap, services.getTermFactory());
+        return or.replace(originalPre);
+    }
+
+    @Override
+    public Term getPost(Term selfVar, ImmutableList<Term> paramTerms,
+            Term resultTerm, Services services) {
+        assert paramTerms != null;
+        assert paramTerms.size() == originalParamVars.size();
+        assert services != null;
+        final Map<Term, Term> replaceMap =
+            getReplaceMap(selfVar, paramTerms, resultTerm, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalPost);
@@ -243,10 +254,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * @param services the services object
      * @return the replacement map
      */
-    protected Map<ProgramVariable, ProgramVariable> getReplaceMap(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
+    protected Map<Term, Term> getReplaceMap(Term selfVar,
+            ImmutableList<Term> paramVars, Term resultVar,
             Services services) {
-        final Map<ProgramVariable, ProgramVariable> result = new LinkedHashMap<>();
+        final Map<Term, Term> result = new LinkedHashMap<>();
 
         // self
         // if (selfVar != null) {
@@ -258,13 +269,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         if (paramVars != null) {
             assert originalParamVars.size() == paramVars.size();
             final Iterator<ProgramVariable> it1 = originalParamVars.iterator();
-            final Iterator<ProgramVariable> it2 = paramVars.iterator();
+            final Iterator<Term> it2 = paramVars.iterator();
             while (it1.hasNext()) {
                 ProgramVariable originalParamVar = it1.next();
-                ProgramVariable paramVar = it2.next();
+                Term paramVar = it2.next();
                 // allow contravariant parameter types
                 assertSubSort(originalParamVar, paramVar);
-                result.put(originalParamVar, paramVar);
+                result.put(tb.var(originalParamVar), paramVar);
             }
         }
 
@@ -272,7 +283,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         if (resultVar != null) {
             // workaround to allow covariant return types (bug #1384)
             assertSubSort(resultVar, originalResultVar);
-            result.put(originalResultVar, resultVar);
+            result.put(tb.var(originalResultVar), resultVar);
         }
 
         return result;

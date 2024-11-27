@@ -8,7 +8,6 @@ import java.util.function.UnaryOperator;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.ProgramFunction;
-import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableList;
 
 public interface OperationContract extends Contract {
@@ -34,6 +33,6 @@ public interface OperationContract extends Contract {
      * @param services the services object.
      * @return the modifiable clause.
      */
-    Term getModifiable(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services);
+    Term getModifiable(Term selfVar,
+            ImmutableList<Term> paramVars, Services services);
 }
