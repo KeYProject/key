@@ -13,7 +13,7 @@ import org.key_project.util.EqualsModProofIrrelevancy;
  * etc. have to implement this interface.
  */
 public interface Operator
-        extends org.key_project.logic.op.Operator, EqualsModProofIrrelevancy {
+        extends org.key_project.logic.op.Operator {
 
     /**
      * comparator to compare operators; for modalities only their kind is compared
@@ -27,22 +27,5 @@ public interface Operator
         return fst == snd ||
                 (fst instanceof Modality mod1 && snd instanceof Modality mod2
                         && mod1.kind() == mod2.kind());
-    }
-
-    @Override
-    default boolean equalsModProofIrrelevancy(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof Operator that)) {
-            return false;
-        }
-        // assume name and arity uniquely identifies operator
-        return arity() == that.arity() && name().equals(that.name());
-    }
-
-    @Override
-    default int hashCodeModProofIrrelevancy() {
-        return Objects.hash(arity(), name());
     }
 }
