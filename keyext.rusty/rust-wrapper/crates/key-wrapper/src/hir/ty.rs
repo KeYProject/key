@@ -18,7 +18,7 @@ pub enum Ty {
     },
     Adt {
         def: AdtDef,
-        args: Vec<GenericArg>,
+        args: Vec<GenericTyArgKind>,
     },
     Foreign {
         def_id: DefId,
@@ -57,19 +57,19 @@ pub enum Ty {
     },
     Closure {
         def_id: DefId,
-        args: Vec<GenericArg>,
+        args: Vec<GenericTyArgKind>,
     },
     CoroutineClosure {
         def_id: DefId,
-        args: Vec<GenericArg>,
+        args: Vec<GenericTyArgKind>,
     },
     Coroutine {
         def_id: DefId,
-        args: Vec<GenericArg>,
+        args: Vec<GenericTyArgKind>,
     },
     CoroutineWitness {
         def_id: DefId,
-        args: Vec<GenericArg>,
+        args: Vec<GenericTyArgKind>,
     },
     Never,
     Tuple {
@@ -104,7 +104,7 @@ pub struct AdtDef {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct AdtFlags(u16);
+pub struct AdtFlags(pub u16);
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Hash)]
 pub struct VariantIdx(pub u32);
@@ -115,12 +115,17 @@ pub struct VariantDef {
     pub ctor: Option<(CtorKind, DefId)>,
     pub name: Symbol,
     pub discr: VariantDiscr,
-    pub fields: HashMap<FieldIdx, FieldDef>,
-    pub tainted: bool,
+    pub fields: HashMap<FieldIdx, TyFieldDef>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Hash)]
 pub struct FieldIdx(pub u32);
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct TyFieldDef {
+    pub did: DefId,
+    pub name: Symbol,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum CtorKind {
@@ -217,8 +222,8 @@ pub enum Pattern {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Binder<T> {
-    value: T,
-    bound_vars: Vec<BoundVarKind>,
+    pub value: T,
+    pub bound_vars: Vec<BoundVarKind>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -256,14 +261,20 @@ pub enum ExistentialPredicate {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ExistentialTraitRef {
     pub def_id: DefId,
-    pub args: GenericArgs,
+    pub args: Vec<GenericTyArgKind>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ExistentialProjection {
     pub def_id: DefId,
-    pub args: Vec<GenericArg>,
-    pub term: Term,
+    pub args: Vec<GenericTyArgKind>,
+    pub term: TyTerm,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub enum TyTerm {
+    Ty { ty: Ty },
+    Const { c: Const },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
