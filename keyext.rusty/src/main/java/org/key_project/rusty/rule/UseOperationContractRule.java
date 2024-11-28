@@ -325,7 +325,6 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term globalDefs = contract.getGlobalDefs();
         final Term originalPre = contract.getPre(null, contractParams, services);
         final Term pre = globalDefs == null ? originalPre : tb.apply(globalDefs, originalPre);
-        // TODO: replace result (and params?)
         final Term originalPost = contract.getPost(null, contractParams, contractResult, services);
         final Term post = globalDefs == null ? originalPost : tb.apply(globalDefs, originalPost);
         final Term modifiable = contract.getModifiable(null, contractParams, services);
