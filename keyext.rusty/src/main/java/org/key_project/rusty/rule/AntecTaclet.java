@@ -27,6 +27,7 @@ public class AntecTaclet extends FindTaclet {
      * @param applPart contains the application part of a Taclet that is the if-sequent, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
+     * @param ruleSets a list of rule sets for the Taclet
      * @param attrs attributes for the Taclet; these are boolean values indicating a non-interactive
      *        or recursive use of the Taclet.
      * @param find the find term of the Taclet
@@ -34,11 +35,11 @@ public class AntecTaclet extends FindTaclet {
      *        SchemaVariable in the Taclet
      */
     public AntecTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
             ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, find, prefixMap, choices,
+        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices,
             tacletAnnotations);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
         createTacletServices();
@@ -73,7 +74,7 @@ public class AntecTaclet extends FindTaclet {
             varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
-        return new AntecTaclet(new Name(s), applPart, goalTemplates(), attrs, find,
+        return new AntecTaclet(new Name(s), applPart, goalTemplates(), ruleSets, attrs, find,
             ignoreTopLevelUpdates, prefixMap, choices, tacletAnnotations);
     }
 }

@@ -272,14 +272,13 @@ public class TacletPBuilder extends ExpressionBuilder {
     public Object visitModifiers(KeYRustyParser.ModifiersContext ctx) {
         TacletBuilder<?> b = peekTBuilder();
         List<RuleSet> rs = accept(ctx.rs);
-        // TODO uncomment this when rulesets are added
-        // if (!ctx.NONINTERACTIVE().isEmpty()) {
-        // b.addRuleSet(ruleSets().lookup(new Name("notHumanReadable")));
-        // }
-        //
-        // if (rs != null) {
-        // rs.forEach(b::addRuleSet);
-        // }
+        if (!ctx.NONINTERACTIVE().isEmpty()) {
+            b.addRuleSet(ruleSets().lookup(new Name("notHumanReadable")));
+        }
+
+        if (rs != null) {
+            rs.forEach(b::addRuleSet);
+        }
 
         if (ctx.DISPLAYNAME() != null) {// last entry
             b.setDisplayName(accept(ctx.dname));

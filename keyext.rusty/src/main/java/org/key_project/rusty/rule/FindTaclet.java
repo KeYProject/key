@@ -44,6 +44,7 @@ public abstract class FindTaclet extends Taclet {
      *        conditions
      * @param goalTemplates a IList<TacletGoalTemplate> that contains all goaltemplates of the
      *        taclet (these are the instructions used to create new goals when applying the Taclet)
+     * @param ruleSets a list of rule sets for the Taclet
      * @param attrs the TacletAttributes encoding if the Taclet is non-interactive, recursive or
      *        something like that
      * @param find the Term that is the pattern that has to be found in a sequent and the places
@@ -52,11 +53,11 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, prefixMap, choices, surviveSymbExec,
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, surviveSymbExec,
             tacletAnnotations);
         this.find = find;
     }
@@ -69,6 +70,7 @@ public abstract class FindTaclet extends Taclet {
      *        conditions
      * @param goalTemplates an ImmutableList that contains all goaltemplates of the
      *        taclet (these are the instructions used to create new goals when applying the Taclet)
+     * @param ruleSets a list of rule sets for the Taclet
      * @param attrs the TacletAttributes encoding if the Taclet is non-interactive, recursive or
      *        something like that
      * @param find the Term that is the pattern that has to be found in a sequent and the places
@@ -77,10 +79,10 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, attrs, find, prefixMap, choices, false,
+        this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices, false,
             tacletAnnotations);
     }
 

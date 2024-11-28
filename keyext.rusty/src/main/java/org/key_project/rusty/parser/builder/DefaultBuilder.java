@@ -48,6 +48,25 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return mapOf(ctx.varId());
     }
 
+    @Override
+    public List<RuleSet> visitRulesets(KeYRustyParser.RulesetsContext ctx) {
+        return mapOf(ctx.ruleset());
+    }
+
+    @Override
+    public RuleSet visitRuleset(KeYRustyParser.RulesetContext ctx) {
+        String id = ctx.IDENT().getText();
+        Name name = new Name(id);
+        RuleSet h = ruleSets().lookup(name);
+        if (h == null) {
+            h = new RuleSet(name);
+            ruleSets().add(h);
+            // addWarning(ctx, String.format("Rule set %s was not previous defined.",
+            // ctx.getText()));
+        }
+        return h;
+    }
+
     protected Named lookup(Name n) {
         final Namespace<?>[] lookups =
             { programVariables(), variables(), functions() };

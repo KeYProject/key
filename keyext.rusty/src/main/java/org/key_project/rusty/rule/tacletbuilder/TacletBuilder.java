@@ -37,6 +37,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected ImmutableList<NewDependingOn> varsNewDependingOn =
         ImmutableSLList.nil();
     protected ImmutableList<TacletGoalTemplate> goals = ImmutableSLList.nil();
+    protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
     protected TacletAttributes attrs = new TacletAttributes(null, null);
 
     /**
@@ -269,6 +270,14 @@ public abstract class TacletBuilder<T extends Taclet> {
         }
         goals = oldGoals;
         return result;
+    }
+
+    public void addRuleSet(RuleSet rs) {
+        ruleSets = ruleSets.prepend(rs);
+    }
+
+    public void setRuleSets(ImmutableList<RuleSet> rs) {
+        ruleSets = rs;
     }
 
     public static class TacletBuilderException extends IllegalArgumentException {

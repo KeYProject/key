@@ -28,6 +28,7 @@ public class SuccTaclet extends FindTaclet {
      * @param applPart contains the application part of a taclet that is the if-sequent, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
+     * @param ruleSets a list of rule sets for the Taclet
      * @param attrs attributes for the Taclet; these are boolean values indicating a non-interactive
      *        or recursive use of the Taclet.
      * @param find the find term of the Taclet
@@ -36,11 +37,11 @@ public class SuccTaclet extends FindTaclet {
      *        the prefix for each SchemaVariable in the taclet
      */
     public SuccTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
             ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, find, prefixMap, choices,
+        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices,
             tacletAnnotations);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
         createTacletServices();
@@ -63,8 +64,9 @@ public class SuccTaclet extends FindTaclet {
     }
 
 
-
-    /** toString for the find part */
+    /**
+     * toString for the find part
+     */
     protected StringBuffer toStringFind(StringBuffer sb) {
         return sb.append("\\find(==>").append(find().toString()).append(")\n");
     }
@@ -75,7 +77,7 @@ public class SuccTaclet extends FindTaclet {
             varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
-        return new SuccTaclet(new Name(s), applPart, goalTemplates(), attrs, find,
+        return new SuccTaclet(new Name(s), applPart, goalTemplates(), ruleSets, attrs, find,
             ignoreTopLevelUpdates, prefixMap, choices, tacletAnnotations);
     }
 

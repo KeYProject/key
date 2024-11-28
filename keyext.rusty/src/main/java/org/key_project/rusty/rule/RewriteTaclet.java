@@ -106,6 +106,7 @@ public class RewriteTaclet extends FindTaclet {
      * @param applPart the TacletApplPart that contains the application part of a Taclet that is
      *        the if-sequent, the variable conditions
      * @param goalTemplates a list of goal descriptions.
+     * @param ruleSets a list of rule sets for the Taclet
      * @param attrs the TacletAttributes; these are boolean values indicating a noninteractive or
      *        recursive use of the Taclet.
      * @param find the find term of the Taclet
@@ -115,21 +116,21 @@ public class RewriteTaclet extends FindTaclet {
      *        for location check)
      */
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ApplicationRestriction p_applicationRestriction,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, attrs, find, prefixMap,
+        this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
             p_applicationRestriction, choices, false, tacletAnnotations);
     }
 
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ApplicationRestriction p_applicationRestriction, ChoiceExpr choices,
             boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, find, prefixMap,
+        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
             choices, surviveSymbExec, tacletAnnotations);
         applicationRestriction = p_applicationRestriction;
         createTacletServices();
@@ -201,7 +202,7 @@ public class RewriteTaclet extends FindTaclet {
             varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
-        return new RewriteTaclet(new Name(s), applPart, goalTemplates(), attrs, find,
+        return new RewriteTaclet(new Name(s), applPart, goalTemplates(), ruleSets, attrs, find,
             prefixMap, applicationRestriction, choices, tacletAnnotations);
     }
 

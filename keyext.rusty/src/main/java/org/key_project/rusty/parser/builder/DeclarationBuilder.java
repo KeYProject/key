@@ -20,6 +20,7 @@ import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.sort.GenericSort;
 import org.key_project.rusty.logic.sort.SortImpl;
 import org.key_project.rusty.parser.KeYRustyParser;
+import org.key_project.rusty.rule.RuleSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
 
@@ -34,7 +35,7 @@ public class DeclarationBuilder extends DefaultBuilder {
 
     @Override
     public Object visitDecls(KeYRustyParser.DeclsContext ctx) {
-        mapMapOf(ctx.option_decls(), ctx.options_choice(),
+        mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(),
             ctx.sort_decls(),
             ctx.prog_var_decls(), ctx.schema_var_decls());
         return null;
@@ -159,5 +160,17 @@ public class DeclarationBuilder extends DefaultBuilder {
     @Override
     public List<Sort> visitOneof_sorts(KeYRustyParser.Oneof_sortsContext ctx) {
         return mapOf(ctx.sortId());
+    }
+
+    @Override
+    public Object visitRuleset_decls(KeYRustyParser.Ruleset_declsContext ctx) {
+        for (String id : this.<String>mapOf(ctx.simple_ident())) {
+            Name name = new Name(id);
+            var h = new RuleSet(name);
+            if (ruleSets().lookup(name) == null) {
+                ruleSets().add(h);
+            }
+        }
+        return null;
     }
 }

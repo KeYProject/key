@@ -29,15 +29,16 @@ public class NoFindTaclet extends Taclet {
      *        variable conditions
      * @param goalTemplates the IList containing all goal descriptions of the
      *        taclet to be created
+     * @param ruleSets a list of rule sets for the Taclet
      * @param attrs attributes for the Taclet; these are boolean values
      * @param prefixMap a ImmutableMap that contains the prefix for each
      *        SchemaVariable in the Taclet
      */
     public NoFindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, prefixMap,
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
             choices, tacletAnnotations);
         createTacletServices();
     }
@@ -72,7 +73,7 @@ public class NoFindTaclet extends Taclet {
             varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
-        return new NoFindTaclet(new Name(s), applPart, goalTemplates(), attrs,
+        return new NoFindTaclet(new Name(s), applPart, goalTemplates(), ruleSets, attrs,
             prefixMap, choices, tacletAnnotations);
     }
 }

@@ -73,6 +73,11 @@ public abstract class Taclet implements Rule {
     private final ImmutableList<TacletGoalTemplate> goalTemplates;
 
     /**
+     * list of rulesets (formerly known as heuristics) the taclet belongs to
+     */
+    protected final ImmutableList<RuleSet> ruleSets;
+
+    /**
      * map from a schemavariable to its prefix. The prefix is used to test correct instantiations of
      * the schemavariables by resolving/avoiding collisions. Mainly the prefix consists of a list of
      * all variables that may appear free in the instantiation of the schemavariable (a bit more
@@ -119,11 +124,12 @@ public abstract class Taclet implements Rule {
      * @param applPart contains the application part of a Taclet that is the if-sequence, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
+     * @param ruleSets a list of rule sets for the Taclet
      * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -135,6 +141,7 @@ public abstract class Taclet implements Rule {
         varsNewDependingOn = applPart.varsNewDependingOn();
         variableConditions = applPart.variableConditions();
         this.goalTemplates = goalTemplates;
+        this.ruleSets = ruleSets;
         this.choices = choices;
         this.prefixMap = prefixMap;
         this.displayName = attrs.displayName() == null ? name.toString() : attrs.displayName();
@@ -162,14 +169,15 @@ public abstract class Taclet implements Rule {
      * @param applPart contains the application part of a Taclet that is the if-sequence, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
+     * @param ruleSets a list of rule sets for the Taclet
      * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, attrs, prefixMap, choices, false,
+        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
             tacletAnnotations);
     }
 
