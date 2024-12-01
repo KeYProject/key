@@ -7,13 +7,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+
 
 /**
  * Initializes the "before loop" update needed for the modifiable clause.
@@ -64,7 +63,8 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
      * @return The anonymizing update.
      */
     private static Term createBeforeLoopUpdate(boolean isTransaction, boolean isPermissions,
-            Term anonHeapTerm, Term anonSavedHeapTerm, Term anonPermissionsHeapTerm,
+            Term anonHeapTerm, Term anonSavedHeapTerm,
+            Term anonPermissionsHeapTerm,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
