@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.ui.core.Main;
 
 import org.key_project.util.java.IOUtil;
 
