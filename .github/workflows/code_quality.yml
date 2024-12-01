@@ -22,9 +22,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4.1.0
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v3.3.2
-        with:
-          arguments: -DENABLE_NULLNESS=true compileTest
+        run: ./gradlew -DENABLE_NULLNESS=true compileTest
 
   formatting:
     runs-on: ubuntu-latest
@@ -36,6 +34,5 @@ jobs:
           java-version: '21'
           cache: 'gradle'
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v4.1.0
-        with:
-          arguments: --continue spotlessCheck
+        run: ./gradlew --parallel --continue spotlessCheck
+

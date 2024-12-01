@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Wed Jun 26 12:45:30 CEST 2024
+# Date: Mon Nov 04 13:26:34 CET 2024
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -12571,7 +12571,7 @@ loopScopeInvBox {
 \find(#box ((modal operator))|{{ ..
   while (#nse) #body
 ... }}| (post))
-\varcond(\new(#permissionsBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#savedHeapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#heapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#x (program Variable), (type, sort): (boolean,boolean)), \varcond (\storeTermIn(loopFormula (formula), #box ((modal operator))|{{
+\varcond(\new(#permissionsBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#savedHeapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#heapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#x (program Variable), (type, sort): (boolean,boolean)), \newLocalVars(#localVarDeclsBefore_LOOP (program Statement), #updateBefore_LOOP (update), #updateFrame_LOOP (update), #body (program Statement)), \varcond (\storeTermIn(loopFormula (formula), #box ((modal operator))|{{
   while (#nse) #body
 }}| (post))), \varcond (\storeStmtIn(#loopStmt (program Statement), #box ((modal operator))|{{
   while (#nse) #body
@@ -12580,7 +12580,8 @@ loopScopeInvBox {
   #typeof(#heapBefore_LOOP) #heapBefore_LOOP;
   #typeof(#savedHeapBefore_LOOP) #savedHeapBefore_LOOP;
   #typeof(#permissionsBefore_LOOP) #permissionsBefore_LOOP;
-}}| (update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),imp(and(inv,freeInv),#box ((modal operator))|{{ ..
+  #localVarDeclsBefore_LOOP
+}}| (update-application(parallel-upd(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#updateBefore_LOOP),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),imp(and(inv,freeInv),#box ((modal operator))|{{ ..
   boolean #x;
   loop-scope (#x) {
     if (#nse) {
@@ -12590,7 +12591,7 @@ loopScopeInvBox {
       break;
     }
   }
-... }}| (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP))))))))) ;
+... }}| (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(inv,update-application(#updateFrame_LOOP,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP)))))))))) ;
 \replacewith(inv) 
 \heuristics(loop_scope_inv_taclet)
 Choices: (programRules:Java & javaLoopTreatment:efficient)}
@@ -12600,7 +12601,7 @@ loopScopeInvDia {
 \find(#dia ((modal operator))|{{ ..
   while (#nse) #body
 ... }}| (post))
-\varcond(\new(#permissionsBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#savedHeapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#heapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#variant (program Variable), KeYJavaType:null,any), \new(#x (program Variable), (type, sort): (boolean,boolean)), \varcond (\storeTermIn(loopFormula (formula), #dia ((modal operator))|{{
+\varcond(\new(#permissionsBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#savedHeapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#heapBefore_LOOP (program Variable), KeYJavaType:null,Heap), \new(#variant (program Variable), KeYJavaType:null,any), \new(#x (program Variable), (type, sort): (boolean,boolean)), \newLocalVars(#localVarDeclsBefore_LOOP (program Statement), #updateBefore_LOOP (update), #updateFrame_LOOP (update), #body (program Statement)), \varcond (\storeTermIn(loopFormula (formula), #dia ((modal operator))|{{
   while (#nse) #body
 }}| (post))), \varcond (\storeStmtIn(#loopStmt (program Statement), #dia ((modal operator))|{{
   while (#nse) #body
@@ -12610,7 +12611,8 @@ loopScopeInvDia {
   #typeof(#savedHeapBefore_LOOP) #savedHeapBefore_LOOP;
   #typeof(#permissionsBefore_LOOP) #permissionsBefore_LOOP;
   #typeof(#variant) #variant;
-}}| (update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),update-application(elem-update(#variant (program Variable))(variantTerm),imp(and(inv,freeInv),#dia ((modal operator))|{{ ..
+  #localVarDeclsBefore_LOOP
+}}| (update-application(parallel-upd(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#updateBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),update-application(elem-update(#variant (program Variable))(variantTerm),imp(and(inv,freeInv),#dia ((modal operator))|{{ ..
   boolean #x;
   loop-scope (#x) {
     if (#nse) {
@@ -12620,7 +12622,7 @@ loopScopeInvDia {
       break;
     }
   }
-... }}| (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP)),prec(variantTerm,#variant)))))))))) ;
+... }}| (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(and(inv,update-application(#updateFrame_LOOP,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP))),prec(variantTerm,#variant)))))))))) ;
 \replacewith(inv) 
 \heuristics(loop_scope_inv_taclet)
 Choices: (programRules:Java & javaLoopTreatment:efficient)}

@@ -161,6 +161,8 @@ public class TacletBuilderManipulators {
             }
         };
 
+    public static final TacletBuilderCommand NEW_LOCAL_VARS = new ConstructorBasedBuilder(
+        "newLocalVars", NewLocalVarsCondition.class, SV, SV, SV, SV);
 
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
         public NotFreeInTacletBuilderCommand(@NonNull ArgumentType... argumentsTypes) {
@@ -367,7 +369,8 @@ public class TacletBuilderManipulators {
     // region Registry
     static {
         register(SAME_OBSERVER, SIMPLIFY_ITE_UPDATE, ABSTRACT_OR_INTERFACE, SAME, IS_SUBTYPE,
-            STRICT, DISJOINT_MODULO_NULL, NEW_JAVATYPE, NEW_VAR, FREE_1, FREE_2, FREE_3, FREE_4,
+            STRICT, DISJOINT_MODULO_NULL, NEW_JAVATYPE, NEW_VAR, NEW_LOCAL_VARS, FREE_1, FREE_2,
+            FREE_3, FREE_4,
             FREE_5, NEW_TYPE_OF, NEW_DEPENDING_ON, FREE_LABEL_IN_VARIABLE, DIFFERENT, FINAL,
             ENUM_CONST, LOCAL_VARIABLE, ARRAY_LENGTH, ARRAY, REFERENCE_ARRAY, MAY_EXPAND_METHOD_2,
             MAY_EXPAND_METHOD_3, STATIC_METHOD, THIS_REFERENCE, REFERENCE, ENUM_TYPE,

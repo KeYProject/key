@@ -101,6 +101,7 @@
      (rule "variableDeclaration" (formula "9") (term "1") (newnames "h_1") (userinteraction))
      (rule "variableDeclaration" (formula "9") (term "1") (newnames "h_2") (userinteraction))
      (rule "variableDeclaration" (formula "9") (term "1") (newnames "x") (userinteraction))
+     (rule "variableDeclaration" (formula "9") (term "1") (newnames "s_before") (userinteraction))
      (rule "emptyModality" (formula "9") (term "1") (userinteraction))
    (builtin "One Step Simplification" (formula "9") (userinteraction))
    (rule "impRight" (formula "9"))
