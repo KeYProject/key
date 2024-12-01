@@ -24,9 +24,9 @@ plugins {
     id "com.diffplug.spotless" version "6.25.0"
 
     // EISOP Checker Framework
-    id "org.checkerframework" version "0.6.45"
+    id "org.checkerframework" version "0.6.46"
 
-    id("org.sonarqube") version "5.0.0.4638"
+    id("org.sonarqube") version "6.0.1.5171"
 }
 
 sonar {
