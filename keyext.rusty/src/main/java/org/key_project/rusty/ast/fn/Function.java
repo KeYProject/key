@@ -83,6 +83,10 @@ public final class Function implements Item, Named {
         return params;
     }
 
+    public FunctionParam getParam(int i) {
+        return params.get(i);
+    }
+
     public void setParams(ImmutableArray<FunctionParam> params) {
         this.params = params;
     }

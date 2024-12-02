@@ -369,4 +369,8 @@ public class InitConfig {
     public BuiltInRuleIndex createBuiltInRuleIndex() {
         return new BuiltInRuleIndex(builtInRules());
     }
+
+    public InitConfig deepCopy() {
+        return copyWithServices(services.copy());
+    }
 }

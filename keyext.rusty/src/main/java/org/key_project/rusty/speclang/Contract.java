@@ -8,6 +8,8 @@ import java.util.function.UnaryOperator;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.IObserverFunction;
+import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A contractual agreement about an ObserverFunction.
@@ -31,6 +33,18 @@ public interface Contract extends SpecificationElement {
      * INVALID_ID.
      */
     int id();
+
+    /**
+     * Returns the precondition of the contract.
+     *
+     * @param selfVar self variable
+     * @param paramVars parameter variables
+     * @param services services object
+     * @return precondition
+     */
+    Term getPre(ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            Services services);
 
     /**
      * Returns the contracted function symbol.
@@ -75,4 +89,15 @@ public interface Contract extends SpecificationElement {
     Contract setID(int newId);
 
     Term getGlobalDefs();
+
+    /**
+     * Returns the measured_by clause of the contract.
+     *
+     * @param selfVar the self variable
+     * @param paramVars the parameter variables
+     * @param services services object
+     * @return the measured-by term
+     */
+    Term getMby(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+            Services services);
 }

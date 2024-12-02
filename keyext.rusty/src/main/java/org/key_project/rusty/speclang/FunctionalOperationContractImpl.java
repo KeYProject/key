@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.speclang;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -113,6 +114,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
+    public Term getPre(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+            Services services) {
+        return null;
+    }
+
+    @Override
     public ProgramFunction getTarget() {
         return fn;
     }
@@ -151,6 +158,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
+    public Term getFreePre(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+            Services services) {
+        return null;
+    }
+
+    @Override
     public Modality.RustyModalityKind getModalityKind() {
         return modalityKind;
     }
@@ -182,6 +195,48 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalPost);
+    }
+
+    @Override
+    public Term getPost(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar, Services services) {
+        // assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert resultVar != null;
+        final var replaceMap = getReplaceMap(selfVar, paramVars, resultVar, services);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
+        return or.replace(originalPost);
+    }
+
+    private Map<ProgramVariable, ProgramVariable> getReplaceMap(ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
+            Services services) {
+        final Map<ProgramVariable, ProgramVariable> result = new HashMap<>();
+
+        // TODO: self
+
+        // params
+        if (paramVars != null) {
+            assert originalParamVars.size() == paramVars.size();
+            final var it1 = originalParamVars.iterator();
+            final var it2 = paramVars.iterator();
+            while (it1.hasNext()) {
+                var ogParamVar = it1.next();
+                var paramVar = it2.next();
+                // allow contravariant parameter types
+                assertSubSort(ogParamVar, paramVar);
+                result.put(ogParamVar, paramVar);
+            }
+        }
+
+        // result
+        if (resultVar != null) {
+            assertSubSort(resultVar, originalResultVar);
+            result.put(originalResultVar, resultVar);
+        }
+
+        return result;
     }
 
     @Override
@@ -227,6 +282,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public Term getGlobalDefs() {
         return globalDefs;
+    }
+
+    @Override
+    public Term getMby(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+            Services services) {
+        return null;
     }
 
     @Override

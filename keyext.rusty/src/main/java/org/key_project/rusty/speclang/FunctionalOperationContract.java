@@ -9,6 +9,7 @@ import java.util.function.UnaryOperator;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.Modality;
+import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -49,6 +50,9 @@ public interface FunctionalOperationContract extends OperationContract {
             ImmutableList<Term> paramTerms, Term resultTerm,
             Services services);
 
+    Term getPost(ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
+            Services services);
 
     String getBaseName();
 

@@ -15,6 +15,8 @@ import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
+import org.key_project.rusty.ast.fn.FunctionParamPattern;
+import org.key_project.rusty.ast.pat.BindingPattern;
 import org.key_project.rusty.ldt.IntLDT;
 import org.key_project.rusty.logic.op.*;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
@@ -641,5 +643,51 @@ public class TermBuilder {
         } else {
             return tt();
         }
+    }
+
+    public Term reachableValue(ProgramVariable pv) {
+        return reachableValue(var(pv), pv.getKeYRustyType());
+    }
+
+    /**
+     * Creates program variables for the parameters. Take care to register them in the namespaces!
+     */
+    public ImmutableList<ProgramVariable> paramVars(ProgramFunction fn, boolean makeNamesUnique) {
+        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+        for (int i = fn.getNumParams() - 1; i >= 0; i--) {
+            final KeYRustyType paramTy = fn.getParamType(i);
+            var pat = ((FunctionParamPattern) fn.getFunction().getParam(i)).pattern();
+            String name = "unknown";
+            if (pat instanceof BindingPattern bp) {
+                name = bp.pv().name().toString();
+            }
+            final var pv = progVar(name, paramTy, makeNamesUnique);
+            result = result.prepend(pv);
+        }
+        return result;
+    }
+
+    public Term measuredBy(Term mby) {
+        final var funcNS = services.getNamespaces().functions();
+        final var f = funcNS.lookup(new Name("measuredBy"));
+        if (f == null) {
+            throw new RuntimeException("LDT: Function measuredBy not found.\n"
+                + "It seems that there are definitions missing from the .key files.");
+        }
+        return func(f, mby);
+    }
+
+    public Function getMeasuredByEmpty() {
+        final var funcNS = services.getNamespaces().functions();
+        final var f = funcNS.lookup(new Name("measuredByEmpty"));
+        if (f == null) {
+            throw new RuntimeException("LDT: Function measuredByEmpty not found.\n"
+                + "It seems that there are definitions missing from the .key files.");
+        }
+        return f;
+    }
+
+    public Term measuredByEmpty() {
+        return func(getMeasuredByEmpty());
     }
 }

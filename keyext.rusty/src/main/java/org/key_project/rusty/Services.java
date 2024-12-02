@@ -249,4 +249,17 @@ public class Services implements LogicServices {
     public NameRecorder getNameRecorder() {
         return nameRecorder;
     }
+
+    public Services copy() {
+        return copy(getProfile());
+    }
+
+    public Services copy(Profile profile) {
+        var s = new Services(profile);
+        s.specRepos = specRepos;
+        s.setLDTs(getLDTs());
+        s.setNamespaces(namespaces.copy());
+        nameRecorder = nameRecorder.copy();
+        return s;
+    }
 }
