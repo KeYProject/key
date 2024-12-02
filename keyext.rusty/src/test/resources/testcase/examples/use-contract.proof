@@ -5,7 +5,7 @@
 }
 
 \problem {
-    inU32(a) & inU32(b)
+    in_u32(a) & in_u32(b)
     -> \<{
         a = 1;
         b = 3;
@@ -56,14 +56,14 @@
             (rule "simplifyUpdate2" (formula "2") (term "1"))
             (rule "applyOnRigidFormula" (formula "2") (term "1"))
             (rule "applyOnPV" (formula "2") (term "0,1"))
-            (rule "expandInU32" (formula "2") (term "0"))
+            (rule "expand_in_u32" (formula "2") (term "0"))
             (rule "replace_u32_MIN" (formula "2") (term "0,0,0"))
             (rule "leq_literals" (formula "2") (term "0,0"))
             (rule "concrete_and_1" (formula "2") (term "0"))
             (rule "replace_u32_MAX" (formula "2") (term "1,0"))
             (rule "leq_literals" (formula "2") (term "0"))
             (rule "concrete_and_1" (formula "2"))
-            (rule "expandInU32" (formula "2"))
+            (rule "expand_in_u32" (formula "2"))
             (rule "replace_u32_MIN" (formula "2") (term "0,0"))
             (rule "leq_literals" (formula "2") (term "0"))
             (rule "concrete_and_1" (formula "2"))

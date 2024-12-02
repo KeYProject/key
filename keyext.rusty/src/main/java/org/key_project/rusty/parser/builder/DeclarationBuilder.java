@@ -26,6 +26,22 @@ import org.key_project.util.collection.Immutables;
 
 import org.antlr.v4.runtime.Token;
 
+/**
+ * This visitor evaluates all basic (level 0) declarations. This includes:
+ * <ul>
+ * <li>Option Declarations</li>
+ * <li>Sorts</li>
+ * <li>Program variables</li>
+ * <li>Schema variables</li>
+ * <li>Rulesets</li>
+ * </ul>
+ * <p>
+ * This information is registered into the given {@link NamespaceSet}.
+ *
+ * @author Alexander Weigl
+ * @version 1 (12/4/19)
+ * @see FunctionPredicateBuilder for level-1 declarations
+ */
 public class DeclarationBuilder extends DefaultBuilder {
     private final Map<String, String> category2Default = new HashMap<>();
 

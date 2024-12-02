@@ -40,7 +40,19 @@ public class IntLDT extends LDT {
     private final Function greaterThan;
     private final Function greaterOrEquals;
     private final Function lessOrEquals;
+
+    private final Function inU8;
+    private final Function inU16;
     private final Function inU32;
+    private final Function inU64;
+    private final Function inU128;
+    private final Function inUSize;
+    private final Function inI8;
+    private final Function inI16;
+    private final Function inI32;
+    private final Function inI64;
+    private final Function inI128;
+    private final Function inISize;
 
     private final Term one;
     private final Term zero;
@@ -69,7 +81,18 @@ public class IntLDT extends LDT {
         greaterOrEquals = addFunction(services, "geq");
         lessOrEquals = addFunction(services, "leq");
 
-        inU32 = addFunction(services, "inU32");
+        inU8 = addFunction(services, "in_u8");
+        inU16 = addFunction(services, "in_u16");
+        inU32 = addFunction(services, "in_u32");
+        inU64 = addFunction(services, "in_u64");
+        inU128 = addFunction(services, "in_u128");
+        inUSize = addFunction(services, "in_usize");
+        inI8 = addFunction(services, "in_i8");
+        inI16 = addFunction(services, "in_i16");
+        inI32 = addFunction(services, "in_i32");
+        inI64 = addFunction(services, "in_i64");
+        inI128 = addFunction(services, "in_i128");
+        inISize = addFunction(services, "in_isize");
 
         // cache often used constants
         zero = makeDigit(0, services.getTermBuilder());

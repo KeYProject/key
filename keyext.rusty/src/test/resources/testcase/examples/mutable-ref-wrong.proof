@@ -56,7 +56,7 @@
             (rule "simplifyUpdate1" (formula "1") (term "1,0"))
             (rule "applyOnPV" (formula "1") (term "1,0"))
             (rule "add_literals" (formula "1") (term "0"))
-            (rule "expandInU32" (formula "1"))
+            (rule "expand_in_u32" (formula "1"))
             (rule "replace_u32_MIN" (formula "1") (term "0,0"))
             (rule "replace_u32_MAX" (formula "1") (term "1,1"))
             (rule "leq_literals" (formula "1") (term "0"))
