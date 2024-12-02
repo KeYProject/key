@@ -232,6 +232,8 @@ public class SchemaConverter {
             return convertExprWithBlock(x.exprWithBlock());
         if (ctx instanceof RustySchemaParser.SchemaVarExpressionContext se)
             return convertSchemaVarExpression(se);
+        if (ctx instanceof RustySchemaParser.EmptyPanicContext p)
+            return new EmptyPanic();
         throw new UnsupportedOperationException(
             "Unknown expr: " + ctx.getText() + " class: " + ctx.getClass());
     }

@@ -16,3 +16,7 @@ CONTEXT_START
 CONTEXT_END
     : '#c'
     ;
+
+PANIC
+    : 'panic!'
+    ;

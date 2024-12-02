@@ -48,6 +48,7 @@ expr
    | enumerationVariantExpr # EnumerationVariantExpression_
    | closureExpr # ClosureExpression_
    | exprWithBlock # ExpressionWithBlock_
+   | PANIC LPAREN RPAREN # EmptyPanic
    ;
 
 stmt
