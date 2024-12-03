@@ -113,8 +113,8 @@ public class RunAllProofsAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        WindowUserInterfaceControl ui = mainWindow.getUserInterface();
 
+        WindowUserInterfaceControl ui = mainWindow.getUserInterface();
         for (int i = 0; i < files.size(); i++) {
             LOGGER.info("{}: {}\n", i, files.get(i));
         }
@@ -133,7 +133,10 @@ public class RunAllProofsAction extends MainWindowAction {
                 MediatorProofControl control = ui.getProofControl();
                 if (control.isAutoModeSupported(proof)) {
                     control.startAutoMode(proof, proof.openEnabledGoals());
-                    control.waitWhileAutoMode();
+                    try {
+                        control.waitWhileAutoMode();
+                    } catch (InterruptedException ignored) {
+                    }
                 }
                 LOGGER.info("Finish: ({}) {}", getMediator().getSelectedProof().closed(), absFile);
                 getMediator().getSelectedProof().dispose();
