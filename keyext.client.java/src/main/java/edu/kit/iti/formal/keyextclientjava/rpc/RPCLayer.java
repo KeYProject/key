@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.keyextclientjava;
+package edu.kit.iti.formal.keyextclientjava.rpc;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -7,9 +7,7 @@ import com.google.gson.JsonParser;
 import org.jspecify.annotations.Nullable;
 
 import java.io.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -27,8 +25,7 @@ public final class RPCLayer {
     private @Nullable Thread threadListener;
     private @Nullable Thread threadMessageHandling;
 
-    private final ConcurrentHashMap<String, Object> waiting = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, JsonObject> responses = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, SimpleFuture> waiting = new ConcurrentHashMap<>();
     public final ArrayBlockingQueue<JsonObject> incomingMessages = new ArrayBlockingQueue<>(16);
 
     private final AtomicInteger idCounter = new AtomicInteger();
@@ -47,25 +44,21 @@ public final class RPCLayer {
         return new RPCLayer(incoming, outgoing);
     }
 
-    public JsonObject waitForResponse(String id) throws InterruptedException {
+    public JsonObject waitForResponse(String id) throws InterruptedException, ExecutionException {
         var cond = waiting.get(id);
-        synchronized (cond) {
-            cond.wait();
-        }
-        var r = responses.get(id);
+        var r = cond.get();
         waiting.remove(id);
-        responses.remove(id);
         return r;
     }
 
     public JsonObject callSync(String methodName, Object... args) {
         var id = nextId();
-        waiting.put(id, new Object());
+        waiting.put(id, new SimpleFuture());
         try {
             sendAsync(id, methodName, args);
             var response = waitForResponse(id);
             return handleError(response);
-        } catch (InterruptedException | IOException e) {
+        } catch (InterruptedException | IOException | ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
@@ -88,13 +81,14 @@ public final class RPCLayer {
 
     private void sendAsync(String id, String methodName, Object[] args) throws IOException {
         var json = JsonRPC.createRequest(id, methodName, args);
-        outgoing.write(JsonRPC.addHeader(json));
+        final var str = JsonRPC.addHeader(json);
+        outgoing.write(str);
         outgoing.flush();
     }
 
     public void start() {
-        threadListener = new Thread(new JsonStreamListener(incoming, incomingMessages));
-        threadMessageHandling = new Thread(this::handler);
+        threadListener = new Thread(new JsonStreamListener(incoming, incomingMessages), "JSON Message Reader");
+        threadMessageHandling = new Thread(this::handler, "JSON Message Handler");
         threadListener.start();
         threadMessageHandling.start();
     }
@@ -108,12 +102,8 @@ public final class RPCLayer {
                 }
                 if (obj.get("id") != null) {
                     var id = obj.get("id").getAsString();
-                    responses.put(id, obj); // store response
                     var syncObj = waiting.get(id);
-
-                    synchronized (syncObj) {
-                        syncObj.notifyAll();
-                    }
+                    syncObj.put(obj);
                 } else {
                     //TODO handle notification
                     System.out.println("Notification received");
@@ -209,4 +199,45 @@ public final class RPCLayer {
             }
         }
     }
+}
+
+class SimpleFuture implements Future<JsonObject> {
+    private final CountDownLatch latch = new CountDownLatch(1);
+    private JsonObject value;
+
+    @Override
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        return false;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return false;
+    }
+
+    @Override
+    public boolean isDone() {
+        return value != null;
+    }
+
+    @Override
+    public JsonObject get() throws InterruptedException, ExecutionException {
+        latch.await();
+        return value;
+    }
+
+    @Override
+    public JsonObject get(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+        if (latch.await(timeout, unit)) {
+            return value;
+        } else {
+            throw new TimeoutException();
+        }
+    }
+
+    void put(JsonObject value) {
+        this.value = value;
+        latch.countDown();
+    }
+
 }

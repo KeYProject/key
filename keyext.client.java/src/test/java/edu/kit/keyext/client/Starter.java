@@ -1,12 +1,10 @@
 package edu.kit.keyext.client;
 
-import edu.kit.iti.formal.keyextclientjava.KeyRemote;
-import edu.kit.iti.formal.keyextclientjava.RPCLayer;
+import edu.kit.iti.formal.keyextclientjava.rpc.KeyRemote;
+import edu.kit.iti.formal.keyextclientjava.rpc.RPCLayer;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-
-import static edu.kit.iti.formal.keyextclientjava.MyKeyClient.JAR_FILE;
 
 /**
  * @author Alexander Weigl
@@ -16,7 +14,9 @@ public class Starter {
     @Test
     void test() throws IOException {
         var file = "/home/weigl/work/key/keyext.api/build/libs/keyext.api-2.12.4-dev-all.jar";
-        var remote = new KeyRemote(RPCLayer.startWithCLI(file));
+        final var rpcLayer = RPCLayer.startWithCLI(file);
+        rpcLayer.start();
+        var remote = new KeyRemote(rpcLayer);
         System.out.println(remote.meta_version());
     }
 }

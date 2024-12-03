@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.keyextclientjava;
+package edu.kit.iti.formal.keyextclientjava.rpc;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -95,6 +95,6 @@ public class JsonRPC {
     }
 
     public static String addHeader(String response) {
-        return "%s %d\r\n%s\r\n".formatted(CONTENT_LENGTH, response.length(), response);
+        return "%s %d\r\n\r\n%s\r\n".formatted(CONTENT_LENGTH, response.length(), response);
     }
 }

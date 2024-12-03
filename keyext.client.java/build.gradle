@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'org.javamodularity.moduleplugin' version '1.8.12'
-    id 'org.openjfx.javafxplugin' version '0.0.13'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
 repositories {
@@ -18,11 +18,13 @@ application {
 }
 
 javafx {
-    version = '21.0.5'
-    modules = ['javafx.controls', 'javafx.fxml']
+    version = "23.0.1"
+    modules = [ 'javafx.controls' ]
 }
 
 dependencies {
+    implementation project(":keyext.api")
+
     implementation('org.controlsfx:controlsfx:11.2.1')
     implementation('org.kordamp.ikonli:ikonli-javafx:12.3.1')
     implementation('org.kordamp.ikonli:ikonli-fontawesome5-pack:12.3.1')

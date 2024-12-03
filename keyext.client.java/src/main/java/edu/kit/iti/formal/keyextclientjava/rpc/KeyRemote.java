@@ -1,4 +1,6 @@
-package edu.kit.iti.formal.keyextclientjava;
+package edu.kit.iti.formal.keyextclientjava.rpc;
+
+import com.google.gson.JsonObject;
 
 /**
  * @author Alexander Weigl
@@ -12,6 +14,7 @@ public class KeyRemote {
     }
 
     public String meta_version() {
-        return layer.callSync("meta/version").getAsString();
+        final var obj = layer.callSync("meta/version");
+        return obj.get("result").getAsString();
     }
 }

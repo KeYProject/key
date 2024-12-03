@@ -1,7 +1,7 @@
 package edu.kit.keyext.client;
 
-import edu.kit.iti.formal.keyextclientjava.JsonRPC;
-import edu.kit.iti.formal.keyextclientjava.RPCLayer;
+import edu.kit.iti.formal.keyextclientjava.rpc.JsonRPC;
+import edu.kit.iti.formal.keyextclientjava.rpc.RPCLayer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
