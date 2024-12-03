@@ -17,6 +17,9 @@ import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.OpReplacer;
+import org.key_project.rusty.proof.init.ContractPO;
+import org.key_project.rusty.proof.init.FunctionalOperationContractPO;
+import org.key_project.rusty.proof.init.InitConfig;
 import org.key_project.util.collection.ImmutableList;
 
 import static org.key_project.rusty.util.Assert.assertSubSort;
@@ -116,7 +119,15 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public Term getPre(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
             Services services) {
-        return null;
+        assert paramVars != null;
+        assert services != null;
+
+        assert paramVars.size() == originalParamVars.size();
+
+        final Map<ProgramVariable, ProgramVariable> replaceMap =
+            getReplaceMap(selfVar, paramVars, null, services);
+        final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
+        return or.replace(originalPre);
     }
 
     @Override
@@ -291,6 +302,17 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
+    public ContractPO createProofObl(InitConfig initConfig) {
+        return createProofObl(initConfig, this);
+    }
+
+    @Override
+    public FunctionalOperationContractPO createProofObl(InitConfig initConfig, Contract contract) {
+        return new FunctionalOperationContractPO(initConfig,
+            (FunctionalOperationContract) contract);
+    }
+
+    @Override
     public Term getSelf() {
         // TODO
         return null;
@@ -357,4 +379,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             originalModifiable, originalParamVars, originalResultVar, globalDefs, newId, toBeSaved,
             services);
     }
+
+
 }

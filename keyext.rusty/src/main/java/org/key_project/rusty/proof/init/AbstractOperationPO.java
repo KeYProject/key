@@ -186,7 +186,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
             var paramIt = paramVars.iterator();
             while (formalParamIt.hasNext()) {
                 Term paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
-                update = tb.parallel(update, paramUpdate);
+                if (update == null)
+                    update = paramUpdate;
+                else
+                    update = tb.parallel(update, paramUpdate);
             }
         }
         return update;
@@ -237,7 +240,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         for (final var paramVar : paramVars) {
             if (isCopyOfArgumentsUsed()) {
                 var pen = new Name("_" + paramVar.name());
-                var formalParamVar = new ProgramVariable(name, paramVar.getKeYRustyType());
+                var formalParamVar = new ProgramVariable(pen, paramVar.getKeYRustyType());
                 formalParamVars = formalParamVars.append(formalParamVar);
                 register(formalParamVar, proofServices);
             } else {

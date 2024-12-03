@@ -9,7 +9,7 @@ import org.key_project.rusty.speclang.Contract;
 /**
  * An obligation for some kind of contract.
  */
-public interface ContractPO {
+public interface ContractPO extends ProofOblInput {
     Contract getContract();
 
     Term getMbyAtPre();

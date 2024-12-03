@@ -25,7 +25,11 @@ import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyBlock;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.parser.hir.Crate;
+import org.key_project.rusty.proof.init.ContractPO;
+import org.key_project.rusty.proof.init.InitConfig;
+import org.key_project.rusty.proof.init.ProofInputException;
 import org.key_project.rusty.speclang.ContractFactory;
+import org.key_project.rusty.speclang.FunctionalOperationContract;
 import org.key_project.rusty.speclang.ProgramVariableCollection;
 import org.key_project.util.collection.ImmutableList;
 
@@ -122,11 +126,18 @@ public class HirRustyReader {
                 var pre = tb.geq(tb.var(a), tb.zero());
                 var post = tb.equals(tb.var(result), tb.add(tb.var(a), tb.var(b)));
                 var pvs = new ProgramVariableCollection(null, ImmutableList.of(a, b), result);
-                services.getSpecificationRepository().addContract(factory.func("my_contract",
-                    target, true, pre, null, post, null, pvs, true));
+                FunctionalOperationContract contract = factory.func("my_contract",
+                    target, true, pre, null, post, null, pvs, true);
+                services.getSpecificationRepository().addContract(contract);
+                ContractPO proofObl = contract.createProofObl(new InitConfig(services));
+                proofObl.readProblem();
+                System.out.println(proofObl.getPO().getProof(0).getOpenGoals()
+                        .head().getNode().sequent());
             }
             return new RustyBlock(es.getExpression());
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ProofInputException e) {
             throw new RuntimeException(e);
         }
     }

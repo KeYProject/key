@@ -9,6 +9,9 @@ import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.IObserverFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.proof.init.ContractPO;
+import org.key_project.rusty.proof.init.InitConfig;
+import org.key_project.rusty.proof.init.ProofOblInput;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -100,4 +103,21 @@ public interface Contract extends SpecificationElement {
      */
     Term getMby(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
             Services services);
+
+    /**
+     * Returns a proof obligation to the passed initConfig.
+     *
+     * @param initConfig the initial configuration
+     * @return the proof obligation
+     */
+    ContractPO createProofObl(InitConfig initConfig);
+
+    /**
+     * Returns a proof obligation to the passed contract and initConfig.
+     *
+     * @param initConfig the initial configuration
+     * @param contract the contract
+     * @return the proof obligation
+     */
+    ProofOblInput createProofObl(InitConfig initConfig, Contract contract);
 }
