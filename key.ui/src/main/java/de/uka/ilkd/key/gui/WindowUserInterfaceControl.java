@@ -221,7 +221,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
-                ProofScriptEntry scriptAndLoc = problemLoader.readProofScript();
+                ProofScriptEntry scriptAndLoc = problemLoader.getProofScript();
                 if (scriptAndLoc != null) {
                     ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
                         scriptAndLoc.script(), scriptAndLoc.location());

@@ -586,7 +586,14 @@ public final class WhileInvariantRule implements BuiltInRule {
         return new Guard(guardJb, guardTrueTerm, guardFalseTerm);
     }
 
-    private record Guard(JavaBlock first, Term second, Term third) {}
+    /**
+     * Represents a {@code javaBlock} which is executed if the {@code trueTerm} is true.
+     *
+     * @param javaBlock a block of java code
+     * @param trueTerm a boolean term
+     * @param falseTerm the negation (at least semantically) of {@code trueTerm}
+     */
+    private record Guard(JavaBlock javaBlock, Term trueTerm, Term falseTerm) {}
 
     private void prepareInvInitiallyValidBranch(TermLabelState termLabelState, Services services,
             RuleApp ruleApp, Instantiation inst, final Term invTerm, Term reachableState,
@@ -747,9 +754,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         // prepare guard
         final Guard guardStuff =
             prepareGuard(inst, booleanKJT, loopRuleApp, services);
-        final JavaBlock guardJb = guardStuff.first;
-        final Term guardTrueTerm = guardStuff.second;
-        final Term guardFalseTerm = guardStuff.third;
+        final JavaBlock guardJb = guardStuff.javaBlock;
+        final Term guardTrueTerm = guardStuff.trueTerm;
+        final Term guardFalseTerm = guardStuff.falseTerm;
 
         Term beforeLoopUpdate = null;
 

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.symbolic_execution.rule;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -18,7 +17,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -134,12 +132,4 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
         return false;
     }
 
-    /**
-     *
-     * @param result
-     * @param conditions
-     * @param node
-     */
-    public record ResultsAndCondition(Term result, Set<Term> conditions, Node node) {
-    }
 }

@@ -454,13 +454,13 @@ public class MergeRule implements BuiltInRule {
      * Override this method for specialized heap merge procedures.
      *
      * @param heapVar The heap variable for which the values should be merged.
-     * @param heap1 The distinguishingFormula heap term.
-     * @param heap2 The ifTerm heap term.
-     * @param state1 SE state for the distinguishingFormula heap term.
-     * @param state2 SE state for the ifTerm heap term
+     * @param heap1 The first heap term.
+     * @param heap2 The second heap term.
+     * @param state1 SE state for the first heap term.
+     * @param state2 SE state for the second heap term
      * @param services The services object.
-     * @param distinguishingFormula The user-specified distinguishing formula. May be null (for
-     *        automatic generation).
+     * @param distinguishingFormula The user-specified distinguishing formula.
+     *        Maybe null (for automatic generation).
      * @return A merged heap term.
      */
     protected ValuesMergeResult mergeHeaps(final MergeProcedure mergeRule,

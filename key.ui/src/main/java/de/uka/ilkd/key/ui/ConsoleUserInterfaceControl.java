@@ -158,7 +158,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         ProblemLoader problemLoader = (ProblemLoader) info.getSource();
         if (problemLoader.hasProofScript()) {
             try {
-                ProofScriptEntry script = problemLoader.readProofScript();
+                ProofScriptEntry script = problemLoader.getProofScript();
                 if (script != null) {
                     ProofScriptEngine pse =
                         new ProofScriptEngine(script.script(), script.location());

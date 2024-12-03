@@ -659,13 +659,6 @@ public abstract class AbstractProblemLoader {
     }
 
     /**
-     * same as {@link #getProofScript()}
-     */
-    public @Nullable ProofScriptEntry readProofScript() {
-        return getProofScript();
-    }
-
-    /**
      * Returns a {@link ProofScriptEntry} if {@code \proofscript} is given with the problem.
      */
     public @Nullable ProofScriptEntry getProofScript() {
