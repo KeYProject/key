@@ -10,6 +10,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import static de.uka.ilkd.key.loopinvgen.analyzer.WhileStatementAnalyzer.findPossibleIndexes;
@@ -26,11 +28,11 @@ public class LoopInvGenMenuItem extends JMenuItem {
         addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Set<ProgramVariable> possibleIndexes = findPossibleIndexes(posInSequent, mediator.getServices());
-                ProgramVariable index = possibleIndexes.iterator().next();
-                if (possibleIndexes.size() > 1) {
-                    index = selectIndex(possibleIndexes);
-                }
+                List<Set<ProgramVariable>> possibleIndexes = findPossibleIndexes(posInSequent, mediator.getServices());
+                List<ProgramVariable> indexes = findIndexes(possibleIndexes);
+                ProgramVariable index = indexes.get(0);
+
+                //System.out.println(indexes);
 
                 final LIGNew loopInvGenerator = new LIGNew(mediator.getSelectedGoal().sequent(), mediator.getServices(), index);
                 LoopInvariantGenerationResult result = loopInvGenerator.generate();
@@ -38,6 +40,28 @@ public class LoopInvGenMenuItem extends JMenuItem {
             }
         });
         setEnabled(isWhileStatement(posInSequent));
+    }
+
+    private static List<ProgramVariable> findIndexes(List<Set<ProgramVariable>> possibleIndexes) {
+        List<ProgramVariable> result = new LinkedList<ProgramVariable>();
+        for (int i = 0; i < possibleIndexes.size(); i++) {
+            if (possibleIndexes.get(i).isEmpty()) {
+                result.add(null);
+            } else if (possibleIndexes.get(i).size() == 1) {
+                result.add(possibleIndexes.get(i).iterator().next());
+            } else {
+                String loopDefinition = "";
+                if (possibleIndexes.size() > 1) {
+                    if (i == possibleIndexes.size() - 1) {
+                        loopDefinition = "innermost ";
+                    } else {
+                        loopDefinition = (i + 1) + "-outermost ";
+                    }
+                }
+                result.add(selectIndex(possibleIndexes.get(i), loopDefinition));
+            }
+        }
+        return result;
     }
 
     private static void showResultInWindow(String text) {
@@ -54,9 +78,9 @@ public class LoopInvGenMenuItem extends JMenuItem {
         frame.setVisible(true);
     }
 
-    public static ProgramVariable selectIndex(Set<ProgramVariable> indexes) {
+    public static ProgramVariable selectIndex(Set<ProgramVariable> indexes, String loopDefinition) {
 
-        JDialog dialog = new JDialog((Frame) null, "Select the loop's index", true);
+        JDialog dialog = new JDialog((Frame) null, "Select the " + loopDefinition + "loop's index", true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setLayout(new BorderLayout());
 

@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -13,6 +12,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableSet;
 
+import java.util.List;
 import java.util.Set;
 
 public class WhileStatementAnalyzer {
@@ -39,7 +39,7 @@ public class WhileStatementAnalyzer {
         return true;
     }
 
-    public static Set<ProgramVariable> findPossibleIndexes(PosInSequent posInSequent, Services services) {
+    public static List<Set<ProgramVariable>> findPossibleIndexes(PosInSequent posInSequent, Services services) {
         PosInOccurrence pos = posInSequent.getPosInOccurrence();
 
         Term loopFormula = pos.subTerm();
@@ -48,7 +48,21 @@ public class WhileStatementAnalyzer {
         StatementBlock statementBlock = (StatementBlock) statement;
 
         While whileStatement = (While) statementBlock.getStatementAt(0);
-        ProgramVariableCollector pvc = new ProgramVariableCollector(whileStatement.getGuardExpression(), services);
+
+        IndexCollector indexCollector = new IndexCollector(whileStatement, services);
+        indexCollector.start();
+        return indexCollector.getIndexes();
+    }
+
+    public static Set<ProgramVariable> findPossibleIndexes2(PosInSequent posInSequent, Services services) {
+        PosInOccurrence pos = posInSequent.getPosInOccurrence();
+
+        Term loopFormula = pos.subTerm();
+        Term loopFormulaWithoutUpdates = TermBuilder.goBelowUpdates(loopFormula);
+        JavaProgramElement statement = loopFormulaWithoutUpdates.javaBlock().program();
+        StatementBlock statementBlock = (StatementBlock) statement;
+
+        While whileStatement = (While) statementBlock.getStatementAt(0);
 
         //find index in loop
         ImmutableSet<ProgramVariable> variablesInGuard = MiscTools.getLocalIns(whileStatement.getGuardExpression(), services);
