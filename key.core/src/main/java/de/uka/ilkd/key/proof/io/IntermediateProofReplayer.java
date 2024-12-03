@@ -49,6 +49,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -111,7 +112,15 @@ public class IntermediateProofReplayer {
     private final LinkedList<Pair<Node, NodeIntermediate>> queue =
         new LinkedList<>();
 
-    private record PartnerNode(Node first, PosInOccurrence second, NodeIntermediate third) {}
+    /**
+     * Used by the node merging during the proof replay.
+     *
+     * @param node the other node to be merged with
+     * @param pio pio of ??? (ask Dominic Steinhöfel)
+     * @param intermediate representation of the node during the replay
+     * @see MergePartnerAppIntermediate
+     */
+    private record PartnerNode(Node node, PosInOccurrence pio, NodeIntermediate intermediate) {}
 
     /** Maps join node IDs to previously seen join partners */
     private final HashMap<Integer, HashSet<PartnerNode>> joinPartnerNodes = new HashMap<>();
@@ -311,9 +320,9 @@ public class IntermediateProofReplayer {
                                     // Now add children of partner nodes
                                     for (PartnerNode partnerNodeInfo : partnerNodesInfo) {
                                         Iterator<Node> children =
-                                            partnerNodeInfo.first.childrenIterator();
+                                            partnerNodeInfo.node.childrenIterator();
                                         LinkedList<NodeIntermediate> intermChildren =
-                                            partnerNodeInfo.third.getChildren();
+                                            partnerNodeInfo.intermediate.getChildren();
 
                                         addChildren(children, intermChildren);
                                     }
@@ -804,16 +813,16 @@ public class IntermediateProofReplayer {
         ImmutableList<MergePartner> joinPartners = ImmutableSLList.nil();
         for (PartnerNode partnerNodeInfo : partnerNodesInfo) {
 
-            var ownSEState =
+            SymbolicExecutionStateWithProgCnt ownSEState =
                 sequentToSETriple(currNode, joinApp.posInOccurrence(), services);
             var partnerSEState =
-                sequentToSETriple(partnerNodeInfo.first, partnerNodeInfo.second, services);
+                sequentToSETriple(partnerNodeInfo.node, partnerNodeInfo.pio, services);
 
             assert ownSEState.programCounter().equals(partnerSEState.programCounter())
                     : "Cannot merge incompatible program counters";
 
             joinPartners = joinPartners.append(
-                new MergePartner(proof.getOpenGoal(partnerNodeInfo.first), partnerNodeInfo.second));
+                new MergePartner(proof.getOpenGoal(partnerNodeInfo.node), partnerNodeInfo.pio));
         }
 
         joinApp.setMergeNode(currNode);
