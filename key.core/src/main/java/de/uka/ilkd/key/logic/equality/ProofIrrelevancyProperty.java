@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.util.EqualityUtils;
 import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -45,7 +44,7 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      * Checks if {@code term2} is a term syntactically equal to {@code term1}, except for attributes
      * that are not relevant for the purpose of these terms in the proof.
      * <p>
-     * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
+     * Combines the prior implementations of {@code EqualsModProofIrrelevancy} in TermImpl and
      * LabeledTermImpl.
      * </p>
      *
@@ -102,8 +101,6 @@ public class ProofIrrelevancyProperty implements Property<Term> {
      * <p>
      * Computes a hashcode that represents the proof-relevant fields of {@code term}.
      * </p>
-     * Combines the prior implementations of {@link EqualsModProofIrrelevancy} in TermImpl and
-     * LabeledTermImpl.
      *
      * @param term the term to compute the hashcode for
      * @return the hashcode

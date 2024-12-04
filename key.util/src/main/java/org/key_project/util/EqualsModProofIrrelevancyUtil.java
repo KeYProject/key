@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 /**
- * Utility methods for the {@link EqualsModProofIrrelevancy} interface.
+ * Utility methods for the equals mod proof irrelevancy check.
  *
  * @author Arne Keller
  */
@@ -21,7 +21,7 @@ public final class EqualsModProofIrrelevancyUtil {
     }
 
     /**
-     * Compare two arrays using the elements' {@link EqualsModProofIrrelevancy} implementation.
+     * Compare two arrays modulo proof irrelevancy.
      *
      * @param a first array
      * @param b second array
@@ -48,8 +48,7 @@ public final class EqualsModProofIrrelevancyUtil {
     }
 
     /**
-     * Compute the hashcode of an iterable using the elements' {@link EqualsModProofIrrelevancy}
-     * implementation.
+     * Compute the hashcode of an iterable modulo proof irrelevancy.
      *
      * @param iter iterable of elements
      * @return combined hashcode
@@ -70,8 +69,7 @@ public final class EqualsModProofIrrelevancyUtil {
     }
 
     /**
-     * Compare two immutable lists using the elements' {@link EqualsModProofIrrelevancy}
-     * implementation.
+     * Compare two immutable lists modulo proof irrelevancy.
      * A null list is considered equal to a zero-sized list.
      *
      * @param a first list
@@ -99,8 +97,7 @@ public final class EqualsModProofIrrelevancyUtil {
     }
 
     /**
-     * Compute the hashcode of an immutable list using the elements'
-     * {@link EqualsModProofIrrelevancy}
+     * Compute the hashcode of an immutable list modulo proof irrelevancy.
      * implementation.
      *
      * @param list list of elements

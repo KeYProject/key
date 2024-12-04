@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link org.key_project.util.EqualsModProofIrrelevancy}.
+ * Tests for equality modulo proof irrelevancy.
  *
  * @author Arne Keller
  */
