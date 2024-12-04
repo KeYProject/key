@@ -554,6 +554,4 @@ public class EqualityModuloProofIrrelevancy {
         return EqualityModuloProofIrrelevancy
                 .hashCodeModProofIrrelevancy(ifInst.getConstrainedFormula());
     }
-
-
 }
