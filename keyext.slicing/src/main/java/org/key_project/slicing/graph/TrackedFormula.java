@@ -107,11 +107,12 @@ public class TrackedFormula extends GraphNode {
             return false;
         }
         TrackedFormula that = (TrackedFormula) o;
-        return inAntec == that.inAntec
-                && ((Object) that.formula instanceof SequentFormula that1
-                        ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(formula, that1)
-                        : false)
+        boolean b = inAntec == that.inAntec
+                && (that.formula instanceof SequentFormula that1
+                        && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(formula, that1))
                 && Objects.equals(branchLocation, that.branchLocation);
+        System.out.println(b);
+        return b;
     }
 
     public int hashCodeModProofIrrelevancy() {
