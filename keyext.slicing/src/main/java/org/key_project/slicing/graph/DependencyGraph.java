@@ -16,7 +16,6 @@ import de.uka.ilkd.key.util.Triple;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.DependencyTracker;
-import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
@@ -330,7 +329,7 @@ public class DependencyGraph {
     public Collection<GraphNode> nodeAndPreviousDerivations(GraphNode node) {
         Collection<GraphNode> all = new ArrayList<>();
         all.add(node);
-        if (node instanceof EqualsModProofIrrelevancy) {
+        if (node instanceof TrackedFormula) {
             all = graph.getVerticesModProofIrrelevancy(node);
         }
         return all;

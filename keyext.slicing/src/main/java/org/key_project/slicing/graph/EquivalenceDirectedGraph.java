@@ -33,8 +33,8 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
             if (v instanceof TrackedFormula tf) {
                 verticesModProof.computeIfAbsent(
                     new EqualsModProofIrrelevancyWrapper<>(tf,
-                        (t1, t2) -> t1.equalsModProofIrrelevancy(t2),
-                        t -> t.hashCodeModProofIrrelevancy()),
+                        TrackedFormula::equalsModProofIrrelevancy,
+                        TrackedFormula::hashCodeModProofIrrelevancy),
                     _v -> new ArrayList<>()).add(v);
             }
             return true;
@@ -67,8 +67,8 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
         if (v instanceof TrackedFormula tf) {
             return verticesModProof
                     .get(new EqualsModProofIrrelevancyWrapper<>(tf,
-                        (t1, t2) -> t1.equalsModProofIrrelevancy(t2),
-                        t -> t.hashCodeModProofIrrelevancy()));
+                        TrackedFormula::equalsModProofIrrelevancy,
+                        TrackedFormula::hashCodeModProofIrrelevancy));
         } else {
             return List.of(v);
         }
