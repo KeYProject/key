@@ -318,7 +318,7 @@ public abstract class AbstractProofReplayer {
 
     /**
      * Try to find the provided formula in the provided sequent,
-     * using {@link org.key_project.util.EqualsModProofIrrelevancy} to check for equality.
+     * using equality modulo proof irrelevancy.
      *
      * @param oldPos formula to look for
      * @param newSequent sequent

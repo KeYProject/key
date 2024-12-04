@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
-import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
 import de.uka.ilkd.key.logic.equality.Property;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -15,7 +14,6 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 import org.key_project.logic.Name;
-import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 
@@ -30,12 +28,7 @@ import org.key_project.util.java.CollectionUtil;
  * while ignoring certain
  * given properties. E.g. by using {@link RenamingTermProperty#RENAMING_TERM_PROPERTY}, just the
  * term structures modulo
- * renaming are compared whilst ignoring annotations.
- * <p>
- * Prior implementations of {@link EqualsModProofIrrelevancy} are now in
- * {@link ProofIrrelevancyProperty}.
- * </p>
- *
+ * renaming are compared whilst ignoring annotations. *
  *
  * @see Term
  * @see TermImpl
