@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.op;
 
-import java.util.Objects;
-
 import org.key_project.logic.Name;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.SyntaxElement;
@@ -13,7 +11,6 @@ import org.key_project.logic.op.Modifier;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
-import org.key_project.util.EqualsModProofIrrelevancy;
 
 import org.jspecify.annotations.NonNull;
 
@@ -26,7 +23,7 @@ import org.jspecify.annotations.NonNull;
  * for definition of logical variables {@see BoundVariable}.
  */
 public final class LogicVariable extends AbstractSortedOperator
-        implements QuantifiableVariable, ParsableVariable, EqualsModProofIrrelevancy {
+        implements QuantifiableVariable, ParsableVariable {
 
     private final int index;
 
@@ -44,20 +41,6 @@ public final class LogicVariable extends AbstractSortedOperator
     @Override
     public @NonNull String toString() {
         return name() + ":" + sort();
-    }
-
-    @Override
-    public boolean equalsModProofIrrelevancy(@NonNull Object obj) {
-        if (!(obj instanceof LogicVariable that)) {
-            return false;
-        }
-        return index == that.index;
-    }
-
-    @Override
-    public int hashCodeModProofIrrelevancy() {
-        // TODO
-        return Objects.hash(name(), sort());
     }
 
     @Override

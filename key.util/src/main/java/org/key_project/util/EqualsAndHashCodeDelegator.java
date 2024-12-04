@@ -7,16 +7,16 @@ import java.util.function.BiPredicate;
 import java.util.function.ToIntFunction;
 
 /**
- * Wrapper around an object that implements {@link EqualsModProofIrrelevancy}.
+ * Wrapper around an object that implements alternative equality and hash code methods.
  * Forwards calls to {@link #equals(Object)} and {@link #hashCode()} to
- * {@link EqualsModProofIrrelevancy#equalsModProofIrrelevancy(Object)} and
- * {@link EqualsModProofIrrelevancy#hashCodeModProofIrrelevancy()}.
+ * {@link #equalityCmp} and
+ * {@link #hasher}.
  *
  * @param <T> type to wrap
  * @author Arne Keller
  */
 @SuppressWarnings("nullness")
-public class EqualsModProofIrrelevancyWrapper<T> {
+public class EqualsAndHashCodeDelegator<T> {
     /**
      * The wrapped object.
      */
@@ -25,12 +25,13 @@ public class EqualsModProofIrrelevancyWrapper<T> {
     private final ToIntFunction<T> hasher;
 
     /**
-     * Construct a new wrapper for the provided object. The provided object must implement
-     * {@link EqualsModProofIrrelevancy}.
+     * Construct a new wrapper for the provided object.
      *
      * @param inner object to wrap
+     * @param equalityCmp the equality method to be used
+     * @param hasher the hash method to be used
      */
-    public EqualsModProofIrrelevancyWrapper(T inner,
+    public EqualsAndHashCodeDelegator(T inner,
             BiPredicate<T, T> equalityCmp,
             ToIntFunction<T> hasher) {
         this.inner = inner;
@@ -47,7 +48,7 @@ public class EqualsModProofIrrelevancyWrapper<T> {
             return false;
         }
 
-        EqualsModProofIrrelevancyWrapper<?> that = (EqualsModProofIrrelevancyWrapper<?>) o;
+        EqualsAndHashCodeDelegator<?> that = (EqualsAndHashCodeDelegator<?>) o;
 
         return inner != null ? equalityCmp.test(inner, (T) that.inner) : that.inner == null;
     }
