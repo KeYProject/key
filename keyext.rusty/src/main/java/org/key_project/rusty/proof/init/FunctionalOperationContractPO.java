@@ -6,8 +6,13 @@ package org.key_project.rusty.proof.init;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.Path;
+import org.key_project.rusty.ast.PathSegment;
+import org.key_project.rusty.ast.ResDef;
+import org.key_project.rusty.ast.expr.AssignmentExpression;
 import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.ast.expr.CallExpression;
+import org.key_project.rusty.ast.expr.PathExpr;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.Modality;
@@ -89,9 +94,15 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     @Override
     protected BlockExpression buildOperationBlock(ImmutableList<ProgramVariable> formalParamVars,
             ProgramVariable resultVar, Services proofServices) {
+        ProgramFunction target = contract.getTarget();
+        var callee = new PathExpr(new Path<>(new ResDef(target), new ImmutableArray<>(
+            new PathSegment(target.getFunction().name().toString(),
+                new ResDef(target)))),
+            target.getType().getRustyType());
         return new BlockExpression(ImmutableList.of(
             new ExpressionStatement(
-                new CallExpression(resultVar, new ImmutableArray<>(formalParamVars.toList())),
+                new AssignmentExpression(resultVar,
+                    new CallExpression(callee, new ImmutableArray<>(formalParamVars.toList()))),
                 true)),
             null);
     }
