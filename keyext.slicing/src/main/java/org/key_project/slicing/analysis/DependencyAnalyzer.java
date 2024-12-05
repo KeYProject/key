@@ -444,7 +444,7 @@ public final class DependencyAnalyzer {
             // (for obvious reasons, we don't care about origin labels here -> wrapper)
             Map<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>> foundDupes = new HashMap<>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
-                Node proofNode = t.first;
+                Node proofNode = t.fromNode();
 
                 // this analysis algorithm does not support proofs with State Merging
                 if (proofNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
@@ -465,7 +465,7 @@ public final class DependencyAnalyzer {
                 }
                 // Only try to deduplicate the addition of new formulas.
                 // It is unlikely that two closed goals are derived using the same formula.
-                GraphNode produced = t.second;
+                GraphNode produced = t.toNode();
                 if (!(produced instanceof TrackedFormula)) {
                     return;
                 }
@@ -473,7 +473,7 @@ public final class DependencyAnalyzer {
                         .computeIfAbsent(
                             new EqualsModProofIrrelevancyWrapper<>(proofNode.getAppliedRuleApp()),
                             _a -> new LinkedHashSet<>())
-                        .add(t.third.getProofStep());
+                        .add(t.annotation().getProofStep());
             });
 
             // scan dupes, try to find a set of mergable rule applications

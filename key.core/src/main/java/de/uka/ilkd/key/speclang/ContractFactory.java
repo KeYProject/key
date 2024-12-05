@@ -16,9 +16,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
+import de.uka.ilkd.key.speclang.njml.TranslatedDependencyContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -192,22 +192,24 @@ public class ContractFactory {
     }
 
     public DependencyContract dep(KeYJavaType kjt, LocationVariable targetHeap,
-            Triple<IObserverFunction, Term, Term> dep, LocationVariable selfVar) {
-        final ImmutableList<LocationVariable> paramVars = tb.paramVars(dep.first, false);
-        assert (selfVar == null) == dep.first.isStatic();
+            TranslatedDependencyContract dep, LocationVariable selfVar) {
+        final ImmutableList<LocationVariable> paramVars =
+            tb.paramVars(dep.observerFunction(), false);
+        assert (selfVar == null) == dep.observerFunction().isStatic();
         Map<LocationVariable, Term> pres = new LinkedHashMap<>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
             selfVar == null ? tb.tt() : tb.inv(tb.var(selfVar)));
         Map<LocationVariable, Term> accessibles = new LinkedHashMap<>();
         for (final LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             if (heap == targetHeap) {
-                accessibles.put(heap, dep.second);
+                accessibles.put(heap, dep.rhs());
             } else {
                 accessibles.put(heap, tb.allLocs());
             }
         }
         // TODO: insert static invariant??
-        return dep(kjt, dep.first, dep.first.getContainerType(), pres, dep.third, accessibles,
+        return dep(kjt, dep.observerFunction(), dep.observerFunction().getContainerType(), pres,
+            dep.mby(), accessibles,
             selfVar, paramVars, null, null);
     }
 
