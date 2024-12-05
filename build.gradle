@@ -348,10 +348,15 @@ subprojects {
             toggleOffOn()
 
             removeUnusedImports()
-            /* At the moment, we have to ensure that version 4.22 of the eclipse formatter is run, since newer versions
-             * of the formatter crash in SymbolicExecutionTreeBuilder (seems to be a but in the formatter)!
+
+            /* When new options are added in new versions of the Eclipse formatter, the easiest way is to export the new
+             * style file from the Eclipse GUI and then use the CodeStyleMerger tool in
+             * "$rootDir/scripts/tools/checkstyle/CodeStyleMerger.java" to merge the old and the new style files,
+             * i.e. "java CodeStyleMerger.java <oldStyleFile> <newStyleFile> keyCodeStyle.xml". The tool adds all
+             * entries with keys that were not present in the old file and optionally overwrites the old entries. The
+             * file is output with ordered keys, such that the file can easily be diffed using git.
              */
-            eclipse("4.22").configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
+            eclipse().configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
             trimTrailingWhitespace()        // not sure how to set this in the xml file ...
             //googleJavaFormat().aosp().reflowLongStrings()
 
