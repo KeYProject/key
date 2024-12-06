@@ -41,6 +41,7 @@ public final class HeapLDT extends LDT {
 
     public static final Name SELECT_NAME = new Name("select");
     public static final Name STORE_NAME = new Name("store");
+    public static final Name FINAL_NAME = new Name("final");
     public static final Name BASE_HEAP_NAME = new Name("heap");
     public static final Name SAVED_HEAP_NAME = new Name("savedHeap");
     public static final Name PERMISSION_HEAP_NAME = new Name("permissions");
@@ -54,6 +55,7 @@ public final class HeapLDT extends LDT {
 
     // select/store
     private final SortDependingFunction select;
+    private final SortDependingFunction finalFunction;
     private final JFunction store;
     private final JFunction create;
     private final JFunction anon;
@@ -96,6 +98,7 @@ public final class HeapLDT extends LDT {
 
         fieldSort = sorts.lookup(new Name("Field"));
         select = addSortDependingFunction(services, SELECT_NAME.toString());
+        finalFunction = addSortDependingFunction(services, FINAL_NAME.toString());
         store = addFunction(services, "store");
         create = addFunction(services, "create");
         anon = addFunction(services, "anon");
@@ -231,6 +234,15 @@ public final class HeapLDT extends LDT {
      */
     public SortDependingFunction getSelect(Sort instanceSort, TermServices services) {
         return select.getInstanceFor(instanceSort, services);
+    }
+
+    public SortDependingFunction getFinal(Sort instanceSort, Services services) {
+        return finalFunction.getInstanceFor(instanceSort, services);
+    }
+
+    public boolean isFinalOp(Operator op) {
+        return op instanceof SortDependingFunction
+                && ((SortDependingFunction) op).isSimilar(finalFunction);
     }
 
 
