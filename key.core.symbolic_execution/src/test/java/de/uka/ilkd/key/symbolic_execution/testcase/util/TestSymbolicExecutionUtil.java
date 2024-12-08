@@ -43,7 +43,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
     public void test1ImproveReadability() throws ProblemLoaderException {
         File location = new File(testCaseDirectory,
             "/readability/InnerAndAnonymousTypeTest/InnerAndAnonymousTypeTest.java")
-                .getAbsoluteFile();
+                    .getAbsoluteFile();
         assertTrue(location.exists(), "Could not find required resource: " + location);
 
         KeYEnvironment<?> environment = KeYEnvironment.load(location, null, null, null);
