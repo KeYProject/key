@@ -254,6 +254,5 @@ class ScriptLineParser {
         return pos;
     }
 
-    public record ParsedCommand(Map<String, String> args, Location start, Location end) {
-    }
+    public record ParsedCommand(Map<String, String> args, Location start, Location end) {}
 }

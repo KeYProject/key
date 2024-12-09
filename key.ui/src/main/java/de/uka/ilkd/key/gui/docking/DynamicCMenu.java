@@ -29,7 +29,8 @@ public class DynamicCMenu extends CDecorateableAction<DynamicCMenu.Action> {
     /**
      * constructor
      *
-     * @param supplier the supplier
+     * @param supplier
+     *        the supplier
      */
     public DynamicCMenu(Supplier<CMenu> supplier) {
         super(null);
@@ -39,9 +40,12 @@ public class DynamicCMenu extends CDecorateableAction<DynamicCMenu.Action> {
     /**
      * constructor
      *
-     * @param text the text of this action
-     * @param icon the icon of this action
-     * @param supplier the supplier
+     * @param text
+     *        the text of this action
+     * @param icon
+     *        the icon of this action
+     * @param supplier
+     *        the supplier
      */
     public DynamicCMenu(String text, Icon icon, Supplier<CMenu> supplier) {
         this(supplier);

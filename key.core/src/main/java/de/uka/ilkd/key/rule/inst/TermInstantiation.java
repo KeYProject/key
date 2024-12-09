@@ -19,8 +19,10 @@ public class TermInstantiation extends InstantiationEntry<Term> {
     /**
      * creates a new ContextInstantiationEntry
      *
-     * @param sv the SchemaVariable that is instantiated
-     * @param term the Term the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable that is instantiated
+     * @param term
+     *        the Term the SchemaVariable is instantiated with
      */
     TermInstantiation(SchemaVariable sv, Term term) {
         super(term);

@@ -60,8 +60,7 @@ public class TermNavigator {
      */
     private final ArrayDeque<MutablePair> stack = new ArrayDeque<>();
 
-    private TermNavigator() {
-    }
+    private TermNavigator() {}
 
     private TermNavigator(Term term) {
         stack.push(MutablePair.get(term, 0));

@@ -5,7 +5,7 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.sort.Sort;
@@ -81,8 +81,10 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
      * Constructs a location variable from a program variable.
      * This should not be done manually since it is important to keep *all* modifiers.
      *
-     * @param variable the variable
-     * @param name the name of the variable
+     * @param variable
+     *        the variable
+     * @param name
+     *        the name of the variable
      * @return a new location variable
      */
     public static LocationVariable fromProgramVariable(ProgramVariable variable,

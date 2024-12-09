@@ -6,7 +6,7 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
@@ -112,7 +112,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      * Parameters and the result of a method only have to appear once in the predicate. This method
      * chooses the right variables out of the poVars.
      *
-     * @param poVars The proof obligation variables.
+     * @param poVars
+     *        The proof obligation variables.
      * @return
      */
     private ImmutableList<Term> extractTermListForPredicate(IProgramMethod pm,

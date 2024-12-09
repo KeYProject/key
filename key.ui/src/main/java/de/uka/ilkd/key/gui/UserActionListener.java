@@ -15,7 +15,8 @@ public interface UserActionListener {
     /**
      * Handle a user action just performed by the user.
      *
-     * @param action the user action
+     * @param action
+     *        the user action
      */
     void actionPerformed(UserAction action);
 }

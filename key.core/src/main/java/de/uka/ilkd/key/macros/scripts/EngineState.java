@@ -84,11 +84,14 @@ public class EngineState {
     /**
      * Returns the first open goal, which has to be automatic iff checkAutomatic is true.
      *
-     * @param checkAutomatic Set to true if the returned {@link Goal} should be automatic.
+     * @param checkAutomatic
+     *        Set to true if the returned {@link Goal} should be automatic.
      * @return the first open goal, which has to be automatic iff checkAutomatic is true.
      *
-     * @throws ProofAlreadyClosedException If the proof is already closed when calling this method.
-     * @throws ScriptException If there is no such {@link Goal}, or something else goes wrong.
+     * @throws ProofAlreadyClosedException
+     *         If the proof is already closed when calling this method.
+     * @throws ScriptException
+     *         If there is no such {@link Goal}, or something else goes wrong.
      */
     @SuppressWarnings("unused")
     public @NonNull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
@@ -125,7 +128,8 @@ public class EngineState {
     /**
      * @return The first open and automatic {@link Goal}.
      *
-     * @throws ScriptException If there is no such {@link Goal}.
+     * @throws ScriptException
+     *         If there is no such {@link Goal}.
      */
     public Goal getFirstOpenAutomaticGoal() throws ScriptException {
         return getFirstOpenGoal(true);

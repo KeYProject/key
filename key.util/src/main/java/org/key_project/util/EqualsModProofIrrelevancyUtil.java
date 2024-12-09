@@ -22,8 +22,10 @@ public final class EqualsModProofIrrelevancyUtil {
     /**
      * Compare two arrays using the elements' {@link EqualsModProofIrrelevancy} implementation.
      *
-     * @param a first array
-     * @param b second array
+     * @param a
+     *        first array
+     * @param b
+     *        second array
      * @return whether they are equal (same length, equal elements)
      */
     public static boolean compareArrays(EqualsModProofIrrelevancy[] a,
@@ -47,8 +49,10 @@ public final class EqualsModProofIrrelevancyUtil {
     /**
      * Compare two arrays using the elements' {@link EqualsModProofIrrelevancy} implementation.
      *
-     * @param a first array
-     * @param b second array
+     * @param a
+     *        first array
+     * @param b
+     *        second array
      * @return whether they are equal (same length, equal elements)
      */
     public static boolean compareImmutableArrays(
@@ -74,7 +78,8 @@ public final class EqualsModProofIrrelevancyUtil {
      * Compute the hashcode of an iterable using the elements' {@link EqualsModProofIrrelevancy}
      * implementation.
      *
-     * @param iter iterable of elements
+     * @param iter
+     *        iterable of elements
      * @return combined hashcode
      */
     public static int hashCodeIterable(Iterable<? extends EqualsModProofIrrelevancy> iter) {
@@ -97,8 +102,10 @@ public final class EqualsModProofIrrelevancyUtil {
      * implementation.
      * A null list is considered equal to a zero-sized list.
      *
-     * @param a first list
-     * @param b second list
+     * @param a
+     *        first list
+     * @param b
+     *        second list
      * @return whether they are equal (same length, equal elements)
      */
     public static boolean compareImmutableLists(
@@ -128,7 +135,8 @@ public final class EqualsModProofIrrelevancyUtil {
      * {@link EqualsModProofIrrelevancy}
      * implementation.
      *
-     * @param list list of elements
+     * @param list
+     *        list of elements
      * @return combined hashcode
      */
     public static int hashCodeImmutableList(

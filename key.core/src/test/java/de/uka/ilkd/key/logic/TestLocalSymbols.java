@@ -15,7 +15,6 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -165,20 +164,16 @@ public class TestLocalSymbols {
      * Loads the given proof file. Checks if the proof file exists and the proof is not null, and
      * fails if the proof could not be loaded.
      *
-     * @param proofFileName The file name of the proof file to load.
+     * @param proofFileName
+     *        The file name of the proof file to load.
      * @return The loaded proof.
      */
     private KeYEnvironment<?> loadProof(String proofFileName) {
         File proofFile = new File(TEST_RESOURCES_DIR_PREFIX, proofFileName);
         Assertions.assertTrue(proofFile.exists(), "Proof file does not exist" + proofFile);
 
-        try {
-            KeYEnvironment<?> environment = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                proofFile, null, null, null, true);
-            return environment;
-        } catch (ProblemLoaderException e) {
-            Assertions.fail("Proof could not be loaded.");
-            return null;
-        }
+        return Assertions
+                .assertDoesNotThrow(() -> KeYEnvironment.load(JavaProfile.getDefaultInstance(),
+                    proofFile.toPath(), null, null, null, true), "Proof could not be loaded.");
     }
 }

@@ -34,7 +34,8 @@ public class TopRuleAppCost implements RuleAppCost {
     /**
      * TOP costs cannot be further increased!
      *
-     * @param cost2 the other costs
+     * @param cost2
+     *        the other costs
      * @return this instance
      */
     public final RuleAppCost add(@NonNull RuleAppCost cost2) {
@@ -46,7 +47,8 @@ public class TopRuleAppCost implements RuleAppCost {
      * <p>
      * (weigl: Dicussable whether {@code TOP times 0 = 0}?)
      *
-     * @param cost - non-null {@link RuleAppCost}
+     * @param cost
+     *        - non-null {@link RuleAppCost}
      * @return this instance
      */
     @Override

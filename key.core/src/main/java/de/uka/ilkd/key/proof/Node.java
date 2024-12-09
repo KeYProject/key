@@ -266,7 +266,8 @@ public class Node implements Iterable<Node> {
     /**
      * adds a new NoPosTacletApp to the set of available NoPosTacletApps at this node
      *
-     * @param s the app to add.
+     * @param s
+     *        the app to add.
      */
     public void addNoPosTacletApp(NoPosTacletApp s) {
         localIntroducedRules = localIntroducedRules.add(s);
@@ -309,7 +310,8 @@ public class Node implements Iterable<Node> {
      * Search for the root of the smallest subtree containing <code>this</code> and
      * <code>other</code>; we assume that the two nodes are part of the same proof tree
      *
-     * @param other a node.
+     * @param other
+     *        a node.
      * @return the most recent common ancestor of {@code this} and the specified node.
      */
     public Node commonAncestor(Node other) {
@@ -363,7 +365,8 @@ public class Node implements Iterable<Node> {
     /**
      * Makes the given node a child of this node.
      *
-     * @param newChild the node to make a child of this node.
+     * @param newChild
+     *        the node to make a child of this node.
      */
     public void add(Node newChild) {
         newChild.siblingNr = children.size();
@@ -375,7 +378,8 @@ public class Node implements Iterable<Node> {
     /**
      * Makes the given node children of this node.
      *
-     * @param newChildren the node to make into children of this node.
+     * @param newChildren
+     *        the node to make into children of this node.
      */
     public void addAll(Node[] newChildren) {
         final int size = children.size();
@@ -404,7 +408,8 @@ public class Node implements Iterable<Node> {
      * Removes child/parent relationship between the given node and this node; if the given node is
      * not child of this node, nothing happens and then and only then false is returned.
      *
-     * @param child the child to remove.
+     * @param child
+     *        the child to remove.
      * @return false iff the given node was not child of this node and nothing has been done.
      */
     boolean remove(Node child) {
@@ -477,7 +482,8 @@ public class Node implements Iterable<Node> {
 
     /**
      *
-     * @param i an index (starting at 0).
+     * @param i
+     *        an index (starting at 0).
      * @return the i-th child of this node.
      */
     public Node child(int i) {
@@ -485,7 +491,8 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * @param child a child of this node.
+     * @param child
+     *        a child of this node.
      * @return the number of the node <code>child</code>, if it is a child of this node (starting
      *         with <code>0</code>), <code>-1</code> otherwise
      */
@@ -526,12 +533,17 @@ public class Node implements Iterable<Node> {
     /**
      * Helper for {@link #toString()}
      *
-     * @param prefix needed to keep track if a line has to be printed
-     * @param tree the tree representation we want to add this subtree " @param preEnumeration the
+     * @param prefix
+     *        needed to keep track if a line has to be printed
+     * @param tree
+     *        the tree representation we want to add this subtree " @param preEnumeration the
      *        enumeration of the parent without the last number
-     * @param postNr the last number of the parents enumeration
-     * @param maxNr the number of nodes at this level
-     * @param ownNr the place of this node at this level
+     * @param postNr
+     *        the last number of the parents enumeration
+     * @param maxNr
+     *        the number of nodes at this level
+     * @param ownNr
+     *        the place of this node at this level
      * @return the string representation of this node.
      */
 
@@ -766,8 +778,10 @@ public class Node implements Iterable<Node> {
     /**
      * Retrieves a user-defined data.
      *
-     * @param service the class for which the data were registered
-     * @param <T> any class
+     * @param service
+     *        the class for which the data were registered
+     * @param <T>
+     *        any class
      * @return null or the previous data
      * @see #register(Object, Class)
      */
@@ -785,8 +799,10 @@ public class Node implements Iterable<Node> {
     /**
      * Register a user-defined data in this node info.
      *
-     * @param obj an object to be registered
-     * @param service the key under it should be registered
+     * @param obj
+     *        an object to be registered
+     * @param service
+     *        the key under it should be registered
      * @param <T>
      */
     public <T> void register(T obj, Class<T> service) {
@@ -796,9 +812,12 @@ public class Node implements Iterable<Node> {
     /**
      * Remove a previous registered user-defined data.
      *
-     * @param obj registered object
-     * @param service the key under which the data was registered
-     * @param <T> arbitray object
+     * @param obj
+     *        registered object
+     * @param service
+     *        the key under which the data was registered
+     * @param <T>
+     *        arbitray object
      */
     public <T> void deregister(T obj, Class<T> service) {
         if (userData != null) {

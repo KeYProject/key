@@ -543,8 +543,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             setEnabled(true);
         }
 
-        public void shutDown(EventObject e) {
-        }
+        public void shutDown(EventObject e) {}
 
     }
 

@@ -26,7 +26,7 @@ import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -94,12 +94,18 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * Creates a new menu that displays all applicable actions and rules at the given position
      *
-     * @param sequentView the SequentView that is the parent of this menu
-     * @param findList with all applicable FindTaclets
-     * @param rewriteList with all applicable RewriteTaclets
-     * @param noFindList with all applicable noFindTaclets
-     * @param builtInList with all applicable BuiltInRules
-     * @param pos the PosInSequent
+     * @param sequentView
+     *        the SequentView that is the parent of this menu
+     * @param findList
+     *        with all applicable FindTaclets
+     * @param rewriteList
+     *        with all applicable RewriteTaclets
+     * @param noFindList
+     *        with all applicable noFindTaclets
+     * @param builtInList
+     *        with all applicable BuiltInRules
+     * @param pos
+     *        the PosInSequent
      */
     CurrentGoalViewMenu(CurrentGoalView sequentView, ImmutableList<TacletApp> findList,
             ImmutableList<TacletApp> rewriteList, ImmutableList<TacletApp> noFindList,
@@ -118,7 +124,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * Removes the unsound "introduceAxiom" taclet from the list of displayed taclets.
      *
-     * @param list The list from which to filter.
+     * @param list
+     *        The list from which to filter.
      * @return The original list, without the "introduceAxiom" taclet.
      */
     private static ImmutableList<TacletApp> removeIntroduceAxiomTaclet(
@@ -131,7 +138,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * removes RewriteTaclet from list
      *
-     * @param list from where the RewriteTaclet are removed
+     * @param list
+     *        from where the RewriteTaclet are removed
      * @return list without RewriteTaclets
      */
     public static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
@@ -157,7 +165,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     /**
      * Creates the menu by adding all sub-menus and items.
      *
-     * @param control the action listener.
+     * @param control
+     *        the action listener.
      */
     private void createMenu(ImmutableList<TacletApp> find, ImmutableList<TacletApp> noFind,
             ImmutableList<BuiltInRule> builtInList, MenuControl control) {
@@ -372,8 +381,10 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * adds a TacletMenuItem for each taclet in the list and sets the given MenuControl as the
      * ActionListener
      *
-     * @param taclets {@link ImmutableList<Taclet>} with the Taclets the items represent
-     * @param control the ActionListener
+     * @param taclets
+     *        {@link ImmutableList<Taclet>} with the Taclets the items represent
+     * @param control
+     *        the ActionListener
      */
     private void addToMenu(ImmutableList<TacletApp> taclets, MenuControl control) {
 

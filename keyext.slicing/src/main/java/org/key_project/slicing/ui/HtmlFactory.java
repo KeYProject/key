@@ -13,8 +13,7 @@ import javax.swing.*;
  * @author Arne Keller
  */
 public final class HtmlFactory {
-    private HtmlFactory() {
-    }
+    private HtmlFactory() {}
 
     /**
      * Generate an HTML table using the given column labels and row data.
@@ -29,11 +28,16 @@ public final class HtmlFactory {
      * left alignment).
      * </p>
      *
-     * @param columnNames column labels
-     * @param clickable whether the cells in a column should be clickable links
-     * @param alignment text alignment of each column
-     * @param rows row data to display in the table
-     * @param indexFactory index factory
+     * @param columnNames
+     *        column labels
+     * @param clickable
+     *        whether the cells in a column should be clickable links
+     * @param alignment
+     *        text alignment of each column
+     * @param rows
+     *        row data to display in the table
+     * @param indexFactory
+     *        index factory
      * @return HTML string
      */
     public static String generateTable(
@@ -95,7 +99,8 @@ public final class HtmlFactory {
     /**
      * Create a Swing component (JEditorPane) showing the given HTML document.
      *
-     * @param html HTML document
+     * @param html
+     *        HTML document
      * @return Swing component showing that HTML
      */
     public static JComponent createComponent(String html) {

@@ -185,13 +185,18 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     /**
      * Constructor.
      *
-     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
-     * @param modalityPio The {@link PosInOccurrence} of the modality or its updates.
-     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode
+     * @param node
+     *        The {@link Node} of KeY's proof tree to compute memory layouts for.
+     * @param modalityPio
+     *        The {@link PosInOccurrence} of the modality or its updates.
+     * @param useUnicode
+     *        {@code true} use unicode characters, {@code false} do not use unicode
      *        characters.
-     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty
+     * @param usePrettyPrinting
+     *        {@code true} use pretty printing, {@code false} do not use pretty
      *        printing.
-     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify
+     * @param simplifyConditions
+     *        {@code true} simplify conditions, {@code false} do not simplify
      *        conditions.
      */
     public SymbolicLayoutExtractor(Node node, PosInOccurrence modalityPio, boolean useUnicode,
@@ -208,7 +213,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * This is the prerequisite to access equivalence classes, initial and current states.
      * </p>
      *
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public void analyse() throws ProofInputException {
         synchronized (this) {
@@ -318,7 +324,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     /**
      * Sorts the given {@link Term}s alphabetically.
      *
-     * @param terms The {@link Term}s to sort.
+     * @param terms
+     *        The {@link Term}s to sort.
      * @return The sorted {@link Term}s.
      */
     protected Set<Term> sortTerms(Set<Term> terms) {
@@ -334,8 +341,10 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     /**
      * Filters out the objects from the second {@link Set} in the first {@link Set}.
      *
-     * @param objectsToFilter The {@link Set} to filter.
-     * @param objectsToIgnore The {@link Set} with the objects to filter out.
+     * @param objectsToFilter
+     *        The {@link Set} to filter.
+     * @param objectsToIgnore
+     *        The {@link Set} with the objects to filter out.
      * @return A new {@link Set} which contains all objects of the first {@link Set} which are not
      *         contained in the second {@link Set}.
      * @throws ProofInputException
@@ -375,9 +384,12 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * is one cut performed.
      * </p>
      *
-     * @param starter The {@link ProofStarter} which provides the side proof.
-     * @param symbolicObjects The symbolic objects to compute equivalence classes for.
-     * @param updates The updates to consider.
+     * @param starter
+     *        The {@link ProofStarter} which provides the side proof.
+     * @param symbolicObjects
+     *        The symbolic objects to compute equivalence classes for.
+     * @param updates
+     *        The updates to consider.
      */
     protected void applyCutRules(ProofStarter starter, Set<Term> symbolicObjects,
             ImmutableList<Term> updates) {
@@ -398,9 +410,12 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     /**
      * Applies one single cut rule for the given {@link Term}.
      *
-     * @param starter The {@link ProofStarter} to apply cut rule in.
-     * @param term The {@link Term} to cut out.
-     * @param maxProofSteps The maximal number of proof steps applied after cut via auto mode.
+     * @param starter
+     *        The {@link ProofStarter} to apply cut rule in.
+     * @param term
+     *        The {@link Term} to cut out.
+     * @param maxProofSteps
+     *        The maximal number of proof steps applied after cut via auto mode.
      */
     protected void applyCut(ProofStarter starter, Term term, int maxProofSteps) {
         ImmutableList<Goal> goals = starter.getProof().openEnabledGoals();
@@ -436,12 +451,14 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * {@code not(equals(obj1, obj2))}
      * </p>
      *
-     * @param proof The {@link Proof} which provides the {@link Goal}s to extract memory layouts
+     * @param proof
+     *        The {@link Proof} which provides the {@link Goal}s to extract memory layouts
      *        from.
      * @return Each entry in the list represents a equivalence class memory layout. For each object
      *         pair checked via cut rules application exists one entry in the {@link Set} of the
      *         form {@code equals(obj1, obj2)} or {@code not(equals(obj1, obj2))}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected List<ImmutableSet<Term>> extractAppliedCutsFromGoals(Proof proof)
             throws ProofInputException {
@@ -457,10 +474,13 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * Extracts the applied cut rules in the given {@link Node}. Each cut rule is represented as
      * {@link Term} of the form {@code equals(obj1, obj2)} or {@code not(equals(obj1, obj2))}.
      *
-     * @param goalnode The current {@link Node}.
-     * @param root The root {@link Node}.
+     * @param goalnode
+     *        The current {@link Node}.
+     * @param root
+     *        The root {@link Node}.
      * @return The applied cut rules.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected ImmutableSet<Term> extractAppliedCutsSet(Node goalnode, Node root)
             throws ProofInputException {
@@ -524,9 +544,11 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * <b>Attention:</b> Requires that {@link #analyse()} was executed.
      * </p>
      *
-     * @param layoutIndex The index of the initial memory layout.
+     * @param layoutIndex
+     *        The index of the initial memory layout.
      * @return The initial memory layout at the given index.
-     * @throws ProofInputException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
      */
     public ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException {
         return getLayout(initialLayouts, layoutIndex, initialLocations, computeInitialStateName(),
@@ -550,9 +572,11 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * <b>Attention:</b> Requires that {@link #analyse()} was executed.
      * </p>
      *
-     * @param layoutIndex The index of the current memory layout.
+     * @param layoutIndex
+     *        The index of the current memory layout.
      * @return The current memory layout at the given index.
-     * @throws ProofInputException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
      */
     public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException {
         return getLayout(currentLayouts, layoutIndex, currentLocations, computeCurrentStateName(),
@@ -572,13 +596,19 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * Helper method of {@link #getInitialLayout(int)} and {@link #getCurrentLayout(int)} to lazily
      * compute and get a memory layout.
      *
-     * @param confiurationsMap The map which contains already computed memory layouts.
-     * @param layoutIndex The index of the memory layout to lazily compute and return.
-     * @param locations The locations to compute in side proof.
-     * @param stateName The name of the state.
-     * @param currentLayout {@code true} current layout, {@code false} initial layout.
+     * @param confiurationsMap
+     *        The map which contains already computed memory layouts.
+     * @param layoutIndex
+     *        The index of the memory layout to lazily compute and return.
+     * @param locations
+     *        The locations to compute in side proof.
+     * @param stateName
+     *        The name of the state.
+     * @param currentLayout
+     *        {@code true} current layout, {@code false} initial layout.
      * @return The lazily computed memory layout.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected ISymbolicLayout getLayout(Map<Integer, ISymbolicLayout> confiurationsMap,
             int layoutIndex, Set<ExtractLocationParameter> locations, String stateName,
@@ -611,13 +641,19 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * the values/associations defined by {@link ExecutionVariableValuePair} instances.
      * </p>
      *
-     * @param layout The memory layout terms.
-     * @param locations The locations to compute in side proof.
-     * @param equivalentClasses The equivalence classes defined by the memory layout terms.
-     * @param stateName The name of the state.
-     * @param currentLayout {@code true} current layout, {@code false} initial layout.
+     * @param layout
+     *        The memory layout terms.
+     * @param locations
+     *        The locations to compute in side proof.
+     * @param equivalentClasses
+     *        The equivalence classes defined by the memory layout terms.
+     * @param stateName
+     *        The name of the state.
+     * @param currentLayout
+     *        {@code true} current layout, {@code false} initial layout.
      * @return The created memory layout.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected ISymbolicLayout lazyComputeLayout(ImmutableSet<Term> layout,
             Set<ExtractLocationParameter> locations,
@@ -648,8 +684,10 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * {@link ISymbolicEquivalenceClass}es, because there is no guarantee that the strategy
      * evaluates each aliased location to the same symbolic value.
      *
-     * @param locations The available {@link ExtractLocationParameter}s.
-     * @param equivalentClasses The available {@link ISymbolicEquivalenceClass}es.
+     * @param locations
+     *        The available {@link ExtractLocationParameter}s.
+     * @param equivalentClasses
+     *        The available {@link ISymbolicEquivalenceClass}es.
      * @return The updated {@link ExtractLocationParameter}s.
      */
     protected Set<ExtractLocationParameter> updateLocationsAccordingtoEquivalentClass(
@@ -672,10 +710,13 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     /**
      * Collects all objects which are used in the conditions of the {@link Sequent}.
      *
-     * @param sequent The {@link Sequent} which provides the conditions to collect objects from.
-     * @param objectsToIgnore Objects which should be excluded in the result.
+     * @param sequent
+     *        The {@link Sequent} which provides the conditions to collect objects from.
+     * @param objectsToIgnore
+     *        Objects which should be excluded in the result.
      * @return The found objects.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected Set<Term> collectObjectsFromSequent(Sequent sequent, Set<Term> objectsToIgnore)
             throws ProofInputException {
@@ -691,10 +732,13 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     /**
      * Collects all objects which are used in the given {@link Term}.
      *
-     * @param term The {@link Term} to collect objects in.
-     * @param objectsToIgnore Objects which should be excluded in the result.
+     * @param term
+     *        The {@link Term} to collect objects in.
+     * @param objectsToIgnore
+     *        Objects which should be excluded in the result.
      * @return The found objects.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected Set<Term> collectSymbolicObjectsFromTerm(Term term, final Set<Term> objectsToIgnore)
             throws ProofInputException {
@@ -721,7 +765,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * <b>Attention:</b> Requires that {@link #analyse()} was executed.
      * </p>
      *
-     * @param layoutIndex The index of the memory layout to get its equivalence classes.
+     * @param layoutIndex
+     *        The index of the memory layout to get its equivalence classes.
      * @return The equivalence classes of the memory layout at the given index.
      */
     public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses(int layoutIndex) {
@@ -753,7 +798,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * that the result is empty if all objects are not equal to each other.
      * </p>
      *
-     * @param appliedCuts The applied cut rules.
+     * @param appliedCuts
+     *        The applied cut rules.
      * @return The created {@link ISymbolicEquivalenceClass} instances.
      */
     protected ImmutableList<ISymbolicEquivalenceClass> lazyComputeEquivalenceClasses(
@@ -786,8 +832,10 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * Searches the {@link ISymbolicEquivalenceClass} from the given one which contains the given
      * {@link Term}.
      *
-     * @param equivalentClasses The available {@link ISymbolicEquivalenceClass} to search in.
-     * @param term The {@link Term} to search.
+     * @param equivalentClasses
+     *        The available {@link ISymbolicEquivalenceClass} to search in.
+     * @param term
+     *        The {@link Term} to search.
      * @return The found {@link ISymbolicEquivalenceClass} which contains the given {@link Term} or
      *         {@code null} if no one was found.
      */
@@ -800,13 +848,17 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * Creates an {@link ISymbolicLayout} which shows the objects, values and associations defined
      * by the given {@link ExecutionVariableValuePair}s.
      *
-     * @param equivalentClasses The used {@link ISymbolicEquivalenceClass} instances of the memory
+     * @param equivalentClasses
+     *        The used {@link ISymbolicEquivalenceClass} instances of the memory
      *        layout.
-     * @param pairs Provides the available objects, their values and associations together with the
+     * @param pairs
+     *        Provides the available objects, their values and associations together with the
      *        variables and association of the state.
-     * @param stateName The name of the state.
+     * @param stateName
+     *        The name of the state.
      * @return The created {@link ISymbolicLayout} with the given content.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected ISymbolicLayout createLayoutFromExecutionVariableValuePairs(
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
@@ -915,10 +967,14 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      * Creates for the object defined by the given {@link Term} an {@link SymbolicObject} instance
      * if not already available.
      *
-     * @param objects The already available {@link SymbolicObject}s.
-     * @param equivalentClasses The available {@link ISymbolicEquivalenceClass}.
-     * @param result The {@link SymbolicLayout} to add the {@link SymbolicObject} to.
-     * @param objectTerm The {@link Term} which represents the {@link Object} a
+     * @param objects
+     *        The already available {@link SymbolicObject}s.
+     * @param equivalentClasses
+     *        The available {@link ISymbolicEquivalenceClass}.
+     * @param result
+     *        The {@link SymbolicLayout} to add the {@link SymbolicObject} to.
+     * @param objectTerm
+     *        The {@link Term} which represents the {@link Object} a
      *        {@link SymbolicObject} should be created for.
      */
     protected void createObjectForTerm(Map<Term, SymbolicObject> objects,

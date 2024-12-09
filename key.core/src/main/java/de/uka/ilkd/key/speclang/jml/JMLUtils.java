@@ -54,8 +54,10 @@ public abstract class JMLUtils {
      * Decides whether the given string is a JML marker that symbolise a recognisable JML comment
      * for the given marker of the {@code tool}. Refer to chapter 4.4. in the jml ref manual.
      *
-     * @param jmlMarkers the marker string at the beginning of an JML comment.
-     * @param tool the marker of the current tool
+     * @param jmlMarkers
+     *        the marker string at the beginning of an JML comment.
+     * @param tool
+     *        the marker of the current tool
      * @return true if the given jml markers represents a KeY-recognisable comment.
      */
     public static boolean isJmlCommentStarter(String jmlMarkers, String tool) {

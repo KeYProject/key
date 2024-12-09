@@ -69,8 +69,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
     /**
      * Constructor to forbid multiple instances.
      */
-    private ModalitySideProofRule() {
-    }
+    private ModalitySideProofRule() {}
 
     /**
      * {@inheritDoc}

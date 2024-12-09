@@ -483,7 +483,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * sets up the proof tree view if a proof has been loaded
      *
-     * @param p the Proof that has been loaded
+     * @param p
+     *        the Proof that has been loaded
      */
     private void setProof(Proof p) {
         if (proof == p) {
@@ -785,8 +786,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * if invoked node is modelled as branch node, select the branch node
      *
-     * @param invokedNode the selected node in the proof
-     * @param defaultPath the {@link TreePath} to be returned if the invokedNode does not have an
+     * @param invokedNode
+     *        the selected node in the proof
+     * @param defaultPath
+     *        the {@link TreePath} to be returned if the invokedNode does not have an
      *        associated branch node
      * @return the path to the branch node if available otherwise {@code defaultPath}
      */
@@ -1329,14 +1332,18 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * be stored and
      * restored when switching proofs
      *
-     * @param model the {@link GUIProofTreeModel} of the proof
-     * @param expansionState the expanded tree paths
-     * @param selectionPath the path to the currently selected node
-     * @param scrollState the state of the scroll pane
+     * @param model
+     *        the {@link GUIProofTreeModel} of the proof
+     * @param expansionState
+     *        the expanded tree paths
+     * @param selectionPath
+     *        the path to the currently selected node
+     * @param scrollState
+     *        the state of the scroll pane
      */
-    record ProofTreeViewState(GUIProofTreeModel model,
+    record ProofTreeViewState(
+            GUIProofTreeModel model,
             Collection<TreePath> expansionState,
             TreePath selectionPath,
-            Integer scrollState) {
-    }
+            Integer scrollState) {}
 }

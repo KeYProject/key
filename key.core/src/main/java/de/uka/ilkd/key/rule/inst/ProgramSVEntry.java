@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.io.Serializable;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**
@@ -28,8 +28,10 @@ public class ProgramSVEntry implements Serializable {
      * creates a new entry encapsulating the SchemaVariable key and its JavaProgramElement
      * instantiation value
      *
-     * @param key the SchemaVariable that is instantiated
-     * @param value the JavaProgramElement
+     * @param key
+     *        the SchemaVariable that is instantiated
+     * @param value
+     *        the JavaProgramElement
      */
     public ProgramSVEntry(SchemaVariable key, JavaProgramElement value) {
         this.key = key;

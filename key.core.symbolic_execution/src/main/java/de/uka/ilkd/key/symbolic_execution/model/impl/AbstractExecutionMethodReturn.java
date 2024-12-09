@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -59,10 +59,13 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param methodCall The {@link IExecutionMethodCall} which is now returned.
+     * @param methodCall
+     *        The {@link IExecutionMethodCall} which is now returned.
      */
     public AbstractExecutionMethodReturn(ITreeSettings settings, Node proofNode,
             ExecutionMethodCall methodCall) {
@@ -126,7 +129,8 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      * Computes the method return condition lazily when {@link #getMethodReturnCondition()} or
      * {@link #getFormattedMethodReturnCondition()} is called the first time.
      *
-     * @throws ProofInputException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
      */
     protected void lazyComputeMethodReturnCondition() throws ProofInputException {
         final InitConfig initConfig = getProof().getInitConfig();

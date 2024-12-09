@@ -3,11 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -37,6 +33,7 @@ import org.key_project.util.Streams;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -54,6 +51,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
  *     gradlew :key.core:testStrictSMT
  * </pre>
  */
+@Tag("slow")
 public class MasterHandlerTest {
     /**
      * If this variable is set when running this test class, then those cases with expected result
@@ -109,58 +107,58 @@ public class MasterHandlerTest {
 
     public record TestData(String name, Path path, LineProperties props, String translation) {
 
-            public static @Nullable TestData create(Path path) throws IOException, ProblemLoaderException {
-                var name = path.getFileName().toString();
-                var props = new LineProperties();
-                try (BufferedReader reader = Files.newBufferedReader(path)) {
-                    props.read(reader);
-                }
-
-                if ("ignore".equals(props.get("state"))) {
-                    LOGGER.info("Test case has been marked ignore");
-                    return null;
-                }
-
-                List<String> sources = props.getLines("sources");
-                List<String> lines = new ArrayList<>(props.getLines("KeY"));
-
-                if (!sources.isEmpty()) {
-                    Path srcDir = Files.createTempDirectory("SMT_key_" + name);
-                    Path tmpSrc = srcDir.resolve("src.java");
-                    Files.write(tmpSrc, sources);
-                    lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
-                }
-
-                Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
-                Files.write(tmpKey, lines);
-
-                KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
-
-                Proof proof = env.getLoadedProof();
-                Sequent sequent = proof.root().sequent();
-
-                SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                        ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                        proof.getSettings().getNewSMTSettings(), proof);
-
-                String updates = props.get("smt-settings");
-                if (updates != null) {
-                    Properties map = new Properties();
-                    map.load(new StringReader(updates));
-                    settings.getNewSettings().readSettings(map);
-                }
-
-                ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
-                var translation =
-                        translator.translateProblem(sequent, env.getServices(), settings).toString();
-                return new TestData(name, path, props, translation);
+        public static @Nullable TestData create(Path path) throws IOException, ProblemLoaderException {
+            var name = path.getFileName().toString();
+            var props = new LineProperties();
+            try (BufferedReader reader = Files.newBufferedReader(path)) {
+                props.read(reader);
             }
 
-            @Override
-            public String toString() {
-                return name;
+            if ("ignore".equals(props.get("state"))) {
+                LOGGER.info("Test case has been marked ignore");
+                return null;
             }
+
+            List<String> sources = props.getLines("sources");
+            List<String> lines = new ArrayList<>(props.getLines("KeY"));
+
+            if (!sources.isEmpty()) {
+                Path srcDir = Files.createTempDirectory("SMT_key_" + name);
+                Path tmpSrc = srcDir.resolve("src.java");
+                Files.write(tmpSrc, sources);
+                lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
+            }
+
+            Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
+            Files.write(tmpKey, lines);
+
+            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey);
+
+            Proof proof = env.getLoadedProof();
+            Sequent sequent = proof.root().sequent();
+
+            SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                proof.getSettings().getNewSMTSettings(), proof);
+
+            String updates = props.get("smt-settings");
+            if (updates != null) {
+                Properties map = new Properties();
+                map.load(new StringReader(updates));
+                settings.getNewSettings().readSettings(map);
+            }
+
+            ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
+            var translation =
+                translator.translateProblem(sequent, env.getServices(), settings).toString();
+            return new TestData(name, path, props, translation);
         }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     @ParameterizedTest
     @MethodSource("data")

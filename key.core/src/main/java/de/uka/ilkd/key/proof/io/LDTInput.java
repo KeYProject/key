@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -15,6 +16,9 @@ import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -39,9 +43,12 @@ public class LDTInput implements EnvInput {
     /**
      * creates a representation of the LDT files to be used as input to the KeY prover.
      *
-     * @param keyFiles an array containing the LDT .key files
-     * @param listener an LDTInputListener for stsus reports while loading
-     * @param profile the Profile for which the LDTs are load
+     * @param keyFiles
+     *        an array containing the LDT .key files
+     * @param listener
+     *        an LDTInputListener for stsus reports while loading
+     * @param profile
+     *        the Profile for which the LDTs are load
      */
     public LDTInput(KeYFile[] keyFiles, LDTInputListener listener, Profile profile) {
         assert profile != null;
@@ -87,21 +94,21 @@ public class LDTInput implements EnvInput {
 
 
     @Override
-    public String readJavaPath() {
-        return "";
+    public @Nullable Path readJavaPath() {
+        return null;
     }
 
 
     // no class path elements here
     @Override
-    public List<File> readClassPath() {
-        return new ArrayList<>();
+    public @NonNull List<Path> readClassPath() {
+        return Collections.emptyList();
     }
 
 
     // no class path elements here
     @Override
-    public File readBootClassPath() {
+    public Path readBootClassPath() {
         return null;
     }
 
@@ -190,7 +197,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public File getInitialFile() {
+    public Path getInitialFile() {
         return null;
     }
 }

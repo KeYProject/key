@@ -57,7 +57,7 @@ public final class Main {
                     LOGGER.debug("Ignoring non proof file " + path);
                     return;
                 }
-                processFile(file, overwrite);
+                processFile(file.toPath(), overwrite);
             } catch (Exception e) {
                 LOGGER.error("error occurred in slicing ", e);
             }
@@ -75,7 +75,8 @@ public final class Main {
     /**
      * Main entry point. Parses CLI flags/options and performs the appropriate actions.
      *
-     * @param args command-line arguments
+     * @param args
+     *        command-line arguments
      */
     public static void main(String[] args) {
         try {
@@ -103,8 +104,8 @@ public final class Main {
         }
     }
 
-    private static void processFile(File proofFile, boolean overwrite) throws Exception {
-        LOGGER.info("Processing proof: {}", proofFile.getName());
+    private static void processFile(Path proofFile, boolean overwrite) throws Exception {
+        LOGGER.info("Processing proof: {}", proofFile.getFileName());
         GeneralSettings.noPruningClosed = false;
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
         KeYEnvironment<?> environment =
@@ -122,7 +123,7 @@ public final class Main {
             File saved = SlicingProofReplayer
                     .constructSlicer(control, proof, results, null).slice();
             KeYEnvironment<?> environment2 =
-                KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved, null, null,
+                KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved.toPath(), null, null,
                     null, null, null, null, true);
             Proof slicedProof = environment2.getLoadedProof();
 
@@ -135,7 +136,7 @@ public final class Main {
 
                 if (overwrite) {
                     LOGGER.info("Saving sliced proof");
-                    Files.move(saved.toPath(), proofFile.toPath(),
+                    Files.move(saved.toPath(), proofFile,
                         StandardCopyOption.REPLACE_EXISTING);
                 } else {
                     Files.delete(saved.toPath());

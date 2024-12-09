@@ -11,8 +11,7 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 public class AnyRuleSetTacletFilter extends TacletFilter {
 
-    private AnyRuleSetTacletFilter() {
-    }
+    private AnyRuleSetTacletFilter() {}
 
     /**
      * @return true iff <code>taclet</code> should be included in the result

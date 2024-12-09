@@ -6,14 +6,17 @@ package de.uka.ilkd.key.rule;
 import java.io.File;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
@@ -379,6 +382,7 @@ public class TestMatchTaclet {
         match = TB.dia(JavaBlock.createJavaBlock(new StatementBlock(mframe)), match.sub(0));
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_methodframe").taclet();
+        System.out.println(taclet.toString());
         MatchConditions mc =
             (taclet.getMatcher().matchFind(match, MatchConditions.EMPTY_MATCHCONDITIONS, services));
         assertNotNull(mc, "Method-Frame should match");

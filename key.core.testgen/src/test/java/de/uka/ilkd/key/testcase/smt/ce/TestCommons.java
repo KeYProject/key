@@ -84,7 +84,8 @@ public abstract class TestCommons {
     /**
      * check a problem file
      *
-     * @param filepath the path to the file
+     * @param filepath
+     *        the path to the file
      * @return the resulttype of the external solver
      * @throws ProblemLoaderException
      */
@@ -110,7 +111,7 @@ public abstract class TestCommons {
 
 
     protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
-        return KeYEnvironment.load(new File(filepath), null, null, null);
+        return KeYEnvironment.load(new File(filepath).toPath(), null, null, null);
     }
 
     /**
@@ -157,15 +158,18 @@ public abstract class TestCommons {
     /**
      * Parses a problem file and returns the corresponding ProofAggregate.
      *
-     * @param file problem file.
-     * @param pro determines the profile that should be used.
+     * @param file
+     *        problem file.
+     * @param pro
+     *        determines the profile that should be used.
      * @return ProofAggregate of the problem file.
      */
     protected ProofAggregate parse(File file, Profile pro) {
         assertTrue(file.exists());
         ProofAggregate result = null;
         try {
-            KeYUserProblemFile po = new KeYUserProblemFile(file.getName(), file, null, pro);
+            KeYUserProblemFile po =
+                new KeYUserProblemFile(file.getName(), file.toPath(), null, pro);
             if (initializer == null) {
                 initializer = new ProblemInitializer(po.getProfile());
             }

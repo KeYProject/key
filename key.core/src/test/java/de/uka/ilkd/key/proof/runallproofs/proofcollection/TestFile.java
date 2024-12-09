@@ -4,9 +4,6 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -50,9 +47,11 @@ public class TestFile implements Serializable {
      * In order to ensure that the implementation is independent of working directory, this method
      * can be used to return an absolute {@link File} object.
      *
-     * @param baseDirectory Base directory that will be used as start location in case given path
+     * @param baseDirectory
+     *        Base directory that will be used as start location in case given path
      *        name is a relative path.
-     * @param pathName Path whose associated {@link File} object will be returned.
+     * @param pathName
+     *        Path whose associated {@link File} object will be returned.
      * @return {@link File} object pointing to given path name relative to given base directory.
      */
     static File getAbsoluteFile(File baseDirectory, String pathName) {
@@ -99,7 +98,8 @@ public class TestFile implements Serializable {
     /**
      * Returns a {@link File} object that points to the .key file that will be tested.
      *
-     * @throws IOException Is thrown in case given .key-file is not a directory or does not exist.
+     * @throws IOException
+     *         Is thrown in case given .key-file is not a directory or does not exist.
      */
     public File getKeYFile() throws IOException {
         File baseDirectory = settings.getGroupDirectory();
@@ -134,7 +134,8 @@ public class TestFile implements Serializable {
      * @return Returns a {@link TestResult} object, which consists of a boolean value indicating
      *         whether test run was successful and a message string that can be printed out on
      *         command line to inform the user about the test result.
-     * @throws Exception Any exception that may occur during KeY execution will be converted into an
+     * @throws Exception
+     *         Any exception that may occur during KeY execution will be converted into an
      *         {@link Exception} object with original exception as cause.
      */
     public TestResult runKey() throws Exception {
@@ -279,7 +280,7 @@ public class TestFile implements Serializable {
      */
     private Pair<KeYEnvironment<DefaultUserInterfaceControl>, ProofScriptEntry> load(
             File keyFile) throws ProblemLoaderException {
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile.toPath());
         return new Pair<>(env, env.getProofScript());
     }
 
@@ -287,7 +288,8 @@ public class TestFile implements Serializable {
      * Reload proof that was previously saved at the location corresponding to the given
      * {@link File} object.
      *
-     * @param proofFile File that contains the proof that will be (re-)loaded.
+     * @param proofFile
+     *        File that contains the proof that will be (re-)loaded.
      */
     private void reloadProof(File proofFile) throws Exception {
         /*
@@ -297,7 +299,7 @@ public class TestFile implements Serializable {
         KeYEnvironment<DefaultUserInterfaceControl> proofLoadEnvironment = null;
         Proof reloadedProof = null;
         try {
-            proofLoadEnvironment = KeYEnvironment.load(proofFile);
+            proofLoadEnvironment = KeYEnvironment.load(proofFile.toPath());
 
             ReplayResult result = proofLoadEnvironment.getReplayResult();
 

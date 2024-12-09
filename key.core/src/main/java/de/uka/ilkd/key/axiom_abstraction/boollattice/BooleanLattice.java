@@ -29,8 +29,7 @@ public class BooleanLattice extends AbstractDomainLattice {
     /**
      * Private constructor: Singleton.
      */
-    private BooleanLattice() {
-    }
+    private BooleanLattice() {}
 
     /**
      * @return The singleton instance of this lattice.
@@ -89,8 +88,7 @@ public class BooleanLattice extends AbstractDomainLattice {
             }
 
             @Override
-            public void remove() {
-            }
+            public void remove() {}
         };
     }
 

@@ -40,8 +40,7 @@ public class InfFlowContractAppFeature implements Feature {
     public static final Feature INSTANCE = new InfFlowContractAppFeature();
 
 
-    protected InfFlowContractAppFeature() {
-    }
+    protected InfFlowContractAppFeature() {}
 
 
     /**
@@ -152,8 +151,8 @@ public class InfFlowContractAppFeature implements Feature {
      */
     protected boolean duplicateFindTaclet(TacletApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
-        assert app.ifFormulaInstantiations().size() >= 1
-                : "Featureis only applicable to rules with at least one assumes.";
+        assert app.ifFormulaInstantiations()
+                .size() >= 1 : "Featureis only applicable to rules with at least one assumes.";
 
         final SequentFormula focusFor = pos.sequentFormula();
         final boolean antec = pos.isInAntec();

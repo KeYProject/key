@@ -8,9 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -105,8 +105,10 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
     public AbstractExecutionNode(ITreeSettings settings, Node proofNode) {
@@ -124,7 +126,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Sets the parent {@link AbstractExecutionNode}.
      *
-     * @param parent The parent {@link AbstractExecutionNode} to set.
+     * @param parent
+     *        The parent {@link AbstractExecutionNode} to set.
      */
     public void setParent(AbstractExecutionNode<?> parent) {
         this.parent = parent;
@@ -141,7 +144,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Adds a new child {@link AbstractExecutionNode}.
      *
-     * @param child A new child {@link AbstractExecutionNode}.
+     * @param child
+     *        A new child {@link AbstractExecutionNode}.
      */
     public void addChild(AbstractExecutionNode<?> child) {
         if (child != null) {
@@ -210,7 +214,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Sets the call stack.
      *
-     * @param callStack The call stack.
+     * @param callStack
+     *        The call stack.
      */
     public void setCallStack(IExecutionNode<?>[] callStack) {
         this.callStack = callStack;
@@ -294,7 +299,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Computes the variables lazily when {@link #getVariables(Term)} is called the first time.
      *
-     * @param condition A {@link Term} specifying some additional constraints to consider.
+     * @param condition
+     *        A {@link Term} specifying some additional constraints to consider.
      * @return The {@link IExecutionVariable}s of the current state under the given condition.
      * @throws ProofInputException
      */
@@ -306,7 +312,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * Returns the used {@link ExecutionNodeSymbolicLayoutExtractor}.
      *
      * @return The used {@link ExecutionNodeSymbolicLayoutExtractor}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public ExecutionNodeSymbolicLayoutExtractor getLayoutExtractor() throws ProofInputException {
         synchronized (this) {
@@ -322,7 +329,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * {@link #getLayoutExtractor()} is called the first time.
      *
      * @return The created {@link ExecutionNodeSymbolicLayoutExtractor}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected ExecutionNodeSymbolicLayoutExtractor lazyComputeLayoutExtractor()
             throws ProofInputException {
@@ -406,7 +414,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Registers the given {@link IExecutionBlockStartNode}.
      *
-     * @param completedBlock The {@link IExecutionBlockStartNode} to register.
+     * @param completedBlock
+     *        The {@link IExecutionBlockStartNode} to register.
      */
     public void addCompletedBlock(IExecutionBlockStartNode<?> completedBlock) {
         if (completedBlock != null && !completedBlocks.contains(completedBlock)) {
@@ -417,7 +426,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Removes the given {@link IExecutionBlockStartNode} from registration.
      *
-     * @param completedBlock The {@link IExecutionBlockStartNode} to be remove.
+     * @param completedBlock
+     *        The {@link IExecutionBlockStartNode} to be remove.
      * @author Anna Filighera
      */
     public void removeCompletedBlock(IExecutionBlockStartNode<?> completedBlock) {
@@ -458,11 +468,14 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * Computes the condition lazily when {@link #getBlockCompletionCondition} or
      * {@link #getFormatedBlockCompletionCondition} is called the first time.
      *
-     * @param completedNode The completed {@link IExecutionNode} for which the condition is
+     * @param completedNode
+     *        The completed {@link IExecutionNode} for which the condition is
      *        requested.
-     * @param returnFormattedCondition {@code true} formatted condition is returned, {@code false}
+     * @param returnFormattedCondition
+     *        {@code true} formatted condition is returned, {@code false}
      *        {@link Term} is returned.
-     * @throws ProofInputException Occurred Exception
+     * @throws ProofInputException
+     *         Occurred Exception
      */
     protected Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode,
             boolean returnFormattedCondition) throws ProofInputException {
@@ -504,7 +517,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Removes the given child.
      *
-     * @param child The child to be removed.
+     * @param child
+     *        The child to be removed.
      * @author Anna Filighera
      */
     public void removeChild(IExecutionNode<?> child) {
@@ -514,7 +528,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Adds the given {@link IExecutionLink} as outgoing link.
      *
-     * @param link The {@link IExecutionLink} to add.
+     * @param link
+     *        The {@link IExecutionLink} to add.
      */
     public void addOutgoingLink(IExecutionLink link) {
         outgoingLinks = outgoingLinks.prepend(link);
@@ -523,7 +538,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Removes the given {@link IExecutionLink} from the outgoing links.
      *
-     * @param link The {@link IExecutionLink} to remove.
+     * @param link
+     *        The {@link IExecutionLink} to remove.
      */
     public void removeOutgoingLink(IExecutionLink link) {
         outgoingLinks = outgoingLinks.removeAll(link);
@@ -556,7 +572,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Adds the given {@link IExecutionLink} as incoming link.
      *
-     * @param link The {@link IExecutionLink} to add.
+     * @param link
+     *        The {@link IExecutionLink} to add.
      */
     public void addIncomingLink(IExecutionLink link) {
         incomingLinks = incomingLinks.prepend(link);
@@ -565,7 +582,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Removes the given {@link IExecutionLink} from the incoming links.
      *
-     * @param link The {@link IExecutionLink} to remove.
+     * @param link
+     *        The {@link IExecutionLink} to remove.
      */
     public void removeIncomingLink(IExecutionLink link) {
         incomingLinks = incomingLinks.removeAll(link);

@@ -168,7 +168,7 @@ subprojects {
     task testFast(type: Test) {
         group "verification"
         useJUnitPlatform {
-            excludeTags "slow", "performance", "interactive"
+            excludeTags "slow", "performance", "interactive", "testRunAllProofs"
         }
 
         testLogging {

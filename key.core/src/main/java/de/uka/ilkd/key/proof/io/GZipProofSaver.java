@@ -21,9 +21,12 @@ public class GZipProofSaver extends ProofSaver {
     /**
      * Instantiates a new proof saver.
      *
-     * @param proof the non-<code>null</code> proof to save
-     * @param fileName the name of the file to write to
-     * @param internalVersion the internal version
+     * @param proof
+     *        the non-<code>null</code> proof to save
+     * @param fileName
+     *        the name of the file to write to
+     * @param internalVersion
+     *        the internal version
      */
     public GZipProofSaver(Proof proof, String fileName, String internalVersion) {
         super(proof, fileName, internalVersion);

@@ -16,7 +16,8 @@ import java.nio.charset.StandardCharsets;
 public class DataRecordingTable implements AutoCloseable {
 
     /**
-     * @param description A description of the data stored in the table.
+     * @param description
+     *        A description of the data stored in the table.
      */
     DataRecordingTable(File location, String[] columns, String description) {
         this.location = location;

@@ -38,7 +38,8 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
      * applicable predicates. The caller is responsible for making sure that none of the predicates
      * is valid.
      *
-     * @param applicablePredicates The predicates to generate the lattice from.
+     * @param applicablePredicates
+     *        The predicates to generate the lattice from.
      */
     public ConjunctivePredicateAbstractionLattice(List<AbstractionPredicate> applicablePredicates) {
         super();

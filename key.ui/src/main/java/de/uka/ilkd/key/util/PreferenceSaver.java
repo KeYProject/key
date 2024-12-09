@@ -31,7 +31,8 @@ public class PreferenceSaver {
     /**
      * Every Component class has its own Saver class.
      *
-     * @param <C> the type of Components to store/read.
+     * @param <C>
+     *        the type of Components to store/read.
      */
     private interface Saver<C extends Component> {
         Class<C> supportedClass();
@@ -66,7 +67,8 @@ public class PreferenceSaver {
     /**
      * Create a new instance allowing to store and load UI properties from the user's preferences.
      *
-     * @param prefs a non-null preference object.
+     * @param prefs
+     *        a non-null preference object.
      */
     public PreferenceSaver(Preferences prefs) {
         assert prefs != null;
@@ -90,9 +92,11 @@ public class PreferenceSaver {
      *
      * The preferences are {@linkplain Preferences#flush() flushed} after writing them.
      *
-     * @param component component to store.
+     * @param component
+     *        component to store.
      *
-     * @throws BackingStoreException possibly thrown by {@link Preferences}.
+     * @throws BackingStoreException
+     *         possibly thrown by {@link Preferences}.
      */
     public void save(Component component) {
         assert component != null;
@@ -126,7 +130,8 @@ public class PreferenceSaver {
     /**
      * Load the properties of the argument and all its children (in depth).
      *
-     * @param component component to load.
+     * @param component
+     *        component to load.
      */
     public void load(Component component) {
         assert component != null;

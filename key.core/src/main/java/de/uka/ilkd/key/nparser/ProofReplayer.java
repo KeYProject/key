@@ -39,17 +39,20 @@ public class ProofReplayer {
         }
     }
 
-    private ProofReplayer() {
-    }
+    private ProofReplayer() {}
 
     /**
      * Replays the proof represented by the expression given in the {@link CharStream} after the
      * position of the {@code token}.
      *
-     * @param token the "\proof" with in the input stream
-     * @param input a valid input stream
-     * @param prl the proof replayer instance
-     * @param source the source of the stream, used for producing exceptions with locations
+     * @param token
+     *        the "\proof" with in the input stream
+     * @param input
+     *        a valid input stream
+     * @param prl
+     *        the proof replayer instance
+     * @param source
+     *        the source of the stream, used for producing exceptions with locations
      * @see #run(CharStream, IProofFileParser, int, URI)
      */
     public static void run(@NonNull Token token, CharStream input, IProofFileParser prl,
@@ -65,10 +68,14 @@ public class ProofReplayer {
      * <p>
      * Avoid the usage of a parser, avoids also the construction of an ASTs.
      *
-     * @param input a valid input stream
-     * @param prl the proof replayer interface
-     * @param startLine the starting of the sexpr needed for {@code prl}
-     * @param source the source of the stream, used for producing exceptions with locations
+     * @param input
+     *        a valid input stream
+     * @param prl
+     *        the proof replayer interface
+     * @param startLine
+     *        the starting of the sexpr needed for {@code prl}
+     * @param source
+     *        the source of the stream, used for producing exceptions with locations
      */
     public static void run(CharStream input, IProofFileParser prl, final int startLine,
             URI source) {

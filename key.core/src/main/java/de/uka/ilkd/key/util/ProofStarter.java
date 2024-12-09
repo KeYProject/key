@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -74,8 +74,7 @@ public class ProofStarter {
         }
 
         @Override
-        public void readProblem() throws ProofInputException {
-        }
+        public void readProblem() throws ProofInputException {}
 
 
         private Proof createProof(String proofName) {
@@ -125,7 +124,8 @@ public class ProofStarter {
     /**
      * creates an instance of the ProofStarter
      *
-     * @param useAutoSaver boolean indicating whether the proof shall be auto saved
+     * @param useAutoSaver
+     *        boolean indicating whether the proof shall be auto saved
      */
     public ProofStarter(boolean useAutoSaver) {
         this(null, useAutoSaver);
@@ -134,8 +134,10 @@ public class ProofStarter {
     /**
      * creates an instance of the ProofStarter
      *
-     * @param ptl the ProverTaskListener to be informed about certain events
-     * @param useAutoSaver boolean indicating whether the proof shall be auto saved
+     * @param ptl
+     *        the ProverTaskListener to be informed about certain events
+     * @param useAutoSaver
+     *        boolean indicating whether the proof shall be auto saved
      */
     public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
         this.ptl = ptl;

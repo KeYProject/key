@@ -6,8 +6,8 @@ package de.uka.ilkd.key.rule.match.vm;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -81,7 +81,8 @@ public class VMTacletMatcher implements TacletMatcher {
     private final Term findExp;
 
     /**
-     * @param taclet the Taclet matched by this matcher
+     * @param taclet
+     *        the Taclet matched by this matcher
      */
     public VMTacletMatcher(Taclet taclet) {
         varconditions = taclet.getVariableConditions();
@@ -155,8 +156,10 @@ public class VMTacletMatcher implements TacletMatcher {
      * If it does not then {@code null} is returned, otherwise the formula without the update
      * context.
      *
-     * @param context the list of update label pairs describing the update context
-     * @param formula the formula whose own update context must be equal (modulo renaming) to the
+     * @param context
+     *        the list of update label pairs describing the update context
+     * @param formula
+     *        the formula whose own update context must be equal (modulo renaming) to the
      *        given one
      * @return {@code null} if the update context does not match the one of the formula or the
      *         formula without the update context
@@ -218,7 +221,8 @@ public class VMTacletMatcher implements TacletMatcher {
 
             p_matchCond = newMC.head();
         }
-        assert !anteIterator.hasNext() && !succIterator.hasNext()
+        assert !anteIterator.hasNext()
+                && !succIterator.hasNext()
                 : "p_toMatch and assumes sequent must have same number of elements";
 
         return p_matchCond;
@@ -251,7 +255,8 @@ public class VMTacletMatcher implements TacletMatcher {
     /**
      * looks if a variable is declared as not free in
      *
-     * @param var the SchemaVariable to look for
+     * @param var
+     *        the SchemaVariable to look for
      * @return true iff declared not free
      */
     private boolean varDeclaredNotFree(SchemaVariable var) {
@@ -268,7 +273,8 @@ public class VMTacletMatcher implements TacletMatcher {
      * returns true iff the given variable is bound either in the ifSequent or in any part of the
      * TacletGoalTemplates
      *
-     * @param v the bound variable to be searched
+     * @param v
+     *        the bound variable to be searched
      */
     private boolean varIsBound(SchemaVariable v) {
         return (v instanceof QuantifiableVariable) && boundVars.contains((QuantifiableVariable) v);
@@ -306,8 +312,10 @@ public class VMTacletMatcher implements TacletMatcher {
      * ignores a possible update prefix This method assumes that the taclet allows to ignore updates
      * and the find expression does not start with an update application operator
      *
-     * @param term the term to be matched
-     * @param matchCond the accumulated match conditions for a successful match
+     * @param term
+     *        the term to be matched
+     * @param matchCond
+     *        the accumulated match conditions for a successful match
      * @return a pair of updated match conditions and the unwrapped term without the ignored updates
      *         (Which have been added to the update context in the match conditions)
      */

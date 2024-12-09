@@ -108,13 +108,13 @@ public final class Main {
         // CL.addSubCommand("bundle");
     }
 
-    private Main() {
-    }
+    private Main() {}
 
     /**
      * Main entry point for ProofManagement.
      *
-     * @param args the commandline arguments. See class JavaDoc for a detailed description.
+     * @param args
+     *        the commandline arguments. See class JavaDoc for a detailed description.
      */
     public static void main(String[] args) {
         try {
@@ -153,12 +153,18 @@ public final class Main {
      * The check subcommand applies the selected checks to the proof bundle and generates an HTML
      * report if desired.
      *
-     * @param missing checks if there are any unproven contracts in the bundle
-     * @param settings checks if the settings for the proofs are compatible
-     * @param replay checks whether the proofs in the bundle are replayable
-     * @param dependency checks for unsound dependencies between contracts and proofs
-     * @param bundlePath the path of the bundle (directory or zip file)
-     * @param reportPath the output path for the HTML report (if selected)
+     * @param missing
+     *        checks if there are any unproven contracts in the bundle
+     * @param settings
+     *        checks if the settings for the proofs are compatible
+     * @param replay
+     *        checks whether the proofs in the bundle are replayable
+     * @param dependency
+     *        checks for unsound dependencies between contracts and proofs
+     * @param bundlePath
+     *        the path of the bundle (directory or zip file)
+     * @param reportPath
+     *        the output path for the HTML report (if selected)
      */
     public static void check(boolean missing, boolean settings, boolean replay, boolean dependency,
             Path bundlePath, Path reportPath) {

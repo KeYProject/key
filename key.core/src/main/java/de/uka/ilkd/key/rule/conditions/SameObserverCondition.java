@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -54,9 +54,12 @@ public final class SameObserverCondition implements VariableCondition {
     /**
      * Create a new condition
      *
-     * @param schema1 first argument, must be schema variable
-     * @param schema2 2nd argument, must be schema variable
-     * @throws IllegalArgumentException if the args are not schema variables.
+     * @param schema1
+     *        first argument, must be schema variable
+     * @param schema2
+     *        2nd argument, must be schema variable
+     * @throws IllegalArgumentException
+     *         if the args are not schema variables.
      */
     public SameObserverCondition(ParsableVariable schema1, ParsableVariable schema2) {
         try {

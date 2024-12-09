@@ -9,7 +9,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -46,7 +46,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
                 .getAbsoluteFile();
         assertTrue(location.exists(), "Could not find required resource: " + location);
 
-        KeYEnvironment<?> environment = KeYEnvironment.load(location, null, null, null);
+        KeYEnvironment<?> environment = KeYEnvironment.load(location.toPath(), null, null, null);
         Services services = environment.getServices();
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         Sort intSort = integerLDT.targetSort();

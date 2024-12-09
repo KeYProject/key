@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -15,14 +15,14 @@ public final class JavaModel {
     /**
      * Directory of Java source files. May be null if the proof doesn't refer to any Java code.
      */
-    private final String modelDir;
+    private final Path modelDir;
     private final String modelTag;
     private final String descr;
     private final String classPath;
-    private final List<File> classPathEntries;
-    private final String bootClassPath;
+    private final List<Path> classPathEntries;
+    private final Path bootClassPath;
     private final String includedFiles;
-    private final File initialFile;
+    private final Path initialFile;
 
     public static final JavaModel NO_MODEL = new JavaModel();
 
@@ -31,8 +31,8 @@ public final class JavaModel {
     /**
      *
      */
-    public static JavaModel createJavaModel(String javaPath, List<File> classPath,
-            File bootClassPath, Includes includes, File initialFile) {
+    public static JavaModel createJavaModel(Path javaPath, List<Path> classPath,
+            Path bootClassPath, Includes includes, Path initialFile) {
         JavaModel result;
         if (javaPath == null) {
             result = JavaModel.NO_MODEL;
@@ -54,28 +54,28 @@ public final class JavaModel {
         initialFile = null;
     }
 
-    private JavaModel(String modelDir, List<File> classPathEntries, File bootClassPath,
-            Includes includes, File initialFile) {
-        this.modelDir = (new File(modelDir)).getAbsolutePath();
+    private JavaModel(Path modelDir, List<Path> classPathEntries, Path bootClassPath,
+            Includes includes, Path initialFile) {
+        this.modelDir = modelDir;
         this.modelTag = "KeY_" + (new Date()).getTime();
-        this.descr = "model " + (new File(modelDir)).getName() + "@"
+        this.descr = "model " + modelDir.toFile().getName() + "@"
             + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
         StringBuilder sb = new StringBuilder();
         if (classPathEntries != null && !classPathEntries.isEmpty()) {
-            for (File f : classPathEntries) {
-                sb.append("\"").append(f.getAbsolutePath()).append("\", ");
+            for (Path f : classPathEntries) {
+                sb.append("\"").append(f.toAbsolutePath()).append("\", ");
             }
             sb.setLength(sb.length() - 2);
         }
         this.classPath = sb.toString();
         this.classPathEntries = classPathEntries;
-        this.bootClassPath = bootClassPath == null ? null : bootClassPath.getAbsolutePath();
+        this.bootClassPath = bootClassPath == null ? null : bootClassPath.toAbsolutePath();
         StringBuilder sb2 = new StringBuilder();
         if (includes != null) {
-            List<File> includeList = includes.getFiles();
+            var includeList = includes.getIncludes();
             if (!includeList.isEmpty()) {
-                for (File f : includeList) {
-                    sb2.append("\"").append(f.getAbsolutePath()).append("\", ");
+                for (var f : includeList) {
+                    sb2.append("\"").append(f).append("\", ");
                 }
                 sb2.setLength(sb2.length() - 2);
             }
@@ -84,7 +84,7 @@ public final class JavaModel {
         this.initialFile = initialFile;
     }
 
-    public String getModelDir() {
+    public Path getModelDir() {
         return modelDir;
     }
 
@@ -96,11 +96,11 @@ public final class JavaModel {
         return classPath;
     }
 
-    public List<File> getClassPathEntries() {
+    public List<Path> getClassPathEntries() {
         return classPathEntries;
     }
 
-    public String getBootClassPath() {
+    public Path getBootClassPath() {
         return bootClassPath;
     }
 
@@ -108,7 +108,7 @@ public final class JavaModel {
         return includedFiles;
     }
 
-    public File getInitialFile() {
+    public Path getInitialFile() {
         return initialFile;
     }
 

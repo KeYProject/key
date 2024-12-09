@@ -55,15 +55,19 @@ public class QueryExpandCost implements Feature {
     private final boolean useExperimentalHeuristics;
 
     /**
-     * @param baseCost Should be set to 200. This was the cost before this class was introduced.
-     * @param maxRepetitionsOnSameTerm Search in the current branch if query expand has been already
+     * @param baseCost
+     *        Should be set to 200. This was the cost before this class was introduced.
+     * @param maxRepetitionsOnSameTerm
+     *        Search in the current branch if query expand has been already
      *        applied on this term. For each such application a penalty cost is added. If this limit
      *        is exceeded the cost is set to TOP_COST, i.e. the rule is not applied.
-     * @param termAgeFactor This factor (must be >= 0) sets the cost of older queries lower, than
+     * @param termAgeFactor
+     *        This factor (must be >= 0) sets the cost of older queries lower, than
      *        that of younger queries (i.e. that occur later in proofs). The effect is a
      *        breath-first search on the expansion of queries. In class <code>QueryExpand</code> the
      *        time is stored, when queries can be expanded for the first time.
-     * @param useExperimentalHeuristics Activates experimental, pattern-based heuristics.
+     * @param useExperimentalHeuristics
+     *        Activates experimental, pattern-based heuristics.
      */
     public QueryExpandCost(int baseCost, int maxRepetitionsOnSameTerm, int termAgeFactor,
             boolean useExperimentalHeuristics) {
@@ -106,7 +110,8 @@ public class QueryExpandCost implements Feature {
                 cost += qtime * termAgeFactor;
             } else {
                 LOGGER.info("QueryExpandCost::compute. Time of query should have been set already."
-                    + "The query was: {}", t);
+                    + "The query was: {}",
+                    t);
             }
         }
 
@@ -114,7 +119,8 @@ public class QueryExpandCost implements Feature {
     }
 
     /**
-     * @param t the query that is considered for the rule expand query.
+     * @param t
+     *        the query that is considered for the rule expand query.
      * @return Cost that is computed base on the integer literals occurring in the numerical
      *         arguments of the query t.
      */
@@ -137,7 +143,8 @@ public class QueryExpandCost implements Feature {
      * Absolute values of literal occurring in t a used for cost computation. The cost of literals
      * is sorted the following way:0,1,-1,2,-2,3,-3,...
      *
-     * @param t The term is expected to be an argument of the query.
+     * @param t
+     *        The term is expected to be an argument of the query.
      * @return Sum* of the absolute values of integer literals occurring in t multiplied by two. (*)
      *         The sum is modified by extrapolating negative numbers from zero by one. The cost of a
      *         query f(n-1) a slightly higher cost than the cost of f(n+1).
@@ -166,9 +173,12 @@ public class QueryExpandCost implements Feature {
      * position in the sequent. This method detects repetitive rule applications and is used to
      * prevent loops in the proof tree.
      *
-     * @param app The rule application.
-     * @param pos The occurrence position.
-     * @param goal The goal.
+     * @param app
+     *        The rule application.
+     * @param pos
+     *        The occurrence position.
+     * @param goal
+     *        The goal.
      * @return The number of repetitive rule applications.
      */
     protected int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence pos, Goal goal) {
@@ -199,7 +209,8 @@ public class QueryExpandCost implements Feature {
      * preserves case. The search is done recursively for all parent nodes until either there are no
      * more parent nodes or we have found an according (or opposing) branch label.
      *
-     * @param goal the current proof goal
+     * @param goal
+     *        the current proof goal
      * @return a boolean saying whether the goal belongs to a step case
      */
     protected static boolean isStepCaseBranch(Goal goal) {

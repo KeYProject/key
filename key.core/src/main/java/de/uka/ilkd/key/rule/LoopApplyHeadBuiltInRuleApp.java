@@ -35,8 +35,10 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     /**
      *
-     * @param rule the rule being applied.
-     * @param pio the position at which the rule is applied.
+     * @param rule
+     *        the rule being applied.
+     * @param pio
+     *        the position at which the rule is applied.
      */
     public LoopApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
         this(rule, pio, null);
@@ -44,9 +46,12 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     /**
      *
-     * @param rule the rule being applied.
-     * @param pio the position at which the rule is applied.
-     * @param contracts the contracts on which the rule is applied.
+     * @param rule
+     *        the rule being applied.
+     * @param pio
+     *        the position at which the rule is applied.
+     * @param contracts
+     *        the contracts on which the rule is applied.
      */
     public LoopApplyHeadBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
             ImmutableSet<LoopContract> contracts) {
@@ -61,7 +66,8 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     /**
-     * @param goal the current goal.
+     * @param goal
+     *        the current goal.
      * @return {@code true} iff the rule application cannot be completed for the current goal.
      */
     public boolean cannotComplete(final Goal goal) {

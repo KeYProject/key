@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -63,8 +63,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * Constructor
      *
-     * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
-     * @param initConfig The loaded project.
+     * @param ui
+     *        The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
+     * @param initConfig
+     *        The loaded project.
      */
     public KeYEnvironment(U ui, InitConfig initConfig) {
         this(ui, initConfig, null, null, null);
@@ -73,8 +75,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * Constructor
      *
-     * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
-     * @param initConfig The loaded project.
+     * @param ui
+     *        The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
+     * @param initConfig
+     *        The loaded project.
      */
     public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof,
             @Nullable ProofScriptEntry proofScript, ReplayResult replayResult) {
@@ -164,9 +168,11 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * Creates a new {@link Proof} with help of the {@link UserInterfaceControl}.
      *
-     * @param input The {@link ProofOblInput} to instantiate {@link Proof} from.
+     * @param input
+     *        The {@link ProofOblInput} to instantiate {@link Proof} from.
      * @return The instantiated {@link Proof}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     public Proof createProof(ProofOblInput input) throws ProofInputException {
         return ui.createProof(getInitConfig(), input);
@@ -176,15 +182,20 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
      * {@code MainWindow} is not involved in the whole process.
      *
-     * @param location The location to load.
-     * @param classPaths The class path entries to use.
-     * @param bootClassPath The boot class path to use.
-     * @param includes Optional includes to consider.
+     * @param location
+     *        The location to load.
+     * @param classPaths
+     *        The class path entries to use.
+     * @param bootClassPath
+     *        The boot class path to use.
+     * @param includes
+     *        Optional includes to consider.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(File location,
-            List<File> classPaths, File bootClassPath, List<File> includes)
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes)
             throws ProblemLoaderException {
         return load(null, location, classPaths, bootClassPath, includes, false);
     }
@@ -193,16 +204,22 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
      * {@code MainWindow} is not involved in the whole process.
      *
-     * @param location The location to load.
-     * @param classPaths The class path entries to use.
-     * @param bootClassPath The boot class path to use.
-     * @param includes Optional includes to consider.
-     * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
+     * @param location
+     *        The location to load.
+     * @param classPaths
+     *        The class path entries to use.
+     * @param bootClassPath
+     *        The boot class path to use.
+     * @param includes
+     *        Optional includes to consider.
+     * @param ruleCompletionHandler
+     *        An optional {@link RuleCompletionHandler}.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(File location,
-            List<File> classPaths, File bootClassPath, List<File> includes,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             RuleCompletionHandler ruleCompletionHandler) throws ProblemLoaderException {
         return load(null, location, classPaths, bootClassPath, includes, null,
             ruleCompletionHandler, false);
@@ -212,20 +229,27 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
      * {@code MainWindow} is not involved in the whole process.
      *
-     * @param profile The {@link Profile} to use.
-     * @param location The location to load.
-     * @param classPaths The class path entries to use.
-     * @param bootClassPath The boot class path to use.
-     * @param includes Optional includes to consider.
-     * @param forceNewProfileOfNewProofs {@code} true
+     * @param profile
+     *        The {@link Profile} to use.
+     * @param location
+     *        The location to load.
+     * @param classPaths
+     *        The class path entries to use.
+     * @param bootClassPath
+     *        The boot class path to use.
+     * @param includes
+     *        Optional includes to consider.
+     * @param forceNewProfileOfNewProofs
+     *        {@code} true
      *        {@code AbstractProblemLoader.profileOfNewProofs} will be used as
      *        {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file
      *        will be used for new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, File location,
-            List<File> classPaths, File bootClassPath, List<File> includes,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, null, null,
             forceNewProfileOfNewProofs);
@@ -235,22 +259,31 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
      * {@code MainWindow} is not involved in the whole process.
      *
-     * @param profile The {@link Profile} to use.
-     * @param location The location to load.
-     * @param classPaths The class path entries to use.
-     * @param bootClassPath The boot class path to use.
-     * @param includes Optional includes to consider.
-     * @param poPropertiesToForce Some optional PO {@link Properties} to force.
-     * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
-     * @param forceNewProfileOfNewProofs {@code} true
+     * @param profile
+     *        The {@link Profile} to use.
+     * @param location
+     *        The location to load.
+     * @param classPaths
+     *        The class path entries to use.
+     * @param bootClassPath
+     *        The boot class path to use.
+     * @param includes
+     *        Optional includes to consider.
+     * @param poPropertiesToForce
+     *        Some optional PO {@link Properties} to force.
+     * @param ruleCompletionHandler
+     *        An optional {@link RuleCompletionHandler}.
+     * @param forceNewProfileOfNewProofs
+     *        {@code} true
      *        {@code AbstractProblemLoader.profileOfNewProofs} will be used as {@link Profile} of
      *        new proofs, {@code false} {@link Profile} specified by problem file will be used for
      *        new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, File location,
-            List<File> classPaths, File bootClassPath, List<File> includes,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce,
@@ -262,24 +295,34 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
      * {@code MainWindow} is not involved in the whole process.
      *
-     * @param profile The {@link Profile} to use.
-     * @param location The location to load.
-     * @param classPaths The class path entries to use.
-     * @param bootClassPath The boot class path to use.
-     * @param includes Optional includes to consider.
-     * @param poPropertiesToForce Some optional PO {@link Properties} to force.
-     * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
-     * @param callbackProofLoaded An optional callback (called when the proof is loaded, before
+     * @param profile
+     *        The {@link Profile} to use.
+     * @param location
+     *        The location to load.
+     * @param classPaths
+     *        The class path entries to use.
+     * @param bootClassPath
+     *        The boot class path to use.
+     * @param includes
+     *        Optional includes to consider.
+     * @param poPropertiesToForce
+     *        Some optional PO {@link Properties} to force.
+     * @param ruleCompletionHandler
+     *        An optional {@link RuleCompletionHandler}.
+     * @param callbackProofLoaded
+     *        An optional callback (called when the proof is loaded, before
      *        replay)
-     * @param forceNewProfileOfNewProofs {@code} true
+     * @param forceNewProfileOfNewProofs
+     *        {@code} true
      *        {@code AbstractProblemLoader.profileOfNewProofs} will be used as {@link Profile} of
      *        new proofs, {@code false} {@link Profile} specified by problem file will be used for
      *        new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
-     * @throws ProblemLoaderException Occurred Exception
+     * @throws ProblemLoaderException
+     *         Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, File location,
-            List<File> classPaths, File bootClassPath, List<File> includes,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
+            List<Path> classPaths, Path bootClassPath, List<Path> includes,
             Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
             Consumer<Proof> callbackProofLoaded,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
@@ -292,7 +335,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             loader.getProofScript(), loader.getResult());
     }
 
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(File keyFile)
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(Path keyFile)
             throws ProblemLoaderException {
         return load(keyFile, null, null, null);
     }
