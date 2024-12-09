@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -29,59 +28,6 @@ import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRE
  * non term classes.
  */
 public class EqualityModuloProofIrrelevancy {
-
-    // Dynamic dispatch on type of _this via reflection
-
-    /**
-     * dispatches to most specific equalsModProofIrrelevancy method using the runtime type of
-     * {@code _this}
-     *
-     * @param _this the first Object to be compared
-     * @param that the second Object to be compared
-     * @return true iff the {@code _this} object is equal modulo proof irrelevancy with the
-     *         {@code that} object
-     */
-    public static boolean equalsModProofIrrelevancy(Object _this, Object that) {
-        if (_this.getClass() == that.getClass()) {
-            try {
-                var method = EqualityModuloProofIrrelevancy.class.getDeclaredMethod(
-                    "equalsModProofIrrelevancy",
-                    _this.getClass(), that.getClass());
-                return (boolean) method.invoke(null, _this, that);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(
-                    "No equality modulo proof irrelevancy defined for " + _this.getClass(), e);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(
-                    "No equality modulo proof irrelevancy defined for " + _this.getClass(), e);
-            }
-        }
-        return false;
-    }
-
-    /**
-     * dispatches to most specific hashCodeModProofIrrelevancy method using the runtime type of
-     * {@code obj}
-     *
-     * @param obj the Object whose hashCodeModProofIrrelevancy shall be computed
-     * @return the hashCodeModProofIrrelevancy of {@code obj}
-     */
-    public static int hashCodeModProofIrrelevancy(Object obj) {
-        try {
-            var method = EqualityModuloProofIrrelevancy.class.getDeclaredMethod(
-                "hashCodeModProofIrrelevancy",
-                obj.getClass());
-            return (int) method.invoke(null, obj);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(
-                "No hash modulo proof irrelevancy defined for " + obj.getClass(), e);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(
-                "No hash modulo proof irrelevancy defined for " + obj.getClass(), e);
-        }
-    }
-
-
     // Operator
     /**
      * test for equality modulo proof irrelevancy for the given arguments
