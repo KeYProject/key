@@ -35,7 +35,9 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
     }
 
     public boolean equals(Object p_obj) {
-        if (!(p_obj instanceof IfFormulaInstDirect)) { return false; }
+        if (!(p_obj instanceof IfFormulaInstDirect)) {
+            return false;
+        }
         return cf.equals(((IfFormulaInstDirect) p_obj).cf);
     }
 

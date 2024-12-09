@@ -94,9 +94,15 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
     @Override
     public int getChildCount() {
         int result = 0;
-        if (hasParameterDeclaration()) { result++; }
-        if (hasNonStdParameterDeclaration()) { result++; }
-        if (body != null) { result++; }
+        if (hasParameterDeclaration()) {
+            result++;
+        }
+        if (hasNonStdParameterDeclaration()) {
+            result++;
+        }
+        if (body != null) {
+            result++;
+        }
         return result;
     }
 
@@ -112,15 +118,21 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
     @Override
     public ProgramElement getChildAt(int index) {
         if (hasParameterDeclaration()) {
-            if (index == 0) { return parameter; }
+            if (index == 0) {
+                return parameter;
+            }
             index--;
         }
         if (hasNonStdParameterDeclaration()) {
-            if (index == 0) { return nonStdParameter; }
+            if (index == 0) {
+                return nonStdParameter;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0) { return body; }
+            if (index == 0) {
+                return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -147,7 +159,9 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      */
     @Override
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) { return body; }
+        if (body != null && index == 0) {
+            return body;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -173,7 +187,9 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      */
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
-        if (hasParameterDeclaration() && index == 0) { return parameter; }
+        if (hasParameterDeclaration() && index == 0) {
+            return parameter;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -188,7 +204,9 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      *         if <tt>index</tt> is out of bounds.
      */
     public CcatchNonstandardParameterDeclaration getNonStdParameterDeclarationAt(int index) {
-        if (hasNonStdParameterDeclaration() && index == 0) { return nonStdParameter; }
+        if (hasNonStdParameterDeclaration() && index == 0) {
+            return nonStdParameter;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

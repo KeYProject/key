@@ -146,7 +146,9 @@ public class NodePreorderIterator {
                     childIndexOnParent = i;
                     return nextChildOnParent;
                 }
-                if (nextChildOnParent == node) { nodeFound = true; }
+                if (nextChildOnParent == node) {
+                    nodeFound = true;
+                }
             }
             if (nextChildOnParent != start) {
                 node = parent; // Continue search on parent without recursive call!

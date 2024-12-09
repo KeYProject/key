@@ -77,7 +77,9 @@ public final class DescriptionFacade {
      * @see ProofScriptArgument#getDocumentation()
      */
     public static String getDocumentation(ProofScriptArgument<?> arg) {
-        if (arg == null || arg.getCommand() == null) { return null; }
+        if (arg == null || arg.getCommand() == null) {
+            return null;
+        }
         String key = arg.getCommand().getName() + "." + arg.getName();
         return getString(key);
     }

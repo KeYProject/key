@@ -58,19 +58,25 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     public void refactorLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term, LabelCollection labels) {
-        if (services.getProof() == null) { return; }
+        if (services.getProof() == null) {
+            return;
+        }
 
         if (rule instanceof BuiltInRule
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return;
         }
 
-        if (rule instanceof Taclet && !shouldRefactorOnTaclet((Taclet) rule)) { return; }
+        if (rule instanceof Taclet && !shouldRefactorOnTaclet((Taclet) rule)) {
+            return;
+        }
 
         final OriginTermLabel oldLabel = labels.getFirst(OriginTermLabel.class);
 
         if (services.getTermBuilder().getOriginFactory() == null) {
-            if (oldLabel != null) { labels.remove(oldLabel); }
+            if (oldLabel != null) {
+                labels.remove(oldLabel);
+            }
             return;
         }
 
@@ -97,7 +103,9 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     }
 
     private Set<Origin> collectSubtermOrigins(ImmutableArray<Term> terms, Set<Origin> result) {
-        for (Term term : terms) { collectSubtermOrigins(term, result); }
+        for (Term term : terms) {
+            collectSubtermOrigins(term, result);
+        }
 
         return result;
     }

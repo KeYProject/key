@@ -227,7 +227,9 @@ public final class KeYTypeUtil {
         } else if (type instanceof ArrayType arrayType) {
             StringBuilder sb = new StringBuilder();
             sb.append(resolveType(arrayType.getBaseType()));
-            for (int i = 0; i < arrayType.getDimension(); i++) { sb.append("[]"); }
+            for (int i = 0; i < arrayType.getDimension(); i++) {
+                sb.append("[]");
+            }
             return sb.toString();
         } else {
             return type != null ? type.getFullName() : null;

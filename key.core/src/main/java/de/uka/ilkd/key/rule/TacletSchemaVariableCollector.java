@@ -86,7 +86,9 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
     public void visit(Term visited) {
         final Operator op = visited.op();
         if (op instanceof Modality mod) {
-            if (mod.kind() instanceof ModalOperatorSV msv) { varList = varList.prepend(msv); }
+            if (mod.kind() instanceof ModalOperatorSV msv) {
+                varList = varList.prepend(msv);
+            }
             varList = collectSVInProgram(visited.javaBlock(), varList);
         } else if (op instanceof ElementaryUpdate) {
             varList = collectSVInElementaryUpdate((ElementaryUpdate) op, varList);
@@ -95,14 +97,20 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
         for (int j = 0, ar = visited.arity(); j < ar; j++) {
             for (int i = 0, sz = visited.varsBoundHere(j).size(); i < sz; i++) {
                 final QuantifiableVariable qVar = visited.varsBoundHere(j).get(i);
-                if (qVar instanceof SchemaVariable) { varList = varList.prepend((SchemaVariable) qVar); }
+                if (qVar instanceof SchemaVariable) {
+                    varList = varList.prepend((SchemaVariable) qVar);
+                }
             }
         }
 
-        if (op instanceof SchemaVariable) { varList = varList.prepend((SchemaVariable) op); }
+        if (op instanceof SchemaVariable) {
+            varList = varList.prepend((SchemaVariable) op);
+        }
 
         for (TermLabel label : visited.getLabels()) {
-            if (label instanceof TermLabelSV) { varList = varList.prepend((SchemaVariable) label); }
+            if (label instanceof TermLabelSV) {
+                varList = varList.prepend((SchemaVariable) label);
+            }
         }
     }
 
@@ -121,7 +129,9 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
             ImmutableList<SchemaVariable> vars) {
         ImmutableList<SchemaVariable> result = vars;
 
-        if (op.lhs() instanceof SchemaVariable) { result = result.prepend((SchemaVariable) op.lhs()); }
+        if (op.lhs() instanceof SchemaVariable) {
+            result = result.prepend((SchemaVariable) op.lhs());
+        }
 
         return result;
     }
@@ -156,7 +166,9 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
      *        the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-        for (SequentFormula aSemiseq : semiseq) { aSemiseq.formula().execPostOrder(this); }
+        for (SequentFormula aSemiseq : semiseq) {
+            aSemiseq.formula().execPostOrder(this);
+        }
     }
 
 
@@ -188,7 +200,9 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
 
 
     protected void visitFindPart(Taclet taclet) {
-        if (taclet instanceof FindTaclet) { (((FindTaclet) taclet).find()).execPostOrder(this); }
+        if (taclet instanceof FindTaclet) {
+            (((FindTaclet) taclet).find()).execPostOrder(this);
+        }
     }
 
 
@@ -203,7 +217,11 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
                     visit(((AntecSuccTacletGoalTemplate) gt).replaceWith());
                 }
             }
-            if (visitAddrules) { for (Taclet taclet1 : gt.rules()) { visit(taclet1, true); } }
+            if (visitAddrules) {
+                for (Taclet taclet1 : gt.rules()) {
+                    visit(taclet1, true);
+                }
+            }
         }
     }
 

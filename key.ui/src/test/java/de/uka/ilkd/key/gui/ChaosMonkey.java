@@ -69,7 +69,9 @@ final class ChaosMonkey {
         mw.setLocation(0, 0);
 
         try {
-            while (true) { Thread.sleep(100000); }
+            while (true) {
+                Thread.sleep(100000);
+            }
         } catch (InterruptedException e) {
         }
     }
@@ -93,7 +95,9 @@ final class ChaosMonkey {
                 // close any dialogs and popup menus
                 var windows = SwingUtil.getAllOpenWindows();
                 for (var window : windows) {
-                    if (window instanceof MainWindow || !window.isVisible()) { continue; }
+                    if (window instanceof MainWindow || !window.isVisible()) {
+                        continue;
+                    }
                     String title = window instanceof JDialog ? ((JDialog) window).getTitle()
                             : window.getClass().toString();
                     LOGGER.info("closing: {}", title);
@@ -120,8 +124,12 @@ final class ChaosMonkey {
                 actions.addAll(buttons);
                 actions.addAll(keyActions);
                 for (var menuItem : allMenuItems) {
-                    if (menuItem.getAction() != null && keyActions.contains(menuItem.getAction())) { continue; }
-                    if (!menuItem.isEnabled() || (menuItem instanceof JMenu)) { continue; }
+                    if (menuItem.getAction() != null && keyActions.contains(menuItem.getAction())) {
+                        continue;
+                    }
+                    if (!menuItem.isEnabled() || (menuItem instanceof JMenu)) {
+                        continue;
+                    }
                     actions.add(menuItem);
                 }
                 var foundButton = false;
@@ -141,7 +149,10 @@ final class ChaosMonkey {
                             button.getName(), button.getToolTipText());
                         var hierarchy = new ArrayList<>();
                         var container = button.getParent();
-                        while (container != null) { hierarchy.add(container); container = container.getParent(); }
+                        while (container != null) {
+                            hierarchy.add(container);
+                            container = container.getParent();
+                        }
                         for (var x : hierarchy) {
                             if (x instanceof AbstractDockable c) {
                                 LOGGER.info(" {}", c.getTitleText());

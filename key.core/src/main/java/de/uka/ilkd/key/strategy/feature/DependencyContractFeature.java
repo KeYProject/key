@@ -27,7 +27,9 @@ public final class DependencyContractFeature extends BinaryFeature {
                     && app.posInOccurrence().subTerm().equalsModProperty(focus,
                         RENAMING_TERM_PROPERTY)) {
                 final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
-                for (PosInOccurrence ifInst : bapp.ifInsts()) { steps.remove(ifInst); }
+                for (PosInOccurrence ifInst : bapp.ifInsts()) {
+                    steps.remove(ifInst);
+                }
             }
         }
     }
@@ -44,12 +46,16 @@ public final class DependencyContractFeature extends BinaryFeature {
 
         final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(heapContext, pos,
             goal.sequent(), goal.proof().getServices());
-        if (steps.isEmpty()) { return false; }
+        if (steps.isEmpty()) {
+            return false;
+        }
 
         // remove previously used steps
         removePreviouslyUsedSteps(focus, goal, steps);
 
-        if (steps.isEmpty()) { return false; }
+        if (steps.isEmpty()) {
+            return false;
+        }
 
         if (pos.isTopLevel() && focus.sort() == JavaDLTheory.FORMULA
                 && pos.isInAntec() == steps.get(0).isInAntec()) {

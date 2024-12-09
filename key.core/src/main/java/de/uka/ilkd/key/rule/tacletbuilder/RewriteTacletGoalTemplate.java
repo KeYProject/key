@@ -86,7 +86,9 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o)) { return false; }
+        if (!super.equals(o)) {
+            return false;
+        }
         final RewriteTacletGoalTemplate other = (RewriteTacletGoalTemplate) o;
         return replacewith.equals(other.replacewith);
     }

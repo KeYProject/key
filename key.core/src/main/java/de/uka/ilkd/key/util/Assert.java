@@ -29,12 +29,14 @@ public final class Assert {
      * @param t2
      */
     public static void assertEqualSort(Sorted t1, Sorted t2) {
-        if (!assertionsEnabled()) { return; }
+        if (!assertionsEnabled()) {
+            return;
+        }
         Sort s1 = t1.sort();
         Sort s2 = t2.sort();
         if (!s1.equals(s2)) {
             throw new AssertionFailure("Assertion failed: The sorts of " + t1 + " and " + t2
-                    + " were supposed to be equal," + " but are " + s1 + " and " + s2 + ".");
+                + " were supposed to be equal," + " but are " + s1 + " and " + s2 + ".");
         }
     }
 
@@ -46,13 +48,15 @@ public final class Assert {
      * @param t2
      */
     public static void assertSubSort(Sorted t1, Sorted t2) {
-        if (!assertionsEnabled()) { return; }
+        if (!assertionsEnabled()) {
+            return;
+        }
         Sort s1 = t1.sort();
         Sort s2 = t2.sort();
         if (!s1.extendsTrans(s2)) {
             throw new AssertionFailure(
                 "Assertion failed: The sort of " + t1 + " was supposed to be a subsort of " + t2
-                        + "'s," + " but are " + s1 + " and " + s2 + ".");
+                    + "'s," + " but are " + s1 + " and " + s2 + ".");
         }
     }
 }

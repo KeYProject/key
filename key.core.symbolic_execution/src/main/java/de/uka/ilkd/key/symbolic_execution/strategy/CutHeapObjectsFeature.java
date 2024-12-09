@@ -42,7 +42,9 @@ public class CutHeapObjectsFeature extends BinaryFeature {
             SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal,
                 mState);
         if (cutFormula != null) {
-            if (cutFormula.op() == Junctor.NOT) { cutFormula = cutFormula.sub(0); }
+            if (cutFormula.op() == Junctor.NOT) {
+                cutFormula = cutFormula.sub(0);
+            }
             if (cutFormula.op() == Equality.EQUALS) {
                 Term cutFormulaC0 = cutFormula.sub(0);
                 Term cutFormulaC1 = cutFormula.sub(1);
@@ -50,7 +52,9 @@ public class CutHeapObjectsFeature extends BinaryFeature {
                 Iterator<SequentFormula> iter = goal.sequent().iterator();
                 while (!contains && iter.hasNext()) {
                     Term formula = iter.next().formula();
-                    if (formula.op() == Junctor.NOT) { formula = formula.sub(0); }
+                    if (formula.op() == Junctor.NOT) {
+                        formula = formula.sub(0);
+                    }
                     if (formula.op() == Equality.EQUALS) {
                         // Check equality ignore order of equality sub terms
                         if (cutFormulaC0.equals(formula.sub(0))) {

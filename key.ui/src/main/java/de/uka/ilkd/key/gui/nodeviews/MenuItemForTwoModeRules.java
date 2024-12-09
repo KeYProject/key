@@ -93,7 +93,9 @@ public class MenuItemForTwoModeRules extends JMenu implements BuiltInRuleMenuIte
 
     @Override
     public void removeActionListener(ActionListener al) {
-        if (this.listener == al) { this.listener = null; }
+        if (this.listener == al) {
+            this.listener = null;
+        }
     }
 
     @Override

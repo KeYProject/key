@@ -76,7 +76,9 @@ class FieldPrinter {
         KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
         String fieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
         ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(fieldName, kjt);
-        if (pv == null) { return false; }
+        if (pv == null) {
+            return false;
+        }
 
         /*
          * Compare originTypeAndName and pvTypeAndName based on their String representation. I did

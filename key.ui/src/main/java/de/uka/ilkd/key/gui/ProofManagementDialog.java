@@ -91,16 +91,22 @@ public final class ProofManagementDialog extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Check that it is a double click on an item, not a folder or the background
-                if (e.getClickCount() != 2) { return; }
+                if (e.getClickCount() != 2) {
+                    return;
+                }
                 // row is -1 when the user does not click on an entry but on the background
                 int row = classTree.getRowForLocation(e.getX(), e.getY());
-                if (row == -1) { return; }
+                if (row == -1) {
+                    return;
+                }
                 final ClassTree.Entry entry = classTree.getSelectedEntry();
                 if (entry.kjt != null && entry.target != null) {
                     final ImmutableSet<Contract> contracts = initConfig.getServices()
                             .getSpecificationRepository().getContracts(entry.kjt, entry.target);
                     final Contract c = contracts.iterator().next();
-                    if (contracts.size() == 1 && c == contractPanelByMethod.getContract()) { startButton.doClick(); }
+                    if (contracts.size() == 1 && c == contractPanelByMethod.getContract()) {
+                        startButton.doClick();
+                    }
                 }
             }
         });
@@ -159,7 +165,9 @@ public final class ProofManagementDialog extends JDialog {
         contractPanelByMethod.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) { startButton.doClick(); }
+                if (e.getClickCount() == 2) {
+                    startButton.doClick();
+                }
             }
         });
         contractPanelByMethod.addListSelectionListener(e -> updateStartButton());
@@ -171,7 +179,9 @@ public final class ProofManagementDialog extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 updateStartButton();
-                if (e.getClickCount() == 2) { startButton.doClick(); }
+                if (e.getClickCount() == 2) {
+                    startButton.doClick();
+                }
             }
         });
         contractPanelByProof.addListSelectionListener(e -> updateStartButton());
@@ -330,13 +340,17 @@ public final class ProofManagementDialog extends JDialog {
         // determine own defaults if not given
         dialog.selectKJTandTarget();
         // if (previouslySelectedContracts.containsKey(selectedProof)) {
-        if (previouslySelectedContracts != null) { dialog.select(previouslySelectedContracts); }
+        if (previouslySelectedContracts != null) {
+            dialog.select(previouslySelectedContracts);
+        }
 
 
         dialog.updateGlobalStatus();
 
         // The selected elements have to be select before the dialog is made visible!
-        if (selectedKJT != null && selectedTarget != null) { dialog.select(selectedKJT, selectedTarget); }
+        if (selectedKJT != null && selectedTarget != null) {
+            dialog.select(selectedKJT, selectedTarget);
+        }
 
         if (selectedProof != null) {
             dialog.select(selectedProof);
@@ -369,7 +383,9 @@ public final class ProofManagementDialog extends JDialog {
                             && ((TypeDeclaration) kjtTmp.getJavaType()).isLibraryClass()))
                     .filter(it -> it.getFullName().equals(keyJavaTypeName)).findAny();
 
-        if (!allJavaTypes.isPresent()) { return; }
+        if (!allJavaTypes.isPresent()) {
+            return;
+        }
         KeYJavaType javaType = allJavaTypes.get();
         Name methodName = new Name(cid.methodName);
         Optional<IObserverFunction> target =
@@ -377,7 +393,9 @@ public final class ProofManagementDialog extends JDialog {
                     .filter(targetTmp -> !servicesLocal.getSpecificationRepository()
                             .getContracts(javaType, targetTmp).isEmpty())
                     .filter(it -> it.name().equals(methodName)).findAny();
-        if (!target.isPresent()) { return; }
+        if (!target.isPresent()) {
+            return;
+        }
         final IObserverFunction method = target.get();
         select(javaType, method);
 
@@ -395,7 +413,9 @@ public final class ProofManagementDialog extends JDialog {
 
     private void select(KeYJavaType kjt, IObserverFunction target) {
         tabbedPane.setSelectedIndex(0);
-        if (classTree != null) { classTree.select(kjt, target); }
+        if (classTree != null) {
+            classTree.select(kjt, target);
+        }
     }
 
     private void select(Proof p) {
@@ -427,14 +447,18 @@ public final class ProofManagementDialog extends JDialog {
         ImmutableSet<Proof> proofs =
             initConfig.getServices().getSpecificationRepository().getProofs(contract);
         // no proofs?
-        if (proofs.isEmpty()) { return null; }
+        if (proofs.isEmpty()) {
+            return null;
+        }
         // try to find closed proof
         Proof fallback = null;
         for (Proof proof : proofs) {
             final ProofStatus status = proof.mgt().getStatus();
             if (status.getProofClosed()) {
                 return proof;
-            } else if (fallback == null || status.getProofClosedButLemmasLeft()) { fallback = proof; }
+            } else if (fallback == null || status.getProofClosedButLemmasLeft()) {
+                fallback = proof;
+            }
         }
         return fallback;
     }
@@ -560,7 +584,9 @@ public final class ProofManagementDialog extends JDialog {
                     boolean cached = false;
                     for (Contract contract : contracts) {
                         // Skip auxiliary contracts (like block/loop contracts).
-                        if (contract.isAuxiliary()) { continue; }
+                        if (contract.isAuxiliary()) {
+                            continue;
+                        }
                         final Proof proof = findPreferablyClosedProof(contract);
                         if (proof == null) {
                             allClosed = false;
@@ -569,8 +595,12 @@ public final class ProofManagementDialog extends JDialog {
                             ProofStatus status = proof.mgt().getStatus();
                             if (status.getProofOpen()) {
                                 allClosed = false;
-                            } else if (status.getProofClosedButLemmasLeft()) { lemmasLeft = true; }
-                            if (status.getProofClosedByCache()) { cached = true; }
+                            } else if (status.getProofClosedButLemmasLeft()) {
+                                lemmasLeft = true;
+                            }
+                            if (status.getProofClosedByCache()) {
+                                cached = true;
+                            }
                         }
                     }
                     targetIcons.put(new Pair<>(kjt, target),
@@ -587,7 +617,9 @@ public final class ProofManagementDialog extends JDialog {
 
         // proof list
         DefaultListModel<ProofWrapper> model = new DefaultListModel<>();
-        for (Proof p : specRepos.getAllProofs()) { model.add(0, new ProofWrapper(p)); }
+        for (Proof p : specRepos.getAllProofs()) {
+            model.add(0, new ProofWrapper(p));
+        }
         boolean changed;
         if (model.size() != proofList.getModel().getSize()) {
             changed = true;

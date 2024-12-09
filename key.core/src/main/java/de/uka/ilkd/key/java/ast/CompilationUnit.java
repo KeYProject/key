@@ -119,9 +119,15 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (packageSpec != null) { result++; }
-        if (imports != null) { result += imports.size(); }
-        if (typeDeclarations != null) { result += typeDeclarations.size(); }
+        if (packageSpec != null) {
+            result++;
+        }
+        if (imports != null) {
+            result += imports.size();
+        }
+        if (typeDeclarations != null) {
+            result += typeDeclarations.size();
+        }
         return result;
     }
 
@@ -138,15 +144,21 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public ProgramElement getChildAt(int index) {
         int len;
         if (packageSpec != null) {
-            if (index == 0) { return packageSpec; }
+            if (index == 0) {
+                return packageSpec;
+            }
             index--;
         }
         if (imports != null) {
             len = imports.size();
-            if (len > index) { return imports.get(index); }
+            if (len > index) {
+                return imports.get(index);
+            }
             index -= len;
         }
-        if (typeDeclarations != null) { return typeDeclarations.get(index); }
+        if (typeDeclarations != null) {
+            return typeDeclarations.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -194,7 +206,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      */
 
     public TypeDeclaration getTypeDeclarationAt(int index) {
-        if (typeDeclarations != null) { return typeDeclarations.get(index); }
+        if (typeDeclarations != null) {
+            return typeDeclarations.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -226,7 +240,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
                     break;
                 }
             } else {
-                if (res == null) { res = t; }
+                if (res == null) {
+                    res = t;
+                }
             }
         }
         return res;

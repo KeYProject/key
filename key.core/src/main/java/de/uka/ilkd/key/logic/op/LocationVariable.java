@@ -54,7 +54,9 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof LocationVariable that)) { return false; }
+        if (!(obj instanceof LocationVariable that)) {
+            return false;
+        }
         return Objects.equals(getKeYJavaType(), that.getKeYJavaType())
                 && isStatic() == that.isStatic()
                 && isModel() == that.isModel()

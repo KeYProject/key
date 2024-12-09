@@ -46,8 +46,12 @@ public class ExactInstanceof extends TypeOperator {
 
     public int getChildCount() {
         int result = 0;
-        if (children != null) { result += children.size(); }
-        if (typeReference != null) { result++; }
+        if (children != null) {
+            result += children.size();
+        }
+        if (typeReference != null) {
+            result++;
+        }
         return result;
     }
 
@@ -69,10 +73,16 @@ public class ExactInstanceof extends TypeOperator {
         int len;
         if (children != null) {
             len = children.size();
-            if (len > index) { return children.get(index); }
+            if (len > index) {
+                return children.get(index);
+            }
             index -= len;
         }
-        if (typeReference != null) { if (index == 0) { return typeReference; } }
+        if (typeReference != null) {
+            if (index == 0) {
+                return typeReference;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

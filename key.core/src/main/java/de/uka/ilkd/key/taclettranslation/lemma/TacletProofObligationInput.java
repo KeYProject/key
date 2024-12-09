@@ -120,8 +120,12 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         // TODO MU ----- make the file names relative
         // MiscTools.makeFilenamesRelative. However ... I need the store save name ...
 
-        if (tacletFile != null) { c.set("tacletFile", tacletFile); }
-        if (definitionFile != null) { c.set("definitionFile", definitionFile); }
+        if (tacletFile != null) {
+            c.set("tacletFile", tacletFile);
+        }
+        if (definitionFile != null) {
+            c.set("definitionFile", definitionFile);
+        }
         if (axiomFiles != null) {
             for (int i = 0; i < axiomFiles.length; i++) {
                 String name = AXIOM_FILE + (i == 0 ? "" : (i + 1));
@@ -163,7 +167,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         poloader.startSynchronously();
         if (proofObligation == null) {
             throw new ProofInputException("Cannot instantiate the proof obligation for taclet '"
-                    + tacletName + "'. Is it defined (in the specified tacletFile?)",
+                + tacletName + "'. Is it defined (in the specified tacletFile?)",
                 ex);
         }
     }
@@ -175,7 +179,9 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
 
     private Collection<File> fileCollection(String[] strings) {
         ArrayList<File> result = new ArrayList<>();
-        for (String string : strings) { result.add(new File(baseDir, string)); }
+        for (String string : strings) {
+            result.add(new File(baseDir, string));
+        }
         return result;
     }
 
@@ -216,7 +222,10 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         this.axiomFiles = new String[axiomFiles.size()];
 
         int i = 0;
-        for (File file : axiomFiles) { this.axiomFiles[i] = file.toString(); i++; }
+        for (File file : axiomFiles) {
+            this.axiomFiles[i] = file.toString();
+            i++;
+        }
     }
 
     /**

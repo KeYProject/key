@@ -99,7 +99,9 @@ public abstract class AbstractPO implements IPersistablePO {
      *        the proof configuration
      */
     void generateWdTaclets(InitConfig proofConfig) {
-        if (!WellDefinednessCheck.isOn()) { return; }
+        if (!WellDefinednessCheck.isOn()) {
+            return;
+        }
         ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.nil();
         ImmutableSet<String> names = DefaultImmutableSet.nil();
         for (WellDefinednessCheck ch : specRepos.getAllWdChecks()) {
@@ -131,7 +133,9 @@ public abstract class AbstractPO implements IPersistablePO {
         }
         // WD(a.<inv>)
         res = res.union(ClassWellDefinedness.createInvTaclet(proofConfig.getServices()));
-        for (RewriteTaclet t : res) { register(t, proofConfig); }
+        for (RewriteTaclet t : res) {
+            register(t, proofConfig);
+        }
     }
 
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType selfKJT) {
@@ -152,12 +156,16 @@ public abstract class AbstractPO implements IPersistablePO {
 
     protected final void register(LocationVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
-        if (pv != null && progVarNames.lookup(pv.name()) == null) { progVarNames.addSafely(pv); }
+        if (pv != null && progVarNames.lookup(pv.name()) == null) {
+            progVarNames.addSafely(pv);
+        }
     }
 
 
     protected final void register(ImmutableList<LocationVariable> pvs, Services services) {
-        for (LocationVariable pv : pvs) { register(pv, services); }
+        for (LocationVariable pv : pvs) {
+            register(pv, services);
+        }
     }
 
 
@@ -202,10 +210,14 @@ public abstract class AbstractPO implements IPersistablePO {
      */
     protected Term generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
             ProgramVariable selfVar, Services services) {
-        if (selfVar == null || pm.isConstructor()) { return tb.tt(); }
+        if (selfVar == null || pm.isConstructor()) {
+            return tb.tt();
+        }
         Term created = null;
         for (LocationVariable heap : heaps) {
-            if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) { continue; }
+            if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
+                continue;
+            }
             final Term cr = tb.created(tb.var(heap), tb.var(selfVar));
             if (created == null) {
                 created = cr;
@@ -331,7 +343,9 @@ public abstract class AbstractPO implements IPersistablePO {
         var choices = Collections.unmodifiableSet(proofConfig.getActivatedChoices().toSet());
         for (ClassAxiom axiom : axioms) {
             final Vertex node = getVertexFor(axiom.getKJT().getSort(), axiom.getTarget(), axiom);
-            if (node.index == -1) { getSCCForNode(node, axioms, proofConfig); }
+            if (node.index == -1) {
+                getSCCForNode(node, axioms, proofConfig);
+            }
             ImmutableList<Pair<Sort, IObserverFunction>> scc = allSCCs.get(node);
             for (Taclet axiomTaclet : axiom.getTaclets(
                 DefaultImmutableSet.fromImmutableList(
@@ -339,7 +353,9 @@ public abstract class AbstractPO implements IPersistablePO {
                 proofConfig.getServices())) {
                 assert axiomTaclet != null : "class axiom returned null taclet: " + axiom.getName();
                 // only include if choices are appropriate
-                if (axiomTaclet.getChoices().eval(choices)) { register(axiomTaclet, proofConfig); }
+                if (axiomTaclet.getChoices().eval(choices)) {
+                    register(axiomTaclet, proofConfig);
+                }
             }
         }
 
@@ -376,8 +392,14 @@ public abstract class AbstractPO implements IPersistablePO {
                 final Vertex nextNode = getVertexFor(nextNodeCore, nodeAxiom);
                 if (nextNode.index == -1) {
                     getSCCForNode(nextNode, axioms, proofConfig);
-                    if (node.lowLink > nextNode.lowLink) { node.lowLink = nextNode.lowLink; }
-                } else if (nextNode.onStack) { if (node.lowLink > nextNode.index) { node.lowLink = nextNode.index; } }
+                    if (node.lowLink > nextNode.lowLink) {
+                        node.lowLink = nextNode.lowLink;
+                    }
+                } else if (nextNode.onStack) {
+                    if (node.lowLink > nextNode.index) {
+                        node.lowLink = nextNode.index;
+                    }
+                }
             }
         }
 
@@ -410,7 +432,9 @@ public abstract class AbstractPO implements IPersistablePO {
      */
     private void createProofHeader(String javaPath, String classPath, String bootClassPath,
             String includedFiles, Services services) {
-        if (header != null) { return; }
+        if (header != null) {
+            return;
+        }
         final StringBuilder sb = new StringBuilder();
 
         // bootclasspath
@@ -419,7 +443,9 @@ public abstract class AbstractPO implements IPersistablePO {
         }
 
         // classpath
-        if (classPath != null && !classPath.isEmpty()) { sb.append("\\classpath ").append(classPath).append(";\n\n"); }
+        if (classPath != null && !classPath.isEmpty()) {
+            sb.append("\\classpath ").append(classPath).append(";\n\n");
+        }
 
         // javaSource
         sb.append("\\javaSource \"").append(javaPath).append("\";\n\n");
@@ -431,10 +457,16 @@ public abstract class AbstractPO implements IPersistablePO {
 
         // contracts
         ImmutableSet<Contract> contractsToSave = specRepos.getAllContracts();
-        for (Contract c : contractsToSave) { if (!c.toBeSaved()) { contractsToSave = contractsToSave.remove(c); } }
+        for (Contract c : contractsToSave) {
+            if (!c.toBeSaved()) {
+                contractsToSave = contractsToSave.remove(c);
+            }
+        }
         if (!contractsToSave.isEmpty()) {
             sb.append("\\contracts {\n");
-            for (Contract c : contractsToSave) { sb.append(c.proofToString(services)); }
+            for (Contract c : contractsToSave) {
+                sb.append(c.proofToString(services));
+            }
             sb.append("}\n\n");
         }
 
@@ -454,7 +486,9 @@ public abstract class AbstractPO implements IPersistablePO {
      * @return the created proof
      */
     protected Proof createProof(String proofName, Term poTerm, InitConfig proofConfig) {
-        if (proofConfig == null) { proofConfig = environmentConfig.deepCopy(); }
+        if (proofConfig == null) {
+            proofConfig = environmentConfig.deepCopy();
+        }
         final JavaModel javaModel = proofConfig.getServices().getJavaModel();
         createProofHeader(javaModel.getModelDir().toString(), javaModel.getClassPath(),
             javaModel.getBootClassPath().toString(), javaModel.getIncludedFiles(),
@@ -477,16 +511,24 @@ public abstract class AbstractPO implements IPersistablePO {
 
     @Override
     public final ProofAggregate getPO() {
-        if (proofAggregate != null) { return proofAggregate; }
+        if (proofAggregate != null) {
+            return proofAggregate;
+        }
 
-        if (poTerms == null) { throw new IllegalStateException("No proof obligation terms."); }
+        if (poTerms == null) {
+            throw new IllegalStateException("No proof obligation terms.");
+        }
 
         Proof[] proofs = new Proof[poTerms.length];
         InitConfig ic = getCreatedInitConfigForSingleProof();
         for (int i = 0; i < proofs.length; i++) {
-            if (i > 0) { ic = ic.deepCopy(); }
+            if (i > 0) {
+                ic = ic.deepCopy();
+            }
             proofs[i] = createProof(poNames != null ? poNames[i] : name, poTerms[i], ic);
-            if (taclets != null) { proofs[i].getOpenGoal(proofs[i].root()).indexOfTaclets().addTaclets(taclets); }
+            if (taclets != null) {
+                proofs[i].getOpenGoal(proofs[i].root()).indexOfTaclets().addTaclets(taclets);
+            }
         }
 
         proofAggregate = ProofAggregate.createProofAggregate(proofs, name);

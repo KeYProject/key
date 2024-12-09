@@ -54,8 +54,12 @@ public class FieldReference extends VariableReference
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null) { result++; }
-        if (variable != null) { result++; }
+        if (prefix != null) {
+            result++;
+        }
+        if (variable != null) {
+            result++;
+        }
         return result;
     }
 
@@ -70,10 +74,16 @@ public class FieldReference extends VariableReference
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0) { return prefix; }
+            if (index == 0) {
+                return prefix;
+            }
             index--;
         }
-        if (variable != null) { if (index == 0) { return variable; } }
+        if (variable != null) {
+            if (index == 0) {
+                return variable;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -127,7 +137,9 @@ public class FieldReference extends VariableReference
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (prefix instanceof TypeReference && index == 0) { return (TypeReference) prefix; }
+        if (prefix instanceof TypeReference && index == 0) {
+            return (TypeReference) prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -150,7 +162,9 @@ public class FieldReference extends VariableReference
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (prefix instanceof Expression && index == 0) { return (Expression) prefix; }
+        if (prefix instanceof Expression && index == 0) {
+            return (Expression) prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

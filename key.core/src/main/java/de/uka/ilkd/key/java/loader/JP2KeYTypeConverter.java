@@ -130,12 +130,16 @@ public class JP2KeYTypeConverter {
     @NonNull
     public KeYJavaType getKeYJavaType(ResolvedType type) {
         // change from 2012-02-07: there must be a definite KJT
-        if (type == null) { throw new NullPointerException("null cannot be converted into a KJT"); }
+        if (type == null) {
+            throw new NullPointerException("null cannot be converted into a KJT");
+        }
 
         {
             // lookup in the cache
             var kjt = jp2KeY.resolvedTypeToKeY(type);
-            if (kjt != null) { return kjt; }
+            if (kjt != null) {
+                return kjt;
+            }
         }
 
         // create a new KeYJavaType
@@ -168,14 +172,20 @@ public class JP2KeYTypeConverter {
         var primitiveType = PrimitiveType.getPrimitiveType(type.describe());
         var result = getTypeConverter().getKeYJavaType(primitiveType);
         var sort = result.getSort();
-        if (sort == null) { throw new RuntimeException("Cannot assign " + description + " a primitive sort."); }
+        if (sort == null) {
+            throw new RuntimeException("Cannot assign " + description + " a primitive sort.");
+        }
         storeInCache(type, result);
     }
 
     private void addNullType(ResolvedType type) {
         var sort = getSortsNamespace().lookup(NullSort.NAME);
-        if (sort == null) { sort = new NullSort(getObjectType().getSort()); }
-        if (getSortsNamespace().lookup(sort.name()) == null) { getSortsNamespace().add(sort); }
+        if (sort == null) {
+            sort = new NullSort(getObjectType().getSort());
+        }
+        if (getSortsNamespace().lookup(sort.name()) == null) {
+            getSortsNamespace().add(sort);
+        }
         storeInCache(type, new KeYJavaType(NullType.JAVA_NULL, sort));
     }
 
@@ -191,7 +201,9 @@ public class JP2KeYTypeConverter {
         var arraySort = ArraySort.getArraySort(kjt.getSort(), elemType, getObjectType().getSort(),
             getCloneableType().getSort(), getSerializableType().getSort());
         var result = new KeYJavaType(arraySort);
-        if (getSortsNamespace().lookup(arraySort.name()) == null) { getSortsNamespace().add(arraySort); }
+        if (getSortsNamespace().lookup(arraySort.name()) == null) {
+            getSortsNamespace().add(arraySort);
+        }
 
         storeInCache(type, result);
 
@@ -234,7 +246,9 @@ public class JP2KeYTypeConverter {
             }
         }
 
-        if (getSortsNamespace().lookup(sort.name()) == null) { getSortsNamespace().add(sort); }
+        if (getSortsNamespace().lookup(sort.name()) == null) {
+            getSortsNamespace().add(sort);
+        }
         // Important: javaType is null until being set by visiting the class/interface/enum
         // declaration!
         storeInCache(type, new KeYJavaType(sort));
@@ -258,9 +272,13 @@ public class JP2KeYTypeConverter {
      */
     private ImmutableSet<Sort> directSuperSorts(ResolvedReferenceTypeDeclaration classType) {
         ImmutableSet<Sort> ss = DefaultImmutableSet.nil();
-        for (var s : classType.getAncestors()) { ss = ss.add(getKeYJavaType(s).getSort()); }
+        for (var s : classType.getAncestors()) {
+            ss = ss.add(getKeYJavaType(s).getSort());
+        }
 
-        if (ss.isEmpty() && !classType.isJavaLangObject()) { ss = ss.add(getObjectType().getSort()); }
+        if (ss.isEmpty() && !classType.isJavaLangObject()) {
+            ss = ss.add(getObjectType().getSort());
+        }
         return ss;
     }
 
@@ -380,7 +398,9 @@ public class JP2KeYTypeConverter {
 
         ProgramVariable length = len;// find("length", fields);
 
-        if (arrayMethodBuilder == null) { initArrayMethodBuilder(); }
+        if (arrayMethodBuilder == null) {
+            initArrayMethodBuilder();
+        }
 
         final IProgramMethod prepare =
             arrayMethodBuilder.getPrepareArrayMethod(parentReference, length, defaultValue, fields);
@@ -402,7 +422,9 @@ public class JP2KeYTypeConverter {
     private ImmutableList<Field> filterField(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableSLList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
-        for (int i = spec.size() - 1; i >= 0; i--) { result = result.prepend(spec.get(i)); }
+        for (int i = spec.size() - 1; i >= 0; i--) {
+            result = result.prepend(spec.get(i));
+        }
         return result;
     }
 
@@ -419,7 +441,9 @@ public class JP2KeYTypeConverter {
         ImmutableList<Field> result = ImmutableSLList.nil();
         for (Object aList : list) {
             Object pe = aList;
-            if (pe instanceof FieldDeclaration) { result = result.prepend(filterField((FieldDeclaration) pe)); }
+            if (pe instanceof FieldDeclaration) {
+                result = result.prepend(filterField((FieldDeclaration) pe));
+            }
         }
         return result;
     }

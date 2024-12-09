@@ -116,8 +116,10 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
                 boolean b = td.getMembers().stream()
                         .anyMatch(BodyDeclaration::isClassOrInterfaceDeclaration);
 
-                if (b) { LOGGER.debug(
-                    "Inner Class detected. Reject building class initialisation methods."); }
+                if (b) {
+                    LOGGER.debug(
+                        "Inner Class detected. Reject building class initialisation methods.");
+                }
 
                 // collect initializers for transformation phase
                 class2staticFields.put(td, prepareFields(td));
@@ -142,7 +144,9 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
             new VoidType(), // return type is void
             CLASS_PREPARE_IDENTIFIER);
         final var statements = class2staticFields.get(td);
-        if (statements != null) { method.setBody(new BlockStmt(statements)); }
+        if (statements != null) {
+            method.setBody(new BlockStmt(statements));
+        }
         return method;
     }
 

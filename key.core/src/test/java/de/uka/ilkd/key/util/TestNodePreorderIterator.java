@@ -160,7 +160,9 @@ public class TestNodePreorderIterator {
                 assertEquals(computeChildIndexOnParent(next), childIndexOnParent);
                 Assertions.assertNotNull(next);
                 assertEquals(node.getExpectedSerialNr(), next.serialNr());
-                if (iterateOverSubtree) { assertRoot(next, new ExpectedNode[] { node }); }
+                if (iterateOverSubtree) {
+                    assertRoot(next, new ExpectedNode[] { node });
+                }
                 previousChildrenDepth = assertExpectedNodes(iter, node.getExpectedChildren(), true,
                     expectedParentReturns + 1);
             }
@@ -242,7 +244,7 @@ public class TestNodePreorderIterator {
         @Override
         public String toString() {
             return expectedSerialNr + " with "
-                    + (expectedChildren != null ? expectedChildren.length : 0) + " children";
+                + (expectedChildren != null ? expectedChildren.length : 0) + " children";
         }
     }
 
@@ -258,7 +260,9 @@ public class TestNodePreorderIterator {
     protected ExpectedNode[] createExpectedNodes(int[] serialNrs, ExpectedNode[]... children) {
         assertEquals(serialNrs.length, children.length);
         List<ExpectedNode> result = new LinkedList<>();
-        for (int i = 0; i < serialNrs.length; i++) { result.add(new ExpectedNode(serialNrs[i], children[i])); }
+        for (int i = 0; i < serialNrs.length; i++) {
+            result.add(new ExpectedNode(serialNrs[i], children[i]));
+        }
         return result.toArray(new ExpectedNode[0]);
     }
 
@@ -271,7 +275,9 @@ public class TestNodePreorderIterator {
      */
     protected ExpectedNode[] createExpectedNodes(int... serialNrs) {
         List<ExpectedNode> result = new LinkedList<>();
-        for (int serialNr : serialNrs) { result.add(new ExpectedNode(serialNr)); }
+        for (int serialNr : serialNrs) {
+            result.add(new ExpectedNode(serialNr));
+        }
         return result.toArray(new ExpectedNode[0]);
     }
 

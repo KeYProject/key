@@ -46,7 +46,9 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
             MatchConditions matchCond, Services services) {
 
-        if (var != exprOrTypeSV) { return matchCond; }
+        if (var != exprOrTypeSV) {
+            return matchCond;
+        }
 
         final SVInstantiations inst = matchCond.getInstantiations();
 
@@ -54,12 +56,16 @@ public final class FieldTypeToSortCondition implements VariableCondition {
             Operator op = ((Term) svSubst).op();
             if (op instanceof JFunction) {
                 HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
-                if (split == null) { return null; }
+                if (split == null) {
+                    return null;
+                }
 
                 ProgramVariable attribute =
                     services.getJavaInfo().getAttribute(split.attributeName(), split.className());
 
-                if (attribute == null) { return null; }
+                if (attribute == null) {
+                    return null;
+                }
 
                 Sort targetSort = attribute.getKeYJavaType().getSort();
 

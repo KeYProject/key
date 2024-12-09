@@ -40,7 +40,7 @@ public class TestCvc4 extends TestSMTSolver {
                 if (!getSolverType().checkForSupport()) {
                     LOGGER.warn(
                         "Warning: The version of the solver {}"
-                                + " used for the following tests may not be supported.",
+                            + " used for the following tests may not be supported.",
                         getSolverType().getName());
                 }
             }
@@ -52,7 +52,9 @@ public class TestCvc4 extends TestSMTSolver {
     public SolverType getSolverType() {
         SolverType type = CVC4_SOLVER;
         String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
-        if (solverPathProperty != null && !solverPathProperty.isEmpty()) { type.setSolverCommand(solverPathProperty); }
+        if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
+            type.setSolverCommand(solverPathProperty);
+        }
         return type;
     }
 }

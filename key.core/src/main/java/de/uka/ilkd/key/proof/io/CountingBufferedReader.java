@@ -45,34 +45,44 @@ public class CountingBufferedReader extends BufferedReader {
 
     private void incCharCounter(long inc) {
         chars += inc;
-        if (monitor != null && chars % step == 0) { monitor.setProgress((int) chars); }
+        if (monitor != null && chars % step == 0) {
+            monitor.setProgress((int) chars);
+        }
     }
 
     @Override
     public int read() throws IOException {
         final int readChar = super.read();
-        if (readChar != -1) { incCharCounter(1); }
+        if (readChar != -1) {
+            incCharCounter(1);
+        }
         return readChar;
     }
 
     @Override
     public int read(char[] cbuf, int off, int len) throws IOException {
         final int readChars = super.read(cbuf, off, len);
-        if (readChars > 0) { incCharCounter(readChars); }
+        if (readChars > 0) {
+            incCharCounter(readChars);
+        }
         return readChars;
     }
 
     @Override
     public String readLine() throws IOException {
         final String line = super.readLine();
-        if (line != null) { incCharCounter(line.length()); }
+        if (line != null) {
+            incCharCounter(line.length());
+        }
         return line;
     }
 
     @Override
     public long skip(long n) throws IOException {
         final long skippedChars = super.skip(n);
-        if (skippedChars > 0) { incCharCounter(skippedChars); }
+        if (skippedChars > 0) {
+            incCharCounter(skippedChars);
+        }
         return skippedChars;
     }
 }

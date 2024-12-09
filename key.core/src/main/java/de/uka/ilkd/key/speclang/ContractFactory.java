@@ -16,9 +16,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
+import de.uka.ilkd.key.speclang.njml.TranslatedDependencyContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -209,22 +209,24 @@ public class ContractFactory {
     }
 
     public DependencyContract dep(KeYJavaType kjt, LocationVariable targetHeap,
-            Triple<IObserverFunction, Term, Term> dep, LocationVariable selfVar) {
-        final ImmutableList<LocationVariable> paramVars = tb.paramVars(dep.first, false);
-        assert (selfVar == null) == dep.first.isStatic();
+            TranslatedDependencyContract dep, LocationVariable selfVar) {
+        final ImmutableList<LocationVariable> paramVars =
+            tb.paramVars(dep.observerFunction(), false);
+        assert (selfVar == null) == dep.observerFunction().isStatic();
         Map<LocationVariable, Term> pres = new LinkedHashMap<>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
             selfVar == null ? tb.tt() : tb.inv(tb.var(selfVar)));
         Map<LocationVariable, Term> accessibles = new LinkedHashMap<>();
         for (final LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             if (heap == targetHeap) {
-                accessibles.put(heap, dep.second);
+                accessibles.put(heap, dep.rhs());
             } else {
                 accessibles.put(heap, tb.allLocs());
             }
         }
         // TODO: insert static invariant??
-        return dep(kjt, dep.first, dep.first.getContainerType(), pres, dep.third, accessibles,
+        return dep(kjt, dep.observerFunction(), dep.observerFunction().getContainerType(), pres,
+            dep.mby(), accessibles,
             selfVar, paramVars, null, null);
     }
 
@@ -490,10 +492,12 @@ public class ContractFactory {
             // I know that this is extremely ugly, but I don't know how to combine other kinds
             // of modalities.
             if (kind == Modality.JavaModalityKind.BOX) {
-                assert otherKind == Modality.JavaModalityKind.DIA : "unknown modality " + otherKind + " in contract";
+                assert otherKind == Modality.JavaModalityKind.DIA
+                        : "unknown modality " + otherKind + " in contract";
                 // do nothing
             } else {
-                assert kind == Modality.JavaModalityKind.DIA : "unknown modality " + kind + " in contract";
+                assert kind == Modality.JavaModalityKind.DIA
+                        : "unknown modality " + kind + " in contract";
                 kind = Modality.JavaModalityKind.BOX;
             }
         }
@@ -590,7 +594,9 @@ public class ContractFactory {
                         }
                     }
                     // if uniformModifiable has no origin, use other origin
-                    if (uol == null) { newLabels.add(ol); }
+                    if (uol == null) {
+                        newLabels.add(ol);
+                    }
                 } else {
                     // copy all non-origin labels
                     newLabels.add(ol);
@@ -712,7 +718,9 @@ public class ContractFactory {
                     other, h, otherPre,
                     services);
 
-                if (otherPre != null) { pres.put(h, pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre)); }
+                if (otherPre != null) {
+                    pres.put(h, pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
+                }
                 if (otherPost != null) {
                     final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
                     posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
@@ -738,8 +746,12 @@ public class ContractFactory {
          * Daniel Grahl for MT-1557.)
          */
         for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            if (uniformModifiable.containsKey(h)) { modifiables.put(h, uniformModifiable.get(h)); }
-            if (uniformFreeModifiable.containsKey(h)) { freeModifiables.put(h, uniformFreeModifiable.get(h)); }
+            if (uniformModifiable.containsKey(h)) {
+                modifiables.put(h, uniformModifiable.get(h));
+            }
+            if (uniformFreeModifiable.containsKey(h)) {
+                freeModifiables.put(h, uniformFreeModifiable.get(h));
+            }
         }
 
         /*
@@ -785,7 +797,9 @@ public class ContractFactory {
 
         // collect information
         Map<LocationVariable, Term> pres = new LinkedHashMap<>(t.originalPres.size());
-        for (LocationVariable h : t.originalPres.keySet()) { pres.put(h, t.originalPres.get(h)); }
+        for (LocationVariable h : t.originalPres.keySet()) {
+            pres.put(h, t.originalPres.get(h));
+        }
         Term mby = t.originalMby;
         Map<LocationVariable, Boolean> hasModifiable = new LinkedHashMap<>();
         Map<LocationVariable, Boolean> hasFreeModifiable = new LinkedHashMap<>();
@@ -853,7 +867,9 @@ public class ContractFactory {
         }
         final String name = nameSB.toString();
 
-        for (FunctionalOperationContract contract : others) { assert contract.getTarget().equals(t.pm); }
+        for (FunctionalOperationContract contract : others) {
+            assert contract.getTarget().equals(t.pm);
+        }
         return union(name, t, others);
     }
 
@@ -867,9 +883,14 @@ public class ContractFactory {
      * @return the union contract
      */
     public FunctionalOperationContract union(FunctionalOperationContract... contracts) {
-        if (contracts.length == 0) { return null; }
-        if (contracts.length == 1) { return contracts[0]; }
-        assert contracts[0] instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
+        if (contracts.length == 0) {
+            return null;
+        }
+        if (contracts.length == 1) {
+            return contracts[0];
+        }
+        assert contracts[0] instanceof FunctionalOperationContractImpl
+                : UNKNOWN_CONTRACT_IMPLEMENTATION;
 
         FunctionalOperationContractImpl t = (FunctionalOperationContractImpl) contracts[0];
         FunctionalOperationContract[] others = Arrays.copyOfRange(contracts, 1, contracts.length);
@@ -880,13 +901,17 @@ public class ContractFactory {
     // PRIVATE METHODS
 
     private static <T> void addToMap(T var, T originalVar, Map<T, T> map) {
-        if (var != null) { map.put(var, originalVar); }
+        if (var != null) {
+            map.put(var, originalVar);
+        }
     }
 
     private Term atPreify(Term t, Map<LocationVariable, LocationVariable> atPreVars) {
         final Map<Term, Term> map = new LinkedHashMap<>(atPreVars.size());
         for (LocationVariable h : atPreVars.keySet()) {
-            if (atPreVars.get(h) != null) { map.put(tb.var(h), tb.var(atPreVars.get(h))); }
+            if (atPreVars.get(h) != null) {
+                map.put(tb.var(h), tb.var(atPreVars.get(h)));
+            }
         }
         return new OpReplacer(map, services.getTermFactory(), services.getProof()).replace(t);
     }
@@ -921,7 +946,10 @@ public class ContractFactory {
         if (paramVars != null) {
             Iterator<LocationVariable> it1 = paramVars.iterator();
             Iterator<LocationVariable> it2 = originalParamVars.iterator();
-            while (it1.hasNext()) { assert it2.hasNext(); map.put(it1.next(), it2.next()); }
+            while (it1.hasNext()) {
+                assert it2.hasNext();
+                map.put(it1.next(), it2.next());
+            }
         }
         OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         original = or.replace(original);
@@ -950,15 +978,17 @@ public class ContractFactory {
         final int startIndexShortName = methodName.indexOf("::") + 2;
         final String methodShortName = methodName.substring(startIndexShortName);
         return forClass.getJavaType().getFullName() + "[" + specifiedIn.getJavaType().getFullName()
-                + "::" + methodShortName + "(" + concatenate(",", target.getParamTypes()) + ")" + "]"
-                + "." + baseName;
+            + "::" + methodShortName + "(" + concatenate(",", target.getParamTypes()) + ")" + "]"
+            + "." + baseName;
     }
 
     private static String concatenate(String delim, ImmutableArray<KeYJavaType> elems) {
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < elems.size(); i++) {
             b.append(elems.get(i).getFullName());
-            if (i + 1 < elems.size()) { b.append(delim); }
+            if (i + 1 < elems.size()) {
+                b.append(delim);
+            }
         }
         return b.toString();
     }

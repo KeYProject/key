@@ -88,7 +88,9 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      */
     @Override
     public String getSignature() throws ProofInputException {
-        if (signature == null) { signature = lazyComputeSignature(); }
+        if (signature == null) {
+            signature = lazyComputeSignature();
+        }
         return signature;
     }
 
@@ -106,7 +108,9 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      */
     @Override
     public Term getMethodReturnCondition() throws ProofInputException {
-        if (methodReturnCondition == null) { lazyComputeMethodReturnCondition(); }
+        if (methodReturnCondition == null) {
+            lazyComputeMethodReturnCondition();
+        }
         return methodReturnCondition;
     }
 
@@ -115,7 +119,9 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      */
     @Override
     public String getFormattedMethodReturnCondition() throws ProofInputException {
-        if (methodReturnCondition == null) { lazyComputeMethodReturnCondition(); }
+        if (methodReturnCondition == null) {
+            lazyComputeMethodReturnCondition();
+        }
         return formattedMethodReturnCondition;
     }
 
@@ -159,7 +165,9 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
     @Override
     public IExecutionVariable[] getCallStateVariables() throws ProofInputException {
         synchronized (this) {
-            if (callStateVariables == null) { callStateVariables = lazyComputeCallStateVariables(); }
+            if (callStateVariables == null) {
+                callStateVariables = lazyComputeCallStateVariables();
+            }
             return callStateVariables;
         }
     }

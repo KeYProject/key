@@ -64,7 +64,11 @@ public class EngineState {
     }
 
     protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
-        for (Goal goal : openGoals) { if (goal.node() == node) { return goal; } }
+        for (Goal goal : openGoals) {
+            if (goal.node() == node) {
+                return goal;
+            }
+        }
         return null;
     }
 
@@ -91,7 +95,9 @@ public class EngineState {
      */
     @SuppressWarnings("unused")
     public @NonNull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
-        if (proof.closed()) { throw new ProofAlreadyClosedException("The proof is closed already"); }
+        if (proof.closed()) {
+            throw new ProofAlreadyClosedException("The proof is closed already");
+        }
 
         Node rootNodeForSearch = proof.root();
         Goal newGoal = goal;
@@ -105,10 +111,14 @@ public class EngineState {
             newGoal = null;
         }
 
-        if (newGoal != null) { return newGoal; }
+        if (newGoal != null) {
+            return newGoal;
+        }
 
         newGoal = findGoalFromRoot(rootNodeForSearch, checkAutomatic);
-        if (newGoal == null) { throw new ScriptException("There must be an open goal at this point"); }
+        if (newGoal == null) {
+            throw new ScriptException("There must be an open goal at this point");
+        }
 
         lastSetGoalNode = newGoal.node();
 
@@ -146,7 +156,9 @@ public class EngineState {
         Node node = rootNode;
 
         loop: while (node != null) {
-            if (node.isClosed()) { return null; }
+            if (node.isClosed()) {
+                return null;
+            }
 
             int childCount = node.childrenCount();
 
@@ -217,7 +229,9 @@ public class EngineState {
     }
 
     public void setMaxAutomaticSteps(int steps) {
-        if (proof != null) { proof.getSettings().getStrategySettings().setMaxSteps(steps); }
+        if (proof != null) {
+            proof.getSettings().getStrategySettings().setMaxSteps(steps);
+        }
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
 

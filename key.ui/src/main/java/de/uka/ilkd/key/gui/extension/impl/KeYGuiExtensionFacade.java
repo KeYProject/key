@@ -76,7 +76,9 @@ public final class KeYGuiExtensionFacade {
         JMenu menu = new JMenu("Extensions");
         getMainMenuActions(mainWindow).forEach(it -> sortActionIntoMenu(it, menuBar, menu));
 
-        if (menu.getMenuComponents().length > 0) { menuBar.add(menu); }
+        if (menu.getMenuComponents().length > 0) {
+            menuBar.add(menu);
+        }
 
     }
 
@@ -139,7 +141,9 @@ public final class KeYGuiExtensionFacade {
             String cur = mpath.next();
             for (int i = 0; i < menuBar.getMenuCount(); i++) {
                 JMenu menu = menuBar.getMenu(i);
-                if (Objects.equals(menu.getText(), cur)) { return findMenu(menu, mpath); }
+                if (Objects.equals(menu.getText(), cur)) {
+                    return findMenu(menu, mpath);
+                }
             }
             JMenu menu = new JMenu(cur);
             menu.setName(cur);
@@ -257,7 +261,9 @@ public final class KeYGuiExtensionFacade {
 
     public static List<Action> getContextMenuItems(ContextMenuKind kind, Object underlyingObject,
             KeYMediator mediator) {
-        if (!kind.getType().isAssignableFrom(underlyingObject.getClass())) { throw new IllegalArgumentException(); }
+        if (!kind.getType().isAssignableFrom(underlyingObject.getClass())) {
+            throw new IllegalArgumentException();
+        }
 
         return getContextMenuExtensions().stream()
                 .flatMap(it -> it.getContextActions(mediator, kind, underlyingObject).stream())
@@ -306,14 +312,18 @@ public final class KeYGuiExtensionFacade {
      * @return
      */
     private static <T> boolean isNotForbidden(Class<T> a) {
-        if (forbiddenPlugins.contains(a.getName())) { return false; }
+        if (forbiddenPlugins.contains(a.getName())) {
+            return false;
+        }
         String sys = System.getProperty(a.getName());
         return sys == null || !sys.equalsIgnoreCase("false");
     }
     // endregion
 
     public static List<Extension<?>> getExtensions() {
-        if (extensions.isEmpty()) { loadExtensions(); }
+        if (extensions.isEmpty()) {
+            loadExtensions();
+        }
         return extensions;
     }
 
@@ -438,7 +448,9 @@ public final class KeYGuiExtensionFacade {
         }
 
         private int getPriority(Action action) {
-            if (action.getValue(KeyAction.PRIORITY) != null) { return (int) action.getValue(KeyAction.PRIORITY); }
+            if (action.getValue(KeyAction.PRIORITY) != null) {
+                return (int) action.getValue(KeyAction.PRIORITY);
+            }
             return 0;
         }
     }

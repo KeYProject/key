@@ -175,7 +175,9 @@ public class KeYJPMapping {
             int end = dot == -1 ? name.length() : dot;
             packageNames.add(name.substring(0, end));
             onePastLastDot = dot + 1;
-            if (dot == -1) { break; }
+            if (dot == -1) {
+                break;
+            }
         }
     }
 

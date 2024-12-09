@@ -53,7 +53,9 @@ public class TypeHierarchy {
                 addSort(sort);
                 sortList.add(sort);
 
-                if (sort.name().toString().endsWith("[]")) { arraySortList.add(sort); }
+                if (sort.name().toString().endsWith("[]")) {
+                    arraySortList.add(sort);
+                }
             }
         }
 
@@ -65,7 +67,9 @@ public class TypeHierarchy {
             for (Sort p : s.extendsSorts(services)) {
                 // get parent node
                 SortNode pn = sortMap.get(p);
-                if (pn == null) { continue; }
+                if (pn == null) {
+                    continue;
+                }
                 n.addParent(pn);
                 pn.addChild(n);
             }
@@ -100,7 +104,9 @@ public class TypeHierarchy {
      */
     public Set<SortNode> getChildren(Sort s) {
 
-        if (sortMap.get(s) == null) { return new HashSet<>(); }
+        if (sortMap.get(s) == null) {
+            return new HashSet<>();
+        }
         return sortMap.get(s).getChildren();
     }
 
@@ -140,7 +146,9 @@ public class TypeHierarchy {
 
         }
         // remove the found interface sorts from the map
-        for (Sort sort : interfaceSorts) { sortMap.remove(sort); }
+        for (Sort sort : interfaceSorts) {
+            sortMap.remove(sort);
+        }
         /*
          * Some sorts may end up with two parents, one of which is java.lang.Object. In those cases
          * we remove java.lang.Object as parent.
@@ -155,7 +163,9 @@ public class TypeHierarchy {
                         toRemove.add(p);
                     }
                 }
-                for (SortNode p : toRemove) { node.removeParent(p); }
+                for (SortNode p : toRemove) {
+                    node.removeParent(p);
+                }
 
             }
         }
@@ -177,9 +187,19 @@ public class TypeHierarchy {
 
 
         // add children as children of parent
-        for (SortNode p : parents) { p.removeChild(node); for (SortNode c : children) { p.addChild(c); } }
+        for (SortNode p : parents) {
+            p.removeChild(node);
+            for (SortNode c : children) {
+                p.addChild(c);
+            }
+        }
         // add parents as parents of children
-        for (SortNode c : children) { c.removeParent(node); for (SortNode p : parents) { c.addParent(p); } }
+        for (SortNode c : children) {
+            c.removeParent(node);
+            for (SortNode p : parents) {
+                c.addParent(p);
+            }
+        }
     }
 
 

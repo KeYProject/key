@@ -99,11 +99,15 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
             // This seems to make cause the find one to be painted
             // over the if one.
 
-            if (app.posInOccurrence() != null) { highlightPos(app.posInOccurrence(), RULEAPP_HIGHLIGHTER); }
+            if (app.posInOccurrence() != null) {
+                highlightPos(app.posInOccurrence(), RULEAPP_HIGHLIGHTER);
+            }
 
             if (app instanceof TacletApp) {
                 highlightIfFormulas((TacletApp) app);
-            } else if (app instanceof IBuiltInRuleApp) { highlightIfInsts((IBuiltInRuleApp) app); }
+            } else if (app instanceof IBuiltInRuleApp) {
+                highlightIfInsts((IBuiltInRuleApp) app);
+            }
 
         } catch (BadLocationException badLocation) {
             LOGGER.warn("NonGoalInfoView tried to highlight an area that does not exist.",
@@ -118,9 +122,13 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
      */
     private void highlightIfFormulas(TacletApp tapp) throws BadLocationException {
         final ImmutableList<IfFormulaInstantiation> ifs = tapp.ifFormulaInstantiations();
-        if (ifs == null) { return; }
+        if (ifs == null) {
+            return;
+        }
         for (final IfFormulaInstantiation inst2 : ifs) {
-            if (!(inst2 instanceof IfFormulaInstSeq inst)) { continue; }
+            if (!(inst2 instanceof IfFormulaInstSeq inst)) {
+                continue;
+            }
             final PosInOccurrence pos = new PosInOccurrence(inst.getConstrainedFormula(),
                 PosInTerm.getTopLevel(), inst.inAntec());
             highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
@@ -141,7 +149,9 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
                 highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
             }
         } else {
-            for (PosInOccurrence pio : ifs) { highlightPos(pio, IF_FORMULA_HIGHLIGHTER); }
+            for (PosInOccurrence pio : ifs) {
+                highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
+            }
         }
     }
 
@@ -172,7 +182,9 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
                 try {
                     ImmutableList<Integer> pathTop =
                         posTable.pathForPosition(pos.topLevel(), getFilter());
-                    if (pathTop == null) { return; }
+                    if (pathTop == null) {
+                        return;
+                    }
                     Range rFormula = posTable.rangeForPath(pathTop);
                     Rectangle2D rect = modelToView2D(rFormula.start() + 1);
                     Rectangle2D rectTerm = modelToView2D(r.start() + 1);
@@ -206,7 +218,9 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     @Override
     public String getTitle() {
         // If a leaf becomes an inner node, it is already closed.
-        if (node != null && node.leaf()) { return "Closed Goal"; }
+        if (node != null && node.leaf()) {
+            return "Closed Goal";
+        }
         return "Inner Node";
     }
 
@@ -220,7 +234,9 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         updateSequent(node);
         posTable = getInitialPositionTable();
 
-        if (ruleApp != null) { highlightRuleAppPosition(ruleApp); }
+        if (ruleApp != null) {
+            highlightRuleAppPosition(ruleApp);
+        }
 
         updateHidingProperty();
         updateHeatMapHighlights();

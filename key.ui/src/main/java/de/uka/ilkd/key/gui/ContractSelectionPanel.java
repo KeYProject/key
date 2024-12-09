@@ -79,7 +79,9 @@ public class ContractSelectionPanel extends JPanel {
                 .setSelectionMode(multipleSelection ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
                         : ListSelectionModel.SINGLE_SELECTION);
         contractList.addListSelectionListener(e -> {
-            if (contractList.isSelectionEmpty()) { contractList.setSelectedIndex(e.getFirstIndex()); }
+            if (contractList.isSelectionEmpty()) {
+                contractList.setSelectedIndex(e.getFirstIndex());
+            }
         });
         final Services serv = services;
         contractList.setCellRenderer(new DefaultListCellRenderer() {
@@ -101,24 +103,34 @@ public class ContractSelectionPanel extends JPanel {
                 Set<Contract> consideredContracts = new HashSet<>();
 
                 for (Contract c : contracts) {
-                    if (c.isAuxiliary()) { continue; }
+                    if (c.isAuxiliary()) {
+                        continue;
+                    }
 
                     consideredContracts.add(c);
                     Proof p = getClosedProof(c);
 
-                    if (p != null) { for (Contract used : p.mgt().getUsedContracts()) { appliedContracts.add(used); } }
+                    if (p != null) {
+                        for (Contract used : p.mgt().getUsedContracts()) {
+                            appliedContracts.add(used);
+                        }
+                    }
                 }
 
                 final int iterations = contracts.length - consideredContracts.size();
                 for (int i = 0; i < iterations; ++i) {
                     for (Contract c : contracts) {
-                        if (consideredContracts.contains(c) || !appliedContracts.contains(c)) { continue; }
+                        if (consideredContracts.contains(c) || !appliedContracts.contains(c)) {
+                            continue;
+                        }
 
                         consideredContracts.add(c);
                         Proof p = getClosedProof(c);
 
                         if (p != null) {
-                            for (Contract used : p.mgt().getUsedContracts()) { appliedContracts.add(used); }
+                            for (Contract used : p.mgt().getUsedContracts()) {
+                                appliedContracts.add(used);
+                            }
                         }
                     }
                 }
@@ -150,7 +162,9 @@ public class ContractSelectionPanel extends JPanel {
                     borderFont = border.getTitleFont();
                     if (borderFont == null) { // MS Windows issues
                         borderFont = result.getFont();
-                        if (borderFont == null) { borderFont = PLAINFONT; }
+                        if (borderFont == null) {
+                            borderFont = PLAINFONT;
+                        }
                     }
                 } else {
                     border = new TitledBorder(BorderFactory.createEtchedBorder(),
@@ -159,7 +173,9 @@ public class ContractSelectionPanel extends JPanel {
                     borderFont = border.getTitleFont();
                     if (borderFont == null) { // MS Windows issues
                         borderFont = result.getFont();
-                        if (borderFont == null) { borderFont = PLAINFONT; }
+                        if (borderFont == null) {
+                            borderFont = PLAINFONT;
+                        }
                     }
                 }
                 border.setTitleFont(borderFont.deriveFont(Font.BOLD));
@@ -179,7 +195,11 @@ public class ContractSelectionPanel extends JPanel {
     private Proof getClosedProof(Contract c) {
         ImmutableSet<Proof> proofs = services.getSpecificationRepository().getProofs(c);
 
-        for (Proof proof : proofs) { if (proof.mgt().getStatus().getProofClosed()) { return proof; } }
+        for (Proof proof : proofs) {
+            if (proof.mgt().getStatus().getProofClosed()) {
+                return proof;
+            }
+        }
 
         return null;
     }
@@ -228,19 +248,27 @@ public class ContractSelectionPanel extends JPanel {
                 res = o1 - o2;
             } else if (o1 != null) {
                 return -1;
-            } else if (o2 != null) { return 1; }
+            } else if (o2 != null) {
+                return 1;
+            }
 
-            if (res != 0) { return res; }
+            if (res != 0) {
+                return res;
+            }
 
             res = c1.getDisplayName().compareTo(c2.getDisplayName());
-            if (res == 0) { return c1.id() - c2.id(); }
+            if (res == 0) {
+                return c1.id() - c2.id();
+            }
             return res;
         });
 
         this.contracts = contracts;
         contractList.setListData(contracts);
         contractList.setSelectedIndex(0);
-        if (title != null) { border.setTitle(title); }
+        if (title != null) {
+            border.setTitle(title);
+        }
         updateUI();
     }
 
@@ -292,7 +320,7 @@ public class ContractSelectionPanel extends JPanel {
                 } else {
                     throw new IllegalStateException(
                         "Don't know how to combine contracts of kind " + contract.getClass() + "\n"
-                                + "Contract:\n" + contract.getPlainText(services));
+                            + "Contract:\n" + contract.getPlainText(services));
                 }
             }
             return services.getSpecificationRepository().combineOperationContracts(contracts);

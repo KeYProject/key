@@ -32,9 +32,9 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.profile.SimplifyTermProfile;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
+import de.uka.ilkd.key.symbolic_execution.rule.ResultsAndCondition;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
@@ -52,17 +52,16 @@ public final class SymbolicExecutionSideProofUtil {
     /**
      * Forbid instances.
      */
-    private SymbolicExecutionSideProofUtil() {}
+    private SymbolicExecutionSideProofUtil() {
+    }
 
     /**
      * Computes a general {@link Sequent} to prove in a side proof which contains all
      * {@link SequentFormula} of the original {@link Sequent} except the given current
      * {@link SequentFormula} and those which contains modalities and queries.
      *
-     * @param goalSequent
-     *        The original {@link Sequent} of the current {@link Goal}.
-     * @param currentSF
-     *        The {@link SequentFormula} to ignore.
+     * @param goalSequent The original {@link Sequent} of the current {@link Goal}.
+     * @param currentSF The {@link SequentFormula} to ignore.
      * @return The general initial {@link Sequent}.
      */
     public static Sequent computeGeneralSequentToProve(Sequent goalSequent,
@@ -93,27 +92,18 @@ public final class SymbolicExecutionSideProofUtil {
      * New used names are automatically added to the {@link Namespace} of the {@link Services}.
      * </p>
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param proof
-     *        The {@link Proof} from on which the side proof si performed.
-     * @param sideProofEnvironment
-     *        The given {@link ProofEnvironment} of the side proof.
-     * @param sequentToProve
-     *        The {@link Sequent} to prove in a side proof.
-     * @param label
-     *        The {@link TermLabel} which is used to compute the result.
-     * @param description
-     *        The side proof description.
-     * @param splittingOption
-     *        The splitting options to use.
-     * @param addNamesToServices
-     *        {@code true} defines that used names in result and conditions are
+     * @param services The {@link Services} to use.
+     * @param proof The {@link Proof} from on which the side proof si performed.
+     * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
+     * @param sequentToProve The {@link Sequent} to prove in a side proof.
+     * @param label The {@link TermLabel} which is used to compute the result.
+     * @param description The side proof description.
+     * @param splittingOption The splitting options to use.
+     * @param addNamesToServices {@code true} defines that used names in result and conditions are
      *        added to the namespace of the given {@link Services}, {@code false} means that names
      *        are not added.
      * @return The found result {@link Term} and the conditions.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     public static List<Pair<Term, Node>> computeResults(Services services, Proof proof,
             ProofEnvironment sideProofEnvironment, Sequent sequentToProve, TermLabel label,
@@ -166,29 +156,21 @@ public final class SymbolicExecutionSideProofUtil {
      * New used names are automatically added to the {@link Namespace} of the {@link Services}.
      * </p>
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param proof
-     *        The {@link Proof} from on which the side proof si performed.
-     * @param sideProofEnvironment
-     *        The given {@link ProofEnvironment} of the side proof.
-     * @param sequentToProve
-     *        The {@link Sequent} to prove in a side proof.
-     * @param operator
-     *        The {@link Operator} which is used to compute the result.
-     * @param description
-     *        The side proof description.
-     * @param splittingOption
-     *        The splitting options to use.
-     * @param addNamesToServices
-     *        {@code true} defines that used names in result and conditions are
+     * @param services The {@link Services} to use.
+     * @param proof The {@link Proof} from on which the side proof si performed.
+     * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
+     * @param sequentToProve The {@link Sequent} to prove in a side proof.
+     * @param operator The {@link Operator} which is used to compute the result.
+     * @param description The side proof description.
+     * @param splittingOption The splitting options to use.
+     * @param addNamesToServices {@code true} defines that used names in result and conditions are
      *        added to the namespace of the given {@link Services}, {@code false} means that names
      *        are not added.
      * @return The found result {@link Term} and the conditions.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
-    public static List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services,
+    public static List<ResultsAndCondition> computeResultsAndConditions(
+            Services services,
             Proof proof, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
             Operator operator, String description, String methodTreatment, String loopTreatment,
             String queryTreatment, String splittingOption, boolean addNamesToServices)
@@ -201,8 +183,7 @@ public final class SymbolicExecutionSideProofUtil {
             Set<Operator> relevantThingsInSequentToProve =
                 extractRelevantThings(info.getProof().getServices(), sequentToProve);
             // Extract results and conditions from side proof
-            List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
-                new LinkedList<>();
+            List<ResultsAndCondition> conditionsAndResultsMap = new LinkedList<>();
             for (Goal resultGoal : info.getProof().openGoals()) {
                 if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
                     throw new IllegalStateException("Not all applicable rules are applied.");
@@ -261,9 +242,11 @@ public final class SymbolicExecutionSideProofUtil {
                         }
                     }
                 }
-                if (result == null) { result = services.getTermBuilder().ff(); }
-                conditionsAndResultsMap.add(
-                    new Triple<>(result, resultConditions, resultGoal.node()));
+                if (result == null) {
+                    result = services.getTermBuilder().ff();
+                }
+                conditionsAndResultsMap
+                        .add(new ResultsAndCondition(result, resultConditions, resultGoal.node()));
             }
             return conditionsAndResultsMap;
         } finally {
@@ -313,21 +296,18 @@ public final class SymbolicExecutionSideProofUtil {
      * Makes sure that all used {@link Name}s in the given {@link Term} are registered in the
      * {@link Namespace}s of the given {@link Services}.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param term
-     *        The {@link Term} to check its {@link Name}s.
+     * @param services The {@link Services} to use.
+     * @param term The {@link Term} to check its {@link Name}s.
      */
     public static void addNewNamesToNamespace(Services services, Term term) {
         final Namespace<JFunction> functions = services.getNamespaces().functions();
         final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
         // LogicVariables are always local bound
-        term.execPreOrder(new DefaultVisitor() {
-            @Override
-            public void visit(Term visited) {
-                if (visited.op() instanceof JFunction) {
-                    functions.add((JFunction) visited.op());
-                } else if (visited.op() instanceof IProgramVariable) { progVars.add((IProgramVariable) visited.op()); }
+        term.execPreOrder((DefaultVisitor) visited -> {
+            if (visited.op() instanceof JFunction) {
+                functions.add((JFunction) visited.op());
+            } else if (visited.op() instanceof IProgramVariable) {
+                progVars.add((IProgramVariable) visited.op());
             }
         });
     }
@@ -335,8 +315,7 @@ public final class SymbolicExecutionSideProofUtil {
     /**
      * Checks if the given {@link SequentFormula} contains a modality or query.
      *
-     * @param sf
-     *        The {@link SequentFormula} to check.
+     * @param sf The {@link SequentFormula} to check.
      * @return {@code true} contains at least one modality or query, {@code false} contains no
      *         modalities and no queries.
      */
@@ -347,8 +326,7 @@ public final class SymbolicExecutionSideProofUtil {
     /**
      * Checks if the given {@link Term} contains a modality or query.
      *
-     * @param term
-     *        The {@link Term} to check.
+     * @param term The {@link Term} to check.
      * @return {@code true} contains at least one modality or query, {@code false} contains no
      *         modalities and no queries.
      */
@@ -376,7 +354,9 @@ public final class SymbolicExecutionSideProofUtil {
         public void visit(Term visited) {
             if (visited.op() instanceof Modality) {
                 containsModalityOrQuery = true;
-            } else if (visited.op() instanceof IProgramMethod) { containsModalityOrQuery = true; }
+            } else if (visited.op() instanceof IProgramMethod) {
+                containsModalityOrQuery = true;
+            }
         }
 
         /**
@@ -394,20 +374,17 @@ public final class SymbolicExecutionSideProofUtil {
      * Extracts all {@link Operator}s from the given {@link Sequent} which represents relevant
      * things.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param sequentToProve
-     *        The {@link Sequent} to extract relevant things from.
+     * @param services The {@link Services} to use.
+     * @param sequentToProve The {@link Sequent} to extract relevant things from.
      * @return The found relevant things.
      */
     public static Set<Operator> extractRelevantThings(final Services services,
             Sequent sequentToProve) {
         final Set<Operator> result = new HashSet<>();
         for (SequentFormula sf : sequentToProve) {
-            sf.formula().execPreOrder(new DefaultVisitor() {
-                @Override
-                public void visit(Term visited) {
-                    if (isRelevantThing(services, visited)) { result.add(visited.op()); }
+            sf.formula().execPreOrder((DefaultVisitor) visited -> {
+                if (isRelevantThing(services, visited)) {
+                    result.add(visited.op());
                 }
             });
         }
@@ -422,10 +399,8 @@ public final class SymbolicExecutionSideProofUtil {
      * <li>Functions of a Java type</li>
      * </ul>
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param term
-     *        The {@link Term} to check.
+     * @param services The {@link Services} to use.
+     * @param term The {@link Term} to check.
      * @return {@code true} is relevant thing, {@code false} is not relevant.
      */
     private static boolean isRelevantThing(Services services, Term term) {
@@ -447,15 +422,11 @@ public final class SymbolicExecutionSideProofUtil {
     /**
      * Checks if the given {@link SequentFormula} is a relevant condition.
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param initialSequent
-     *        The initial {@link Sequent} of the side proof.
-     * @param relevantThingsInSequentToProve
-     *        The relevant things found in the initial
+     * @param services The {@link Services} to use.
+     * @param initialSequent The initial {@link Sequent} of the side proof.
+     * @param relevantThingsInSequentToProve The relevant things found in the initial
      *        {@link Sequent}.
-     * @param sf
-     *        The {@link SequentFormula} to check.
+     * @param sf The {@link SequentFormula} to check.
      * @return {@code true} {@link SequentFormula} is relevant condition, {@code false}
      *         {@link SequentFormula} is not a relevant condition.
      */
@@ -497,12 +468,9 @@ public final class SymbolicExecutionSideProofUtil {
      * Checks if the given {@link SequentFormula} contains irrelevant things (things which are not
      * contained in the relevantThingsToProve and are no Java types)
      *
-     * @param services
-     *        The {@link Services} to use.
-     * @param sf
-     *        The {@link SequentFormula} to check.
-     * @param relevantThings
-     *        The relevant things.
+     * @param services The {@link Services} to use.
+     * @param sf The {@link SequentFormula} to check.
+     * @param relevantThings The relevant things.
      * @return {@code true} The {@link SequentFormula} contains irrelevant things, {@code false} the
      *         {@link SequentFormula} contains no irrelevant things.
      */
@@ -539,10 +507,8 @@ public final class SymbolicExecutionSideProofUtil {
         /**
          * Constructor.
          *
-         * @param services
-         *        The {@link Services} to use.
-         * @param relevantThings
-         *        The relevant things.
+         * @param services The {@link Services} to use.
+         * @param relevantThings The relevant things.
          */
         public ContainsIrrelevantThingsVisitor(Services services, Set<Operator> relevantThings) {
             this.services = services;
@@ -558,7 +524,9 @@ public final class SymbolicExecutionSideProofUtil {
                 if (!SymbolicExecutionUtil.isSelect(services, visited)
                         && !SymbolicExecutionUtil.isBoolean(services, visited.op())
                         && !SymbolicExecutionUtil.isNumber(visited.op())) {
-                    if (!relevantThings.contains(visited.op())) { containsIrrelevantThings = true; }
+                    if (!relevantThings.contains(visited.op())) {
+                        containsIrrelevantThings = true;
+                    }
                 }
             }
         }
@@ -577,15 +545,11 @@ public final class SymbolicExecutionSideProofUtil {
     /**
      * Starts a site proof for the given {@link Sequent}.
      *
-     * @param proof
-     *        The parent {@link Proof} of the site proof to do.
-     * @param sideProofEnvironment
-     *        The given {@link ProofEnvironment} of the side proof.
-     * @param sequentToProve
-     *        The {@link Sequent} to prove.
+     * @param proof The parent {@link Proof} of the site proof to do.
+     * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
+     * @param sequentToProve The {@link Sequent} to prove.
      * @return The proof result represented as {@link ApplyStrategyInfo} instance.
-     * @throws ProofInputException
-     *         Occurred Exception
+     * @throws ProofInputException Occurred Exception
      */
     public static ApplyStrategyInfo startSideProof(Proof proof,
             ProofEnvironment sideProofEnvironment, Sequent sequentToProve)
@@ -598,15 +562,11 @@ public final class SymbolicExecutionSideProofUtil {
     /**
      * Starts a site proof for the given {@link Sequent}.
      *
-     * @param proof
-     *        The parent {@link Proof} of the site proof to do.
-     * @param sideProofEnvironment
-     *        The given {@link ProofEnvironment} of the side proof.
-     * @param sequentToProve
-     *        The {@link Sequent} to prove.
+     * @param proof The parent {@link Proof} of the site proof to do.
+     * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
+     * @param sequentToProve The {@link Sequent} to prove.
      * @return The proof result represented as {@link ApplyStrategyInfo} instance.
-     * @throws ProofInputException
-     *         Occurred Exception
+     * @throws ProofInputException Occurred Exception
      */
     public static ApplyStrategyInfo startSideProof(Proof proof,
             ProofEnvironment sideProofEnvironment, Sequent sequentToProve, String methodTreatment,
@@ -621,15 +581,11 @@ public final class SymbolicExecutionSideProofUtil {
      * Creates a new {@link ProofStarter} which contains a new site proof of the given
      * {@link Proof}.
      *
-     * @param sideProofEnvironment
-     *        The given {@link ProofEnvironment} of the side proof.
-     * @param sequentToProve
-     *        The {@link Sequent} to proof in a new site proof.
-     * @param proofName
-     *        An optional name for the newly created {@link Proof}.
+     * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
+     * @param sequentToProve The {@link Sequent} to proof in a new site proof.
+     * @param proofName An optional name for the newly created {@link Proof}.
      * @return The created {@link ProofStarter} with the site proof.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     public static ProofStarter createSideProof(ProofEnvironment sideProofEnvironment,
             Sequent sequentToProve, String proofName) throws ProofInputException {
@@ -639,12 +595,9 @@ public final class SymbolicExecutionSideProofUtil {
     /**
      * Starts a site proof.
      *
-     * @param proof
-     *        The original {@link Proof}.
-     * @param starter
-     *        The {@link ProofStarter} with the site proof.
-     * @param splittingOption
-     *        The splitting option to use.
+     * @param proof The original {@link Proof}.
+     * @param starter The {@link ProofStarter} with the site proof.
+     * @param splittingOption The splitting option to use.
      * @return The site proof result.
      */
     public static ApplyStrategyInfo startSideProof(Proof proof, ProofStarter starter,
@@ -672,10 +625,8 @@ public final class SymbolicExecutionSideProofUtil {
      * Extracts the value for the formula with the given {@link Operator} from the given
      * {@link Goal}.
      *
-     * @param goal
-     *        The {@link Goal} to search the {@link Operator} in.
-     * @param operator
-     *        The {@link Operator} for the formula which should be extracted.
+     * @param goal The {@link Goal} to search the {@link Operator} in.
+     * @param operator The {@link Operator} for the formula which should be extracted.
      * @return The value of the formula with the given {@link Operator}.
      */
     public static Term extractOperatorValue(Goal goal, final Operator operator) {
@@ -687,10 +638,8 @@ public final class SymbolicExecutionSideProofUtil {
      * Extracts the value for the formula with the given {@link Operator} from the given
      * {@link Node}.
      *
-     * @param node
-     *        The {@link Node} to search the {@link Operator} in.
-     * @param operator
-     *        The {@link Operator} for the formula which should be extracted.
+     * @param node The {@link Node} to search the {@link Operator} in.
+     * @param operator The {@link Operator} for the formula which should be extracted.
      * @return The value of the formula with the given {@link Operator}.
      */
     public static Term extractOperatorValue(Node node, final Operator operator) {
@@ -702,13 +651,10 @@ public final class SymbolicExecutionSideProofUtil {
      * Extracts the operator term for the formula with the given {@link Operator} from the site
      * proof result ({@link ApplyStrategyInfo}).
      *
-     * @param info
-     *        The site proof result.
-     * @param operator
-     *        The {@link Operator} for the formula which should be extracted.
+     * @param info The site proof result.
+     * @param operator The {@link Operator} for the formula which should be extracted.
      * @return The operator term of the formula with the given {@link Operator}.
-     * @throws ProofInputException
-     *         Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
      */
     public static Term extractOperatorTerm(ApplyStrategyInfo info, Operator operator)
             throws ProofInputException {
@@ -717,7 +663,7 @@ public final class SymbolicExecutionSideProofUtil {
         if (info.getProof().openGoals().size() != 1) {
             throw new ProofInputException(
                 "Assumption that return value extraction has one goal does not hold because "
-                        + info.getProof().openGoals().size() + " goals are available.");
+                    + info.getProof().openGoals().size() + " goals are available.");
         }
         // Get node of open goal
         return extractOperatorTerm(info.getProof().openGoals().head(), operator);
@@ -727,10 +673,8 @@ public final class SymbolicExecutionSideProofUtil {
      * Extracts the operator term for the formula with the given {@link Operator} from the given
      * {@link Goal}.
      *
-     * @param goal
-     *        The {@link Goal} to search the {@link Operator} in.
-     * @param operator
-     *        The {@link Operator} for the formula which should be extracted.
+     * @param goal The {@link Goal} to search the {@link Operator} in.
+     * @param operator The {@link Operator} for the formula which should be extracted.
      * @return The operator term of the formula with the given {@link Operator}.
      */
     public static Term extractOperatorTerm(Goal goal, final Operator operator) {
@@ -742,10 +686,8 @@ public final class SymbolicExecutionSideProofUtil {
      * Extracts the operator term for the formula with the given {@link Operator} from the given
      * {@link Node}.
      *
-     * @param node
-     *        The {@link Node} to search the {@link Operator} in.
-     * @param operator
-     *        The {@link Operator} for the formula which should be extracted.
+     * @param node The {@link Node} to search the {@link Operator} in.
+     * @param operator The {@link Operator} for the formula which should be extracted.
      * @return The operator term of the formula with the given {@link Operator}.
      */
     public static Term extractOperatorTerm(Node node, final Operator operator) {
@@ -770,8 +712,7 @@ public final class SymbolicExecutionSideProofUtil {
      * {@link OneStepSimplifier} instance. Such copies are required for instance during parallel
      * usage of site proofs because {@link OneStepSimplifier} has an internal state.
      *
-     * @param source
-     *        The {@link Proof} to copy its {@link ProofEnvironment}.
+     * @param source The {@link Proof} to copy its {@link ProofEnvironment}.
      * @return The created {@link ProofEnvironment} which is a copy of the environment of the given
      *         {@link Proof} but with its own {@link OneStepSimplifier} instance.
      */
@@ -788,8 +729,7 @@ public final class SymbolicExecutionSideProofUtil {
      * {@link OneStepSimplifier} instance. Such copies are required for instance during parallel
      * usage of site proofs because {@link OneStepSimplifier} has an internal state.
      *
-     * @param sourceInitConfig
-     *        The {@link InitConfig} to copy its {@link ProofEnvironment}.
+     * @param sourceInitConfig The {@link InitConfig} to copy its {@link ProofEnvironment}.
      * @return The created {@link ProofEnvironment} which is a copy of the environment of the given
      *         {@link Proof} but with its own {@link OneStepSimplifier} instance.
      */
@@ -885,10 +825,8 @@ public final class SymbolicExecutionSideProofUtil {
      * or stored for debugging purposes.
      * </p>
      *
-     * @param description
-     *        The description.
-     * @param info
-     *        The {@link ApplyStrategyInfo} to store or dispose its {@link Proof}.
+     * @param description The description.
+     * @param info The {@link ApplyStrategyInfo} to store or dispose its {@link Proof}.
      */
     public static void disposeOrStore(String description, ApplyStrategyInfo info) {
         if (info != null) {

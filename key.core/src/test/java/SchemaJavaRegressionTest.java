@@ -149,7 +149,9 @@ public class SchemaJavaRegressionTest {
                     if (e.getChildCount() != 0) {
                         TreeMap<String, Object> map = new TreeMap<>();
                         map.put("name", program.getClass().getSimpleName());
-                        for (int i = 0; i < e.getChildCount(); i++) { map.put("z" + i, traverse(e.getChildAt(i))); }
+                        for (int i = 0; i < e.getChildCount(); i++) {
+                            map.put("z" + i, traverse(e.getChildAt(i)));
+                        }
                         return map;
                     }
                 } catch (ClassCastException ignored) {

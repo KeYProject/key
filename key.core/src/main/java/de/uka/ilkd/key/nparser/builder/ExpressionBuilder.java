@@ -96,7 +96,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         try {
             t = services.getTermFactory().createTermWithOrigin(t,
                 ctx.start.getTokenSource().getSourceName() + "@" + ctx.start.getLine()
-                        + ":" + ctx.start.getCharPositionInLine() + 1);
+                    + ":" + ctx.start.getCharPositionInLine() + 1);
         } catch (ClassCastException ignored) {
         }
         return t;
@@ -110,8 +110,12 @@ public class ExpressionBuilder extends DefaultBuilder {
      * @return non-null string
      */
     public static String trimJavaBlock(String raw) {
-        if (raw.startsWith("\\<")) { return StringUtil.trim(raw, "\\<>"); }
-        if (raw.startsWith("\\[")) { return StringUtil.trim(raw, "\\[]"); }
+        if (raw.startsWith("\\<")) {
+            return StringUtil.trim(raw, "\\<>");
+        }
+        if (raw.startsWith("\\[")) {
+            return StringUtil.trim(raw, "\\[]");
+        }
         int end = raw.length() - (raw.endsWith("\\endmodality") ? "\\endmodality".length() : 0);
         int start = 0;
         if (raw.startsWith("\\throughout_transaction")) {
@@ -126,7 +130,9 @@ public class ExpressionBuilder extends DefaultBuilder {
             start = "\\box".length();
         } else if (raw.startsWith("\\throughout")) {
             start = "\\throughout".length();
-        } else if (raw.startsWith("\\modality")) { start = raw.indexOf('}') + 1; }
+        } else if (raw.startsWith("\\modality")) {
+            start = raw.indexOf('}') + 1;
+        }
         return raw.substring(start, end);
     }
 
@@ -134,14 +140,30 @@ public class ExpressionBuilder extends DefaultBuilder {
      * Given a raw modality string, this method determines the operator name.
      */
     public static String operatorOfJavaBlock(String raw) {
-        if (raw.startsWith("\\<")) { return "diamond"; }
-        if (raw.startsWith("\\[")) { return "box"; }
-        if (raw.startsWith("\\diamond_transaction")) { return "diamond_transaction"; }
-        if (raw.startsWith("\\box_transaction")) { return "box_transaction"; }
-        if (raw.startsWith("\\diamond")) { return "diamond"; }
-        if (raw.startsWith("\\box")) { return "box"; }
-        if (raw.startsWith("\\throughout_transaction")) { return "throughout_transaction"; }
-        if (raw.startsWith("\\throughout")) { return "throughout"; }
+        if (raw.startsWith("\\<")) {
+            return "diamond";
+        }
+        if (raw.startsWith("\\[")) {
+            return "box";
+        }
+        if (raw.startsWith("\\diamond_transaction")) {
+            return "diamond_transaction";
+        }
+        if (raw.startsWith("\\box_transaction")) {
+            return "box_transaction";
+        }
+        if (raw.startsWith("\\diamond")) {
+            return "diamond";
+        }
+        if (raw.startsWith("\\box")) {
+            return "box";
+        }
+        if (raw.startsWith("\\throughout_transaction")) {
+            return "throughout_transaction";
+        }
+        if (raw.startsWith("\\throughout")) {
+            return "throughout";
+        }
         if (raw.startsWith("\\modality")) {
             int start = raw.indexOf('{') + 1;
             int end = raw.indexOf('}');
@@ -173,14 +195,18 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Term visitElementary_update_term(KeYParser.Elementary_update_termContext ctx) {
         Term a = accept(ctx.a);
         Term b = accept(ctx.b);
-        if (b != null) { return updateOrigin(getServices().getTermBuilder().elementary(a, b), ctx, services); }
+        if (b != null) {
+            return updateOrigin(getServices().getTermBuilder().elementary(a, b), ctx, services);
+        }
         return updateOrigin(a, ctx, services);
     }
 
     @Override
     public Term visitEquivalence_term(KeYParser.Equivalence_termContext ctx) {
         Term a = accept(ctx.a);
-        if (ctx.b.isEmpty()) { return a; }
+        if (ctx.b.isEmpty()) {
+            return a;
+        }
 
         Term cur = a;
         for (KeYParser.Implication_termContext context : ctx.b) {
@@ -192,7 +218,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private Term binaryTerm(ParserRuleContext ctx, Operator operator, Term left, Term right) {
-        if (right == null) { return updateOrigin(left, ctx, services); }
+        if (right == null) {
+            return updateOrigin(left, ctx, services);
+        }
         return capsulateTf(ctx,
             () -> updateOrigin(getTermFactory().createTerm(operator, left, right), ctx, services));
     }
@@ -207,14 +235,18 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitDisjunction_term(KeYParser.Disjunction_termContext ctx) {
         Term t = accept(ctx.a);
-        for (KeYParser.Conjunction_termContext c : ctx.b) { t = binaryTerm(ctx, Junctor.OR, t, accept(c)); }
+        for (KeYParser.Conjunction_termContext c : ctx.b) {
+            t = binaryTerm(ctx, Junctor.OR, t, accept(c));
+        }
         return t;
     }
 
     @Override
     public Term visitConjunction_term(KeYParser.Conjunction_termContext ctx) {
         Term t = accept(ctx.a);
-        for (KeYParser.Term60Context c : ctx.b) { t = binaryTerm(ctx, Junctor.AND, t, accept(c)); }
+        for (KeYParser.Term60Context c : ctx.b) {
+            t = binaryTerm(ctx, Junctor.AND, t, accept(c));
+        }
         return t;
         // Term termR = accept(ctx.b);
         // return binaryTerm(ctx, Junctor.AND, termL, termR);
@@ -235,14 +267,18 @@ public class ExpressionBuilder extends DefaultBuilder {
                     () -> getTermFactory().createTerm(Z, getTermFactory().createTerm(neglit, num)));
             } else if (result.sort() != JavaDLTheory.FORMULA) {
                 Sort sort = result.sort();
-                if (sort == null) { semanticError(ctx, "No sort for %s", result); }
+                if (sort == null) {
+                    semanticError(ctx, "No sort for %s", result);
+                }
                 LDT ldt = services.getTypeConverter().getLDTFor(sort);
                 if (ldt == null) {
                     // falling back to integer ldt (for instance for untyped schema variables)
                     ldt = services.getTypeConverter().getIntegerLDT();
                 }
                 JFunction op = ldt.getFunctionFor("neg", services);
-                if (op == null) { semanticError(ctx, "Could not find function symbol 'neg' for sort '%s'.", sort); }
+                if (op == null) {
+                    semanticError(ctx, "Could not find function symbol 'neg' for sort '%s'.", sort);
+                }
                 return capsulateTf(ctx, () -> getTermFactory().createTerm(op, result));
             } else {
                 semanticError(ctx, "Formulas cannot be prefixed with '-'");
@@ -266,7 +302,9 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term termL = accept(ctx.a);
         Term termR = accept(ctx.b);
         Term eq = binaryTerm(ctx, Equality.EQUALS, termL, termR);
-        if (ctx.NOT_EQUALS() != null) { return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, eq)); }
+        if (ctx.NOT_EQUALS() != null) {
+            return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, eq));
+        }
         return eq;
     }
 

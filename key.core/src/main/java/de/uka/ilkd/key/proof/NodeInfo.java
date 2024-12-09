@@ -118,7 +118,9 @@ public class NodeInfo {
      * determines the first and active statement if the applied taclet worked on a modality
      */
     private void determineFirstAndActiveStatement() {
-        if (determinedFstAndActiveStatement) { return; }
+        if (determinedFstAndActiveStatement) {
+            return;
+        }
         final RuleApp ruleApp = node.getAppliedRuleApp();
         if (ruleApp instanceof PosTacletApp) {
             firstStatement = computeFirstStatement(ruleApp);
@@ -163,10 +165,14 @@ public class NodeInfo {
         SourceElement firstStatement = null;
         // TODO: unify with MiscTools getActiveStatement
         if (ruleApp instanceof PosTacletApp pta) {
-            if (!isSymbolicExecution(pta.taclet())) { return null; }
+            if (!isSymbolicExecution(pta.taclet())) {
+                return null;
+            }
             Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
             final ProgramElement pe = t.javaBlock().program();
-            if (pe != null) { firstStatement = pe.getFirstElement(); }
+            if (pe != null) {
+                firstStatement = pe.getFirstElement();
+            }
         }
         return firstStatement;
     }
@@ -240,7 +246,9 @@ public class NodeInfo {
         while (!list.isEmpty()) {
             rs = list.head();
             Name name = rs.name();
-            if (symbolicExecNames.contains(name)) { return true; }
+            if (symbolicExecNames.contains(name)) {
+                return true;
+            }
             list = list.tail();
         }
         return false;
@@ -285,7 +293,9 @@ public class NodeInfo {
     public String getFirstStatementString() {
         determineFirstAndActiveStatement();
         if (firstStatement != null) {
-            if (firstStatementString == null) { firstStatementString = String.valueOf(firstStatement); }
+            if (firstStatementString == null) {
+                firstStatementString = String.valueOf(firstStatement);
+            }
             firstStatementString = String.valueOf(activeStatement);
             return firstStatementString;
         }
@@ -301,8 +311,12 @@ public class NodeInfo {
      */
     public void setBranchLabel(String s) {
         determineFirstAndActiveStatement();
-        if (s == null) { return; }
-        if (node.parent() == null) { return; }
+        if (s == null) {
+            return;
+        }
+        if (node.parent() == null) {
+            return;
+        }
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof TacletApp tacletApp) {
             Pattern p = Pattern.compile("#\\w+");
@@ -405,7 +419,9 @@ public class NodeInfo {
     public void setNotes(String newNotes) {
         String oldNotes = notes;
         notes = newNotes;
-        if (!Objects.equals(oldNotes, newNotes)) { node.proof().fireNotesChanged(node); }
+        if (!Objects.equals(oldNotes, newNotes)) {
+            node.proof().fireNotesChanged(node);
+        }
     }
 
     /**

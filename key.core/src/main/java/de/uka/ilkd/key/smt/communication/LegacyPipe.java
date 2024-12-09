@@ -87,7 +87,9 @@ class LegacyPipe implements Pipe {
             try {
 
                 while (true) {
-                    if (Thread.interrupted()) { break; }
+                    if (Thread.interrupted()) {
+                        break;
+                    }
                     // this call blocks the thread and waits until there is a message.
                     String message = reader.readMessage();
                     if (message == null) {
@@ -106,7 +108,9 @@ class LegacyPipe implements Pipe {
             } finally {
                 try {
                     String buf = reader.drain();
-                    if (buf != null && !buf.isEmpty()) { deliverMessage(buf, type); }
+                    if (buf != null && !buf.isEmpty()) {
+                        deliverMessage(buf, type);
+                    }
                     input.close();
                 } catch (IOException ex) {
                     // considered harmless.

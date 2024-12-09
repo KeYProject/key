@@ -50,7 +50,11 @@ public class ShowOriginAction extends MainWindowAction {
         PosInOccurrence pio = pos.getPosInOccurrence();
 
         // OriginTermLabelVisualizer.TermView can only print sequents or formulas, not terms.
-        if (pio != null) { while (!pio.subTerm().sort().equals(JavaDLTheory.FORMULA)) { pio = pio.up(); } }
+        if (pio != null) {
+            while (!pio.subTerm().sort().equals(JavaDLTheory.FORMULA)) {
+                pio = pio.up();
+            }
+        }
 
         OriginTermLabelVisualizer vis = new OriginTermLabelVisualizer(pio,
             getMediator().getSelectedNode(), getMediator().getServices());

@@ -50,7 +50,9 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      */
     public static ImmutableSet<LoopContract> getApplicableContracts(
             final Instantiation instantiation, final Goal goal, final Services services) {
-        if (instantiation == null) { return DefaultImmutableSet.nil(); }
+        if (instantiation == null) {
+            return DefaultImmutableSet.nil();
+        }
         return getApplicableContracts(services.getSpecificationRepository(),
             instantiation.statement(), instantiation.modality().kind(), goal);
     }
@@ -113,7 +115,9 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             final ImmutableSet<LoopContract> collectedContracts, final Goal goal) {
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
         for (LoopContract contract : collectedContracts) {
-            if (!contractApplied(contract, goal)) { result = result.add(contract); }
+            if (!contractApplied(contract, goal)) {
+                result = result.add(contract);
+            }
         }
         return result;
     }
@@ -160,15 +164,21 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
     @Override
     public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
-        if (occursNotAtTopLevelInSuccedent(occurrence)) { return false; }
+        if (occursNotAtTopLevelInSuccedent(occurrence)) {
+            return false;
+        }
 
         // abort if inside of transformer
-        if (Transformer.inTransformer(occurrence)) { return false; }
+        if (Transformer.inTransformer(occurrence)) {
+            return false;
+        }
 
         final Instantiation instantiation =
             instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
 
-        if (instantiation == null) { return false; }
+        if (instantiation == null) {
+            return false;
+        }
 
         final ImmutableSet<LoopContract> contracts =
             getApplicableContracts(instantiation, goal, goal.proof().getServices());
@@ -178,7 +188,9 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             // (a) the block starts with a while loop or
             // (b) the block starts with a for loop whose head has already been applied
             // via the rule LoopContractApplyHead.
-            if (contract.getHead() == null) { return true; }
+            if (contract.getHead() == null) {
+                return true;
+            }
         }
         return false;
     }

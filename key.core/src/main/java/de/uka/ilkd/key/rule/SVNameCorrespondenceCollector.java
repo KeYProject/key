@@ -86,7 +86,9 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
      *        the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-        for (SequentFormula cf : semiseq) { cf.formula().execPostOrder(this); }
+        for (SequentFormula cf : semiseq) {
+            cf.formula().execPostOrder(this);
+        }
     }
 
     /**
@@ -136,7 +138,11 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
                     visit(((AntecSuccTacletGoalTemplate) gt).replaceWith());
                 }
             }
-            if (visitAddrules) { for (Taclet taclet1 : gt.rules()) { visit(taclet1, true); } }
+            if (visitAddrules) {
+                for (Taclet taclet1 : gt.rules()) {
+                    visit(taclet1, true);
+                }
+            }
         }
     }
 

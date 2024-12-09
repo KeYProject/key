@@ -56,7 +56,9 @@ public class HeatmapSettingsAction extends MainWindowAction {
     }
 
     private HeatmapOptionsDialog getDialog() {
-        if (dialog == null) { dialog = new HeatmapOptionsDialog(); }
+        if (dialog == null) {
+            dialog = new HeatmapOptionsDialog();
+        }
         return dialog;
     }
 }

@@ -40,7 +40,9 @@ public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
 
     @Override
     public boolean addVertex(V v) {
-        if (vertices.contains(v)) { return false; }
+        if (vertices.contains(v)) {
+            return false;
+        }
         vertices.add(v);
         return true;
     }
@@ -63,13 +65,17 @@ public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
 
     @Override
     public Collection<E> incomingEdgesOf(V v) {
-        if (!incomingEdges.containsKey(v)) { return Collections.emptySet(); }
+        if (!incomingEdges.containsKey(v)) {
+            return Collections.emptySet();
+        }
         return Collections.unmodifiableSet(incomingEdges.get(v));
     }
 
     @Override
     public Collection<E> outgoingEdgesOf(V v) {
-        if (!outgoingEdges.containsKey(v)) { return Collections.emptySet(); }
+        if (!outgoingEdges.containsKey(v)) {
+            return Collections.emptySet();
+        }
         return Collections.unmodifiableSet(outgoingEdges.get(v));
     }
 

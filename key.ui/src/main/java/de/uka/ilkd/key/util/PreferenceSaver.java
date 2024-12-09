@@ -53,7 +53,11 @@ public class PreferenceSaver {
      */
     @SuppressWarnings("unchecked")
     private static <C extends Component> Saver<C> getSaver(C component) {
-        for (Saver<?> saver : SAVERS) { if (saver.supportedClass().isInstance(component)) { return (Saver<C>) saver; } }
+        for (Saver<?> saver : SAVERS) {
+            if (saver.supportedClass().isInstance(component)) {
+                return (Saver<C>) saver;
+            }
+        }
         return null;
     }
 
@@ -105,14 +109,21 @@ public class PreferenceSaver {
         String name = component.getName();
         if (name != null) {
             Saver<C> saver = getSaver(component);
-            if (saver != null) { saver.save(component, prefs); }
+            if (saver != null) {
+                saver.save(component, prefs);
+            }
         }
     }
 
     private void saveChildren(Component component) {
         if (component instanceof Container) {
             Component[] children = getChildren(component);
-            if (children != null) { for (Component child : children) { saveComponent(child); saveChildren(child); } }
+            if (children != null) {
+                for (Component child : children) {
+                    saveComponent(child);
+                    saveChildren(child);
+                }
+            }
         }
     }
 
@@ -133,14 +144,20 @@ public class PreferenceSaver {
         String name = component.getName();
         if (name != null) {
             Saver<C> saver = getSaver(component);
-            if (saver != null) { saver.load(component, prefs); }
+            if (saver != null) {
+                saver.load(component, prefs);
+            }
         }
     }
 
     private void loadChildren(Component component) {
         if (component instanceof Container) {
             Component[] children = getChildren(component);
-            if (children != null) { for (Component child : children) { load(child); } }
+            if (children != null) {
+                for (Component child : children) {
+                    load(child);
+                }
+            }
         }
     }
 

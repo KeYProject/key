@@ -327,7 +327,9 @@ public abstract class WellDefinednessCheck implements Contract {
 
     private ImmutableList<Term> replace(Iterable<Term> l, Variables vars) {
         ImmutableList<Term> res = ImmutableSLList.nil();
-        for (Term t : l) { res = res.append(replace(t, vars)); }
+        for (Term t : l) {
+            res = res.append(replace(t, vars));
+        }
         return res;
     }
 
@@ -363,8 +365,12 @@ public abstract class WellDefinednessCheck implements Contract {
         }
         sig.append(target instanceof IProgramMethod ? ((IProgramMethod) target).getName() : "");
         sig.append("(");
-        for (ProgramVariable pv : origVars.params) { sig.append(pv.name()).append(", "); }
-        if (!origVars.params.isEmpty()) { sig.setLength(sig.length() - 2); }
+        for (ProgramVariable pv : origVars.params) {
+            sig.append(pv.name()).append(", ");
+        }
+        if (!origVars.params.isEmpty()) {
+            sig.setLength(sig.length() - 2);
+        }
         sig.append(")");
         if (!modelField() && !(type().equals(Type.OPERATION_CONTRACT)
                 && ((MethodWellDefinedness) this).isModel())) {
@@ -376,8 +382,8 @@ public abstract class WellDefinednessCheck implements Contract {
         String mby = "";
         if (printMby != null) {
             mby = mby + (includeHtmlMarkup ? "<br><b>" : "\n") + "measured-by"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMby, false) : printMby.trim());
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMby, false) : printMby.trim());
         }
         String modifiables = "";
         final boolean isInv = type().equals(Type.CLASS_INVARIANT);
@@ -390,22 +396,22 @@ public abstract class WellDefinednessCheck implements Contract {
                             : this.getModifiable(null),
                 services);
             modifiables += (includeHtmlMarkup ? "<br><b>" : "\n") + "modifiable"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printModifiables, false)
-                            : printModifiables.trim());
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printModifiables, false)
+                        : printModifiables.trim());
         }
         if (getModifiable() != null && getModifiable().equals(TB.strictlyNothing()) && showSig) {
             modifiables +=
                 (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
-                        + (includeHtmlMarkup ? "</b>" : "");
+                    + (includeHtmlMarkup ? "</b>" : "");
         }
         String globalUpdates = "";
         if (getGlobalDefs() != null) {
             final String printUpdates = LogicPrinter.quickPrintTerm(getGlobalDefs(), services);
             globalUpdates = (includeHtmlMarkup ? "<br><b>" : "\n") + "defs"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates, false)
-                            : printUpdates);
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates, false)
+                        : printUpdates);
         }
         String pres = "";
         if (getRequires(null) != null) {
@@ -419,44 +425,44 @@ public abstract class WellDefinednessCheck implements Contract {
         if (getAccessible() != null) {
             String printDeps = LogicPrinter.quickPrintTerm(getAccessible(), services);
             deps += (includeHtmlMarkup ? "<br><b>" : "\n") + "dep"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printDeps, false)
-                            : printDeps);
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printDeps, false)
+                        : printDeps);
         }
         String reps = "";
         if (getRepresents() != null) {
             String printReps = LogicPrinter.quickPrintTerm(getRepresents(), services);
             reps += (includeHtmlMarkup ? "<br><b>" : "\n") + "rep"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printReps, false)
-                            : printReps);
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printReps, false)
+                        : printReps);
         }
         String posts = "";
         if (getEnsures(null) != null && showSig && !isLoop) {
             String printPosts = LogicPrinter.quickPrintTerm(getEnsures(null), services);
             posts += (includeHtmlMarkup ? "<br><b>" : "\n") + "post"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false)
-                            : printPosts);
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false)
+                        : printPosts);
         }
         String axioms = "";
         if (getAxiom() != null) {
             String printAxioms = LogicPrinter.quickPrintTerm(getAxiom(), services);
             axioms += (includeHtmlMarkup ? "<br><b>" : "\n") + "axiom"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false)
-                            : printAxioms);
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false)
+                        : printAxioms);
         }
         String transactionApplicable = "";
         if (transactionApplicableContract()) {
             transactionApplicable = (includeHtmlMarkup ? "<br><b>" : "\n")
-                    + "transaction applicable" + (includeHtmlMarkup ? "</b> " : ":");
+                + "transaction applicable" + (includeHtmlMarkup ? "</b> " : ":");
         }
         if (includeHtmlMarkup) {
             return "<html>"
-                    + (showSig ? ("<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>") : "")
-                    + globalUpdates + pres + deps + reps + posts + axioms + modifiables + mby
-                    + transactionApplicable + "</html>";
+                + (showSig ? ("<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>") : "")
+                + globalUpdates + pres + deps + reps + posts + axioms + modifiables + mby
+                + transactionApplicable + "</html>";
         } else {
             return (showSig ? sig.toString() : "") + globalUpdates + pres + deps + reps + posts
                     + axioms + modifiables + mby + transactionApplicable;
@@ -609,7 +615,9 @@ public abstract class WellDefinednessCheck implements Contract {
             new Term[] { wellFormed, selfNotNull, selfCreated, selfExactType, invTerm,
                 paramsOK, implicitPre, mbyAtPreDef };
 
-        for (Term t : result) { resList = resList.append(t); }
+        for (Term t : result) {
+            resList = resList.append(t);
+        }
         return new TermListAndFunc(resList, mbyAtPreFunc);
     }
 
@@ -654,7 +662,9 @@ public abstract class WellDefinednessCheck implements Contract {
         final Term[] result;
         result = new Term[] { wellFormed, paramsOK, implicitPre };
 
-        for (Term t : result) { resList = resList.append(t); }
+        for (Term t : result) {
+            resList = resList.append(t);
+        }
         return new TermListAndFunc(resList, mbyAtPreFunc);
     }
 
@@ -683,7 +693,10 @@ public abstract class WellDefinednessCheck implements Contract {
 
         Map<Operator, Operator> map = new LinkedHashMap<>();
         int i = 0;
-        for (Term sub : find1.sub(0).subs()) { map.put(find2.sub(0).sub(i).op(), sub.op()); i++; }
+        for (Term sub : find1.sub(0).subs()) {
+            map.put(find2.sub(0).sub(i).op(), sub.op());
+            i++;
+        }
         final OpReplacer or = new OpReplacer(map, services.getTermFactory());
         final Term goal = services.getTermBuilder().orSC(goal1, or.replace(goal2));
         final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
@@ -823,7 +836,9 @@ public abstract class WellDefinednessCheck implements Contract {
             final Term allLocs = TB.allLocs();
             if (acc.equals(allLocs)) {
                 setAccessible(accPre);
-            } else if (accPre.equals(allLocs)) { setAccessible(acc); }
+            } else if (accPre.equals(allLocs)) {
+                setAccessible(acc);
+            }
         } else {
             setAccessible(TB.union(acc, accPre));
         }
@@ -857,11 +872,17 @@ public abstract class WellDefinednessCheck implements Contract {
     ImmutableList<Term> getRest() {
         ImmutableList<Term> rest = ImmutableSLList.nil();
         final Term accessible = this.accessible;
-        if (accessible != null) { rest = rest.append(accessible); }
+        if (accessible != null) {
+            rest = rest.append(accessible);
+        }
         final Term mby = this.mby;
-        if (mby != null) { rest = rest.append(mby); }
+        if (mby != null) {
+            rest = rest.append(mby);
+        }
         final Term represents = this.represents;
-        if (represents != null) { rest = rest.append(represents); }
+        if (represents != null) {
+            rest = rest.append(represents);
+        }
         return rest;
     }
 
@@ -953,7 +974,9 @@ public abstract class WellDefinednessCheck implements Contract {
     public static boolean isOn() {
         final String setting =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
-        if (setting == null) { return false; }
+        if (setting == null) {
+            return false;
+        }
         if (setting.equals(OPTION + ":on")) {
             return true;
         } else if (setting.equals(OPTION + ":off")) {
@@ -1241,8 +1264,12 @@ public abstract class WellDefinednessCheck implements Contract {
         } else {
             displayName = displayName + typeString();
         }
-        if (!modelField() && !type().equals(Type.CLASS_INVARIANT)) { displayName = displayName + " " + id; }
-        if (!getBehaviour().isEmpty()) { displayName = displayName + " (" + getBehaviour() + ")"; }
+        if (!modelField() && !type().equals(Type.CLASS_INVARIANT)) {
+            displayName = displayName + " " + id;
+        }
+        if (!getBehaviour().isEmpty()) {
+            displayName = displayName + " (" + getBehaviour() + ")";
+        }
         return displayName;
     }
 

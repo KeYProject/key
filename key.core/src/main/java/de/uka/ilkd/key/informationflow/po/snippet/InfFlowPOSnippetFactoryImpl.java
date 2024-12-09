@@ -105,7 +105,7 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
             return result;
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for " + "snippet \""
-                    + snippet.name() + "threw " + "TermCreationException: " + e.getMessage());
+                + snippet.name() + "threw " + "TermCreationException: " + e.getMessage());
         }
     }
 }

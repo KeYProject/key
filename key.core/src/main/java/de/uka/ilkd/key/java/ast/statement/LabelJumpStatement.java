@@ -91,7 +91,9 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      * @return the identifier.
      */
     public ProgramElementName getProgramElementName() {
-        if ((name instanceof ProgramElementName) || (name == null)) { return (ProgramElementName) name; }
+        if ((name instanceof ProgramElementName) || (name == null)) {
+            return (ProgramElementName) name;
+        }
         return null;
     }
 
@@ -114,7 +116,11 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      *         if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (name != null) { if (index == 0) { return name; } }
+        if (name != null) {
+            if (index == 0) {
+                return name;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

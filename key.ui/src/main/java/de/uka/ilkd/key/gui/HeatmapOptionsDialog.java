@@ -68,19 +68,19 @@ public class HeatmapOptionsDialog extends JDialog {
     /** Descriptions for heatmap options */
     private static final String[] DESCRIPTIONS = { "No Heatmaps are shown.",
         "All sequent formulae that have been added or changed in the last k steps are highlighted. "
-                + "More recent formulae will have a stronger highlight. It is possible that less "
-                + "than k formulae are highlighted, e.g. if one formula has changed multiple times.",
+            + "More recent formulae will have a stronger highlight. It is possible that less "
+            + "than k formulae are highlighted, e.g. if one formula has changed multiple times.",
         "All formulae in the sequent are sorted by how new they are, i.e., how recently they have"
-                + " been added or changed. The first k formulae of the sorted list are highlighted "
-                + "according to their position in the list,"
-                + " with the most recent formula receiving the strongest highlight.",
+            + " been added or changed. The first k formulae of the sorted list are highlighted "
+            + "according to their position in the list,"
+            + " with the most recent formula receiving the strongest highlight.",
         "All terms that have been added or changed in the last k steps are highlighted. "
-                + "More recent terms will have a stronger highlight. It is possible that less than "
-                + "k terms are highlighted, e.g. if one term has changed multiple times.",
+            + "More recent terms will have a stronger highlight. It is possible that less than "
+            + "k terms are highlighted, e.g. if one term has changed multiple times.",
         "All terms in the sequent are sorted by how new they are, i.e., how recently they "
-                + "have been added or changed. The first k terms of the sorted list are highlighted "
-                + "according to their position in the list,"
-                + " with the most recent term receiving the strongest highlight." };
+            + "have been added or changed. The first k terms of the sorted list are highlighted "
+            + "according to their position in the list,"
+            + " with the most recent term receiving the strongest highlight." };
 
     /** Error message on invalid textfield input */ // Not needed atm
     // private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and
@@ -270,7 +270,9 @@ public class HeatmapOptionsDialog extends JDialog {
             sf.setAlignmentX(.5f);
             JLabel terms = new JLabel("Highlight terms");
             terms.setAlignmentX(.5f);
-            if (i == 0) { radioBoxes.add(dis); }
+            if (i == 0) {
+                radioBoxes.add(dis);
+            }
             if (i == 1) {
                 radioBoxes.add(new JLabel("                   "));
                 radioBoxes.add(sf);

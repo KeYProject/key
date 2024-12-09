@@ -36,12 +36,12 @@ class TestReferenceSearcher {
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(new File(testCaseDirectory,
                 "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof")
-                        .toPath());
+                    .toPath());
         Proof p = env.getLoadedProof();
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
             KeYEnvironment.load(new File(testCaseDirectory,
                 "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof")
-                        .toPath());
+                    .toPath());
         Proof p2 = env2.getLoadedProof();
 
         List<Proof> previousProofs = new CopyOnWriteArrayList<>();
@@ -56,7 +56,9 @@ class TestReferenceSearcher {
         // -> only check the first node in each closed branch
         for (Goal g : p.closedGoals()) {
             Node n = g.node();
-            while (n.parent().childrenCount() == 1) { n = n.parent(); }
+            while (n.parent().childrenCount() == 1) {
+                n = n.parent();
+            }
             if (ReferenceSearcher.suitableForCloseByReference(n)) {
                 ClosedBy c = ReferenceSearcher.findPreviousProof(previousProofs, n);
                 assertEquals(n.serialNr(), c.node().serialNr());

@@ -98,7 +98,11 @@ public final class IOUtil {
         if (file.exists()) {
             if (file.isDirectory()) {
                 File[] children = file.listFiles();
-                if (children != null) { for (File child : children) { delete(child); } }
+                if (children != null) {
+                    for (File child : children) {
+                        delete(child);
+                    }
+                }
             }
             file.delete();
         }
@@ -161,7 +165,9 @@ public final class IOUtil {
             StringBuilder sb = new StringBuilder();
             char[] buffer = new char[BUFFER_SIZE];
             int read;
-            while ((read = reader.read(buffer)) >= 1) { sb.append(buffer, 0, read); }
+            while ((read = reader.read(buffer)) >= 1) {
+                sb.append(buffer, 0, read);
+            }
             return sb.toString();
         }
     }
@@ -346,7 +352,9 @@ public final class IOUtil {
                             lastSignWasRBreakIndex = lastIndex;
                             lastIndex = startIndex + i + 1;
                         }
-                    } else if ('\t' == buffer[i]) { tabIndices.add(i - lastIndex); }
+                    } else if ('\t' == buffer[i]) {
+                        tabIndices.add(i - lastIndex);
+                    }
                 }
                 startIndex += read;
             }
@@ -431,7 +439,11 @@ public final class IOUtil {
             if (tabIndices != null) {
                 this.tabIndices = new int[tabIndices.size()];
                 int i = 0;
-                for (Integer index : tabIndices) { assert index != null; this.tabIndices[i] = index; i++; }
+                for (Integer index : tabIndices) {
+                    assert index != null;
+                    this.tabIndices[i] = index;
+                    i++;
+                }
             } else {
                 this.tabIndices = new int[0];
             }
@@ -544,8 +556,12 @@ public final class IOUtil {
      */
     public static File createTempDirectory(String prefix, String suffix) throws IOException {
         File tempFile = File.createTempFile(prefix, suffix);
-        if (!tempFile.delete()) { throw new IOException("Can't delete temp file, reason is unknown."); }
-        if (!tempFile.mkdir()) { throw new IOException("Can't create temp directory, reason is unknown."); }
+        if (!tempFile.delete()) {
+            throw new IOException("Can't delete temp file, reason is unknown.");
+        }
+        if (!tempFile.mkdir()) {
+            throw new IOException("Can't create temp directory, reason is unknown.");
+        }
         return tempFile;
     }
 
@@ -565,7 +581,9 @@ public final class IOUtil {
     public static List<File> search(File file, final Predicate<File> filter) throws IOException {
         final List<File> result = new LinkedList<>();
         visit(file, visitedFile -> {
-            if (filter == null || filter.test(visitedFile)) { result.add(visitedFile); }
+            if (filter == null || filter.test(visitedFile)) {
+                result.add(visitedFile);
+            }
         });
         return result;
     }
@@ -583,7 +601,11 @@ public final class IOUtil {
     public static void visit(File file, IFileVisitor visitor) throws IOException {
         visitor.visit(file);
         File[] children = file.listFiles();
-        if (children != null) { for (File child : children) { visit(child, visitor); } }
+        if (children != null) {
+            for (File child : children) {
+                visit(child, visitor);
+            }
+        }
     }
 
     /**
@@ -634,7 +656,9 @@ public final class IOUtil {
         boolean contains = false;
         if (parents != null) {
             Iterator<File> iter = parents.iterator();
-            while (!contains && iter.hasNext()) { contains = contains(iter.next(), child); }
+            while (!contains && iter.hasNext()) {
+                contains = contains(iter.next(), child);
+            }
         }
         return contains;
     }
@@ -654,7 +678,9 @@ public final class IOUtil {
         @Nullable
         File current = child;
         while (!contains && current != null) {
-            if (parent.equals(current)) { contains = true; }
+            if (parent.equals(current)) {
+                contains = true;
+            }
             current = current.getParentFile();
         }
         return contains;
@@ -675,7 +701,9 @@ public final class IOUtil {
         try {
             char[] buffer = new char[BUFFER_SIZE];
             int read;
-            while ((read = source.read(buffer)) >= 1) { target.write(buffer, 0, read); }
+            while ((read = source.read(buffer)) >= 1) {
+                target.write(buffer, 0, read);
+            }
             return true;
         } finally {
             source.close();
@@ -699,7 +727,9 @@ public final class IOUtil {
         try {
             byte[] buffer = new byte[BUFFER_SIZE];
             int read;
-            while ((read = source.read(buffer)) >= 1) { target.write(buffer, 0, read); }
+            while ((read = source.read(buffer)) >= 1) {
+                target.write(buffer, 0, read);
+            }
             return true;
         } finally {
             source.close();
@@ -763,7 +793,8 @@ public final class IOUtil {
      */
     public static File getCurrentDirectory() {
         File result = new File(".").getAbsoluteFile().getParentFile();
-        assert result != null : "@AssumeAssertion(nullness): this always works, even in the toplevel directory ...";
+        assert result != null
+                : "@AssumeAssertion(nullness): this always works, even in the toplevel directory ...";
         return result;
     }
 
@@ -859,7 +890,9 @@ public final class IOUtil {
      *         if an I/O error occurs
      */
     public static void extractZip(Path archive, Path targetDir) throws IOException {
-        if (archive == null || targetDir == null) { return; }
+        if (archive == null || targetDir == null) {
+            return;
+        }
         extractZip(new FileInputStream(archive.toFile()), targetDir);
     }
 

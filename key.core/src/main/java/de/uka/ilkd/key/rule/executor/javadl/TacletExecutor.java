@@ -387,7 +387,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             final ImmutableList<GenericSortCondition> cs =
                 matchCond.getInstantiations().getGenericSortInstantiations().toConditions();
 
-            for (final GenericSortCondition gsc : cs) { neededInstances = neededInstances.add(gsc, services); }
+            for (final GenericSortCondition gsc : cs) {
+                neededInstances = neededInstances.add(gsc, services);
+            }
 
             goal.addTaclet(tacletToAdd, neededInstances, true);
         }
@@ -405,7 +407,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             // (not just a variable with the same name), then there is nothing to do
             Collection<IProgramVariable> progVars =
                 goal.getLocalNamespaces().programVariables().elements();
-            if (progVars.contains(inst)) { continue; }
+            if (progVars.contains(inst)) {
+                continue;
+            }
 
             final VariableNamer vn = services.getVariableNamer();
             final LocationVariable renamedInst = vn.rename(inst, goal, posOfFind);
@@ -469,7 +473,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         Term ifObl = null;
 
         // always create at least one new goal
-        if (p_numberOfNewGoals == 0) { p_numberOfNewGoals = 1; }
+        if (p_numberOfNewGoals == 0) {
+            p_numberOfNewGoals = 1;
+        }
 
         if (p_list != null) {
             int i = taclet.ifSequent().antecedent().size();
@@ -482,7 +488,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
                     // negate formulas of the if-succedent
                     final TermServices services = p_goal.proof().getServices();
-                    if (i <= 0) { ifPart = services.getTermBuilder().not(ifPart); }
+                    if (i <= 0) {
+                        ifPart = services.getTermBuilder().not(ifPart);
+                    }
 
                     if (res == null) {
                         res = ImmutableSLList.nil();
@@ -523,7 +531,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             // find the sequent the if obligation has to be added to
             itNewGoalSequents = res.iterator();
             SequentChangeInfo seq = itNewGoalSequents.next();
-            while (itNewGoalSequents.hasNext()) { seq = itNewGoalSequents.next(); }
+            while (itNewGoalSequents.hasNext()) {
+                seq = itNewGoalSequents.next();
+            }
 
             addToPosWithoutInst(new SequentFormula(ifObl), seq, null, false);
         }

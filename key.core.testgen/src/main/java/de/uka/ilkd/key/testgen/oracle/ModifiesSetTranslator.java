@@ -81,7 +81,9 @@ public class ModifiesSetTranslator {
             return OracleLocationSet.EMPTY;
         }
 
-        else if (isAllLocs(t)) { return OracleLocationSet.ALL_LOCS; }
+        else if (isAllLocs(t)) {
+            return OracleLocationSet.ALL_LOCS;
+        }
 
 
         throw new RuntimeException("Unsupported locset operation: " + t.op());

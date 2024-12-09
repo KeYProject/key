@@ -74,9 +74,13 @@ public class MasterHandlerTest {
     public static List<Arguments> data()
             throws IOException, URISyntaxException, ProblemLoaderException {
         URL url = MasterHandlerTest.class.getResource("cases");
-        if (url == null) { throw new FileNotFoundException("Cannot find resource 'cases'."); }
+        if (url == null) {
+            throw new FileNotFoundException("Cannot find resource 'cases'.");
+        }
 
-        if (!url.getProtocol().equals("file")) { throw new IOException("Resource should be a file URL not " + url); }
+        if (!url.getProtocol().equals("file")) {
+            throw new IOException("Resource should be a file URL not " + url);
+        }
 
         Path directory = Paths.get(url.toURI());
         Assertions.assertTrue(Files.isDirectory(directory));
@@ -89,7 +93,9 @@ public class MasterHandlerTest {
         for (Path file : files) {
             try {
                 final var testData = TestData.create(file);
-                if (testData != null) { result.add(Arguments.of(testData)); }
+                if (testData != null) {
+                    result.add(Arguments.of(testData));
+                }
             } catch (Exception e) {
                 LOGGER.error("Error reading {}", file, e);
                 // make sure faulty test cases fail
@@ -208,14 +214,19 @@ public class MasterHandlerTest {
             switch (expectation) {
             case "valid" -> lookFor = "unsat";
             case "fail" -> lookFor = "(sat|timeout)";
-            case "irrelevant" -> {}
+            case "irrelevant" -> {
+            }
             default -> fail("Unexpected expectation: " + expectation);
             }
 
             if (lookFor != null) {
                 for (String line : response) {
-                    if (line.startsWith("(error ")) { fail("An error in Z3: " + line); }
-                    if (line.matches(lookFor)) { return; }
+                    if (line.startsWith("(error ")) {
+                        fail("An error in Z3: " + line);
+                    }
+                    if (line.matches(lookFor)) {
+                        return;
+                    }
                 }
             }
 
@@ -224,7 +235,9 @@ public class MasterHandlerTest {
                     "This is an extended test (will be run only in strict mode)");
             }
 
-            if (lookFor != null) { fail("Expectation not found"); }
+            if (lookFor != null) {
+                fail("Expectation not found");
+            }
         } catch (Throwable t) {
             LOGGER.error("Z3 input {}", data.translation);
             LOGGER.error("Z3 response: {}", response, t);

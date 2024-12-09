@@ -285,7 +285,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             ImmutableSet<QuantifiableVariable> result =
                 DefaultImmutableSet.nil();
 
-            for (final TacletGoalTemplate tgt : goalTemplates()) { result = result.union(tgt.getBoundVariables()); }
+            for (final TacletGoalTemplate tgt : goalTemplates()) {
+                result = result.union(tgt.getBoundVariables());
+            }
 
             final BoundVarsVisitor bvv = new BoundVarsVisitor();
             bvv.visit(ifSequent());
@@ -322,7 +324,11 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      * @return the sort of the SV to match or the SV it shares the same match-sort with
      */
     public NewVarcond varDeclaredNew(SchemaVariable var) {
-        for (final NewVarcond nv : varsNew) { if (nv.getSchemaVariable() == var) { return nv; } }
+        for (final NewVarcond nv : varsNew) {
+            if (nv.getSchemaVariable() == var) {
+                return nv;
+            }
+        }
         return null;
     }
 
@@ -407,7 +413,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      */
     public boolean hasReplaceWith() {
         for (final TacletGoalTemplate goalDescr : goalTemplates) {
-            if (goalDescr.replaceWithExpressionAsObject() != null) { return true; }
+            if (goalDescr.replaceWithExpressionAsObject() != null) {
+                return true;
+            }
         }
         return false;
     }
@@ -433,7 +441,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      * @return true iff a context flag is set in one of the entries in the prefix map.
      */
     public boolean isContextInPrefix() {
-        if (contextInfoComputed) { return contextIsInPrefix; }
+        if (contextInfoComputed) {
+            return contextIsInPrefix;
+        }
         contextInfoComputed = true;
         Iterator<TacletPrefix> it = prefixMap().valueIterator();
         while (it.hasNext()) {
@@ -452,19 +462,29 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true; }
+        if (o == this) {
+            return true;
+        }
 
-        if (o == null || o.getClass() != this.getClass()) { return false; }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
 
         final Taclet t2 = (Taclet) o;
-        if (!name.equals(t2.name)) { return false; }
+        if (!name.equals(t2.name)) {
+            return false;
+        }
 
         if ((ifSequent == null && t2.ifSequent != null)
                 || (ifSequent != null && t2.ifSequent == null)) {
             return false;
-        } else if (ifSequent != null && !ifSequent.equals(t2.ifSequent)) { return false; }
+        } else if (ifSequent != null && !ifSequent.equals(t2.ifSequent)) {
+            return false;
+        }
 
-        if (!choices.equals(t2.choices)) { return false; }
+        if (!choices.equals(t2.choices)) {
+            return false;
+        }
 
         return goalTemplates.equals(t2.goalTemplates);
     }
@@ -474,7 +494,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         if (o == this)
             return true;
 
-        if (o == null || o.getClass() != this.getClass()) { return false; }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
 
         final Taclet t2 = (Taclet) o;
 
@@ -489,12 +511,18 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
                 if1 = if1.tail();
                 if2 = if2.tail();
             }
-            if (!if1.isEmpty() || !if2.isEmpty()) { return false; }
+            if (!if1.isEmpty() || !if2.isEmpty()) {
+                return false;
+            }
         }
 
-        if (!choices.equals(t2.choices)) { return false; }
+        if (!choices.equals(t2.choices)) {
+            return false;
+        }
 
-        if (!goalTemplates.equals(t2.goalTemplates)) { return false; }
+        if (!goalTemplates.equals(t2.goalTemplates)) {
+            return false;
+        }
 
         return true;
     }
@@ -503,7 +531,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     public int hashCode() {
         if (hashcode == 0) {
             hashcode = 37 * name.hashCode() + 17;
-            if (hashcode == 0) { hashcode = -1; }
+            if (hashcode == 0) {
+                hashcode = -1;
+            }
         }
         return hashcode;
     }
@@ -512,7 +542,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     public int hashCodeModProofIrrelevancy() {
         if (hashcode2 == 0) {
             hashcode2 = ifSequent.getFormulabyNr(1).hashCodeModProofIrrelevancy();
-            if (hashcode2 == 0) { hashcode2 = -1; }
+            if (hashcode2 == 0) {
+                hashcode2 = -1;
+            }
         }
         return hashcode2;
     }
@@ -529,7 +561,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             svc.visit(ifSequent());
 
             ifVariables = DefaultImmutableSet.nil();
-            for (final SchemaVariable sv : svc.vars()) { ifVariables = ifVariables.add(sv); }
+            for (final SchemaVariable sv : svc.vars()) {
+                ifVariables = ifVariables.add(sv);
+            }
         }
 
         return ifVariables;
@@ -586,7 +620,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             for (NotFreeIn pair : varsNotFreeIn) {
                 sb = sb.append("\\notFreeIn(").append(pair.first()).append(", ")
                         .append(pair.second()).append(")");
-                if (countVarsNotFreeIn > 0 || !variableConditions.isEmpty()) { sb = sb.append(", "); }
+                if (countVarsNotFreeIn > 0 || !variableConditions.isEmpty()) {
+                    sb = sb.append(", ");
+                }
                 --countVarsNotFreeIn;
             }
 
@@ -607,7 +643,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     }
 
     StringBuffer toStringRuleSets(StringBuffer sb) {
-        if (!ruleSets.isEmpty()) { sb.append("\\heuristics").append(formatAsList(ruleSets, "(", ", ", ")")); }
+        if (!ruleSets.isEmpty()) {
+            sb.append("\\heuristics").append(formatAsList(ruleSets, "(", ", ", ")"));
+        }
         return sb;
     }
 
@@ -671,7 +709,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
     protected boolean admissibleAutomatic(ImmutableList<RuleSet> admissibleRuleSets) {
         for (final RuleSet tacletRuleSet : getRuleSets()) {
-            if (admissibleRuleSets.contains(tacletRuleSet)) { return true; }
+            if (admissibleRuleSets.contains(tacletRuleSet)) {
+                return true;
+            }
         }
         return false;
     }
@@ -686,7 +726,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         OpCollector oc = new OpCollector();
 
         // find, assumes
-        for (SchemaVariable sv : this.getIfFindVariables()) { result.add(sv); }
+        for (SchemaVariable sv : this.getIfFindVariables()) {
+            result.add(sv);
+        }
 
         // add, replacewith
         for (TacletGoalTemplate tgt : this.goalTemplates()) {
@@ -698,7 +740,11 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
             }
         }
 
-        for (Operator op : oc.ops()) { if (op instanceof SchemaVariable) { result.add((SchemaVariable) op); } }
+        for (Operator op : oc.ops()) {
+            if (op instanceof SchemaVariable) {
+                result.add((SchemaVariable) op);
+            }
+        }
 
         return result;
     }
@@ -706,7 +752,9 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
 
     private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
-        for (SequentFormula cf : s) { cf.formula().execPostOrder(oc); }
+        for (SequentFormula cf : s) {
+            cf.formula().execPostOrder(oc);
+        }
     }
 
     /**
@@ -853,7 +901,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
         @Override
         public String toString() {
             return tacletOperation + ", sequent = " + sequent + ", sequent formula = "
-                    + sequentFormula + ", term = " + term;
+                + sequentFormula + ", term = " + term;
         }
 
         /**

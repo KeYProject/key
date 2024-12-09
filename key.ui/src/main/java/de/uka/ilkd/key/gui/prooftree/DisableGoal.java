@@ -42,7 +42,9 @@ public abstract class DisableGoal extends AbstractAction {
      *        array of goals to be enabled or disabled
      */
     private void setGoalStatus(Iterable<Goal> goals) {
-        for (final Goal g : goals) { g.setEnabled(enableGoals); }
+        for (final Goal g : goals) {
+            g.setEnabled(enableGoals);
+        }
     }
 
     /**

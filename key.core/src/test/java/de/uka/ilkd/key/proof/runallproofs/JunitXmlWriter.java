@@ -56,7 +56,9 @@ public class JunitXmlWriter implements AutoCloseable {
                 if (tc.state == TestCaseState.SKIPPED)
                     p.format("<skipped/>");
 
-                if (tc.error != null && !tc.error.trim().isEmpty()) { p.format("<error message=\"%s\"/>", tc.error); }
+                if (tc.error != null && !tc.error.trim().isEmpty()) {
+                    p.format("<error message=\"%s\"/>", tc.error);
+                }
 
                 if (tc.failure != null && !tc.failure.trim().isEmpty()) {
                     p.format("<failure message=\"%s\"/>", tc.error);

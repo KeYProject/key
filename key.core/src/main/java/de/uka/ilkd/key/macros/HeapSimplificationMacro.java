@@ -32,8 +32,8 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
     @Override
     public String getDescription() {
         return "This macro performs simplification of Heap and LocSet terms.\n"
-                + "It applies simplification rules (including the \"unoptimized\" select rules), "
-                + "One Step Simplification, alpha, and delta rules.";
+            + "It applies simplification rules (including the \"unoptimized\" select rules), "
+            + "One Step Simplification, alpha, and delta rules.";
     }
 
     // note that rules in the 'concrete' rule set are usually not included here

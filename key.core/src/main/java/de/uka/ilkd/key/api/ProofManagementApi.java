@@ -45,7 +45,9 @@ public class ProofManagementApi {
      *         exception here)
      */
     public List<Contract> getProofContracts() {
-        if (proofContracts.isEmpty()) { buildContracts(); }
+        if (proofContracts.isEmpty()) {
+            buildContracts();
+        }
         return proofContracts;
     }
 
@@ -62,7 +64,9 @@ public class ProofManagementApi {
                 for (IObserverFunction target : targets) {
                     ImmutableSet<Contract> contracts =
                         currentEnv.getSpecificationRepository().getContracts(type, target);
-                    for (Contract contract : contracts) { proofContracts.add(contract); }
+                    for (Contract contract : contracts) {
+                        proofContracts.add(contract);
+                    }
                 }
             }
         }

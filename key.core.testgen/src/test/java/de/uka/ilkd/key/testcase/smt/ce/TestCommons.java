@@ -60,7 +60,9 @@ public abstract class TestCommons {
 
     protected boolean correctResult(String filepath, boolean isValid)
             throws ProblemLoaderException {
-        if (toolNotInstalled()) { return true; }
+        if (toolNotInstalled()) {
+            return true;
+        }
         SMTSolverResult result = checkFile(filepath);
         // System.gc();
         // unknown is always allowed. But wrong answers are not allowed
@@ -120,8 +122,12 @@ public abstract class TestCommons {
      */
     protected Collection<Taclet> getTaclets() {
         if (taclets.isEmpty()) {
-            if (initConfig == null) { parse(); }
-            for (Taclet t : initConfig.getTaclets()) { taclets.add(t); }
+            if (initConfig == null) {
+                parse();
+            }
+            for (Taclet t : initConfig.getTaclets()) {
+                taclets.add(t);
+            }
         }
         return taclets;
     }
@@ -129,7 +135,9 @@ public abstract class TestCommons {
     protected HashSet<String> getTacletNames() {
         Collection<Taclet> set = getTaclets();
         HashSet<String> names = new HashSet<>();
-        for (Taclet taclet : set) { names.add(taclet.name().toString()); }
+        for (Taclet taclet : set) {
+            names.add(taclet.name().toString());
+        }
         return names;
     }
 
@@ -162,7 +170,9 @@ public abstract class TestCommons {
         try {
             KeYUserProblemFile po =
                 new KeYUserProblemFile(file.getName(), file.toPath(), null, pro);
-            if (initializer == null) { initializer = new ProblemInitializer(po.getProfile()); }
+            if (initializer == null) {
+                initializer = new ProblemInitializer(po.getProfile());
+            }
             initConfig = initializer.prepare(po);
             result = initializer.startProver(initConfig, po);
             services = initConfig.getServices();

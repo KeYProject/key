@@ -25,7 +25,18 @@ plugins {
 
     // EISOP Checker Framework
     id "org.checkerframework" version "0.6.45"
+
+    id("org.sonarqube") version "5.0.0.4638"
 }
+
+sonar {
+  properties {
+    property "sonar.projectKey", "KeYProject_key"
+    property "sonar.organization", "keyproject"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
+}
+
 
 // Configure this project for use inside IntelliJ:
 idea {
@@ -338,10 +349,16 @@ subprojects {
 
             removeUnusedImports()
 
-            eclipse("4.29").configFile("$rootDir/gradle/keyCodeStyle.xml")
-            //googleJavaFormat().reorderImports(true).formatJavadoc(true).aosp().reflowLongStrings().style()
+            /* When new options are added in new versions of the Eclipse formatter, the easiest way is to export the new
+             * style file from the Eclipse GUI and then use the CodeStyleMerger tool in
+             * "$rootDir/scripts/tools/checkstyle/CodeStyleMerger.java" to merge the old and the new style files,
+             * i.e. "java CodeStyleMerger.java <oldStyleFile> <newStyleFile> keyCodeStyle.xml". The tool adds all
+             * entries with keys that were not present in the old file and optionally overwrites the old entries. The
+             * file is output with ordered keys, such that the file can easily be diffed using git.
+             */
+            eclipse().configFile("$rootDir/scripts/tools/checkstyle/keyCodeStyle.xml")
             trimTrailingWhitespace()        // not sure how to set this in the xml file ...
-
+            //googleJavaFormat().aosp().reflowLongStrings()
 
             // note: you can use an empty string for all the imports you didn't specify explicitly,
             // '|' to join group without blank line, and '\\#` prefix for static imports

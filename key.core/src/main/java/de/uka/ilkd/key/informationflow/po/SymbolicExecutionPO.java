@@ -95,7 +95,9 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof SymbolicExecutionPO cPO)) { return false; }
+        if (!(po instanceof SymbolicExecutionPO cPO)) {
+            return false;
+        }
         return contract.equals(cPO.contract);
     }
 
@@ -230,7 +232,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
         ProofOblInput initiatingPO =
             initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
         assert initiatingPO instanceof AbstractInfFlowPO : "Information flow auxiliary "
-                + "proof started from within non-information flow proof!?!";
+            + "proof started from within non-information flow proof!?!";
         return (AbstractInfFlowPO) initiatingPO;
     }
 

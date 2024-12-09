@@ -41,7 +41,9 @@ public final class ReferenceSearcher {
     public static ClosedBy findPreviousProof(List<Proof> previousProofs, Node newNode) {
         // first verify that the new node does not contain any terms that depend on external
         // influences
-        if (!suitableForCloseByReference(newNode)) { return null; }
+        if (!suitableForCloseByReference(newNode)) {
+            return null;
+        }
         for (int i = 0; i < previousProofs.size(); i++) {
             Proof p = previousProofs.get(i);
             if (p == newNode.proof()) {
@@ -64,7 +66,9 @@ public final class ReferenceSearcher {
                     break;
                 }
             }
-            if (!tacletsOk) { continue; }
+            if (!tacletsOk) {
+                continue;
+            }
 
             // only search in compatible proofs
             if (!p.getSettings().getChoiceSettings()
@@ -97,25 +101,37 @@ public final class ReferenceSearcher {
                 // for each node, check that the sequent in the reference is
                 // a subset of the new sequent
                 Node n = nodesToCheck.remove();
-                if (checkedNodes.contains(n) || !n.isClosed()) { continue; }
+                if (checkedNodes.contains(n) || !n.isClosed()) {
+                    continue;
+                }
                 checkedNodes.add(n);
 
                 // find the first node in the branch
-                while (n.parent() != null && n.parent().childrenCount() == 1) { n = n.parent(); }
-                if (n.parent() != null) { nodesToCheck.add(n.parent()); }
+                while (n.parent() != null && n.parent().childrenCount() == 1) {
+                    n = n.parent();
+                }
+                if (n.parent() != null) {
+                    nodesToCheck.add(n.parent());
+                }
                 Sequent seq = n.sequent();
-                if (results != null) { seq = results.reduceSequent(n); }
+                if (results != null) {
+                    seq = results.reduceSequent(n);
+                }
                 Semisequent ante = seq.antecedent();
                 Semisequent succ = seq.succedent();
                 Semisequent anteNew = newNode.sequent().antecedent();
                 Semisequent succNew = newNode.sequent().succedent();
-                if (!containedIn(anteNew, ante) || !containedIn(succNew, succ)) { continue; }
+                if (!containedIn(anteNew, ante) || !containedIn(succNew, succ)) {
+                    continue;
+                }
                 Set<Node> toSkip = new HashSet<>();
                 if (results != null) {
                     // computed skipped nodes by iterating through all nodes
                     AnalysisResults finalResults = results;
                     n.subtreeIterator().forEachRemaining(x -> {
-                        if (!finalResults.usefulSteps.contains(x)) { toSkip.add(x); }
+                        if (!finalResults.usefulSteps.contains(x)) {
+                            toSkip.add(x);
+                        }
                     });
                 }
                 return new ClosedBy(p, n, toSkip);
@@ -142,7 +158,9 @@ public final class ReferenceSearcher {
                     break;
                 }
             }
-            if (!found) { return false; }
+            if (!found) {
+                return false;
+            }
         }
         return true;
     }
@@ -169,7 +187,9 @@ public final class ReferenceSearcher {
             // then, check for program methods
             // (may expand differently depending on Java code associated with proofs)
             term.execPreOrder(f);
-            if (f.getFoundProgramMethod()) { return false; }
+            if (f.getFoundProgramMethod()) {
+                return false;
+            }
         }
         return true;
     }

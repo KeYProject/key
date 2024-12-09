@@ -54,7 +54,9 @@ public final class ExecutionTime {
      *        activity name
      */
     public void stop(String activity) {
-        if (!startTimes.containsKey(activity)) { throw new IllegalStateException("tried to end unknown activity!"); }
+        if (!startTimes.containsKey(activity)) {
+            throw new IllegalStateException("tried to end unknown activity!");
+        }
         if (endTimes.containsKey(activity)) {
             throw new IllegalStateException("tried to end already stopped activity!");
         }

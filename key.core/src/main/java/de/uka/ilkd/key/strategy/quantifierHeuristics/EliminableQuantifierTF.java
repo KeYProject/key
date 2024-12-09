@@ -26,9 +26,13 @@ public class EliminableQuantifierTF extends BinaryTermFeature {
         assert op == Quantifier.ALL || op == Quantifier.EX;
 
         Term matrix = term;
-        do { matrix = matrix.sub(0); } while (matrix.op() == term.op());
+        do {
+            matrix = matrix.sub(0);
+        } while (matrix.op() == term.op());
 
-        if (matrix.op() == Quantifier.ALL || matrix.op() == Quantifier.EX) { return false; }
+        if (matrix.op() == Quantifier.ALL || matrix.op() == Quantifier.EX) {
+            return false;
+        }
 
         final QuantifiableVariable var = term.varsBoundHere(0).last();
 

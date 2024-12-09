@@ -141,7 +141,9 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
                 message.append(echo.message());
             } else {
                 var exec = (ProofScriptEngine.ExecuteInfo) info;
-                if (exec.command().startsWith("'echo ")) { continue; }
+                if (exec.command().startsWith("'echo ")) {
+                    continue;
+                }
                 if (exec.location().getFileURI().isPresent()) {
                     message.append(exec.location().getFileURI().get()).append(":");
                 }
@@ -174,7 +176,9 @@ public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Mes
      */
     @Override
     public void done() {
-        if (monitor != null) { monitor.setVisible(false); }
+        if (monitor != null) {
+            monitor.setVisible(false);
+        }
 
         try {
             get();

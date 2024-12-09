@@ -211,11 +211,17 @@ public class SMTSort {
     /** Returns true iff ((that is from type sort) and (this.id == that.id)) */
     @Override
     public boolean equals(Object that) {
-        if (this == that) { return true; }
+        if (this == that) {
+            return true;
+        }
 
-        if (!(that instanceof SMTSort sort)) { return false; }
+        if (!(that instanceof SMTSort sort)) {
+            return false;
+        }
 
-        if (this.isBV() && sort.isBV()) { return this.bitSize == sort.bitSize; }
+        if (this.isBV() && sort.isBV()) {
+            return this.bitSize == sort.bitSize;
+        }
 
         return this.id.equals(sort.id);
     }
@@ -229,7 +235,9 @@ public class SMTSort {
      * Sort's string value
      */
     public String toString() {
-        if (this.bitSize > 0) { return "(define-sort " + id + " () (_ BitVec " + this.bitSize + "))"; }
+        if (this.bitSize > 0) {
+            return "(define-sort " + id + " () (_ BitVec " + this.bitSize + "))";
+        }
         return "(declare-sort " + id + " 0)";
     }
 

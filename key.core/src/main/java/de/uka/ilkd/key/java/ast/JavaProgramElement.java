@@ -106,7 +106,9 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     public final int hashCode() {
         if (hashCode == -1) {
             int localHash = computeHashCode();
-            if (localHash == -1) { localHash = 1; }
+            if (localHash == -1) {
+                localHash = 1;
+            }
             this.hashCode = localHash;
         }
         return hashCode;
@@ -114,8 +116,12 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true; }
-        if (o == null) { return false; }
+        if (o == this) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
         return (this.getClass() == o.getClass());
     }
 
@@ -154,7 +160,9 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
 
-        if (src.getClass() != getClass()) { return null; }
+        if (src.getClass() != getClass()) {
+            return null;
+        }
         source.next();
         return matchCond;
     }

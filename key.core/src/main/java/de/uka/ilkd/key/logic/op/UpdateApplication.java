@@ -37,7 +37,9 @@ public final class UpdateApplication extends AbstractOperator implements Operato
     public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
             throws TermCreationException {
         super.validTopLevelException(term);
-        if (term.sub(0).sort() != JavaDLTheory.UPDATE) { throw new TermCreationException(this, term); }
+        if (term.sub(0).sort() != JavaDLTheory.UPDATE) {
+            throw new TermCreationException(this, term);
+        }
     }
 
 

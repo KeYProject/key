@@ -187,7 +187,9 @@ public class LabeledStatement extends JavaStatement
      * @return the identifier.
      */
     public ProgramElementName getProgramElementName() {
-        if ((name instanceof ProgramElementName) || (name == null)) { return (ProgramElementName) name; }
+        if ((name instanceof ProgramElementName) || (name == null)) {
+            return (ProgramElementName) name;
+        }
         LOGGER.debug("labeledstatement: SCHEMAVARIABLE IN LABELEDSTATEMENT");
         return null;
     }
@@ -208,8 +210,12 @@ public class LabeledStatement extends JavaStatement
      */
     public int getChildCount() {
         int result = 0;
-        if (name != null) { result++; }
-        if (body != null) { result++; }
+        if (name != null) {
+            result++;
+        }
+        if (body != null) {
+            result++;
+        }
         return result;
     }
 
@@ -224,11 +230,15 @@ public class LabeledStatement extends JavaStatement
      */
     public ProgramElement getChildAt(int index) {
         if (name != null) {
-            if (index == 0) { return name; }
+            if (index == 0) {
+                return name;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0) { return body; }
+            if (index == 0) {
+                return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -253,7 +263,9 @@ public class LabeledStatement extends JavaStatement
      *            if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) { return body; }
+        if (body != null && index == 0) {
+            return body;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

@@ -44,7 +44,9 @@ public class FloatRemainderHandler implements SMTHandler {
 
     @Override
     public Capability canHandle(Term term) {
-        if (term.sort() == floatSort || term.sort() == doubleSort) { return Capability.YES_THIS_INSTANCE; }
+        if (term.sort() == floatSort || term.sort() == doubleSort) {
+            return Capability.YES_THIS_INSTANCE;
+        }
         return Capability.UNABLE;
     }
 
@@ -63,7 +65,9 @@ public class FloatRemainderHandler implements SMTHandler {
         }
 
         SExpr alreadySeen = map.get(term);
-        if (alreadySeen != null) { return alreadySeen; }
+        if (alreadySeen != null) {
+            return alreadySeen;
+        }
 
         Type type;
         String smtType;

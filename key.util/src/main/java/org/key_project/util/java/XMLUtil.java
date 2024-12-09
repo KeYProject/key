@@ -54,13 +54,18 @@ public final class XMLUtil {
                     sb.append(sign);
                 }
             } else {
-                assert tagSB != null : "@AssumeAssertion(nullness): tagSB must have been intialised already";
+                assert tagSB != null
+                        : "@AssumeAssertion(nullness): tagSB must have been intialised already";
                 tagSB.append(sign);
                 if (sign == '>' && !inAttribute) {
                     inTag = false;
                     String replacement = replacer.replaceTag(tagSB.toString());
-                    if (replacement != null) { sb.append(replacement); }
-                } else if (sign == '\'' || sign == '"') { inAttribute = !inAttribute; }
+                    if (replacement != null) {
+                        sb.append(replacement);
+                    }
+                } else if (sign == '\'' || sign == '"') {
+                    inAttribute = !inAttribute;
+                }
             }
         }
         return sb.toString();
@@ -134,7 +139,9 @@ public final class XMLUtil {
             } else {
                 if (sign == '>' && !inAttribute) {
                     inTag = false;
-                } else if (sign == '\'' || sign == '"') { inAttribute = !inAttribute; }
+                } else if (sign == '\'' || sign == '"') {
+                    inAttribute = !inAttribute;
+                }
             }
         }
         return sb.toString();

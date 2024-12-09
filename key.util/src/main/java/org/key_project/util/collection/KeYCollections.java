@@ -65,7 +65,9 @@ public class KeYCollections {
             final T v1 = e.getValue();
             if (v1 != null) {
                 final U value = m1.get(v1);
-                if (value != null) { res.put(e.getKey(), value); }
+                if (value != null) {
+                    res.put(e.getKey(), value);
+                }
             }
         }
         return res;
@@ -122,7 +124,9 @@ public class KeYCollections {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) { res.append(c); }
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+                res.append(c);
+            }
         }
         return res.toString();
     }

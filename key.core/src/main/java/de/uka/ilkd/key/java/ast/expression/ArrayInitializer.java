@@ -73,7 +73,9 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
     @Override
     public ProgramElement getChildAt(int index) {
-        if (children != null) { return children.get(index); }
+        if (children != null) {
+            return children.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -86,7 +88,9 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
     @Override
     public Expression getExpressionAt(int index) {
-        if (children != null) { return children.get(index); }
+        if (children != null) {
+            return children.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

@@ -37,7 +37,9 @@ public final class ObserverCondition implements VariableCondition {
 
         if (obsInst == null) {
             return mc;
-        } else if (!(obsInst.op() instanceof IObserverFunction)) { return null; }
+        } else if (!(obsInst.op() instanceof IObserverFunction)) {
+            return null;
+        }
 
         final Term heapInst = (Term) svInst.getInstantiation(heap);
         final Term properHeapInst = obsInst.sub(0);

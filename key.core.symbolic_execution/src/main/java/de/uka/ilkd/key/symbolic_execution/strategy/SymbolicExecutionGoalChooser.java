@@ -76,12 +76,18 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
                 }
             }
             // Reinitialize preferred set if required: With all goals
-            if (goalsToPrefer.isEmpty()) { for (Goal goalToPrefer : selectedList) { goalsToPrefer.add(goalToPrefer); } }
+            if (goalsToPrefer.isEmpty()) {
+                for (Goal goalToPrefer : selectedList) {
+                    goalsToPrefer.add(goalToPrefer);
+                }
+            }
             // Select goal
             Set<Goal> goalsWhereStopConditionDoNotAllowNextRule = new LinkedHashSet<>();
             do {
                 Goal next = super.getNextGoal();
-                if (next == null) { return null; }
+                if (next == null) {
+                    return null;
+                }
                 Node node = next.node();
                 RuleApp ruleApp = next.getRuleAppManager().peekNext();
                 if (!SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {

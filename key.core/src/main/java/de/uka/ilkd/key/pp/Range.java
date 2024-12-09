@@ -74,11 +74,19 @@ public class Range {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) { return true; }
-        if (obj == null) { return false; }
-        if (getClass() != obj.getClass()) { return false; }
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
         Range other = (Range) obj;
-        if (end != other.end) { return false; }
+        if (end != other.end) {
+            return false;
+        }
         return start == other.start;
     }
 }

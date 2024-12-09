@@ -337,7 +337,7 @@ public class TacletFindModel extends AbstractTableModel {
         if (pe == null) {
             throw new SVInstantiationParserException(instantiation, createPosition(irow),
                 "Unexpected sort: " + sv.sort() + "." + "Label SV or a program variable SV expected"
-                        + " declared as new.",
+                    + " declared as new.",
                 false);
         }
         return pe;
@@ -404,7 +404,9 @@ public class TacletFindModel extends AbstractTableModel {
 
             for (irow = noEditRow + 1; irow < entries.size(); irow++) {
 
-                if (!isInputAvailable(irow)) { continue; }
+                if (!isInputAvailable(irow)) {
+                    continue;
+                }
 
                 sv = (SchemaVariable) getValueAt(irow, 0);
 
@@ -479,7 +481,9 @@ public class TacletFindModel extends AbstractTableModel {
     private int getSVRow(SchemaVariable sv) {
         int rowIndex = 0;
         for (Pair<SchemaVariable, String> pair : entries) {
-            if (pair.first.equals(sv)) { return rowIndex; }
+            if (pair.first.equals(sv)) {
+                return rowIndex;
+            }
             ++rowIndex;
         }
         return -1;

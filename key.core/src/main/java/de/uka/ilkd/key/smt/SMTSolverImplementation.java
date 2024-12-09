@@ -214,7 +214,9 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
     @Override
     public long getStartTime() {
-        if (solverTimeout == null) { return -1; }
+        if (solverTimeout == null) {
+            return -1;
+        }
         return solverTimeout.scheduledExecutionTime();
     }
 
@@ -355,7 +357,9 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
 
         String[] parameters = this.type.getSolverParameters().split(" ");
         String[] result = new String[parameters.length + 1];
-        for (int i = 0; i < result.length; i++) { result[i] = i == 0 ? type.getSolverCommand() : parameters[i - 1]; }
+        for (int i = 0; i < result.length; i++) {
+            result[i] = i == 0 ? type.getSolverCommand() : parameters[i - 1];
+        }
         return result;
     }
 
@@ -364,7 +368,9 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         // order of assignments is important
         setReasonOfInterruption(reason);
         setSolverState(SolverState.Stopped);
-        if (solverTimeout != null) { solverTimeout.cancel(); }
+        if (solverTimeout != null) {
+            solverTimeout.cancel();
+        }
         if (thread != null) {
             processLauncher.stop();
             thread.interrupt();

@@ -37,7 +37,9 @@ public class Cached<A, T> {
      * @return the value
      */
     public T get(A args) {
-        if (Objects.equals(args, this.args)) { return value; }
+        if (Objects.equals(args, this.args)) {
+            return value;
+        }
         value = update.apply(args);
         this.args = args;
         return value;

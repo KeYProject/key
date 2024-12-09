@@ -649,14 +649,18 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
             Assertions.assertNotNull(eqSelector);
             ImmutableList<ISymbolicEquivalenceClass> sec =
                 eqSelector.selectEquivalenceClass(environment, proof, seed);
-            if (PRINT_SLICE) { LOGGER.info("Equivalence Class: {}", sec); }
+            if (PRINT_SLICE) {
+                LOGGER.info("Equivalence Class: {}", sec);
+            }
             // Perform slicing
             ThinBackwardSlicer slicer = new ThinBackwardSlicer();
             ImmutableArray<Node> slices = slicer.slice(seed.first, seed.second, sec);
             // Print slice if requested
             if (PRINT_SLICE) {
                 LOGGER.info("Found Slices: {}", slices.size());
-                for (Node slice : slices) { LOGGER.info("SerialNr {}", slice.serialNr()); }
+                for (Node slice : slices) {
+                    LOGGER.info("SerialNr {}", slice.serialNr());
+                }
             }
             if (fullSlize) {
                 // Compare all Nodes in the slice
@@ -674,7 +678,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
                     while (slice == null && currentIndex < slices.size()) {
                         Node toCheck = slices.get(currentIndex);
                         Assertions.assertNotNull(toCheck);
-                        if (toCheck.serialNr() == expected) { slice = toCheck; }
+                        if (toCheck.serialNr() == expected) {
+                            slice = toCheck;
+                        }
                         currentIndex++;
                     }
                     Assertions.assertNotNull(slice);
@@ -973,7 +979,9 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
          */
         @Override
         public void visit(Proof proof, Node visitedNode) {
-            if (visitedNode.serialNr() == nodeId) { node = visitedNode; }
+            if (visitedNode.serialNr() == nodeId) {
+                node = visitedNode;
+            }
         }
 
         /**

@@ -51,7 +51,9 @@ public final class RuleAppUtil {
         }
         // built-ins need special treatment:
         // record if instantiations
-        if (ruleApp instanceof AbstractBuiltInRuleApp builtIn) { builtIn.ifInsts().forEach(inputs::add); }
+        if (ruleApp instanceof AbstractBuiltInRuleApp builtIn) {
+            builtIn.ifInsts().forEach(inputs::add);
+        }
 
         // State Merging: add all formulas as inputs
         // TODO: this is not enough, as the State Merge processes every formula in the sequent

@@ -82,7 +82,9 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof FunctionalLoopContractPO other)) { return false; }
+        if (!(po instanceof FunctionalLoopContractPO other)) {
+            return false;
+        }
         return contract.equals(other.contract);
     }
 
@@ -97,12 +99,22 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) { return true; }
-        if (obj == null) { return false; }
-        if (!(obj instanceof FunctionalLoopContractPO other)) { return false; }
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof FunctionalLoopContractPO other)) {
+            return false;
+        }
         if (contract == null) {
-            if (other.contract != null) { return false; }
-        } else if (!contract.equals(other.contract)) { return false; }
+            if (other.contract != null) {
+                return false;
+            }
+        } else if (!contract.equals(other.contract)) {
+            return false;
+        }
         if (environmentConfig == null) {
             return other.environmentConfig == null;
         } else {

@@ -64,10 +64,14 @@ public final class ThreadUtilities {
     public static Thread[] getThreads() {
         ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
         ThreadGroup parentGroup;
-        while ((parentGroup = rootGroup.getParent()) != null) { rootGroup = parentGroup; }
+        while ((parentGroup = rootGroup.getParent()) != null) {
+            rootGroup = parentGroup;
+        }
 
         Thread[] threads = new Thread[rootGroup.activeCount() + 1];
-        while (rootGroup.enumerate(threads, true) == threads.length) { threads = new Thread[threads.length * 2]; }
+        while (rootGroup.enumerate(threads, true) == threads.length) {
+            threads = new Thread[threads.length * 2];
+        }
         return threads;
     }
 }

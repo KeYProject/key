@@ -140,10 +140,12 @@ public class ChoiceSelector extends JDialog {
                 if (changed) {
                     int res = JOptionPane.showOptionDialog(ChoiceSelector.this,
                         "Your changes will become effective when "
-                                + "the next problem is loaded.\n",
+                            + "the next problem is loaded.\n",
                         "Taclet Options", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, new Object[] { "OK", "Cancel" }, "OK");
-                    if (res == 0) { settings.setDefaultChoices(category2DefaultChoice); }
+                    if (res == 0) {
+                        settings.setDefaultChoices(category2DefaultChoice);
+                    }
                 }
                 setVisible(false);
                 dispose();
@@ -214,7 +216,9 @@ public class ChoiceSelector extends JDialog {
                 explanationMap = new Properties();
                 InputStream is = ChoiceSelector.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
                 try {
-                    if (is == null) { throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found"); }
+                    if (is == null) {
+                        throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
+                    }
                     explanationMap.loadFromXML(is);
                 } catch (IOException e) {
                     LOGGER.warn("Cannot load help message in rule view.", e);
@@ -222,7 +226,9 @@ public class ChoiceSelector extends JDialog {
             }
         }
         String result = explanationMap.getProperty(category);
-        if (result == null) { result = "No explanation for " + category + " available."; }
+        if (result == null) {
+            result = "No explanation for " + category + " available.";
+        }
 
         return result;
     }
@@ -301,7 +307,10 @@ public class ChoiceSelector extends JDialog {
         if (choices != null) {
             ChoiceEntry[] entries = new ChoiceEntry[choices.size()];
             int i = 0;
-            for (String choice : choices) { entries[i] = createChoiceEntry(choice); i++; }
+            for (String choice : choices) {
+                entries[i] = createChoiceEntry(choice);
+                i++;
+            }
             return entries;
         } else {
             return null;

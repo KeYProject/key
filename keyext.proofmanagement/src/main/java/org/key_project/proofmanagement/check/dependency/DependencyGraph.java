@@ -170,7 +170,9 @@ public class DependencyGraph {
      * @return all SCCs of the graph
      */
     public Set<SCC> getAllSCCs() {
-        if (allSCCs == null) { recalculateSCCs(); }
+        if (allSCCs == null) {
+            recalculateSCCs();
+        }
         return allSCCs;
     }
 
@@ -194,11 +196,19 @@ public class DependencyGraph {
         index = 0;
         stack.clear();
         allSCCs = new HashSet<>();
-        for (DependencyNode node : nodes) { node.setIndex(-1); node.setLowLink(0); node.setOnStack(false); }
+        for (DependencyNode node : nodes) {
+            node.setIndex(-1);
+            node.setLowLink(0);
+            node.setOnStack(false);
+        }
 
         // starting Tarjan's algorithm:
         // iterating over all nodes ensures that SCCs of separated subgraphs are found
-        for (DependencyNode node : nodes) { if (node.getIndex() == -1) { calculateSCCForNode(node); } }
+        for (DependencyNode node : nodes) {
+            if (node.getIndex() == -1) {
+                calculateSCCForNode(node);
+            }
+        }
     }
 
     /**
@@ -244,7 +254,9 @@ public class DependencyGraph {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        for (DependencyNode currentNode : nodes) { result.append(currentNode).append("\n"); }
+        for (DependencyNode currentNode : nodes) {
+            result.append(currentNode).append("\n");
+        }
         return result.toString();
     }
 }

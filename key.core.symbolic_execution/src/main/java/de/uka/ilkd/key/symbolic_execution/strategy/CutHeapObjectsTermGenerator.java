@@ -38,7 +38,9 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
         // Compute collect terms of sequent formulas
         Sequent sequent = goal.sequent();
         Set<Term> topTerms = new LinkedHashSet<>();
-        for (SequentFormula sf : sequent) { topTerms.add(sf.formula()); }
+        for (SequentFormula sf : sequent) {
+            topTerms.add(sf.formula());
+        }
         // Compute equality terms
         HeapLDT heapLDT = goal.node().proof().getServices().getTypeConverter().getHeapLDT();
         Set<Term> equalityTerms = new LinkedHashSet<>();
@@ -107,7 +109,9 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
         term.execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
-                if (visited.op() == heapLDT.getStore()) { storeLocations.add(visited.sub(1)); }
+                if (visited.op() == heapLDT.getStore()) {
+                    storeLocations.add(visited.sub(1));
+                }
             }
         });
     }

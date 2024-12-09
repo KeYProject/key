@@ -131,7 +131,9 @@ class TermImpl implements Term {
         ImmutableSet<QuantifiableVariable> localFreeVars =
             DefaultImmutableSet.nil();
 
-        if (op instanceof QuantifiableVariable) { localFreeVars = localFreeVars.add((QuantifiableVariable) op); }
+        if (op instanceof QuantifiableVariable) {
+            localFreeVars = localFreeVars.add((QuantifiableVariable) op);
+        }
         for (int i = 0, ar = arity(); i < ar; i++) {
             ImmutableSet<QuantifiableVariable> subFreeVars = sub(i).freeVars();
             for (int j = 0, sz = varsBoundHere(i).size(); j < sz; j++) {
@@ -170,7 +172,7 @@ class TermImpl implements Term {
     public <T> T op(Class<T> opClass) throws IllegalArgumentException {
         if (!opClass.isInstance(op)) {
             throw new IllegalArgumentException("Operator does not match the expected type:\n"
-                    + "Operator type was: " + op.getClass() + "\n" + "Expected type was: " + opClass);
+                + "Operator type was: " + op.getClass() + "\n" + "Expected type was: " + opClass);
         }
         return opClass.cast(op);
     }
@@ -220,7 +222,9 @@ class TermImpl implements Term {
     public Sort sort() {
         if (sort == null) {
             Sort[] sorts = new Sort[subs.size()];
-            for (int i = 0; i < sorts.length; i++) { sorts[i] = subs.get(i).sort(); }
+            for (int i = 0; i < sorts.length; i++) {
+                sorts[i] = subs.get(i).sort();
+            }
             sort = op.sort(sorts);
         }
         return sort;
@@ -233,7 +237,9 @@ class TermImpl implements Term {
             int localDepth = -1;
             for (int i = 0, n = arity(); i < n; i++) {
                 final int subTermDepth = sub(i).depth();
-                if (subTermDepth > depth) { localDepth = subTermDepth; }
+                if (subTermDepth > depth) {
+                    localDepth = subTermDepth;
+                }
             }
             ++localDepth;
             depth = localDepth;
@@ -265,7 +271,9 @@ class TermImpl implements Term {
 
     @Override
     public ImmutableSet<QuantifiableVariable> freeVars() {
-        if (freeVars == null) { freeVars = determineFreeVars(); }
+        if (freeVars == null) {
+            freeVars = determineFreeVars();
+        }
         return freeVars;
     }
 
@@ -273,7 +281,9 @@ class TermImpl implements Term {
     public void execPostOrder(Visitor visitor) {
         visitor.subtreeEntered(this);
         if (visitor.visitSubtree(this)) {
-            for (int i = 0, ar = arity(); i < ar; i++) { sub(i).execPostOrder(visitor); }
+            for (int i = 0, ar = arity(); i < ar; i++) {
+                sub(i).execPostOrder(visitor);
+            }
         }
         visitor.visit(this);
         visitor.subtreeLeft(this);
@@ -284,7 +294,11 @@ class TermImpl implements Term {
     public void execPreOrder(Visitor visitor) {
         visitor.subtreeEntered(this);
         visitor.visit(this);
-        if (visitor.visitSubtree(this)) { for (int i = 0, ar = arity(); i < ar; i++) { sub(i).execPreOrder(visitor); } }
+        if (visitor.visitSubtree(this)) {
+            for (int i = 0, ar = arity(); i < ar; i++) {
+                sub(i).execPreOrder(visitor);
+            }
+        }
         visitor.subtreeLeft(this);
     }
 
@@ -293,9 +307,13 @@ class TermImpl implements Term {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true; }
+        if (o == this) {
+            return true;
+        }
 
-        if (o == null || o.getClass() != getClass() || hashCode() != o.hashCode()) { return false; }
+        if (o == null || o.getClass() != getClass() || hashCode() != o.hashCode()) {
+            return false;
+        }
 
         final TermImpl t = (TermImpl) o;
 
@@ -325,13 +343,17 @@ class TermImpl implements Term {
         hashcode = hashcode * 17 + boundVars().hashCode();
         hashcode = hashcode * 17 + javaBlock().hashCode();
 
-        if (hashcode == -1) { hashcode = 0; }
+        if (hashcode == -1) {
+            hashcode = 0;
+        }
         return hashcode;
     }
 
     @Override
     public <V> boolean equalsModProperty(Object o, Property<Term> property, V... v) {
-        if (!(o instanceof Term other)) { return false; }
+        if (!(o instanceof Term other)) {
+            return false;
+        }
         return property.equalsModThisProperty(this, other);
     }
 
@@ -360,8 +382,12 @@ class TermImpl implements Term {
             return sb.toString();
         } else {
             sb.append(op().name().toString());
-            if (!boundVars.isEmpty()) { sb.append(Strings.formatAsList(boundVars(), "{", ",", "}")); }
-            if (arity() == 0) { return sb.toString(); }
+            if (!boundVars.isEmpty()) {
+                sb.append(Strings.formatAsList(boundVars(), "{", ",", "}"));
+            }
+            if (arity() == 0) {
+                return sb.toString();
+            }
             sb.append(Strings.formatAsList(subs(), "(", ",", ")"));
         }
 

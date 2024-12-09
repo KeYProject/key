@@ -128,8 +128,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement
 
     public SourceElement getFirstElement() {
         return switch (getNotation()) {
-            case INFIX, POSTFIX -> children.get(0).getFirstElement();
-            default -> this;
+        case INFIX, POSTFIX -> children.get(0).getFirstElement();
+        default -> this;
         };
     }
 
@@ -143,8 +143,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement
 
     public SourceElement getLastElement() {
         return switch (getNotation()) {
-            case INFIX, PREFIX -> children.get(getArity() - 1).getLastElement();
-            default -> this;
+        case INFIX, PREFIX -> children.get(getArity() - 1).getLastElement();
+        default -> this;
         };
     }
 
@@ -168,7 +168,9 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (children != null) { return children.get(index); }
+        if (children != null) {
+            return children.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -193,7 +195,9 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     public Expression getExpressionAt(int index) {
-        if (children != null) { return children.get(index); }
+        if (children != null) {
+            return children.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -212,7 +216,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
     public String reuseSignature(Services services, ExecutionContext ec) {
         return super.reuseSignature(services, ec) + "("
-                + services.getTypeConverter().getKeYJavaType(this, ec).getName() + ")";
+            + services.getTypeConverter().getKeYJavaType(this, ec).getName() + ")";
     }
 
     public abstract KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);

@@ -72,7 +72,9 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      */
     protected static void register(ProgramVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
-        if (pv != null && progVarNames.lookup(pv.name()) == null) { progVarNames.addSafely(pv); }
+        if (pv != null && progVarNames.lookup(pv.name()) == null) {
+            progVarNames.addSafely(pv);
+        }
     }
 
     /**
@@ -241,11 +243,15 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         public Instantiation instantiate() {
             final Term update = extractUpdate();
             final Term target = extractUpdateTarget();
-            if (!(target.op() instanceof Modality modality)) { return null; }
+            if (!(target.op() instanceof Modality modality)) {
+                return null;
+            }
             final JavaStatement statement =
                 getFirstStatementInPrefixWithAtLeastOneApplicableContract(modality,
                     goal);
-            if (statement == null) { return null; }
+            if (statement == null) {
+                return null;
+            }
             final MethodFrame frame =
                 JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
             final Term self = extractSelf(frame);
@@ -285,7 +291,9 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          * @return the self term.
          */
         private Term extractSelf(final MethodFrame frame) {
-            if (frame == null) { return null; }
+            if (frame == null) {
+                return null;
+            }
             return MiscTools.getSelfTerm(frame, services);
         }
 
@@ -296,7 +304,9 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          * @return the execution context.
          */
         private static ExecutionContext extractExecutionContext(final MethodFrame frame) {
-            if (frame == null) { return null; }
+            if (frame == null) {
+                return null;
+            }
             return (ExecutionContext) frame.getExecutionContext();
         }
 

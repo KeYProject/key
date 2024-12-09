@@ -27,13 +27,17 @@ public class InstantiationFileHandler {
     private static HashMap<String, List<List<String>>> hm;
 
     public static boolean hasInstantiationListsFor(Taclet taclet) {
-        if (hm == null) { createHashMap(); }
+        if (hm == null) {
+            createHashMap();
+        }
         return hm.containsKey(taclet.name().toString());
     }
 
     public static java.util.List<List<String>> getInstantiationListsFor(Taclet taclet) {
         if (hasInstantiationListsFor(taclet)) {
-            if (hm.get(taclet.name().toString()) == null) { createListFor(taclet); }
+            if (hm.get(taclet.name().toString()) == null) {
+                createListFor(taclet);
+            }
             return hm.get(taclet.name().toString());
         }
         return null;
@@ -41,14 +45,18 @@ public class InstantiationFileHandler {
 
     private static void createHashMap() {
         File dir = new File(INSTANTIATION_DIR);
-        if (!dir.exists()) { dir.mkdirs(); }
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
         String[] instFiles = dir.list();
         if (instFiles == null) {
             hm = new LinkedHashMap<>(0);
         } else {
             // Avoid resizing of HashMap
             hm = new LinkedHashMap<>(instFiles.length + 1, 1);
-            for (String instFile : instFiles) { hm.put(instFile, null); }
+            for (String instFile : instFiles) {
+                hm.put(instFile, null);
+            }
         }
     }
 
@@ -62,23 +70,35 @@ public class InstantiationFileHandler {
             StringBuilder sb = new StringBuilder();
             while (line != null) {
                 if (line.equals(SEPARATOR1)) {
-                    if (sb.length() > 0) { instantiations.add(sb.toString()); }
+                    if (sb.length() > 0) {
+                        instantiations.add(sb.toString());
+                    }
                     sb = new StringBuilder();
-                    if (instantiations.size() > 0) { instList.add(instantiations); }
+                    if (instantiations.size() > 0) {
+                        instList.add(instantiations);
+                    }
                     instantiations = new LinkedList<>();
                 } else if (line.equals(SEPARATOR2)) {
-                    if (sb.length() > 0) { instantiations.add(sb.toString()); }
+                    if (sb.length() > 0) {
+                        instantiations.add(sb.toString());
+                    }
                     sb = new StringBuilder();
                 } else {
-                    if (sb.length() > 0) { sb.append(LINE_END); }
+                    if (sb.length() > 0) {
+                        sb.append(LINE_END);
+                    }
                     sb.append(line);
                 }
                 line = br.readLine();
             }
-            if (sb.length() > 0) { instantiations.add(sb.toString()); }
+            if (sb.length() > 0) {
+                instantiations.add(sb.toString());
+            }
         } catch (IOException e) {
         }
-        if (instantiations.size() > 0) { instList.add(instantiations); }
+        if (instantiations.size() > 0) {
+            instList.add(instantiations);
+        }
         hm.put(taclet.name().toString(), instList);
     }
 
@@ -92,7 +112,9 @@ public class InstantiationFileHandler {
                 StandardCharsets.UTF_8))) {
             StringBuilder sb = new StringBuilder();
             for (int i = start; i < tableModel.getRowCount(); i++) {
-                if (i > start) { sb.append(SEPARATOR2).append(LINE_END); }
+                if (i > start) {
+                    sb.append(SEPARATOR2).append(LINE_END);
+                }
                 sb.append(tableModel.getValueAt(i, 1)).append(LINE_END);
             }
             String newInst = sb.toString();
@@ -104,7 +126,9 @@ public class InstantiationFileHandler {
                     final ListIterator<String> instIt = instListIt.next().listIterator();
                     sb = new StringBuilder();
                     for (int i = 0; instIt.hasNext(); i++) {
-                        if (i > 0) { sb.append(SEPARATOR2).append(LINE_END); }
+                        if (i > 0) {
+                            sb.append(SEPARATOR2).append(LINE_END);
+                        }
                         sb.append(instIt.next()).append(LINE_END);
                     }
                     String oldInst = sb.toString();

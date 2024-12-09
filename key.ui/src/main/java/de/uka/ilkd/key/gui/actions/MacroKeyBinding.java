@@ -45,7 +45,9 @@ public class MacroKeyBinding extends AbstractAction {
 
         if (isGoal) {
             PosInSequent mousePos = sequentView.getLastPosInSequent();
-            if (mousePos != null) { posInOcc = mousePos.getPosInOccurrence(); }
+            if (mousePos != null) {
+                posInOcc = mousePos.getPosInOccurrence();
+            }
         }
 
         if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {

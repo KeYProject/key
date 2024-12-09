@@ -39,7 +39,9 @@ public abstract class NodeIntermediateWalker {
     protected void walk(NodeIntermediate node) {
         doAction(node);
 
-        for (NodeIntermediate child : node.getChildren()) { walk(child); }
+        for (NodeIntermediate child : node.getChildren()) {
+            walk(child);
+        }
     }
 
     /**

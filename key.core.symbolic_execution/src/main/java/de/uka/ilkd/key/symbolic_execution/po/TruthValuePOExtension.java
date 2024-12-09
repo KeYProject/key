@@ -63,7 +63,9 @@ public class TruthValuePOExtension implements POExtension {
                 for (int i = 0; i < newSubs.length; i++) {
                     Term oldTerm = term.sub(i);
                     newSubs[i] = labelPostTerm(services, oldTerm);
-                    if (oldTerm != newSubs[i]) { subsChanged = true; }
+                    if (oldTerm != newSubs[i]) {
+                        subsChanged = true;
+                    }
                 }
                 term = subsChanged
                         ? tf.createTerm(term.op(), new ImmutableArray<>(newSubs),

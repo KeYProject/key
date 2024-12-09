@@ -47,7 +47,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         putValue(NAME, getTitle());
         putValue(SHORT_DESCRIPTION, getDescription());
-        if (proofIsRequired()) { getMediator().enableWhenProofLoaded(this); }
+        if (proofIsRequired()) {
+            getMediator().enableWhenProofLoaded(this);
+        }
     }
 
     abstract protected void loadTaclets();
@@ -149,7 +151,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 public void doStopped(ProofAggregate p, ImmutableSet<Taclet> taclets,
                         boolean addAxioms) {
                     getMediator().startInterface(true);
-                    if (p != null) { mainWindow.getUserInterface().registerProofAggregate(p); }
+                    if (p != null) {
+                        mainWindow.getUserInterface().registerProofAggregate(p);
+                    }
 
                 }
 
@@ -191,11 +195,15 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         @Override
         protected void loadTaclets() {
-            if (chooser == null) { chooser = new LoadUserTacletsDialog(LoadUserTacletsDialog.Mode.PROVE); }
+            if (chooser == null) {
+                chooser = new LoadUserTacletsDialog(LoadUserTacletsDialog.Mode.PROVE);
+            }
 
             boolean loaded = chooser.showAsDialog();
 
-            if (!loaded) { return; }
+            if (!loaded) {
+                return;
+            }
 
             final File fileForLemmata = chooser.getFileForTaclets();
             final boolean loadAsLemmata = chooser.isGenerateProofObligations();
@@ -270,7 +278,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
             boolean loaded = chooser.showAsDialog();
 
-            if (!loaded) { return; }
+            if (!loaded) {
+                return;
+            }
             final Proof proof = getMediator().getSelectedProof();
             final File fileForLemmata = chooser.getFileForTaclets();
             final boolean loadAsLemmata = chooser.isGenerateProofObligations();
@@ -296,7 +306,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 public void doStopped(ProofAggregate p, ImmutableSet<Taclet> taclets,
                         boolean addAxioms) {
                     getMediator().startInterface(true);
-                    if (p != null) { mainWindow.getUserInterface().registerProofAggregate(p); }
+                    if (p != null) {
+                        mainWindow.getUserInterface().registerProofAggregate(p);
+                    }
 
                     if (p != null || addAxioms) {
                         // add only the taclets to the goals if

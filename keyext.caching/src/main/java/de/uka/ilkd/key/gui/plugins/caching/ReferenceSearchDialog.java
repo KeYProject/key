@@ -130,7 +130,9 @@ public class ReferenceSearchDialog extends JDialog {
     }
 
     private JScrollPane getScrollPane() {
-        if (scrollPane == null) { scrollPane = SwingUtil.createScrollPane(table); }
+        if (scrollPane == null) {
+            scrollPane = SwingUtil.createScrollPane(table);
+        }
         return scrollPane;
     }
 

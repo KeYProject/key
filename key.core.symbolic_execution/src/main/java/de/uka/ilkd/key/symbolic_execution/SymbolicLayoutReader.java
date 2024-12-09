@@ -138,7 +138,9 @@ public class SymbolicLayoutReader {
                     throw new SAXException("Model found a second time.");
                 }
             } else if (isState(uri, localName, qName)) {
-                if (!(parent instanceof KeYlessLayout)) { throw new SAXException("Found state in wrong hierarchy."); }
+                if (!(parent instanceof KeYlessLayout)) {
+                    throw new SAXException("Found state in wrong hierarchy.");
+                }
                 KeYlessState state = new KeYlessState(getName(attributes));
                 if (((KeYlessLayout) parent).getState() != null) {
                     throw new SAXException("State found a second time.");
@@ -146,7 +148,9 @@ public class SymbolicLayoutReader {
                 ((KeYlessLayout) parent).setState(state);
                 parentStack.addFirst(state);
             } else if (isObject(uri, localName, qName)) {
-                if (!(parent instanceof KeYlessLayout)) { throw new SAXException("Found object in wrong hierarchy."); }
+                if (!(parent instanceof KeYlessLayout)) {
+                    throw new SAXException("Found object in wrong hierarchy.");
+                }
                 KeYlessObject object =
                     new KeYlessObject(getName(attributes), getTypeString(attributes));
                 ((KeYlessLayout) parent).addObject(object);
@@ -195,7 +199,9 @@ public class SymbolicLayoutReader {
          */
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
-            if (!isTerm(uri, localName, qName)) { parentStack.removeFirst(); }
+            if (!isTerm(uri, localName, qName)) {
+                parentStack.removeFirst();
+            }
         }
 
         /**
@@ -208,7 +214,7 @@ public class SymbolicLayoutReader {
                 ISymbolicObject target = objectIdMapping.get(entry.getValue());
                 if (target == null) {
                     throw new SAXException("Association target object with id \"" + entry.getValue()
-                            + "\" is not available.");
+                        + "\" is not available.");
                 }
                 entry.getKey().setTarget(target);
             }

@@ -26,8 +26,12 @@ public class LetCommand extends AbstractCommand<Map<String, String>> {
         AbbrevMap abbrMap = stateMap.getAbbreviations();
         for (Map.Entry<String, String> entry : args.entrySet()) {
             String key = entry.getKey();
-            if ("#1".equals(key)) { continue; }
-            if ("#literal".equals(key)) { continue; }
+            if ("#1".equals(key)) {
+                continue;
+            }
+            if ("#literal".equals(key)) {
+                continue;
+            }
             if (!key.startsWith("@")) {
                 throw new ScriptException("Unexpected parameter to let, only @var allowed: " + key);
             }

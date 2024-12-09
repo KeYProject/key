@@ -71,7 +71,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     public void clearCache() {
         queue = null;
         previousMinimum = null;
-        if (goal != null) { goal.proof().getServices().getCaches().getIfInstantiationCache().releaseAll(); }
+        if (goal != null) {
+            goal.proof().getServices().getCaches().getIfInstantiationCache().releaseAll();
+        }
         clearNextRuleApp();
     }
 
@@ -79,7 +81,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * Add all rules to the heap that are not reported via the <code>RuleListener</code> connection
      */
     private void ensureQueueExists() {
-        if (queue != null) { return; }
+        if (queue != null) {
+            return;
+        }
 
         /*
          * If no goal is specified, we cannot assign a value to the queue. In that case clear the
@@ -138,7 +142,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             RuleAppContainer.createAppContainers(rules, pos, goal);
         PERF_CREATE_CONTAINER.addAndGet(System.nanoTime() - time);
         ensureQueueExists();
-        for (RuleAppContainer rac : containers) { addRuleApp(rac); }
+        for (RuleAppContainer rac : containers) {
+            addRuleApp(rac);
+        }
     }
 
     private void addRuleApp(RuleAppContainer rac) {
@@ -155,7 +161,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     private static ImmutableHeap<RuleAppContainer> push(Iterator<RuleAppContainer> it,
             ImmutableHeap<RuleAppContainer> sourceQueue) {
-        while (it.hasNext()) { sourceQueue = push(it.next(), sourceQueue); }
+        while (it.hasNext()) {
+            sourceQueue = push(it.next(), sourceQueue);
+        }
         return sourceQueue;
     }
 
@@ -173,13 +181,19 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
 
     private static ImmutableHeap<RuleAppContainer> createFurtherApps(
             @Nullable RuleAppContainer from, Goal goal) {
-        if (from == null) { return ImmutableLeftistHeap.nilHeap(); }
+        if (from == null) {
+            return ImmutableLeftistHeap.nilHeap();
+        }
         var apps = from.createFurtherApps(goal);
-        if (apps.isEmpty()) { return ImmutableLeftistHeap.nilHeap(); }
+        if (apps.isEmpty()) {
+            return ImmutableLeftistHeap.nilHeap();
+        }
 
         var actualApps = new ArrayList<RuleAppContainer>(apps.size());
         for (RuleAppContainer app : apps) {
-            if (app.getCost() == TopRuleAppCost.INSTANCE) { continue; }
+            if (app.getCost() == TopRuleAppCost.INSTANCE) {
+                continue;
+            }
             actualApps.add(app);
         }
         var time = System.nanoTime();
@@ -208,7 +222,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                 nextRuleTime = currentTime;
             }
 
-            if (nextRuleApp != null) { return nextRuleApp; }
+            if (nextRuleApp != null) {
+                return nextRuleApp;
+            }
 
             goal.ruleAppIndex().fillCache();
 

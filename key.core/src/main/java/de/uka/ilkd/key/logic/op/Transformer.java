@@ -83,7 +83,9 @@ public class Transformer extends JFunction {
      */
     public static boolean inTransformer(PosInOccurrence pio) {
         boolean trans = false;
-        if (pio == null) { return false; }
+        if (pio == null) {
+            return false;
+        }
         if (pio.posInTerm() != null) {
             PIOPathIterator it = pio.iterator();
             Operator op;
@@ -113,7 +115,9 @@ public class Transformer extends JFunction {
             while (it.next() != -1) {
                 final Term t = it.getSubTerm();
                 op = t.op();
-                if (op instanceof Transformer) { return (Transformer) op; }
+                if (op instanceof Transformer) {
+                    return (Transformer) op;
+                }
             }
         }
         return null;

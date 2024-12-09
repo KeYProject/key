@@ -41,7 +41,9 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      *        The {@link IBreakpoint} to use.
      */
     public BreakpointStopCondition(IBreakpoint... breakpoints) {
-        if (breakpoints != null) { Collections.addAll(this.breakpoints, breakpoints); }
+        if (breakpoints != null) {
+            Collections.addAll(this.breakpoints, breakpoints);
+        }
     }
 
     /**

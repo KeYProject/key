@@ -40,7 +40,9 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
 
             final boolean result =
                 findIsInAntec != iffi.inAntec() || !findFormula.equals(ifFormula);
-            if (!result) { return false; }
+            if (!result) {
+                return false;
+            }
         }
         return true;
     }

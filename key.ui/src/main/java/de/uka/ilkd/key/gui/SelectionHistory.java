@@ -86,7 +86,9 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
                 previousNode = selectedNodes.peekLast();
                 previous = previousNode != null ? previousNode.get() : null;
             }
-            if (previous != null) { selectedNodes.addLast(new WeakReference<>(previous)); }
+            if (previous != null) {
+                selectedNodes.addLast(new WeakReference<>(previous));
+            }
             selectedNodes.addLast(new WeakReference<>(currentSelection));
             return previous;
         }
@@ -124,7 +126,9 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
                         : null;
             }
             // this is a query method (modulo fixing up the history), re-instantiate previous state
-            if (previous != null) { selectionHistoryForward.addLast(previous); }
+            if (previous != null) {
+                selectionHistoryForward.addLast(previous);
+            }
             return previous;
         }
         return null;
@@ -163,13 +167,17 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
         Proof p = e.getSource().getSelectedProof();
-        if (p == null || monitoredProofs.contains(p)) { return; }
+        if (p == null || monitoredProofs.contains(p)) {
+            return;
+        }
         monitoredProofs.add(p);
         p.addProofDisposedListener(this);
     }
 
     private void fireChangeEvent() {
-        for (SelectionHistoryChangeListener l : listeners) { l.update(); }
+        for (SelectionHistoryChangeListener l : listeners) {
+            l.update();
+        }
     }
 
     public void addChangeListener(SelectionHistoryChangeListener listener) {

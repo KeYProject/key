@@ -154,7 +154,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
             ProofOblInput problem =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             if (problem instanceof AbstractOperationPO operationPO) {
-                if (operationPO.isAddUninterpretedPredicate()) { return operationPO.getUninterpretedPredicate(); }
+                if (operationPO.isAddUninterpretedPredicate()) {
+                    return operationPO.getUninterpretedPredicate();
+                }
             }
         }
         return null;
@@ -289,7 +291,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
             updateSubs[i] = tb.var(selfVar);
             i++;
         }
-        for (ProgramVariable paramVar : paramVars) { updateSubs[i] = tb.var(paramVar); i++; }
+        for (ProgramVariable paramVar : paramVars) {
+            updateSubs[i] = tb.var(paramVar);
+            i++;
+        }
         return updateSubs;
     }
 
@@ -316,7 +321,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
         for (LocationVariable heap : modifiableHeaps) {
             if (target.getStateCount() >= 1) {
                 heaps.add(heap);
-                if (target.getStateCount() == 2) { heaps.add(atPreVars.get(heap)); }
+                if (target.getStateCount() == 2) {
+                    heaps.add(atPreVars.get(heap));
+                }
             }
         }
         return heaps;
@@ -338,7 +345,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private static Map<Term, Term> createHeapToAtPres(final List<LocationVariable> modifiableHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
         final Map<Term, Term> heapToAtPre = new LinkedHashMap<>();
-        for (LocationVariable heap : modifiableHeaps) { heapToAtPre.put(tb.var(heap), tb.var(atPreVars.get(heap))); }
+        for (LocationVariable heap : modifiableHeaps) {
+            heapToAtPre.put(tb.var(heap), tb.var(atPreVars.get(heap)));
+        }
         return heapToAtPre;
     }
 
@@ -355,8 +364,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
             } catch (IllegalArgumentException iae) {
                 throw new IllegalStateException(
                     "You are trying to prove a contract that involves Java Card "
-                            + "transactions, but the required Java Card API classes are not "
-                            + "in your project.");
+                        + "transactions, but the required Java Card API classes are not "
+                        + "in your project.");
             }
         }
         return pre;
@@ -375,8 +384,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), post));
         } else {
             final Term body = representsFromContract;
-            assert body.op() == Equality.EQUALS : "Only fully functional represents clauses for model"
-                    + " methods are supported!";
+            assert body.op() == Equality.EQUALS
+                    : "Only fully functional represents clauses for model"
+                        + " methods are supported!";
             progPost = tb.apply(saveBeforeHeaps,
                 tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), post));
         }
@@ -544,7 +554,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
      */
     protected Term modifyPostTerm(Services proofServices, Term post) {
         ImmutableList<POExtension> extensions = ProofInitServiceUtil.getOperationPOExtension(this);
-        for (POExtension extension : extensions) { post = extension.modifyPostTerm(proofConfig, proofServices, post); }
+        for (POExtension extension : extensions) {
+            post = extension.modifyPostTerm(proofConfig, proofServices, post);
+        }
         return post;
     }
 
@@ -661,7 +673,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
      */
     protected Term generateParamsOK(ImmutableList<LocationVariable> paramVars) {
         Term paramsOK = tb.tt();
-        for (LocationVariable paramVar : paramVars) { paramsOK = tb.and(paramsOK, tb.reachableValue(paramVar)); }
+        for (LocationVariable paramVar : paramVars) {
+            paramsOK = tb.and(paramsOK, tb.reachableValue(paramVar));
+        }
         return paramsOK;
     }
 
@@ -811,7 +825,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
         ImmutableList<Term> arguments = ImmutableSLList.nil(); // tb.var(paramVars);
         // Method parameters
-        for (LocationVariable formalParam : formalParamVars) { arguments = arguments.prepend(tb.var(formalParam)); }
+        for (LocationVariable formalParam : formalParamVars) {
+            arguments = arguments.prepend(tb.var(formalParam));
+        }
         // Exception variable (As second argument for the predicate)
         arguments = arguments.prepend(exceptionVar);
         // Heap (As first argument for the predicate)
@@ -1085,7 +1101,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
         for (KeYJavaType superType : proofServices.getJavaInfo()
                 .getAllSupertypes(getCalleeKeYJavaType())) {
             for (FunctionalOperationContract fop : cs) {
-                if (fop.getSpecifiedIn().equals(superType)) { lookupContracts = lookupContracts.append(fop); }
+                if (fop.getSpecifiedIn().equals(superType)) {
+                    lookupContracts = lookupContracts.append(fop);
+                }
             }
         }
         return lookupContracts;
@@ -1101,7 +1119,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
         for (FunctionalOperationContract fop : lookupContracts) {
             representsFromContract = fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars,
                 resultVar, atPreVars, proofServices);
-            if (representsFromContract != null) { break; }
+            if (representsFromContract != null) {
+                break;
+            }
         }
         return representsFromContract;
     }
@@ -1112,8 +1132,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // register the variables so they are declared in proof header
         // if the proof is saved to a file
         register(paramVars, proofServices);
-        for (LocationVariable var : vars) { register(var, proofServices); }
-        for (LocationVariable lv : atPreVars) { register(lv, proofServices); }
+        for (LocationVariable var : vars) {
+            register(var, proofServices);
+        }
+        for (LocationVariable lv : atPreVars) {
+            register(lv, proofServices);
+        }
     }
 
     private Term createApplyGlobalUpdateTerm(final LocationVariable selfVar,

@@ -63,13 +63,17 @@ public class NewSMTTranslationSettings extends AbstractSettings {
     public void readSettings(Properties props) {
         for (Object k : props.keySet()) {
             String key = k.toString();
-            if (key.startsWith(PREFIX)) { map.put(key.substring(PREFIX.length()), props.getProperty(key)); }
+            if (key.startsWith(PREFIX)) {
+                map.put(key.substring(PREFIX.length()), props.getProperty(key));
+            }
         }
     }
 
     @Override
     public void writeSettings(Properties props) {
-        for (Entry<String, String> en : map.entrySet()) { props.put(PREFIX + en.getKey(), en.getValue()); }
+        for (Entry<String, String> en : map.entrySet()) {
+            props.put(PREFIX + en.getKey(), en.getValue());
+        }
     }
 
     @Override
@@ -87,7 +91,9 @@ public class NewSMTTranslationSettings extends AbstractSettings {
     @Override
     public void writeSettings(Configuration props) {
         var newSmt = props.getOrCreateSection("NewSMT");
-        for (Entry<String, String> en : map.entrySet()) { newSmt.set(en.getKey(), en.getValue()); }
+        for (Entry<String, String> en : map.entrySet()) {
+            newSmt.set(en.getKey(), en.getValue());
+        }
     }
 
 

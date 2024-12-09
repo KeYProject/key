@@ -158,7 +158,9 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     @Override
     public TypeDeclaration getTypeDeclarationAt(int index) {
-        if (anonymousClass != null && index == 0) { return anonymousClass; }
+        if (anonymousClass != null && index == 0) {
+            return anonymousClass;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -166,10 +168,18 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     @Override
     public int getChildCount() {
         int result = 0;
-        if (accessPath != null) { result++; }
-        if (typeReference != null) { result++; }
-        if (children != null) { result += children.size(); }
-        if (anonymousClass != null) { result++; }
+        if (accessPath != null) {
+            result++;
+        }
+        if (typeReference != null) {
+            result++;
+        }
+        if (children != null) {
+            result += children.size();
+        }
+        if (anonymousClass != null) {
+            result++;
+        }
         return result;
     }
 
@@ -178,19 +188,29 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     public ProgramElement getChildAt(int index) {
         int len;
         if (accessPath != null) {
-            if (index == 0) { return accessPath; }
+            if (index == 0) {
+                return accessPath;
+            }
             index--;
         }
         if (typeReference != null) {
-            if (index == 0) { return typeReference; }
+            if (index == 0) {
+                return typeReference;
+            }
             index--;
         }
         if (children != null) {
             len = children.size();
-            if (len > index) { return children.get(index); }
+            if (len > index) {
+                return children.get(index);
+            }
             index -= len;
         }
-        if (anonymousClass != null) { if (index == 0) { return anonymousClass; } }
+        if (anonymousClass != null) {
+            if (index == 0) {
+                return anonymousClass;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

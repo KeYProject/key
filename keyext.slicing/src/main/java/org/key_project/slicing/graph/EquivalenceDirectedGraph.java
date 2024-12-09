@@ -48,7 +48,9 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
                 new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v);
             Collection<GraphNode> group = verticesModProof.get(wrapper);
             group.remove(v);
-            if (group.isEmpty()) { verticesModProof.remove(wrapper); }
+            if (group.isEmpty()) {
+                verticesModProof.remove(wrapper);
+            }
         }
     }
 
@@ -69,8 +71,12 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
 
     public EquivalenceDirectedGraph copy() {
         var g = new EquivalenceDirectedGraph();
-        for (var vertex : vertexSet()) { g.addVertex(vertex); }
-        for (var edge : edgeSet()) { g.addEdge((GraphNode) edge.getSource(), (GraphNode) edge.getTarget(), edge); }
+        for (var vertex : vertexSet()) {
+            g.addVertex(vertex);
+        }
+        for (var edge : edgeSet()) {
+            g.addEdge((GraphNode) edge.getSource(), (GraphNode) edge.getTarget(), edge);
+        }
         return g;
     }
 }

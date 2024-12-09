@@ -128,7 +128,9 @@ public class PositionInfo {
      */
     @Deprecated // only kept for compatibility reasons
     public String getFileName() {
-        if (fileURI != null && fileURI.getScheme().equals("file")) { return Paths.get(fileURI).toString(); }
+        if (fileURI != null && fileURI.getScheme().equals("file")) {
+            return Paths.get(fileURI).toString();
+        }
         return null;
     }
 
@@ -168,12 +170,16 @@ public class PositionInfo {
             return null;
         } else if (p1 == null) {
             return p2;
-        } else if (p2 == null) { return p1; }
+        } else if (p2 == null) {
+            return p1;
+        }
 
         // -> p1 and p2 not null
         if (p1 == UNDEFINED) {
             return p2;
-        } else if (p2 == UNDEFINED) { return p1; }
+        } else if (p2 == UNDEFINED) {
+            return p1;
+        }
 
         // -> p1 and p2 != UNDEFINED
         Position start;
@@ -210,7 +216,7 @@ public class PositionInfo {
             return "UNDEFINED";
         } else {
             return ((fileURI == null ? "" : fileURI) + " start Pos: " + startPos
-                    + " end Pos: " + endPos);
+                + " end Pos: " + endPos);
         }
     }
 

@@ -251,7 +251,9 @@ public final class LoopScopeBlock extends JavaStatement
      */
     @Override
     public Statement getStatementAt(int index) {
-        if (index == 0) { return body; }
+        if (index == 0) {
+            return body;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

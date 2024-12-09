@@ -26,7 +26,9 @@ public class ShowHashcodesExtension implements KeYGuiExtension, KeYGuiExtension.
 
     @Override
     public List<String> getTooltipStrings(MainWindow mainWindow, PosInSequent pos) {
-        if (pos == null || pos.isSequent()) { return Collections.emptyList(); }
+        if (pos == null || pos.isSequent()) {
+            return Collections.emptyList();
+        }
 
         String result = "";
 

@@ -49,7 +49,7 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
             positiveContext = false;
         } else {
             throw new RuntimeException("Second argument of the meta construct " + name
-                    + " must be true or false, but it is: " + arg2);
+                + " must be true or false, but it is: " + arg2);
         }
 
         final Term result;

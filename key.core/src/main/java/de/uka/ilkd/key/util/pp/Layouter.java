@@ -599,7 +599,9 @@ public class Layouter<M> {
     /** Pop the topmost Token from the delimStack */
     private StreamToken<M> pop() {
         StreamToken<M> token = delimStack.pollLast();
-        if (token == null) { throw new UnbalancedBlocksException(); }
+        if (token == null) {
+            throw new UnbalancedBlocksException();
+        }
         return token;
     }
 
@@ -608,14 +610,18 @@ public class Layouter<M> {
      */
     private @NonNull StreamToken<M> popBottom() {
         StreamToken<M> token = delimStack.pollFirst();
-        if (token == null) { throw new UnbalancedBlocksException(); }
+        if (token == null) {
+            throw new UnbalancedBlocksException();
+        }
         return token;
     }
 
     /** Return the top of the delimStack, without popping it. */
     private StreamToken<M> top() {
         StreamToken<M> token = delimStack.peekLast();
-        if (token == null) { throw new UnbalancedBlocksException(); }
+        if (token == null) {
+            throw new UnbalancedBlocksException();
+        }
         return token;
     }
 

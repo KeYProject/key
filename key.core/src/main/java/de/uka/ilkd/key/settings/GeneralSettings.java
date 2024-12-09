@@ -173,29 +173,41 @@ public class GeneralSettings extends AbstractSettings {
     public void readSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         String val = props.getProperty(prefix + TACLET_FILTER);
-        if (val != null) { setTacletFilter(Boolean.parseBoolean(val)); }
+        if (val != null) {
+            setTacletFilter(Boolean.parseBoolean(val));
+        }
 
         val = props.getProperty(prefix + DND_DIRECTION_SENSITIVE_KEY);
-        if (val != null) { dndDirectionSensitive = Boolean.parseBoolean(val); }
+        if (val != null) {
+            dndDirectionSensitive = Boolean.parseBoolean(val);
+        }
 
         val = props.getProperty(prefix + RIGHT_CLICK_MACROS_KEY);
-        if (val != null) { setRightClickMacros(Boolean.parseBoolean(val)); }
+        if (val != null) {
+            setRightClickMacros(Boolean.parseBoolean(val));
+        }
 
         val = props.getProperty(prefix + USE_JML_KEY);
-        if (val != null) { setUseJML(Boolean.parseBoolean(val)); }
+        if (val != null) {
+            setUseJML(Boolean.parseBoolean(val));
+        }
 
         val = props.getProperty(prefix + AUTO_SAVE);
         if (val != null) {
             try {
                 setAutoSave(Integer.parseInt(val));
-                if (autoSave < 0) { setAutoSave(0); }
+                if (autoSave < 0) {
+                    setAutoSave(0);
+                }
             } catch (NumberFormatException e) {
                 setAutoSave(0);
             }
         }
 
         val = props.getProperty(prefix + ENSURE_SOURCE_CONSISTENCY);
-        if (val != null) { setEnsureSourceConsistency(Boolean.parseBoolean(val)); }
+        if (val != null) {
+            setEnsureSourceConsistency(Boolean.parseBoolean(val));
+        }
 
         {
             String sysProp = System.getProperty(KEY_JML_ENABLED_KEYS);
@@ -206,7 +218,9 @@ public class GeneralSettings extends AbstractSettings {
                 val = props.getProperty(prefix + KEY_JML_ENABLED_KEYS);
             }
 
-            if (val != null) { setJmlEnabledKeys(new TreeSet<>(Arrays.stream(val.split(",")).toList())); }
+            if (val != null) {
+                setJmlEnabledKeys(new TreeSet<>(Arrays.stream(val.split(",")).toList()));
+            }
         }
     }
 

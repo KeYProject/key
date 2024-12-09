@@ -20,12 +20,16 @@ public class EqualityUtils {
             Property<T> property,
             Iterable<? extends T> iter) {
         // adapted from Arrays.hashCode
-        if (iter == null) { return 0; }
+        if (iter == null) {
+            return 0;
+        }
 
         int result = 1;
 
-        for (T element : iter) { result = 31 * result + (element == null ? 0
-                : element.hashCodeModProperty(property)); }
+        for (T element : iter) {
+            result = 31 * result + (element == null ? 0
+                    : element.hashCodeModProperty(property));
+        }
 
         return result;
     }

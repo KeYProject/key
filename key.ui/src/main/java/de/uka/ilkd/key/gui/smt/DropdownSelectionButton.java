@@ -119,7 +119,9 @@ public class DropdownSelectionButton {
      *        true iff the action button should be enabled
      */
     public void setEnabled(boolean b) {
-        if (items.length == 0) { b = false; }
+        if (items.length == 0) {
+            b = false;
+        }
         getActionButton().setEnabled(b);
     }
 
@@ -233,7 +235,9 @@ public class DropdownSelectionButton {
         if (getAction() != null) {
             getAction().putValue(Action.NAME,
                 isEmptyItem() ? executedAction.toString() : prefix + executedAction.toString());
-            if (isEmptyItem()) { getAction().putValue(Action.SHORT_DESCRIPTION, emptyItem.getToolTip()); }
+            if (isEmptyItem()) {
+                getAction().putValue(Action.SHORT_DESCRIPTION, emptyItem.getToolTip());
+            }
         }
         if (maxChoiceAmount == 1) {
             selectedItems.clear();
@@ -250,7 +254,11 @@ public class DropdownSelectionButton {
      * @return whether the given item can be selected
      */
     public boolean contains(Action item) {
-        for (Object it : items) { if (it.equals(item)) { return true; } }
+        for (Object it : items) {
+            if (it.equals(item)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -263,10 +271,14 @@ public class DropdownSelectionButton {
      *        the new executedAction
      */
     public void setSelectedItem(Action item) {
-        if (item == null) { return; }
+        if (item == null) {
+            return;
+        }
         executedAction = item;
         update();
-        for (ChangeListener l : listeners) { l.stateChanged(new ChangeEvent(this)); }
+        for (ChangeListener l : listeners) {
+            l.stateChanged(new ChangeEvent(this));
+        }
     }
 
     /**
@@ -310,7 +322,9 @@ public class DropdownSelectionButton {
                         }
                         OptionalInt width = Arrays.stream(getMenu().getComponents())
                                 .mapToInt(c -> c.getPreferredSize().width).max();
-                        if (width.isEmpty()) { width = OptionalInt.of(0); }
+                        if (width.isEmpty()) {
+                            width = OptionalInt.of(0);
+                        }
                         int newWidth = Math.max(width.getAsInt(),
                             actionComponent.getWidth() + selectionComponent.getWidth());
                         getMenu().setPopupSize(newWidth, Arrays.stream(getMenu().getComponents())
@@ -376,18 +390,24 @@ public class DropdownSelectionButton {
      */
     public void setItems(Action[] it, Function<Action[], Action> reduce, int maxChoice) {
         items = it;
-        if (it == null) { items = new Action[0]; }
+        if (it == null) {
+            items = new Action[0];
+        }
         reduceChoice = reduce;
         // make maxChoiceAmount at least 1
         maxChoiceAmount = Math.max(1, maxChoice);
-        if (items.length <= 1) { maxChoiceAmount = 1; }
+        if (items.length <= 1) {
+            maxChoiceAmount = 1;
+        }
         Set<Action> oldSelectedItems = new HashSet<>(selectedItems);
         selectedItems.clear();
         menuItems.clear();
         for (Action item : items) {
             JMenuItem menuItem = maxChoiceAmount > 1 ? new DoubleClickCheckBoxMenuItem(item)
                     : new SelectionMenuItem(item);
-            if (oldSelectedItems.contains(item) && maxChoiceAmount > 1) { menuItem.setSelected(true); }
+            if (oldSelectedItems.contains(item) && maxChoiceAmount > 1) {
+                menuItem.setSelected(true);
+            }
             menuItem.setEnabled(true);
             menuItem.setText(item.toString());
             menuItem.putClientProperty("CheckBoxMenuItem.doNotCloseOnMouseClick", Boolean.TRUE);
@@ -402,7 +422,9 @@ public class DropdownSelectionButton {
             setSelectedItem(contains(getAction()) ? getAction() : getTopItem());
             return;
         }
-        if (getSelectedItems().length == 0) { menuItems.get(0).setSelected(true); }
+        if (getSelectedItems().length == 0) {
+            menuItems.get(0).setSelected(true);
+        }
     }
 
     /**
@@ -420,8 +442,12 @@ public class DropdownSelectionButton {
          * just expect the text to be completely on the left).
          */
         menu = null;
-        for (JMenuItem item : newMenuItems) { getMenu().add(item); }
-        for (Component comp : components) { getMenu().add(comp); }
+        for (JMenuItem item : newMenuItems) {
+            getMenu().add(item);
+        }
+        for (Component comp : components) {
+            getMenu().add(comp);
+        }
         getMenu().pack();
     }
 
@@ -453,7 +479,9 @@ public class DropdownSelectionButton {
      * @return the first action of the items list or the empty item if items is empty.
      */
     public Action getTopItem() {
-        if (items.length > 0) { return items[0]; }
+        if (items.length > 0) {
+            return items[0];
+        }
         return emptyItem;
     }
 
@@ -461,14 +489,18 @@ public class DropdownSelectionButton {
      * Select the first maxChoiceAmount items of the items list.
      */
     public void selectMaxNumber() {
-        for (int i = 0; i < maxChoiceAmount; i++) { menuItems.get(i).setSelected(true); }
+        for (int i = 0; i < maxChoiceAmount; i++) {
+            menuItems.get(i).setSelected(true);
+        }
     }
 
     /**
      * Deselect all currently selected items.
      */
     public void deselectAll() {
-        for (JMenuItem item : menuItems) { item.setSelected(false); }
+        for (JMenuItem item : menuItems) {
+            item.setSelected(false);
+        }
     }
 
     /**

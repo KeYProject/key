@@ -22,7 +22,9 @@ public class OpCollectorJavaBlock extends OpCollector {
             var collect = new JavaASTCollector(t.javaBlock().program(), LocationVariable.class);
             collect.start();
             for (ProgramElement programElement : collect.getNodes()) {
-                if (programElement instanceof LocationVariable locationVariable) { ops.add(locationVariable); }
+                if (programElement instanceof LocationVariable locationVariable) {
+                    ops.add(locationVariable);
+                }
             }
         }
     }

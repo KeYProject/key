@@ -29,7 +29,9 @@ public final class PrimitiveHeapTermFeature extends BinaryTermFeature {
         // t.op() is the base heap or another primitive heap variable
         boolean isPrimitive = false;
         Iterator<LocationVariable> it = heapLDT.getAllHeaps().iterator();
-        while (!isPrimitive && it.hasNext()) { isPrimitive = (it.next() == t.op()); }
+        while (!isPrimitive && it.hasNext()) {
+            isPrimitive = (it.next() == t.op());
+        }
         // the location variables which are created in the block contract rule
         // also need to be classified primitive
         isPrimitive = isPrimitive || (t.op() instanceof LocationVariable);

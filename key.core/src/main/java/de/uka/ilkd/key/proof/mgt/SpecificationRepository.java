@@ -34,15 +34,10 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -83,10 +78,11 @@ public final class SpecificationRepository {
     private final Map<ProofOblInput, ImmutableSet<Proof>> proofs = new LinkedHashMap<>();
     private final Map<Pair<LoopStatement, Integer>, LoopSpecification> loopInvs =
         new LinkedHashMap<>();
-    private final Map<Triple<StatementBlock, URI, Integer>, ImmutableSet<BlockContract>> blockContracts =
+    private final Map<BlockContractKey, ImmutableSet<BlockContract>> blockContracts =
         new LinkedHashMap<>();
-    private final Map<Triple<StatementBlock, URI, Integer>, ImmutableSet<LoopContract>> loopContracts =
+    private final Map<LoopContractKey, ImmutableSet<LoopContract>> loopContracts =
         new LinkedHashMap<>();
+
     /**
      * A map which relates each loop statement its starting line number and set of loop contracts.
      */
@@ -135,9 +131,13 @@ public final class SpecificationRepository {
     private static String getUniqueNameForObserver(IObserverFunction obs) {
         var sb = new StringBuilder(obs.name().toString());
 
-        if (obs.isStatic()) { sb.append("_static_"); }
+        if (obs.isStatic()) {
+            sb.append("_static_");
+        }
 
-        for (KeYJavaType pType : obs.getParamTypes()) { sb.append(pType.getFullName()); }
+        for (KeYJavaType pType : obs.getParamTypes()) {
+            sb.append(pType.getFullName());
+        }
 
         return sb.toString();
     }
@@ -211,7 +211,9 @@ public final class SpecificationRepository {
     private IObserverFunction getCanonicalFormForKJT(IObserverFunction obs, KeYJavaType kjt) {
         assert obs != null;
         assert kjt != null;
-        if (!(obs instanceof IProgramMethod pm) || obs.getContainerType().equals(kjt)) { return unlimitObs(obs); }
+        if (!(obs instanceof IProgramMethod pm) || obs.getContainerType().equals(kjt)) {
+            return unlimitObs(obs);
+        }
         if (pm.isConstructor()) {
             assert pm.getContainerType().equals(kjt);
             return pm;
@@ -226,7 +228,9 @@ public final class SpecificationRepository {
             if (candidatePM.getMethodDeclaration().getName().equals(name)
                     && candidatePM.getParameterDeclarationCount() == numParams) {
                 for (int i = 0; i < numParams; i++) {
-                    if (!candidatePM.getParameterType(i).equals(pm.getParameterType(i))) { continue outer; }
+                    if (!candidatePM.getParameterType(i).equals(pm.getParameterType(i))) {
+                        continue outer;
+                    }
                 }
                 return candidatePM;
             }
@@ -234,10 +238,13 @@ public final class SpecificationRepository {
 
         // not found (happens for private methods of superclasses)
         // -> search through superclasses
-        for (KeYJavaType sup : services.getJavaInfo().getAllSupertypes(kjt)) {
-            if (sup.equals(kjt)) { continue; }
+        final var allSupertypes = services.getJavaInfo().getAllSupertypes(kjt);
+        allSupertypes.remove(kjt);
+        for (KeYJavaType sup : allSupertypes) {
             final IProgramMethod result = (IProgramMethod) getCanonicalFormForKJT(obs, sup);
-            if (result != null) { return result; }
+            if (result != null) {
+                return result;
+            }
         }
 
         // should not happen
@@ -250,7 +257,9 @@ public final class SpecificationRepository {
         ImmutableList<Pair<KeYJavaType, IObserverFunction>> result = ImmutableSLList.nil();
 
         // static methods and constructors are not overriden
-        if (pm.isConstructor() || pm.isStatic()) { return DefaultImmutableSet.fromImmutableList(result); }
+        if (pm.isConstructor() || pm.isStatic()) {
+            return DefaultImmutableSet.fromImmutableList(result);
+        }
 
         assert kjt != null;
         final JavaInfo javaInfo = services.getJavaInfo();
@@ -312,14 +321,22 @@ public final class SpecificationRepository {
     private ImmutableSet<ClassAxiom> getVisibleAxiomsOfOtherClasses(KeYJavaType visibleTo) {
         ImmutableSet<ClassAxiom> result = DefaultImmutableSet.nil();
         for (Map.Entry<KeYJavaType, ImmutableSet<ClassAxiom>> e : axioms.entrySet()) {
-            if (e.getKey().equals(visibleTo)) { continue; }
-            for (ClassAxiom ax : e.getValue()) { if (JavaInfo.isVisibleTo(ax, visibleTo)) { result = result.add(ax); } }
+            if (e.getKey().equals(visibleTo)) {
+                continue;
+            }
+            for (ClassAxiom ax : e.getValue()) {
+                if (JavaInfo.isVisibleTo(ax, visibleTo)) {
+                    result = result.add(ax);
+                }
+            }
         }
         return result;
     }
 
     private RepresentsAxiom getRepresentsAxiom(KeYJavaType kjt, ClassAxiom ax) {
-        if (!(ax instanceof RepresentsAxiom) || axioms.get(kjt) == null) { return null; }
+        if (!(ax instanceof RepresentsAxiom) || axioms.get(kjt) == null) {
+            return null;
+        }
         RepresentsAxiom result = null;
         for (ClassAxiom ca : axioms.get(kjt)) {
             if (ca instanceof RepresentsAxiom && (ca.getTarget().equals(ax.getTarget()))) {
@@ -337,7 +354,9 @@ public final class SpecificationRepository {
 
         // set id
         Integer nextId = contractCounters.get(contract.getTypeName());
-        if (nextId == null) { nextId = 0; }
+        if (nextId == null) {
+            nextId = 0;
+        }
         contract = contract.setID(nextId);
         contractCounters.put(contract.getTypeName(), nextId + 1);
         return contract;
@@ -351,21 +370,26 @@ public final class SpecificationRepository {
 
     private void registerContract(Contract contract,
             final ImmutableSet<Pair<KeYJavaType, IObserverFunction>> targets) {
-        for (Pair<KeYJavaType, IObserverFunction> impl : targets) { registerContract(contract, impl); }
+        for (Pair<KeYJavaType, IObserverFunction> impl : targets) {
+            registerContract(contract, impl);
+        }
     }
 
     private void registerContract(Contract contract,
             Pair<KeYJavaType, IObserverFunction> targetPair) {
         LOGGER.trace("Contract registered {}", contract);
-        if (!WellDefinednessCheck.isOn() && contract instanceof WellDefinednessCheck) { return; }
+        if (!WellDefinednessCheck.isOn() && contract instanceof WellDefinednessCheck) {
+            return;
+        }
         final KeYJavaType targetKJT = targetPair.first;
         final IObserverFunction targetMethod = targetPair.second;
         contract = contract.setTarget(targetKJT, targetMethod);
         final String name = contract.getName();
-        assert contractsByName.get(name) == null : "Tried to add a contract with a non-unique name: " + name;
-        assert !name.contains(CONTRACT_COMBINATION_MARKER) : "Tried to add a contract with a name containing the"
-                + " reserved character "
-                + CONTRACT_COMBINATION_MARKER + ": " + name;
+        assert contractsByName.get(name) == null
+                : "Tried to add a contract with a non-unique name: " + name;
+        assert !name.contains(CONTRACT_COMBINATION_MARKER)
+                : "Tried to add a contract with a name containing the" + " reserved character "
+                    + CONTRACT_COMBINATION_MARKER + ": " + name;
         assert contract.id() != Contract.INVALID_ID : "Tried to add a contract with an invalid id!";
         contracts.put(targetPair, getContracts(targetKJT, targetMethod).add(contract));
 
@@ -412,7 +436,9 @@ public final class SpecificationRepository {
                 mwd = mwd.combine(oldMwd, services);
             }
             registerContract(mwd);
-        } else if (contract instanceof WellDefinednessCheck) { registerWdCheck((WellDefinednessCheck) contract); }
+        } else if (contract instanceof WellDefinednessCheck) {
+            registerWdCheck((WellDefinednessCheck) contract);
+        }
         contractsByName.put(contract.getName(), contract);
         final ImmutableSet<IObserverFunction> oldTargets = getContractTargets(targetKJT);
         final ImmutableSet<IObserverFunction> newTargets = oldTargets.add(targetMethod);
@@ -442,7 +468,9 @@ public final class SpecificationRepository {
                 }
             }
         }
-        if (contract instanceof WellDefinednessCheck) { unregisterWdCheck((WellDefinednessCheck) contract); }
+        if (contract instanceof WellDefinednessCheck) {
+            unregisterWdCheck((WellDefinednessCheck) contract);
+        }
         contractsByName.remove(contract.getName());
     }
 
@@ -450,16 +478,15 @@ public final class SpecificationRepository {
      * Adds initially clause as post-condition to contracts of constructors. Creates a new contract
      * if there is none yet.
      *
-     * @param inv
-     *        initially clause
-     * @param kjt
-     *        constructors of this type are added a post-condition
-     * @throws SLTranslationException
-     *         during contract construction from history constraint
+     * @param inv initially clause
+     * @param kjt constructors of this type are added a post-condition
+     * @throws SLTranslationException during contract construction from history constraint
      */
     private void createContractsFromInitiallyClause(InitiallyClause inv, KeYJavaType kjt)
             throws SLTranslationException {
-        if (!kjt.equals(inv.getKJT())) { inv = inv.setKJT(kjt); }
+        if (!kjt.equals(inv.getKJT())) {
+            inv = inv.setKJT(kjt);
+        }
         for (IProgramMethod pm : services.getJavaInfo().getConstructors(kjt)) {
             if (!JMLInfoExtractor.isHelper(pm)) {
                 final ImmutableSet<Contract> oldContracts = getContracts(kjt, pm);
@@ -492,14 +519,19 @@ public final class SpecificationRepository {
     /**
      * Remove well-definedness checks from a given set of contracts
      *
-     * @param contracts
-     *        A set of contracts
+     * @param contracts A set of contracts
      * @return contracts without well-definedness checks
      */
     private static ImmutableSet<Contract> removeWdChecks(ImmutableSet<Contract> contracts) {
         ImmutableList<Contract> result = ImmutableSLList.nil();
-        if (contracts == null) { return contracts; }
-        for (Contract c : contracts) { if (!(c instanceof WellDefinednessCheck)) { result = result.prepend(c); } }
+        if (contracts == null) {
+            return contracts;
+        }
+        for (Contract c : contracts) {
+            if (!(c instanceof WellDefinednessCheck)) {
+                result = result.prepend(c);
+            }
+        }
         return DefaultImmutableSet.fromImmutableList(result);
     }
 
@@ -507,8 +539,7 @@ public final class SpecificationRepository {
      * Registers a well-definedness check. It does not take care of its visibility in the proof
      * management dialog (this is done in {@link #registerContract(Contract, Pair)}).
      *
-     * @param check
-     *        The well-definedness check to be registered
+     * @param check The well-definedness check to be registered
      */
     private void registerWdCheck(WellDefinednessCheck check) {
         ImmutableSet<WellDefinednessCheck> checks =
@@ -520,8 +551,7 @@ public final class SpecificationRepository {
      * Unregisters a well-definedness check. It does not take care of its visibility in the proof
      * management dialog.
      *
-     * @param check
-     *        The well-definedness check to be unregistered
+     * @param check The well-definedness check to be unregistered
      */
     private void unregisterWdCheck(WellDefinednessCheck check) {
         wdChecks.put(new Pair<>(check.getKJT(), check.getTarget()),
@@ -534,7 +564,11 @@ public final class SpecificationRepository {
     private ImmutableSet<WellDefinednessCheck> getWdChecks(KeYJavaType kjt) {
         assert kjt != null;
         ImmutableSet<WellDefinednessCheck> result = DefaultImmutableSet.nil();
-        for (WellDefinednessCheck ch : getAllWdChecks()) { if (ch.getKJT().equals(kjt)) { result = result.add(ch); } }
+        for (WellDefinednessCheck ch : getAllWdChecks()) {
+            if (ch.getKJT().equals(kjt)) {
+                result = result.add(ch);
+            }
+        }
         return result;
     }
 
@@ -557,7 +591,9 @@ public final class SpecificationRepository {
     private ImmutableSet<MethodWellDefinedness> getAllWdMethodChecks() {
         ImmutableSet<MethodWellDefinedness> result = DefaultImmutableSet.nil();
         for (var s : getAllWdChecks()) {
-            if (s instanceof MethodWellDefinedness) { result = result.add((MethodWellDefinedness) s); }
+            if (s instanceof MethodWellDefinedness) {
+                result = result.add((MethodWellDefinedness) s);
+            }
         }
         return result;
     }
@@ -569,7 +605,9 @@ public final class SpecificationRepository {
         assert kjt != null;
         ImmutableSet<MethodWellDefinedness> result = DefaultImmutableSet.nil();
         for (MethodWellDefinedness ch : getAllWdMethodChecks()) {
-            if (ch.getKJT().equals(kjt)) { result = result.add(ch); }
+            if (ch.getKJT().equals(kjt)) {
+                result = result.add(ch);
+            }
         }
         return result;
     }
@@ -583,7 +621,9 @@ public final class SpecificationRepository {
         assert target != null;
         ImmutableSet<MethodWellDefinedness> result = DefaultImmutableSet.nil();
         for (MethodWellDefinedness ch : getAllWdMethodChecks()) {
-            if (ch.getKJT().equals(kjt) && ch.getTarget().equals(target)) { result = result.add(ch); }
+            if (ch.getKJT().equals(kjt) && ch.getTarget().equals(target)) {
+                result = result.add(ch);
+            }
         }
         return result;
     }
@@ -595,7 +635,9 @@ public final class SpecificationRepository {
         ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt);
         ImmutableSet<ClassWellDefinedness> invs = DefaultImmutableSet.nil();
         for (WellDefinednessCheck check : checks) {
-            if (check instanceof ClassWellDefinedness) { invs = invs.add((ClassWellDefinedness) check); }
+            if (check instanceof ClassWellDefinedness) {
+                invs = invs.add((ClassWellDefinedness) check);
+            }
         }
         return invs;
     }
@@ -603,12 +645,9 @@ public final class SpecificationRepository {
     /**
      * Helper for {@link #map(UnaryOperator, Services)}.
      *
-     * @param map
-     *        a map.
-     * @param op
-     *        an operator.
-     * @param services
-     *        services.
+     * @param map a map.
+     * @param op an operator.
+     * @param services services.
      */
     @SuppressWarnings("unchecked")
     private <K, V extends SpecificationElement> void mapValueSets(Map<K, ImmutableSet<V>> map,
@@ -637,12 +676,9 @@ public final class SpecificationRepository {
     /**
      * Helper for {@link #map(UnaryOperator, Services)}.
      *
-     * @param map
-     *        a map.
-     * @param op
-     *        an operator.
-     * @param services
-     *        services.
+     * @param map a map.
+     * @param op an operator.
+     * @param services services.
      */
     @SuppressWarnings("unchecked")
     private <K, V extends SpecificationElement> void mapValues(Map<K, V> map,
@@ -668,10 +704,8 @@ public final class SpecificationRepository {
     /**
      * Applies the specified operator to every contract in this repository.
      *
-     * @param op
-     *        an operator.
-     * @param services
-     *        services.
+     * @param op an operator.
+     * @param services services.
      * @see SpecificationElement#map(java.util.function.UnaryOperator, Services)
      */
     public void map(UnaryOperator<Term> op, Services services) {
@@ -693,7 +727,9 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<Contract> getAllContracts() {
         ImmutableSet<Contract> result = DefaultImmutableSet.nil();
-        for (ImmutableSet<Contract> s : contracts.values()) { result = result.union(s); }
+        for (ImmutableSet<Contract> s : contracts.values()) {
+            result = result.union(s);
+        }
         return WellDefinednessCheck.isOn() ? result : removeWdChecks(result);
     }
 
@@ -748,15 +784,21 @@ public final class SpecificationRepository {
      * null.
      */
     public Contract getContractByName(String name) {
-        if (name == null || name.isEmpty()) { return null; }
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
         String[] baseNames = name.split(CONTRACT_COMBINATION_MARKER);
-        if (baseNames.length == 1) { return contractsByName.get(baseNames[0]); }
+        if (baseNames.length == 1) {
+            return contractsByName.get(baseNames[0]);
+        }
 
         ImmutableSet<FunctionalOperationContract> baseContracts = DefaultImmutableSet.nil();
         for (String baseName : baseNames) {
             FunctionalOperationContract baseContract =
                 (FunctionalOperationContract) contractsByName.get(baseName);
-            if (baseContract == null) { return null; }
+            if (baseContract == null) {
+                return null;
+            }
             baseContracts = baseContracts.add(baseContract);
         }
 
@@ -767,7 +809,7 @@ public final class SpecificationRepository {
      * Returns a set encompassing the passed contract and all its versions inherited to overriding
      * methods.
      */
-    private ImmutableSet<Contract> getInheritedContracts(Contract contract) {
+    public ImmutableSet<Contract> getInheritedContracts(Contract contract) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil().add(contract);
         final ImmutableSet<Pair<KeYJavaType, IObserverFunction>> subs =
             getOverridingTargets(contract.getKJT(), contract.getTarget());
@@ -788,7 +830,9 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<Contract> getInheritedContracts(ImmutableSet<Contract> contractSet) {
         ImmutableSet<Contract> result = DefaultImmutableSet.nil();
-        for (Contract c : contractSet) { result = result.union(getInheritedContracts(c)); }
+        for (Contract c : contractSet) {
+            result = result.union(getInheritedContracts(c));
+        }
         return result;
     }
 
@@ -821,7 +865,7 @@ public final class SpecificationRepository {
     /**
      * Registers the passed (atomic) contract without inheriting it.
      */
-    private void addContractNoInheritance(Contract contract) {
+    public void addContractNoInheritance(Contract contract) {
         registerContract(prepareContract(contract));
     }
 
@@ -829,7 +873,9 @@ public final class SpecificationRepository {
      * Registers the passed contracts.
      */
     public void addContracts(ImmutableSet<Contract> toAdd) {
-        for (Contract contract : toAdd) { addContract(contract); }
+        for (Contract contract : toAdd) {
+            addContract(contract);
+        }
     }
 
     /**
@@ -839,7 +885,8 @@ public final class SpecificationRepository {
             ImmutableSet<FunctionalOperationContract> toCombine) {
         assert toCombine != null && !toCombine.isEmpty();
         for (Contract contract : toCombine) {
-            assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER) : "Please combine only atomic contracts!";
+            assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
+                    : "Please combine only atomic contracts!";
         }
 
         // sort contracts alphabetically (for determinism)
@@ -878,7 +925,7 @@ public final class SpecificationRepository {
      * Registers the passed class invariant, and inherits it to all subclasses if it is public or
      * protected.
      */
-    private void addClassInvariant(ClassInvariant inv) {
+    public void addClassInvariant(ClassInvariant inv) {
         final KeYJavaType kjt = inv.getKJT();
         final IObserverFunction target = inv.isStatic() ? services.getJavaInfo().getStaticInv(kjt)
                 : services.getJavaInfo().getInv();
@@ -898,7 +945,9 @@ public final class SpecificationRepository {
         // in any case, create axiom with non-static target
         addClassAxiom(new PartialInvAxiom(inv, false, services));
         // for a static invariant, create also an axiom with a static target
-        if (inv.isStatic()) { addClassAxiom(new PartialInvAxiom(inv, true, services)); }
+        if (inv.isStatic()) {
+            addClassAxiom(new PartialInvAxiom(inv, true, services));
+        }
         // inherit non-private, non-static invariants
         if (!inv.isStatic() && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
             final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
@@ -927,15 +976,16 @@ public final class SpecificationRepository {
      * Registers the passed class invariants.
      */
     public void addClassInvariants(ImmutableSet<ClassInvariant> toAdd) {
-        for (ClassInvariant inv : toAdd) { addClassInvariant(inv); }
+        for (ClassInvariant inv : toAdd) {
+            addClassInvariant(inv);
+        }
     }
 
     /**
      * Adds postconditions raising from initially clauses to all constructors. <b>Warning</b>: To be
      * called after all contracts have been registered.
      *
-     * @throws SLTranslationException
-     *         may be thrown during contract extraction
+     * @throws SLTranslationException may be thrown during contract extraction
      */
     public void createContractsFromInitiallyClauses() throws SLTranslationException {
         for (KeYJavaType kjt : initiallyClauses.keySet()) {
@@ -944,7 +994,9 @@ public final class SpecificationRepository {
                 if (VisibilityModifier.allowsInheritance(inv.getVisibility())) {
                     final ImmutableList<KeYJavaType> subs =
                         services.getJavaInfo().getAllSubtypes(kjt);
-                    for (KeYJavaType sub : subs) { createContractsFromInitiallyClause(inv, sub); }
+                    for (KeYJavaType sub : subs) {
+                        createContractsFromInitiallyClause(inv, sub);
+                    }
                 }
             }
         }
@@ -957,12 +1009,13 @@ public final class SpecificationRepository {
      * <code>createContractsFromInitiallyClauses</code> adds them to the contracts of respective
      * constructors (or adds a contract if there is none yet).
      *
-     * @param ini
-     *        initially clause
+     * @param ini initially clause
      */
     public void addInitiallyClause(InitiallyClause ini) {
         ImmutableSet<InitiallyClause> oldClauses = initiallyClauses.get(ini.getKJT());
-        if (oldClauses == null) { oldClauses = DefaultImmutableSet.nil(); }
+        if (oldClauses == null) {
+            oldClauses = DefaultImmutableSet.nil();
+        }
         initiallyClauses.put(ini.getKJT(), oldClauses.add(ini));
     }
 
@@ -970,7 +1023,9 @@ public final class SpecificationRepository {
      * Registers the passed initially clauses.
      */
     public void addInitiallyClauses(ImmutableSet<InitiallyClause> toAdd) {
-        for (InitiallyClause inv : toAdd) { addInitiallyClause(inv); }
+        for (InitiallyClause inv : toAdd) {
+            addInitiallyClause(inv);
+        }
     }
 
     /**
@@ -984,7 +1039,11 @@ public final class SpecificationRepository {
             result = getVisibleAxiomsOfOtherClasses(selfKjt);
             // add registered axioms of own class
             ImmutableSet<ClassAxiom> ownAxioms = axioms.get(selfKjt);
-            if (ownAxioms != null) { for (ClassAxiom ax : ownAxioms) { result = result.add(ax); } }
+            if (ownAxioms != null) {
+                for (ClassAxiom ax : ownAxioms) {
+                    result = result.add(ax);
+                }
+            }
 
             final JavaInfo ji = services.getJavaInfo();
 
@@ -1068,8 +1127,7 @@ public final class SpecificationRepository {
                     }
 
                     final ClassAxiom queryAxiom = new QueryAxiom("Query axiom for " + pm.getName()
-                            + "_" + sb + " in " + selfKjt.getFullName(),
-                        pm, selfKjt);
+                        + "_" + sb + " in " + selfKjt.getFullName(), pm, selfKjt);
                     result = result.add(queryAxiom);
                 }
             }
@@ -1078,7 +1136,9 @@ public final class SpecificationRepository {
             result = result.union(getModelMethodAxioms());
             // add axioms for enclosing class, if applicable
             final KeYJavaType enclosingKJT = getEnclosingKJT(selfKjt);
-            if (enclosingKJT != null) { result = result.union(getClassAxioms(enclosingKJT)); }
+            if (enclosingKJT != null) {
+                result = result.union(getClassAxioms(enclosingKJT));
+            }
             allClassAxiomsCache.put(selfKjt, result);
         }
         return result;
@@ -1107,7 +1167,9 @@ public final class SpecificationRepository {
                     ImmutableList<FunctionalOperationContract> lookupContracts =
                         ImmutableSLList.nil();
                     ImmutableSet<FunctionalOperationContract> cs = getOperationContracts(kjt, pm);
-                    for (KeYJavaType superType : services.getJavaInfo().getAllSupertypes(kjt)) {
+                    List<KeYJavaType> superTypes =
+                        services.getJavaInfo().getAllSupertypes(kjt);
+                    for (KeYJavaType superType : superTypes) {
                         for (FunctionalOperationContract fop : cs) {
                             if (fop.getSpecifiedIn().equals(superType)) {
                                 lookupContracts = lookupContracts.append(fop);
@@ -1119,7 +1181,9 @@ public final class SpecificationRepository {
                             paramVars, tb.resultVar(pm, false), atPreVars, services);
                         Term preContract =
                             fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
-                        if (preContract == null) { preContract = tb.tt(); }
+                        if (preContract == null) {
+                            preContract = tb.tt();
+                        }
                         if (representsFromContract != null) {
                             // TODO Wojtek: I do not understand the visibility
                             // issues of model fields/methods.
@@ -1130,7 +1194,7 @@ public final class SpecificationRepository {
                             final ClassAxiom modelMethodRepresentsAxiom =
                                 new RepresentsAxiom(
                                     "Definition axiom for " + pm.getName() + " in "
-                                            + kjt.getFullName(),
+                                        + kjt.getFullName(),
                                     pm, kjt, new Private(), preContract, representsFromContract,
                                     selfVar, paramVars, atPreVars);
                             result = result.add(modelMethodRepresentsAxiom);
@@ -1138,7 +1202,9 @@ public final class SpecificationRepository {
                         }
                     }
                     for (FunctionalOperationContract fop : getOperationContracts(kjt, pm)) {
-                        if (!fop.getSpecifiedIn().equals(kjt)) { continue; }
+                        if (!fop.getSpecifiedIn().equals(kjt)) {
+                            continue;
+                        }
                         Term preFromContract =
                             fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
                         Term freePreFromContract =
@@ -1170,10 +1236,12 @@ public final class SpecificationRepository {
     /**
      * Registers the passed class axiom.
      */
-    private void addClassAxiom(ClassAxiom ax) {
+    public void addClassAxiom(ClassAxiom ax) {
         KeYJavaType kjt = ax.getKJT();
         ImmutableSet<ClassAxiom> currentAxioms = axioms.get(kjt);
-        if (currentAxioms == null) { currentAxioms = DefaultImmutableSet.nil(); }
+        if (currentAxioms == null) {
+            currentAxioms = DefaultImmutableSet.nil();
+        }
         if (ax instanceof RepresentsAxiom) {
             // there may only be one conjoined represents axiom per model field
             RepresentsAxiom oldRep = getRepresentsAxiom(kjt, ax);
@@ -1189,7 +1257,9 @@ public final class SpecificationRepository {
                 for (KeYJavaType sub : subs) {
                     RepresentsAxiom subAx = ((RepresentsAxiom) ax).setKJT(sub);
                     currentAxioms = axioms.get(sub);
-                    if (currentAxioms == null) { currentAxioms = DefaultImmutableSet.nil(); }
+                    if (currentAxioms == null) {
+                        currentAxioms = DefaultImmutableSet.nil();
+                    }
                     oldRep = getRepresentsAxiom(sub, subAx);
                     if (oldRep == null) {
                         axioms.put(sub, currentAxioms.add(subAx));
@@ -1208,7 +1278,9 @@ public final class SpecificationRepository {
      * Registers the passed class axioms.
      */
     public void addClassAxioms(ImmutableSet<ClassAxiom> toAdd) {
-        for (ClassAxiom ax : toAdd) { addClassAxiom(ax); }
+        for (ClassAxiom ax : toAdd) {
+            addClassAxiom(ax);
+        }
     }
 
     /**
@@ -1219,7 +1291,9 @@ public final class SpecificationRepository {
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
             ProofOblInput mapPO = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
-            if (mapPO.implies(po)) { result = result.union(sop); }
+            if (mapPO.implies(po)) {
+                result = result.union(sop);
+            }
         }
         return result;
     }
@@ -1229,14 +1303,17 @@ public final class SpecificationRepository {
      * including the passed atomic contract
      */
     public ImmutableSet<Proof> getProofs(Contract atomicContract) {
-        assert !atomicContract.getName().contains(CONTRACT_COMBINATION_MARKER) : "Contract must be atomic";
+        assert !atomicContract.getName().contains(CONTRACT_COMBINATION_MARKER)
+                : "Contract must be atomic";
 
         ImmutableSet<Proof> result = DefaultImmutableSet.nil();
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
             final ProofOblInput po = entry.getKey();
             if (po instanceof ContractPO) {
                 final Contract poContract = ((ContractPO) po).getContract();
-                if (splitContract(poContract).contains(atomicContract)) { result = result.union(entry.getValue()); }
+                if (splitContract(poContract).contains(atomicContract)) {
+                    result = result.union(entry.getValue());
+                }
             }
         }
         return result;
@@ -1256,7 +1333,9 @@ public final class SpecificationRepository {
                 final Contract contract = ((ContractPO) po).getContract();
                 final Pair<KeYJavaType, IObserverFunction> pair =
                     new Pair<>(contract.getKJT(), contract.getTarget());
-                if (targets.contains(pair)) { result = result.union(sop); }
+                if (targets.contains(pair)) {
+                    result = result.union(sop);
+                }
             }
         }
         return result;
@@ -1268,7 +1347,9 @@ public final class SpecificationRepository {
     public ImmutableSet<Proof> getAllProofs() {
         ImmutableSet<Proof> result = DefaultImmutableSet.nil();
         Collection<ImmutableSet<Proof>> proofSets = proofs.values();
-        for (ImmutableSet<Proof> proofSet : proofSets) { result = result.union(proofSet); }
+        for (ImmutableSet<Proof> proofSet : proofSets) {
+            result = result.union(proofSet);
+        }
         return result;
     }
 
@@ -1289,7 +1370,9 @@ public final class SpecificationRepository {
      */
     public ContractPO getPO(Contract c) {
         for (ProofOblInput po : proofs.keySet()) {
-            if (po instanceof ContractPO && ((ContractPO) po).getContract().equals(c)) { return (ContractPO) po; }
+            if (po instanceof ContractPO && ((ContractPO) po).getContract().equals(c)) {
+                return (ContractPO) po;
+            }
         }
         return null;
     }
@@ -1298,7 +1381,9 @@ public final class SpecificationRepository {
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
             ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
-            if (sop.contains(proof) && po instanceof ContractPO) { return (ContractPO) po; }
+            if (sop.contains(proof) && po instanceof ContractPO) {
+                return (ContractPO) po;
+            }
         }
         return null;
     }
@@ -1306,8 +1391,7 @@ public final class SpecificationRepository {
     /**
      * Returns the {@link ProofOblInput} from which the given {@link Proof} was created.
      *
-     * @param proof
-     *        The {@link Proof}.
+     * @param proof The {@link Proof}.
      * @return The {@link ProofOblInput} of the given {@link Proof} or {@code null} if not
      *         available.
      */
@@ -1315,7 +1399,9 @@ public final class SpecificationRepository {
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
             ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
-            if (sop.contains(proof)) { return po; }
+            if (sop.contains(proof)) {
+                return po;
+            }
         }
         return null;
     }
@@ -1372,10 +1458,8 @@ public final class SpecificationRepository {
      * possess an invariant, none is set to the target. A possibly existing old registration will be
      * overwritten, a registration for the original loop remains untouched.
      *
-     * @param from
-     *        the loop with the original contract
-     * @param to
-     *        the loop for which the contract is to be copied
+     * @param from the loop with the original contract
+     * @param to the loop for which the contract is to be copied
      */
     public void copyLoopInvariant(LoopStatement from, LoopStatement to) {
         LoopSpecification inv = getLoopSpec(from);
@@ -1403,13 +1487,12 @@ public final class SpecificationRepository {
     /**
      * Returns all block contracts for the specified block.
      *
-     * @param block
-     *        a block.
+     * @param block a block.
      * @return all block contracts for the specified block.
      */
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
-        final Triple<StatementBlock, URI, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
+        var b =
+            new BlockContractKey(block, block.getParentClass(), block.getStartPosition().line());
         final ImmutableSet<BlockContract> contracts = blockContracts.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.nil();
@@ -1421,13 +1504,11 @@ public final class SpecificationRepository {
     /**
      * Returns all loop contracts for the specified block.
      *
-     * @param block
-     *        a block.
+     * @param block a block.
      * @return all loop contracts for the specified block.
      */
     public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
-        final Triple<StatementBlock, URI, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
+        var b = new LoopContractKey(block, block.getParentClass(), block.getStartPosition().line());
         final ImmutableSet<LoopContract> contracts = loopContracts.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.nil();
@@ -1439,8 +1520,7 @@ public final class SpecificationRepository {
     /**
      * Returns all loop contracts for the specified loop.
      *
-     * @param loop
-     *        a loop.
+     * @param loop a loop.
      * @return all loop contracts for the specified loop.
      */
     public ImmutableSet<LoopContract> getLoopContracts(LoopStatement loop) {
@@ -1465,10 +1545,8 @@ public final class SpecificationRepository {
     /**
      * Returns block contracts for according block statement and modality.
      *
-     * @param block
-     *        the given block.
-     * @param modalityKind
-     *        the given modality.
+     * @param block the given block.
+     * @param modalityKind the given modality.
      */
     public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block,
             final Modality.JavaModalityKind modalityKind) {
@@ -1499,10 +1577,8 @@ public final class SpecificationRepository {
     /**
      * Returns loop contracts for according loop statement and modality.
      *
-     * @param loop
-     *        the given loop.
-     * @param modalityKind
-     *        the given modality.
+     * @param loop the given loop.
+     * @param modalityKind the given modality.
      * @return the set of resulting loop statements.
      */
     public ImmutableSet<LoopContract> getLoopContracts(final LoopStatement loop,
@@ -1521,8 +1597,7 @@ public final class SpecificationRepository {
     /**
      * Adds a new {@code BlockContract} and a new {@link FunctionalBlockContract} to the repository.
      *
-     * @param contract
-     *        the {@code BlockContract} to add.
+     * @param contract the {@code BlockContract} to add.
      */
     public void addBlockContract(final BlockContract contract) {
         addBlockContract(contract, false);
@@ -1531,19 +1606,19 @@ public final class SpecificationRepository {
     /**
      * Adds a new {@code BlockContract} to the repository.
      *
-     * @param contract
-     *        the {@code BlockContract} to add.
-     * @param addFunctionalContract
-     *        whether or not to add a new {@link FunctionalBlockContract}
+     * @param contract the {@code BlockContract} to add.
+     * @param addFunctionalContract whether or not to add a new {@link FunctionalBlockContract}
      *        based on {@code contract}.
      */
     public void addBlockContract(final BlockContract contract, boolean addFunctionalContract) {
         final StatementBlock block = contract.getBlock();
-        final Triple<StatementBlock, URI, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
+        var b =
+            new BlockContractKey(block, block.getParentClass(), block.getStartPosition().line());
         blockContracts.put(b, getBlockContracts(block).add(contract));
 
-        if (addFunctionalContract) { addContract(cf.funcBlock(contract)); }
+        if (addFunctionalContract) {
+            addContract(cf.funcBlock(contract));
+        }
     }
 
     /**
@@ -1555,23 +1630,20 @@ public final class SpecificationRepository {
      * The associated {@link FunctionalBlockContract} is not removed.
      * </p>
      *
-     * @param contract
-     *        the {@code BlockContract} to remove.
+     * @param contract the {@code BlockContract} to remove.
      */
     public void removeBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
-        final Triple<StatementBlock, URI, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
+        var b =
+            new BlockContractKey(block, block.getParentClass(), block.getStartPosition().line());
 
-        ImmutableSet<BlockContract> set = blockContracts.get(b);
-        blockContracts.put(b, set.remove(contract));
+        blockContracts.compute(b, (k, set) -> set.remove(contract));
     }
 
     /**
      * Adds a new {@code LoopContract} and a new {@link FunctionalLoopContract} to the repository.
      *
-     * @param contract
-     *        the {@code LoopContract} to add.
+     * @param contract the {@code LoopContract} to add.
      */
     public void addLoopContract(final LoopContract contract) {
         addLoopContract(contract, false);
@@ -1580,17 +1652,15 @@ public final class SpecificationRepository {
     /**
      * Adds a new {@code LoopContract} to the repository.
      *
-     * @param contract
-     *        the {@code LoopContract} to add.
-     * @param addFunctionalContract
-     *        whether or not to add a new {@link FunctionalLoopContract} based
+     * @param contract the {@code LoopContract} to add.
+     * @param addFunctionalContract whether or not to add a new {@link FunctionalLoopContract} based
      *        on {@code contract}.
      */
     public void addLoopContract(final LoopContract contract, boolean addFunctionalContract) {
         if (contract.isOnBlock()) {
             final StatementBlock block = contract.getBlock();
-            final Triple<StatementBlock, URI, Integer> b =
-                new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
+            var b =
+                new LoopContractKey(block, block.getParentClass(), block.getStartPosition().line());
             loopContracts.put(b, getLoopContracts(block).add(contract));
         } else {
             final LoopStatement loop = contract.getLoop();
@@ -1617,32 +1687,28 @@ public final class SpecificationRepository {
      * The associated {@link FunctionalLoopContract} is not removed.
      * </p>
      *
-     * @param contract
-     *        the {@code LoopContract} to remove.
+     * @param contract the {@code LoopContract} to remove.
      */
     public void removeLoopContract(final LoopContract contract) {
         if (contract.isOnBlock()) {
             final StatementBlock block = contract.getBlock();
-            final Triple<StatementBlock, URI, Integer> b =
-                new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
+            var b =
+                new LoopContractKey(block, block.getParentClass(), block.getStartPosition().line());
 
-            ImmutableSet<LoopContract> set = loopContracts.get(b);
-            loopContracts.put(b, set.remove(contract));
+            loopContracts.compute(b, (k, set) -> set.remove(contract));
         } else {
             final LoopStatement loop = contract.getLoop();
             final Pair<LoopStatement, Integer> b =
                 new Pair<>(loop, loop.getStartPosition().line());
 
-            ImmutableSet<LoopContract> set = loopContractsOnLoops.get(b);
-            loopContractsOnLoops.put(b, set.remove(contract));
+            loopContractsOnLoops.compute(b, (k, set) -> set.remove(contract));
         }
     }
 
     /**
      * Registers a {@link MergeContract}.
      *
-     * @param mc
-     *        The {@link MergeContract} to register.
+     * @param mc The {@link MergeContract} to register.
      */
     public void addMergeContract(final MergeContract mc) {
         final MergePointStatement mps = mc.getMergePointStatement();
@@ -1652,14 +1718,13 @@ public final class SpecificationRepository {
     /**
      * Deletes the {@link MergeContract}s for a given {@link MergePointStatement}.
      *
-     * @param mps
-     *        The {@link MergePointStatement} to delete the registered contracts for.
+     * @param mps The {@link MergePointStatement} to delete the registered contracts for.
      */
     public void removeMergeContracts(final MergePointStatement mps) {
         mergeContracts.put(mps, DefaultImmutableSet.nil());
     }
 
-    public void addSpecs(Iterable<SpecificationElement> specs) {
+    public void addSpecs(ImmutableSet<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
             if (spec instanceof Contract) {
                 addContract((Contract) spec);
@@ -1720,7 +1785,9 @@ public final class SpecificationRepository {
 
     public IObserverFunction unlimitObs(IObserverFunction obs) {
         IObserverFunction result = limitedToUnlimited.get(obs);
-        if (result == null) { result = obs; }
+        if (result == null) {
+            result = obs;
+        }
         return result;
     }
 
@@ -1730,14 +1797,19 @@ public final class SpecificationRepository {
      * Represent terms belong to model fields, so the well-definedness check considers both of them
      * together.
      *
-     * @param kjt
-     *        The relevant KeYJavaType
+     * @param kjt The relevant KeYJavaType
      */
     public void addRepresentsTermToWdChecksForModelFields(KeYJavaType kjt) {
         ImmutableSet<ClassAxiom> axs = axioms.get(kjt);
-        if (axs == null) { return; }
+        if (axs == null) {
+            return;
+        }
         ImmutableSet<RepresentsAxiom> reps = DefaultImmutableSet.nil();
-        for (ClassAxiom ax : axs) { if (ax instanceof RepresentsAxiom) { reps = reps.add((RepresentsAxiom) ax); } }
+        for (ClassAxiom ax : axs) {
+            if (ax instanceof RepresentsAxiom) {
+                reps = reps.add((RepresentsAxiom) ax);
+            }
+        }
         final ProgramVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
         for (RepresentsAxiom rep : reps) {
             boolean dep = false;
@@ -1761,8 +1833,7 @@ public final class SpecificationRepository {
      * Registers a well-definedness check for a jml statement. It does not take care of its
      * visibility in the proof management dialog.
      *
-     * @param swd
-     *        The well-definedness check
+     * @param swd The well-definedness check
      */
     public void addWdStatement(StatementWellDefinedness swd) {
         registerWdCheck(swd);
@@ -1773,7 +1844,9 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<WellDefinednessCheck> getAllWdChecks() {
         ImmutableSet<WellDefinednessCheck> result = DefaultImmutableSet.nil();
-        for (ImmutableSet<WellDefinednessCheck> s : wdChecks.values()) { result = result.union(s); }
+        for (ImmutableSet<WellDefinednessCheck> s : wdChecks.values()) {
+            result = result.union(s);
+        }
         return result;
     }
 
@@ -1809,15 +1882,13 @@ public final class SpecificationRepository {
      */
     public record JmlStatementSpec(
             ProgramVariableCollection vars,
-            ImmutableList<Term> terms) {
+            ImmutableList<Term> terms
+    ){
         /**
          * Retrieve a term
-         *
-         * @param index
-         *        a index to the list of {@code terms}.
+         * @param index a index to the list of {@code terms}.
          * @return the term at {@code index} in the {@code terms} list
-         * @throws IndexOutOfBoundsException
-         *         if the given {@code index} is negative or {@code >= terms().size()}
+         * @throws IndexOutOfBoundsException if the given {@code index} is negative or {@code >= terms().size()}
          */
         public Term term(int index) {
             return terms.get(index);
@@ -1825,13 +1896,9 @@ public final class SpecificationRepository {
 
         /**
          * Retrieve a term with a update to the given {@code self} term.
-         *
-         * @param services
-         *        the corresponding services instance
-         * @param self
-         *        a term which describes the {@code self} object aka. this on the current sequence
-         * @param index
-         *        the index of the term in {@code terms()}
+         * @param services the corresponding services instance
+         * @param self a term which describes the {@code self} object aka. this on the current sequence
+         * @param index the index of the term in {@code terms()}
          * @return a term updated with {@code self} and the {@code vars()}.
          */
         public Term getTerm(Services services, Term self, int index) {
@@ -1839,7 +1906,9 @@ public final class SpecificationRepository {
 
             final TermFactory termFactory = services.getTermFactory();
             final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
-            if (self != null) { replacementMap.replaceSelf(vars().selfVar, self, services); }
+            if (self != null) {
+                replacementMap.replaceSelf(vars().selfVar, self, services);
+            }
             replacementMap.replaceRemembranceLocalVariables(vars().atPreVars, vars().atPres, services);
             replacementMap.replaceRemembranceLocalVariables(vars().atBeforeVars, vars().atBefores, services);
             final OpReplacer replacer = new OpReplacer(replacementMap, termFactory, services.getProof());
@@ -1851,11 +1920,9 @@ public final class SpecificationRepository {
          * The update is applied directly and an updated specification is returned. You need to add
          * the updated spec to the statement in the {@link SpecificationRepository} by yourself.
          *
-         * @param atPres
-         *        a non-null map of a map of program variable to a term which describes
-         *        the value of this variable in the pre-state.
-         * @param services
-         *        the corresponding services object
+         * @param atPres a non-null map of a map of program variable to a term which describes
+         *               the value of this variable in the pre-state.
+         * @param services the corresponding services object
          * @return a fresh {@link JmlStatementSpec} instance, non-registered.
          */
         public JmlStatementSpec updateVariables(Map<LocationVariable, Term> atPres, Services services) {
@@ -1865,10 +1932,16 @@ public final class SpecificationRepository {
             var replacer = new OpReplacer(replacementMap, termFactory, services.getProof());
             var newTerms = terms().map(replacer::replace);
             return new JmlStatementSpec(
-                new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
-                    vars.atPreVars, atPres, vars.atBeforeVars, vars.atBefores),
-                newTerms);
+                    new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
+                            vars.atPreVars, atPres, vars.atBeforeVars, vars.atBefores),
+                    newTerms);
         }
+    }
+
+    private record BlockContractKey(StatementBlock block, URI file, Integer pos) {
+    }
+
+    private record LoopContractKey(StatementBlock block, URI file, Integer pos) {
     }
     // endregion
 }

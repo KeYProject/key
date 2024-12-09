@@ -102,7 +102,9 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
     public VisibilityModifier getVisibilityModifier() {
         for (int i = modArray.size() - 1; i >= 0; i -= 1) {
             Modifier m = modArray.get(i);
-            if (m instanceof VisibilityModifier) { return (VisibilityModifier) m; }
+            if (m instanceof VisibilityModifier) {
+                return (VisibilityModifier) m;
+            }
         }
         return null;
     }
@@ -110,7 +112,11 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
 
     private boolean containsModifier(Class<?> type) {
         int s = modArray.size();
-        for (int i = 0; i < s; i += 1) { if (type.isInstance(modArray.get(i))) { return true; } }
+        for (int i = 0; i < s; i += 1) {
+            if (type.isInstance(modArray.get(i))) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -174,8 +180,12 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      * Get the state count of the declaration
      */
     protected int getStateCount() {
-        if (containsModifier(TwoState.class)) { return 2; }
-        if (containsModifier(NoState.class)) { return 0; }
+        if (containsModifier(TwoState.class)) {
+            return 2;
+        }
+        if (containsModifier(NoState.class)) {
+            return 0;
+        }
         return 1;
     }
 

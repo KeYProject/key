@@ -302,12 +302,18 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
-        if (occursNotAtTopLevelInSuccedent(occurrence)) { return false; }
+        if (occursNotAtTopLevelInSuccedent(occurrence)) {
+            return false;
+        }
         // abort if inside of transformer
-        if (Transformer.inTransformer(occurrence)) { return false; }
+        if (Transformer.inTransformer(occurrence)) {
+            return false;
+        }
         final Instantiation instantiation =
             instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
-        if (instantiation == null) { return false; }
+        if (instantiation == null) {
+            return false;
+        }
         final ImmutableSet<BlockContract> contracts =
             getApplicableContracts(instantiation, goal, goal.proof().getServices());
 

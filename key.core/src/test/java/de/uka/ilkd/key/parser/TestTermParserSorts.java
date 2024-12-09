@@ -23,7 +23,7 @@ public class TestTermParserSorts extends AbstractTestTermParser {
         parseDecls("\\programVariables {Seq s;}");
         parseDecls("\\programVariables {int i;}");
         parseDecls("\\programVariables {" + "testTermParserSorts.IntegerMethods a;" + "byte[] ba;"
-                + "char[] ca;" + "short[] sa;" + "int[] ia;" + "long[] la;" + "}");
+            + "char[] ca;" + "short[] sa;" + "int[] ia;" + "long[] la;" + "}");
     }
 
     /*

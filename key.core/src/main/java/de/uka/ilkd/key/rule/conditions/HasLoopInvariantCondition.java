@@ -47,7 +47,9 @@ public class HasLoopInvariantCondition implements VariableCondition {
         final LoopSpecification loopSpec = //
             services.getSpecificationRepository().getLoopSpec(loop);
 
-        if (loopSpec == null) { return null; }
+        if (loopSpec == null) {
+            return null;
+        }
 
         final JavaBlock javaBlock = JavaBlock.createJavaBlock(
             (StatementBlock) svInst.getContextInstantiation().contextProgram());

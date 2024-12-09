@@ -70,21 +70,29 @@ public class InfFlowContractAppFeature implements Feature {
      */
     protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp, PosInOccurrence newPio) {
         // compare the rules
-        if (newApp.rule() != ruleCmp.rule()) { return false; }
+        if (newApp.rule() != ruleCmp.rule()) {
+            return false;
+        }
 
         final TacletApp cmp = (TacletApp) ruleCmp;
 
         // compare the position of application
         if (newPio != null) {
-            if (!(cmp instanceof PosTacletApp)) { return false; }
+            if (!(cmp instanceof PosTacletApp)) {
+                return false;
+            }
             final PosInOccurrence oldPio = cmp.posInOccurrence();
-            if (!comparePio(newApp, cmp, newPio, oldPio)) { return false; }
+            if (!comparePio(newApp, cmp, newPio, oldPio)) {
+                return false;
+            }
         }
 
 
         // compare the if-sequent instantiations
         if (newApp.ifFormulaInstantiations() == null || cmp.ifFormulaInstantiations() == null) {
-            if (newApp.ifFormulaInstantiations() != null || cmp.ifFormulaInstantiations() != null) { return false; }
+            if (newApp.ifFormulaInstantiations() != null || cmp.ifFormulaInstantiations() != null) {
+                return false;
+            }
         } else {
             final Iterator<IfFormulaInstantiation> it0 =
                 newApp.ifFormulaInstantiations().iterator();
@@ -92,7 +100,9 @@ public class InfFlowContractAppFeature implements Feature {
 
             while (it0.hasNext()) {
                 // this test should be improved
-                if (it0.next().getConstrainedFormula() != it1.next().getConstrainedFormula()) { return false; }
+                if (it0.next().getConstrainedFormula() != it1.next().getConstrainedFormula()) {
+                    return false;
+                }
             }
         }
 
@@ -101,7 +111,9 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     private boolean equalInterestingInsts(SVInstantiations inst0, SVInstantiations inst1) {
-        if (!inst0.getUpdateContext().equals(inst1.getUpdateContext())) { return false; }
+        if (!inst0.getUpdateContext().equals(inst1.getUpdateContext())) {
+            return false;
+        }
 
         final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting0 =
             inst0.interesting();
@@ -115,7 +127,9 @@ public class InfFlowContractAppFeature implements Feature {
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
 
         for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
-            if (entry0.key() instanceof SkolemTermSV || entry0.key() instanceof VariableSV) { continue; }
+            if (entry0.key() instanceof SkolemTermSV || entry0.key() instanceof VariableSV) {
+                continue;
+            }
 
             final InstantiationEntry<?> instEntry1 = insts1.get(entry0.key());
 
@@ -149,7 +163,9 @@ public class InfFlowContractAppFeature implements Feature {
         // to avoid duplicated applications
         int focusPos = goal.node().sequent().formulaNumberInSequent(antec, focusFor);
         int assumesPos = goal.node().sequent().formulaNumberInSequent(antec, assumesFor);
-        if (focusPos <= assumesPos) { return true; }
+        if (focusPos <= assumesPos) {
+            return true;
+        }
 
         Node node = goal.node();
 
@@ -163,13 +179,19 @@ public class InfFlowContractAppFeature implements Feature {
 
                 final Sequent pseq = par.sequent();
                 if (antec) {
-                    if (!semiSequentContains(pseq.antecedent(), focusFor)) { return false; }
+                    if (!semiSequentContains(pseq.antecedent(), focusFor)) {
+                        return false;
+                    }
                 } else {
-                    if (!semiSequentContains(pseq.succedent(), focusFor)) { return false; }
+                    if (!semiSequentContains(pseq.succedent(), focusFor)) {
+                        return false;
+                    }
                 }
             }
 
-            if (sameApplication(par.getAppliedRuleApp(), app, pos)) { return true; }
+            if (sameApplication(par.getAppliedRuleApp(), app, pos)) {
+                return true;
+            }
 
             node = par;
         }
@@ -185,7 +207,9 @@ public class InfFlowContractAppFeature implements Feature {
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;
 
-        if (!app.ifInstsComplete()) { return NumberRuleAppCost.getZeroCost(); }
+        if (!app.ifInstsComplete()) {
+            return NumberRuleAppCost.getZeroCost();
+        }
 
         if (!isInfFlowProof(goal.proof()) || app.ifFormulaInstantiations() == null
                 || app.ifFormulaInstantiations().size() < 1
@@ -209,7 +233,9 @@ public class InfFlowContractAppFeature implements Feature {
             }
         }
         final int findApplNumber = assumesApplNumber + numOfContractAppls;
-        if (!relatesTerms.get(findApplNumber).equals(focusFor)) { return TopRuleAppCost.INSTANCE; }
+        if (!relatesTerms.get(findApplNumber).equals(focusFor)) {
+            return TopRuleAppCost.INSTANCE;
+        }
 
         return NumberRuleAppCost.create(assumesApplNumber);
     }
@@ -226,7 +252,9 @@ public class InfFlowContractAppFeature implements Feature {
         ArrayList<SequentFormula> list = new ArrayList<>();
         Semisequent antecedent = goal.node().sequent().antecedent();
         for (SequentFormula f : antecedent) {
-            if (f.formula().op().toString().startsWith("RELATED_BY_")) { list.add(f); }
+            if (f.formula().op().toString().startsWith("RELATED_BY_")) {
+                list.add(f);
+            }
         }
         return list;
     }

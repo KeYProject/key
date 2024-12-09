@@ -74,7 +74,9 @@ public class PredictCostProver {
         ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
         for (Term t : set) {
             ImmutableSet<ImmutableSet<Term>> tmp = nil;
-            for (ImmutableSet<Term> cl : res) { tmp = createClauseHelper(tmp, t, cl); }
+            for (ImmutableSet<Term> cl : res) {
+                tmp = createClauseHelper(tmp, t, cl);
+            }
             res = tmp;
         }
         return res;
@@ -97,7 +99,11 @@ public class PredictCostProver {
         boolean negated = false;
         Term pro = problem;
         Operator op = pro.op();
-        while (op == Junctor.NOT) { negated = !negated; pro = pro.sub(0); op = pro.op(); }
+        while (op == Junctor.NOT) {
+            negated = !negated;
+            pro = pro.sub(0);
+            op = pro.op();
+        }
         if ((op == Equality.EQUALS || op == Equality.EQV)
                 && pro.sub(0).equalsModProperty(pro.sub(1), RENAMING_TERM_PROPERTY)) {
             return negated ? falseT : trueT;
@@ -118,10 +124,18 @@ public class PredictCostProver {
     private Term directConsequenceOrContradictionOfAxiom(Term problem, Term axiom) {
         boolean negated = false;
         Term pro = problem;
-        while (pro.op() == Junctor.NOT) { pro = pro.sub(0); negated = !negated; }
+        while (pro.op() == Junctor.NOT) {
+            pro = pro.sub(0);
+            negated = !negated;
+        }
         Term ax = axiom;
-        while (ax.op() == Junctor.NOT) { ax = ax.sub(0); negated = !negated; }
-        if (pro.equalsModProperty(ax, RENAMING_TERM_PROPERTY)) { return negated ? falseT : trueT; }
+        while (ax.op() == Junctor.NOT) {
+            ax = ax.sub(0);
+            negated = !negated;
+        }
+        if (pro.equalsModProperty(ax, RENAMING_TERM_PROPERTY)) {
+            return negated ? falseT : trueT;
+        }
         return problem;
     }
 
@@ -134,7 +148,9 @@ public class PredictCostProver {
      */
     private Term provedByAnother(Term problem, Term axiom) {
         Term res = directConsequenceOrContradictionOfAxiom(problem, axiom);
-        if (TriggerUtils.isTrueOrFalse(res)) { return res; }
+        if (TriggerUtils.isTrueOrFalse(res)) {
+            return res;
+        }
         return HandleArith.provedByArith(problem, axiom, services);
     }
 
@@ -197,7 +213,9 @@ public class PredictCostProver {
                 res.clear();
                 break;
             }
-            if (cCost == -1) { continue; }
+            if (cCost == -1) {
+                continue;
+            }
             if (c.literals.size() == 1) {
                 assertChanged = true;
                 assertLiterals = assertLiterals.union(c.literals);
@@ -207,8 +225,12 @@ public class PredictCostProver {
             cost = cost * cCost;
         }
         clauses = res;
-        if (cost == 0) { return 0; }
-        if (res.isEmpty() && !assertChanged) { return -1; }
+        if (cost == 0) {
+            return 0;
+        }
+        if (res.isEmpty() && !assertChanged) {
+            return -1;
+        }
         return cost;
     }
 
@@ -237,8 +259,12 @@ public class PredictCostProver {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof Clause other)) { return false; }
-            if (other.literals.size() != literals.size()) { return false; }
+            if (!(o instanceof Clause other)) {
+                return false;
+            }
+            if (other.literals.size() != literals.size()) {
+                return false;
+            }
             return literals.equals(other.literals);
         }
 
@@ -257,8 +283,12 @@ public class PredictCostProver {
          *         literals it left.
          */
         public long cost() {
-            if (literals.size() == 1 && literals.contains(falseT)) { return 0; }
-            if (literals.contains(trueT)) { return -1; }
+            if (literals.size() == 1 && literals.contains(falseT)) {
+                return 0;
+            }
+            if (literals.contains(trueT)) {
+                return -1;
+            }
             return literals.size();
         }
 
@@ -286,10 +316,14 @@ public class PredictCostProver {
                     res = DefaultImmutableSet.<Term>nil().add(trueT);
                     break;
                 }
-                if (op == Junctor.FALSE) { continue; }
+                if (op == Junctor.FALSE) {
+                    continue;
+                }
                 res = res.add(lit);
             }
-            if (res.size() == 0) { res = res.add(falseT); }
+            if (res.size() == 0) {
+                res = res.add(falseT);
+            }
             return res;
         }
 
@@ -301,7 +335,9 @@ public class PredictCostProver {
          * (!!a->a) and (a>=1|a<=0) which is !a>=1->a<=0
          */
         public boolean selfRefine(ImmutableSet<Term> lits) {
-            if (lits.size() <= 1) { return false; }
+            if (lits.size() <= 1) {
+                return false;
+            }
             Term[] terms = lits.toArray(new Term[lits.size()]);
             ImmutableSet<Term> next = lits.remove(terms[0]);
             boolean opNot = terms[0].op() == Junctor.NOT;
@@ -309,7 +345,9 @@ public class PredictCostProver {
             for (int j = 1; j < terms.length; j++) {
                 Term pro = provedByAnother(terms[j], axiom);
                 final Operator op = pro.op();
-                if (op == Junctor.TRUE) { return true; }
+                if (op == Junctor.TRUE) {
+                    return true;
+                }
                 if (op == Junctor.FALSE
                         && terms[0].equalsModProperty(terms[j], IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     next = next.remove(terms[j]);

@@ -43,7 +43,9 @@ public class CheckedProcessBuilder {
      */
     public CheckedProcessBuilder(String program, String[] programCheck) {
         this.program = program;
-        if (CHECKED.contains(program)) { return; }
+        if (CHECKED.contains(program)) {
+            return;
+        }
         CHECKED.add(program);
         try {
             String[] check = Stream.concat(Stream.of(program), Arrays.stream(programCheck))
@@ -68,7 +70,9 @@ public class CheckedProcessBuilder {
      *         on wait error
      */
     public void start(String... args) throws IOException, InterruptedException {
-        if (args.length == 0) { throw new IllegalStateException("need program to execute"); }
+        if (args.length == 0) {
+            throw new IllegalStateException("need program to execute");
+        }
         if (AVAILABLE.contains(program)) {
             String[] fullArgs =
                 Stream.concat(Stream.of(program), Arrays.stream(args)).toArray(String[]::new);

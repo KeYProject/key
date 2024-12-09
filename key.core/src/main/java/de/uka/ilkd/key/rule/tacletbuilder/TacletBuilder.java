@@ -58,12 +58,20 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
     private static boolean containsFreeVarSV(Term t) {
-        for (final QuantifiableVariable var : t.freeVars()) { if (var instanceof VariableSV) { return true; } }
+        for (final QuantifiableVariable var : t.freeVars()) {
+            if (var instanceof VariableSV) {
+                return true;
+            }
+        }
         return false;
     }
 
     private static boolean containsFreeVarSV(Sequent sequent) {
-        for (final SequentFormula cf : sequent) { if (containsFreeVarSV(cf.formula())) { return true; } }
+        for (final SequentFormula cf : sequent) {
+            if (containsFreeVarSV(cf.formula())) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -129,7 +137,9 @@ public abstract class TacletBuilder<T extends Taclet> {
      * adds a mapping from GoalTemplate <code>gt</code> to SetOf<Choice> <code>soc</code>
      */
     public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ChoiceExpr soc) {
-        if (goal2Choices == null) { goal2Choices = new LinkedHashMap<>(); }
+        if (goal2Choices == null) {
+            goal2Choices = new LinkedHashMap<>();
+        }
         goal2Choices.put(gt, soc);
     }
 
@@ -159,7 +169,9 @@ public abstract class TacletBuilder<T extends Taclet> {
      * given type
      */
     public void addVarsNew(SchemaVariable v, KeYJavaType type) {
-        if (type == null) { throw new NullPointerException("given type is null"); }
+        if (type == null) {
+            throw new NullPointerException("given type is null");
+        }
         addVarsNew(new NewVarcond(v, type));
     }
 
@@ -169,7 +181,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     public void addVarsNew(NewVarcond nv) {
         if (!(nv.getSchemaVariable() instanceof ProgramSV)) {
             throw new TacletBuilderException(this, "Tried to add condition:" + nv
-                    + "to new vars-list. That can" + "match more than program" + " variables.");
+                + "to new vars-list. That can" + "match more than program" + " variables.");
         }
         varsNew = varsNew.prepend(nv);
     }
@@ -179,7 +191,9 @@ public abstract class TacletBuilder<T extends Taclet> {
      * all v's in the given list
      */
     public void addVarsNew(ImmutableList<NewVarcond> list) {
-        for (NewVarcond aList : list) { addVarsNew(aList); }
+        for (NewVarcond aList : list) {
+            addVarsNew(aList);
+        }
     }
 
     /**
@@ -194,14 +208,18 @@ public abstract class TacletBuilder<T extends Taclet> {
     public void addVarsNotFreeIn(Iterable<? extends SchemaVariable> v0,
             Iterable<? extends SchemaVariable> v1) {
         for (SchemaVariable boundSV : v0) {
-            for (SchemaVariable schemaVar : v1) { addVarsNotFreeIn(boundSV, schemaVar); }
+            for (SchemaVariable schemaVar : v1) {
+                addVarsNotFreeIn(boundSV, schemaVar);
+            }
         }
     }
 
 
     public void addVarsNotFreeIn(Iterable<? extends SchemaVariable> v0, SchemaVariable... v1) {
         for (SchemaVariable boundSV : v0) {
-            for (SchemaVariable schemaVar : v1) { addVarsNotFreeIn(boundSV, schemaVar); }
+            for (SchemaVariable schemaVar : v1) {
+                addVarsNotFreeIn(boundSV, schemaVar);
+            }
         }
     }
 

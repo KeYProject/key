@@ -155,7 +155,9 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
                 sb.append(" >= ");
                 sb.append(getArrayStartIndexString());
             }
-            if (getArrayStartIndex() != null && getArrayEndIndex() != null) { sb.append(" and "); }
+            if (getArrayStartIndex() != null && getArrayEndIndex() != null) {
+                sb.append(" and ");
+            }
             if (getArrayEndIndex() != null) {
                 sb.append(getArrayIndexString());
                 sb.append(" <= ");

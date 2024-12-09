@@ -84,7 +84,10 @@ public class SearchNodeReversePreorderIterator {
      */
     protected Node lastLeaf(Node node) {
         int childCount = node.childrenCount();
-        while (childCount >= 1) { node = node.child(childCount - 1); childCount = node.childrenCount(); }
+        while (childCount >= 1) {
+            node = node.child(childCount - 1);
+            childCount = node.childrenCount();
+        }
         return node;
     }
 }

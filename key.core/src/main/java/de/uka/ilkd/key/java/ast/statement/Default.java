@@ -67,7 +67,9 @@ public class Default extends BranchImp {
      */
     public int getChildCount() {
         int result = 0;
-        if (body != null) { result += body.size(); }
+        if (body != null) {
+            result += body.size();
+        }
         return result;
     }
 
@@ -84,7 +86,9 @@ public class Default extends BranchImp {
         int len;
         if (body != null) {
             len = body.size();
-            if (len > index) { return body.get(index); }
+            if (len > index) {
+                return body.get(index);
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -108,7 +112,9 @@ public class Default extends BranchImp {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
-        if (body != null) { return body.get(index); }
+        if (body != null) {
+            return body.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

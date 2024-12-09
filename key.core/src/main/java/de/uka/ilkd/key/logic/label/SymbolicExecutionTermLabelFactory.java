@@ -23,14 +23,14 @@ public class SymbolicExecutionTermLabelFactory
             throws TermLabelException {
         if (parameters == null || parameters.size() != 1) {
             throw new TermLabelException("Label " + SymbolicExecutionTermLabel.NAME
-                    + " requires exactly one Integer-Parameter with its ID.");
+                + " requires exactly one Integer-Parameter with its ID.");
         }
         int val;
         try {
             val = Integer.parseInt(parameters.get(0));
         } catch (NumberFormatException e) {
             throw new TermLabelException("Label " + SymbolicExecutionTermLabel.NAME
-                    + " requires exactly one Integer-Parameter with its ID.",
+                + " requires exactly one Integer-Parameter with its ID.",
                 e);
         }
 

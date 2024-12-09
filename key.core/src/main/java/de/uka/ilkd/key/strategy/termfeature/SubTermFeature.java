@@ -38,7 +38,9 @@ public class SubTermFeature implements TermFeature {
     private final RuleAppCost arityMismatchCost;
 
     public RuleAppCost compute(Term term, MutableState mState, Services services) {
-        if (term.arity() != features.length) { return arityMismatchCost; }
+        if (term.arity() != features.length) {
+            return arityMismatchCost;
+        }
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
 

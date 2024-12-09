@@ -40,7 +40,9 @@ public class ClickableMessageBox extends JTextPane {
             if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                 int index = Integer.parseInt(e.getDescription());
                 Object item = items.get(index);
-                for (ClickableMessageBoxListener listener : listeners) { listener.eventMessageClicked(item); }
+                for (ClickableMessageBoxListener listener : listeners) {
+                    listener.eventMessageClicked(item);
+                }
             }
 
         });
@@ -60,12 +62,12 @@ public class ClickableMessageBox extends JTextPane {
             if (item != null) {
                 kit.insertHTML(doc, doc.getLength(),
                     "<u><a href=\"" + items.size() + "\" style=\"color: rgb(" + color.getRed() + ","
-                            + color.getGreen() + "," + color.getBlue() + ")\">" + message + "</a></u>",
+                        + color.getGreen() + "," + color.getBlue() + ")\">" + message + "</a></u>",
                     0, 0, null);
             } else {
                 kit.insertHTML(
                     doc, doc.getLength(), "<font color= rgb(" + color.getRed() + ","
-                            + color.getGreen() + "," + color.getBlue() + ")\">" + message + "</font>",
+                        + color.getGreen() + "," + color.getBlue() + ")\">" + message + "</font>",
                     0, 0, null);
             }
         } catch (Throwable e) {

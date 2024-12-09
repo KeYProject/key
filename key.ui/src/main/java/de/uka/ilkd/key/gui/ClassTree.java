@@ -92,7 +92,9 @@ public class ClassTree extends JTree {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) (parentNode.getChildAt(i));
 
             Entry te = (Entry) (childNode.getUserObject());
-            if (childString.equals(te.string)) { return childNode; }
+            if (childString.equals(te.string)) {
+                return childNode;
+            }
         }
         return null;
     }
@@ -105,7 +107,9 @@ public class ClassTree extends JTree {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) (parentNode.getChildAt(i));
 
             Entry te = (Entry) (childNode.getUserObject());
-            if (target.equals(te.target)) { return childNode; }
+            if (target.equals(te.target)) {
+                return childNode;
+            }
         }
         return null;
     }
@@ -121,7 +125,9 @@ public class ClassTree extends JTree {
             // get next part of the name
             int lastIndex = index;
             index = fullClassName.indexOf('.', ++index);
-            if (index == -1) { index = length; }
+            if (index == -1) {
+                index = length;
+            }
             String namePart = fullClassName.substring(lastIndex + 1, index);
 
             // try to get child node; otherwise, create and insert it
@@ -183,7 +189,9 @@ public class ClassTree extends JTree {
             if (numGrandChildren == 1) {
                 DefaultMutableTreeNode grandChild = (DefaultMutableTreeNode) child.getFirstChild();
                 // stop compressing at method name
-                if (((Entry) grandChild.getUserObject()).target != null) { continue; }
+                if (((Entry) grandChild.getUserObject()).target != null) {
+                    continue;
+                }
                 child.removeFromParent();
                 root.add(grandChild);
                 Entry e1 = (Entry) child.getUserObject();
@@ -222,10 +230,18 @@ public class ClassTree extends JTree {
         } else {
             sb.append(ov.name());
         }
-        if (ov.getNumParams() > 0 || ov instanceof IProgramMethod) { sb.append("("); }
-        for (KeYJavaType paramType : ov.getParamTypes()) { sb.append(paramType.getSort().name()).append(", "); }
-        if (ov.getNumParams() > 0) { sb.setLength(sb.length() - 2); }
-        if (ov.getNumParams() > 0 || ov instanceof IProgramMethod) { sb.append(")"); }
+        if (ov.getNumParams() > 0 || ov instanceof IProgramMethod) {
+            sb.append("(");
+        }
+        for (KeYJavaType paramType : ov.getParamTypes()) {
+            sb.append(paramType.getSort().name()).append(", ");
+        }
+        if (ov.getNumParams() > 0) {
+            sb.setLength(sb.length() - 2);
+        }
+        if (ov.getNumParams() > 0 || ov instanceof IProgramMethod) {
+            sb.append(")");
+        }
         return sb.toString();
     }
 
@@ -244,7 +260,9 @@ public class ClassTree extends JTree {
 
         // build tree
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(new Entry(""));
-        for (KeYJavaType keYJavaType : types) { insertIntoTree(rootNode, keYJavaType, addContractTargets, services); }
+        for (KeYJavaType keYJavaType : types) {
+            insertIntoTree(rootNode, keYJavaType, addContractTargets, services);
+        }
 
         compressLinearPaths(rootNode);
         return rootNode;
@@ -327,7 +345,9 @@ public class ClassTree extends JTree {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) parent.getChildAt(i);
             Entry e = (Entry) childNode.getUserObject();
 
-            if (Objects.equals(text, e.string)) { return childNode; }
+            if (Objects.equals(text, e.string)) {
+                return childNode;
+            }
         }
         return null;
     }

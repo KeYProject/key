@@ -75,15 +75,27 @@ public class ProofScriptArgument<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ProofScriptArgument<?> that = (ProofScriptArgument<?>) o;
 
-        if (required != that.required) { return false; }
-        if (flag != that.flag) { return false; }
-        if (!Objects.equals(command, that.command)) { return false; }
-        if (!Objects.equals(name, that.name)) { return false; }
+        if (required != that.required) {
+            return false;
+        }
+        if (flag != that.flag) {
+            return false;
+        }
+        if (!Objects.equals(command, that.command)) {
+            return false;
+        }
+        if (!Objects.equals(name, that.name)) {
+            return false;
+        }
         return type == that.type;
     }
 

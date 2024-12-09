@@ -146,9 +146,9 @@ public class FormulaTermLabel implements TermLabel {
     @Override
     public Object getTLChild(int i) {
         return switch (i) {
-            case 0 -> getId();
-            case 1 -> beforeIds;
-            default -> null;
+        case 0 -> getId();
+        case 1 -> beforeIds;
+        default -> null;
         };
     }
 
@@ -265,7 +265,9 @@ public class FormulaTermLabel implements TermLabel {
      *         Occurred Exception in case that the given IDs are not valid.
      */
     public static List<String> getValidBeforeIds(String beforeIds) throws TermLabelException {
-        if (beforeIds == null || beforeIds.isEmpty()) { throw new TermLabelException("No before IDs defined."); }
+        if (beforeIds == null || beforeIds.isEmpty()) {
+            throw new TermLabelException("No before IDs defined.");
+        }
         List<String> result = new LinkedList<>();
         String[] candidates = getBeforeIds(beforeIds);
         for (String id : candidates) {

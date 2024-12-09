@@ -78,7 +78,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         taclet_sb.append("</pre>");
         if (truncated) {
             taclet_sb.append("\n<b>!!</b><i> Message has been truncated. "
-                    + "See View &rarr; ToolTip Options.</i>");
+                + "See View &rarr; ToolTip Options.</i>");
         }
 
         setToolTipText(taclet_sb.toString());
@@ -93,7 +93,9 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
                 printer.setInstantiation(connectedTo.instantiations());
                 printer.printSequent(templates.head().sequent());
                 String s = printer.result();
-                if (s.length() > 40) { s = s.substring(0, 37) + "..."; }
+                if (s.length() > 40) {
+                    s = s.substring(0, 37) + "...";
+                }
                 setText(s);
             }
         }

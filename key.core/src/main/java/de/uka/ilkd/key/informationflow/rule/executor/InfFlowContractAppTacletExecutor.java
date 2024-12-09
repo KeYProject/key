@@ -45,7 +45,8 @@ public class InfFlowContractAppTacletExecutor
             RuleApp tacletApp, Services services) {
         final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi,
             termLabelState, labelHint, pos, matchCond, goal, tacletApp, services);
-        assert replacements.size() == 1 : "information flow taclets must have " + "exactly one add!";
+        assert replacements.size() == 1
+                : "information flow taclets must have " + "exactly one add!";
         updateStrategyInfo(services.getProof().openEnabledGoals().head(),
             replacements.iterator().next().formula());
         super.addToAntec(semi, termLabelState, labelHint, currentSequent, pos,
@@ -62,7 +63,9 @@ public class InfFlowContractAppTacletExecutor
      */
     private void updateStrategyInfo(Goal goal, final Term applFormula) {
         ImmutableList<Term> applFormulas = goal.getStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY);
-        if (applFormulas == null) { applFormulas = ImmutableSLList.nil(); }
+        if (applFormulas == null) {
+            applFormulas = ImmutableSLList.nil();
+        }
         applFormulas = applFormulas.append(applFormula);
         StrategyInfoUndoMethod undo = strategyInfos -> {
             ImmutableList<Term> applFormulas1 =

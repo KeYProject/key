@@ -160,7 +160,9 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
     public void addPredicate(AbstractionPredicate predicate) {
         Sort s = predicate.getArgSort();
 
-        if (!predicates.containsKey(s)) { predicates.put(s, new ArrayList<>()); }
+        if (!predicates.containsKey(s)) {
+            predicates.put(s, new ArrayList<>());
+        }
 
         predicates.get(s).add(predicate);
     }
@@ -172,7 +174,9 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      *        The predicates to set.
      */
     public void addPredicates(Iterable<AbstractionPredicate> predicates) {
-        for (AbstractionPredicate predicate : predicates) { addPredicate(predicate); }
+        for (AbstractionPredicate predicate : predicates) {
+            addPredicate(predicate);
+        }
     }
 
     /**

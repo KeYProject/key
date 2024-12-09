@@ -22,7 +22,9 @@ public class Sequence {
     public Sequence(int length, String name) {
         super();
         this.name = name;
-        if (length >= 0) { content = new String[length]; }
+        if (length >= 0) {
+            content = new String[length];
+        }
     }
 
     public String getName() {

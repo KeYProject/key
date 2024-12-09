@@ -35,10 +35,16 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
      */
     protected final boolean lessThan(ImmutableList<Term> list1, ImmutableList<Term> list2,
             PosInOccurrence focus, Goal currentGoal) {
-        if (list2.isEmpty()) { return false; }
+        if (list2.isEmpty()) {
+            return false;
+        }
         for (Term aList1 : list1) {
             final Term te1 = aList1;
-            for (Term aList2 : list2) { if (!lessThan(te1, aList2, focus, currentGoal)) { return false; } }
+            for (Term aList2 : list2) {
+                if (!lessThan(te1, aList2, focus, currentGoal)) {
+                    return false;
+                }
+            }
         }
         return true;
     }

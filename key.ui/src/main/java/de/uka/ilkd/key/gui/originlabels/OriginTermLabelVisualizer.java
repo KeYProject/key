@@ -112,7 +112,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             if (!mediator.getSelectedProof().equals(getNode().proof())) {
                 int choice = JOptionPane.showOptionDialog(OriginTermLabelVisualizer.this,
                     "The proof containing this node is not currently selected."
-                            + " Do you want to select it?",
+                        + " Do you want to select it?",
                     "Switch Proof?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
                     null, null);
 
@@ -397,7 +397,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             nodeLinkAction.setEnabled(false);
 
             unregister(this);
-        } else if (nodeLinkButton.isEnabled()) { nodeLinkButton.setText(node.serialNr() + ": " + node.name()); }
+        } else if (nodeLinkButton.isEnabled()) {
+            nodeLinkButton.setText(node.serialNr() + ": " + node.name());
+        }
     }
 
     /**
@@ -417,7 +419,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             PosInTerm completePos = termPio.posInTerm();
 
             IntIterator it = pio.posInTerm().iterator();
-            while (it.hasNext()) { completePos = completePos.down(it.next()); }
+            while (it.hasNext()) {
+                completePos = completePos.down(it.next());
+            }
 
             return new PosInOccurrence(termPio.sequentFormula(), completePos, termPio.isInAntec());
         }
@@ -494,7 +498,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     }
 
     private ImmutableList<Integer> getPosTablePath(PosInOccurrence pos) {
-        if (pos == null) { return ImmutableSLList.<Integer>nil().prepend(0); }
+        if (pos == null) {
+            return ImmutableSLList.<Integer>nil().prepend(0);
+        }
 
         InitialPositionTable posTable = view.posTable;
 
@@ -540,16 +546,18 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     }
 
     private String getTooltipText(PosInOccurrence pio) {
-        if (pio == null) { return null; }
+        if (pio == null) {
+            return null;
+        }
 
         OriginTermLabel label = (OriginTermLabel) pio.subTerm().getLabel(OriginTermLabel.NAME);
         Origin origin = OriginTermLabel.getOrigin(pio);
 
         return "<html>Origin of selected term: <b>" + (origin == null ? "" : origin)
-                + "</b><hr>Origin of (former) sub-terms:<br>"
-                + (label == null ? ""
-                        : label.getSubtermOrigins().stream().map(o -> o + "<br>").reduce("",
-                            String::concat));
+            + "</b><hr>Origin of (former) sub-terms:<br>"
+            + (label == null ? ""
+                    : label.getSubtermOrigins().stream().map(o -> o + "<br>").reduce("",
+                        String::concat));
     }
 
     private class CellRenderer extends DefaultTreeCellRenderer {
@@ -632,7 +640,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             super(pos);
             this.pos = pos;
 
-            if (pos != null) { this.term = pos.subTerm(); }
+            if (pos != null) {
+                this.term = pos.subTerm();
+            }
         }
     }
 
@@ -705,7 +715,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         public String getToolTipText(MouseEvent event) {
             PosInSequent pis = getPosInSequent(event.getPoint());
 
-            if (pis == null) { return null; }
+            if (pis == null) {
+                return null;
+            }
 
             return OriginTermLabelVisualizer.this.getTooltipText(pis.getPosInOccurrence());
         }

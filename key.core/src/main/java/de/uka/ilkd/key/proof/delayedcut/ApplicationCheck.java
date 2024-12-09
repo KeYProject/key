@@ -59,7 +59,9 @@ public interface ApplicationCheck {
 
         @Override
         public String check(Node cutNode, Term cutFormula) {
-            if (cutNode == null) { throw new IllegalArgumentException("cutNode is null"); }
+            if (cutNode == null) {
+                throw new IllegalArgumentException("cutNode is null");
+            }
             if (node != cutNode) {
                 node = cutNode;
                 clearCaches();
@@ -80,10 +82,14 @@ public interface ApplicationCheck {
             while (!queue.isEmpty()) {
                 Node next = queue.pollFirst();
                 if (next.getNameRecorder() != null) {
-                    for (Name name : next.getNameRecorder().getProposals()) { names.add(name.toString()); }
+                    for (Name name : next.getNameRecorder().getProposals()) {
+                        names.add(name.toString());
+                    }
                 }
 
-                for (Iterator<Node> it = next.childrenIterator(); it.hasNext();) { queue.add(it.next()); }
+                for (Iterator<Node> it = next.childrenIterator(); it.hasNext();) {
+                    queue.add(it.next());
+                }
             }
         }
 
@@ -93,16 +99,23 @@ public interface ApplicationCheck {
                 @Override
                 public void visit(Term visited) {
                     String name = visited.op().name().toString();
-                    if (names.contains(name)) { newSymbols.add(name); }
+                    if (names.contains(name)) {
+                        newSymbols.add(name);
+                    }
                 }
             });
 
-            if (newSymbols.isEmpty()) { return null; }
+            if (newSymbols.isEmpty()) {
+                return null;
+            }
 
             StringBuilder buf =
                 new StringBuilder(newSymbols.size() == 1 ? INFORMATION1 : INFORMATION2);
             buf.append(node.serialNr()).append(": ");
-            for (String name : newSymbols) { buf.append(name); buf.append(", "); }
+            for (String name : newSymbols) {
+                buf.append(name);
+                buf.append(", ");
+            }
             buf.replace(buf.length() - 2, buf.length(),
                 ". (For more information click on this message)");
             buf.append("#");

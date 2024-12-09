@@ -48,7 +48,9 @@ public class IfInstantiator {
     }
 
     private void addResult(NoPosTacletApp app) {
-        if (app == null) { return; }
+        if (app == null) {
+            return;
+        }
         results = results.prepend(app);
         /*
          * final RuleAppContainer cont = TacletAppContainer.createContainer ( app,
@@ -95,11 +97,15 @@ public class IfInstantiator {
      */
     private ImmutableArray<IfFormulaInstantiation> getSequentFormulas(boolean p_antec,
             boolean p_all) {
-        if (p_all) { return getAllSequentFormulas(p_antec); }
+        if (p_all) {
+            return getAllSequentFormulas(p_antec);
+        }
 
         final ImmutableArray<IfFormulaInstantiation> cache =
             getNewSequentFormulasFromCache(p_antec);
-        if (cache != null) { return cache; }
+        if (cache != null) {
+            return cache;
+        }
 
         final ImmutableArray<IfFormulaInstantiation> newFormulas = selectNewFormulas(p_antec);
 
@@ -139,7 +145,9 @@ public class IfInstantiator {
 
         final ImmutableArray<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(antec);
 
-        if (cache != null) { return cache.contains(p_ifInstantiation); }
+        if (cache != null) {
+            return cache.contains(p_ifInstantiation);
+        }
 
         return isNewFormulaDirect(p_ifInstantiation);
     }

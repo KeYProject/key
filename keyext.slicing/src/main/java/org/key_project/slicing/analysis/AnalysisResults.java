@@ -181,7 +181,9 @@ public final class AnalysisResults {
         for (SequentFormula sf : semi) {
             var graphNode = dependencyGraph.getGraphNode(node.proof(), node.getBranchLocation(),
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), antec));
-            if (usefulNodes.contains(graphNode)) { semiList.add(sf); }
+            if (usefulNodes.contains(graphNode)) {
+                semiList.add(sf);
+            }
         }
         return Semisequent.create(semiList);
     }
@@ -189,8 +191,8 @@ public final class AnalysisResults {
     @Override
     public String toString() {
         return "AnalysisResults{" +
-                "totalSteps=" + totalSteps +
-                ", usefulSteps=" + usefulStepsNr +
-                ", ...}";
+            "totalSteps=" + totalSteps +
+            ", usefulSteps=" + usefulStepsNr +
+            ", ...}";
     }
 }

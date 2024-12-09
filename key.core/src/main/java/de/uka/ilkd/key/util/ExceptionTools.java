@@ -94,7 +94,10 @@ public final class ExceptionTools {
         sb.append("\n");
         sb.append("Expected token type(s): ");
         for (var interval : expectedTokens.getIntervals()) {
-            for (int i = interval.a; i <= interval.b; i++) { sb.append(vocabulary.getDisplayName(i)); sb.append("\n"); }
+            for (int i = interval.a; i <= interval.b; i++) {
+                sb.append(vocabulary.getDisplayName(i));
+                sb.append("\n");
+            }
         }
 
         return sb.toString();
@@ -115,9 +118,13 @@ public final class ExceptionTools {
      */
     public static Location getLocation(@NonNull Throwable exc)
             throws MalformedURLException {
-        if (exc instanceof HasLocation) { return ((HasLocation) exc).getLocation(); }
+        if (exc instanceof HasLocation) {
+            return ((HasLocation) exc).getLocation();
+        }
 
-        if (exc.getCause() != null) { return getLocation(exc.getCause()); }
+        if (exc.getCause() != null) {
+            return getLocation(exc.getCause());
+        }
 
         return null;
     }

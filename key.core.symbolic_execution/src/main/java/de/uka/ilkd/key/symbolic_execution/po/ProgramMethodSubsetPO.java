@@ -187,7 +187,9 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         undeclaredVariableCollector.start();
         // Register undeclared variables
         Set<LocationVariable> undeclaredVariables = undeclaredVariableCollector.result();
-        for (LocationVariable x : undeclaredVariables) { register(x, services); }
+        for (LocationVariable x : undeclaredVariables) {
+            register(x, services);
+        }
         return ImmutableSLList.<StatementBlock>nil().prepend(null, result, null, null);
     }
 
@@ -284,7 +286,9 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      */
     protected static ImmutableList<LocationVariable> convert(Collection<LocationVariable> c) {
         ImmutableList<LocationVariable> result = ImmutableSLList.nil();
-        for (LocationVariable var : c) { result = result.append(var); }
+        for (LocationVariable var : c) {
+            result = result.append(var);
+        }
         return result;
     }
 
@@ -373,14 +377,18 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         } catch (NumberFormatException e) {
             throw new IOException("Start line \"" + line + "\" is no valid integer.");
         }
-        if (lineValue < 0) { throw new IOException("Start line \"" + line + "\" is a negative integer."); }
+        if (lineValue < 0) {
+            throw new IOException("Start line \"" + line + "\" is a negative integer.");
+        }
         int columnValue;
         try {
             columnValue = Integer.parseInt(column);
         } catch (NumberFormatException e) {
             throw new IOException("Start column \"" + column + "\" is no valid integer.");
         }
-        if (columnValue < 0) { throw new IOException("Start column \"" + column + "\" is a negative integer."); }
+        if (columnValue < 0) {
+            throw new IOException("Start column \"" + column + "\" is a negative integer.");
+        }
         return Position.newOneBased(lineValue, columnValue);
     }
 
@@ -408,14 +416,18 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         } catch (NumberFormatException e) {
             throw new IOException("End line \"" + line + "\" is no valid integer.");
         }
-        if (lineValue <= 0) { throw new IOException("End line \"" + line + "\" is a negative integer."); }
+        if (lineValue <= 0) {
+            throw new IOException("End line \"" + line + "\" is a negative integer.");
+        }
         int columnValue;
         try {
             columnValue = Integer.parseInt(column);
         } catch (NumberFormatException e) {
             throw new IOException("End column \"" + column + "\" is no valid integer.");
         }
-        if (columnValue <= 0) { throw new IOException("End column \"" + column + "\" is a negative integer."); }
+        if (columnValue <= 0) {
+            throw new IOException("End column \"" + column + "\" is a negative integer.");
+        }
         return Position.newOneBased(lineValue, columnValue);
     }
 }

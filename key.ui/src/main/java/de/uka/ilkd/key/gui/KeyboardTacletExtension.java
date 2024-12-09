@@ -141,7 +141,9 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         mainWindow.getCurrentGoalView().addPropertyChangeListener(
             SequentView.PROP_LAST_MOUSE_POSITION,
             e -> {
-                if (actionFilterUsingMouse.isSelected()) { buildModel(); }
+                if (actionFilterUsingMouse.isSelected()) {
+                    buildModel();
+                }
             });
 
         pCenter.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -213,11 +215,15 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
      */
     private void relayout() {
         pCenter.removeAll();
-        if (model == null || !actionActivate.isSelected()) { return; }
+        if (model == null || !actionActivate.isSelected()) {
+            return;
+        }
 
         Collection<String> names = model.getPrefixTable().keySet();
         for (String prefix : names) {
-            if (!prefix.startsWith(model.getCurrentPrefix())) { continue; }
+            if (!prefix.startsWith(model.getCurrentPrefix())) {
+                continue;
+            }
             Box box = new Box(BoxLayout.X_AXIS);
             String name = model.getPrefixTable().get(prefix);
             int pLength = prefix.length();
@@ -446,7 +452,7 @@ class KeyboardTacletModel {
     public void processChar(char c) {
         switch (c) {
         case '\u001B' -> // escape
-                reset();
+            reset();
         case '\b' -> {
             if (currentPrefix.length() <= 1) {
                 setCurrentPrefix("");
@@ -455,8 +461,12 @@ class KeyboardTacletModel {
             }
         }
         default -> {
-            if ('0' <= c && c <= '9') { setCurrentPos(c - '0'); }
-            if (charValid(c)) { setCurrentPrefix(currentPrefix + c); }
+            if ('0' <= c && c <= '9') {
+                setCurrentPos(c - '0');
+            }
+            if (charValid(c)) {
+                setCurrentPrefix(currentPrefix + c);
+            }
         }
         }
     }

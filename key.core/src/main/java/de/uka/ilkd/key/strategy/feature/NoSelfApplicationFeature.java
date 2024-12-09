@@ -26,7 +26,9 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
         Debug.assertTrue(pos != null,
             "NoSelfApplicationFeature: Need to know the position of the application of the taclet");
 
-        if (!p_app.ifInstsComplete()) { return true; }
+        if (!p_app.ifInstsComplete()) {
+            return true;
+        }
 
         ImmutableList<IfFormulaInstantiation> ifInsts = p_app.ifFormulaInstantiations();
 

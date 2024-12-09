@@ -72,7 +72,9 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
     public Term[] renameVariablesAndSkolemConstants() {
         Term[] result = new Term[terms.length];
-        for (int i = 0; i < terms.length; i++) { result[i] = renameVariablesAndSkolemConstants(terms[i]); }
+        for (int i = 0; i < terms.length; i++) {
+            result[i] = renameVariablesAndSkolemConstants(terms[i]);
+        }
         return result;
     }
 
@@ -86,9 +88,13 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private Term renameFormulasWithoutPrograms(Term term) {
-        if (term == null) { return null; }
+        if (term == null) {
+            return null;
+        }
 
-        if (!replaceMap.containsKey(term)) { renameAndAddToReplaceMap(term); }
+        if (!replaceMap.containsKey(term)) {
+            renameAndAddToReplaceMap(term);
+        }
         return replaceMap.get(term);
     }
 
@@ -186,7 +192,9 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
     private Term[] renameSubs(Term term) {
         Term[] renamedSubs = new Term[term.arity()];
-        for (int i = 0; i < renamedSubs.length; i++) { renamedSubs[i] = renameFormulasWithoutPrograms(term.sub(i)); }
+        for (int i = 0; i < renamedSubs.length; i++) {
+            renamedSubs[i] = renameFormulasWithoutPrograms(term.sub(i));
+        }
         return renamedSubs;
     }
 

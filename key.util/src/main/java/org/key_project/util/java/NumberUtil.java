@@ -111,7 +111,10 @@ public class NumberUtil {
             return 1;
         } else {
             byte digits = 0;
-            while (number != 0) { digits++; number = number / 10; }
+            while (number != 0) {
+                digits++;
+                number = number / 10;
+            }
             return digits;
         }
     }
@@ -128,7 +131,10 @@ public class NumberUtil {
             return 1;
         } else {
             byte digits = 0;
-            while (number != 0) { digits++; number = number / 10; }
+            while (number != 0) {
+                digits++;
+                number = number / 10;
+            }
             return digits;
         }
     }
@@ -142,7 +148,9 @@ public class NumberUtil {
      */
     public static int parseFullInt(String text) {
         if (text != null) {
-            if (text.startsWith("+")) { text = text.substring(1); }
+            if (text.startsWith("+")) {
+                text = text.substring(1);
+            }
             return Integer.parseInt(text);
         } else {
             throw new NumberFormatException("Text not defined.");
@@ -158,7 +166,9 @@ public class NumberUtil {
      */
     public static long parseFullLong(String text) {
         if (text != null) {
-            if (text.startsWith("+")) { text = text.substring(1); }
+            if (text.startsWith("+")) {
+                text = text.substring(1);
+            }
             return Long.parseLong(text);
         } else {
             throw new NumberFormatException("Text not defined.");

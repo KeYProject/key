@@ -126,7 +126,9 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         ImmutableList<Field> result = ImmutableSLList.nil();
         for (int i = list.size() - 1; i >= 0; i--) {
             MemberDeclaration pe = list.get(i);
-            if (pe instanceof FieldDeclaration) { result = result.append(filterField((FieldDeclaration) pe)); }
+            if (pe instanceof FieldDeclaration) {
+                result = result.append(filterField((FieldDeclaration) pe));
+            }
         }
         return result;
     }
@@ -142,7 +144,9 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     private ImmutableList<Field> filterField(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableSLList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
-        for (int i = spec.size() - 1; i >= 0; i--) { result = result.prepend(spec.get(i)); }
+        for (int i = spec.size() - 1; i >= 0; i--) {
+            result = result.prepend(spec.get(i));
+        }
         return result;
     }
 
@@ -155,7 +159,11 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     private ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
         ImmutableList<Field> result = ImmutableSLList.nil();
-        for (Field field : list) { if (field.isImplicit()) { result = result.append(field); } }
+        for (Field field : list) {
+            if (field.isImplicit()) {
+                result = result.append(field);
+            }
+        }
         return result;
     }
 
@@ -172,7 +180,9 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         for (Field field1 : fields) {
             Field field = field1;
             final ProgramVariable fieldVar = (ProgramVariable) field.getProgramVariable();
-            if (name.equals(fieldVar.getProgramElementName().getProgramName())) { return fieldVar; }
+            if (name.equals(fieldVar.getProgramElementName().getProgramName())) {
+                return fieldVar;
+            }
         }
         return null;
     }
@@ -347,7 +357,9 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return the default value of the given type according to JLS \S 4.5.5
      */
     private Expression getDefaultValue(Type type) {
-        if (type instanceof PrimitiveType) { return type.getDefaultValue(); }
+        if (type instanceof PrimitiveType) {
+            return type.getDefaultValue();
+        }
         return NullLiteral.NULL;
     }
 

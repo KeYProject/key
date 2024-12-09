@@ -95,7 +95,9 @@ public class SettingsDialog extends JDialog {
 
     private boolean showErrors(List<Exception> apply) {
         if (!apply.isEmpty()) {
-            for (Exception e : apply) { LOGGER.error("", e); }
+            for (Exception e : apply) {
+                LOGGER.error("", e);
+            }
             String msg = apply.stream().map(Throwable::getMessage)
                     .collect(Collectors.joining("<br>", "<html>", "</html>"));
             JOptionPane.showMessageDialog(this, msg, "Error in Settings",

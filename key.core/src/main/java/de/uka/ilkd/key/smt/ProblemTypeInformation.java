@@ -125,7 +125,9 @@ public class ProblemTypeInformation {
         if (kjt != null && kjt.getJavaType() instanceof ClassDeclaration c) {
 
             for (KeYJavaType sp : info.getAllSupertypes(kjt)) {
-                if (!sp.equals(kjt)) { result.addAll(getFieldsForSort(sp.getSort())); }
+                if (!sp.equals(kjt)) {
+                    result.addAll(getFieldsForSort(sp.getSort()));
+                }
             }
 
             for (Field f : info.getAllFields(c)) {
@@ -173,7 +175,9 @@ public class ProblemTypeInformation {
 
         StringBuilder s = new StringBuilder(Long.toBinaryString(val));
 
-        while (s.length() < 3) { s.insert(0, "0"); }
+        while (s.length() < 3) {
+            s.insert(0, "0");
+        }
 
         return s.toString();
 

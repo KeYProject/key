@@ -99,7 +99,9 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (typeReference != null && index == 0) { return typeReference; }
+        if (typeReference != null && index == 0) {
+            return typeReference;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

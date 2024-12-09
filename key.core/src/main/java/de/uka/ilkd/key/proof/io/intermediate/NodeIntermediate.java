@@ -43,10 +43,15 @@ public abstract class NodeIntermediate {
      * @return number of NodeIntermediates in this tree of nodes (including this node)
      */
     public int countAllChildren() {
-        if (subtreeSize != -1) { return subtreeSize; }
+        if (subtreeSize != -1) {
+            return subtreeSize;
+        }
         int total = 1;
         Queue<NodeIntermediate> queue = new ArrayDeque<>(getChildren());
-        while (!queue.isEmpty()) { total++; queue.addAll(queue.poll().getChildren()); }
+        while (!queue.isEmpty()) {
+            total++;
+            queue.addAll(queue.poll().getChildren());
+        }
         subtreeSize = total;
         return total;
     }

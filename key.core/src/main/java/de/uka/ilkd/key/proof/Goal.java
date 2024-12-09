@@ -151,7 +151,9 @@ public final class Goal {
      * @return the strategy that determines automated rule applications for this goal
      */
     public Strategy getGoalStrategy() {
-        if (goalStrategy == null) { goalStrategy = proof().getActiveStrategy(); }
+        if (goalStrategy == null) {
+            goalStrategy = proof().getActiveStrategy();
+        }
         return goalStrategy;
     }
 
@@ -230,16 +232,22 @@ public final class Goal {
         ruleAppIndex.sequentChanged(sci);
         var time2 = System.nanoTime();
         PERF_UPDATE_RULE_APP_INDEX.getAndAdd(time2 - time1);
-        for (GoalListener listener : listeners) { listener.sequentChanged(this, sci); }
+        for (GoalListener listener : listeners) {
+            listener.sequentChanged(this, sci);
+        }
         PERF_UPDATE_LISTENERS.getAndAdd(System.nanoTime() - time2);
     }
 
     private void fireGoalReplaced(Goal goal, Node parent, ImmutableList<Goal> newGoals) {
-        for (GoalListener listener : listeners) { listener.goalReplaced(goal, parent, newGoals); }
+        for (GoalListener listener : listeners) {
+            listener.goalReplaced(goal, parent, newGoals);
+        }
     }
 
     private void fireAutomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
-        for (GoalListener listener : listeners) { listener.automaticStateChanged(this, oldAutomatic, newAutomatic); }
+        for (GoalListener listener : listeners) {
+            listener.automaticStateChanged(this, oldAutomatic, newAutomatic);
+        }
     }
 
     /**
@@ -562,7 +570,9 @@ public final class Goal {
             this.setNode(newNode[0]);
             goalList = goalList.prepend(this);
 
-            for (int i = 1; i < n; i++) { goalList = goalList.prepend(clone(newNode[i])); }
+            for (int i = 1; i < n; i++) {
+                goalList = goalList.prepend(clone(newNode[i]));
+            }
         }
 
         fireGoalReplaced(this, parent, goalList);
@@ -585,8 +595,12 @@ public final class Goal {
      */
     private void resetLocalSymbols() {
         NamespaceSet newNS = proof().getServices().getNamespaces().copyWithParent();
-        for (IProgramVariable pv : node.getLocalProgVars()) { newNS.programVariables().add(pv); }
-        for (JFunction op : node.getLocalFunctions()) { newNS.functions().add(op); }
+        for (IProgramVariable pv : node.getLocalProgVars()) {
+            newNS.programVariables().add(pv);
+        }
+        for (JFunction op : node.getLocalFunctions()) {
+            newNS.functions().add(op);
+        }
 
         localNamespaces = newNS.copyWithParent();
     }
@@ -623,7 +637,9 @@ public final class Goal {
             PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
         }
         // can be null when the taclet failed to apply (RuleAbortException)
-        if (goalList == null) { return null; }
+        if (goalList == null) {
+            return null;
+        }
 
         proof.getServices().saveNameRecorder(n);
 

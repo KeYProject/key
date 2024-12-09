@@ -85,7 +85,10 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                     event.acceptDrop(event.getSourceActions());
                     List<?> files =
                         (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-                    for (Object file : files) { File f = (File) file; MainWindow.getInstance().loadProblem(f); }
+                    for (Object file : files) {
+                        File f = (File) file;
+                        MainWindow.getInstance().loadProblem(f);
+                    }
                     event.dropComplete(true);
                 } catch (ClassCastException ex) {
                     event.rejectDrop();
@@ -289,7 +292,9 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     private ImmutableList<PosTacletApp> getApplicableTaclets(PosInSequent findPos,
             TacletFilter filter, Services services) {
 
-        if (findPos == null || findPos.isSequent()) { return ImmutableSLList.nil(); }
+        if (findPos == null || findPos.isSequent()) {
+            return ImmutableSLList.nil();
+        }
 
         ImmutableList<TacletApp> allTacletsAtFindPosition = ImmutableSLList.nil();
         KeYMediator r = seqView.getMediator();
@@ -420,7 +425,9 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             PosInOccurrence missingSVPIO, Services services) {
 
         ImmutableList<PosTacletApp> result = ImmutableSLList.nil();
-        if (missingSVPIO == null) { return ImmutableSLList.nil(); }
+        if (missingSVPIO == null) {
+            return ImmutableSLList.nil();
+        }
 
         for (PosTacletApp app1 : apps) {
             PosTacletApp app = app1;
@@ -442,7 +449,9 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                     app = null;
                 }
 
-                if (app != null && app.complete()) { result = result.prepend(app); }
+                if (app != null && app.complete()) {
+                    result = result.prepend(app);
+                }
             }
         }
         return result;
@@ -456,7 +465,9 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      *        the PosTacletApp to be applied
      */
     private void execute(PosTacletApp app) {
-        if (app == null) { return; }
+        if (app == null) {
+            return;
+        }
         final KeYMediator mediator = seqView.getMediator();
         mediator.getUI().getProofControl().applyInteractive(app, mediator.getSelectedGoal());
     }
@@ -575,7 +586,11 @@ public class DragNDropInstantiator extends DropTargetAdapter {
              */
             private boolean goalTemplatesContainAddrules(
                     ImmutableList<TacletGoalTemplate> goalDescriptions) {
-                for (final TacletGoalTemplate tgt : goalDescriptions) { if (tgt.rules().size() >= 1) { return true; } }
+                for (final TacletGoalTemplate tgt : goalDescriptions) {
+                    if (tgt.rules().size() >= 1) {
+                        return true;
+                    }
+                }
 
                 return false;
             }

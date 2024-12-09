@@ -84,7 +84,7 @@ public class ProblemFinder extends ExpressionBuilder {
                 } catch (IOException e) {
                     throw new BuildingException(ctx,
                         "Could not load the proof obligation given " +
-                                "as a property file due to an error in the properties format",
+                            "as a property file due to an error in the properties format",
                         e);
                 }
             } else if (obl instanceof KeYParser.TableContext tbl) {
@@ -94,7 +94,9 @@ public class ProblemFinder extends ExpressionBuilder {
                     "Found a proof obligation entry, but the value is not a string or a JSON object");
             }
         }
-        if (ctx.PROBLEM() != null) { problem = accept(ctx.termorseq()); }
+        if (ctx.PROBLEM() != null) {
+            problem = accept(ctx.termorseq());
+        }
         return null;
     }
 

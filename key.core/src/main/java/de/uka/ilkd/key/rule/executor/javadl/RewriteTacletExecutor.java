@@ -56,7 +56,9 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
         with = syntacticalReplace(with, termLabelState, labelHint, posOfFind, mc, goal, ruleApp,
             services);
 
-        if (!with.sort().extendsTrans(maxSort)) { with = services.getTermBuilder().cast(maxSort, with); }
+        if (!with.sort().extendsTrans(maxSort)) {
+            with = services.getTermBuilder().cast(maxSort, with);
+        }
 
         return with;
     }

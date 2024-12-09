@@ -104,7 +104,9 @@ public abstract class SMTHandlerProperty<T> {
      */
     public T get(Services services) {
         String val = services.getProof().getSettings().getNewSMTSettings().get(getIdentifier());
-        if (val == null) { return defaultValue(); }
+        if (val == null) {
+            return defaultValue();
+        }
         return fromString(val);
     }
 
@@ -117,7 +119,9 @@ public abstract class SMTHandlerProperty<T> {
      */
     public T get(Map<String, Object> properties) {
         Object val = properties.get(getIdentifier());
-        if (val == null) { return defaultValue(); }
+        if (val == null) {
+            return defaultValue();
+        }
         return fromString(val.toString());
     }
 
@@ -259,7 +263,9 @@ public abstract class SMTHandlerProperty<T> {
 
         public E fromString(String value) {
             for (E enumConstant : enumType.getEnumConstants()) {
-                if (value.equalsIgnoreCase(enumConstant.toString())) { return enumConstant; }
+                if (value.equalsIgnoreCase(enumConstant.toString())) {
+                    return enumConstant;
+                }
             }
             return null;
         }

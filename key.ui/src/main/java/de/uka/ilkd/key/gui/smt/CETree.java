@@ -150,7 +150,9 @@ public class CETree {
 
     public static List<String> computeArrayFields(ObjectVal ov) {
         List<String> result = new LinkedList<>();
-        for (int i = 0; i < ov.getLength(); ++i) { result.add("[" + i + "]=" + ov.getArrayValue(i)); }
+        for (int i = 0; i < ov.getLength(); ++i) {
+            result.add("[" + i + "]=" + ov.getArrayValue(i));
+        }
         return result;
     }
 
@@ -220,7 +222,7 @@ public class CETree {
         for (int i = 0; i < ls.size(); ++i) {
             Location l = ls.get(i);
             String locationName = "(" + Model.removePipes(l.getObjectID()) + ", "
-                    + Model.removePipes(l.getFieldID()) + ")";
+                + Model.removePipes(l.getFieldID()) + ")";
             result.add(locationName);
         }
         return result;
@@ -257,7 +259,9 @@ public class CETree {
         List<String> result = new LinkedList<>();
         result.add("Length=" + s.getLength());
 
-        for (int i = 0; i < s.getLength(); ++i) { result.add("[" + i + "]=" + Model.removePipes(s.get(i))); }
+        for (int i = 0; i < s.getLength(); ++i) {
+            result.add("[" + i + "]=" + Model.removePipes(s.get(i)));
+        }
         return result;
     }
 
@@ -305,10 +309,14 @@ public class CETree {
                     Object oNode = selPath.getLastPathComponent();
                     if (oNode instanceof DefaultMutableTreeNode node) {
 
-                        if (node.getChildCount() > 0) { return; }
+                        if (node.getChildCount() > 0) {
+                            return;
+                        }
 
                         String value = node.getUserObject().toString();
-                        if (value.contains("=")) { value = value.substring(value.indexOf('=') + 1); }
+                        if (value.contains("=")) {
+                            value = value.substring(value.indexOf('=') + 1);
+                        }
 
                         if (value.startsWith("#o")) {
 
@@ -329,7 +337,9 @@ public class CETree {
                                         break;
                                     }
                                 }
-                                if (heap == null) { return; }
+                                if (heap == null) {
+                                    return;
+                                }
 
 
                                 // search for object
@@ -340,7 +350,9 @@ public class CETree {
                                         break;
                                     }
                                 }
-                                if (val == null) { return; }
+                                if (val == null) {
+                                    return;
+                                }
                                 addObjectProperties(val, node);
 
                             }
@@ -354,7 +366,9 @@ public class CETree {
                                     break;
                                 }
                             }
-                            if (locset == null) { return; }
+                            if (locset == null) {
+                                return;
+                            }
                             addLocSetProperties(locset, node);
 
                         } else if (value.startsWith("#s")) {
@@ -366,7 +380,9 @@ public class CETree {
                                     break;
                                 }
                             }
-                            if (sequence == null) { return; }
+                            if (sequence == null) {
+                                return;
+                            }
 
                             addSequenceProperties(sequence, node);
 

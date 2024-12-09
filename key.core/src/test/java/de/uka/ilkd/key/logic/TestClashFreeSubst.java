@@ -91,13 +91,17 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 
     public Sort lookup_sort(String name) {
         Sort s = nss.sorts().lookup(new Name(name));
-        if (s == null) { throw new RuntimeException("Sort named " + name + " not found"); }
+        if (s == null) {
+            throw new RuntimeException("Sort named " + name + " not found");
+        }
         return s;
     }
 
     public JFunction lookup_func(String name) {
         JFunction f = nss.functions().lookup(new Name(name));
-        if (f == null) { throw new RuntimeException("Function named " + name + " not found"); }
+        if (f == null) {
+            throw new RuntimeException("Function named " + name + " not found");
+        }
         return f;
     }
 
@@ -146,7 +150,9 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
                 }
             }
             Term[] sub = new Term[arity];
-            for (int i = arity - 1; i >= 0; i--) { sub[i] = subStack.pop(); }
+            for (int i = arity - 1; i >= 0; i--) {
+                sub[i] = subStack.pop();
+            }
             subStack.push(tf.createTerm(op, sub, visited.boundVars(), null));
         }
 
@@ -326,7 +332,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         ns.add(x1);
         nss.setVariables(ns);
         assertEquals(parseTerm("{\\subst " + x1.name()
-                + "; f(pv0)} ( q(f(pv0),x) & {pv0:=f(pv0)}q(x," + x1.name() + ") )"),
+            + "; f(pv0)} ( q(f(pv0),x) & {pv0:=f(pv0)}q(x," + x1.name() + ") )"),
             cfs.apply(t),
             "substitution");
         nss.setVariables(nss.variables().parent());

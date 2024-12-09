@@ -29,7 +29,9 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         ImmutableList<Term> posts = ImmutableSLList.nil();
-        if (poVars.post.self != null) { posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self)); }
+        if (poVars.post.self != null) {
+            posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
+        }
 
         if (poVars.pre.guard != null) {
             final JavaBlock guardJb = buildJavaBlock(d).second;
@@ -41,7 +43,9 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         while (localVars.hasNext()) {
             Term i = localVars.next();
             Term o = localVarsAtPost.next();
-            if (i != null && o != null) { posts = posts.append(d.tb.equals(o, i)); }
+            if (i != null && o != null) {
+                posts = posts.append(d.tb.equals(o, i));
+            }
         }
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
 

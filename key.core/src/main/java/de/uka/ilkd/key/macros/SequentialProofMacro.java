@@ -80,7 +80,9 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
             throws Exception {
         final List<Node> initNodes = new ArrayList<>(goals.size());
-        for (Goal goal : goals) { initNodes.add(goal.node()); }
+        for (Goal goal : goals) {
+            initNodes.add(goal.node());
+        }
         final ImmutableList<Goal> gs = initNodes.isEmpty() ? proof.openEnabledGoals()
                 : proof.getSubtreeEnabledGoals(initNodes.get(0));
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, gs, proof);

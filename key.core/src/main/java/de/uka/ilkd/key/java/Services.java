@@ -313,7 +313,9 @@ public class Services implements TermServices, LogicServices {
      */
     public Counter getCounter(String name) {
         Counter c = counters.get(name);
-        if (c != null) { return c; }
+        if (c != null) {
+            return c;
+        }
         c = new Counter(name);
         counters.put(name, c);
         return c;

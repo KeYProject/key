@@ -45,8 +45,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     @Override
     public String getDescription() {
         return "Extract the self-composed states after the merge of the "
-                + "symbolic execution goals which is included in the proof "
-                + "obligation generation from information flow contracts.";
+            + "symbolic execution goals which is included in the proof "
+            + "obligation generation from information flow contracts.";
     }
 
     private static final String[] ADMITTED_RULES =
@@ -85,9 +85,13 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
 
-        if (proof == null) { return false; }
+        if (proof == null) {
+            return false;
+        }
         final Services services = proof.getServices();
-        if (services == null) { return false; }
+        if (services == null) {
+            return false;
+        }
         final ProofOblInput poForProof =
             services.getSpecificationRepository().getProofOblInput(proof);
         return (poForProof instanceof AbstractInfFlowPO)
@@ -129,7 +133,9 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
                 Strategy javaDlStrategy =
                     strategyFactory.create(goal.proof(), new StrategyProperties());
                 RuleAppCost costs = javaDlStrategy.computeCost(ruleApp, pio, goal, mState);
-                if ("orLeft".equals(name)) { costs = costs.add(NumberRuleAppCost.create(100)); }
+                if ("orLeft".equals(name)) {
+                    costs = costs.add(NumberRuleAppCost.create(100));
+                }
                 return costs;
             } else {
                 return TopRuleAppCost.INSTANCE;

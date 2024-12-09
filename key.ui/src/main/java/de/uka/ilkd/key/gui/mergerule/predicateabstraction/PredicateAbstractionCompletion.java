@@ -62,13 +62,16 @@ public class PredicateAbstractionCompletion
                                 joinState.getSymbolicState(), v)))
                     .reduce(false, (b1, b2) -> (b1 || b2));
 
-            if (isDifferent) { differingLocVars.add(v); }
+            if (isDifferent) {
+                differingLocVars.add(v);
+            }
         });
 
         final AbstractionPredicatesChoiceDialog dialog =
             new AbstractionPredicatesChoiceDialog(joinGoalPio.first, differingLocVars);
 
-        assert proc instanceof MergeWithPredicateAbstractionFactory : "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
+        assert proc instanceof MergeWithPredicateAbstractionFactory
+                : "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
 
         final MergeWithPredicateAbstractionFactory procF =
             (MergeWithPredicateAbstractionFactory) proc;

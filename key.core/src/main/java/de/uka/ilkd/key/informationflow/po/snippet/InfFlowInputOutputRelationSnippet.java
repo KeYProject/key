@@ -30,7 +30,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         if (d.get(BasicSnippetData.Key.INF_FLOW_SPECS) == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce " + "information flow relations for a contract without "
-                        + "information flow specification.");
+                    + "information flow specification.");
         }
         assert ImmutableList.class.equals(BasicSnippetData.Key.INF_FLOW_SPECS.getType());
         @SuppressWarnings("unchecked")
@@ -169,7 +169,9 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
 
         @Override
         public void visit(Term visited) {
-            for (Term searchTerm : searchTerms) { termFound = termFound || visited.equals(searchTerm); }
+            for (Term searchTerm : searchTerms) {
+                termFound = termFound || visited.equals(searchTerm);
+            }
         }
     }
 }

@@ -55,7 +55,9 @@ public class JavaDLFieldNames {
 
     public static ParsedFieldName split(String name) {
         int index = name.indexOf(SEPARATOR);
-        if (index == -1) { return new ParsedFieldName(null, name); }
+        if (index == -1) {
+            return new ParsedFieldName(null, name);
+        }
         return new ParsedFieldName(name.substring(0, index), name.substring(index + 2));
     }
 

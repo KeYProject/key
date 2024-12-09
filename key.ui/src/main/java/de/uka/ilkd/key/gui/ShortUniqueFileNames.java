@@ -32,10 +32,14 @@ public final class ShortUniqueFileNames {
             // By extending shorter's name
             boolean shorterCanBeMadeLonger = shorter.makeNameLonger();
             // return if we resolved the duplicate
-            if (!entry.getName().endsWith(shorter.getName())) { return; }
+            if (!entry.getName().endsWith(shorter.getName())) {
+                return;
+            }
 
             // break if shorter can't be made longer
-            if (!shorterCanBeMadeLonger) { break; }
+            if (!shorterCanBeMadeLonger) {
+                break;
+            }
         }
 
         // When we are here, we have a common stem of the same length
@@ -152,7 +156,9 @@ public final class ShortUniqueFileNames {
          * @return true if the name was made longer
          */
         public boolean makeNameLonger() {
-            if (this.nameStart == -1) { return false; }
+            if (this.nameStart == -1) {
+                return false;
+            }
             this.nameStart = getNextNameStart();
             this.name = path.substring(nameStart + 1);
             return true;

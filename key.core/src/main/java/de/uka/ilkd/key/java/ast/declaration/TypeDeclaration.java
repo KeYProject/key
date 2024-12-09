@@ -256,7 +256,9 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * [dlohner] The given parameter is obsolete with this implementation.
      */
     public ImmutableList<Field> getAllFields(Services services) {
-        if (members == null) { return ImmutableSLList.nil(); }
+        if (members == null) {
+            return ImmutableSLList.nil();
+        }
 
         ImmutableList<Field> result = ImmutableSLList.nil();
 
@@ -323,7 +325,9 @@ public abstract class TypeDeclaration extends JavaDeclaration
         int count = 0;
         if (members != null) {
             for (int i = members.size() - 1; i >= 0; i -= 1) {
-                if (members.get(i) instanceof TypeDeclaration) { count += 1; }
+                if (members.get(i) instanceof TypeDeclaration) {
+                    count += 1;
+                }
             }
         }
         return count;
@@ -347,7 +351,9 @@ public abstract class TypeDeclaration extends JavaDeclaration
             for (int i = 0; i < s && index >= 0; i += 1) {
                 MemberDeclaration md = members.get(i);
                 if (md instanceof TypeDeclaration) {
-                    if (index == 0) { return (TypeDeclaration) md; }
+                    if (index == 0) {
+                        return (TypeDeclaration) md;
+                    }
                     index -= 1;
                 }
             }

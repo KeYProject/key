@@ -28,6 +28,8 @@ public class TermInstantiation extends InstantiationEntry<Term> {
         super(term);
         // TODO: Remove the check below and move it to the matching logic
         // Done for VM based matching
-        if (sv instanceof OperatorSV asv && !term.isRigid() && asv.isRigid()) { throw RIGIDNESS_EXCEPTION; }
+        if (sv instanceof OperatorSV asv && !term.isRigid() && asv.isRigid()) {
+            throw RIGIDNESS_EXCEPTION;
+        }
     }
 }

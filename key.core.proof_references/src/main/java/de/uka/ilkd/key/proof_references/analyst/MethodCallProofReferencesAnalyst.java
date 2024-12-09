@@ -122,7 +122,7 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                     .equals(MiscTools.getRuleName(node))) {
                 throw new IllegalArgumentException(
                     "Rule \"staticMethodCallStaticWithAssignmentViaTypereference\" expected, but is \""
-                            + MiscTools.getRuleName(node) + "\".");
+                        + MiscTools.getRuleName(node) + "\".");
             }
             SchemaVariable methodSV = app.instantiations().lookupVar(new Name("#mn"));
             SchemaVariable typeSV = app.instantiations().lookupVar(new Name("#t"));
@@ -133,7 +133,9 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
             TypeRef type = (TypeRef) app.instantiations().getInstantiation(typeSV);
             ImmutableArray<?> args =
                 (ImmutableArray<?>) app.instantiations().getInstantiation(argsSV);
-            if (!args.isEmpty()) { throw new IllegalArgumentException("Empty argument list expected."); }
+            if (!args.isEmpty()) {
+                throw new IllegalArgumentException("Empty argument list expected.");
+            }
             IProgramMethod pm = services.getJavaInfo().getProgramMethod(type.getKeYJavaType(),
                 method.toString(), ImmutableSLList.nil());
             return new DefaultProofReference<>(IProofReference.CALL_METHOD, node, pm);

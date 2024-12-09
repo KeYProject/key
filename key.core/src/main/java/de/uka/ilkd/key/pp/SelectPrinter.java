@@ -40,7 +40,9 @@ class SelectPrinter extends FieldPrinter {
         if (lp.notationInfo.isPrettySyntax() && heapLDT != null) {
 
             // if tacitHeap is null, use default heap as tacitHeap
-            if (tacitHeap == null) { tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap()); }
+            if (tacitHeap == null) {
+                tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap());
+            }
 
             final Term heapTerm = t.sub(0);
             final Term objectTerm = t.sub(1);
@@ -48,7 +50,9 @@ class SelectPrinter extends FieldPrinter {
             if (fieldTerm.op() == heapLDT.getArr()) {
                 KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(objectTerm.sort());
                 Type jtype = null;
-                if (kjt != null) { jtype = kjt.getJavaType(); }
+                if (kjt != null) {
+                    jtype = kjt.getJavaType();
+                }
                 if (jtype instanceof ArrayType && ((ArrayType) jtype).getBaseType().getKeYJavaType()
                         .getSort() == t.sort()) {
                     printArraySelect(lp, heapTerm, objectTerm, fieldTerm, tacitHeap);

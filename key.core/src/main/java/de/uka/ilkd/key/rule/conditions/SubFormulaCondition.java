@@ -35,12 +35,18 @@ public class SubFormulaCondition extends VariableConditionAdapter {
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
-        if (!(var instanceof FormulaSV) || var != this.a) { return false; }
+        if (!(var instanceof FormulaSV) || var != this.a) {
+            return false;
+        }
         Term tInst = (Term) instMap.getInstantiation(a);
         if (tInst.arity() == 0) {
             return negated;
         } else {
-            for (Term sub : tInst.subs()) { if (sub.sort() == JavaDLTheory.FORMULA) { return !negated; } }
+            for (Term sub : tInst.subs()) {
+                if (sub.sort() == JavaDLTheory.FORMULA) {
+                    return !negated;
+                }
+            }
             return negated;
         }
     }

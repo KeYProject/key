@@ -93,7 +93,9 @@ public class SMTInvokeAction extends MainWindowAction {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof SMTInvokeAction)) { return false; }
+        if (!(obj instanceof SMTInvokeAction)) {
+            return false;
+        }
         return this.solverUnion.equals(((SMTInvokeAction) obj).solverUnion);
     }
 

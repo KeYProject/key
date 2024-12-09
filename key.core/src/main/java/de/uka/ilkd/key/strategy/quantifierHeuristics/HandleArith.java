@@ -41,7 +41,9 @@ public class HandleArith {
         synchronized (provedByArithCache) {
             result = provedByArithCache.get(problem);
         }
-        if (result != null) { return result; }
+        if (result != null) {
+            return result;
+        }
 
         TermBuilder tb = services.getTermBuilder();
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
@@ -91,7 +93,11 @@ public class HandleArith {
         Term pro = problem;
         Operator op = pro.op();
         // may be here we should check wehre sub0 and sub1 is integer.
-        while (op == Junctor.NOT) { pro = pro.sub(0); op = pro.op(); temp = !temp; }
+        while (op == Junctor.NOT) {
+            pro = pro.sub(0);
+            op = pro.op();
+            temp = !temp;
+        }
         if (op == Equality.EQUALS) {
             Term sub0 = pro.sub(0);
             Term sub1 = pro.sub(1);
@@ -99,8 +105,12 @@ public class HandleArith {
             Polynomial poly2 = Polynomial.create(sub1, services);
             boolean gt = poly2.valueLeq(poly1);
             boolean lt = poly1.valueLeq(poly2);
-            if (gt && lt) { return temp ? trueT : falseT; }
-            if (gt || lt) { return temp ? falseT : trueT; }
+            if (gt && lt) {
+                return temp ? trueT : falseT;
+            }
+            if (gt || lt) {
+                return temp ? falseT : trueT;
+            }
         }
         return problem;
     }
@@ -123,7 +133,9 @@ public class HandleArith {
         synchronized (provedByArithCache) {
             result = provedByArithCache.get(key);
         }
-        if (result != null) { return result; }
+        if (result != null) {
+            return result;
+        }
 
         final TermBuilder tb = services.getTermBuilder();
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
@@ -181,18 +193,26 @@ public class HandleArith {
         synchronized (formattedTermCache) {
             pro = formattedTermCache.get(problem);
         }
-        if (pro != null) { return pro; }
+        if (pro != null) {
+            return pro;
+        }
 
         pro = problem;
         Operator op = pro.op();
         boolean opNot = false;
-        while (op == Junctor.NOT) { opNot = !opNot; pro = pro.sub(0); op = pro.op(); }
+        while (op == Junctor.NOT) {
+            opNot = !opNot;
+            pro = pro.sub(0);
+            op = pro.op();
+        }
         final Function geq = ig.getGreaterOrEquals();
         final Function leq = ig.getLessOrEquals();
         final Term falseT = tb.ff();
 
         if (op == geq) {
-            if (opNot) { pro = tb.geq(pro.sub(1), tb.func(ig.getAdd(), pro.sub(0), ig.one())); }
+            if (opNot) {
+                pro = tb.geq(pro.sub(1), tb.func(ig.getAdd(), pro.sub(0), ig.one()));
+            }
         } else {
             if (op == leq) {
                 if (opNot) {

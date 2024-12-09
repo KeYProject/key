@@ -112,7 +112,11 @@ public class ImmutableArray<S extends @Nullable Object>
     }
 
     public boolean contains(S op) {
-        for (S el : content) { if (Objects.equals(el, op)) { return true; } }
+        for (S el : content) {
+            if (Objects.equals(el, op)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -143,7 +147,9 @@ public class ImmutableArray<S extends @Nullable Object>
 
     @Override
     public boolean equals(@Nullable Object o) {
-        if (o == this) { return true; }
+        if (o == this) {
+            return true;
+        }
 
         final @Nullable Object @Nullable [] cmp;
         if (o instanceof ImmutableArray) {
@@ -152,9 +158,15 @@ public class ImmutableArray<S extends @Nullable Object>
             return false;
         }
 
-        if (cmp.length != content.length) { return false; }
+        if (cmp.length != content.length) {
+            return false;
+        }
 
-        for (int i = 0; i < content.length; i++) { if (!Objects.equals(content[i], cmp[i])) { return false; } }
+        for (int i = 0; i < content.length; i++) {
+            if (!Objects.equals(content[i], cmp[i])) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -201,7 +213,9 @@ public class ImmutableArray<S extends @Nullable Object>
      */
     public ImmutableList<S> toImmutableList() {
         ImmutableList<S> ret = ImmutableSLList.nil();
-        for (S s : this) { ret = ret.prepend(s); }
+        for (S s : this) {
+            ret = ret.prepend(s);
+        }
         return ret.reverse();
     }
 
@@ -212,7 +226,9 @@ public class ImmutableArray<S extends @Nullable Object>
      */
     public List<S> toList() {
         List<S> result = new ArrayList<>();
-        for (S s : this) { result.add(s); }
+        for (S s : this) {
+            result.add(s);
+        }
         return result;
     }
 

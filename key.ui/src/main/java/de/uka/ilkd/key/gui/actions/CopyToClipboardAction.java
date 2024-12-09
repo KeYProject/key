@@ -33,9 +33,13 @@ public class CopyToClipboardAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         CurrentGoalView goalView = mainWindow.getGoalView();
-        if (goalView == null) { return; }
+        if (goalView == null) {
+            return;
+        }
         PosInSequent pis = goalView.getMousePosInSequent();
-        if (pis == null) { return; }
+        if (pis == null) {
+            return;
+        }
         GuiUtilities.copyHighlightToClipboard(goalView, pis);
     }
 }

@@ -43,7 +43,9 @@ public abstract class SLExpressionResolver {
      * areInSamePackage().
      */
     private String trimPackageRef(String ref) {
-        if (ref == null || javaInfo.isPackage(ref)) { return ref; }
+        if (ref == null || javaInfo.isPackage(ref)) {
+            return ref;
+        }
 
         int i = ref.lastIndexOf('.');
         if (i < 0) {
@@ -87,7 +89,9 @@ public abstract class SLExpressionResolver {
                 mod = new Public();
             } else if (md.isProtected()) {
                 mod = new Protected();
-            } else if (md.isPrivate()) { mod = new Private(); }
+            } else if (md.isPrivate()) {
+                mod = new Private();
+            }
         }
 
         // check according to visibility rules
@@ -115,7 +119,9 @@ public abstract class SLExpressionResolver {
         // visible in enclosing classes of specInClass?
         while (!result) {
             final PackageReference p = inType.createPackagePrefix();
-            if (p == null || javaInfo.isPackage(p.toString())) { break; }
+            if (p == null || javaInfo.isPackage(p.toString())) {
+                break;
+            }
             inType = javaInfo.getTypeByClassName(p.toString());
             assert inType != null;
             result = isVisibleHelper(md, containingType, inType);
@@ -143,7 +149,9 @@ public abstract class SLExpressionResolver {
 
     public final SLExpression resolve(SLExpression receiver, String name, SLParameters parameters)
             throws SLTranslationException {
-        if (!canHandleReceiver(receiver)) { return null; }
+        if (!canHandleReceiver(receiver)) {
+            return null;
+        }
         return doResolving(receiver, name, parameters);
     }
 

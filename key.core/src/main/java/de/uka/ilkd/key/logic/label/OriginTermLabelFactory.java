@@ -54,7 +54,7 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
             throws TermLabelException {
         if (arguments.size() != OriginTermLabel.CHILD_COUNT) {
             throw new TermLabelException("OriginTermLabel has " + arguments.size()
-                    + " children, but should have " + OriginTermLabel.CHILD_COUNT);
+                + " children, but should have " + OriginTermLabel.CHILD_COUNT);
         }
 
         Origin origin = parseOrigin(arguments.get(0));
@@ -75,14 +75,16 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
     private Set<Origin> parseSubtermOrigins(String str) throws TermLabelException {
         if (!str.startsWith("[") || !str.endsWith("]")) {
             throw new TermLabelException("Malformed set of origins: \"" + str + "\"\n"
-                    + "(Should be a comma-separated set of of origins, "
-                    + "delimited by \"[\" and \"]\"");
+                + "(Should be a comma-separated set of of origins, "
+                + "delimited by \"[\" and \"]\"");
         }
 
         Set<Origin> result = new LinkedHashSet<>();
 
         for (String s : str.substring(1, str.length() - 1).split("\\s*,\\s*")) {
-            if (s.isEmpty()) { break; }
+            if (s.isEmpty()) {
+                break;
+            }
 
             result.add(parseOrigin(s));
         }
@@ -132,7 +134,9 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
 
                     if (ruleName.startsWith("(")) {
                         ruleName = ruleName.substring(1);
-                        while (!ruleName.endsWith(")")) { ruleName += tokenizer.nextToken(); }
+                        while (!ruleName.endsWith(")")) {
+                            ruleName += tokenizer.nextToken();
+                        }
                         ruleName = ruleName.substring(0, ruleName.length() - 1);
                     } else {
                         throw new IllegalArgumentException();
@@ -147,10 +151,10 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
             }
         } catch (NoSuchElementException | IllegalArgumentException e) {
             throw new TermLabelException("Malformed origin string: \"" + str + "\"\n"
-                    + "(Well-formed origins have one of the following formats: \""
-                    + "spec_type @ file <file name> @ line <line number>\")\n"
-                    + "spec_type @ node <node number> (<rule name>)\")\n"
-                    + "spec_type (implicit)\")\n");
+                + "(Well-formed origins have one of the following formats: \""
+                + "spec_type @ file <file name> @ line <line number>\")\n"
+                + "spec_type @ node <node number> (<rule name>)\")\n"
+                + "spec_type (implicit)\")\n");
         }
     }
 
@@ -162,7 +166,9 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
      * @return the parsed spec type.
      */
     private SpecType parseSpecType(String str) {
-        if (str.toLowerCase().equals(SpecType.NONE.toString())) { str = "none"; }
+        if (str.toLowerCase().equals(SpecType.NONE.toString())) {
+            str = "none";
+        }
 
         return SpecType.valueOf(str.toUpperCase());
     }
@@ -183,7 +189,7 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
     private String matchId(String actual, String line, String expected) throws TermLabelException {
         if (!expected.equals(actual)) {
             throw new TermLabelException("Unexpected token \"" + actual + "\", " + "expected: \""
-                    + expected + "\"" + "\nin line \"" + line + "\"");
+                + expected + "\"" + "\nin line \"" + line + "\"");
         }
 
         return expected;
@@ -207,7 +213,7 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
     private char matchChar(String actual, String line, String expected) throws TermLabelException {
         if (actual.length() != 1 || !expected.contains(actual)) {
             throw new TermLabelException("Unexpected token \"" + actual + "\", "
-                    + "expected any of: " + expected + "\nin line \"" + line + "\"");
+                + "expected any of: " + expected + "\nin line \"" + line + "\"");
         }
 
         return actual.charAt(0);
@@ -226,7 +232,7 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
     private void matchEnd(StringTokenizer tokenizer, String line) throws TermLabelException {
         if (tokenizer.hasMoreTokens()) {
             throw new TermLabelException("Unexpected token '" + tokenizer.nextToken() + "', "
-                    + "expected: '\"'" + "\nin line \"" + line + "\"");
+                + "expected: '\"'" + "\nin line \"" + line + "\"");
         }
     }
 }

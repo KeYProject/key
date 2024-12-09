@@ -83,7 +83,9 @@ public class AutomaticProver {
 
         private LinkedList<Goal> copyGoals(ImmutableList<Goal> goals) {
             LinkedList<Goal> result = new LinkedList<>();
-            for (Goal goal : goals) { result.add(goal); }
+            for (Goal goal : goals) {
+                result.add(goal);
+            }
             return result;
         }
 
@@ -103,9 +105,15 @@ public class AutomaticProver {
                         openGoals.removeFirst();
                     } else {
                         ImmutableList<Goal> goals = goal.apply(app);
-                        for (Goal res : goals) { if (!res.equals(goal)) { openGoals.add(res); } }
+                        for (Goal res : goals) {
+                            if (!res.equals(goal)) {
+                                openGoals.add(res);
+                            }
+                        }
                         ruleCounter++;
-                        if (goal.node().isClosed()) { openGoals.removeFirst(); }
+                        if (goal.node().isClosed()) {
+                            openGoals.removeFirst();
+                        }
                     }
                 }
             } catch (Throwable e) {

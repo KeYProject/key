@@ -62,7 +62,9 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      */
     @SuppressWarnings("unchecked")
     public T getRewriteTaclet() {
-        if (find == null) { throw new TacletBuilderException(this, "No find part specified"); }
+        if (find == null) {
+            throw new TacletBuilderException(this, "No find part specified");
+        }
         checkBoundInIfAndFind();
         TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();

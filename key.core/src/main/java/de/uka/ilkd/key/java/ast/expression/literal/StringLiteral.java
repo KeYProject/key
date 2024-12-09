@@ -67,7 +67,9 @@ public final class StringLiteral extends Literal implements ReferencePrefix {
 
 
     public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o instanceof StringLiteral)) { return false; }
+        if (!(o instanceof StringLiteral)) {
+            return false;
+        }
         return ((StringLiteral) o).getValue().equals(getValue());
     }
 

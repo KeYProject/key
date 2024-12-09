@@ -93,7 +93,9 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     @Override
     public ImmutableList<String> getTermStrings() {
         ImmutableList<String> strings = ImmutableSLList.nil();
-        for (Term term : terms) { strings = strings.append(formatTerm(term, services)); }
+        for (Term term : terms) {
+            strings = strings.append(formatTerm(term, services));
+        }
         return strings;
     }
 

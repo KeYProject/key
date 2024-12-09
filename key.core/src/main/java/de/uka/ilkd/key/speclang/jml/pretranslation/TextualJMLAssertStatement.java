@@ -39,7 +39,9 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
      */
     public static void ruleContextToText(StringBuilder builder, RuleContext context) {
         for (int i = 0; i < context.getChildCount(); i++) {
-            if (i > 0) { builder.append(' '); }
+            if (i > 0) {
+                builder.append(' ');
+            }
 
             var child = context.getChild(i);
             if (child instanceof RuleContext) {

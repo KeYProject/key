@@ -90,7 +90,9 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         if (symbols == null) {
             symbols = Collections.singletonMap(sym.name(), sym);
         } else {
-            if (symbols.size() == 1) { symbols = new LinkedHashMap<>(symbols); }
+            if (symbols.size() == 1) {
+                symbols = new LinkedHashMap<>(symbols);
+            }
             symbols.put(sym.name(), sym);
         }
         LOGGER.debug("Registered {} {}", sym.getClass().getSimpleName(), sym.name());
@@ -101,7 +103,9 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public void add(Iterable<? extends E> list) {
-        for (E element : list) { add(element); }
+        for (E element : list) {
+            add(element);
+        }
     }
 
     /**
@@ -110,13 +114,17 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      */
     public void addSafely(E sym) {
         Named old = lookup(sym.name());
-        if (old != null && old != sym) { throw new RuntimeException("Name already in namespace: " + sym.name()); }
+        if (old != null && old != sym) {
+            throw new RuntimeException("Name already in namespace: " + sym.name());
+        }
 
         add(sym);
     }
 
     public void addSafely(Iterable<? extends E> names) {
-        for (E name : names) { addSafely(name); }
+        for (E name : names) {
+            addSafely(name);
+        }
     }
 
     /**
@@ -128,7 +136,9 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      *        non-null name whose symbol is to be removed.
      */
     public void remove(Name name) {
-        if (symbols != null) { symbols.remove(name); }
+        if (symbols != null) {
+            symbols.remove(name);
+        }
     }
 
     protected E lookupLocally(Name name) {
@@ -164,9 +174,13 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      */
     public @Nullable E lookup(Name name) {
         E symbol = lookupLocally(name);
-        if (symbol != null) { return symbol; }
+        if (symbol != null) {
+            return symbol;
+        }
 
-        if (parent != null) { return parent.lookup(name); }
+        if (parent != null) {
+            return parent.lookup(name);
+        }
 
         return null;
     }
@@ -211,13 +225,17 @@ public class Namespace<E extends Named> implements java.io.Serializable {
 
     public String toString() {
         String res = "Namespace: [local:" + symbols;
-        if (parent != null) { res = res + "; parent:" + parent; }
+        if (parent != null) {
+            res = res + "; parent:" + parent;
+        }
         return res + "]";
     }
 
     public Namespace<E> copy() {
         Namespace<E> copy = new Namespace<>(parent);
-        if (symbols != null) { copy.add(symbols.values()); }
+        if (symbols != null) {
+            copy.add(symbols.values());
+        }
 
         return copy;
     }
@@ -264,9 +282,13 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public void flushToParent() {
-        if (parent == null) { return; }
+        if (parent == null) {
+            return;
+        }
 
-        for (E element : elements()) { parent.add(element); }
+        for (E element : elements()) {
+            parent.add(element);
+        }
         // all symbols are contained in parent now ... we are empty again.
         symbols = null;
     }

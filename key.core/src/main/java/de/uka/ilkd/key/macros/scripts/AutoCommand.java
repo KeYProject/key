@@ -75,7 +75,9 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         // set the max number of steps if given
         int oldNumberOfSteps = state.getMaxAutomaticSteps();
-        if (arguments.getSteps() > 0) { state.setMaxAutomaticSteps(arguments.getSteps()); }
+        if (arguments.getSteps() > 0) {
+            state.setMaxAutomaticSteps(arguments.getSteps());
+        }
 
         // Give some feedback
         applyStrategy.addProverTaskObserver(uiControl);
@@ -86,7 +88,9 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
                 applyStrategy.start(state.getProof(), ImmutableSLList.<Goal>nil().prepend(goal));
 
                 // only now reraise the interruption exception
-                if (applyStrategy.hasBeenInterrupted()) { throw new InterruptedException(); }
+                if (applyStrategy.hasBeenInterrupted()) {
+                    throw new InterruptedException();
+                }
 
             }
         } finally {

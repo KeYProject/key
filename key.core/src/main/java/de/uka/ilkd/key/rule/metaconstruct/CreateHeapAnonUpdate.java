@@ -41,7 +41,9 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         final Term loopTerm = term.sub(0);
         final LoopSpecification loopSpec = MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
-        if (loopSpec == null) { return null; }
+        if (loopSpec == null) {
+            return null;
+        }
 
         final Term anonHeapTerm = term.sub(1);
         final Term anonSavedHeapTerm = term.sub(2);

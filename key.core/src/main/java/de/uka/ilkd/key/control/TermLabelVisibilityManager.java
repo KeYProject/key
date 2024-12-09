@@ -98,9 +98,13 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      */
     public void setHidden(Name labelName, boolean hidden) {
         if (hidden) {
-            if (hiddenLabels.add(labelName)) { fireVisibleLabelsChanged(new TermLabelVisibilityManagerEvent(this)); }
+            if (hiddenLabels.add(labelName)) {
+                fireVisibleLabelsChanged(new TermLabelVisibilityManagerEvent(this));
+            }
         } else {
-            if (hiddenLabels.remove(labelName)) { fireVisibleLabelsChanged(new TermLabelVisibilityManagerEvent(this)); }
+            if (hiddenLabels.remove(labelName)) {
+                fireVisibleLabelsChanged(new TermLabelVisibilityManagerEvent(this));
+            }
         }
     }
 
@@ -131,7 +135,9 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      *        The {@link TermLabelVisibilityManagerListener} to add.
      */
     public void addTermLabelVisibilityManagerListener(TermLabelVisibilityManagerListener l) {
-        if (l != null) { listeners.add(l); }
+        if (l != null) {
+            listeners.add(l);
+        }
     }
 
     /**
@@ -141,7 +147,9 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      *        The {@link TermLabelVisibilityManagerListener} to remove.
      */
     public void removeTermLabelVisibilityManagerListener(TermLabelVisibilityManagerListener l) {
-        if (l != null) { listeners.remove(l); }
+        if (l != null) {
+            listeners.remove(l);
+        }
     }
 
     /**
@@ -163,7 +171,9 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      */
     protected void fireVisibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
         TermLabelVisibilityManagerListener[] listener = getTermLabelVisibilityManagerListeners();
-        for (TermLabelVisibilityManagerListener l : listener) { l.visibleLabelsChanged(e); }
+        for (TermLabelVisibilityManagerListener l : listener) {
+            l.visibleLabelsChanged(e);
+        }
     }
 
     /**

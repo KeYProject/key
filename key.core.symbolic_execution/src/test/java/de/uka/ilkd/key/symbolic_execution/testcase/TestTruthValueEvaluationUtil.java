@@ -1171,7 +1171,9 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
             // Evaluate truth values
             doTruthValueEvaluationTest(env, expectedResults);
         } finally {
-            if (env != null) { env.dispose(); }
+            if (env != null) {
+                env.dispose();
+            }
         }
     }
 
@@ -1209,7 +1211,9 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
             // Evaluate truth values
             doTruthValueEvaluationTest(env, expectedResults);
         } finally {
-            if (env != null) { env.dispose(); }
+            if (env != null) {
+                env.dispose();
+            }
         }
     }
 
@@ -1250,7 +1254,9 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                 TruthValueTracingResult result = TruthValueTracingUtil.evaluate(nodeToEvaluate,
                     FormulaTermLabel.NAME, false, false);
                 currentResults.add(result);
-                if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) { LOGGER.info("Found Result: {}", result); }
+                if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+                    LOGGER.info("Found Result: {}", result);
+                }
             }
         }
         // Compare results
@@ -1310,7 +1316,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
         for (Entry<String, TruthValue> expectedEntry : expected.labelResults.entrySet()) {
             MultiEvaluationResult currentInstruction = currentResults.get(expectedEntry.getKey());
             assertNotNull(currentInstruction, "Current result of " + expectedEntry.getKey()
-                    + " is missing at goal " + current.leafNode().serialNr() + ".");
+                + " is missing at goal " + current.leafNode().serialNr() + ".");
             TruthValue currentResult =
                 currentInstruction.evaluate(current.termLabelName(), currentResults);
             TruthValue expectedValue = expectedEntry.getValue();
@@ -1318,10 +1324,10 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                 Assertions.assertNull(currentResult);
             } else {
                 assertNotNull(currentResult, "Current result of " + expectedEntry.getKey()
-                        + " at goal " + current.leafNode().serialNr() + " is not available.");
+                    + " at goal " + current.leafNode().serialNr() + " is not available.");
                 Assertions.assertEquals(expectedValue, currentResult,
                     "Wrong truth value of " + expectedEntry.getKey() + " at goal "
-                            + current.leafNode().serialNr() + ".");
+                        + current.leafNode().serialNr() + ".");
             }
         }
     }

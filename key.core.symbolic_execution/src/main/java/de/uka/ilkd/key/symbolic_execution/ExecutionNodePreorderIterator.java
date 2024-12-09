@@ -97,9 +97,15 @@ public class ExecutionNodePreorderIterator {
                                                         // child after iteration has finished
             for (IExecutionNode<?> child : children) {
                 nextChildOnParent = child;
-                if (nextChildOnParent == start) { return null; }
-                if (IExecutionNodeFound) { return nextChildOnParent; }
-                if (nextChildOnParent == node) { IExecutionNodeFound = true; }
+                if (nextChildOnParent == start) {
+                    return null;
+                }
+                if (IExecutionNodeFound) {
+                    return nextChildOnParent;
+                }
+                if (nextChildOnParent == node) {
+                    IExecutionNodeFound = true;
+                }
             }
             if (nextChildOnParent != start) {
                 node = parent; // Continue search on parent without recursive call!

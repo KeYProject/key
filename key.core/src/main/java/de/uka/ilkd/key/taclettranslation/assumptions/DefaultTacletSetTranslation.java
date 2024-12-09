@@ -88,7 +88,9 @@ public final class DefaultTacletSetTranslation
     public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts) {
 
         // only translate once.
-        if (!translate) { return translation; }
+        if (!translate) {
+            return translation;
+        }
         translate = false;
         usedSorts.clear();
         notTranslated = ImmutableSLList.nil();
@@ -193,7 +195,9 @@ public final class DefaultTacletSetTranslation
 
         if (!usedFormulaSV.isEmpty()) {
             toStore.append("\\predicates{\n\n");
-            for (SchemaVariable var : usedFormulaSV) { toStore.append(var.name().toString()).append(";\n"); }
+            for (SchemaVariable var : usedFormulaSV) {
+                toStore.append(var.name().toString()).append(";\n");
+            }
             toStore.append("}\n\n\n");
         }
 
@@ -202,7 +206,9 @@ public final class DefaultTacletSetTranslation
         for (TacletFormula tf : list) {
             toStore.append("//").append(tf.getTaclet().name().toString()).append("\n");
             toStore.append(convertTerm(tf.getFormula(services)));
-            if (i != list.size() - 1) { toStore.append("\n\n& //and\n\n"); }
+            if (i != list.size() - 1) {
+                toStore.append("\n\n& //and\n\n");
+            }
             i++;
 
         }
@@ -219,7 +225,9 @@ public final class DefaultTacletSetTranslation
 
         if (instantiationFailures.size() > 0) {
             toStore.append("\n\n/* instantiation failures:\n");
-            for (String s : instantiationFailures) { toStore.append("\n\n").append(s); }
+            for (String s : instantiationFailures) {
+                toStore.append("\n\n").append(s);
+            }
             toStore.append("\n\n*/");
         }
         return toStore.toString();

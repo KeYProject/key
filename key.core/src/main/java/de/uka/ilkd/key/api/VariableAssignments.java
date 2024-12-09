@@ -122,7 +122,7 @@ public class VariableAssignments {
         if (typeMap.containsKey(varName)) {
             if (typeMap.get(varName) != type) {
                 throw new Exception("Variable " + varName + "was already declared with type "
-                        + typeMap.get(varName).toString());
+                    + typeMap.get(varName).toString());
             }
         } else {
             typeMap.put(varName, type);

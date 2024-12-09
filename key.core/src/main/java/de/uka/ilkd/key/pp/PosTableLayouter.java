@@ -96,7 +96,9 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
     }
 
     public void mark(MarkType type, int parameter) {
-        if (!pure) { mark(new Mark(type, parameter)); }
+        if (!pure) {
+            mark(new Mark(type, parameter));
+        }
     }
 
     protected void mark(MarkType type) {
@@ -204,7 +206,9 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
      * information is not computed there.
      */
     public InitialPositionTable getInitialPositionTable() {
-        if (pure) { return null; }
+        if (pure) {
+            return null;
+        }
         return ((PosTableStringBackend) backend()).getInitialPositionTable();
     }
 

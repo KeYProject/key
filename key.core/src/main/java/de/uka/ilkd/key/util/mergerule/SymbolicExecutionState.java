@@ -77,8 +77,8 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
         final Services services = getCorrespondingNode().proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
-                + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
-                + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services)) + ")]";
+            + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
+            + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services)) + ")]";
     }
 
     /**
@@ -90,7 +90,9 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
      *         not end with an \n.
      */
     private String rmN(String str) {
-        if (str.endsWith("\n") && str.length() > 1) { return str.substring(0, str.length() - 1); }
+        if (str.endsWith("\n") && str.length() > 1) {
+            return str.substring(0, str.length() - 1);
+        }
 
         return str;
     }

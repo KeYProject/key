@@ -49,7 +49,9 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
             return selection.get(0);
         } else {
             ImmutableSet<BlockContract> contracts = DefaultImmutableSet.nil();
-            for (BlockContract contract : selection) { contracts = contracts.add(contract); }
+            for (BlockContract contract : selection) {
+                contracts = contracts.add(contract);
+            }
             return BlockContractImpl.combine(contracts, services);
         }
     }

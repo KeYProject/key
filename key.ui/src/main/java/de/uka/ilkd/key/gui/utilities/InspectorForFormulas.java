@@ -27,12 +27,18 @@ public class InspectorForFormulas implements CheckedUserInputInspector {
 
     @Override
     public String check(String toBeChecked) {
-        if (toBeChecked.isEmpty()) { return CheckedUserInputInspector.NO_USER_INPUT; }
+        if (toBeChecked.isEmpty()) {
+            return CheckedUserInputInspector.NO_USER_INPUT;
+        }
         Term term = translate(services, toBeChecked);
 
-        if (term == null) { return NO_USER_INPUT; }
+        if (term == null) {
+            return NO_USER_INPUT;
+        }
 
-        if (term.sort() != JavaDLTheory.FORMULA) { return "Not a formula."; }
+        if (term.sort() != JavaDLTheory.FORMULA) {
+            return "Not a formula.";
+        }
         return null;
 
     }

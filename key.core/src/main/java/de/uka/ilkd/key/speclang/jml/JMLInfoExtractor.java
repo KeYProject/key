@@ -38,7 +38,11 @@ public final class JMLInfoExtractor {
      * Checks whether one of the passed comments is a JML comment containing "key".
      */
     private static boolean checkFor(String key, ImmutableList<Comment> coms) {
-        for (Comment c : coms) { if (checkFor(key, c.getText())) { return true; } }
+        for (Comment c : coms) {
+            if (checkFor(key, c.getText())) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -47,7 +51,11 @@ public final class JMLInfoExtractor {
      */
     private static boolean checkForNotContaining(String key, String bad,
             ImmutableList<Comment> coms) {
-        for (Comment c : coms) { if (checkFor(key, c.getText()) && !c.getText().contains(bad)) { return true; } }
+        for (Comment c : coms) {
+            if (checkFor(key, c.getText()) && !c.getText().contains(bad)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -72,10 +80,14 @@ public final class JMLInfoExtractor {
         coms = coms.prepend(decl.getComments());
 
         // ... or to a modifier ...
-        for (Modifier modifier : decl.getModifiers()) { coms = coms.prepend(modifier.getComments()); }
+        for (Modifier modifier : decl.getModifiers()) {
+            coms = coms.prepend(modifier.getComments());
+        }
 
         // ... or to the name
-        if (decl.getProgramElementName() != null) { coms = coms.prepend(decl.getProgramElementName().getComments()); }
+        if (decl.getProgramElementName() != null) {
+            coms = coms.prepend(decl.getProgramElementName().getComments());
+        }
         return coms;
     }
 
@@ -84,10 +96,14 @@ public final class JMLInfoExtractor {
 
         // Either method is attached to the method itself ...
         Comment[] methodComments = method.getComments();
-        if (methodComments.length > 0) { coms = coms.prepend(methodComments[methodComments.length - 1]); }
+        if (methodComments.length > 0) {
+            coms = coms.prepend(methodComments[methodComments.length - 1]);
+        }
 
         // ... or to a modifier ...
-        for (Modifier modifier : method.getModifiers()) { coms = coms.prepend(modifier.getComments()); }
+        for (Modifier modifier : method.getModifiers()) {
+            coms = coms.prepend(modifier.getComments());
+        }
 
         // ... or to the return type ...
         if (!method.isVoid() && !(method instanceof ConstructorDeclaration)) {
@@ -95,7 +111,9 @@ public final class JMLInfoExtractor {
         }
 
         // ... or to 'void' (special case) ...
-        if (method.getVoidComments() != null) { coms = coms.prepend(method.getVoidComments()); }
+        if (method.getVoidComments() != null) {
+            coms = coms.prepend(method.getVoidComments());
+        }
 
         // ... or to the method name
         coms = coms.prepend(method.getProgramElementName().getComments());
@@ -155,7 +173,9 @@ public final class JMLInfoExtractor {
         comments = comments.prepend(fd.getTypeReference().getComments());
         comments = comments.prepend(fd.getFieldSpecifications().get(position).getComments());
 
-        for (Modifier modifier : fd.getModifiers()) { comments = comments.prepend(modifier.getComments()); }
+        for (Modifier modifier : fd.getModifiers()) {
+            comments = comments.prepend(modifier.getComments());
+        }
         return comments;
     }
 
@@ -171,7 +191,9 @@ public final class JMLInfoExtractor {
         coms = coms.prepend(fd.getComments());
 
         // ... or to a modifier ...
-        for (Modifier modifier : fd.getModifiers()) { coms = coms.prepend(modifier.getComments()); }
+        for (Modifier modifier : fd.getModifiers()) {
+            coms = coms.prepend(modifier.getComments());
+        }
 
         // ... or to the type
         coms = coms.prepend(fd.getTypeReference().getComments());
@@ -249,7 +271,9 @@ public final class JMLInfoExtractor {
     public static boolean isNullable(String fieldName, TypeDeclaration td) {
 
         ImmutableList<Comment> comments = extractFieldModifiers(fieldName, td);
-        if (comments.isEmpty()) { return false; }
+        if (comments.isEmpty()) {
+            return false;
+        }
 
         boolean non_null = checkFor("non_null", comments);
         boolean nullable = checkFor("nullable", comments);
@@ -280,12 +304,14 @@ public final class JMLInfoExtractor {
      */
     public static boolean parameterIsNullable(IProgramMethod pm, ParameterDeclaration pd) {
         assert pm.getMethodDeclaration().getParameters().contains(pd) : "parameter " + pd
-                + " does not belong to method declaration " + pm;
+            + " does not belong to method declaration " + pm;
         ImmutableList<Comment> comments = ImmutableSLList.nil();
         comments = comments.prepend(pd.getComments());
         comments = comments.prepend(pd.getTypeReference().getComments());
         comments = comments.prepend(pd.getVariableSpecification().getComments());
-        for (Modifier modifier : pd.getModifiers()) { comments = comments.prepend(modifier.getComments()); }
+        for (Modifier modifier : pd.getModifiers()) {
+            comments = comments.prepend(modifier.getComments());
+        }
 
         boolean non_null = checkFor("non_null", comments);
         boolean nullable = checkFor("nullable", comments);
@@ -302,10 +328,16 @@ public final class JMLInfoExtractor {
         MethodDeclaration decl = pm.getMethodDeclaration();
 
         ImmutableList<Comment> comments = ImmutableSLList.nil();
-        for (Modifier modifier : decl.getModifiers()) { comments = comments.prepend(modifier.getComments()); }
-        if (!pm.isVoid() && !pm.isConstructor()) { comments = comments.prepend(decl.getTypeReference().getComments()); }
+        for (Modifier modifier : decl.getModifiers()) {
+            comments = comments.prepend(modifier.getComments());
+        }
+        if (!pm.isVoid() && !pm.isConstructor()) {
+            comments = comments.prepend(decl.getTypeReference().getComments());
+        }
         Comment[] methodComments = decl.getComments();
-        if (methodComments.length > 0) { comments = comments.prepend(methodComments[methodComments.length - 1]); }
+        if (methodComments.length > 0) {
+            comments = comments.prepend(methodComments[methodComments.length - 1]);
+        }
 
         boolean non_null = checkFor("non_null", comments);
         boolean nullable = checkFor("nullable", comments);

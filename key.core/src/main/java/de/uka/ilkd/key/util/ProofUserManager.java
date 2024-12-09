@@ -58,8 +58,12 @@ public final class ProofUserManager {
      *        The user.
      */
     public void addUser(Proof proof, KeYEnvironment<?> environment, Object user) {
-        if (proof == null) { throw new IllegalArgumentException("Proof not defined."); }
-        if (user == null) { throw new IllegalArgumentException("User not defined."); }
+        if (proof == null) {
+            throw new IllegalArgumentException("Proof not defined.");
+        }
+        if (user == null) {
+            throw new IllegalArgumentException("User not defined.");
+        }
         synchronized (this) {
             Set<Object> users = proofUsers.computeIfAbsent(proof, k -> new HashSet<>());
             users.add(user);
@@ -82,8 +86,12 @@ public final class ProofUserManager {
      *        The user.
      */
     public void removeUserAndDispose(Proof proof, Object user) {
-        if (proof == null) { throw new IllegalArgumentException("Proof not defined."); }
-        if (user == null) { throw new IllegalArgumentException("User not defined."); }
+        if (proof == null) {
+            throw new IllegalArgumentException("Proof not defined.");
+        }
+        if (user == null) {
+            throw new IllegalArgumentException("User not defined.");
+        }
         synchronized (this) {
             Set<Object> users = proofUsers.get(proof);
             if (users != null) {

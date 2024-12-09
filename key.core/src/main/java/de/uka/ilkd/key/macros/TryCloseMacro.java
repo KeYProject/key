@@ -51,7 +51,7 @@ public class TryCloseMacro extends AbstractProofMacro {
                 return super.getMessageSuffix();
             } else {
                 return super.getMessageSuffix() + ", " + notClosedGoals
-                        + " goal(s) remain(s) open.";
+                    + " goal(s) remain(s) open.";
             }
         }
 
@@ -123,7 +123,7 @@ public class TryCloseMacro extends AbstractProofMacro {
     @Override
     public String getDescription() {
         return "Closes closable goals, leave rest untouched (see settings AutoPrune). "
-                + "Applies only to goals beneath the selected node.";
+            + "Applies only to goals beneath the selected node.";
     }
 
     /*
@@ -214,7 +214,9 @@ public class TryCloseMacro extends AbstractProofMacro {
     private static ImmutableList<Goal> setDifference(ImmutableList<Goal> goals1,
             ImmutableList<Goal> goals2) {
         ImmutableList<Goal> difference = goals1;
-        for (Goal goal : goals2) { difference = difference.removeFirst(goal); }
+        for (Goal goal : goals2) {
+            difference = difference.removeFirst(goal);
+        }
         return difference;
     }
 }

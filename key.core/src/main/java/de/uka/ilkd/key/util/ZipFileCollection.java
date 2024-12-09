@@ -60,7 +60,9 @@ public class ZipFileCollection implements FileCollection {
             assert extensions.length > 0;
             this.enumeration = zipFile.entries();
             this.extensions = new ArrayList<>();
-            for (String extension : extensions) { this.extensions.add(extension.toLowerCase()); }
+            for (String extension : extensions) {
+                this.extensions.add(extension.toLowerCase());
+            }
         }
 
         public InputStream openCurrent() throws IOException {

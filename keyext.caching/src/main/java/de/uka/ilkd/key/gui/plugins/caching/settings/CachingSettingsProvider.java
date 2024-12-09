@@ -74,11 +74,13 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
         disposeOption = addComboBox(DISPOSE_TITLE, """
                 When a referenced proof is disposed, this is what happens to
                  all cached branches that reference it.""",
-            0, x -> {}, DISPOSE_COPY, DISPOSE_REOPEN);
+            0, x -> {
+            }, DISPOSE_COPY, DISPOSE_REOPEN);
         pruneOption = addComboBox(PRUNE_TITLE, """
                 When a referenced proof is pruned, this is what happens to
                  all cached branches that reference it.""",
-            0, x -> {}, PRUNE_REOPEN, PRUNE_COPY);
+            0, x -> {
+            }, PRUNE_REOPEN, PRUNE_COPY);
     }
 
     @Override

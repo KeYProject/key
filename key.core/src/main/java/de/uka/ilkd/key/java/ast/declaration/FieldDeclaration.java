@@ -85,9 +85,15 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) { result += modArray.size(); }
-        if (typeReference != null) { result++; }
-        if (fieldSpecs != null) { result += fieldSpecs.size(); }
+        if (modArray != null) {
+            result += modArray.size();
+        }
+        if (typeReference != null) {
+            result++;
+        }
+        if (fieldSpecs != null) {
+            result += fieldSpecs.size();
+        }
         return result;
     }
 
@@ -104,14 +110,20 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) { return modArray.get(index); }
+            if (len > index) {
+                return modArray.get(index);
+            }
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0) { return typeReference; }
+            if (index == 0) {
+                return typeReference;
+            }
             index--;
         }
-        if (fieldSpecs != null) { return fieldSpecs.get(index); }
+        if (fieldSpecs != null) {
+            return fieldSpecs.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

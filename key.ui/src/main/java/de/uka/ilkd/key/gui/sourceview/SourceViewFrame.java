@@ -126,7 +126,9 @@ public class SourceViewFrame extends JSplitPane {
 
         tabbedPane.setToolTipTextAt(tabbedPane.indexOfComponent(component), toolTipText);
 
-        if (!tabbedPaneShown) { showTabbedPane(); }
+        if (!tabbedPaneShown) {
+            showTabbedPane();
+        }
 
         toFront(component);
     }
@@ -147,7 +149,9 @@ public class SourceViewFrame extends JSplitPane {
         tabbedPane.remove(component);
 
         synchronized (tabbedPane.getTreeLock()) {
-            if (tabbedPaneShown && tabbedPane.getComponentCount() == 1) { hideTabbedPane(); }
+            if (tabbedPaneShown && tabbedPane.getComponentCount() == 1) {
+                hideTabbedPane();
+            }
         }
     }
 }

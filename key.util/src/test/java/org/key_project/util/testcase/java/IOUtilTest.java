@@ -70,7 +70,9 @@ public class IOUtilTest {
                 HelperClassForUtilityTests.createFile(new File(noFolder, "Hello.txt"), "Hello");
             List<File> parents = Arrays.asList(yesDir, alsoYesDir);
             File yesDirParent = yesDir.getParentFile();
-            if (yesDirParent != null) { assertFalse(IOUtil.contains(yesDir, yesDirParent)); }
+            if (yesDirParent != null) {
+                assertFalse(IOUtil.contains(yesDir, yesDirParent));
+            }
             assertTrue(IOUtil.contains(parents, yesDir));
             assertTrue(IOUtil.contains(parents, yesFile));
             assertTrue(IOUtil.contains(parents, yesFolder));
@@ -109,7 +111,9 @@ public class IOUtilTest {
             File noSubFile =
                 HelperClassForUtilityTests.createFile(new File(noFolder, "Hello.txt"), "Hello");
             File yesDirParent = yesDir.getParentFile();
-            if (yesDirParent != null) { assertFalse(IOUtil.contains(yesDir, yesDirParent)); }
+            if (yesDirParent != null) {
+                assertFalse(IOUtil.contains(yesDir, yesDirParent));
+            }
             assertTrue(IOUtil.contains(yesDir, yesDir));
             assertTrue(IOUtil.contains(yesDir, yesFile));
             assertTrue(IOUtil.contains(yesDir, yesFolder));
@@ -352,7 +356,9 @@ public class IOUtilTest {
             assertTrue(tempDir.getName().startsWith("IOUtilTest"));
             assertTrue(tempDir.getName().endsWith("testCreateTempDirectory"));
         } finally {
-            if (tempDir != null) { IOUtil.delete(tempDir); }
+            if (tempDir != null) {
+                IOUtil.delete(tempDir);
+            }
         }
     }
 
@@ -424,7 +430,7 @@ public class IOUtilTest {
     public void testComputeLineInformation_File() throws IOException {
         // Get test file
         File textFile = new File(HelperClassForUtilityTests.RESOURCE_DIRECTORY + File.separator
-                + "lineIndicesTest" + File.separator + "Text.txt");
+            + "lineIndicesTest" + File.separator + "Text.txt");
         assertTrue(textFile.isFile(), "File '" + textFile + "' does not exist.");
         // Test unix file
         assertLineInformation(convertTextFile(textFile, "Text_Unix.txt", "\r"), 0, 1, 2, 9, 16, 17,
@@ -468,7 +474,10 @@ public class IOUtilTest {
                     new BufferedReader(new InputStreamReader(new FileInputStream(source),
                         StandardCharsets.UTF_8))) {
             String line;
-            while ((line = reader.readLine()) != null) { writer.write(line); writer.write(lineBreak); }
+            while ((line = reader.readLine()) != null) {
+                writer.write(line);
+                writer.write(lineBreak);
+            }
             String newText = writer.toString();
             // Create new file
             File target = new File(source.getParentFile(), newFileName);
@@ -570,7 +579,11 @@ public class IOUtilTest {
             // Compute tabs
             List<Integer> tabIndices = new LinkedList<>();
             char[] lineChars = textLines[i].toCharArray();
-            for (int j = 0; j < lineChars.length; j++) { if ('\t' == lineChars[j]) { tabIndices.add(j); } }
+            for (int j = 0; j < lineChars.length; j++) {
+                if ('\t' == lineChars[j]) {
+                    tabIndices.add(j);
+                }
+            }
             // Compute line
             expectedInfos[i] = new LineInformation(lastIndex, tabIndices);
             sb.append(textLines[i]);
@@ -630,7 +643,9 @@ public class IOUtilTest {
             IOUtil.writeTo(new FileOutputStream(tempFile), content);
             assertEquals(content, IOUtil.readFrom(new FileInputStream(tempFile)));
         } finally {
-            if (tempFile != null) { tempFile.delete(); }
+            if (tempFile != null) {
+                tempFile.delete();
+            }
         }
     }
 
@@ -822,7 +837,9 @@ public class IOUtilTest {
         assertTrue(IOUtil.copy(in, out));
         byte[] outBytes = out.toByteArray();
         assertEquals(inBytes.length, outBytes.length);
-        for (int i = 0; i < inBytes.length; i++) { assertEquals(inBytes[i], outBytes[i]); }
+        for (int i = 0; i < inBytes.length; i++) {
+            assertEquals(inBytes[i], outBytes[i]);
+        }
     }
 
     /**

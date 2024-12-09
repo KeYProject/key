@@ -98,7 +98,12 @@ public class ProofSMTApplyUserAction extends UserAction {
     private String getTitle(SMTProblem p) {
         StringBuilder title = new StringBuilder();
         Iterator<SMTSolver> it = p.getSolvers().iterator();
-        while (it.hasNext()) { title.append(it.next().name()); if (it.hasNext()) { title.append(", "); } }
+        while (it.hasNext()) {
+            title.append(it.next().name());
+            if (it.hasNext()) {
+                title.append(", ");
+            }
+        }
         return title.toString();
     }
 }

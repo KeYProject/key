@@ -194,7 +194,10 @@ public class CloseAfterMerge implements BuiltInRule {
         // Collect sorts and create logical variables for
         // closing over program variables.
         final LinkedList<Sort> argSorts = new LinkedList<>();
-        for (LocationVariable var : allLocs) { argSorts.add(var.sort()); origQfdVarTerms.add(tb.var(var)); }
+        for (LocationVariable var : allLocs) {
+            argSorts.add(var.sort());
+            origQfdVarTerms.add(tb.var(var));
+        }
 
         // Create and register the new predicate symbol
         final Name predicateSymbName = new Name(tb.newName("P"));

@@ -260,12 +260,18 @@ public class OpReplacer {
      * @return the transformed term.
      */
     public Term replace(Term term) {
-        if (term == null) { return null; }
+        if (term == null) {
+            return null;
+        }
         final Term newTerm = (Term) map.get(term);
-        if (newTerm != null) { return newTerm; }
+        if (newTerm != null) {
+            return newTerm;
+        }
 
         for (SyntaxElement svs : map.keySet()) {
-            if (term.equalsModProperty(svs, TERM_LABELS_PROPERTY)) { return (Term) map.get(svs); }
+            if (term.equalsModProperty(svs, TERM_LABELS_PROPERTY)) {
+                return (Term) map.get(svs);
+            }
         }
 
         final Operator newOp = replace(term.op());
@@ -277,7 +283,9 @@ public class OpReplacer {
             Term subTerm = term.sub(i);
             newSubTerms[i] = replace(subTerm);
 
-            if (newSubTerms[i] != subTerm) { changedSubTerm = true; }
+            if (newSubTerms[i] != subTerm) {
+                changedSubTerm = true;
+            }
         }
         final ImmutableArray<QuantifiableVariable> newBoundVars = replace(term.boundVars());
 
@@ -301,7 +309,9 @@ public class OpReplacer {
      */
     public ImmutableList<Term> replace(ImmutableList<Term> terms) {
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (final Term term : terms) { result = result.append(replace(term)); }
+        for (final Term term : terms) {
+            result = result.append(replace(term));
+        }
         return result;
     }
 
@@ -314,7 +324,9 @@ public class OpReplacer {
      */
     public ImmutableList<InfFlowSpec> replaceInfFlowSpec(ImmutableList<InfFlowSpec> terms) {
         ImmutableList<InfFlowSpec> result = ImmutableSLList.nil();
-        if (terms == null) { return result; }
+        if (terms == null) {
+            return result;
+        }
 
         for (final InfFlowSpec infFlowSpec : terms) {
             final ImmutableList<Term> preExpressions = replace(infFlowSpec.preExpressions);
@@ -335,7 +347,9 @@ public class OpReplacer {
      */
     public ImmutableSet<Term> replace(ImmutableSet<Term> terms) {
         ImmutableSet<Term> result = DefaultImmutableSet.nil();
-        for (final Term term : terms) { result = result.add(replace(term)); }
+        for (final Term term : terms) {
+            result = result.add(replace(term));
+        }
         return result;
     }
 
@@ -372,7 +386,9 @@ public class OpReplacer {
             QuantifiableVariable qv = vars.get(i);
             QuantifiableVariable newQv = (QuantifiableVariable) replace(qv);
             result[i++] = newQv;
-            if (newQv != qv) { changed = true; }
+            if (newQv != qv) {
+                changed = true;
+            }
         }
         return changed ? new ImmutableArray<>(result) : vars;
     }

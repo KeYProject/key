@@ -43,7 +43,9 @@ public class EditFormulaAction extends ExplorationAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (posInSeq.isSequent()) { return; }
+        if (posInSeq.isSequent()) {
+            return;
+        }
 
         TermBuilder tb = getMediator().getServices().getTermBuilder();
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
@@ -52,7 +54,9 @@ public class EditFormulaAction extends ExplorationAction {
         Goal g = getMediator().getSelectedGoal();
         Term newTerm = promptForTerm(mainWindow, term);
 
-        if (newTerm.equals(term)) { return; }
+        if (newTerm.equals(term)) {
+            return;
+        }
 
         ProofExplorationService api = ProofExplorationService.get(getMediator());
         Node toBeSelected = api.applyChangeFormula(g, pio, sf.formula(),

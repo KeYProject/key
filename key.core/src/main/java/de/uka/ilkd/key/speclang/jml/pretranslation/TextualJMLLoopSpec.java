@@ -46,8 +46,12 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     public TextualJMLLoopSpec addClause(ClauseHd clause, @Nullable Name heapName,
             LabeledParserRuleContext ctx) {
-        if (heapName == null) { heapName = HeapLDT.BASE_HEAP_NAME; }
-        if (clauses.isEmpty()) { setPosition(ctx); }
+        if (heapName == null) {
+            heapName = HeapLDT.BASE_HEAP_NAME;
+        }
+        if (clauses.isEmpty()) {
+            setPosition(ctx);
+        }
         clauses.add(new Entry(clause, ctx, heapName));
         return this;
     }
@@ -134,7 +138,9 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         }
 
         for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            if (!map.containsKey(h.toString())) { map.put(h.toString(), ImmutableSLList.nil()); }
+            if (!map.containsKey(h.toString())) {
+                map.put(h.toString(), ImmutableSLList.nil());
+            }
         }
         return map;
     }
@@ -152,7 +158,9 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         }
 
         for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            if (!map.containsKey(h.toString())) { map.put(h.toString(), ImmutableSLList.nil()); }
+            if (!map.containsKey(h.toString())) {
+                map.put(h.toString(), ImmutableSLList.nil());
+            }
         }
         return map;
     }
@@ -190,8 +198,12 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         TextualJMLLoopSpec that = (TextualJMLLoopSpec) o;
         return variant.equals(that.variant) && clauses.equals(that.clauses);
     }

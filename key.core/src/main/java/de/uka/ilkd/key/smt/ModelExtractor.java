@@ -704,7 +704,10 @@ public class ModelExtractor {
         currentQuery = 0;
 
         for (String objectID : getAllIDs((int) types.getSettings().getObjectBound())) {
-            for (Sort s : types.getJavaSorts()) { Query q = new ObjectTypeQuery(objectID, s); queries.add(q); }
+            for (Sort s : types.getJavaSorts()) {
+                Query q = new ObjectTypeQuery(objectID, s);
+                queries.add(q);
+            }
         }
     }
 
@@ -768,7 +771,9 @@ public class ModelExtractor {
 
         for (String objectID : getAllIDs((int) types.getSettings().getObjectBound())) {
 
-            if (objectID.equals("#o0")) { continue; }
+            if (objectID.equals("#o0")) {
+                continue;
+            }
 
 
             Sort s = objectSorts.get(objectID);
@@ -794,7 +799,9 @@ public class ModelExtractor {
                 int i = 0;
                 for (String fieldID : getAllIDs(fieldSize)) {
 
-                    if (i++ >= intBound / 2) { break; }
+                    if (i++ >= intBound / 2) {
+                        break;
+                    }
 
                     Query q = new LocSetQuery(locSetID, objectID, fieldID);
                     queries.add(q);
@@ -837,10 +844,14 @@ public class ModelExtractor {
 
         for (Heap h : model.getHeaps()) {
             for (ObjectVal ov : h.getObjects()) {
-                if (ov.getSort() == null) { continue; }
+                if (ov.getSort() == null) {
+                    continue;
+                }
 
                 String sortName = ov.getSort().name().toString();
-                if (!sortName.endsWith("[]")) { continue; }
+                if (!sortName.endsWith("[]")) {
+                    continue;
+                }
 
                 for (int i = 0; i < ov.getLength(); ++i) {
                     Query q = new ArrayFieldQuery(h.getName(), ov.getName(), i, intBound);
@@ -902,7 +913,9 @@ public class ModelExtractor {
 
         for (int i = 0; i < Math.pow(2, size); ++i) {
             StringBuilder val = new StringBuilder(Integer.toBinaryString(i));
-            while (val.length() < size) { val.insert(0, "0"); }
+            while (val.length() < size) {
+                val.insert(0, "0");
+            }
             val.insert(0, "#b");
             result.add(val.toString());
         }
@@ -1011,7 +1024,9 @@ public class ModelExtractor {
                 } else {
                     model.addLocationSet(ls);
                 }
-                if (value.equals("true")) { ls.add(new Location(objectID, fieldID)); }
+                if (value.equals("true")) {
+                    ls.add(new Location(objectID, fieldID));
+                }
 
             } else if (q instanceof ObjectLengthQuery oq) {
                 String objectID = oq.getObjectID();
@@ -1020,7 +1035,9 @@ public class ModelExtractor {
 
                 long intBound = (long) Math.pow(2, types.getSettings().getIntBound());
 
-                if (result >= intBound / 2) { result -= intBound; }
+                if (result >= intBound / 2) {
+                    result -= intBound;
+                }
 
 
                 for (Heap h : model.getHeaps()) {
@@ -1042,7 +1059,9 @@ public class ModelExtractor {
 
                 long intBound = (long) Math.pow(2, types.getSettings().getIntBound());
 
-                if (result >= intBound / 2) { result -= intBound; }
+                if (result >= intBound / 2) {
+                    result -= intBound;
+                }
 
 
                 Sequence s = new Sequence(result, seqId);

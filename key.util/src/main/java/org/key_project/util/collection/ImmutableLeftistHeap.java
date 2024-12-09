@@ -176,13 +176,19 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
         public ImmutableHeap<S> removeAll(S element) {
             int c = data.compareTo(element);
 
-            if (c > 0) { return this; }
+            if (c > 0) {
+                return this;
+            }
 
             ImmutableLeftistHeap<S> newLeft = (ImmutableLeftistHeap<S>) left.removeAll(element);
             ImmutableLeftistHeap<S> newRight = (ImmutableLeftistHeap<S>) right.removeAll(element);
 
-            if (c == 0 && data.equals(element)) { return newLeft.insert(newRight); }
-            if (left == newLeft && right == newRight) { return this; }
+            if (c == 0 && data.equals(element)) {
+                return newLeft.insert(newRight);
+            }
+            if (left == newLeft && right == newRight) {
+                return this;
+            }
             return new Node<>(data, newLeft, newRight);
         }
 
@@ -311,7 +317,9 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
             s.push(h);
         }
         ImmutableHeap<T> res = s.pop();
-        while (!s.isEmpty()) { res = res.insert(s.pop()); }
+        while (!s.isEmpty()) {
+            res = res.insert(s.pop());
+        }
         return res;
     }
 
@@ -347,7 +355,9 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
         }
 
         private void push(ImmutableLeftistHeap<T> heap) {
-            if (!heap.isEmpty()) { remainder.push((Node<T>) heap); }
+            if (!heap.isEmpty()) {
+                remainder.push((Node<T>) heap);
+            }
         }
 
         public boolean hasNext() {

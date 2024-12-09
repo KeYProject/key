@@ -37,7 +37,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         final List<PosInOccurrence> steps = UseDependencyContractRule
                 .getSteps(cApp.getHeapContext(), cApp.posInOccurrence(), goal.sequent(), services);
         PosInOccurrence step = letUserChooseStep(cApp.getHeapContext(), steps, forced, services);
-        if (step == null) { return null; }
+        if (step == null) {
+            return null;
+        }
         return cApp.setStep(step);
     }
 
@@ -54,7 +56,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
             List<PosInOccurrence> steps, boolean forced, Services services) {
         assert heapContext != null;
 
-        if (steps.size() == 0) { return null; }
+        if (steps.size() == 0) {
+            return null;
+        }
 
         // prepare array of possible base heaps
         final TermStringWrapper[] heaps = new TermStringWrapper[steps.size()];
@@ -71,7 +75,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
                     "Please select base heap configuration:", "Instantiation",
                     JOptionPane.QUESTION_MESSAGE, null, heaps, heaps[0]);
 
-            if (heapWrapper == null) { return null; }
+            if (heapWrapper == null) {
+                return null;
+            }
             resultHeaps = heapWrapper.terms;
         } else {
             resultHeaps = heaps[0].terms;
@@ -91,7 +97,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
                     break;
                 }
             }
-            if (match) { return step; }
+            if (match) {
+                return step;
+            }
         }
         assert false;
         return null;

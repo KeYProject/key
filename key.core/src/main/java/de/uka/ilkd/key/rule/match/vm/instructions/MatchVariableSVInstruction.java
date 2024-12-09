@@ -25,7 +25,9 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<V
             final Term foundMapping = (Term) mc.getInstantiations().getInstantiation(op);
             if (foundMapping == null) {
                 return addInstantiation(subst, mc, services);
-            } else if (foundMapping.op() == subst.op()) { return mc; }
+            } else if (foundMapping.op() == subst.op()) {
+                return mc;
+            }
         }
         return null;
     }
@@ -34,7 +36,9 @@ public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<V
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
-        if (result != null) { termPosition.gotoNextSibling(); }
+        if (result != null) {
+            termPosition.gotoNextSibling();
+        }
         return result;
     }
 

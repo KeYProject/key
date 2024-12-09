@@ -87,7 +87,7 @@ public class TestLocalSymbols {
 
         Term target = TacletForTests
                 .parseTerm("((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & "
-                        + "((\\forall s varr; varr=const) | (\\forall s varr; const=varr))");
+                    + "((\\forall s varr; varr=const) | (\\forall s varr; const=varr))");
 
         Proof proof = new Proof("TestLocalSymbols", target, "n/a", TacletForTests.initConfig());
 
@@ -126,7 +126,7 @@ public class TestLocalSymbols {
 
         KeYEnvironment<?> env = loadProof("doubleSkolem.key");
         Proof proof = env.getLoadedProof();
-        String script = env.getProofScript().first;
+        String script = env.getProofScript().script();
 
         ProofScriptEngine pse =
             new ProofScriptEngine(script, new Location(null, Position.newOneBased(1, 1)));
@@ -142,7 +142,10 @@ public class TestLocalSymbols {
     private void apply(Proof proof, NoPosTacletApp rule, int goalNo, int formulaNo) {
 
         ImmutableList<Goal> goals = proof.openGoals();
-        while (goalNo > 0) { goals = goals.tail(); goalNo--; }
+        while (goalNo > 0) {
+            goals = goals.tail();
+            goalNo--;
+        }
 
         Goal goal = goals.head();
 

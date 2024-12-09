@@ -30,10 +30,14 @@ public class CVC5Socket extends AbstractSolverSocket {
     @Override
     public void messageIncoming(@NonNull Pipe pipe, @NonNull String msg) throws IOException {
         SolverCommunication sc = pipe.getSolverCommunication();
-        if ("".equals(msg.trim())) { return; }
+        if ("".equals(msg.trim())) {
+            return;
+        }
 
         // used only to steer the interaction with the solver and thus filtered out currently
-        if (!msg.contains("success")) { sc.addMessage(msg, SolverCommunication.MessageType.OUTPUT); }
+        if (!msg.contains("success")) {
+            sc.addMessage(msg, SolverCommunication.MessageType.OUTPUT);
+        }
 
         if (msg.contains("error") || msg.contains("Error")) {
             sc.addMessage(msg, SolverCommunication.MessageType.ERROR);

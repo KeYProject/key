@@ -47,10 +47,12 @@ public class AbbrevMap {
      */
     public void put(Term t, String abbreviation, boolean enabled) throws AbbrevException {
         AbbrevWrapper scw;
-        if (containsTerm(t)) { throw new AbbrevException("A abbreviation for " + t + " already exists", true); }
+        if (containsTerm(t)) {
+            throw new AbbrevException("A abbreviation for " + t + " already exists", true);
+        }
         if (containsAbbreviation(abbreviation)) {
             throw new AbbrevException("The abbreviation " + abbreviation + " is already"
-                    + " in use for: " + getTerm(abbreviation),
+                + " in use for: " + getTerm(abbreviation),
                 false);
         }
         scw = new AbbrevWrapper(t);
@@ -71,7 +73,7 @@ public class AbbrevMap {
             AbbrevWrapper scw;
             if (containsAbbreviation(abbreviation)) {
                 throw new AbbrevException("The abbreviation " + abbreviation + " is already"
-                        + " in use for: " + getTerm(abbreviation),
+                    + " in use for: " + getTerm(abbreviation),
                     false);
             }
             scw = new AbbrevWrapper(t);
@@ -91,7 +93,9 @@ public class AbbrevMap {
     public void changeAbbrev(String abbreviation, Term t, boolean enabled) throws AbbrevException {
         if (containsAbbreviation(abbreviation)) {
             AbbrevWrapper scw;
-            if (containsTerm(t)) { throw new AbbrevException("A abbreviation for " + t + " already exists", true); }
+            if (containsTerm(t)) {
+                throw new AbbrevException("A abbreviation for " + t + " already exists", true);
+            }
             scw = new AbbrevWrapper(t);
             stringterm.remove(termstring.get(scw));
             termstring.put(scw, abbreviation);
@@ -136,7 +140,9 @@ public class AbbrevMap {
      */
     public boolean isEnabled(Term t) {
         Boolean b = termenabled.get(new AbbrevWrapper(t));
-        if (b != null) { return b; }
+        if (b != null) {
+            return b;
+        }
         return false;
     }
 

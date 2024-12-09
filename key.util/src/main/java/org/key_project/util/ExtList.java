@@ -45,7 +45,11 @@ public final class ExtList extends LinkedList<Object> {
     @SuppressWarnings("unchecked")
     public <T> T[] collect(Class<T> cl) {
         LinkedList<T> colls = new LinkedList<>();
-        for (Object next : this) { if (cl.isInstance(next) && (next != null)) { colls.add((T) next); } }
+        for (Object next : this) {
+            if (cl.isInstance(next) && (next != null)) {
+                colls.add((T) next);
+            }
+        }
 
         return toArray(cl, colls);
 
@@ -60,7 +64,11 @@ public final class ExtList extends LinkedList<Object> {
      */
     @SuppressWarnings("unchecked")
     public <T> @Nullable T get(Class<T> cl) {
-        for (Object next : this) { if (cl.isInstance(next) && (next != null)) { return (T) next; } }
+        for (Object next : this) {
+            if (cl.isInstance(next) && (next != null)) {
+                return (T) next;
+            }
+        }
 
         return null;
     }

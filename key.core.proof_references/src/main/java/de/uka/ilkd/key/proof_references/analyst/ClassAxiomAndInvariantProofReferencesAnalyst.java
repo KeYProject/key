@@ -60,7 +60,9 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
                     Iterator<Taclet> tacletIterator = taclets.iterator();
                     while (found == null && tacletIterator.hasNext()) {
                         Taclet t = tacletIterator.next();
-                        if (t.name().equals(tacletName)) { found = ca; }
+                        if (t.name().equals(tacletName)) {
+                            found = ca;
+                        }
                     }
                 }
                 if (found instanceof PartialInvAxiom axiom) {
@@ -83,7 +85,7 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
                     return result;
                 } else {
                     throw new IllegalStateException("ClassAxiom for taclet \"" + name
-                            + "\" was not found applied in node \"" + node.serialNr() + "\".");
+                        + "\" was not found applied in node \"" + node.serialNr() + "\".");
                 }
             } else {
                 return null; // Proof might be disposed.
@@ -106,7 +108,9 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
             services.getSpecificationRepository().getProofOblInput(services.getProof());
         if (problem != null) {
             KeYJavaType type = problem.getContainerType();
-            if (type == null) { throw new IllegalStateException("Problem \"" + problem + "\" is not supported."); }
+            if (type == null) {
+                throw new IllegalStateException("Problem \"" + problem + "\" is not supported.");
+            }
             return type;
         } else {
             return null; // Proof might be disposed.

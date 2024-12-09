@@ -35,9 +35,13 @@ public abstract class SMTBeautifier {
 
         public int length() {
             int result = 0;
-            if (head != null) { result += head.length(); }
+            if (head != null) {
+                result += head.length();
+            }
             if (children != null) {
-                for (Element child : children) { result += child.length(); }
+                for (Element child : children) {
+                    result += child.length();
+                }
                 result += 2 + children.size(); // "(", ")" and spaces
             }
             return result;
@@ -125,7 +129,9 @@ public abstract class SMTBeautifier {
             case '|':
                 int start = pos.val;
                 pos.val++;
-                while (s.charAt(pos.val) != '|') { pos.val++; }
+                while (s.charAt(pos.val) != '|') {
+                    pos.val++;
+                }
                 Element result = new Element();
                 pos.val++;
                 result.head = s.substring(start, pos.val);
@@ -134,7 +140,9 @@ public abstract class SMTBeautifier {
             case ';':
                 start = pos.val;
                 pos.val++;
-                while (pos.val < s.length() && s.charAt(pos.val) != '\n') { pos.val++; }
+                while (pos.val < s.length() && s.charAt(pos.val) != '\n') {
+                    pos.val++;
+                }
                 result = new Element();
                 result.head = s.substring(start, pos.val);
                 pos.val++;
@@ -143,7 +151,9 @@ public abstract class SMTBeautifier {
             default:
                 start = pos.val;
                 pos.val++;
-                while (pos.val < s.length() && " \t\n();|".indexOf(s.charAt(pos.val)) == -1) { pos.val++; }
+                while (pos.val < s.length() && " \t\n();|".indexOf(s.charAt(pos.val)) == -1) {
+                    pos.val++;
+                }
                 result = new Element();
                 result.head = s.substring(start, pos.val);
                 return result;
@@ -161,7 +171,9 @@ public abstract class SMTBeautifier {
         pos.val++;
         while (pos.val < s.length() && s.charAt(pos.val) != ')') {
             result.children.add(parse(s, pos));
-            while (pos.val < s.length() && Character.isWhitespace(s.charAt(pos.val))) { pos.val++; }
+            while (pos.val < s.length() && Character.isWhitespace(s.charAt(pos.val))) {
+                pos.val++;
+            }
         }
         pos.val++;
         return result;

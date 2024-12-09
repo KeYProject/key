@@ -98,7 +98,11 @@ public abstract class MergeProcedure {
      * @return The merge procedure of the given name; null if there is no such procedure.
      */
     public static MergeProcedure getProcedureByName(String procName) {
-        for (MergeProcedure proc : CONCRETE_RULES) { if (proc.toString().equals(procName)) { return proc; } }
+        for (MergeProcedure proc : CONCRETE_RULES) {
+            if (proc.toString().equals(procName)) {
+                return proc;
+            }
+        }
 
         return null;
     }

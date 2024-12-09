@@ -21,7 +21,9 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      * @return this SuccTacletBuilder
      */
     public SuccTacletBuilder setFind(Term findTerm) {
-        if (findTerm.sort() == JavaDLTheory.FORMULA) { find = findTerm; }
+        if (findTerm.sort() == JavaDLTheory.FORMULA) {
+            find = findTerm;
+        }
         checkContainsFreeVarSV(findTerm, this.getName(), "find term");
         return this;
     }

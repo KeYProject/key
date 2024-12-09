@@ -46,7 +46,6 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
 import org.key_project.logic.Name;
@@ -92,7 +91,9 @@ public class JMLSpecFactory {
     // constructors
     // -------------------------------------------------------------------------
     public JMLSpecFactory(Services services) {
-        if (services == null) { throw new AssertionError(); }
+        if (services == null) {
+            throw new AssertionError();
+        }
         this.services = services;
         this.tb = services.getTermBuilder();
         cf = new ContractFactory(services);
@@ -358,7 +359,9 @@ public class JMLSpecFactory {
                 return new Private();
             } else if (modifier.equals(JMLModifier.PROTECTED)) {
                 return new Protected();
-            } else if (modifier.equals(JMLModifier.PUBLIC)) { return new Public(); }
+            } else if (modifier.equals(JMLModifier.PUBLIC)) {
+                return new Public();
+            }
         }
         return null;
     }
@@ -388,9 +391,15 @@ public class JMLSpecFactory {
             ImmutableList<JMLModifier> modifiers) {
         for (var modifier : modifiers) {
             // Consistency: bigint > safe > java
-            if (modifier == JMLModifier.SPEC_BIGINT_MATH) { return SpecMathMode.BIGINT; }
-            if (modifier == JMLModifier.SPEC_SAFE_MATH) { return SpecMathMode.JAVA; }
-            if (modifier == JMLModifier.SPEC_JAVA_MATH) { return SpecMathMode.JAVA; }
+            if (modifier == JMLModifier.SPEC_BIGINT_MATH) {
+                return SpecMathMode.BIGINT;
+            }
+            if (modifier == JMLModifier.SPEC_SAFE_MATH) {
+                return SpecMathMode.JAVA;
+            }
+            if (modifier == JMLModifier.SPEC_JAVA_MATH) {
+                return SpecMathMode.JAVA;
+            }
         }
         return null;
     }
@@ -595,12 +604,11 @@ public class JMLSpecFactory {
      */
     private ImmutableList<Term> registerAbbreviationVariables(TextualJMLSpecCase textualSpecCase,
             Context context, ProgramVariableCollection progVars, ContractClauses clauses) {
-        for (Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext> abbrv : textualSpecCase
-                .getAbbreviations()) {
+        for (TextualJMLSpecCase.Abbreviation abbrv : textualSpecCase.getAbbreviations()) {
             final KeYJavaType abbrKJT =
-                services.getJavaInfo().getKeYJavaType(abbrv.first.first.getText());
+                services.getJavaInfo().getKeYJavaType(abbrv.typeName().first.getText());
             final ProgramElementName abbrVarName =
-                new ProgramElementName(abbrv.second.first.getText());
+                new ProgramElementName(abbrv.abbrevName().first.getText());
             final LocationVariable abbrVar = new LocationVariable(abbrVarName, abbrKJT, true, true);
             assert abbrVar.isGhost() : "specification parameter not ghost";
             services.getNamespaces().programVariables().addSafely(abbrVar);
@@ -609,7 +617,7 @@ public class JMLSpecFactory {
             // parameter
             Term rhs = new JmlIO(services).context(context).parameters(progVars.paramVars)
                     .atPres(progVars.atPres).atBefore(progVars.atBefores)
-                    .translateTerm(abbrv.third);
+                    .translateTerm(abbrv.abbreviatedTerm());
             clauses.abbreviations =
                 clauses.abbreviations.append(tb.elementary(tb.var(abbrVar), rhs));
         }
@@ -626,7 +634,9 @@ public class JMLSpecFactory {
             for (LabeledParserRuleContext expr : originalClauses) {
                 InfFlowSpec translated = new JmlIO(services).context(context).parameters(paramVars)
                         .resultVariable(resultVar).exceptionVariable(excVar).translateInfFlow(expr);
-                if (translated != null) { result = result.append(translated); }
+                if (translated != null) {
+                    result = result.append(translated);
+                }
             }
             return result;
         }
@@ -684,7 +694,7 @@ public class JMLSpecFactory {
                 if (originalClauses.size() > 1) {
                     throw new SLTranslationException(
                         "\"assignable \\strictly_nothing\" cannot be joined with other "
-                                + "\"assignable\" clauses (even if they declare the same).",
+                            + "\"assignable\" clauses (even if they declare the same).",
                         Location.fromToken(expr.first.start));
                 }
                 return tb.empty();
@@ -836,7 +846,9 @@ public class JMLSpecFactory {
 
             // less than nothing is marked by some special term
             if (translated.equalsModProperty(tb.strictlyNothing(),
-                IRRELEVANT_TERM_LABELS_PROPERTY)) { return true; }
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                return true;
+            }
         }
 
         return false;
@@ -884,7 +896,7 @@ public class JMLSpecFactory {
     }
 
     public String generateName(IProgramMethod pm, Behavior originalBehavior, String customName) {
-        return ((!(customName == null) && customName.length() > 0) ? customName
+        return ((!(customName == null) && !customName.isEmpty()) ? customName
                 : getContractName(pm, originalBehavior));
     }
 
@@ -920,7 +932,9 @@ public class JMLSpecFactory {
 
                     result.put(heap, post);
                 } else {
-                    if (clauses.assignables.get(heap) != null) { result.put(heap, tb.tt()); }
+                    if (clauses.assignables.get(heap) != null) {
+                        result.put(heap, tb.tt());
+                    }
                 }
             }
         }
@@ -931,7 +945,9 @@ public class JMLSpecFactory {
             ContractClauses clauses, Behavior originalBehavior) {
         Map<LocationVariable, Term> result = new LinkedHashMap<>();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            if (clauses.axioms.get(heap) != null) { result.put(heap, tb.convertToFormula(clauses.axioms.get(heap))); }
+            if (clauses.axioms.get(heap) != null) {
+                result.put(heap, tb.convertToFormula(clauses.axioms.get(heap)));
+            }
         }
         return result;
     }
@@ -956,7 +972,9 @@ public class JMLSpecFactory {
         ImmutableSet<Contract> result = DefaultImmutableSet.nil();
 
         Term abbrvLhs = null;
-        if (!clauses.abbreviations.isEmpty()) { abbrvLhs = tb.sequential(clauses.abbreviations); }
+        if (!clauses.abbreviations.isEmpty()) {
+            abbrvLhs = tb.sequential(clauses.abbreviations);
+        }
 
         // requires
         Map<LocationVariable, Term> pres = new LinkedHashMap<>();
@@ -965,7 +983,9 @@ public class JMLSpecFactory {
                 Term pre = tb.convertToFormula(clauses.requires.get(heap));
                 pres.put(heap, pre);
             } else {
-                if (clauses.assignables.get(heap) != null) { pres.put(heap, tb.tt()); }
+                if (clauses.assignables.get(heap) != null) {
+                    pres.put(heap, tb.tt());
+                }
             }
         }
 
@@ -1027,7 +1047,9 @@ public class JMLSpecFactory {
         ImmutableSet<Contract> result = DefaultImmutableSet.nil();
 
         Term abbrvLhs = null;
-        if (!clauses.abbreviations.isEmpty()) { abbrvLhs = tb.sequential(clauses.abbreviations); }
+        if (!clauses.abbreviations.isEmpty()) {
+            abbrvLhs = tb.sequential(clauses.abbreviations);
+        }
 
         boolean createContract = true;
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
@@ -1164,7 +1186,7 @@ public class JMLSpecFactory {
             Token start = clause.first.start;
             throw new SLWarningException(
                 "JML represents clauses must occur uniquely per " + "type and target."
-                        + "\nAll but one are ignored.",
+                    + "\nAll but one are ignored.",
                 Location.fromToken(start));
         }
         // create class axiom
@@ -1188,7 +1210,9 @@ public class JMLSpecFactory {
      */
     public ClassAxiom createJMLClassAxiom(@NonNull KeYJavaType kjt, TextualJMLClassAxiom textual) {
         LabeledParserRuleContext originalRep = textual.getAxiom();
-        if (originalRep == null) { throw new NullPointerException(); }
+        if (originalRep == null) {
+            throw new NullPointerException();
+        }
 
         var context = Context.inClass(kjt, false, tb);
 
@@ -1205,15 +1229,20 @@ public class JMLSpecFactory {
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, LocationVariable targetHeap,
             LabeledParserRuleContext originalDep) {
-        if (kjt == null) { throw new NullPointerException(); }
-        if (originalDep == null) { throw new NullPointerException(); }
+        if (kjt == null) {
+            throw new NullPointerException();
+        }
+        if (originalDep == null) {
+            throw new NullPointerException();
+        }
 
         var context = Context.inClass(kjt, false, tb);
 
         // translateToTerm expression
-        Triple<IObserverFunction, Term, Term> dep =
+        TranslatedDependencyContract dep =
             new JmlIO(services).context(context).translateDependencyContract(originalDep);
-        return cf.dep(kjt, targetHeap, dep, dep.first.isStatic() ? null : context.selfVar());
+        return cf.dep(kjt, targetHeap, dep,
+            dep.observerFunction().isStatic() ? null : context.selfVar());
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, TextualJMLDepends textualDep) {
@@ -1243,8 +1272,12 @@ public class JMLSpecFactory {
      */
     public ImmutableSet<Contract> createJMLOperationContracts(IProgramMethod pm,
             TextualJMLSpecCase textualSpecCase) throws SLTranslationException {
-        if (pm == null) { throw new NullPointerException(); }
-        if (textualSpecCase == null) { throw new NullPointerException(); }
+        if (pm == null) {
+            throw new NullPointerException();
+        }
+        if (textualSpecCase == null) {
+            throw new NullPointerException();
+        }
 
         Behavior originalBehavior =
             pm.isModel() ? Behavior.MODEL_BEHAVIOR : textualSpecCase.getBehavior();
@@ -1301,7 +1334,7 @@ public class JMLSpecFactory {
                                                                     // for params
             if (!(mergeProc instanceof MergeWithPredicateAbstraction)) {
                 throw new IllegalStateException("Currently, MergeWithPredicateAbstraction(Factory) "
-                        + "is the only supported ParametricMergeProcedure");
+                    + "is the only supported ParametricMergeProcedure");
             }
 
             // @formatter:off
@@ -1359,7 +1392,9 @@ public class JMLSpecFactory {
     public ImmutableSet<BlockContract> createJMLBlockContracts(IProgramMethod method,
             List<Label> labels, StatementBlock block, TextualJMLSpecCase specificationCase)
             throws SLTranslationException {
-        if (specificationCase.isLoopContract()) { return DefaultImmutableSet.nil(); }
+        if (specificationCase.isLoopContract()) {
+            return DefaultImmutableSet.nil();
+        }
 
         final Behavior behavior = specificationCase.getBehavior();
         final AuxiliaryContract.Variables variables =
@@ -1395,7 +1430,9 @@ public class JMLSpecFactory {
     public ImmutableSet<LoopContract> createJMLLoopContracts(final IProgramMethod method,
             final List<Label> labels, final LoopStatement loop,
             final TextualJMLSpecCase specificationCase) throws SLTranslationException {
-        if (!specificationCase.isLoopContract()) { return DefaultImmutableSet.nil(); }
+        if (!specificationCase.isLoopContract()) {
+            return DefaultImmutableSet.nil();
+        }
 
         final Behavior behavior = specificationCase.getBehavior();
         final AuxiliaryContract.Variables variables =
@@ -1411,7 +1448,7 @@ public class JMLSpecFactory {
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
             clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasAssignable,
             clauses.hasFreeAssignable, clauses.decreases, services)
-                    .create();
+                .create();
     }
 
     /**
@@ -1433,7 +1470,9 @@ public class JMLSpecFactory {
             List<Label> labels, StatementBlock block, TextualJMLSpecCase specificationCase)
             throws SLTranslationException {
 
-        if (!specificationCase.isLoopContract()) { return DefaultImmutableSet.nil(); }
+        if (!specificationCase.isLoopContract()) {
+            return DefaultImmutableSet.nil();
+        }
 
         final Behavior behavior = specificationCase.getBehavior();
         final AuxiliaryContract.Variables variables =
@@ -1449,7 +1488,7 @@ public class JMLSpecFactory {
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
             clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasAssignable,
             clauses.hasFreeAssignable, clauses.decreases, services)
-                    .create();
+                .create();
     }
 
     private ProgramVariableCollection createProgramVariablesForStatement(Statement statement,
@@ -1496,8 +1535,7 @@ public class JMLSpecFactory {
     }
 
     public @Nullable String checkSetStatementAssignee(Term assignee) {
-        if (assignee.op() instanceof LocationVariable) {
-            var variable = (LocationVariable) assignee.op();
+        if (assignee.op() instanceof LocationVariable variable) {
             if (variable.isGhost()) {
                 return null;
             } else {
@@ -1543,7 +1581,9 @@ public class JMLSpecFactory {
                 .atBefore(pv.atBefores);
         Term assignee = io.translateTerm(setStatementContext.getAssignee());
         Term value = io.translateTerm(setStatementContext.getValue());
-        if (value.sort() == JavaDLTheory.FORMULA) { value = tb.convertToBoolean(value); }
+        if (value.sort() == JavaDLTheory.FORMULA) {
+            value = tb.convertToBoolean(value);
+        }
         String error = checkSetStatementAssignee(assignee);
         if (error != null) {
             throw new SLTranslationException(
@@ -1578,7 +1618,9 @@ public class JMLSpecFactory {
         ImmutableList<LocationVariable> vars;
 
         SourceElement first = block.getFirstElement();
-        while (first instanceof LabeledStatement) { first = ((LabeledStatement) first).getBody(); }
+        while (first instanceof LabeledStatement) {
+            first = ((LabeledStatement) first).getBody();
+        }
 
         if (first instanceof For) {
             vars = append(collectLocalVariables(method.getBody(), (For) first),
@@ -1755,7 +1797,9 @@ public class JMLSpecFactory {
         for (String h : originalModifiables.keySet()) {
             LocationVariable heap =
                 services.getTypeConverter().getHeapLDT().getHeapForName(new Name(h));
-            if (heap == null) { continue; }
+            if (heap == null) {
+                continue;
+            }
             Term a;
             ImmutableList<LabeledParserRuleContext> as = originalModifiables.get(h);
             if (as.isEmpty()) {
@@ -1785,7 +1829,9 @@ public class JMLSpecFactory {
     private ImmutableList<LocationVariable> append(ImmutableList<LocationVariable> localVars,
             ImmutableList<LocationVariable> paramVars) {
         ImmutableList<LocationVariable> result = ImmutableSLList.nil();
-        for (LocationVariable param : paramVars) { result = result.prepend(param); }
+        for (LocationVariable param : paramVars) {
+            result = result.prepend(param);
+        }
         return result.prepend(localVars);
     }
 

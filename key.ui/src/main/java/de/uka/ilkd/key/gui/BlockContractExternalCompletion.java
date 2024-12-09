@@ -33,10 +33,14 @@ public class BlockContractExternalCompletion implements InteractiveRuleApplicati
             final boolean force) {
         BlockContractExternalBuiltInRuleApp result =
             (BlockContractExternalBuiltInRuleApp) application;
-        if (!result.complete() && result.cannotComplete(goal)) { return result; }
+        if (!result.complete() && result.cannotComplete(goal)) {
+            return result;
+        }
         if (force) {
             result.tryToInstantiate(goal);
-            if (result.complete()) { return result; }
+            if (result.complete()) {
+                return result;
+            }
         }
         final Services services = goal.proof().getServices();
         final Instantiation instantiation = BlockContractExternalRule.INSTANCE

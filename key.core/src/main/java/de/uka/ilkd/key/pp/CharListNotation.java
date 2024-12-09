@@ -35,7 +35,9 @@ public final class CharListNotation extends Notation {
     private String translateCharTerm(Term t) {
         char charVal = 0;
         int intVal = 0;
-        if (t.op().arity() == 0) { throw new IllegalArgumentException("Term is not a value!"); }
+        if (t.op().arity() == 0) {
+            throw new IllegalArgumentException("Term is not a value!");
+        }
         String result = printlastfirst(t.sub(0)).toString();
         try {
             intVal = Integer.parseInt(result);

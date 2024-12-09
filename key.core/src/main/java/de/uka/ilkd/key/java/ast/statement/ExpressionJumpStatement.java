@@ -74,7 +74,9 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      *            if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) { return expression; }
+        if (expression != null && index == 0) {
+            return expression;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -106,7 +108,11 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (expression != null) { if (index == 0) { return expression; } }
+        if (expression != null) {
+            if (index == 0) {
+                return expression;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 }

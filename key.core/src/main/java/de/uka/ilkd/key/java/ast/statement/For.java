@@ -75,7 +75,9 @@ public class For extends LoopStatement implements VariableScope {
     public ImmutableArray<VariableSpecification> getVariablesInScope() {
         if (inits != null) {
             LoopInitializer li = inits.getInits().get(0);
-            if (li instanceof LocalVariableDeclaration) { return ((LocalVariableDeclaration) li).getVariables(); }
+            if (li instanceof LocalVariableDeclaration) {
+                return ((LocalVariableDeclaration) li).getVariables();
+            }
         }
         return EMPTY_VARSPECS;
     }
@@ -88,7 +90,9 @@ public class For extends LoopStatement implements VariableScope {
                     ((LocalVariableDeclaration) li).getVariables();
                 for (int i = 0, s = vars.size(); i < s; i += 1) {
                     VariableSpecification v = vars.get(i);
-                    if (name.equals(v.getName())) { return v; }
+                    if (name.equals(v.getName())) {
+                        return v;
+                    }
                 }
             }
         }

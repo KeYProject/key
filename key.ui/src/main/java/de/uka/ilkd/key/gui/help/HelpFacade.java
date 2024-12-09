@@ -51,7 +51,9 @@ public class HelpFacade {
     public static String HELP_BASE_URL = "https://keyproject.github.io/key-docs/";
 
     static {
-        if (System.getProperty("KEY_HELP_URL") != null) { HELP_BASE_URL = System.getProperty(KEY_HELP_URL); }
+        if (System.getProperty("KEY_HELP_URL") != null) {
+            HELP_BASE_URL = System.getProperty(KEY_HELP_URL);
+        }
     }
 
     private static void openHelpInBrowser(String url) {
@@ -80,7 +82,9 @@ public class HelpFacade {
             openHelpInBrowser(path);
             return;
         }
-        if (path.startsWith("/")) { path = path.substring(1); }
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
         openHelpInBrowser(HELP_BASE_URL + path);
     }
 
@@ -165,7 +169,9 @@ public class HelpFacade {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (e != null && e.getSource() != null) { HelpFacade.openHelp((JComponent) e.getSource()); }
+            if (e != null && e.getSource() != null) {
+                HelpFacade.openHelp((JComponent) e.getSource());
+            }
         }
     }
 }

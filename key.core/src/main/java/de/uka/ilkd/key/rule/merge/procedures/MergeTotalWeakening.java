@@ -30,7 +30,9 @@ public class MergeTotalWeakening extends MergeProcedure implements UnparametricM
     private static MergeTotalWeakening INSTANCE = null;
 
     public static MergeTotalWeakening instance() {
-        if (INSTANCE == null) { INSTANCE = new MergeTotalWeakening(); }
+        if (INSTANCE == null) {
+            INSTANCE = new MergeTotalWeakening();
+        }
         return INSTANCE;
     }
 

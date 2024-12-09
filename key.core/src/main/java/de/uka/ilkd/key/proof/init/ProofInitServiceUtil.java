@@ -50,7 +50,9 @@ public final class ProofInitServiceUtil {
     public static ImmutableList<POExtension> getOperationPOExtension(ProofOblInput po) {
         ImmutableList<POExtension> result = ImmutableSLList.nil();
         for (POExtension extension : poExtensions) {
-            if (extension.isPOSupported(po)) { result = result.prepend(extension); }
+            if (extension.isPOSupported(po)) {
+                result = result.prepend(extension);
+            }
         }
         return result;
     }

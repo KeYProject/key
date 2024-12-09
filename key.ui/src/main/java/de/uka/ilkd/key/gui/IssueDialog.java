@@ -500,7 +500,9 @@ public final class IssueDialog extends JDialog {
         int pos = editor.getUI().viewToModel(editor, event.getPoint());
         if (pos >= 0 && editor.getDocument() instanceof HTMLDocument hdoc) {
             Element elem = hdoc.getCharacterElement(pos);
-            if (elem.getAttributes().getAttribute(HTML.Tag.A) != null) { return elem; }
+            if (elem.getAttributes().getAttribute(HTML.Tag.A) != null) {
+                return elem;
+            }
         }
         return null;
     }
@@ -547,7 +549,9 @@ public final class IssueDialog extends JDialog {
 
         // by default, do not ignore any warnings
         chkIgnoreWarnings.setSelected(false);
-        if (!critical) { pSouth.add(chkIgnoreWarnings); }
+        if (!critical) {
+            pSouth.add(chkIgnoreWarnings);
+        }
         pSouth.add(pButtons);
         getRootPane().setDefaultButton(btnOK);
 
@@ -632,10 +636,16 @@ public final class IssueDialog extends JDialog {
             String message = exception.getMessage();
             String info = sw.toString();
 
-            if (exception instanceof ParseCancellationException) { exception = exception.getCause(); }
+            if (exception instanceof ParseCancellationException) {
+                exception = exception.getCause();
+            }
 
-            if (exception instanceof InputMismatchException ime) { message = ExceptionTools.getNiceMessage(ime); }
-            if (exception instanceof NoViableAltException nvae) { message = ExceptionTools.getNiceMessage(nvae); }
+            if (exception instanceof InputMismatchException ime) {
+                message = ExceptionTools.getNiceMessage(ime);
+            }
+            if (exception instanceof NoViableAltException nvae) {
+                message = ExceptionTools.getNiceMessage(nvae);
+            }
 
             // also add message of the cause to the string if available
             if (exception.getCause() != null) {
@@ -650,8 +660,12 @@ public final class IssueDialog extends JDialog {
             Location location = ExceptionTools.getLocation(exception);
             if (location != null) {
                 var loc = location;
-                if (!loc.getPosition().isNegative()) { pos = loc.getPosition(); }
-                if (loc.getFileURI().isPresent()) { resourceLocation = loc.getFileURI().get(); }
+                if (!loc.getPosition().isNegative()) {
+                    pos = loc.getPosition();
+                }
+                if (loc.getFileURI().isPresent()) {
+                    resourceLocation = loc.getFileURI().get();
+                }
             }
             return new PositionedIssueString(message == null ? exception.toString() : message,
                 new Location(resourceLocation, pos), info);
@@ -663,7 +677,9 @@ public final class IssueDialog extends JDialog {
     }
 
     private void accept() {
-        if (!critical && chkIgnoreWarnings.isSelected()) { ignoredWarnings.addAll(warnings); }
+        if (!critical && chkIgnoreWarnings.isSelected()) {
+            ignoredWarnings.addAll(warnings);
+        }
         setVisible(false);
     }
 
@@ -681,7 +697,9 @@ public final class IssueDialog extends JDialog {
             txtSource.setText("[SOURCE COULD NOT BE LOADED]");
         } else {
             URI uri = location.getFileURI().get();
-            if (uri.getScheme() == null) { uri = URI.create("file:" + uri.getPath()); }
+            if (uri.getScheme() == null) {
+                uri = URI.create("file:" + uri.getPath());
+            }
             fTextField.setText("URL: " + uri);
             fTextField.setVisible(true);
 
@@ -691,7 +709,9 @@ public final class IssueDialog extends JDialog {
                     fileContentsCache.computeIfAbsent(uri, fn -> {
                         try {
                             String result = IOUtil.readFrom(finalUri);
-                            if (result == null) { throw new NullPointerException(); }
+                            if (result == null) {
+                                throw new NullPointerException();
+                            }
                             return result;
                         } catch (IOException e) {
                             LOGGER.debug("Unknown IOException!", e);
@@ -740,11 +760,15 @@ public final class IssueDialog extends JDialog {
     private void addHighlights(DefaultHighlighter dh, PositionedString ps) {
         // if we have no position there is no highlight
         Position pos = ps.getLocation().getPosition();
-        if (pos.isNegative()) { return; }
+        if (pos.isNegative()) {
+            return;
+        }
         String source = txtSource.getText();
         int offset = getOffsetFromLineColumn(source, pos);
         int end = offset;
-        while (end < source.length() && !Character.isWhitespace(source.charAt(end))) { end++; }
+        while (end < source.length() && !Character.isWhitespace(source.charAt(end))) {
+            end++;
+        }
         try {
             if (critical) {
                 dh.addHighlight(offset, end, new SquigglyUnderlinePainter(Color.RED, 2, 1f));
@@ -767,12 +791,22 @@ public final class IssueDialog extends JDialog {
     }
 
     private static int getOffsetFromLineColumn(String source, int line, int column) {
-        if (line < 0) { throw new IllegalArgumentException(); }
-        if (column < 0) { throw new IllegalArgumentException(); }
+        if (line < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (column < 0) {
+            throw new IllegalArgumentException();
+        }
 
         int pos = 0;
-        for (; pos < source.length() && line > 0; ++pos) { if (source.charAt(pos) == '\n') { --line; } }
-        if (line == 0) { return Math.min(pos + column, source.length()); }
+        for (; pos < source.length() && line > 0; ++pos) {
+            if (source.charAt(pos) == '\n') {
+                --line;
+            }
+        }
+        if (line == 0) {
+            return Math.min(pos + column, source.length());
+        }
 
         // Best effort, don't throw here
         return 0;

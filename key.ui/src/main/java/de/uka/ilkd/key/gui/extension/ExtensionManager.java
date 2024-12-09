@@ -43,7 +43,7 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
 
         JLabel lblExplainExperimental =
             new JLabel("<html>The flask marks extensions " + "that are only available, <br>"
-                    + "if KeY was started in experimental mode. Restart KeY with `--experimental`.");
+                + "if KeY was started in experimental mode. Restart KeY with `--experimental`.");
         lblExplainExperimental.setIcon(IconFactory.EXPERIMENTAL_EXTENSION.get());
         pNorth.add(lblExplainExperimental);
 
@@ -104,11 +104,11 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
 
     private String getSupportLabel(Extension<?> it) {
         return "Provides: " + (it.supportsContextMenu() ? "ContextMenu " : "")
-                + (it.supportsLeftPanel() ? "LeftPanel " : "")
-                + (it.supportsMainMenu() ? "MainMenu " : "")
-                + (it.supportsSettings() ? "Settings " : "")
-                + (it.supportsStatusLine() ? "StatusLine " : "")
-                + (it.supportsToolbar() ? "Toolbar " : "");
+            + (it.supportsLeftPanel() ? "LeftPanel " : "")
+            + (it.supportsMainMenu() ? "MainMenu " : "")
+            + (it.supportsSettings() ? "Settings " : "")
+            + (it.supportsStatusLine() ? "StatusLine " : "")
+            + (it.supportsToolbar() ? "Toolbar " : "");
     }
 
     @Override
@@ -131,7 +131,9 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
     public void applySettings(MainWindow window) {
         Set<String> seq = new HashSet<>();
         map.forEach((k, v) -> {
-            if (!k.isSelected()) { seq.add(v.getType().getName()); }
+            if (!k.isSelected()) {
+                seq.add(v.getType().getName());
+            }
         });
         ExtensionManager.getExtensionSettings().setForbiddenClasses(seq);
     }

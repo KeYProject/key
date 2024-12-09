@@ -57,7 +57,10 @@ public class XMLUtilTest {
         assertEquals(expectedResult, result);
         assertEquals(expectedTags.length, replacer.getLog().size());
         int i = 0;
-        for (String tag : expectedTags) { assertEquals(expectedTags[i], tag); i++; }
+        for (String tag : expectedTags) {
+            assertEquals(expectedTags[i], tag);
+            i++;
+        }
     }
 
     /**

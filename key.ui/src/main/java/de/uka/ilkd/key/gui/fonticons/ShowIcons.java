@@ -30,10 +30,18 @@ public class ShowIcons extends JFrame {
         search.add(txtSearch);
         txtSearch.addActionListener(l -> filter(txtSearch.getText()));
 
-        for (IconFont fa : FontAwesomeRegular.values()) { add(fa); }
-        for (IconFont fa : FontAwesomeSolid.values()) { add(fa); }
-        for (IconFont fa : Entypo.values()) { add(fa); }
-        for (IconFont fa : Typicons.values()) { add(fa); }
+        for (IconFont fa : FontAwesomeRegular.values()) {
+            add(fa);
+        }
+        for (IconFont fa : FontAwesomeSolid.values()) {
+            add(fa);
+        }
+        for (IconFont fa : Entypo.values()) {
+            add(fa);
+        }
+        for (IconFont fa : Typicons.values()) {
+            add(fa);
+        }
 
         JScrollPane scroll = new JScrollPane(box);
         setSize(500, 500);
@@ -50,11 +58,15 @@ public class ShowIcons extends JFrame {
     private void filter(String text) {
         box.removeAll();
         if (text.isEmpty()) {
-            for (Component c : icons) { box.add(c); }
+            for (Component c : icons) {
+                box.add(c);
+            }
         } else {
             for (JComponent c : icons) {
                 String toolTipText = c.getToolTipText();
-                if (toolTipText != null && toolTipText.toLowerCase().contains(text.toLowerCase())) { box.add(c); }
+                if (toolTipText != null && toolTipText.toLowerCase().contains(text.toLowerCase())) {
+                    box.add(c);
+                }
             }
         }
         box.revalidate();

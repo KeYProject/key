@@ -125,21 +125,31 @@ public class LoopApplyHeadRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) { return false; }
+        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
+            return false;
+        }
 
         // abort if inside of transformer
-        if (Transformer.inTransformer(pio)) { return false; }
+        if (Transformer.inTransformer(pio)) {
+            return false;
+        }
 
         final AbstractLoopContractRule.Instantiation instantiation =
             new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal,
                 goal.proof().getServices()).instantiate();
 
-        if (instantiation == null) { return false; }
+        if (instantiation == null) {
+            return false;
+        }
 
         final ImmutableSet<LoopContract> contracts = AbstractLoopContractRule
                 .getApplicableContracts(instantiation, goal, goal.proof().getServices());
 
-        for (LoopContract contract : contracts) { if (contract.getHead() != null) { return true; } }
+        for (LoopContract contract : contracts) {
+            if (contract.getHead() != null) {
+                return true;
+            }
+        }
 
         return false;
     }

@@ -97,7 +97,9 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
                             && ks.getKeyCode() != KeyEvent.VK_SHIFT
                             && ks.getKeyCode() != KeyEvent.VK_ALT;
 
-                if (shortcutComplete) { cellEditor.stopCellEditing(); }
+                if (shortcutComplete) {
+                    cellEditor.stopCellEditing();
+                }
             }
 
             @Override
@@ -140,7 +142,9 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
             KeyStroke ks = keystrokes.get(i);
             KeyStrokeManager.getSettings().setKeyStroke(key, ks, true);
             Action action = modelShortcuts.actions.get(i);
-            if (action != null) { action.putValue(Action.ACCELERATOR_KEY, ks); }
+            if (action != null) {
+                action.putValue(Action.ACCELERATOR_KEY, ks);
+            }
         }
     }
 
@@ -184,7 +188,9 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
             }
             case 1 -> {
                 Action a = actions.get(rowIndex);
-                if (a == null) { return ""; }
+                if (a == null) {
+                    return "";
+                }
                 Object val = a.getValue(Action.SHORT_DESCRIPTION);
                 return val != null ? val.toString() : "";
             }

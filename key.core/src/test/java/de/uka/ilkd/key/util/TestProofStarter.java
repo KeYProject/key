@@ -77,7 +77,9 @@ public class TestProofStarter {
         } finally {
             HelperClassForTests.setOneStepSimplificationEnabled(null,
                 originalOneStepSimplification);
-            if (env != null) { env.dispose(); }
+            if (env != null) {
+                env.dispose();
+            }
         }
     }
 }

@@ -58,7 +58,9 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
         }
 
         final ImmutableList<TacletGoalTemplate> goalTemplates = t.goalTemplates();
-        if (goalTemplates.size() != 1) { return null; }
+        if (goalTemplates.size() != 1) {
+            return null;
+        }
         return goalTemplates.head().sequent();
     }
 

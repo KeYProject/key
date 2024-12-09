@@ -109,7 +109,9 @@ public class JavaDLTheory extends LDT {
     public final SortDependingFunction getCastSymbol(Sort sort, TermServices services) {
         SortDependingFunction castFunction =
             SortDependingFunction.getFirstInstance(CAST_NAME, services);
-        if (castFunction == null) { throw new IllegalStateException("No 'cast' function found for any type."); }
+        if (castFunction == null) {
+            throw new IllegalStateException("No 'cast' function found for any type.");
+        }
         SortDependingFunction result = castFunction.getInstanceFor(sort, services);
         assert result.getSortDependingOn() == sort && result.sort() == sort;
         return result;

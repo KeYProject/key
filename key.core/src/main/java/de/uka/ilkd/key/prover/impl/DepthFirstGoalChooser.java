@@ -23,7 +23,9 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
         Goal result;
 
         if (allGoalsSatisfiable) {
-            if (nextGoals.isEmpty()) { nextGoals = selectedList; }
+            if (nextGoals.isEmpty()) {
+                nextGoals = selectedList;
+            }
 
             if (nextGoals.isEmpty()) {
                 result = null;
@@ -37,7 +39,9 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
             ++nextGoalCounter;
             do {
                 result = selectedList.isEmpty() ? null : selectedList.head();
-                if (result != null && !result.isAutomatic()) { selectedList = selectedList.tail(); }
+                if (result != null && !result.isAutomatic()) {
+                    selectedList = selectedList.tail();
+                }
             } while (result != null && !result.isAutomatic());
         }
         return result;

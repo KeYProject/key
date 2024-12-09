@@ -88,9 +88,10 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
             // to be fixed?
             // assert (pm.isVoid() || pm.isConstructor()) : "resultVar == null for method "+pm;
         } else {
-            assert (!pm.isVoid() && !pm.isConstructor()) : "non-null result variable for void method or constructor "
-                    + pm
-                    + " with return type " + pm.getReturnType();
+            assert (!pm.isVoid() && !pm.isConstructor())
+                    : "non-null result variable for void method or constructor "
+                        + pm
+                        + " with return type " + pm.getReturnType();
         }
         assert exc != null;
         // assert dep != null;
@@ -279,11 +280,11 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     public String getHTMLBody(Services services) {
         return "<html>" + getHTMLSignature() + getHTMLFor(origPre, "pre", services)
-                + getHTMLFor(origFreePre, "free_pre", services)
-                + getHTMLFor(origModifiable, "modifiable", services)
-                + (hasRealModifiableClause ? "" : "<b>, creates no new objects</b>")
-                + getHTMLFor(origMby, "measured-by", services) + "<br><b>termination</b> " + modality
-                + getHTMLFor(origInfFlowSpecs, "determines", services) + "</html>";
+            + getHTMLFor(origFreePre, "free_pre", services)
+            + getHTMLFor(origModifiable, "modifiable", services)
+            + (hasRealModifiableClause ? "" : "<b>, creates no new objects</b>")
+            + getHTMLFor(origMby, "measured-by", services) + "<br><b>termination</b> " + modality
+            + getHTMLFor(origInfFlowSpecs, "determines", services) + "</html>";
     }
 
 
@@ -307,8 +308,12 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         }
         sig.append(pm.getName());
         sig.append("(");
-        for (Term pv : origParams) { sig.append(pv.toString()).append(", "); }
-        if (!origParams.isEmpty()) { sig.setLength(sig.length() - 2); }
+        for (Term pv : origParams) {
+            sig.append(pv.toString()).append(", ");
+        }
+        if (!origParams.isEmpty()) {
+            sig.setLength(sig.length() - 2);
+        }
         sig.append(")");
         sig.append(" catch(");
         sig.append(origExc);
@@ -340,7 +345,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
             Term term = it.next();
             final String quickPrint = LogicPrinter.quickPrintTerm(term, services);
             result.append(LogicPrinter.escapeHTML(quickPrint, false));
-            if (it.hasNext()) { result.append(", "); }
+            if (it.hasNext()) {
+                result.append(", ");
+            }
         }
         return result.toString();
     }
@@ -363,7 +370,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                 }
                 if (it.hasNext()) {
                     infFlowSpecString.append("<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                            + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "<b>and</b> ");
+                        + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "<b>and</b> ");
                 }
             }
         }
@@ -375,9 +382,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public String toString() {
         // TODO: all fields should be printed!!
         return name + ":: kjt: " + forClass + "; pm: " + pm + "; modality: " + modality + "; pre: "
-                + origPre + "; origFreePre: " + origFreePre + "; mby: " + origMby + "; modifiable: "
-                + origModifiable
-                + "; selfVar: " + origSelf + "; paramVars: " + origParams + "; id:" + id;
+            + origPre + "; origFreePre: " + origFreePre + "; mby: " + origMby + "; modifiable: "
+            + origModifiable
+            + "; selfVar: " + origSelf + "; paramVars: " + origParams + "; id:" + id;
     }
 
 
@@ -499,7 +506,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     public boolean equals(Contract c) {
-        if (!(c instanceof InformationFlowContract ifc)) { return false; }
+        if (!(c instanceof InformationFlowContract ifc)) {
+            return false;
+        }
         assert name != null;
         assert forClass != null;
         assert pm != null;

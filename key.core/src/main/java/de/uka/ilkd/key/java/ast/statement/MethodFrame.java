@@ -209,9 +209,15 @@ public class MethodFrame extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (resultVar != null) { result++; }
-        if (execContext != null) { result++; }
-        if (body != null) { result++; }
+        if (resultVar != null) {
+            result++;
+        }
+        if (execContext != null) {
+            result++;
+        }
+        if (body != null) {
+            result++;
+        }
         return result;
     }
 
@@ -227,15 +233,21 @@ public class MethodFrame extends JavaStatement
 
     public ProgramElement getChildAt(int index) {
         if (resultVar != null) {
-            if (index == 0) { return resultVar; }
+            if (index == 0) {
+                return resultVar;
+            }
             index--;
         }
         if (execContext != null) {
-            if (index == 0) { return execContext; }
+            if (index == 0) {
+                return execContext;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0) { return body; }
+            if (index == 0) {
+                return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -262,7 +274,9 @@ public class MethodFrame extends JavaStatement
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) { return body; }
+        if (body != null && index == 0) {
+            return body;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

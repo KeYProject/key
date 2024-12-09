@@ -175,7 +175,9 @@ public final class HeapLDT extends LDT {
             startAttributeName = endOfClassName + 2;
         }
 
-        if (endOfClassName < 0) { return null; }
+        if (endOfClassName < 0) {
+            return null;
+        }
 
         String className = name.substring(0, endOfClassName);
         String attributeName = name.substring(startAttributeName);
@@ -193,7 +195,9 @@ public final class HeapLDT extends LDT {
             return name;
         } else {
             String result = name.substring(index + 2);
-            if (result.charAt(0) == '$') { result = result.substring(1); }
+            if (result.charAt(0) == '$') {
+                result = result.substring(1);
+            }
             return result;
         }
     }
@@ -347,7 +351,11 @@ public final class HeapLDT extends LDT {
     }
 
     public LocationVariable getHeapForName(Name name) {
-        for (LocationVariable h : getAllHeaps()) { if (h.name().equals(name)) { return h; } }
+        for (LocationVariable h : getAllHeaps()) {
+            if (h.name().equals(name)) {
+                return h;
+            }
+        }
         return null;
     }
 
@@ -382,7 +390,9 @@ public final class HeapLDT extends LDT {
                 if (fieldPV.isModel()) {
                     int heapCount = 0;
                     for (LocationVariable heap : getAllHeaps()) {
-                        if (heap == getSavedHeap()) { continue; }
+                        if (heap == getSavedHeap()) {
+                            continue;
+                        }
                         heapCount++;
                     }
                     result = new ObserverFunction(kind.toString(), fieldPV.sort(),
@@ -408,8 +418,12 @@ public final class HeapLDT extends LDT {
 
     @Override
     public boolean containsFunction(Function op) {
-        if (super.containsFunction(op)) { return true; }
-        if (op instanceof SortDependingFunction) { return ((SortDependingFunction) op).isSimilar(select); }
+        if (super.containsFunction(op)) {
+            return true;
+        }
+        if (op instanceof SortDependingFunction) {
+            return ((SortDependingFunction) op).isSimilar(select);
+        }
         return op.isUnique() && op.sort() == getFieldSort();
     }
 
@@ -467,7 +481,9 @@ public final class HeapLDT extends LDT {
             ReferencePrefix prefix = (ReferencePrefix) children.remove(0);
             ProgramVariable field = (ProgramVariable) children.remove(0);
 
-            if (prefix instanceof NullLiteral) { return new FieldReference(field, null); }
+            if (prefix instanceof NullLiteral) {
+                return new FieldReference(field, null);
+            }
             return new FieldReference(field, prefix);
         } else if (t.sort() == getFieldSort() && t.op() instanceof JFunction
                 && ((Function) t.op()).isUnique()) {

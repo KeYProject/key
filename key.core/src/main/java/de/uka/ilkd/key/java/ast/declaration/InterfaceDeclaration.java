@@ -136,7 +136,9 @@ public class InterfaceDeclaration extends TypeDeclaration {
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) { return modArray.get(index); }
+            if (len > index) {
+                return modArray.get(index);
+            }
             index -= len;
         }
         if (name != null) {
@@ -151,7 +153,9 @@ public class InterfaceDeclaration extends TypeDeclaration {
         }
         if (members != null) {
             len = members.size();
-            if (len > index) { return members.get(index); }
+            if (len > index) {
+                return members.get(index);
+            }
             index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();

@@ -123,7 +123,9 @@ public class PosInProgram {
     private static PosInProgram add(PosInProgram first, PosInProgram second) {
         if (first == TOP) {
             return second;
-        } else if (second == TOP) { return first; }
+        } else if (second == TOP) {
+            return first;
+        }
 
         final int[] newPos = new int[first.depth + second.depth];
 
@@ -138,27 +140,45 @@ public class PosInProgram {
      * same position
      */
     public boolean equals(Object obj) {
-        if (this == obj) { return true; }
+        if (this == obj) {
+            return true;
+        }
 
-        if (obj == null || this.getClass() != obj.getClass()) { return false; }
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
 
         final PosInProgram cmp = (PosInProgram) obj;
 
-        if (depth != cmp.depth) { return false; }
+        if (depth != cmp.depth) {
+            return false;
+        }
 
-        for (int i = 0; i < depth; i++) { if (cmp.pos[i] != pos[i]) { return false; } }
+        for (int i = 0; i < depth; i++) {
+            if (cmp.pos[i] != pos[i]) {
+                return false;
+            }
+        }
         return true;
     }
 
     public boolean leq(PosInProgram pip) {
-        if (pip.depth < depth) { return false; }
+        if (pip.depth < depth) {
+            return false;
+        }
 
-        for (int i = 0; i < depth; i++) { if (pip.pos[i] < pos[i]) { return false; } }
+        for (int i = 0; i < depth; i++) {
+            if (pip.pos[i] < pos[i]) {
+                return false;
+            }
+        }
         return true;
     }
 
     public int get(int i) {
-        if (i >= depth || i < 0) { throw new ArrayIndexOutOfBoundsException(); }
+        if (i >= depth || i < 0) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
         return pos[i];
     }
 
@@ -187,8 +207,12 @@ public class PosInProgram {
     /** toString */
     public String toString() {
         final StringBuilder list = new StringBuilder("\"PosInProgram: \"[");
-        for (int i = 0; i < depth - 1; i++) { list.append(pos[i]).append(", "); }
-        if (depth > 0) { list.append(pos[depth - 1]); }
+        for (int i = 0; i < depth - 1; i++) {
+            list.append(pos[i]).append(", ");
+        }
+        if (depth > 0) {
+            list.append(pos[depth - 1]);
+        }
         return list.append("]").toString();
     }
 
@@ -214,7 +238,9 @@ public class PosInProgram {
 
     public int hashCode() {
         int hashCode = 0;
-        for (int i : pos) { hashCode = 31 * hashCode + i; }
+        for (int i : pos) {
+            hashCode = 31 * hashCode + i;
+        }
         return hashCode;
     }
 }

@@ -33,7 +33,9 @@ public class TypeOf extends ProgramTransformer {
 
         ExecutionContext ec = null;
 
-        if (insts.getContextInstantiation() != null) { ec = insts.getContextInstantiation().activeStatementContext(); }
+        if (insts.getContextInstantiation() != null) {
+            ec = insts.getContextInstantiation().activeStatementContext();
+        }
         KeYJavaType kjt = null;
         if (pe instanceof Expression) {
             kjt = services.getTypeConverter().getKeYJavaType((Expression) pe, ec);

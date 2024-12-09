@@ -76,7 +76,9 @@ public final class HTMLReport {
         ClassLoader classLoader = HTMLReport.class.getClassLoader();
         URL url = classLoader.getResource("report/html");
 
-        if (url == null) { throw new IOException("Could not load report template resource from report/html."); }
+        if (url == null) {
+            throw new IOException("Could not load report template resource from report/html.");
+        }
 
         STGroup group = new STRawGroupDir(url, "UTF-8", '$', '$');
 
@@ -106,7 +108,9 @@ public final class HTMLReport {
             public Object getProperty(Interpreter interp, ST self, Map<?, ?> map, Object property,
                     String propertyName)
                     throws STNoSuchPropertyException {
-                if (property.equals("entrySet")) { return map.entrySet(); }
+                if (property.equals("entrySet")) {
+                    return map.entrySet();
+                }
                 return super.getProperty(interp, self, map, property, propertyName);
             }
         });
@@ -126,7 +130,9 @@ public final class HTMLReport {
                     throws STNoSuchPropertyException {
                 if (property.equals("value")) {
                     return entry.getValue();
-                } else if (property.equals("key")) { return entry.getKey(); }
+                } else if (property.equals("key")) {
+                    return entry.getKey();
+                }
                 return super.getProperty(interp, self, entry, property, propertyName);
             }
         });

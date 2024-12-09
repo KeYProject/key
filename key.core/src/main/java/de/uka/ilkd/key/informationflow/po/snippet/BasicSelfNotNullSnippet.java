@@ -22,7 +22,7 @@ class BasicSelfNotNullSnippet implements FactoryMethod {
             (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         if (!(targetMethod instanceof IProgramMethod pm)) {
             throw new UnsupportedOperationException("Tried to produce "
-                    + "SELF_NOT_NULL for an observer " + "which is no IProgramMethod.");
+                + "SELF_NOT_NULL for an observer " + "which is no IProgramMethod.");
         }
         return (poVars.pre.self == null || pm.isConstructor()) ? d.tb.tt()
                 : d.tb.not(d.tb.equals(poVars.pre.self, d.tb.NULL()));

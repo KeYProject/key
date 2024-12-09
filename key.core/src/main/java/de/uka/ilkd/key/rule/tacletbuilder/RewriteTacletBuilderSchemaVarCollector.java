@@ -35,11 +35,15 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
         Set<SchemaVariable> result = new LinkedHashSet<>(collectSchemaVariables(rtb.ifSequent()));
 
-        if (rtb instanceof FindTacletBuilder) { result.addAll(collectSchemaVariables(rtb.getFind())); }
+        if (rtb instanceof FindTacletBuilder) {
+            result.addAll(collectSchemaVariables(rtb.getFind()));
+        }
 
         for (TacletGoalTemplate tgt : rtb.goalTemplates()) {
             result.addAll(collectSchemaVariables(tgt));
-            for (Taclet tacletInAddrules : tgt.rules()) { result.addAll(tacletInAddrules.collectSchemaVars()); }
+            for (Taclet tacletInAddrules : tgt.rules()) {
+                result.addAll(tacletInAddrules.collectSchemaVars());
+            }
         }
 
         return result;
@@ -57,7 +61,9 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
             @Override
             public void visit(Term visited) {
-                if (visited.op() instanceof SchemaVariable) { result.add((SchemaVariable) visited.op()); }
+                if (visited.op() instanceof SchemaVariable) {
+                    result.add((SchemaVariable) visited.op());
+                }
             }
 
 
@@ -80,7 +86,9 @@ public class RewriteTacletBuilderSchemaVarCollector {
     private Set<SchemaVariable> collectSchemaVariables(Sequent s) {
         Set<SchemaVariable> result = new LinkedHashSet<>();
 
-        for (final SequentFormula cf : s) { result.addAll(collectSchemaVariables(cf.formula())); }
+        for (final SequentFormula cf : s) {
+            result.addAll(collectSchemaVariables(cf.formula()));
+        }
 
         return result;
     }

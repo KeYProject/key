@@ -277,7 +277,9 @@ public class TestApplyUpdateOnRigidCondition {
         // First two arguments are not used by this check
         mc = cond.check(null, null, mc, TacletForTests.services());
 
-        if (mc == null) { return term; }
+        if (mc == null) {
+            return term;
+        }
 
         return mc.getInstantiations().getTermInstantiation(result, null, TacletForTests.services());
     }

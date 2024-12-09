@@ -271,7 +271,9 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     public static synchronized SymbolicExecutionJavaProfile getDefaultInstance(
             boolean truthValueEvaluationEnabled) {
         if (!truthValueEvaluationEnabled) {
-            if (defaultInstance == null) { defaultInstance = new SymbolicExecutionJavaProfile(false); }
+            if (defaultInstance == null) {
+                defaultInstance = new SymbolicExecutionJavaProfile(false);
+            }
             return defaultInstance;
         } else {
             if (defaultInstanceWithTruthValueEvaluation == null) {

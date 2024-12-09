@@ -372,7 +372,9 @@ public abstract class ProgramSVSort extends SortImpl {
             ProgramVariable accessedField = null;
             if (pe instanceof FieldReference) {
                 accessedField = ((FieldReference) pe).getProgramVariable();
-            } else if (pe instanceof ProgramVariable) { accessedField = (ProgramVariable) pe; }
+            } else if (pe instanceof ProgramVariable) {
+                accessedField = (ProgramVariable) pe;
+            }
 
             if (accessedField != null && accessedField.isStatic()
                     && !(accessedField instanceof ProgramConstant)) {
@@ -400,7 +402,9 @@ public abstract class ProgramSVSort extends SortImpl {
             ProgramVariable accessedField = null;
             if (pe instanceof FieldReference) {
                 accessedField = ((FieldReference) pe).getProgramVariable();
-            } else if (pe instanceof ProgramVariable) { accessedField = (ProgramVariable) pe; }
+            } else if (pe instanceof ProgramVariable) {
+                accessedField = (ProgramVariable) pe;
+            }
             if (accessedField != null) {
                 return accessedField.isStatic() && !(accessedField instanceof ProgramConstant)
                         && super.canStandFor(pe, services);
@@ -455,11 +459,17 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
-            if (pe instanceof Negative) { return ((Negative) pe).getChildAt(0) instanceof Literal; }
+            if (pe instanceof Negative) {
+                return ((Negative) pe).getChildAt(0) instanceof Literal;
+            }
 
-            if (pe instanceof StringLiteral) { return false; }
+            if (pe instanceof StringLiteral) {
+                return false;
+            }
 
-            if (pe instanceof Literal) { return true; }
+            if (pe instanceof Literal) {
+                return true;
+            }
 
             if (pe instanceof Instanceof) {
                 ProgramElement v = ((Instanceof) pe).getChildAt(0);
@@ -473,7 +483,9 @@ public abstract class ProgramSVSort extends SortImpl {
                     || pe instanceof SeqSub || pe instanceof SeqReverse || pe instanceof SeqPut) {
                 if (pe instanceof NonTerminalProgramElement npe) {
                     for (int i = 0, childCount = npe.getChildCount(); i < childCount; i++) {
-                        if (!canStandFor(npe.getChildAt(i), services)) { return false; }
+                        if (!canStandFor(npe.getChildAt(i), services)) {
+                            return false;
+                        }
                     }
                 }
                 return true;
@@ -520,7 +532,9 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
-            if (!(check instanceof Expression) || check instanceof SuperReference) { return false; }
+            if (!(check instanceof Expression) || check instanceof SuperReference) {
+                return false;
+            }
             return !SIMPLEEXPRESSION.canStandFor(check, services);
         }
     }
@@ -612,9 +626,13 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
-            if (!(check instanceof New)) { return false; }
+            if (!(check instanceof New)) {
+                return false;
+            }
             for (Expression arg : ((New) check).getArguments()) {
-                if (NONSIMPLEEXPRESSION.canStandFor(arg, services)) { return false; }
+                if (NONSIMPLEEXPRESSION.canStandFor(arg, services)) {
+                    return false;
+                }
             }
             return true;
         }
@@ -633,9 +651,13 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
-            if (!(check instanceof New)) { return false; }
+            if (!(check instanceof New)) {
+                return false;
+            }
             for (Expression arg : ((New) check).getArguments()) {
-                if (NONSIMPLEEXPRESSION.canStandFor(arg, services)) { return true; }
+                if (NONSIMPLEEXPRESSION.canStandFor(arg, services)) {
+                    return true;
+                }
             }
             return false;
         }
@@ -771,10 +793,14 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
-            if (!(pe instanceof MethodBodyStatement)) { return false; }
+            if (!(pe instanceof MethodBodyStatement)) {
+                return false;
+            }
 
             final IProgramMethod pm = ((MethodBodyStatement) pe).getProgramMethod(services);
-            if (pm == null) { return false; }
+            if (pm == null) {
+                return false;
+            }
             final MethodDeclaration methodDeclaration = pm.getMethodDeclaration();
 
             return !(// pm.isModel() ||
@@ -806,9 +832,13 @@ public abstract class ProgramSVSort extends SortImpl {
                         && NONSIMPLEEXPRESSION.canStandFor(mr.getReferencePrefix(), services)) {
                     return false;
                 }
-                if (mr.getArguments() == null) { return false; }
+                if (mr.getArguments() == null) {
+                    return false;
+                }
                 for (int i = 0; i < mr.getArguments().size(); i++) {
-                    if (NONSIMPLEEXPRESSION.canStandFor(mr.getArgumentAt(i), services)) { return true; }
+                    if (NONSIMPLEEXPRESSION.canStandFor(mr.getArgumentAt(i), services)) {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -862,7 +892,9 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
-            if (!(check instanceof TypeReference)) { return false; }
+            if (!(check instanceof TypeReference)) {
+                return false;
+            }
             return ((TypeReference) (check)).getKeYJavaType()
                     .getJavaType() instanceof PrimitiveType;
         }
@@ -893,8 +925,12 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
-            if (!(check instanceof TypeReference)) { return false; }
-            if (((TypeReference) (check)).getKeYJavaType().getJavaType() instanceof PrimitiveType) { return false; }
+            if (!(check instanceof TypeReference)) {
+                return false;
+            }
+            if (((TypeReference) (check)).getKeYJavaType().getJavaType() instanceof PrimitiveType) {
+                return false;
+            }
             if (matchName != null) {
                 return matchName.equals(
                     ((TypeReference) (check)).getKeYJavaType().getJavaType().getFullName());
@@ -948,7 +984,9 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
-            if (pe instanceof MethodName) { return methodName == null || pe.equals(methodName); }
+            if (pe instanceof MethodName) {
+                return methodName == null || pe.equals(methodName);
+            }
             return false;
         }
 
@@ -991,7 +1029,9 @@ public abstract class ProgramSVSort extends SortImpl {
         /* Will only match on String variables */
         @Override
         public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
-            if (!super.canStandFor(check, ec, services)) { return false; }
+            if (!super.canStandFor(check, ec, services)) {
+                return false;
+            }
             // String Literal has SideEffects, but SimpleExpressionSort will not match
             // if (check instanceof StringLiteral) return false;
             if (check instanceof ProgramVariable) {
@@ -1015,7 +1055,9 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
-            if (!super.canStandFor(check, ec, services)) { return false; }
+            if (!super.canStandFor(check, ec, services)) {
+                return false;
+            }
             if (check instanceof ProgramVariable) {
                 final Sort checkSort = ((ProgramVariable) check).sort();
                 Namespace<Sort> ns = services.getNamespaces().sorts();
@@ -1046,11 +1088,17 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
-            if (!super.canStandFor(check, ec, services)) { return false; }
+            if (!super.canStandFor(check, ec, services)) {
+                return false;
+            }
             final KeYJavaType kjt = getKeYJavaType(check, ec, services);
             if (kjt != null) {
                 final Type type = kjt.getJavaType();
-                for (PrimitiveType allowedType : allowedPrimitiveTypes) { if (type == allowedType) { return true; } }
+                for (PrimitiveType allowedType : allowedPrimitiveTypes) {
+                    if (type == allowedType) {
+                        return true;
+                    }
+                }
             }
             return false;
         }
@@ -1071,11 +1119,17 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
-            if (!super.canStandFor(check, ec, services)) { return false; }
+            if (!super.canStandFor(check, ec, services)) {
+                return false;
+            }
             final KeYJavaType kjt = getKeYJavaType(check, ec, services);
             if (kjt != null) {
                 final Type type = kjt.getJavaType();
-                for (PrimitiveType forbidden_type : forbidden_types) { if (type == forbidden_type) { return false; } }
+                for (PrimitiveType forbidden_type : forbidden_types) {
+                    if (type == forbidden_type) {
+                        return false;
+                    }
+                }
             }
             return true;
         }
@@ -1096,13 +1150,19 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
-            if (!super.canStandFor(check, ec, services)) { return false; }
+            if (!super.canStandFor(check, ec, services)) {
+                return false;
+            }
 
             final KeYJavaType kjt = getKeYJavaType(check, ec, services);
             if (kjt != null) {
                 final Type type = kjt.getJavaType();
 
-                for (PrimitiveType allowedType : allowedPrimitiveTypes) { if (type == allowedType) { return true; } }
+                for (PrimitiveType allowedType : allowedPrimitiveTypes) {
+                    if (type == allowedType) {
+                        return true;
+                    }
+                }
             }
             return false;
         }
@@ -1232,7 +1292,9 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
-            if (check instanceof ProgramVariable) { return check == services.getJavaInfo().getArrayLength(); }
+            if (check instanceof ProgramVariable) {
+                return check == services.getJavaInfo().getArrayLength();
+            }
             return false;
         }
     }
@@ -1260,7 +1322,9 @@ public abstract class ProgramSVSort extends SortImpl {
         for (final Object o : l) {
             if (o instanceof ProgramSV psv && (psv.sort() == this)) {
                 return (ProgramElement) o;
-            } else if ((alternative.isInstance(o)) && (!(o instanceof SchemaVariable))) { return (ProgramElement) o; }
+            } else if ((alternative.isInstance(o)) && (!(o instanceof SchemaVariable))) {
+                return (ProgramElement) o;
+            }
         }
         return null;
     }
@@ -1270,7 +1334,11 @@ public abstract class ProgramSVSort extends SortImpl {
     }
 
     static boolean implicit(ProgramElement pe) {
-        if (pe instanceof ProgramVariable) { if (!((ProgramVariable) pe).isMember()) { return false; } }
+        if (pe instanceof ProgramVariable) {
+            if (!((ProgramVariable) pe).isMember()) {
+                return false;
+            }
+        }
 
         final String elemname;
         if (pe instanceof NamedProgramElement) {

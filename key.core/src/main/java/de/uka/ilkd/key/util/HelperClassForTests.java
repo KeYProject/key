@@ -216,8 +216,12 @@ public class HelperClassForTests {
                     contract.createProofObl(environment.getInitConfig(), contract));
                 // Assert.assertNotNull(proof);
             } catch (Exception e) {
-                if (proof != null) { proof.dispose(); }
-                if (environment != null) { environment.dispose(); }
+                if (proof != null) {
+                    proof.dispose();
+                }
+                if (environment != null) {
+                    environment.dispose();
+                }
             }
         }
         return setDefaultTacletOptions();

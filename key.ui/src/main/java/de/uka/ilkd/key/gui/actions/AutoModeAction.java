@@ -43,11 +43,15 @@ public final class AutoModeAction extends MainWindowAction {
     private final ProofTreeListener ptl = new ProofTreeAdapter() {
 
         public void proofStructureChanged(ProofTreeEvent e) {
-            if (e.getSource() == associatedProof) { enable(); }
+            if (e.getSource() == associatedProof) {
+                enable();
+            }
         }
 
         public void proofClosed(ProofTreeEvent e) {
-            if (e.getSource() == associatedProof) { enable(); }
+            if (e.getSource() == associatedProof) {
+                enable();
+            }
         }
 
         public void proofGoalsAdded(ProofTreeEvent e) {
@@ -84,12 +88,16 @@ public final class AutoModeAction extends MainWindowAction {
              * available or not
              */
             public void selectedProofChanged(KeYSelectionEvent e) {
-                if (associatedProof != null) { associatedProof.removeProofTreeListener(ptl); }
+                if (associatedProof != null) {
+                    associatedProof.removeProofTreeListener(ptl);
+                }
 
                 associatedProof = e.getSource().getSelectedProof();
                 enable();
 
-                if (associatedProof != null) { associatedProof.addProofTreeListener(ptl); }
+                if (associatedProof != null) {
+                    associatedProof.addProofTreeListener(ptl);
+                }
             }
         });
 
@@ -102,7 +110,9 @@ public final class AutoModeAction extends MainWindowAction {
              * invoked if automatic execution has started
              */
             public void autoModeStarted(ProofEvent e) {
-                if (associatedProof != null) { associatedProof.removeProofTreeListener(ptl); }
+                if (associatedProof != null) {
+                    associatedProof.removeProofTreeListener(ptl);
+                }
                 putValue(Action.NAME, "Stop");
                 putValue(Action.SMALL_ICON, stopLogo);
                 putValue(Action.ACCELERATOR_KEY, STOP_KEY);

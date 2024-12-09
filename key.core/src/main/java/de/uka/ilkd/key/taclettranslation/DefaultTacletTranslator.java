@@ -65,8 +65,12 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
         }
         Term add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
-        if (add == null) { add = TacletSections.ADD.getDefaultValue(services); }
-        if (replace == null) { replace = TacletSections.REPLACE.getDefaultValue(services); }
+        if (add == null) {
+            add = TacletSections.ADD.getDefaultValue(services);
+        }
+        if (replace == null) {
+            replace = TacletSections.REPLACE.getDefaultValue(services);
+        }
 
         return tb.imp(tb.equals(find, replace), add);
     }
@@ -97,11 +101,16 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
         Term add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
-        if (add == null) { add = TacletSections.ADD.getDefaultValue(services); }
-        if (replace == null) { replace = TacletSections.REPLACE.getDefaultValue(services); }
+        if (add == null) {
+            add = TacletSections.ADD.getDefaultValue(services);
+        }
+        if (replace == null) {
+            replace = TacletSections.REPLACE.getDefaultValue(services);
+        }
 
         assert polarity == 0 || add == TacletSections.ADD
-                .getDefaultValue(services) : "add() commands not allowed in polarity rules (syntactically forbidden)";
+                .getDefaultValue(services)
+                : "add() commands not allowed in polarity rules (syntactically forbidden)";
 
         return tb.imp(translateEquivalence(find, replace, polarity, services), add);
 
@@ -130,8 +139,12 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
                 : TacletSections.ADD.getDefaultValue(services);
         Term rep = replace == null ? TacletSections.REPLACE.getDefaultValue(services)
                 : translate(replace, services);
-        if (add == null) { add = TacletSections.ADD.getDefaultValue(services); }
-        if (rep == null) { rep = TacletSections.REPLACE.getDefaultValue(services); }
+        if (add == null) {
+            add = TacletSections.ADD.getDefaultValue(services);
+        }
+        if (rep == null) {
+            rep = TacletSections.REPLACE.getDefaultValue(services);
+        }
         return tb.or(rep, add);
     }
 
@@ -151,7 +164,9 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
         // translate the find pattern.
         if (taclet instanceof FindTaclet findTaclet) {
-            if (getFindFromTaclet(findTaclet) != null) { find = getFindFromTaclet(findTaclet); }
+            if (getFindFromTaclet(findTaclet) != null) {
+                find = getFindFromTaclet(findTaclet);
+            }
         }
 
         // translate the replace and add patterns of the taclet.
@@ -190,7 +205,9 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
 
         if (taclet instanceof AntecTaclet || taclet instanceof SuccTaclet) {
-            if (taclet instanceof AntecTaclet) { find = tb.not(find); }
+            if (taclet instanceof AntecTaclet) {
+                find = tb.not(find);
+            }
             return tb.imp(tb.and(list), tb.or(find, assum));
         }
         return tb.imp(tb.and(list), assum);

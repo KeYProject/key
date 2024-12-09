@@ -53,7 +53,9 @@ public class LicenseAction extends MainWindowAction {
                 new InputStreamReader(resource.openStream(), StandardCharsets.UTF_8);
             int c;
             char[] buf = new char[1024];
-            while ((c = inp.read(buf)) > 0) { sb.append(buf, 0, c); }
+            while ((c = inp.read(buf)) > 0) {
+                sb.append(buf, 0, c);
+            }
             inp.close();
         } catch (IOException ioe) {
             return fallback;

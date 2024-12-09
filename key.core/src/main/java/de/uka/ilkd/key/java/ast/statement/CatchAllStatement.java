@@ -46,8 +46,12 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int i = 0;
-        if (body != null) { i++; }
-        if (param != null) { i++; }
+        if (body != null) {
+            i++;
+        }
+        if (param != null) {
+            i++;
+        }
         return i;
     }
 
@@ -72,8 +76,12 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
      *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (index == 0) { return param; }
-        if (index == 1) { return body; }
+        if (index == 0) {
+            return param;
+        }
+        if (index == 1) {
+            return body;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

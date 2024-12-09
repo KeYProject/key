@@ -142,11 +142,19 @@ public class TestProofUserManager {
         }
         // Made sure that correct proofs are known
         Proof[] currentFirstEnvProofs = ProofUserManager.getInstance().getProofs(firstEnv);
-        for (Proof proof : currentFirstEnvProofs) { assertTrue(ArrayUtil.contains(firstEnvProofs, proof)); }
-        for (Proof proof : firstEnvProofs) { assertTrue(ArrayUtil.contains(currentFirstEnvProofs, proof)); }
+        for (Proof proof : currentFirstEnvProofs) {
+            assertTrue(ArrayUtil.contains(firstEnvProofs, proof));
+        }
+        for (Proof proof : firstEnvProofs) {
+            assertTrue(ArrayUtil.contains(currentFirstEnvProofs, proof));
+        }
         Proof[] currentSecondEnvProofs = ProofUserManager.getInstance().getProofs(secondEnv);
-        for (Proof proof : currentSecondEnvProofs) { assertTrue(ArrayUtil.contains(secondEnvProofs, proof)); }
-        for (Proof proof : secondEnvProofs) { assertTrue(ArrayUtil.contains(currentSecondEnvProofs, proof)); }
+        for (Proof proof : currentSecondEnvProofs) {
+            assertTrue(ArrayUtil.contains(secondEnvProofs, proof));
+        }
+        for (Proof proof : secondEnvProofs) {
+            assertTrue(ArrayUtil.contains(currentSecondEnvProofs, proof));
+        }
     }
 
     /**
@@ -338,7 +346,9 @@ public class TestProofUserManager {
         Object[] users = ProofUserManager.getInstance().getUsers(proof);
         assertNotNull(users);
         assertEquals(expectedUsers.length, users.length);
-        for (Object user : expectedUsers) { assertTrue(ArrayUtil.contains(users, user)); }
+        for (Object user : expectedUsers) {
+            assertTrue(ArrayUtil.contains(users, user));
+        }
     }
 
     /**
@@ -351,7 +361,9 @@ public class TestProofUserManager {
         Proof[] proofs = ProofUserManager.getInstance().getProofs();
         assertNotNull(proofs);
         assertEquals(expectedProofs.length, proofs.length);
-        for (Proof proof : expectedProofs) { assertTrue(ArrayUtil.contains(proofs, proof)); }
+        for (Proof proof : expectedProofs) {
+            assertTrue(ArrayUtil.contains(proofs, proof));
+        }
     }
 
     /**

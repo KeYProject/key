@@ -86,7 +86,7 @@ public class RecoderExample {
         System.out.println("Read Original:\n" + block);
         System.out.println("Transforming...");
         System.out.println("Transformed:\n"
-                + (JavaBlock.createJavaBlock(ex.transform((StatementBlock) block.program()))));
+            + (JavaBlock.createJavaBlock(ex.transform((StatementBlock) block.program()))));
         System.out.println("The original is left untouched:\n" + block);
     }
 

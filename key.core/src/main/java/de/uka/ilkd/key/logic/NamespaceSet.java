@@ -157,7 +157,12 @@ public class NamespaceSet {
      *         <tt>null</tt>
      */
     private Named lookup(Name name, final Namespace<?>[] spaces) {
-        for (Namespace<?> space : spaces) { final Named n = space.lookup(name); if (n != null) { return n; } }
+        for (Namespace<?> space : spaces) {
+            final Named n = space.lookup(name);
+            if (n != null) {
+                return n;
+            }
+        }
         return null;
     }
 
@@ -165,13 +170,17 @@ public class NamespaceSet {
     @Override
     public String toString() {
         return "Sorts: " + sorts() + "\n" + "Functions: " + functions() + "\n" + "Variables: "
-                + variables() + "\n" + "ProgramVariables: " + programVariables() + "\n" + "Heuristics: "
-                + ruleSets() + "\n" + "Taclet Options: " + choices() + "\n";
+            + variables() + "\n" + "ProgramVariables: " + programVariables() + "\n" + "Heuristics: "
+            + ruleSets() + "\n" + "Taclet Options: " + choices() + "\n";
     }
 
 
     public <T extends Name> boolean containsAll(Iterable<T> names) {
-        for (Name name : names) { if (lookupLogicSymbol(name) == null) { return false; } }
+        for (Name name : names) {
+            if (lookupLogicSymbol(name) == null) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -202,7 +211,9 @@ public class NamespaceSet {
     }
 
     public void flushToParent() {
-        for (Namespace<?> ns : asArray()) { ns.flushToParent(); }
+        for (Namespace<?> ns : asArray()) {
+            ns.flushToParent();
+        }
     }
 
     public NamespaceSet getParent() {

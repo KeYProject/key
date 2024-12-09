@@ -48,7 +48,11 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
 
     private static Set<String> parseStringSet(String o) {
         Set<String> set = new TreeSet<>();
-        for (String entry : o.split(SET_DELIMITER)) { if (!entry.isEmpty()) { set.add(entry.trim()); } }
+        for (String entry : o.split(SET_DELIMITER)) {
+            if (!entry.isEmpty()) {
+                set.add(entry.trim());
+            }
+        }
         return set;
     }
 
@@ -89,7 +93,9 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     public void readSettings(Properties props) {
         propertyEntries.forEach(it -> {
             String value = props.getProperty(it.getKey());
-            if (value != null) { it.parseFrom(value); }
+            if (value != null) {
+                it.parseFrom(value);
+            }
         });
     }
 
@@ -108,7 +114,9 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
             return;
         propertyEntries.forEach(it -> {
             final var value = it.fromObject(cat.get(it.getKey()));
-            if (value != null) { properties.put(it.getKey(), value); }
+            if (value != null) {
+                properties.put(it.getKey(), value);
+            }
         });
     }
 

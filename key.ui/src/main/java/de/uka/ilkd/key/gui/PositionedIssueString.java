@@ -59,9 +59,15 @@ public class PositionedIssueString extends PositionedString
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        if (!super.equals(o)) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         PositionedIssueString that = (PositionedIssueString) o;
         return additionalInfo.equals(that.additionalInfo) && kind.equals(that.kind);
     }
@@ -74,7 +80,9 @@ public class PositionedIssueString extends PositionedString
     @Override
     public int compareTo(PositionedIssueString o) {
         int compareLocation = location.compareTo(o.location);
-        if (compareLocation != 0) { return compareLocation; }
+        if (compareLocation != 0) {
+            return compareLocation;
+        }
         return kind.compareTo(o.kind);
     }
 }

@@ -114,7 +114,9 @@ public class TestDropEffectlessElementary {
         // first 2 args are not used in the following method, hence, can be null.
         mc = cond.check(null, null, mc, TacletForTests.services());
 
-        if (mc == null) { return term; }
+        if (mc == null) {
+            return term;
+        }
 
         return mc.getInstantiations().getTermInstantiation(result, null, TacletForTests.services());
     }

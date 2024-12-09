@@ -54,7 +54,9 @@ public final class EqualUniqueCondition implements VariableCondition {
         Term tInst = (Term) svInst.getInstantiation(t);
         Term t2Inst = (Term) svInst.getInstantiation(t2);
         Term resInst = (Term) svInst.getInstantiation(res);
-        if (tInst == null || t2Inst == null) { return mc; }
+        if (tInst == null || t2Inst == null) {
+            return mc;
+        }
 
         Term properResInst = equalUnique(tInst, t2Inst, services);
         if (properResInst == null) {

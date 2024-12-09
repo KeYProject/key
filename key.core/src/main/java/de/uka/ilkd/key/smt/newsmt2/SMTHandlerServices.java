@@ -76,7 +76,9 @@ public class SMTHandlerServices {
      * @return non-null instance of this class. Always the same.
      */
     public static SMTHandlerServices getInstance() {
-        if (theInstance == null) { theInstance = new SMTHandlerServices(); }
+        if (theInstance == null) {
+            theInstance = new SMTHandlerServices();
+        }
         return theInstance;
     }
 
@@ -115,7 +117,9 @@ public class SMTHandlerServices {
         for (String name : handlerNames) {
             try {
                 Class<SMTHandler> handlerClass = (Class<SMTHandler>) Class.forName(name);
-                if (findHandler(handlerClass, result)) { continue; }
+                if (findHandler(handlerClass, result)) {
+                    continue;
+                }
                 synchronized (handlerModificationLock) {
                     /*
                      * Make sure that each handler is added to the template handlers (keyset of
@@ -127,7 +131,9 @@ public class SMTHandlerServices {
                         SMTHandler handler = handlerClass.getConstructor().newInstance();
                         result.add(handler);
                         Properties handlerSnippets = loadSnippets(handlerClass);
-                        if (handlerSnippets != null) { snippetMap.put(handler, handlerSnippets); }
+                        if (handlerSnippets != null) {
+                            snippetMap.put(handler, handlerSnippets);
+                        }
                         smtProperties.addAll(handler.getProperties());
                     }
                 }
@@ -151,7 +157,9 @@ public class SMTHandlerServices {
         Optional<SMTHandler> handler =
             snippetMap.keySet().stream().filter(h -> h.getClass().equals(clazz)).findFirst();
         if (handler.isPresent()) {
-            if (!result.contains(handler.get())) { result.add(handler.get()); }
+            if (!result.contains(handler.get())) {
+                result.add(handler.get());
+            }
             return true;
         }
         return false;

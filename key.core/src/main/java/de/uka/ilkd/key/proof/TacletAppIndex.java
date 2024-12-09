@@ -123,8 +123,12 @@ public class TacletAppIndex {
 
     private void createNewIndexCache() {
         indexCaches = new TermTacletAppIndexCacheSet(cache);
-        if (antecIndex != null) { antecIndex.setIndexCache(indexCaches); }
-        if (succIndex != null) { succIndex.setIndexCache(indexCaches); }
+        if (antecIndex != null) {
+            antecIndex.setIndexCache(indexCaches);
+        }
+        if (succIndex != null) {
+            succIndex.setIndexCache(indexCaches);
+        }
     }
 
     /**
@@ -208,7 +212,9 @@ public class TacletAppIndex {
         for (NoPosTacletApp tacletApp : tacletInsts) {
             if (tacletApp.taclet() instanceof FindTaclet) {
                 PosTacletApp newTacletApp = tacletApp.setPosInOccurrence(pos, services);
-                if (newTacletApp != null) { result = result.prepend(newTacletApp); }
+                if (newTacletApp != null) {
+                    result = result.prepend(newTacletApp);
+                }
             } else {
                 result = result.prepend(tacletApp);
             }
@@ -352,7 +358,9 @@ public class TacletAppIndex {
         }
 
         if (tacletApp.taclet() instanceof NoFindTaclet) {
-            if (ruleFilter.filter(tacletApp.taclet())) { newRuleListener.ruleAdded(tacletApp, null); }
+            if (ruleFilter.filter(tacletApp.taclet())) {
+                newRuleListener.ruleAdded(tacletApp, null);
+            }
             return;
         }
 
@@ -389,13 +397,17 @@ public class TacletAppIndex {
         final SetRuleFilter newTaclets = new SetRuleFilter();
         for (NoPosTacletApp tacletApp : tacletApps) {
             if (tacletApp.taclet() instanceof NoFindTaclet) {
-                if (ruleFilter.filter(tacletApp.taclet())) { newRuleListener.ruleAdded(tacletApp, null); }
+                if (ruleFilter.filter(tacletApp.taclet())) {
+                    newRuleListener.ruleAdded(tacletApp, null);
+                }
             } else {
                 newTaclets.addRuleToSet(tacletApp.taclet());
             }
         }
 
-        if (newTaclets.isEmpty()) { return; }
+        if (newTaclets.isEmpty()) {
+            return;
+        }
 
         updateIndices(newTaclets);
     }
@@ -422,13 +434,15 @@ public class TacletAppIndex {
 
     public String toString() {
         return "TacletAppIndex with indexing, getting Taclets from" + " TacletIndex "
-                + tacletIndex;
+            + tacletIndex;
     }
 
     // helper because IList<NoPosTacletApp> is no IList<TacletApp>
     private static ImmutableList<TacletApp> prepend(ImmutableList<TacletApp> l1,
             ImmutableList<NoPosTacletApp> l2) {
-        for (NoPosTacletApp aL2 : l2) { l1 = l1.prepend(aL2); }
+        for (NoPosTacletApp aL2 : l2) {
+            l1 = l1.prepend(aL2);
+        }
         return l1;
     }
 
@@ -464,8 +478,12 @@ public class TacletAppIndex {
      * taclet app.
      */
     public void reportRuleApps(NewRuleListener l, Services services) {
-        if (antecIndex != null) { antecIndex.reportRuleApps(l); }
-        if (succIndex != null) { succIndex.reportRuleApps(l); }
+        if (antecIndex != null) {
+            antecIndex.reportRuleApps(l);
+        }
+        if (succIndex != null) {
+            succIndex.reportRuleApps(l);
+        }
 
         l.rulesAdded(getNoFindTaclet(TacletFilter.TRUE, services), null);
     }

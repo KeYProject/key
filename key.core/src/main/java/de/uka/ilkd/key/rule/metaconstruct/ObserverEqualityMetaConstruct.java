@@ -98,7 +98,9 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
             throw new IllegalArgumentException("\\sameObserver must be true for " + NAME);
         }
 
-        if (obs1 != obs2) { throw new IllegalArgumentException("\\sameObserver must be true"); }
+        if (obs1 != obs2) {
+            throw new IllegalArgumentException("\\sameObserver must be true");
+        }
 
         KeYJavaType kjt = obs1.isStatic() ? obs1.getContainerType()
                 : services.getTypeConverter().getKeYJavaType(termExt.sub(1));

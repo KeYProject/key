@@ -72,8 +72,8 @@ public class ExecutionExceptionalMethodReturn extends AbstractExecutionMethodRet
     protected String lazyComputeSignature() throws ProofInputException {
         String methodName = getMethodCall().getName();
         return INTERNAL_NODE_NAME_START + "exceptional return"
-                + (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "")
-                + INTERNAL_NODE_NAME_END;
+            + (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "")
+            + INTERNAL_NODE_NAME_END;
     }
 
     /**

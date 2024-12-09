@@ -149,8 +149,12 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl>
     @Override
     public void dispose() {
         Proof proof = getProof();
-        if (builder != null) { builder.dispose(); }
-        if (proof != null && !proof.isDisposed() && proof != getLoadedProof()) { proof.dispose(); }
+        if (builder != null) {
+            builder.dispose();
+        }
+        if (proof != null && !proof.isDisposed() && proof != getLoadedProof()) {
+            proof.dispose();
+        }
         super.dispose();
     }
 }

@@ -123,23 +123,35 @@ class LabeledTermImpl extends TermImpl {
     @Override
     public boolean containsLabel(TermLabel label) {
         assert label != null : "Label must not be null";
-        for (int i = 0, sz = labels.size(); i < sz; i++) { if (label.equals(labels.get(i))) { return true; } }
+        for (int i = 0, sz = labels.size(); i < sz; i++) {
+            if (label.equals(labels.get(i))) {
+                return true;
+            }
+        }
         return false;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true; }
+        if (o == this) {
+            return true;
+        }
 
         if (o instanceof final LabeledTermImpl cmp) {
-            if (labels.size() != cmp.labels.size()) { return false; }
+            if (labels.size() != cmp.labels.size()) {
+                return false;
+            }
 
-            if (!super.equals(o)) { return false; }
+            if (!super.equals(o)) {
+                return false;
+            }
 
             if (labels.size() == cmp.labels.size()) {
                 for (int i = 0, sz = labels.size(); i < sz; i++) {
                     // this is not optimal, but as long as number of labels limited ok
-                    if (!cmp.labels.contains(labels.get(i))) { return false; }
+                    if (!cmp.labels.contains(labels.get(i))) {
+                        return false;
+                    }
                 }
                 return true;
             }
@@ -150,7 +162,9 @@ class LabeledTermImpl extends TermImpl {
     @Override
     public int computeHashCode() {
         int hash = super.computeHashCode();
-        for (int i = 0, sz = labels.size(); i < sz; i++) { hash += 7 * labels.get(i).hashCode(); }
+        for (int i = 0, sz = labels.size(); i < sz; i++) {
+            hash += 7 * labels.get(i).hashCode();
+        }
         return hash;
     }
 

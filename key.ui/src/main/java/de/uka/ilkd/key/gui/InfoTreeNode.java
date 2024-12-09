@@ -62,7 +62,7 @@ public class InfoTreeNode extends DefaultMutableTreeNode {
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), null);
         lp.printTaclet(taclet);
         description = lp.result() + "\n\n Defined at:" + taclet.getOrigin()
-                + "\n\n under options:" + taclet.getChoices();
+            + "\n\n under options:" + taclet.getChoices();
     }
 
     InfoTreeNode(String title, String description) {

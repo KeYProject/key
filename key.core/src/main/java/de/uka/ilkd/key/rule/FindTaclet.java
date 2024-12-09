@@ -145,7 +145,9 @@ public abstract class FindTaclet extends Taclet {
 
             ifFindVariables = getIfVariables();
 
-            for (final SchemaVariable sv : svc.vars()) { ifFindVariables = ifFindVariables.add(sv); }
+            for (final SchemaVariable sv : svc.vars()) {
+                ifFindVariables = ifFindVariables.add(sv);
+            }
         }
 
         return ifFindVariables;
@@ -153,7 +155,9 @@ public abstract class FindTaclet extends Taclet {
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o)) { return false; }
+        if (!super.equals(o)) {
+            return false;
+        }
         return find.equals(((FindTaclet) o).find);
     }
 

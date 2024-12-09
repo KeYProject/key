@@ -17,6 +17,6 @@ public class NotUniqueException extends Exception {
     @Override
     public String toString() {
         return "Tried to add a duplicate object to set. Offender is \n" + offender +
-                (offender != null ? " of class " + offender.getClass() : "");
+            (offender != null ? " of class " + offender.getClass() : "");
     }
 }

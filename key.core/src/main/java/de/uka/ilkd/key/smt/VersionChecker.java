@@ -36,7 +36,9 @@ public class VersionChecker {
             try (BufferedReader r = new BufferedReader(
                 new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8))) {
                 // Avoid potential blocking by the buffer's readLine()
-                if (!r.ready()) { return null; }
+                if (!r.ready()) {
+                    return null;
+                }
                 String line = r.readLine();
                 // TODO weigl for Java 11 use "p.destroyForcibly();"
                 return line;
@@ -44,7 +46,9 @@ public class VersionChecker {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            if (p != null && p.isAlive()) { p.destroy(); }
+            if (p != null && p.isAlive()) {
+                p.destroy();
+            }
         }
     }
 }

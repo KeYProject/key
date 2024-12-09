@@ -95,7 +95,9 @@ public final class InfFlowMethodContractTacletBuilder
         ImmutableSet<InformationFlowContract> ifContracts =
             DefaultImmutableSet.nil();
         for (Contract c : contracts) {
-            if (c instanceof InformationFlowContract) { ifContracts = ifContracts.add((InformationFlowContract) c); }
+            if (c instanceof InformationFlowContract) {
+                ifContracts = ifContracts.add((InformationFlowContract) c);
+            }
         }
         return ifContracts;
     }

@@ -67,7 +67,11 @@ public final class TypeConverter {
 
 
     public LDT getLDTFor(Sort s) {
-        for (LDT ldt : LDTs.values()) { if (s.equals(ldt.targetSort())) { return ldt; } }
+        for (LDT ldt : LDTs.values()) {
+            if (s.equals(ldt.targetSort())) {
+                return ldt;
+            }
+        }
         LOGGER.debug("No LDT found for {}", s);
         return null;
     }
@@ -133,11 +137,14 @@ public final class TypeConverter {
             ExecutionContext ec) {
 
         final Term[] subs = new Term[op.getArity()];
-        for (int i = 0, n = op.getArity(); i < n; i++) { subs[i] = convertToLogicElement(op.getExpressionAt(i), ec); }
+        for (int i = 0, n = op.getArity(); i < n; i++) {
+            subs[i] = convertToLogicElement(op.getExpressionAt(i), ec);
+        }
 
         // hack: convert object singleton to location singleton
         if (op instanceof Singleton) {
-            assert heapLDT.getSortOfSelect(subs[0].op()) != null : "unexpected argument of \\singleton: " + subs[0];
+            assert heapLDT.getSortOfSelect(subs[0].op()) != null
+                    : "unexpected argument of \\singleton: " + subs[0];
             return tb.singleton(subs[0].sub(1), subs[0].sub(2));
         }
 
@@ -169,7 +176,9 @@ public final class TypeConverter {
     private Term convertReferencePrefix(ReferencePrefix prefix, ExecutionContext ec) {
         if (prefix instanceof FieldReference) {
             return convertVariableReference((FieldReference) prefix, ec);
-        } else if (prefix instanceof VariableReference vr) { prefix = vr.getProgramVariable(); }
+        } else if (prefix instanceof VariableReference vr) {
+            prefix = vr.getProgramVariable();
+        }
         if (prefix instanceof MetaClassReference) {
             LOGGER.warn("WARNING: metaclass references not supported yet");
             throw new IllegalArgumentException("TypeConverter could not handle" + " this");
@@ -198,7 +207,9 @@ public final class TypeConverter {
 
     public Term findThisForSortExact(Sort s, ExecutionContext ec) {
         ProgramElement pe = ec.getRuntimeInstance();
-        if (pe == null) { return null; }
+        if (pe == null) {
+            return null;
+        }
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), true);
 
@@ -206,7 +217,9 @@ public final class TypeConverter {
 
     public Term findThisForSort(Sort s, ExecutionContext ec) {
         ProgramElement pe = ec.getRuntimeInstance();
-        if (pe == null) { return null; }
+        if (pe == null) {
+            return null;
+        }
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), false);
     }
@@ -236,11 +249,15 @@ public final class TypeConverter {
             Term[] argTerms = new Term[args.size() + 2]; // heap, self,
             int index = 0;
             for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                if (h == services.getTypeConverter().getHeapLDT().getSavedHeap()) { continue; }
+                if (h == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
+                    continue;
+                }
                 argTerms[index++] = tb.var(h);
             }
             argTerms[index++] = p;
-            for (Expression e : args) { argTerms[index++] = convertToLogicElement(e, ec); }
+            for (Expression e : args) {
+                argTerms[index++] = convertToLogicElement(e, ec);
+            }
             return tb.func(pm, argTerms);
         }
         throw new IllegalArgumentException("TypeConverter could not handle this");
@@ -332,7 +349,7 @@ public final class TypeConverter {
         }
         throw new IllegalArgumentException(
             "TypeConverter: Unknown or not convertible ProgramElement " + pe + " of type "
-                    + pe.getClass());
+                + pe.getClass());
     }
 
 
@@ -506,7 +523,9 @@ public final class TypeConverter {
      * @return the KeYJavaType of expression <tt>e</tt>
      */
     public KeYJavaType getKeYJavaType(Expression e, ExecutionContext ec) {
-        if (e instanceof ThisReference) { return ec.getTypeReference().getKeYJavaType(); }
+        if (e instanceof ThisReference) {
+            return ec.getTypeReference().getKeYJavaType();
+        }
         return e.getKeYJavaType(services, ec);
     }
 
@@ -527,21 +546,29 @@ public final class TypeConverter {
             return NullLiteral.NULL;
         } else if (term.op() instanceof JFunction function) {
             for (LDT model : LDTs.values()) {
-                if (model.hasLiteralFunction(function)) { return model.translateTerm(term, null, services); }
+                if (model.hasLiteralFunction(function)) {
+                    return model.translateTerm(term, null, services);
+                }
             }
         }
 
         final ExtList children = new ExtList();
-        for (int i = 0; i < term.arity(); i++) { children.add(convertToProgramElement(term.sub(i))); }
+        for (int i = 0; i < term.arity(); i++) {
+            children.add(convertToProgramElement(term.sub(i)));
+        }
 
         if (term.op() instanceof ProgramInLogic) {
             return ((ProgramInLogic) term.op()).convertToProgram(term, children);
         } else if (term.op() instanceof Function function) {
             for (LDT model : LDTs.values()) {
-                if (model.containsFunction(function)) { return model.translateTerm(term, children, services); }
+                if (model.containsFunction(function)) {
+                    return model.translateTerm(term, children, services);
+                }
             }
             Expression tryTranslate = translateJavaCast(term, children);
-            if (tryTranslate != null) { return tryTranslate; }
+            if (tryTranslate != null) {
+                return tryTranslate;
+            }
         }
         throw new RuntimeException(
             "Cannot convert term to program: " + term + " " + term.op().getClass());
@@ -585,7 +612,9 @@ public final class TypeConverter {
             // HACK
             result = services.getJavaInfo().getKeYJavaType(t.sort().toString());
         }
-        if (result == null) { result = getKeYJavaType(convertToProgramElement(t)); }
+        if (result == null) {
+            result = getKeYJavaType(convertToProgramElement(t));
+        }
 
         return result;
     }
@@ -601,13 +630,21 @@ public final class TypeConverter {
      */
     public boolean isWidening(PrimitiveType from, PrimitiveType to) {
         // we do not handle null's
-        if (from == null || to == null) { return false; }
+        if (from == null || to == null) {
+            return false;
+        }
         // equal types can be coerced
-        if (from == to) { return true; }
+        if (from == to) {
+            return true;
+        }
         // boolean types cannot be coerced into something else
-        if (from == PrimitiveType.JAVA_BOOLEAN || to == PrimitiveType.JAVA_BOOLEAN) { return false; }
+        if (from == PrimitiveType.JAVA_BOOLEAN || to == PrimitiveType.JAVA_BOOLEAN) {
+            return false;
+        }
         // everything else can be coerced to a \real
-        if (to == PrimitiveType.JAVA_REAL) { return true; }
+        if (to == PrimitiveType.JAVA_REAL) {
+            return true;
+        }
         // everything except \real and \bigint can be coerced to a double
         if (to == PrimitiveType.JAVA_DOUBLE) {
             return from != PrimitiveType.JAVA_BIGINT && from != PrimitiveType.JAVA_REAL;
@@ -617,19 +654,33 @@ public final class TypeConverter {
             return false; // real case already covered above
         }
         // everything except doubles can be coerced to a float
-        if (to == PrimitiveType.JAVA_FLOAT) { return true; }
+        if (to == PrimitiveType.JAVA_FLOAT) {
+            return true;
+        }
         // but a float cannot be coerced to anything but float or double
-        if (from == PrimitiveType.JAVA_FLOAT) { return false; }
+        if (from == PrimitiveType.JAVA_FLOAT) {
+            return false;
+        }
         // any integral type can be coerced to a \bigint
-        if (to == PrimitiveType.JAVA_BIGINT) { return true; }
+        if (to == PrimitiveType.JAVA_BIGINT) {
+            return true;
+        }
         // everything except the above can be coerced to a long
-        if (to == PrimitiveType.JAVA_LONG) { return true; }
+        if (to == PrimitiveType.JAVA_LONG) {
+            return true;
+        }
         // but a long cannot be coerced to anything but float, double or long
-        if (from == PrimitiveType.JAVA_LONG) { return false; }
+        if (from == PrimitiveType.JAVA_LONG) {
+            return false;
+        }
         // everything except long, float or double can be coerced to an int
-        if (to == PrimitiveType.JAVA_INT) { return true; }
+        if (to == PrimitiveType.JAVA_INT) {
+            return true;
+        }
         // but an int cannot be coerced to the remaining byte, char, short
-        if (from == PrimitiveType.JAVA_INT) { return false; }
+        if (from == PrimitiveType.JAVA_INT) {
+            return false;
+        }
         // between byte, char, short, only one conversion is admissible
         return (from == PrimitiveType.JAVA_BYTE && to == PrimitiveType.JAVA_SHORT);
     }
@@ -646,24 +697,34 @@ public final class TypeConverter {
             return true;
         }
         KeYJavaType fromBase = from.getBaseType().getKeYJavaType();
-        if (toBase.getJavaType() instanceof PrimitiveType) { return toBase == fromBase; }
+        if (toBase.getJavaType() instanceof PrimitiveType) {
+            return toBase == fromBase;
+        }
         return isWidening(fromBase, toBase);
     }
 
 
     public boolean isWidening(Type from, Type to) {
-        if (from instanceof KeYJavaType) { return isWidening((KeYJavaType) from, getKeYJavaType(to)); }
-        if (to instanceof KeYJavaType) { return isWidening(getKeYJavaType(from), (KeYJavaType) to); }
+        if (from instanceof KeYJavaType) {
+            return isWidening((KeYJavaType) from, getKeYJavaType(to));
+        }
+        if (to instanceof KeYJavaType) {
+            return isWidening(getKeYJavaType(from), (KeYJavaType) to);
+        }
 
         if (from instanceof ClassType) {
             return isWidening(getKeYJavaType(from), getKeYJavaType(to));
         } else if (from instanceof PrimitiveType) {
-            if (to instanceof PrimitiveType) { return isWidening((PrimitiveType) from, (PrimitiveType) to); }
+            if (to instanceof PrimitiveType) {
+                return isWidening((PrimitiveType) from, (PrimitiveType) to);
+            }
         } else if (from instanceof ArrayType) {
             if (to instanceof ClassType) {
                 final Sort toSort = getKeYJavaType(to).getSort();
                 return services.getJavaInfo().isAJavaCommonSort(toSort);
-            } else if (to instanceof ArrayType) { return isWidening((ArrayType) from, (ArrayType) to); }
+            } else if (to instanceof ArrayType) {
+                return isWidening((ArrayType) from, (ArrayType) to);
+            }
         }
         return false;
     }
@@ -758,9 +819,13 @@ public final class TypeConverter {
 
     public boolean isNarrowing(PrimitiveType from, PrimitiveType to) {
         // we do not handle null's
-        if (from == null || to == null) { return false; }
+        if (from == null || to == null) {
+            return false;
+        }
 
-        if (from == PrimitiveType.JAVA_BYTE) { return (to == PrimitiveType.JAVA_CHAR); }
+        if (from == PrimitiveType.JAVA_BYTE) {
+            return (to == PrimitiveType.JAVA_CHAR);
+        }
         if (from == PrimitiveType.JAVA_SHORT) {
             return (to == PrimitiveType.JAVA_BYTE || to == PrimitiveType.JAVA_CHAR);
         }
@@ -785,8 +850,12 @@ public final class TypeConverter {
                     || to == PrimitiveType.JAVA_CHAR || to == PrimitiveType.JAVA_INT
                     || to == PrimitiveType.JAVA_LONG || to == PrimitiveType.JAVA_FLOAT);
         }
-        if (from == PrimitiveType.JAVA_BIGINT) { return (to != PrimitiveType.JAVA_REAL && to != from); }
-        if (from == PrimitiveType.JAVA_REAL) { return (to != from); }
+        if (from == PrimitiveType.JAVA_BIGINT) {
+            return (to != PrimitiveType.JAVA_REAL && to != from);
+        }
+        if (from == PrimitiveType.JAVA_REAL) {
+            return (to != from);
+        }
         return false;
     }
 
@@ -805,15 +874,23 @@ public final class TypeConverter {
 
 
     public boolean isNarrowing(Type from, Type to) {
-        if (from instanceof KeYJavaType) { return isNarrowing((KeYJavaType) from, getKeYJavaType(to)); }
-        if (to instanceof KeYJavaType) { return isNarrowing(getKeYJavaType(from), (KeYJavaType) to); }
+        if (from instanceof KeYJavaType) {
+            return isNarrowing((KeYJavaType) from, getKeYJavaType(to));
+        }
+        if (to instanceof KeYJavaType) {
+            return isNarrowing(getKeYJavaType(from), (KeYJavaType) to);
+        }
 
         if (from instanceof ClassType) {
             return isNarrowing(getKeYJavaType(from), getKeYJavaType(to));
         } else if (from instanceof PrimitiveType) {
-            if (to instanceof PrimitiveType) { return isNarrowing((PrimitiveType) from, (PrimitiveType) to); }
+            if (to instanceof PrimitiveType) {
+                return isNarrowing((PrimitiveType) from, (PrimitiveType) to);
+            }
         } else if (from instanceof ArrayType) {
-            if (to instanceof ArrayType) { return isNarrowing((ArrayType) from, (ArrayType) to); }
+            if (to instanceof ArrayType) {
+                return isNarrowing((ArrayType) from, (ArrayType) to);
+            }
         }
         return false;
     }
@@ -823,13 +900,19 @@ public final class TypeConverter {
         // there is currently no interface handling
 
         // identity conversion
-        if (isIdentical(from, to)) { return true; }
+        if (isIdentical(from, to)) {
+            return true;
+        }
 
         // conversions between numeric types are always possible
-        if (isNumericalType(from) && isNumericalType(to)) { return true; }
+        if (isNumericalType(from) && isNumericalType(to)) {
+            return true;
+        }
 
         // all widening conversions
-        if (isWidening(from, to)) { return true; }
+        if (isWidening(from, to)) {
+            return true;
+        }
 
         // narrowing
         return isNarrowing(from, to);
@@ -837,7 +920,9 @@ public final class TypeConverter {
 
 
     public boolean isNumericalType(Type t) {
-        if (t instanceof KeYJavaType) { t = ((KeYJavaType) t).getJavaType(); }
+        if (t instanceof KeYJavaType) {
+            t = ((KeYJavaType) t).getJavaType();
+        }
         return t == PrimitiveType.JAVA_BYTE || t == PrimitiveType.JAVA_SHORT
                 || t == PrimitiveType.JAVA_INT || t == PrimitiveType.JAVA_CHAR
                 || t == PrimitiveType.JAVA_LONG || t == PrimitiveType.JAVA_BIGINT
@@ -847,7 +932,9 @@ public final class TypeConverter {
 
 
     public boolean isIntegralType(Type t) {
-        if (t instanceof KeYJavaType) { t = ((KeYJavaType) t).getJavaType(); }
+        if (t instanceof KeYJavaType) {
+            t = ((KeYJavaType) t).getJavaType();
+        }
         return t == PrimitiveType.JAVA_BYTE || t == PrimitiveType.JAVA_SHORT
                 || t == PrimitiveType.JAVA_INT || t == PrimitiveType.JAVA_CHAR
                 || t == PrimitiveType.JAVA_LONG || t == PrimitiveType.JAVA_BIGINT;
@@ -855,7 +942,9 @@ public final class TypeConverter {
 
 
     public boolean isReferenceType(Type t) {
-        if (t instanceof KeYJavaType) { t = ((KeYJavaType) t).getJavaType(); }
+        if (t instanceof KeYJavaType) {
+            t = ((KeYJavaType) t).getJavaType();
+        }
         return
         // there is currently no interface handling
         t == null || (t instanceof ClassType && !(t instanceof NullType)) || t instanceof ArrayType;
@@ -863,13 +952,17 @@ public final class TypeConverter {
 
 
     public boolean isNullType(Type t) {
-        if (t instanceof KeYJavaType) { t = ((KeYJavaType) t).getJavaType(); }
+        if (t instanceof KeYJavaType) {
+            t = ((KeYJavaType) t).getJavaType();
+        }
         return t == NullType.JAVA_NULL;
     }
 
 
     public boolean isBooleanType(Type t) {
-        if (t instanceof KeYJavaType) { t = ((KeYJavaType) t).getJavaType(); }
+        if (t instanceof KeYJavaType) {
+            t = ((KeYJavaType) t).getJavaType();
+        }
         return t == PrimitiveType.JAVA_BOOLEAN;
     }
 
@@ -882,7 +975,11 @@ public final class TypeConverter {
     private LDT getResponsibleLDT(
             Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
-        for (LDT ldt : LDTs.values()) { if (ldt.isResponsible(op, subs, services, ec)) { return ldt; } }
+        for (LDT ldt : LDTs.values()) {
+            if (ldt.isResponsible(op, subs, services, ec)) {
+                return ldt;
+            }
+        }
         return null;
     }
 

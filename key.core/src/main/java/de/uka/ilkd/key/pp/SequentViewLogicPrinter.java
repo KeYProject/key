@@ -89,7 +89,9 @@ public class SequentViewLogicPrinter extends LogicPrinter {
         List<TermLabel> termLabelList = new LinkedList<>();
         if (visibleTermLabels != null) {
             for (TermLabel label : t.getLabels()) {
-                if (label instanceof TermLabelSV || visibleTermLabels.contains(label)) { termLabelList.add(label); }
+                if (label instanceof TermLabelSV || visibleTermLabels.contains(label)) {
+                    termLabelList.add(label);
+                }
             }
         }
 
@@ -100,7 +102,9 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     public void printClassName(String className) {
         final boolean hidePP =
             notationInfo.isPrettySyntax() && getNotationInfo().isHidePackagePrefix();
-        if (hidePP) { className = className.substring(className.lastIndexOf('.') + 1); }
+        if (hidePP) {
+            className = className.substring(className.lastIndexOf('.') + 1);
+        }
         super.printClassName(className);
     }
 }

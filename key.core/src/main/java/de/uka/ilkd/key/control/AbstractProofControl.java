@@ -111,7 +111,9 @@ public abstract class AbstractProofControl implements ProofControl {
 
         for (RuleApp ruleApp : focusedGoal.ruleAppIndex().getBuiltInRules(focusedGoal, pos)) {
             BuiltInRule r = (BuiltInRule) ruleApp.rule();
-            if (!rules.contains(r)) { rules = rules.prepend(r); }
+            if (!rules.contains(r)) {
+                rules = rules.prepend(r);
+            }
         }
         return rules;
     }
@@ -185,7 +187,9 @@ public abstract class AbstractProofControl implements ProofControl {
     @Override
     public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos) {
         ImmutableSet<TacletApp> applics = getAppsForName(goal, taclet.name().toString(), pos);
-        if (applics.size() == 0) { return false; }
+        if (applics.size() == 0) {
+            return false;
+        }
         return selectedTaclet(applics, goal);
     }
 
@@ -205,7 +209,9 @@ public abstract class AbstractProofControl implements ProofControl {
                 }
                 TacletApp tmpApp =
                     firstApp.tryToInstantiate(services.getOverlay(goal.getLocalNamespaces()));
-                if (tmpApp != null) { firstApp = tmpApp; }
+                if (tmpApp != null) {
+                    firstApp = tmpApp;
+                }
 
             }
             if (ifSeqInteraction || !firstApp.complete()) {
@@ -219,7 +225,10 @@ public abstract class AbstractProofControl implements ProofControl {
         } else if (applics.size() > 1) {
             java.util.List<TacletApp> appList = new java.util.LinkedList<>();
 
-            for (int i = 0; i < applics.size(); i++) { TacletApp rapp = it.next(); appList.add(rapp); }
+            for (int i = 0; i < applics.size(); i++) {
+                TacletApp rapp = it.next();
+                appList.add(rapp);
+            }
 
             if (appList.size() == 0) {
                 assert false;
@@ -263,7 +272,9 @@ public abstract class AbstractProofControl implements ProofControl {
      * @see {@link Proof#pruneProof(Goal)}
      */
     public void pruneTo(Goal goal) {
-        if (goal.node().parent() != null) { pruneTo(goal.node().parent()); }
+        if (goal.node().parent() != null) {
+            pruneTo(goal.node().parent());
+        }
     }
 
     protected void emitInteractivePrune(Node node) {
@@ -321,7 +332,9 @@ public abstract class AbstractProofControl implements ProofControl {
 
         // filter fitting applications
         for (TacletApp app : fittingApps) {
-            if (app.rule().name().toString().equals(name)) { result = result.add(app); }
+            if (app.rule().name().toString().equals(name)) {
+                result = result.add(app);
+            }
         }
         return result;
     }
@@ -344,7 +357,9 @@ public abstract class AbstractProofControl implements ProofControl {
                             - start == instantiations.size()) {
                         TacletInstantiationModel m = createModel(tA, goal);
                         recentInstModels.add(m);
-                        for (final String inst : instantiations) { m.tableModel().setValueAt(inst, start++, 1); }
+                        for (final String inst : instantiations) {
+                            m.tableModel().setValueAt(inst, start++, 1);
+                        }
                     }
                 }
             }
@@ -354,9 +369,13 @@ public abstract class AbstractProofControl implements ProofControl {
         TacletInstantiationModel[] models =
             new TacletInstantiationModel[origInstModels.length + recentInstModels.size()];
         int i;
-        for (i = 0; i < origInstModels.length; i++) { models[i] = origInstModels[i]; }
+        for (i = 0; i < origInstModels.length; i++) {
+            models[i] = origInstModels[i];
+        }
 
-        for (final TacletInstantiationModel model : recentInstModels) { models[i++] = model; }
+        for (final TacletInstantiationModel model : recentInstModels) {
+            models[i++] = model;
+        }
 
         return models;
     }
@@ -377,13 +396,15 @@ public abstract class AbstractProofControl implements ProofControl {
         if (set.size() > 1) {
             LOGGER.warn(
                 "Expected a single app. If it is OK that there are more than one built-in rule apps. "
-                        + "You have to add a selection dialog here");
+                    + "You have to add a selection dialog here");
             LOGGER.warn("Ambiguous applications, taking the first in list.");
         }
 
         IBuiltInRuleApp app = set.iterator().next();
 
-        if (!app.complete()) { app = completeBuiltInRuleApp(app, goal, forced); }
+        if (!app.complete()) {
+            app = completeBuiltInRuleApp(app, goal, forced);
+        }
 
         if (app != null && app.rule() == rule) {
             if (interactive) {
@@ -412,7 +433,9 @@ public abstract class AbstractProofControl implements ProofControl {
 
         for (final IBuiltInRuleApp app : focusedGoal.ruleAppIndex().getBuiltInRules(focusedGoal,
             pos)) {
-            if (app.rule() == rule) { result = result.add(app); }
+            if (app.rule() == rule) {
+                result = result.add(app);
+            }
         }
 
         return result;
@@ -440,20 +463,26 @@ public abstract class AbstractProofControl implements ProofControl {
         // find all rules that match given name
         while (iter.hasNext()) {
             BuiltInRule rule = iter.next();
-            if (rule.name().toString().equals(name)) { match = match.append(rule); }
+            if (rule.name().toString().equals(name)) {
+                match = match.append(rule);
+            }
         }
 
         iter = match.iterator();
 
         // find all applications for matched rules
-        while (iter.hasNext()) { result = result.union(getBuiltInRuleApp(focusedGoal, iter.next(), pos)); }
+        while (iter.hasNext()) {
+            result = result.union(getBuiltInRuleApp(focusedGoal, iter.next(), pos));
+        }
 
         return result;
     }
 
 
     protected void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
-        if (ruleCompletionHandler != null) { ruleCompletionHandler.completeAndApplyTacletMatch(models, goal); }
+        if (ruleCompletionHandler != null) {
+            ruleCompletionHandler.completeAndApplyTacletMatch(models, goal);
+        }
     }
 
     protected IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal,
@@ -499,7 +528,9 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     @Override
     public void addAutoModeListener(AutoModeListener p) {
-        if (p != null) { autoModeListener.add(p); }
+        if (p != null) {
+            autoModeListener.add(p);
+        }
     }
 
     /**
@@ -507,7 +538,9 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     @Override
     public void removeAutoModeListener(AutoModeListener p) {
-        if (p != null) { autoModeListener.remove(p); }
+        if (p != null) {
+            autoModeListener.remove(p);
+        }
     }
 
     /**
@@ -516,7 +549,9 @@ public abstract class AbstractProofControl implements ProofControl {
     protected void fireAutoModeStarted(ProofEvent e) {
         AutoModeListener[] listener =
             autoModeListener.toArray(new AutoModeListener[0]);
-        for (AutoModeListener aListenerList : listener) { aListenerList.autoModeStarted(e); }
+        for (AutoModeListener aListenerList : listener) {
+            aListenerList.autoModeStarted(e);
+        }
     }
 
     /**
@@ -525,7 +560,9 @@ public abstract class AbstractProofControl implements ProofControl {
     protected void fireAutoModeStopped(ProofEvent e) {
         AutoModeListener[] listener =
             autoModeListener.toArray(new AutoModeListener[0]);
-        for (AutoModeListener aListenerList : listener) { aListenerList.autoModeStopped(e); }
+        for (AutoModeListener aListenerList : listener) {
+            aListenerList.autoModeStopped(e);
+        }
     }
 
     /**

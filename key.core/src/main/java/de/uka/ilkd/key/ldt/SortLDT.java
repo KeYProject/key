@@ -67,7 +67,9 @@ public final class SortLDT extends LDT {
 
     @Override
     public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-        if (op instanceof Subtype) { return ssubsort; }
+        if (op instanceof Subtype) {
+            return ssubsort;
+        }
 
         assert false;
         return null;

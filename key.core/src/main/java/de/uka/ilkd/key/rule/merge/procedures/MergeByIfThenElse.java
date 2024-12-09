@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -45,7 +44,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     private static final int SIMPLIFICATION_TIMEOUT_MS = 1000;
 
     public static MergeByIfThenElse instance() {
-        if (INSTANCE == null) { INSTANCE = new MergeByIfThenElse(); }
+        if (INSTANCE == null) {
+            INSTANCE = new MergeByIfThenElse();
+        }
         return INSTANCE;
     }
 
@@ -112,12 +113,12 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         Term cond, ifForm, elseForm;
 
         if (distinguishingFormula == null) {
-            Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
+            DistanceFormRightSide distFormAndRightSidesForITEUpd =
                 createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
 
-            cond = distFormAndRightSidesForITEUpd.first();
-            ifForm = distFormAndRightSidesForITEUpd.second();
-            elseForm = distFormAndRightSidesForITEUpd.third();
+            cond = distFormAndRightSidesForITEUpd.distinguishingFormula();
+            ifForm = distFormAndRightSidesForITEUpd.ifTerm();
+            elseForm = distFormAndRightSidesForITEUpd.elseTerm();
         } else {
             cond = distinguishingFormula;
             ifForm = ifTerm;
@@ -155,7 +156,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         second (fourth component = true) state was used as a basis for the condition (first
      *         component).
      */
-    static Quadruple<Term, Term, Term, Boolean> createDistFormAndRightSidesForITEUpd(
+    static DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
             LocationVariable v, SymbolicExecutionState state1, SymbolicExecutionState state2,
             Services services) {
 
@@ -164,16 +165,21 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         Term rightSide1 = getUpdateRightSideFor(state1.first, v);
         Term rightSide2 = getUpdateRightSideFor(state2.first, v);
 
-        if (rightSide1 == null) { rightSide1 = tb.var(v); }
+        if (rightSide1 == null) {
+            rightSide1 = tb.var(v);
+        }
 
-        if (rightSide2 == null) { rightSide2 = tb.var(v); }
+        if (rightSide2 == null) {
+            rightSide2 = tb.var(v);
+        }
 
         return createDistFormAndRightSidesForITEUpd(state1, state2, rightSide1, rightSide2,
             services);
     }
 
     /**
-     * Creates the input for an if-then-else update. The elements of the resulting quadruple can be
+     * Creates the input for an if-then-else update. The elements of the resulting
+     * {@link DistanceFormRightSide} can be
      * used to construct an elementary update corresponding to
      * <code>{ v := \if (c1) \then (ifTerm) \else (elseTerm) }</code>, where c1 is the path
      * condition of state1. However, the method also tries an optimization: The path condition c2 of
@@ -199,7 +205,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
      *         second (fourth component = true) state was used as a basis for the condition (first
      *         component).
      */
-    static Quadruple<Term, Term, Term, Boolean> createDistFormAndRightSidesForITEUpd(
+    static DistanceFormRightSide createDistFormAndRightSidesForITEUpd(
             SymbolicExecutionState state1, SymbolicExecutionState state2, Term ifTerm,
             Term elseTerm, Services services) {
 
@@ -254,7 +260,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         distinguishingFormula = trySimplify(services.getProof(), distinguishingFormula, true,
             SIMPLIFICATION_TIMEOUT_MS);
 
-        return new Quadruple<>(distinguishingFormula,
+        return new DistanceFormRightSide(distinguishingFormula,
             commuteSides ? elseTerm : ifTerm, commuteSides ? ifTerm : elseTerm, commuteSides);
 
     }
@@ -262,5 +268,28 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
     @Override
     public String toString() {
         return DISPLAY_NAME;
+    }
+
+    /**
+     * Represents the distance between formulas for an if-then-else update.
+     * Input to construct an elementary update like
+     * <code>{ v := \if (distinguishingFormula) \then (ifTerm) \else (elseTerm) }</code>, where
+     * distinguishingFormula, ifTerm
+     * and elseTerm are the respective components of the returned triple. The sideCommuted component
+     * indicates whether the path condition of the distinguishingFormula (sideCommuted component =
+     * false) or the
+     * ifTerm (sideCommuted component = true) state was used as a basis for the condition
+     * (distinguishingFormula
+     * component).
+     *
+     * @param distinguishingFormula a formula
+     * @param ifTerm a term
+     * @param elseTerm a term
+     * @param sideCommuted true if ifTerm and elseTerm have been swapped.
+     * @see #createDistFormAndRightSidesForITEUpd(SymbolicExecutionState, SymbolicExecutionState,
+     *      Term, Term, Services)
+     */
+    public record DistanceFormRightSide(Term distinguishingFormula, Term ifTerm, Term elseTerm,
+            boolean sideCommuted) {
     }
 }

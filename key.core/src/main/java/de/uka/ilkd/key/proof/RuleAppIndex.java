@@ -148,8 +148,10 @@ public final class RuleAppIndex {
     public ImmutableList<TacletApp> getTacletAppAt(TacletFilter filter, PosInOccurrence pos,
             Services services) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
-        if (!autoMode) { result =
-            result.prepend(interactiveTacletAppIndex.getTacletAppAt(pos, filter, services)); }
+        if (!autoMode) {
+            result =
+                result.prepend(interactiveTacletAppIndex.getTacletAppAt(pos, filter, services));
+        }
         result = result.prepend(automatedTacletAppIndex.getTacletAppAt(pos, filter, services));
         return result;
     }
@@ -192,7 +194,9 @@ public final class RuleAppIndex {
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter filter, PosInOccurrence pos) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
-        if (!autoMode) { result = result.prepend(interactiveTacletAppIndex.getFindTaclet(pos, filter)); }
+        if (!autoMode) {
+            result = result.prepend(interactiveTacletAppIndex.getFindTaclet(pos, filter));
+        }
         result = result.prepend(automatedTacletAppIndex.getFindTaclet(pos, filter));
         return result;
     }
@@ -209,7 +213,9 @@ public final class RuleAppIndex {
      */
     public ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter filter, Services services) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
-        if (!autoMode) { result = interactiveTacletAppIndex.getNoFindTaclet(filter, services); }
+        if (!autoMode) {
+            result = interactiveTacletAppIndex.getNoFindTaclet(filter, services);
+        }
         result = result.prepend(automatedTacletAppIndex.getNoFindTaclet(filter, services));
         return result;
     }
@@ -228,8 +234,10 @@ public final class RuleAppIndex {
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(TacletFilter filter,
             PosInOccurrence pos) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
-        if (!autoMode) { result =
-            result.prepend(interactiveTacletAppIndex.getRewriteTaclet(pos, filter)); }
+        if (!autoMode) {
+            result =
+                result.prepend(interactiveTacletAppIndex.getRewriteTaclet(pos, filter));
+        }
         result = result.prepend(automatedTacletAppIndex.getRewriteTaclet(pos, filter));
 
         return result;
@@ -255,7 +263,9 @@ public final class RuleAppIndex {
     public void addNoPosTacletApp(Iterable<NoPosTacletApp> tacletApps) {
         tacletIndex.addTaclets(tacletApps);
 
-        if (autoMode) { interactiveTacletAppIndex.clearIndexes(); }
+        if (autoMode) {
+            interactiveTacletAppIndex.clearIndexes();
+        }
 
         interactiveTacletAppIndex.addedNoPosTacletApps(tacletApps);
         automatedTacletAppIndex.addedNoPosTacletApps(tacletApps);
@@ -270,7 +280,9 @@ public final class RuleAppIndex {
     public void addNoPosTacletApp(NoPosTacletApp tacletApp) {
         tacletIndex.add(tacletApp);
 
-        if (autoMode) { interactiveTacletAppIndex.clearIndexes(); }
+        if (autoMode) {
+            interactiveTacletAppIndex.clearIndexes();
+        }
 
         interactiveTacletAppIndex.addedNoPosTacletApp(tacletApp);
         automatedTacletAppIndex.addedNoPosTacletApp(tacletApp);
@@ -285,7 +297,9 @@ public final class RuleAppIndex {
     public void removeNoPosTacletApp(NoPosTacletApp tacletApp) {
         tacletIndex.remove(tacletApp);
 
-        if (autoMode) { interactiveTacletAppIndex.clearIndexes(); }
+        if (autoMode) {
+            interactiveTacletAppIndex.clearIndexes();
+        }
 
         interactiveTacletAppIndex.removedNoPosTacletApp(tacletApp);
         automatedTacletAppIndex.removedNoPosTacletApp(tacletApp);
@@ -298,7 +312,9 @@ public final class RuleAppIndex {
      *        SequentChangeInfo describing the change of the sequent
      */
     public void sequentChanged(SequentChangeInfo sci) {
-        if (!autoMode) { interactiveTacletAppIndex.sequentChanged(sci); }
+        if (!autoMode) {
+            interactiveTacletAppIndex.sequentChanged(sci);
+        }
         automatedTacletAppIndex.sequentChanged(sci);
         builtInRuleAppIndex.sequentChanged(goal, sci, newRuleListener);
     }
@@ -325,7 +341,9 @@ public final class RuleAppIndex {
      * Ensures that all caches are fully up-to-date
      */
     public void fillCache() {
-        if (!autoMode) { interactiveTacletAppIndex.fillCache(); }
+        if (!autoMode) {
+            interactiveTacletAppIndex.fillCache();
+        }
         automatedTacletAppIndex.fillCache();
     }
 
@@ -357,7 +375,9 @@ public final class RuleAppIndex {
      * informs all observers, if a formula has been added, changed or removed
      */
     private void informNewRuleListener(RuleApp p_app, PosInOccurrence p_pos) {
-        if (ruleListener != null) { ruleListener.ruleAdded(p_app, p_pos); }
+        if (ruleListener != null) {
+            ruleListener.ruleAdded(p_app, p_pos);
+        }
     }
 
     /**
@@ -365,7 +385,9 @@ public final class RuleAppIndex {
      */
     private void informNewRuleListener(ImmutableList<? extends RuleApp> p_apps,
             PosInOccurrence p_pos) {
-        if (ruleListener != null) { ruleListener.rulesAdded(p_apps, p_pos); }
+        if (ruleListener != null) {
+            ruleListener.rulesAdded(p_apps, p_pos);
+        }
     }
 
 
@@ -386,6 +408,6 @@ public final class RuleAppIndex {
 
     public String toString() {
         return "RuleAppIndex with indexing, getting Taclets from" + " TacletAppIndex "
-                + interactiveTacletAppIndex + " and " + automatedTacletAppIndex;
+            + interactiveTacletAppIndex + " and " + automatedTacletAppIndex;
     }
 }

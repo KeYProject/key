@@ -81,7 +81,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      */
     private LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
             TermServices services) {
-        if (rawInv == null) { return null; }
+        if (rawInv == null) {
+            return null;
+        }
         Map<LocationVariable, Term> invs = rawInv.getInternalInvariants();
         Map<LocationVariable, Term> freeInvs = rawInv.getInternalFreeInvariants();
         Term var = rawInv.getInternalVariant();
@@ -139,7 +141,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                     }
                 } else {
                     Term[] newSubs = new Term[subs.size()];
-                    for (int i = 0; i < subs.size(); i++) { newSubs[i] = replace(subs.get(i)); }
+                    for (int i = 0; i < subs.size(); i++) {
+                        newSubs[i] = replace(subs.get(i));
+                    }
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<>(newSubs),
                         visited.boundVars(), visited.getLabels());
                 }
@@ -168,7 +172,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                     }
                 } else {
                     Term[] newSubs = new Term[subs.size()];
-                    for (int i = 0; i < subs.size(); i++) { newSubs[i] = replace(subs.get(i)); }
+                    for (int i = 0; i < subs.size(); i++) {
+                        newSubs[i] = replace(subs.get(i));
+                    }
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<>(newSubs),
                         visited.boundVars(), visited.getLabels());
                 }
@@ -269,7 +275,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public Term programTerm() {
-        if (posInOccurrence() != null) { return TermBuilder.goBelowUpdates(posInOccurrence().subTerm()); }
+        if (posInOccurrence() != null) {
+            return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
+        }
         return null;
     }
 
@@ -292,7 +300,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopSpecification inv) {
         assert inv != null;
-        if (this.loop == inv.getLoop()) { this.spec = inv; }
+        if (this.loop == inv.getLoop()) {
+            this.spec = inv;
+        }
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext,
             services);
     }
@@ -311,7 +321,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public LoopInvariantBuiltInRuleApp tryToInstantiate(Goal goal) {
-        if (spec != null) { return this; }
+        if (spec != null) {
+            return this;
+        }
         final Services services = goal.proof().getServices();
         LoopSpecification inv = retrieveLoopInvariantFromSpecification(services);
         var m = ((Modality) programTerm().op()).<Modality.JavaModalityKind>kind();

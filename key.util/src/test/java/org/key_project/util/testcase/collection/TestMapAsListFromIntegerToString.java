@@ -41,7 +41,9 @@ public class TestMapAsListFromIntegerToString {
     private ImmutableMap<Integer, String> createMap() {
         ImmutableMap<Integer, String> map = DefaultImmutableMap.nilMap();
         // create map with entrys like (1,"Eins")
-        for (int i = 0; i < entryStr.length; i++) { map = map.put(entryInt[i], entryStr[i]); }
+        for (int i = 0; i < entryStr.length; i++) {
+            map = map.put(entryInt[i], entryStr[i]);
+        }
         return map;
     }
 

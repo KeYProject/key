@@ -57,7 +57,9 @@ public class KeYResourceManager {
         if (url != null) {
             try (InputStream io = new BufferedInputStream(url.openStream())) {
                 int c;
-                while ((c = io.read()) != -1) { result.append((char) c); }
+                while ((c = io.read()) != -1) {
+                    result.append((char) c);
+                }
             } catch (IOException ioe) {
                 // who cares it is just a version number
                 result = new StringBuilder(DEFAULT_VERSION);
@@ -75,7 +77,9 @@ public class KeYResourceManager {
      * @return returns the SHA1 hash uniquely identifying the version
      */
     public String getSHA1() {
-        if (sha1 != null) { return sha1; }
+        if (sha1 != null) {
+            return sha1;
+        }
         sha1 = readVersionString(getResourceFile(this, "sha1"));
 
         return sha1;
@@ -87,7 +91,9 @@ public class KeYResourceManager {
      * @return returns the git branch partially identifying the version
      */
     public String getBranch() {
-        if (branch != null) { return branch; }
+        if (branch != null) {
+            return branch;
+        }
         branch = readVersionString(getResourceFile(this, "branch"));
 
         return branch;
@@ -106,7 +112,9 @@ public class KeYResourceManager {
      * @return a readable version number
      */
     public String getVersion() {
-        if (version != null) { return version; }
+        if (version != null) {
+            return version;
+        }
         version = readVersionString(getResourceFile(this, "version"));
 
         return version;
@@ -197,7 +205,9 @@ public class KeYResourceManager {
         URL resourceURL = cl.getResource(resourcename);
         if (resourceURL == null && cl.getSuperclass() != null) {
             return getResourceFile(cl.getSuperclass(), resourcename);
-        } else if (resourceURL == null && cl.getSuperclass() == null) { return null; }
+        } else if (resourceURL == null && cl.getSuperclass() == null) {
+            return null;
+        }
         return resourceURL;
     }
 

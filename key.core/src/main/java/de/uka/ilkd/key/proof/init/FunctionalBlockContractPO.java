@@ -280,7 +280,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
             Term localAnonUpdate = createLocalAnonUpdate(localOutVariables, services, tb);
 
-            if (localAnonUpdate == null) { localAnonUpdate = tb.skip(); }
+            if (localAnonUpdate == null) {
+                localAnonUpdate = tb.skip();
+            }
 
             Term wellDefinedness = configurator.setUpWdGoal(null, bc, wdUpdate, localAnonUpdate,
                 heaps.get(0), anonOutHeaps.get(heaps.get(0)), localInVariables);
@@ -299,7 +301,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof FunctionalBlockContractPO other)) { return false; }
+        if (!(po instanceof FunctionalBlockContractPO other)) {
+            return false;
+        }
 
         return contract.equals(other.contract);
     }
@@ -315,12 +319,22 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) { return true; }
-        if (obj == null) { return false; }
-        if (!(obj instanceof FunctionalBlockContractPO other)) { return false; }
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof FunctionalBlockContractPO other)) {
+            return false;
+        }
         if (contract == null) {
-            if (other.contract != null) { return false; }
-        } else if (!contract.equals(other.contract)) { return false; }
+            if (other.contract != null) {
+                return false;
+            }
+        } else if (!contract.equals(other.contract)) {
+            return false;
+        }
         if (environmentConfig == null) {
             return other.environmentConfig == null;
         } else {

@@ -62,7 +62,10 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
         final IfFormulaInstSeq[] assumesInstFromSeq = new IfFormulaInstSeq[semi.size()];
         int i = assumesInstFromSeq.length - 1;
 
-        for (final var sf : semi) { assumesInstFromSeq[i] = new IfFormulaInstSeq(p_s, antec, sf); --i; }
+        for (final var sf : semi) {
+            assumesInstFromSeq[i] = new IfFormulaInstSeq(p_s, antec, sf);
+            --i;
+        }
 
         return new ImmutableArray<>(assumesInstFromSeq);
     }
@@ -95,7 +98,9 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 
     @Override
     public boolean equals(Object p_obj) {
-        if (!(p_obj instanceof IfFormulaInstSeq other)) { return false; }
+        if (!(p_obj instanceof IfFormulaInstSeq other)) {
+            return false;
+        }
         return seq == other.seq && cf == other.cf && antec == other.antec;
     }
 

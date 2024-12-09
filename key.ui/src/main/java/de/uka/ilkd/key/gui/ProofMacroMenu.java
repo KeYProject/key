@@ -103,7 +103,9 @@ public class ProofMacroMenu extends JMenu {
                 addSeparator();
             }
 
-            for (JMenuItem item : items) { add(item); }
+            for (JMenuItem item : items) {
+                add(item);
+            }
         }
 
         {

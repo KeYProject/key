@@ -116,7 +116,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             ImmutableArray<VariableSpecification> vspecs = vd.getVariableSpecifications();
             for (int i = 0; i < vspecs.size(); i++) {
                 var pv = (LocationVariable) vspecs.get(i).getProgramVariable();
-                if (!replaceMap.containsKey(pv)) { replaceMap.put(pv, copy(pv)); }
+                if (!replaceMap.containsKey(pv)) {
+                    replaceMap.put(pv, copy(pv));
+                }
             }
         }
         super.walk(node);
@@ -140,7 +142,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         walk(root());
         ExtList el = stack.peek();
         int i = 0;
-        while (!(el.get(i) instanceof ProgramElement)) { i++; }
+        while (!(el.get(i) instanceof ProgramElement)) {
+            i++;
+        }
         result = (ProgramElement) stack.peek().get(i);
     }
 
@@ -160,7 +164,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     private Term replaceVariablesInTerm(Term t) {
-        if (t == null) { return null; }
+        if (t == null) {
+            return null;
+        }
         if (t.op() instanceof ProgramVariable) {
             if (replaceMap.containsKey(t.op())) {
                 ProgramVariable replacement = replaceMap.get(t.op());
@@ -311,7 +317,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             for (Entry<LocationVariable, Term> h : saveCopy.entrySet()) {
                 LocationVariable pv = h.getKey();
                 final Term t = h.getValue();
-                if (t == null) { continue; }
+                if (t == null) {
+                    continue;
+                }
                 if (replaceMap.containsKey(pv)) {
                     atPres.remove(pv);
                     pv = (LocationVariable) replaceMap.get(pv);
@@ -329,10 +337,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                             Collectors.toCollection(ArrayList::new)));
 
         } else {
-            if (!changed) { return oldContract; }
+            if (!changed) {
+                return oldContract;
+            }
 
             assert false : "ProgVarReplaceVisitor: Unknown type of MergeContract ("
-                    + oldContract.getClass().getName() + ")";
+                + oldContract.getClass().getName() + ")";
         }
 
         // Nothing's changed
@@ -535,7 +545,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     public void performActionOnLoopInvariant(LoopStatement oldLoop, LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
         LoopSpecification inv = services.getSpecificationRepository().getLoopSpec(oldLoop);
-        if (inv == null) { return; }
+        if (inv == null) {
+            return;
+        }
         Term selfTerm = inv.getInternalSelfTerm();
         Map<LocationVariable, Term> atPres = inv.getInternalAtPres();
 
@@ -578,7 +590,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         for (Entry<LocationVariable, Term> h : saveCopy.entrySet()) {
             LocationVariable pv = h.getKey();
             final Term t = h.getValue();
-            if (t == null) { continue; }
+            if (t == null) {
+                continue;
+            }
             if (replaceMap.containsKey(pv)) {
                 atPres.remove(pv);
                 pv = (LocationVariable) replaceMap.get(pv);
@@ -618,7 +632,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         for (Entry<LocationVariable, Term> e : atPres.entrySet()) {
             LocationVariable pv = e.getKey();
             final Term t = e.getValue();
-            if (t == null) { continue; }
+            if (t == null) {
+                continue;
+            }
 
             if (replaceMap.containsKey(pv)) {
                 newAtPres.remove(pv);

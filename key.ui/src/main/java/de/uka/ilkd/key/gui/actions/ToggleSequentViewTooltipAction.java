@@ -25,7 +25,7 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
 
     /** This action's tooltip. */
     public static final String TOOL_TIP = "If ticked, moving the mouse over a term in the"
-            + " sequent view will show a tooltip with additional information.";
+        + " sequent view will show a tooltip with additional information.";
 
     private static final long serialVersionUID = -3352122484627890921L;
 

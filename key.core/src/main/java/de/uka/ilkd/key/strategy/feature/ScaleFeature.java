@@ -71,7 +71,9 @@ public abstract class ScaleFeature implements Feature {
             RuleAppCost img0, RuleAppCost img1) {
         Debug.assertFalse(dom0.equals(dom1),
             "Two different points are needed to define the " + "affine transformation");
-        if (img0.equals(img1)) { return ConstFeature.createConst(img0); }
+        if (img0.equals(img1)) {
+            return ConstFeature.createConst(img0);
+        }
 
         // now the two points of the domain (resp. of the image) are distinct
 

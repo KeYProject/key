@@ -43,7 +43,9 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     }
 
     public List<ProofScriptArgument<T>> getArguments() {
-        if (parameterClazz == null) { return new ArrayList<>(); }
+        if (parameterClazz == null) {
+            return new ArrayList<>();
+        }
         return ArgumentsLifter.inferScriptArguments(parameterClazz, this);
     }
 
@@ -89,7 +91,9 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
      */
     @Override
     public String getDocumentation() {
-        if (documentation == null) { documentation = DescriptionFacade.getDocumentation(this); }
+        if (documentation == null) {
+            documentation = DescriptionFacade.getDocumentation(this);
+        }
         return documentation;
     }
 }

@@ -46,7 +46,9 @@ public abstract class AbstractProfile implements Profile {
 
         ImmutableSet<String> result = DefaultImmutableSet.nil();
 
-        for (GoalChooserBuilder goalChooserBuilder : supportedGCB) { result = result.add(goalChooserBuilder.name()); }
+        for (GoalChooserBuilder goalChooserBuilder : supportedGCB) {
+            result = result.add(goalChooserBuilder.name());
+        }
 
         return result;
     }
@@ -103,7 +105,11 @@ public abstract class AbstractProfile implements Profile {
     }
 
     public StrategyFactory getStrategyFactory(Name n) {
-        for (StrategyFactory sf : getStrategyFactories()) { if (sf.name().equals(n)) { return sf; } }
+        for (StrategyFactory sf : getStrategyFactories()) {
+            if (sf.name().equals(n)) {
+                return sf;
+            }
+        }
         return null;
     }
 
@@ -150,7 +156,9 @@ public abstract class AbstractProfile implements Profile {
      */
     public GoalChooserBuilder lookupGC(String name) {
         for (GoalChooserBuilder supprotedGCB : supportedGCB) {
-            if (supprotedGCB.name().equals(name)) { return supprotedGCB.copy(); }
+            if (supprotedGCB.name().equals(name)) {
+                return supprotedGCB.copy();
+            }
         }
         return null;
     }

@@ -127,6 +127,8 @@ public class NotificationManager {
      */
     public void handleNotificationEvent(NotificationEvent event) {
         NotificationTask notificationTask = notificationTasks.get(event.getEventID());
-        if (notificationTask != null) { notificationTask.execute(event, this); }
+        if (notificationTask != null) {
+            notificationTask.execute(event, this);
+        }
     }
 }

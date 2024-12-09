@@ -28,12 +28,14 @@ public class AssumptionProjection implements ProjectionToTerm {
     }
 
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
-        assert app instanceof TacletApp : "Projection is only applicable to taclet apps," + " but got " + app;
+        assert app instanceof TacletApp
+                : "Projection is only applicable to taclet apps," + " but got " + app;
         final TacletApp tapp = (TacletApp) app;
 
-        assert tapp.ifFormulaInstantiations() != null : "Projection is only applicable to taclet apps with assumptions,"
-                + " but got "
-                + app;
+        assert tapp.ifFormulaInstantiations() != null
+                : "Projection is only applicable to taclet apps with assumptions,"
+                    + " but got "
+                    + app;
 
         return tapp.ifFormulaInstantiations().take(no).head().getConstrainedFormula().formula();
     }

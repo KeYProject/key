@@ -149,7 +149,9 @@ public class ApplyStrategy extends AbstractProverCore {
                 }
                 countApplied++;
                 fireTaskProgress();
-                if (Thread.interrupted()) { throw new InterruptedException(); }
+                if (Thread.interrupted()) {
+                    throw new InterruptedException();
+                }
                 shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, time,
                     countApplied, srInfo);
             }
@@ -313,7 +315,9 @@ public class ApplyStrategy extends AbstractProverCore {
      */
     private GoalChooser getGoalChooserForProof(Proof proof) {
         GoalChooser chooser = null;
-        if (proof != null) { chooser = proof.getSettings().getStrategySettings().getCustomApplyStrategyGoalChooser(); }
+        if (proof != null) {
+            chooser = proof.getSettings().getStrategySettings().getCustomApplyStrategyGoalChooser();
+        }
         return chooser != null ? chooser : defaultGoalChooser;
     }
 
@@ -321,9 +325,13 @@ public class ApplyStrategy extends AbstractProverCore {
 
         /** invoked when a rule has been applied */
         public void ruleApplied(ProofEvent e) {
-            if (!isAutoModeActive()) { return; }
+            if (!isAutoModeActive()) {
+                return;
+            }
             RuleAppInfo rai = e.getRuleAppInfo();
-            if (rai == null) { return; }
+            if (rai == null) {
+                return;
+            }
 
             final GoalChooser goalChooser = getGoalChooserForProof(rai.getOriginalNode().proof());
             synchronized (goalChooser) {
@@ -350,7 +358,9 @@ public class ApplyStrategy extends AbstractProverCore {
     public void clear() {
         final GoalChooser goalChooser = getGoalChooserForProof(proof);
         proof = null;
-        if (goalChooser != null) { goalChooser.init(null, ImmutableSLList.nil()); }
+        if (goalChooser != null) {
+            goalChooser.init(null, ImmutableSLList.nil());
+        }
     }
 
     /*

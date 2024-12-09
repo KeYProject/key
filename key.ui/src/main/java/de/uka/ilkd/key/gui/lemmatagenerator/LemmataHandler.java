@@ -85,7 +85,9 @@ public class LemmataHandler implements TacletFilter {
                     return;
                 }
                 println("Proofs have been created for");
-                for (Proof p : pa.getProofs()) { LOGGER.info(p.name().toString()); }
+                for (Proof p : pa.getProofs()) {
+                    LOGGER.info(p.name().toString());
+                }
                 startProofs(pa);
 
             }
@@ -122,7 +124,9 @@ public class LemmataHandler implements TacletFilter {
 
     private Collection<File> createFilesForAxioms(Collection<String> filenames) {
         Collection<File> list = new LinkedList<>();
-        for (String filename : filenames) { list.add(new File(filename)); }
+        for (String filename : filenames) {
+            list.add(new File(filename));
+        }
         return list;
     }
 
@@ -137,7 +141,9 @@ public class LemmataHandler implements TacletFilter {
         for (Proof p : pa.getProofs()) {
             try {
                 startProof(p);
-                if (options.isSavingResultsToFile()) { saveProof(p); }
+                if (options.isSavingResultsToFile()) {
+                    saveProof(p);
+                }
             } catch (Throwable e) {
                 handleException(e);
             }
@@ -157,7 +163,7 @@ public class LemmataHandler implements TacletFilter {
             prover.start(proof, options.getMaxNumberOfRules(), options.getTimeout());
             println(proof.closed() ? "closed"
                     : ("not closed (open goals: " + proof.openGoals().size() + " nodes: "
-                            + proof.countNodes() + ")"));
+                        + proof.countNodes() + ")"));
         } catch (InterruptedException exception) {
             println("time out");
         }
@@ -207,7 +213,9 @@ public class LemmataHandler implements TacletFilter {
     public ImmutableSet<Taclet> filter(List<TacletInfo> taclets) {
         ImmutableSet<Taclet> set = DefaultImmutableSet.nil();
         for (TacletInfo tacletInfo : taclets) {
-            if (!tacletInfo.isAlreadyInUse() && !tacletInfo.isNotSupported()) { set = set.add(tacletInfo.getTaclet()); }
+            if (!tacletInfo.isAlreadyInUse() && !tacletInfo.isNotSupported()) {
+                set = set.add(tacletInfo.getTaclet());
+            }
         }
 
         return set;

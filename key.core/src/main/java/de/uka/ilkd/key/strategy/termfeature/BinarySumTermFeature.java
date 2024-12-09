@@ -17,7 +17,9 @@ public class BinarySumTermFeature implements TermFeature {
 
     public RuleAppCost compute(Term term, MutableState mState, Services services) {
         RuleAppCost f0Cost = f0.compute(term, mState, services);
-        if (f0Cost instanceof TopRuleAppCost) { return f0Cost; }
+        if (f0Cost instanceof TopRuleAppCost) {
+            return f0Cost;
+        }
         return f0Cost.add(f1.compute(term, mState, services));
     }
 

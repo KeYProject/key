@@ -198,7 +198,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             modalityPio, firstPair.getProgramVariable(), firstPair.getArrayIndex(),
             firstPair.getArrayStartIndex(), firstPair.getArrayEndIndex(), additionalCondition,
             parentValue);
-        if (parentValue != null) { parentValue.addChildVariable(variable); }
+        if (parentValue != null) {
+            parentValue.addChildVariable(variable);
+        }
         // Fill variable with values
         List<IExecutionValue> values = new LinkedList<>();
         createValues(variable, pairs, firstPair, childrenInfo, values, alreadyVisitedObjects);
@@ -448,7 +450,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public synchronized IExecutionValue[] getValues() throws ProofInputException {
-            if (values != null) { return values; }
+            if (values != null) {
+                return values;
+            }
             // Compute values
             Set<ExecutionVariableValuePair> pairs =
                 computeVariableValuePairs(getAdditionalCondition(), layoutTerm,
@@ -609,8 +613,12 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 if (getArrayStartIndex() != null) {
                     name += getArrayIndexString() + " >= " + getArrayStartIndexString();
                 }
-                if (getArrayStartIndex() != null && getArrayEndIndex() != null) { name += " and "; }
-                if (getArrayEndIndex() != null) { name += getArrayIndexString() + " <= " + getArrayEndIndexString(); }
+                if (getArrayStartIndex() != null && getArrayEndIndex() != null) {
+                    name += " and ";
+                }
+                if (getArrayEndIndex() != null) {
+                    name += getArrayIndexString() + " <= " + getArrayEndIndexString();
+                }
                 name += "]";
                 return name;
             } else {
@@ -696,7 +704,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          *        The {@link ExtractedExecutionVariable} to add.
          */
         protected void addChildVariable(ExtractedExecutionVariable variable) {
-            if (variable != null) { childVariables.add(variable); }
+            if (variable != null) {
+                childVariables.add(variable);
+            }
         }
 
         /**

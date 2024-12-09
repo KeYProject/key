@@ -83,7 +83,9 @@ public class TriggeredInstantiations implements TermGenerator {
                 terms = new HashSet<>();
                 axiomSet = new HashSet<>();
                 computeAxiomAndCandidateSets(seq, terms, axiomSet, services);
-                for (Term axiom : axiomSet) { axioms = axioms.add(axiom); }
+                for (Term axiom : axiomSet) {
+                    axioms = axioms.add(axiom);
+                }
 
                 synchronized (this) {
                     last = seq;
@@ -198,7 +200,9 @@ public class TriggeredInstantiations implements TermGenerator {
                             }
                         }
                     }
-                    if (addToInstances) { instances.add(middle); }
+                    if (addToInstances) {
+                        instances.add(middle);
+                    }
                 }
             }
         }

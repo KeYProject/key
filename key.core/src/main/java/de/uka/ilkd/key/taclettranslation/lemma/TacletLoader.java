@@ -88,7 +88,9 @@ public abstract class TacletLoader {
         HashMap<Taclet, TacletBuilder<? extends Taclet>> map = initConfig.getTaclet2Builder();
         boolean tacletfound = false;
         for (Taclet taclet : sysTaclets) {
-            if (taclet.equals(tacletToProve)) { tacletfound = true; }
+            if (taclet.equals(tacletToProve)) {
+                tacletfound = true;
+            }
 
             if (!tacletfound) {
                 newTaclets = newTaclets.prepend(taclet);
@@ -167,7 +169,9 @@ public abstract class TacletLoader {
         public ImmutableList<Taclet> loadTaclets() throws ProofInputException {
 
             // No axioms file:
-            if (initConfig == null) { initConfig = getProofEnvForTaclets().getInitConfigForEnvironment(); }
+            if (initConfig == null) {
+                initConfig = getProofEnvForTaclets().getInitConfigForEnvironment();
+            }
 
             int sizeBefore = initConfig.getTaclets().size();
 
@@ -181,7 +185,9 @@ public abstract class TacletLoader {
         @Override
         public ImmutableSet<Taclet> loadAxioms() throws ProofInputException {
             ImmutableSet<Taclet> axioms = DefaultImmutableSet.nil();
-            for (File f : filesForAxioms) { prepareKeYFile(f.toPath()); }
+            for (File f : filesForAxioms) {
+                prepareKeYFile(f.toPath());
+            }
 
             return axioms;
         }
@@ -190,7 +196,8 @@ public abstract class TacletLoader {
         @Override
         public ProofOblInput getTacletFile(Proof proof) {
             String name = proof.name().toString();
-            assert name.startsWith("Taclet: ") : "This depends (unfortunately) on the name of the proof";
+            assert name.startsWith("Taclet: ")
+                    : "This depends (unfortunately) on the name of the proof";
             TacletProofObligationInput result =
                 new TacletProofObligationInput(name.substring(8), null);
             result.setLoadInfo(fileForTaclets, new File("unknown"), filesForAxioms);
@@ -224,7 +231,8 @@ public abstract class TacletLoader {
         @Override
         public ProofOblInput getTacletFile(Proof proof) {
             String name = proof.name().toString();
-            assert name.startsWith("Taclet: ") : "This depends (unfortunately) on the name of the proof";
+            assert name.startsWith("Taclet: ")
+                    : "This depends (unfortunately) on the name of the proof";
             return new TacletProofObligationInput(name.substring(8), null);
         }
 

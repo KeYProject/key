@@ -298,7 +298,9 @@ public class TextLineNumber extends JPanel
             descent = fontMetrics.getDescent();
         } else {
             // We need to check all the attributes for font changes
-            if (fonts == null) { fonts = new HashMap<>(); }
+            if (fonts == null) {
+                fonts = new HashMap<>();
+            }
 
             Element root = component.getDocument().getDefaultRootElement();
             int index = root.getElementIndex(rowStartOffset);

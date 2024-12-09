@@ -53,8 +53,10 @@ public class PosInSequentTransferable implements Transferable {
      */
     public PosInSequentTransferable(PosInSequent pis, Services serv) {
         this.pis = pis;
-        if (!pis.isSequent()) { this.stringSelection =
-            ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv); }
+        if (!pis.isSequent()) {
+            this.stringSelection =
+                ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv);
+        }
     }
 
     /**
@@ -91,7 +93,9 @@ public class PosInSequentTransferable implements Transferable {
         if (flavor != null) {
             if (flavor.equals(POS_IN_SEQUENT_TRANSFER)) {
                 return pis;
-            } else if (flavor.equals(DataFlavor.stringFlavor)) { return stringSelection; }
+            } else if (flavor.equals(DataFlavor.stringFlavor)) {
+                return stringSelection;
+            }
         }
         throw new UnsupportedFlavorException(flavor);
     }

@@ -139,7 +139,9 @@ public abstract class VariableDeclaration extends JavaDeclaration
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (typeReference != null && index == 0) { return typeReference; }
+        if (typeReference != null && index == 0) {
+            return typeReference;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

@@ -71,12 +71,15 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
         pCenter.add(new JLabel(INTRO_LABEL), new CC().span().alignX("left"));
 
         addSeparator("Dependency graph");
-        alwaysTrack = addCheckBox(ALWAYS_TRACK, ALWAYS_TRACK_INFO, true, e -> {});
-        dotExecutable = addTextField(DOT_EXECUTABLE, "dot", DOT_EXECUTABLE_INFO, e -> {});
+        alwaysTrack = addCheckBox(ALWAYS_TRACK, ALWAYS_TRACK_INFO, true, e -> {
+        });
+        dotExecutable = addTextField(DOT_EXECUTABLE, "dot", DOT_EXECUTABLE_INFO, e -> {
+        });
 
         addSeparator("Duplicate rule applications");
         aggressiveDeduplicate =
-            addCheckBox(AGGRESSIVE_DEDUPLICATE, AGGRESSIVE_DEDUPLICATE_INFO, true, e -> {});
+            addCheckBox(AGGRESSIVE_DEDUPLICATE, AGGRESSIVE_DEDUPLICATE_INFO, true, e -> {
+            });
     }
 
     @Override

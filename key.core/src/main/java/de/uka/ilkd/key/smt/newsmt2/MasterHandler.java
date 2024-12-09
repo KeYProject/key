@@ -95,10 +95,14 @@ public class MasterHandler {
      */
     public void addDeclarationsAndAxioms(Properties snippets) {
         String decls = snippets.getProperty("decls");
-        if (decls != null) { addDeclaration(new VerbatimSMT(decls)); }
+        if (decls != null) {
+            addDeclaration(new VerbatimSMT(decls));
+        }
 
         String axioms = snippets.getProperty("axioms");
-        if (axioms != null) { addAxiom(new VerbatimSMT(axioms)); }
+        if (axioms != null) {
+            addAxiom(new VerbatimSMT(axioms));
+        }
 
         for (Entry<Object, Object> en : snippets.entrySet()) {
             String key = (String) en.getKey();
@@ -204,7 +208,9 @@ public class MasterHandler {
      * @return a generic translation as unknown value
      */
     private SExpr handleAsUnknownValue(Term problem) {
-        if (unknownValues.containsKey(problem)) { return unknownValues.get(problem); }
+        if (unknownValues.containsKey(problem)) {
+            return unknownValues.get(problem);
+        }
         int number = unknownValues.size();
         SExpr translation;
         SExpr abbr = new SExpr("unknown_" + number, Type.UNIVERSE);
@@ -276,7 +282,9 @@ public class MasterHandler {
      */
     SExpr handleAsFunctionCall(String functionName, Type type, Term term) {
         List<SExpr> children = new ArrayList<>();
-        for (int i = 0; i < term.arity(); i++) { children.add(translate(term.sub(i), Type.UNIVERSE)); }
+        for (int i = 0; i < term.arity(); i++) {
+            children.add(translate(term.sub(i), Type.UNIVERSE));
+        }
         return new SExpr(functionName, type, children);
     }
 
@@ -324,7 +332,9 @@ public class MasterHandler {
      */
     public List<SExpr> translate(Iterable<Term> terms) {
         List<SExpr> result = new LinkedList<>();
-        for (Term term : terms) { result.add(translate(term)); }
+        for (Term term : terms) {
+            result.add(translate(term));
+        }
         return result;
     }
 
@@ -357,7 +367,9 @@ public class MasterHandler {
     }
 
     void introduceSymbol(String functionName) throws SMTTranslationException {
-        if (isKnownSymbol(functionName)) { return; }
+        if (isKnownSymbol(functionName)) {
+            return;
+        }
 
         if (translationState.containsKey(functionName + ".intro")) {
             SymbolIntroducer introducer =
@@ -367,7 +379,9 @@ public class MasterHandler {
 
         // Handle it locally.
         // mark it known to avoid cyclic inclusion (if not already registered)
-        if (!isKnownSymbol(functionName)) { addKnownSymbol(functionName); }
+        if (!isKnownSymbol(functionName)) {
+            addKnownSymbol(functionName);
+        }
 
         if (translationState.containsKey(functionName + ".decls")) {
             String decls = (String) translationState.get(functionName + ".decls");
@@ -384,7 +398,9 @@ public class MasterHandler {
         if (translationState.containsKey(functionName + ".deps")) {
             String entry = (String) translationState.get(functionName + ".deps");
             String[] deps = entry.trim().split(", *");
-            for (String dep : deps) { introduceSymbol(dep); }
+            for (String dep : deps) {
+                introduceSymbol(dep);
+            }
         }
 
     }

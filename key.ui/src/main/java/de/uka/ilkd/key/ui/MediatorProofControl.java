@@ -56,7 +56,9 @@ public class MediatorProofControl extends AbstractProofControl {
     @Override
     public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos) {
         boolean result = super.selectedTaclet(taclet, goal, pos);
-        if (!result) { ui.notify(new GeneralFailureEvent("Taclet application failed." + taclet.name())); }
+        if (!result) {
+            ui.notify(new GeneralFailureEvent("Taclet application failed." + taclet.name()));
+        }
         return result;
     }
 
@@ -89,7 +91,9 @@ public class MediatorProofControl extends AbstractProofControl {
      */
     @Override
     public void stopAutoMode() {
-        if (worker != null) { worker.cancel(true); }
+        if (worker != null) {
+            worker.cancel(true);
+        }
         ui.getMediator().interrupt();
     }
 
@@ -162,7 +166,9 @@ public class MediatorProofControl extends AbstractProofControl {
             this.initialGoals = goals.stream().map(Goal::node).collect(Collectors.toList());
             this.applyStrategy = new ApplyStrategy(
                 proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
-            if (ptl != null) { applyStrategy.addProverTaskObserver(ptl); }
+            if (ptl != null) {
+                applyStrategy.addProverTaskObserver(ptl);
+            }
             applyStrategy.addProverTaskObserver(getDefaultProverTaskListener());
 
             if (ui.getMediator().getAutoSaver() != null) {
@@ -189,7 +195,9 @@ public class MediatorProofControl extends AbstractProofControl {
                 ui.getMediator().finishAutoMode(proof, true, true, null);
                 emitInteractiveAutoMode(initialGoals, proof, info);
 
-                if (info.getException() != null) { notifyException(info.getException()); }
+                if (info.getException() != null) {
+                    notifyException(info.getException());
+                }
             }
         }
 

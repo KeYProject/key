@@ -66,7 +66,9 @@ class StdPredicateEstimator implements PredicateEstimator {
             int index = branchLabel.lastIndexOf(suffix);
             branchLabel = branchLabel.substring(0, index);
 
-            if (branchLabel.startsWith(CUT_LABEL)) { branchLabel = branchLabel.substring(CUT_LABEL.length()); }
+            if (branchLabel.startsWith(CUT_LABEL)) {
+                branchLabel = branchLabel.substring(CUT_LABEL.length());
+            }
 
             final Term term = translate(branchLabel, proof.getServices());
 
@@ -75,7 +77,9 @@ class StdPredicateEstimator implements PredicateEstimator {
 
                     @Override
                     public Term getPredicate() {
-                        if (!positive) { return proof.getServices().getTermBuilder().not(term); }
+                        if (!positive) {
+                            return proof.getServices().getTermBuilder().not(term);
+                        }
                         return term;
                     }
 
@@ -117,15 +121,27 @@ class StdPredicateEstimator implements PredicateEstimator {
         TreeSet<Node> set = new TreeSet<>(Comparator.comparingInt(Node::serialNr));
 
         Node node = partner.getNode(0);
-        while (!node.root()) { set.add(node); node = node.parent(); }
-        if (node.root()) { set.add(node); }
+        while (!node.root()) {
+            set.add(node);
+            node = node.parent();
+        }
+        if (node.root()) {
+            set.add(node);
+        }
 
         node = partner.getNode(1);
-        while (node.parent() != null && !set.contains(node)) { node = node.parent(); }
+        while (node.parent() != null && !set.contains(node)) {
+            node = node.parent();
+        }
 
         if (set.contains(node)) {
             Iterator<Node> it = node.childrenIterator();
-            while (it.hasNext()) { Node child = it.next(); if (set.contains(child)) { return child; } }
+            while (it.hasNext()) {
+                Node child = it.next();
+                if (set.contains(child)) {
+                    return child;
+                }
+            }
         }
 
         return null;

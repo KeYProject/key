@@ -148,16 +148,22 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof IBuiltInRuleApp that)) { return false; }
+        if (!(obj instanceof IBuiltInRuleApp that)) {
+            return false;
+        }
         if (!(Objects.equals(rule(), that.rule())
                 && Objects.equals(getHeapContext(), that.getHeapContext()))) {
             return false;
         }
         ImmutableList<PosInOccurrence> ifInsts1 = ifInsts();
         ImmutableList<PosInOccurrence> ifInsts2 = that.ifInsts();
-        if (ifInsts1.size() != ifInsts2.size()) { return false; }
+        if (ifInsts1.size() != ifInsts2.size()) {
+            return false;
+        }
         while (!ifInsts1.isEmpty()) {
-            if (!ifInsts1.head().eqEquals(ifInsts2.head())) { return false; }
+            if (!ifInsts1.head().eqEquals(ifInsts2.head())) {
+                return false;
+            }
             ifInsts1 = ifInsts1.tail();
             ifInsts2 = ifInsts2.tail();
         }

@@ -83,7 +83,9 @@ class TwoSidedMatching {
                 && (trigger.isElementOfMultitrigger() || sub.isTotalOn(trigger.getUniVariables())
                 // sub.containFreevar(trigger.ts.allTerm.
                 // varsBoundHere(0).getQuantifiableVariable(0))
-                )) { allsubs = allsubs.add(sub); }
+                )) {
+            allsubs = allsubs.add(sub);
+        }
         final Operator op = target.op();
         if (!(op instanceof Modality || op instanceof UpdateApplication)) {
             for (int i = 0; i < target.arity(); i++) {
@@ -103,10 +105,16 @@ class TwoSidedMatching {
                 QuantifiableVariable q = quantifiableVariable;
                 Term mv = triggerSubstWithMVs.getSubstitutedTerm(q);
                 Term t = c.getInstantiation((Metavariable) (mv.op()), services);
-                if (t == null || t.op() instanceof Metavariable) { return null; }
-                if (isGround(t)) { sub = sub.put(q, t); }
+                if (t == null || t.op() instanceof Metavariable) {
+                    return null;
+                }
+                if (isGround(t)) {
+                    sub = sub.put(q, t);
+                }
             }
-            if (sub.size() > 0) { return new Substitution(sub); }
+            if (sub.size() > 0) {
+                return new Substitution(sub);
+            }
         }
         return null;
     }

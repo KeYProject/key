@@ -66,7 +66,9 @@ public class Semisequent implements Iterable<SequentFormula> {
      *        list of sequent formulas
      */
     public static Semisequent create(Collection<SequentFormula> seqList) {
-        if (seqList.isEmpty()) { return EMPTY_SEMISEQUENT; }
+        if (seqList.isEmpty()) {
+            return EMPTY_SEMISEQUENT;
+        }
         return new Semisequent(seqList);
     }
 
@@ -218,7 +220,10 @@ public class Semisequent implements Iterable<SequentFormula> {
 
         searchList = semiCI.getFormulaList().take(pos).prepend(sequentFormula);
 
-        while (pos > 0) { --pos; searchList = searchList.prepend(newSeqList[pos]); }
+        while (pos > 0) {
+            --pos;
+            searchList = searchList.prepend(newSeqList[pos]);
+        }
 
         // add new formula list to result object
         semiCI.setFormulaList(searchList);
@@ -371,7 +376,9 @@ public class Semisequent implements Iterable<SequentFormula> {
         ImmutableList<SequentFormula> newList = seqList;
         int index = 0;
 
-        if (idx < 0 || idx >= size()) { return new SemisequentChangeInfo(seqList); }
+        if (idx < 0 || idx >= size()) {
+            return new SemisequentChangeInfo(seqList);
+        }
 
         final SequentFormula[] temp = new SequentFormula[idx];
 
@@ -385,7 +392,9 @@ public class Semisequent implements Iterable<SequentFormula> {
         final SequentFormula removedFormula = newList.head();
         newList = newList.tail();
 
-        for (int k = index - 1; k >= 0; k--) { newList = newList.prepend(temp[k]); }
+        for (int k = index - 1; k >= 0; k--) {
+            newList = newList.prepend(temp[k]);
+        }
 
         // create change info object
         final SemisequentChangeInfo sci = new SemisequentChangeInfo(newList);
@@ -407,7 +416,9 @@ public class Semisequent implements Iterable<SequentFormula> {
         ImmutableList<SequentFormula> searchList = seqList;
         int index = 0;
         while (!searchList.isEmpty()) {
-            if (searchList.head() == sequentFormula) { return index; }
+            if (searchList.head() == sequentFormula) {
+                return index;
+            }
             searchList = searchList.tail();
             index++;
         }
@@ -425,7 +436,9 @@ public class Semisequent implements Iterable<SequentFormula> {
      *         {@link Sequent#size()}
      */
     public SequentFormula get(int idx) {
-        if (idx < 0 || idx >= seqList.size()) { throw new IndexOutOfBoundsException(); }
+        if (idx < 0 || idx >= seqList.size()) {
+            throw new IndexOutOfBoundsException();
+        }
         return seqList.take(idx).head();
     }
 
@@ -472,7 +485,9 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Semisequent)) { return false; }
+        if (!(o instanceof Semisequent)) {
+            return false;
+        }
         return seqList.equals(((Semisequent) o).seqList);
     }
 

@@ -123,7 +123,9 @@ public abstract class AbstractFileRepo implements FileRepo {
         if (source != null && target != null) {
             byte[] buffer = new byte[1024];
             int read;
-            while ((read = source.read(buffer)) >= 1) { target.write(buffer, 0, read); }
+            while ((read = source.read(buffer)) >= 1) {
+                target.write(buffer, 0, read);
+            }
             return true;
         } else {
             return false;
@@ -244,7 +246,9 @@ public abstract class AbstractFileRepo implements FileRepo {
      */
     public void saveProof(Path savePath) throws IOException {
         // We overwrite an existing proof here in any case. Checks have to be done earlier.
-        if (Files.exists(savePath)) { Files.delete(savePath); }
+        if (Files.exists(savePath)) {
+            Files.delete(savePath);
+        }
 
         // create actual ZIP file (plus its directory if not existent)
         Files.createDirectories(savePath.getParent());
@@ -258,7 +262,9 @@ public abstract class AbstractFileRepo implements FileRepo {
             // use the correct name for saving!
             // fix for #1655: replace separators to conform to zip specification (only slashes)!
             String entryName = getSaveName(p).toString();
-            if (File.separatorChar != '/') { entryName = entryName.replace(File.separatorChar, '/'); }
+            if (File.separatorChar != '/') {
+                entryName = entryName.replace(File.separatorChar, '/');
+            }
             zos.putNextEntry(new ZipEntry(entryName));
 
             InputStream is;
@@ -360,7 +366,9 @@ public abstract class AbstractFileRepo implements FileRepo {
      * @return the modified content of the file with inserted "\classpath ..." declarations.
      */
     private String addClasspath(String keyFileContent) {
-        if (classpath == null || classpath.isEmpty()) { return keyFileContent; }
+        if (classpath == null || classpath.isEmpty()) {
+            return keyFileContent;
+        }
 
         // build a String with all classpaths
         StringBuilder sb = new StringBuilder();
@@ -391,7 +399,9 @@ public abstract class AbstractFileRepo implements FileRepo {
         }
 
         // fallback: insert at beginning of String
-        if (index == -1) { index = 0; }
+        if (index == -1) {
+            index = 0;
+        }
 
         return keyFileContent.substring(0, index) + System.lineSeparator() + sb
                 + keyFileContent.substring(index);
@@ -399,13 +409,19 @@ public abstract class AbstractFileRepo implements FileRepo {
 
     @Override
     public void setBootClassPath(Path path) throws IllegalStateException {
-        if (bootclasspath != null) { throw new IllegalStateException("Bootclasspath is already set!"); }
-        if (path != null) { bootclasspath = path.toAbsolutePath().normalize(); }
+        if (bootclasspath != null) {
+            throw new IllegalStateException("Bootclasspath is already set!");
+        }
+        if (path != null) {
+            bootclasspath = path.toAbsolutePath().normalize();
+        }
     }
 
     @Override
     public void setClassPath(List<Path> paths) throws IllegalStateException {
-        if (classpath != null) { throw new IllegalStateException("Classpath is already set!"); }
+        if (classpath != null) {
+            throw new IllegalStateException("Classpath is already set!");
+        }
         if (paths != null) {
             classpath = paths.stream().filter(Objects::nonNull) // to be sure it contains no null
                                                                 // elements
@@ -417,8 +433,12 @@ public abstract class AbstractFileRepo implements FileRepo {
 
     @Override
     public void setJavaPath(Path path) throws IllegalStateException {
-        if (javaPath != null) { throw new IllegalStateException("JavaPath is already set!"); }
-        if (path != null) { javaPath = path; }
+        if (javaPath != null) {
+            throw new IllegalStateException("JavaPath is already set!");
+        }
+        if (path != null) {
+            javaPath = path;
+        }
     }
 
     @Override
@@ -447,7 +467,9 @@ public abstract class AbstractFileRepo implements FileRepo {
      * Clears all data in the FileRepo and marks it as disposed.
      */
     protected void dispose() {
-        if (disposed) { return; }
+        if (disposed) {
+            return;
+        }
 
         // delete all references
         javaPath = null;

@@ -50,7 +50,9 @@ class KeyJavaPipelineTest {
             try {
                 ParseResult<CompilationUnit> r = jp.parse(it);
                 if (!r.isSuccessful()) {
-                    for (Problem problem : r.getProblems()) { System.err.println(problem); }
+                    for (Problem problem : r.getProblems()) {
+                        System.err.println(problem);
+                    }
                     throw new IllegalStateException();
                 }
                 var c = r.getResult().get();
@@ -94,7 +96,9 @@ class KeyJavaPipelineTest {
     private void checkEqualFile(Path expectedFile, Path expectedFolder, Path actualFolder)
             throws IOException {
         var actualFile = actualFolder.resolve(expectedFolder.relativize(expectedFile));
-        if (!Files.exists(actualFile)) { Assertions.fail("Actual file " + actualFile + " does not exists."); }
+        if (!Files.exists(actualFile)) {
+            Assertions.fail("Actual file " + actualFile + " does not exists.");
+        }
         var expected = Files.readString(expectedFile);
         var actual = Files.readString(actualFile);
 

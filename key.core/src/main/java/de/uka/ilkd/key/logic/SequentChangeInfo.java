@@ -295,20 +295,26 @@ public class SequentChangeInfo {
      */
     public void combine(SequentChangeInfo succ) {
         final SequentChangeInfo antec = this;
-        if (antec == succ) { return; }
+        if (antec == succ) {
+            return;
+        }
 
         antec.resultingSequent = succ.resultingSequent;
 
         if (antec.antecedent != succ.antecedent) {
             if (antec.antecedent == null) {
                 antec.antecedent = succ.antecedent;
-            } else if (succ.antecedent != null) { antec.antecedent.combine(succ.antecedent); }
+            } else if (succ.antecedent != null) {
+                antec.antecedent.combine(succ.antecedent);
+            }
         }
 
         if (antec.succedent != succ.succedent) {
             if (antec.succedent == null) {
                 antec.succedent = succ.succedent;
-            } else if (succ.succedent != null) { antec.succedent.combine(succ.succedent); }
+            } else if (succ.succedent != null) {
+                antec.succedent.combine(succ.succedent);
+            }
         }
     }
 

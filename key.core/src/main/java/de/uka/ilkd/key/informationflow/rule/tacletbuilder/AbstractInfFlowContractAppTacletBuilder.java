@@ -56,7 +56,9 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     public Term buildContractApplPredTerm() {
         ProofObligationVars appData = poVars;
         Term contractApplPredTerm = getContractApplPred(appData);
-        for (Term update : contextUpdates) { contractApplPredTerm = apply(update, contractApplPredTerm); }
+        for (Term update : contextUpdates) {
+            contractApplPredTerm = apply(update, contractApplPredTerm);
+        }
         return contractApplPredTerm;
     }
 
@@ -78,7 +80,9 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         int i = 0;
         final String s = name.toString();
         name = new Name(s + "_" + getBranchUID(goal.node()));
-        while (InfFlowContractAppTaclet.registered(name)) { name = new Name(s + "_" + i++); }
+        while (InfFlowContractAppTaclet.registered(name)) {
+            name = new Name(s + "_" + i++);
+        }
         InfFlowContractAppTaclet.register(name);
         return name;
     }
@@ -98,7 +102,9 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         StringBuilder path = new StringBuilder();
         int zeroCount = 0;
 
-        while (!node.root() && node.parent().childrenCount() <= 1) { node = node.parent(); }
+        while (!node.root() && node.parent().childrenCount() <= 1) {
+            node = node.parent();
+        }
 
         // For each branching in the path, append the number of the branch in base-36
         // (using 0-9 and a-z as digits) followed by a '_'.
@@ -116,7 +122,9 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             zeroCount++;
             node = node.parent();
 
-            while (!node.root() && node.parent().childrenCount() <= 1) { node = node.parent(); }
+            while (!node.root() && node.parent().childrenCount() <= 1) {
+                node = node.parent();
+            }
         }
 
         path.append("_");

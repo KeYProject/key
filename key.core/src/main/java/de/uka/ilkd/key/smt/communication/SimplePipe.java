@@ -109,7 +109,7 @@ public class SimplePipe implements Pipe {
                 tryToReadExhaustively();
                 int exit = process.exitValue();
                 throw new IllegalStateException("Process terminated (exit code " + exit
-                        + "). Process report:\n" + getReadMessages());
+                    + "). Process report:\n" + getReadMessages());
             } else {
                 throw e;
             }

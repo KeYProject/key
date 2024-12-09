@@ -48,7 +48,9 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
             Services services) {
         final MatchConditions result =
             match(termPosition.getCurrentSubterm(), matchConditions, services);
-        if (result != null) { termPosition.gotoNext(); }
+        if (result != null) {
+            termPosition.gotoNext();
+        }
         return result;
     }
 }

@@ -55,7 +55,9 @@ public class TacletPrefixBuilder {
         Iterator<NotFreeIn> it = tacletBuilder.varsNotFreeIn();
         while (it.hasNext()) {
             NotFreeIn notFreeIn = it.next();
-            if (notFreeIn.second() == sv) { result = result.remove(notFreeIn.first()); }
+            if (notFreeIn.second() == sv) {
+                result = result.remove(notFreeIn.first());
+            }
         }
         return result;
     }
@@ -101,12 +103,16 @@ public class TacletPrefixBuilder {
     }
 
     private void visit(Sequent s) {
-        for (final SequentFormula cf : s) { visit(cf.formula()); }
+        for (final SequentFormula cf : s) {
+            visit(cf.formula());
+        }
     }
 
     private void visit(TacletGoalTemplate templ) {
         visit(templ.sequent());
-        if (templ instanceof RewriteTacletGoalTemplate) { visit(((RewriteTacletGoalTemplate) templ).replaceWith()); }
+        if (templ instanceof RewriteTacletGoalTemplate) {
+            visit(((RewriteTacletGoalTemplate) templ).replaceWith());
+        }
         if (templ instanceof AntecSuccTacletGoalTemplate) {
             visit(((AntecSuccTacletGoalTemplate) templ).replaceWith());
         }
@@ -123,7 +129,9 @@ public class TacletPrefixBuilder {
 
         for (final TacletGoalTemplate tgt : tacletBuilder.goalTemplates()) {
             visit(tgt);
-            for (Taclet tacletInAddRule : tgt.rules()) { checkPrefixInAddRules(tacletInAddRule); }
+            for (Taclet tacletInAddRule : tgt.rules()) {
+                checkPrefixInAddRules(tacletInAddRule);
+            }
         }
     }
 
@@ -142,7 +150,9 @@ public class TacletPrefixBuilder {
         // we have to descend into the addrules of the addrules
 
         for (TacletGoalTemplate tacletGoalTemplate : addRule.goalTemplates()) {
-            for (Taclet taclet : tacletGoalTemplate.rules()) { checkPrefixInAddRules(taclet); }
+            for (Taclet taclet : tacletGoalTemplate.rules()) {
+                checkPrefixInAddRules(taclet);
+            }
         }
     }
 
@@ -154,9 +164,13 @@ public class TacletPrefixBuilder {
         int count = 0;
         for (TacletGoalTemplate tmpl : rwtacletBuilder.goalTemplates()) {
             if (tmpl instanceof RewriteTacletGoalTemplate) {
-                if (((RewriteTacletGoalTemplate) tmpl).replaceWith() != null) { count++; }
+                if (((RewriteTacletGoalTemplate) tmpl).replaceWith() != null) {
+                    count++;
+                }
             }
-            if (count > 1) { return false; }
+            if (count > 1) {
+                return false;
+            }
         }
         return true;
     }
@@ -182,7 +196,9 @@ public class TacletPrefixBuilder {
     }
 
     private void considerContext() {
-        if (!(tacletBuilder instanceof RewriteTacletBuilder) || !atMostOneRepl()) { return; }
+        if (!(tacletBuilder instanceof RewriteTacletBuilder) || !atMostOneRepl()) {
+            return;
+        }
         for (final ImmutableMapEntry<SchemaVariable, TacletPrefix> entry : prefixMap) {
             if (occurrsOnlyInFindOrRepl(entry.key())) {
                 prefixMap = prefixMap.put(entry.key(), entry.value().setContext(true));
@@ -201,9 +217,9 @@ public class TacletPrefixBuilder {
         InvalidPrefixException(String tacletName, SchemaVariable sv, TacletPrefix prefix,
                 ImmutableSet<SchemaVariable> sndPrefixVar) {
             super("Schema variable " + sv + "occurs at different places " + "in taclet "
-                    + tacletName + " with different prefixes.\n" + "Prefix P1:"
-                    + ((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil() : prefix.prefix())
-                    + "\n" + "Prefix P2:" + sndPrefixVar);
+                + tacletName + " with different prefixes.\n" + "Prefix P1:"
+                + ((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil() : prefix.prefix())
+                + "\n" + "Prefix P2:" + sndPrefixVar);
         }
 
     }

@@ -29,7 +29,9 @@ public class TermLabelTermFeature extends BinaryTermFeature {
 
     @Override
     protected boolean filter(Term term, MutableState mState, Services services) {
-        if (label == null) { return term.hasLabels(); }
+        if (label == null) {
+            return term.hasLabels();
+        }
         return term.containsLabel(label);
     }
 }

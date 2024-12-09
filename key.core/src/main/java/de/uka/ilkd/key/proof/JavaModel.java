@@ -59,10 +59,12 @@ public final class JavaModel {
         this.modelDir = modelDir;
         this.modelTag = "KeY_" + (new Date()).getTime();
         this.descr = "model " + modelDir.toFile().getName() + "@"
-                + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
+            + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
         StringBuilder sb = new StringBuilder();
         if (classPathEntries != null && !classPathEntries.isEmpty()) {
-            for (Path f : classPathEntries) { sb.append("\"").append(f.toAbsolutePath()).append("\", "); }
+            for (Path f : classPathEntries) {
+                sb.append("\"").append(f.toAbsolutePath()).append("\", ");
+            }
             sb.setLength(sb.length() - 2);
         }
         this.classPath = sb.toString();
@@ -72,7 +74,9 @@ public final class JavaModel {
         if (includes != null) {
             var includeList = includes.getIncludes();
             if (!includeList.isEmpty()) {
-                for (var f : includeList) { sb2.append("\"").append(f).append("\", "); }
+                for (var f : includeList) {
+                    sb2.append("\"").append(f).append("\", ");
+                }
                 sb2.setLength(sb2.length() - 2);
             }
         }
@@ -119,7 +123,9 @@ public final class JavaModel {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || o.getClass() != this.getClass()) { return false; }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
         final JavaModel other = (JavaModel) o;
         if (getModelTag() == null) {
             return other.getModelTag() == null;
@@ -142,6 +148,6 @@ public final class JavaModel {
     @Override
     public String toString() {
         return "---Program model---\nModel dir: " + modelDir + "\nModel tag: " + modelTag
-                + "\nDescription: " + descr;
+            + "\nDescription: " + descr;
     }
 }

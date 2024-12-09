@@ -120,7 +120,7 @@ public class SimplePredicateAbstractionLattice extends AbstractPredicateAbstract
     @Override
     public String toString() {
         return "Simple Predicate Abstraction Lattice of size " + size() + " with predicates "
-                + predicates.toString();
+            + predicates.toString();
     }
 
     @Override

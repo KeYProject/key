@@ -94,7 +94,9 @@ public class KeyIO {
         KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
-        if (schemaNamespace != null) { visitor.setSchemaVariables(schemaNamespace); }
+        if (schemaNamespace != null) {
+            visitor.setSchemaVariables(schemaNamespace);
+        }
         Term t = (Term) ctx.accept(visitor);
         warnings = visitor.getBuildingIssues();
         return t;
@@ -114,7 +116,9 @@ public class KeyIO {
         KeyAst.Seq ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
-        if (schemaNamespace != null) { visitor.setSchemaVariables(schemaNamespace); }
+        if (schemaNamespace != null) {
+            visitor.setSchemaVariables(schemaNamespace);
+        }
         Sequent seq = (Sequent) ctx.accept(visitor);
         warnings = visitor.getBuildingIssues();
         return seq;
@@ -240,7 +244,9 @@ public class KeyIO {
         }
 
         public List<Taclet> loadComplete() throws IOException {
-            if (ctx.isEmpty()) { parseFile(); }
+            if (ctx.isEmpty()) {
+                parseFile();
+            }
             loadDeclarations();
             loadSndDegreeDeclarations();
             activateLDTs();
@@ -253,7 +259,9 @@ public class KeyIO {
         }
 
         public ProblemFinder loadCompleteProblem() throws IOException {
-            if (ctx.isEmpty()) { parseFile(); }
+            if (ctx.isEmpty()) {
+                parseFile();
+            }
             loadDeclarations();
             loadSndDegreeDeclarations();
             activateLDTs();
@@ -262,7 +270,9 @@ public class KeyIO {
         }
 
         public Loader parseFile() throws IOException {
-            if (!ctx.isEmpty()) { return this; }
+            if (!ctx.isEmpty()) {
+                return this;
+            }
             long start = System.currentTimeMillis();
             if (resource != null) {
                 ctx = parseFiles(resource);
@@ -276,12 +286,16 @@ public class KeyIO {
         }
 
         public ProblemInformation getProblemInformation() {
-            if (ctx.isEmpty()) { throw new IllegalStateException("No files loaded."); }
+            if (ctx.isEmpty()) {
+                throw new IllegalStateException("No files loaded.");
+            }
             return ctx.get(0).getProblemInformation();
         }
 
         public ChoiceInformation loadChoices() {
-            if (ctx.isEmpty()) { throw new IllegalStateException("No files loaded."); }
+            if (ctx.isEmpty()) {
+                throw new IllegalStateException("No files loaded.");
+            }
             return ParsingFacade.getChoices(ctx);
         }
 
@@ -301,21 +315,28 @@ public class KeyIO {
         public Loader loadSndDegreeDeclarations() {
             FunctionPredicateBuilder visitor = new FunctionPredicateBuilder(services, nss);
             long start = System.currentTimeMillis();
-            for (int i = ctx.size() - 1; i >= 0; --i) { KeyAst.File s = ctx.get(i); s.accept(visitor); }
+            for (int i = ctx.size() - 1; i >= 0; --i) {
+                KeyAst.File s = ctx.get(i);
+                s.accept(visitor);
+            }
             long stop = System.currentTimeMillis();
             LOGGER.debug("MODE: {} took {}", "2nd degree decls", stop - start);
             return this;
         }
 
         public ProblemFinder loadProblem() {
-            if (ctx.isEmpty()) { throw new IllegalStateException(); }
+            if (ctx.isEmpty()) {
+                throw new IllegalStateException();
+            }
             ProblemFinder pf = new ProblemFinder(services, nss);
             ctx.get(0).accept(pf);
             return pf;
         }
 
         public List<Taclet> loadTaclets() {
-            if (ctx.isEmpty()) { throw new IllegalStateException(); }
+            if (ctx.isEmpty()) {
+                throw new IllegalStateException();
+            }
             List<TacletPBuilder> parsers = ctx.stream().map(it -> new TacletPBuilder(services, nss))
                     .toList();
             long start = System.currentTimeMillis();

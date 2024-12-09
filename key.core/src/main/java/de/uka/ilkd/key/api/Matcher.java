@@ -91,7 +91,9 @@ public class Matcher {
 
             SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];
             int i = 0;
-            for (SequentFormula fm : patternSeq) { patternArray[i++] = fm; }
+            for (SequentFormula fm : patternSeq) {
+                patternArray[i++] = fm;
+            }
 
 
             Queue<SearchNode> queue = new LinkedList<>();

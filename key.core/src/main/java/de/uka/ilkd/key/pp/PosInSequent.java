@@ -113,7 +113,9 @@ public class PosInSequent {
      * returns a string representation of this PosInSequent
      */
     public String toString() {
-        if (isSequent()) { return "Whole Sequent"; }
+        if (isSequent()) {
+            return "Whole Sequent";
+        }
         return String.valueOf(posInOcc);
     }
 }

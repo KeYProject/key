@@ -95,7 +95,9 @@ public class TestMethodBreakpointWithHitCount extends AbstractSymbolicExecutionT
         } finally {
             setOneStepSimplificationEnabled(null, originalOneStepSimplification);
             restoreTacletOptions(originalTacletOptions);
-            if (env != null) { env.dispose(); }
+            if (env != null) {
+                env.dispose();
+            }
         }
     }
 }

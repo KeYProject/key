@@ -54,9 +54,15 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
         ImmutableList<Term> ante = getFormulaeOfSemisequent(s.antecedent());
         ImmutableList<Term> succ = getFormulaeOfSemisequent(s.succedent());
 
-        if (ante.size() == 0 && succ.size() == 0) { return null; }
-        if (succ.size() == 0) { return builder.not(builder.and(ante)); }
-        if (ante.size() == 0) { return builder.or(succ); }
+        if (ante.size() == 0 && succ.size() == 0) {
+            return null;
+        }
+        if (succ.size() == 0) {
+            return builder.not(builder.and(ante));
+        }
+        if (ante.size() == 0) {
+            return builder.or(succ);
+        }
 
         return builder.imp(builder.and(ante), builder.or(succ));
     }
@@ -71,7 +77,9 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
      */
     private ImmutableList<Term> getFormulaeOfSemisequent(Semisequent s) {
         ImmutableList<Term> terms = ImmutableSLList.nil();
-        for (SequentFormula cf : s) { terms = terms.append(cf.formula()); }
+        for (SequentFormula cf : s) {
+            terms = terms.append(cf.formula());
+        }
         return terms;
 
     }

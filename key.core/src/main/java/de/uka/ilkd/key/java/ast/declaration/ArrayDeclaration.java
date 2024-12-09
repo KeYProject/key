@@ -74,10 +74,18 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
      */
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) { result += modArray.size(); }
-        if (name != null) { result++; }
-        if (baseType != null) { result++; }
-        if (members != null) { result += members.size(); }
+        if (modArray != null) {
+            result += modArray.size();
+        }
+        if (name != null) {
+            result++;
+        }
+        if (baseType != null) {
+            result++;
+        }
+        if (members != null) {
+            result += members.size();
+        }
         return result;
     }
 
@@ -98,18 +106,26 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) { return modArray.get(index); }
+            if (len > index) {
+                return modArray.get(index);
+            }
             index -= len;
         }
         if (name != null) {
-            if (index == 0) { return name; }
+            if (index == 0) {
+                return name;
+            }
             index--;
         }
         if (baseType != null) {
-            if (index == 0) { return baseType; }
+            if (index == 0) {
+                return baseType;
+            }
             index--;
         }
-        if (members != null) { return members.get(index); }
+        if (members != null) {
+            return members.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

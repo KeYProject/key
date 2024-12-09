@@ -55,7 +55,10 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         // ImmutableArray<Sort> pmSorts = pm.argSorts();
 
         int i = 0;
-        for (final Term arg : termList) { argSorts[i] = arg.sort(); i++; }
+        for (final Term arg : termList) {
+            argSorts[i] = arg.sort();
+            i++;
+        }
 
         return argSorts;
     }
@@ -71,7 +74,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
          * This predicate needs to present on all branches and, therefore, must be added to the
          * toplevel function namespace. Hence, we rewind to the parent namespace here.
          */
-        while (functionNS.parent() != null) { functionNS = functionNS.parent(); }
+        while (functionNS.parent() != null) {
+            functionNS = functionNS.parent();
+        }
 
         JFunction pred = functionNS.lookup(name);
 
@@ -90,7 +95,10 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         Term[] predArgs = new Term[predArgSorts.length];
 
         int i = 0;
-        for (final Term arg : termList) { predArgs[i] = arg; i++; }
+        for (final Term arg : termList) {
+            predArgs[i] = arg;
+            i++;
+        }
 
         return tb.func(pred, predArgs);
     }
@@ -127,7 +135,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         for (Term localPreVar : poVars.pre.localVars) {
             Term localPostVar = localPostVarsIt.next();
             relevantPreVars = relevantPreVars.append(localPreVar);
-            if (localPostVar != localPreVar) { relevantPostVars = relevantPostVars.append(localPostVar); }
+            if (localPostVar != localPreVar) {
+                relevantPostVars = relevantPostVars.append(localPostVar);
+            }
         }
 
         // guard term (for loop invariants) is relevant in the pre and

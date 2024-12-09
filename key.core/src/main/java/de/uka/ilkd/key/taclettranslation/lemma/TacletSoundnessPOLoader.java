@@ -115,7 +115,9 @@ public class TacletSoundnessPOLoader {
 
         this.isOnlyUsedForProvingTaclets = isOnlyUsedForProvingTaclets;
 
-        if (listener != null) { listeners.add(listener); }
+        if (listener != null) {
+            listeners.add(listener);
+        }
     }
 
     public void addListener(LoaderListener listener) {
@@ -127,17 +129,23 @@ public class TacletSoundnessPOLoader {
     }
 
     public void start() {
-        for (LoaderListener listener : listeners) { listener.started(); }
+        for (LoaderListener listener : listeners) {
+            listener.started();
+        }
         Thread thread = new Thread(new Working(), "TacletSoundnessPOLoader");
         thread.start();
     }
 
     public void startSynchronously() {
-        for (LoaderListener listener : listeners) { listener.started(); }
+        for (LoaderListener listener : listeners) {
+            listener.started();
+        }
         try {
             doWork();
         } catch (ProofInputException exception) {
-            for (LoaderListener listener : listeners) { listener.stopped(exception); }
+            for (LoaderListener listener : listeners) {
+                listener.stopped(exception);
+            }
         } finally {
             for (LoaderListener listener : listeners) {
                 listener.stopped(resultingProof,
@@ -159,7 +167,9 @@ public class TacletSoundnessPOLoader {
             try {
                 doWork();
             } catch (final Throwable exception) {
-                for (LoaderListener listener : listeners) { listener.stopped(exception); }
+                for (LoaderListener listener : listeners) {
+                    listener.stopped(exception);
+                }
             } finally {
                 for (LoaderListener listener : listeners) {
                     listener.stopped(resultingProof,
@@ -176,7 +186,9 @@ public class TacletSoundnessPOLoader {
             ImmutableSet<Taclet> base) {
         List<TacletInfo> collectionOfTacletInfo = new ArrayList<>(base.size());
         TreeSet<Taclet> treeSet = new TreeSet<>(Comparator.comparing(o -> o.name().toString()));
-        for (Taclet taclet : base) { treeSet.add(taclet); }
+        for (Taclet taclet : base) {
+            treeSet.add(taclet);
+        }
 
         for (Taclet taclet : taclets) {
             collectionOfTacletInfo.add(
@@ -203,7 +215,9 @@ public class TacletSoundnessPOLoader {
         // filter the taclets that should be proved.
         computeResultingTaclets(collectionOfTacletInfo);
 
-        if (getResultingTaclets().isEmpty()) { return; }
+        if (getResultingTaclets().isEmpty()) {
+            return;
+        }
 
         resultingProof = loadAsLemmata
                 ? createProof(tacletLoader.getProofEnvForTaclets(), getResultingTaclets(), axioms,
@@ -217,10 +231,16 @@ public class TacletSoundnessPOLoader {
             ImmutableSet<Taclet> reference) {
         TreeSet<Taclet> treeSet =
             new TreeSet<>(Comparator.comparing(o -> o.name().toString()));
-        for (Taclet taclet : reference) { treeSet.add(taclet); }
+        for (Taclet taclet : reference) {
+            treeSet.add(taclet);
+        }
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
 
-        for (Taclet taclet : taclets) { if (treeSet.contains(taclet)) { result = result.add(taclet); } }
+        for (Taclet taclet : taclets) {
+            if (treeSet.contains(taclet)) {
+                result = result.add(taclet);
+            }
+        }
         return result;
     }
 
@@ -260,7 +280,9 @@ public class TacletSoundnessPOLoader {
 
 
         List<Taclet> tacletsToProveList = new ArrayList<>();
-        for (Taclet taclet : tacletsToProve) { tacletsToProveList.add(taclet); }
+        for (Taclet taclet : tacletsToProve) {
+            tacletsToProveList.add(taclet);
+        }
 
         InitConfig[] proofConfigs = new InitConfig[tacletsToProve.size()];
         for (int i = 0; i < proofConfigs.length; i++) {
@@ -290,7 +312,9 @@ public class TacletSoundnessPOLoader {
 
     public void registerProofs(ProofAggregate aggregate, ProofEnvironment proofEnv) {
         if (aggregate instanceof CompoundProof cp) {
-            for (ProofAggregate child : cp.getChildren()) { registerProofs(child, proofEnv); }
+            for (ProofAggregate child : cp.getChildren()) {
+                registerProofs(child, proofEnv);
+            }
         } else {
             assert aggregate instanceof SingleProof;
             Proof proof = aggregate.getFirstProof();

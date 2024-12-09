@@ -29,7 +29,7 @@ public class IntegerOpHandler implements SMTHandler {
     public static final SMTHandlerProperty.BooleanProperty PROPERTY_PRESBURGER =
         new BooleanProperty("Presburger", "Limit arithmetics to Presburger arithmetic (LIA)",
             "Some tools only support linear arithmetic, others "
-                    + "may handle this more efficiently.");
+                + "may handle this more efficiently.");
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
     private final Set<Operator> predicateOperators = new HashSet<>();
@@ -77,11 +77,17 @@ public class IntegerOpHandler implements SMTHandler {
     @Override
     public Capability canHandle(Term term) {
         Operator op = term.op();
-        if (!supportedOperators.containsKey(op)) { return Capability.UNABLE; }
+        if (!supportedOperators.containsKey(op)) {
+            return Capability.UNABLE;
+        }
 
-        if (!limitedToPresbuger || op != mul) { return Capability.YES_THIS_OPERATOR; }
+        if (!limitedToPresbuger || op != mul) {
+            return Capability.YES_THIS_OPERATOR;
+        }
 
-        if (!isIntLiteral(term.sub(0))) { isIntLiteral(term.sub(1)); }
+        if (!isIntLiteral(term.sub(0))) {
+            isIntLiteral(term.sub(1));
+        }
 
         return Capability.YES_THIS_INSTANCE;
     }

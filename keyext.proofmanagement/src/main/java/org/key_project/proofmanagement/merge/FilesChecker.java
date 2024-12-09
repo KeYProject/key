@@ -58,7 +58,9 @@ public class FilesChecker {
 
     private static List<Path> collectBcpFiles(ProofBundleHandler pbh) throws IOException {
         Path bcp = pbh.getBootclasspath();
-        if (bcp == null) { return Collections.emptyList(); }
+        if (bcp == null) {
+            return Collections.emptyList();
+        }
         try (var files = Files.walk(pbh.getBootclasspath())) {
             return files.toList();
         }
@@ -93,7 +95,9 @@ public class FilesChecker {
 
             // check if all files contained in both paths are equal
             for (Path p : mapA.keySet()) {
-                if (mapB.containsKey(p) && !(Arrays.equals(mapA.get(p), mapB.get(p)))) { return false; }
+                if (mapB.containsKey(p) && !(Arrays.equals(mapA.get(p), mapB.get(p)))) {
+                    return false;
+                }
             }
         } catch (IOException e1) {
             e1.printStackTrace();
@@ -122,7 +126,9 @@ public class FilesChecker {
 
             do {
                 numRead = fis.read(buffer);
-                if (numRead > 0) { complete.update(buffer, 0, numRead); }
+                if (numRead > 0) {
+                    complete.update(buffer, 0, numRead);
+                }
             } while (numRead != -1);
         }
         return complete.digest();

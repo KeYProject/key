@@ -72,9 +72,13 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
             Object bInst = app.instantiations().getInstantiation(b);
             boolean succApp = app.taclet().goalTemplates().head().sequent().antecedent().isEmpty();
             if (succApp) {
-                if (succs.contains(bInst)) { goal.apply(app); }
+                if (succs.contains(bInst)) {
+                    goal.apply(app);
+                }
             } else {
-                if (antes.contains(bInst)) { goal.apply(app); }
+                if (antes.contains(bInst)) {
+                    goal.apply(app);
+                }
             }
         }
     }

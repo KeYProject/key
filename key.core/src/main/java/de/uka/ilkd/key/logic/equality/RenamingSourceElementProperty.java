@@ -79,16 +79,26 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
             next2 = c2.getCurrentNode();
             // Handle special cases of prior equalsModRenaming implementation
             if (next1 instanceof LabeledStatement ls) {
-                if (!handleLabeledStatement(ls, next2, nat)) { return false; }
+                if (!handleLabeledStatement(ls, next2, nat)) {
+                    return false;
+                }
             } else if (next1 instanceof VariableSpecification vs) {
-                if (!handleVariableSpecification(vs, next2, nat)) { return false; }
+                if (!handleVariableSpecification(vs, next2, nat)) {
+                    return false;
+                }
             } else if (next1 instanceof ProgramVariable || next1 instanceof ProgramElementName) {
-                if (!handleProgramVariableOrElementName(next1, next2, nat)) { return false; }
+                if (!handleProgramVariableOrElementName(next1, next2, nat)) {
+                    return false;
+                }
             } else if (next1 instanceof JavaNonTerminalProgramElement jnte) {
                 if (!handleJavaNonTerminalProgramElements(jnte,
-                    next2)) { return false; }
+                    next2)) {
+                    return false;
+                }
             } else {
-                if (!handleStandard(next1, next2)) { return false; }
+                if (!handleStandard(next1, next2)) {
+                    return false;
+                }
             }
             // walk to the next nodes in the tree
         } while ((hasNext1 = c1.goToNext()) & (hasNext2 = c2.goToNext()));
@@ -183,8 +193,12 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
          * as we might have to add some entries of children nodes to a NameAbstractionTable so
          * that they can be compared later on by the TreeWalker.
          */
-        if (se == jnte) { return true; }
-        if (se.getClass() != jnte.getClass()) { return false; }
+        if (se == jnte) {
+            return true;
+        }
+        if (se.getClass() != jnte.getClass()) {
+            return false;
+        }
         final JavaNonTerminalProgramElement other = (JavaNonTerminalProgramElement) se;
         return jnte.getChildCount() == other.getChildCount();
     }
@@ -207,10 +221,16 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
          * A LabeledStatement is a special case of a JavaNonTerminalProgramElement, as we must also
          * not traverse the children recursively but also additionally add the label to a NAT.
          */
-        if (se == ls) { return true; }
-        if (se.getClass() != ls.getClass()) { return false; }
+        if (se == ls) {
+            return true;
+        }
+        if (se.getClass() != ls.getClass()) {
+            return false;
+        }
         final LabeledStatement other = (LabeledStatement) se;
-        if (ls.getChildCount() != other.getChildCount()) { return false; }
+        if (ls.getChildCount() != other.getChildCount()) {
+            return false;
+        }
         nat.add(ls.getLabel(), ((LabeledStatement) se).getLabel());
         return true;
     }
@@ -235,15 +255,27 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
          * LabeledStatement, but we also need to check the dimensions and type of the
          * VariableSpecification.
          */
-        if (se == vs) { return true; }
-        if (se.getClass() != vs.getClass()) { return false; }
+        if (se == vs) {
+            return true;
+        }
+        if (se.getClass() != vs.getClass()) {
+            return false;
+        }
         final VariableSpecification other = (VariableSpecification) se;
-        if (vs.getChildCount() != other.getChildCount()) { return false; }
-        if (vs.getDimensions() != other.getDimensions()) { return false; }
+        if (vs.getChildCount() != other.getChildCount()) {
+            return false;
+        }
+        if (vs.getDimensions() != other.getDimensions()) {
+            return false;
+        }
         if (vs.getType() != null) {
-            if (!vs.getType().equals(other.getType())) { return false; }
+            if (!vs.getType().equals(other.getType())) {
+                return false;
+            }
         } else {
-            if (other.getType() != null) { return false; }
+            if (other.getType() != null) {
+                return false;
+            }
         }
         nat.add(vs.getProgramVariable(), other.getProgramVariable());
         return true;
@@ -270,7 +302,9 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
          * of the main reasons for equalsModRenaming. Equality here comes down to checking the
          * abstract name of the elements in a NAT.
          */
-        if (se1.getClass() != se2.getClass()) { return false; }
+        if (se1.getClass() != se2.getClass()) {
+            return false;
+        }
         // We can cast here as se1 is either a ProgramVariable or a ProgramElementName
         // (this method is only called for these two classes in equalsModThisProperty)
         // and se2 is of the same class as se1

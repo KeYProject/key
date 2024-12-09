@@ -37,7 +37,9 @@ public class JavaASTCollector extends JavaASTWalker {
      * the action that is performed just before leaving the node the last time
      */
     protected void doAction(ProgramElement node) {
-        if (type.isInstance(node)) { resultList = resultList.prepend(node); }
+        if (type.isInstance(node)) {
+            resultList = resultList.prepend(node);
+        }
     }
 
     /**

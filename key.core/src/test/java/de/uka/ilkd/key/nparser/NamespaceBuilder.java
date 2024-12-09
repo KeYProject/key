@@ -31,7 +31,9 @@ public class NamespaceBuilder {
     }
 
     private Sort getOrCreateSort(String group) {
-        if (nss.sorts().lookup(group) == null) { addSort(group); }
+        if (nss.sorts().lookup(group) == null) {
+            addSort(group);
+        }
         return nss.sorts().lookup(group);
     }
 

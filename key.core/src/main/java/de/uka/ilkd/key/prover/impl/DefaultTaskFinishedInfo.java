@@ -82,16 +82,22 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     // display message for the status bar
     @Override
     public String toString() {
-        if (proof.isDisposed()) { return "Proof disposed"; }
+        if (proof.isDisposed()) {
+            return "Proof disposed";
+        }
         if (appliedRules != 0) {
             StringBuilder message = new StringBuilder();
             String timeString = (timeInMillis / 1000) + "." + ((timeInMillis % 1000) / 100);
 
             message.append("Strategy: Applied ").append(appliedRules).append(" rule");
-            if (appliedRules != 1) { message.append("s"); }
+            if (appliedRules != 1) {
+                message.append("s");
+            }
             message.append(" (").append(timeString).append(" sec), ");
             message.append(" closed ").append(closedGoals).append(" goal");
-            if (closedGoals != 1) { message.append("s"); }
+            if (closedGoals != 1) {
+                message.append("s");
+            }
             message.append(", ").append(proof.openGoals().size());
             message.append(" remaining");
             return message.toString();

@@ -53,10 +53,10 @@ public class Assignment {
         if (rfl) {
             if (left instanceof RefEx leftEx) {
                 return ReflectionClassCreator.NAME_OF_CLASS + "."
-                        + ReflectionClassCreator.SET_PREFIX
-                        + ReflectionClassCreator.cleanTypeName(leftEx.fieldType) + "("
-                        + leftEx.rcObjType + ".class, " + leftEx.rcObj + ", \"" + leftEx.field + "\", "
-                        + right + ");";
+                    + ReflectionClassCreator.SET_PREFIX
+                    + ReflectionClassCreator.cleanTypeName(leftEx.fieldType) + "("
+                    + leftEx.rcObjType + ".class, " + leftEx.rcObj + ", \"" + leftEx.field + "\", "
+                    + right + ");";
             } else {
                 return type + " " + left + " = " + right + ";";
             }

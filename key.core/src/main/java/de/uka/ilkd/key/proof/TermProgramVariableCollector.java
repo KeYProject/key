@@ -31,7 +31,9 @@ public class TermProgramVariableCollector implements DefaultVisitor {
      *        to the list of found variables
      */
     public void visit(Term visited) {
-        if (visited.op() instanceof LocationVariable variable) { result.add(variable); }
+        if (visited.op() instanceof LocationVariable variable) {
+            result.add(variable);
+        }
 
         if (!visited.javaBlock().isEmpty()) {
             ProgramVariableCollector pvc =

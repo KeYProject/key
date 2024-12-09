@@ -101,7 +101,9 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      */
     @Override
     public String getFormatedBranchCondition() throws ProofInputException {
-        if (branchCondition == null) { lazyComputeBranchCondition(); }
+        if (branchCondition == null) {
+            lazyComputeBranchCondition();
+        }
         return formatedBranchCondition;
     }
 
@@ -118,7 +120,9 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      */
     @Override
     public Term getBranchCondition() throws ProofInputException {
-        if (branchCondition == null) { lazyComputeBranchCondition(); }
+        if (branchCondition == null) {
+            lazyComputeBranchCondition();
+        }
         return branchCondition;
     }
 
@@ -169,7 +173,9 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      */
     @Override
     public Term getPathCondition() throws ProofInputException {
-        if (pathCondition == null) { lazyComputePathCondition(); }
+        if (pathCondition == null) {
+            lazyComputePathCondition();
+        }
         return pathCondition;
     }
 
@@ -178,7 +184,9 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      */
     @Override
     public String getFormatedPathCondition() throws ProofInputException {
-        if (formatedPathCondition == null) { lazyComputePathCondition(); }
+        if (formatedPathCondition == null) {
+            lazyComputePathCondition();
+        }
         return formatedPathCondition;
     }
 
@@ -246,7 +254,9 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      */
     @Override
     public Term[] getMergedBranchCondtions() throws ProofInputException {
-        if (mergedBranchCondtions == null) { mergedBranchCondtions = lazyComputeMergedBranchCondtions(); }
+        if (mergedBranchCondtions == null) {
+            mergedBranchCondtions = lazyComputeMergedBranchCondtions();
+        }
         return mergedBranchCondtions;
     }
 

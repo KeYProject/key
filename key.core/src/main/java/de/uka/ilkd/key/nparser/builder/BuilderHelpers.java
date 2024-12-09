@@ -13,7 +13,9 @@ import org.jspecify.annotations.Nullable;
  */
 public final class BuilderHelpers {
     public static String getPosition(@Nullable ParserRuleContext node) {
-        if (node == null) { return " pos n/a"; }
+        if (node == null) {
+            return " pos n/a";
+        }
         return getPosition(node.start);
     }
 

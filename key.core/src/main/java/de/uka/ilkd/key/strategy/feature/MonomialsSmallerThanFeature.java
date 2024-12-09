@@ -78,8 +78,12 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         // here, the ordering is graded concerning multiplication on integers
         final int t1Deg = degree(t1);
         final int t2Deg = degree(t2);
-        if (t1Deg < t2Deg) { return true; }
-        if (t1Deg > t2Deg) { return false; }
+        if (t1Deg < t2Deg) {
+            return true;
+        }
+        if (t1Deg > t2Deg) {
+            return false;
+        }
 
         if (t1Deg == 0) {
             // check whether the symbol was introduced as part of a basis
@@ -87,18 +91,30 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             // the smaller the later they were introduced)
 
             final int v = introductionTime(t2.op(), goal) - introductionTime(t1.op(), goal);
-            if (v < 0) { return true; }
-            if (v > 0) { return false; }
+            if (v < 0) {
+                return true;
+            }
+            if (v > 0) {
+                return false;
+            }
         } else {
             final ImmutableList<Term> atoms1 = collectAtoms(t1);
             final ImmutableList<Term> atoms2 = collectAtoms(t2);
 
-            if (atoms1.size() < atoms2.size()) { return false; }
-            if (atoms1.size() > atoms2.size()) { return true; }
+            if (atoms1.size() < atoms2.size()) {
+                return false;
+            }
+            if (atoms1.size() > atoms2.size()) {
+                return true;
+            }
 
             final int v = compareLexNewSyms(atoms1, atoms2, goal);
-            if (v < 0) { return true; }
-            if (v > 0) { return false; }
+            if (v < 0) {
+                return true;
+            }
+            if (v > 0) {
+                return false;
+            }
         }
 
         return super.lessThan(t1, t2, focus, goal);
@@ -113,7 +129,9 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             atoms2 = atoms2.tail();
 
             final int c = introductionTime(t2.op(), goal) - introductionTime(t1.op(), goal);
-            if (c != 0) { return c; }
+            if (c != 0) {
+                return c;
+            }
         }
 
         return 0;
@@ -129,9 +147,13 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     private int degree(Term t) {
         int res = 0;
 
-        if (t.op() == mul && t.sub(0).op() != Z && t.sub(1).op() != Z) { ++res; }
+        if (t.op() == mul && t.sub(0).op() != Z && t.sub(1).op() != Z) {
+            ++res;
+        }
 
-        for (int i = 0; i != t.arity(); ++i) { res += degree(t.sub(i)); }
+        for (int i = 0; i != t.arity(); ++i) {
+            res += degree(t.sub(i));
+        }
 
         return res;
     }
@@ -141,14 +163,18 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             if (te.op() == add) {
                 collect(te.sub(0), mState, services);
                 collect(te.sub(1), mState, services);
-            } else if (te.op() != Z) { addTerm(stripOffLiteral(te, mState, services)); }
+            } else if (te.op() != Z) {
+                addTerm(stripOffLiteral(te, mState, services));
+            }
         }
 
         private Term stripOffLiteral(Term te, MutableState mState, Services services) {
             if (!(hasCoeff.compute(te, mState, services) instanceof TopRuleAppCost))
             // we leave out literals/coefficients on the right, because we
             // do not want to compare these literals
-            { return te.sub(0); }
+            {
+                return te.sub(0);
+            }
             return te;
         }
     }

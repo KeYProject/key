@@ -32,9 +32,13 @@ public abstract class AbstractTacletBuilderCommand implements TacletBuilderComma
 
     @Override
     public boolean isSuitableFor(@NonNull String name) {
-        if (triggerName.equalsIgnoreCase(name)) { return true; }
+        if (triggerName.equalsIgnoreCase(name)) {
+            return true;
+        }
         if (name.startsWith("\\")) // handling leading backslashes
-        { return isSuitableFor(name.substring(1)); }
+        {
+            return isSuitableFor(name.substring(1));
+        }
         return false;
     }
 

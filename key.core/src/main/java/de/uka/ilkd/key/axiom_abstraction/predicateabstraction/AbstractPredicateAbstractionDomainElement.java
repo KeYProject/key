@@ -72,16 +72,22 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      */
     @Override
     public Name name() {
-        if (topElem) { return new Name("TOP"); }
+        if (topElem) {
+            return new Name("TOP");
+        }
 
-        if (predicates.size() == 0) { return new Name("BOTTOM"); }
+        if (predicates.size() == 0) {
+            return new Name("BOTTOM");
+        }
 
         StringBuilder result = new StringBuilder();
         int i = 1;
         for (AbstractionPredicate pred : predicates) {
             result.append(pred.name());
 
-            if (i++ < predicates.size()) { result.append(getPredicateNameCombinationString()); }
+            if (i++ < predicates.size()) {
+                result.append(getPredicateNameCombinationString());
+            }
         }
 
         return new Name(result.toString());
@@ -102,9 +108,13 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
     public Term getDefiningAxiom(Term varOrConst, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        if (topElem) { return tb.tt(); }
+        if (topElem) {
+            return tb.tt();
+        }
 
-        if (predicates.size() == 0) { return tb.ff(); }
+        if (predicates.size() == 0) {
+            return tb.ff();
+        }
 
         Term result = null;
         for (AbstractionPredicate pred : predicates) {
@@ -150,7 +160,9 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
         final Iterator<AbstractionPredicate> it = getPredicates().iterator();
         while (it.hasNext()) {
             sb.append(it.next().toParseableString(services));
-            if (it.hasNext()) { sb.append(getPredicateNameCombinationString()); }
+            if (it.hasNext()) {
+                sb.append(getPredicateNameCombinationString());
+            }
         }
 
         return sb.toString();

@@ -189,7 +189,9 @@ public abstract class AbstractProofReferenceTestCase {
         return (environment, proof) -> {
             // Compute proof references
             ImmutableList<IProofReferencesAnalyst> analysts = ImmutableSLList.nil();
-            if (analyst != null) { analysts = analysts.append(analyst); }
+            if (analyst != null) {
+                analysts = analysts.append(analyst);
+            }
             LinkedHashSet<IProofReference<?>> references =
                 ProofReferenceUtil.computeProofReferences(proof, analysts);
             // Filter references
@@ -197,7 +199,9 @@ public abstract class AbstractProofReferenceTestCase {
                 LinkedHashSet<IProofReference<?>> filteredReferences =
                     new LinkedHashSet<>();
                 for (IProofReference<?> reference : references) {
-                    if (currentReferenceFilter.test(reference)) { filteredReferences.add(reference); }
+                    if (currentReferenceFilter.test(reference)) {
+                        filteredReferences.add(reference);
+                    }
                 }
                 references = filteredReferences;
             }
@@ -220,7 +224,9 @@ public abstract class AbstractProofReferenceTestCase {
             LinkedHashSet<IProofReference<?>> references, Node node) {
         LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
         for (IProofReference<?> reference : references) {
-            if (reference.getNodes().contains(node)) { result.add(reference); }
+            if (reference.getNodes().contains(node)) {
+                result.add(reference);
+            }
         }
         return result;
     }
@@ -396,8 +402,12 @@ public abstract class AbstractProofReferenceTestCase {
             // Restore taclet options
             HelperClassForTests.restoreTacletOptions(originalTacletOptions);
             // Dispose proof and environment
-            if (proof != null) { proof.dispose(); }
-            if (environment != null) { environment.dispose(); }
+            if (proof != null) {
+                proof.dispose();
+            }
+            if (environment != null) {
+                environment.dispose();
+            }
         }
     }
 
@@ -465,8 +475,12 @@ public abstract class AbstractProofReferenceTestCase {
             // Restore taclet options
             HelperClassForTests.restoreTacletOptions(originalTacletOptions);
             // Dispose proof and environment
-            if (proof != null) { proof.dispose(); }
-            if (environment != null) { environment.dispose(); }
+            if (proof != null) {
+                proof.dispose();
+            }
+            if (environment != null) {
+                environment.dispose();
+            }
         }
     }
 

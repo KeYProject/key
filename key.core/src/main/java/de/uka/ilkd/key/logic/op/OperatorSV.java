@@ -46,11 +46,19 @@ public abstract class OperatorSV extends AbstractSortedOperator implements Schem
 
     @Override
     public void validTopLevelException(Term term) throws TermCreationException {
-        if (arity() != term.arity()) { throw new TermCreationException(this, term); }
+        if (arity() != term.arity()) {
+            throw new TermCreationException(this, term);
+        }
 
-        if (arity() != term.subs().size()) { throw new TermCreationException(this, term); }
+        if (arity() != term.subs().size()) {
+            throw new TermCreationException(this, term);
+        }
 
-        for (int i = 0; i < arity(); i++) { if (term.sub(i) == null) { throw new TermCreationException(this, term); } }
+        for (int i = 0; i < arity(); i++) {
+            if (term.sub(i) == null) {
+                throw new TermCreationException(this, term);
+            }
+        }
 
     }
 }

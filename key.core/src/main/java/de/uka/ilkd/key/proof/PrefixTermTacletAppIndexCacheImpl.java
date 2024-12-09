@@ -45,7 +45,9 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
     @SuppressWarnings("unused")
     private void countAccess(boolean hit) {
         ++total;
-        if (hit) { ++hits; }
+        if (hit) {
+            ++hits;
+        }
         if (total % 1000 == 0 && total != 0) {
             LOGGER.info("{} {}, size {}: {}", name(), hashCode(), cache.size(),
                 ((double) hits) / (double) total);
@@ -91,7 +93,9 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         }
 
         public boolean equals(Object obj) {
-            if (!(obj instanceof CacheKey objKey)) { return false; }
+            if (!(obj instanceof CacheKey objKey)) {
+                return false;
+            }
 
             return parent == objKey.parent && analysedTerm.equals(objKey.analysedTerm);
         }

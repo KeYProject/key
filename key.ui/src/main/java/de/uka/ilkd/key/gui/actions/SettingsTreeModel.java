@@ -98,7 +98,9 @@ public class SettingsTreeModel extends DefaultTreeModel {
     private Properties getChoicesAsProperties(ChoiceSettings settings) {
         Properties prop = new Properties();
 
-        for (Choice choice : settings.getDefaultChoicesAsSet()) { prop.put(choice.category(), choice.name()); }
+        for (Choice choice : settings.getDefaultChoicesAsSet()) {
+            prop.put(choice.category(), choice.name());
+        }
 
         return prop;
     }

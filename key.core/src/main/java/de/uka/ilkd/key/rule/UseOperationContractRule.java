@@ -180,7 +180,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         } else {
             New n = (New) mr;
             ImmutableList<KeYJavaType> sig = ImmutableSLList.nil();
-            for (Expression e : n.getArguments()) { sig = sig.append(e.getKeYJavaType(services, ec)); }
+            for (Expression e : n.getArguments()) {
+                sig = sig.append(e.getKeYJavaType(services, ec));
+            }
             result = services.getJavaInfo().getConstructor(staticType, sig);
             assert result != null;
         }
@@ -226,7 +228,9 @@ public final class UseOperationContractRule implements BuiltInRule {
      */
     public static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
             Instantiation inst, Services services) {
-        if (inst == null) { return DefaultImmutableSet.nil(); }
+        if (inst == null) {
+            return DefaultImmutableSet.nil();
+        }
 
         // there must be applicable contracts for the operation
         return getApplicableContracts(services, inst.pm, inst.staticType, inst.modality.kind());
@@ -309,7 +313,9 @@ public final class UseOperationContractRule implements BuiltInRule {
             assert selfTerm != null;
             Term createdForm = null;
             for (LocationVariable heap : heapContext) {
-                if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) { continue; }
+                if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
+                    continue;
+                }
                 final Term cr = TB.and(OpReplacer.replace(TB.var(heap), heapAtPres.get(heap),
                     TB.not(TB.created(TB.var(heap), selfTerm)), services.getTermFactory(),
                     services.getProof()), TB.created(TB.var(heap), selfTerm));
@@ -352,7 +358,9 @@ public final class UseOperationContractRule implements BuiltInRule {
             do {
                 result = curPrefix.getFirstActiveChildPos().append(result);
                 i--;
-                if (i >= 0) { curPrefix = prefix.get(i); }
+                if (i >= 0) {
+                    curPrefix = prefix.get(i);
+                }
             } while (i >= 0);
 
         } else {
@@ -374,7 +382,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     private static Instantiation instantiate(Term focusTerm, Services services) {
         // result cached?
-        if (focusTerm == lastFocusTerm) { return lastInstantiation; }
+        if (focusTerm == lastFocusTerm) {
+            return lastInstantiation;
+        }
 
         // compute
         final Instantiation result = computeInstantiation(focusTerm, services);
@@ -390,11 +400,13 @@ public final class UseOperationContractRule implements BuiltInRule {
             final Term result, final Term exception, final Term mby, final Term atPreUpdates,
             final Term finalPreTerm, final ImmutableList<AnonUpdateData> anonUpdateDatas,
             Services services) {
-        if (!InfFlowCheckInfo.isInfFlow(goal)) { return; }
+        if (!InfFlowCheckInfo.isInfFlow(goal)) {
+            return;
+        }
 
         // prepare information flow analysis
         assert anonUpdateDatas.size() == 1 : "information flow extension " + "is at the moment not "
-                + "compatible with the " + "non-base-heap setting";
+            + "compatible with the " + "non-base-heap setting";
         AnonUpdateData anonUpdateData = anonUpdateDatas.head();
 
         final Term heapAtPre = anonUpdateData.methodHeapAtPre;
@@ -458,12 +470,16 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
 
         // focus (below update) must be modality term
-        if (!(progPost.op() instanceof Modality modality)) { return null; }
+        if (!(progPost.op() instanceof Modality modality)) {
+            return null;
+        }
 
         // active statement must be method call or new
         final Pair<Expression, MethodOrConstructorReference> methodCall =
             getMethodCall(progPost.javaBlock(), services);
-        if (methodCall == null) { return null; }
+        if (methodCall == null) {
+            return null;
+        }
         final Expression actualResult = methodCall.first;
         final MethodOrConstructorReference mr = methodCall.second;
         assert mr != null;
@@ -471,7 +487,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         final ExecutionContext ec =
             JavaTools.getInnermostExecutionContext(progPost.javaBlock(), services);
         for (Expression arg : mr.getArguments()) {
-            if (!ProgramSVSort.SIMPLEEXPRESSION.canStandFor(arg, ec, services)) { return null; }
+            if (!ProgramSVSort.SIMPLEEXPRESSION.canStandFor(arg, ec, services)) {
+                return null;
+            }
         }
 
         // collect further information
@@ -479,7 +497,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         assert staticType != null;
         final IProgramMethod pm = getProgramMethod(mr, staticType, ec, services);
         assert pm != null : "Getting program method failed.\nReference: " + mr + ", static type: "
-                + staticType + ", execution context: " + ec;
+            + staticType + ", execution context: " + ec;
         final Term actualSelf = getActualSelf(mr, pm, ec, services);
         final ImmutableList<Term> actualParams = getActualParams(mr, ec, services);
 
@@ -493,23 +511,33 @@ public final class UseOperationContractRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         // focus must be top level succedent
-        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) { return false; }
+        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
+            return false;
+        }
 
         // instantiation must succeed
         final Instantiation inst = instantiate(pio.subTerm(), goal.proof().getServices());
-        if (inst == null) { return false; }
+        if (inst == null) {
+            return false;
+        }
 
         // abort if inside of transformer
-        if (Transformer.inTransformer(pio)) { return false; }
+        if (Transformer.inTransformer(pio)) {
+            return false;
+        }
 
         // cannot be applied on model methods
-        if (inst.pm.isModel()) { return false; }
+        if (inst.pm.isModel()) {
+            return false;
+        }
 
         // there must be applicable contracts for the operation
         final ImmutableSet<FunctionalOperationContract> contracts =
             getApplicableContracts(goal.proof().getServices(), inst.pm, inst.staticType,
                 inst.modality.kind());
-        if (contracts.isEmpty()) { return false; }
+        if (contracts.isEmpty()) {
+            return false;
+        }
 
         // contract can be applied if modality is box and needs no termination
         // argument
@@ -522,7 +550,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         // applying a contract here must not create circular dependencies
         // between proofs
         for (FunctionalOperationContract contract : contracts) {
-            if (goal.proof().mgt().isContractApplicable(contract)) { return true; }
+            if (goal.proof().mgt().isContractApplicable(contract)) {
+                return true;
+            }
         }
         return false;
     }
@@ -546,13 +576,17 @@ public final class UseOperationContractRule implements BuiltInRule {
         // prepare heapBefore_method
         Map<LocationVariable, LocationVariable> atPreVars =
             computeAtPreVars(heapContext, services, inst);
-        for (LocationVariable v : atPreVars.values()) { goal.addProgramVariable(v); }
+        for (LocationVariable v : atPreVars.values()) {
+            goal.addProgramVariable(v);
+        }
 
         Map<LocationVariable, Term> atPres = HeapContext.getAtPres(atPreVars, services);
 
         // create variables for result and exception
         final ProgramVariable resultVar = computeResultVar(inst, services);
-        if (resultVar != null) { goal.addProgramVariable(resultVar); }
+        if (resultVar != null) {
+            goal.addProgramVariable(resultVar);
+        }
         assert inst.pm.isConstructor() || !(inst.actualResult != null && resultVar == null);
         final ProgramVariable excVar = tb.excVar(inst.pm, true);
         assert excVar != null;
@@ -569,7 +603,9 @@ public final class UseOperationContractRule implements BuiltInRule {
             contractResult == null && resultVar != null ? tb.var(resultVar) : contractResult,
             services.getTermFactory());
         Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
-        for (LocationVariable h : heapContext) { heapTerms.put(h, tb.var(h)); }
+        for (LocationVariable h : heapContext) {
+            heapTerms.put(h, tb.var(h));
+        }
         final Term globalDefs =
             contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf, contractParams, services);
         final Term originalPre =

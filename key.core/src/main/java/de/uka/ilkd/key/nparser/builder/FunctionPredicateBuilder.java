@@ -173,7 +173,9 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         List<Sort> argSorts = accept(ctx.arg_sorts_or_formula());
         Transformer t =
             new Transformer(new Name(trans_name), retSort, new ImmutableArray<>(argSorts));
-        if (lookup(t.name()) == null) { functions().add(t); }
+        if (lookup(t.name()) == null) {
+            functions().add(t);
+        }
         return null;
     }
 

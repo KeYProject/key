@@ -199,18 +199,26 @@ public class ChoiceSettings extends AbstractSettings {
 
 
     public ChoiceSettings updateWith(Iterable<Choice> sc) {
-        for (final Choice c : sc) { category2Default.put(c.category(), c.name().toString()); }
+        for (final Choice c : sc) {
+            category2Default.put(c.category(), c.name().toString());
+        }
         return this;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ChoiceSettings that = (ChoiceSettings) o;
 
-        if (!Objects.equals(category2Default, that.category2Default)) { return false; }
+        if (!Objects.equals(category2Default, that.category2Default)) {
+            return false;
+        }
         return Objects.equals(category2Choices, that.category2Choices);
     }
 

@@ -56,6 +56,6 @@ public final class FreeLabelInVariableCondition extends VariableConditionAdapter
     @Override
     public String toString() {
         return (negated ? "\\not" : "") + "\\freeLabelIn (" + label.name() + "," + statement.name()
-                + ")";
+            + ")";
     }
 }

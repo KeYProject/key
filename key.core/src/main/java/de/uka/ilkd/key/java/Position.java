@@ -45,7 +45,9 @@ public class Position implements Comparable<Position> {
      *        the column number.
      */
     private Position(int line, int column) {
-        if (line < 1 || column < 1) { throw new IllegalArgumentException(line + ", " + column); }
+        if (line < 1 || column < 1) {
+            throw new IllegalArgumentException(line + ", " + column);
+        }
         this.line = line;
         this.column = column;
     }
@@ -139,8 +141,12 @@ public class Position implements Comparable<Position> {
      */
 
     public boolean equals(Object x) {
-        if (x == this) { return true; }
-        if (!(x instanceof Position p)) { return false; }
+        if (x == this) {
+            return true;
+        }
+        if (!(x instanceof Position p)) {
+            return false;
+        }
         return line == p.line && column == p.column;
     }
 

@@ -28,7 +28,9 @@ public final class GuiUtilities {
     public static void paintEmptyViewComponent(JComponent pane, String name) {
         pane.setBorder(new TitledBorder(name));
         pane.setBackground(Color.white);
-        if (pane instanceof JScrollPane) { ((JScrollPane) pane).getViewport().setBackground(Color.white); }
+        if (pane instanceof JScrollPane) {
+            ((JScrollPane) pane).getViewport().setBackground(Color.white);
+        }
         pane.setMinimumSize(new java.awt.Dimension(150, 0));
     }
 
@@ -54,8 +56,12 @@ public final class GuiUtilities {
     public static void setCenter(Component comp) {
         Dimension screenSize = comp.getToolkit().getScreenSize();
         Dimension frameSize = comp.getSize();
-        if (frameSize.height > screenSize.height) { frameSize.height = screenSize.height; }
-        if (frameSize.width > screenSize.width) { frameSize.width = screenSize.width; }
+        if (frameSize.height > screenSize.height) {
+            frameSize.height = screenSize.height;
+        }
+        if (frameSize.width > screenSize.width) {
+            frameSize.width = screenSize.width;
+        }
         comp.setLocation((screenSize.width - frameSize.width) / 2,
             (screenSize.height - frameSize.height) / 2);
     }
@@ -95,7 +101,9 @@ public final class GuiUtilities {
      */
     public static void attachClickOnEscListener(JButton button) {
         ActionListener escapeListener = event -> {
-            if (event.getActionCommand().equals(ESC_COMMAND)) { button.doClick(); }
+            if (event.getActionCommand().equals(ESC_COMMAND)) {
+                button.doClick();
+            }
         };
         button.registerKeyboardAction(escapeListener, ESC_COMMAND,
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);

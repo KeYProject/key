@@ -68,7 +68,9 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
      */
     @Override
     public ProgramElement getChildAt(int index) {
-        if (delegate != null && index == 0) { return delegate; }
+        if (delegate != null && index == 0) {
+            return delegate;
+        }
 
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -95,7 +97,9 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
 
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int idx) {
-        if (delegate != null && idx == 0) { return delegate; }
+        if (delegate != null && idx == 0) {
+            return delegate;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

@@ -114,7 +114,9 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         for (SequentFormula sf : g.node().sequent().antecedent()) {
 
             if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) { continue; }
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
+                continue;
+            }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
@@ -122,7 +124,9 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         // filter taclets that are applicable on the given formula in the succedent
         for (SequentFormula sf : g.node().sequent().succedent()) {
             if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) { continue; }
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
+                continue;
+            }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
         }
@@ -141,10 +145,14 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 if (pta.taclet() instanceof RewriteTaclet) {
-                    if (pta.taclet().displayName().equals("cut_direct")) { continue; }
+                    if (pta.taclet().displayName().equals("cut_direct")) {
+                        continue;
+                    }
                     if (pta.posInOccurrence().subTerm().equals(p.find) && pta.complete()) {
                         // if Term already succ replaced, then skip
-                        if (succposInOccs.contains(pta.posInOccurrence())) { continue; }
+                        if (succposInOccs.contains(pta.posInOccurrence())) {
+                            continue;
+                        }
 
                         try { // Term not already successfully replaced
                             Goal goalold = state.getFirstOpenAutomaticGoal();

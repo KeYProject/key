@@ -117,7 +117,9 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      * @see #toLoopContract()
      */
     void setLoopContract(LoopContract loopContract) {
-        if (this.loopContract != null) { throw new IllegalStateException(); }
+        if (this.loopContract != null) {
+            throw new IllegalStateException();
+        }
 
         this.loopContract = loopContract;
     }
@@ -131,7 +133,9 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     public void setFunctionalContract(FunctionalAuxiliaryContract<?> contract) {
         super.setFunctionalContract(contract);
 
-        if (loopContract != null) { loopContract.setFunctionalContract(contract); }
+        if (loopContract != null) {
+            loopContract.setFunctionalContract(contract);
+        }
     }
 
     @Override
@@ -149,10 +153,10 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     public String getUniqueName() {
         if (getTarget() != null) {
             return "Block Contract " + getBlock().getStartPosition().line() + " "
-                    + getTarget().getUniqueName();
+                + getTarget().getUniqueName();
         } else {
             return "Block Contract " + getBlock().getStartPosition().line() + " "
-                    + Math.abs(getBlock().hashCode());
+                + Math.abs(getBlock().hashCode());
         }
     }
 
@@ -227,11 +231,11 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     @Override
     public String toString() {
         return "SimpleBlockContract [block=" + block + ", labels=" + labels + ", method=" + method
-                + ", modality=" + modalityKind + ", instantiationSelf=" + instantiationSelf
-                + ", preconditions=" + preconditions + ", postconditions=" + postconditions
-                + ", modifiableClauses=" + modifiableClauses + ", infFlowSpecs=" + infFlowSpecs
-                + ", variables=" + variables + ", transactionApplicable=" + transactionApplicable
-                + ", hasModifiable=" + hasModifiable + "]";
+            + ", modality=" + modalityKind + ", instantiationSelf=" + instantiationSelf
+            + ", preconditions=" + preconditions + ", postconditions=" + postconditions
+            + ", modifiableClauses=" + modifiableClauses + ", infFlowSpecs=" + infFlowSpecs
+            + ", variables=" + variables + ", transactionApplicable=" + transactionApplicable
+            + ", hasModifiable=" + hasModifiable + "]";
     }
 
     /**
@@ -344,7 +348,9 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         @Override
         protected BlockContract combine() {
             assert contracts.length > 0;
-            if (contracts.length == 1) { return contracts[0]; }
+            if (contracts.length == 1) {
+                return contracts[0];
+            }
 
             final BlockContract head = contracts[0];
             StringBuilder baseName = new StringBuilder(head.getBaseName());

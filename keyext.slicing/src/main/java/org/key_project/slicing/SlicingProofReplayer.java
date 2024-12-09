@@ -111,11 +111,15 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
             ProgressMonitor progressMonitor)
             throws Exception {
         boolean loadInUI = MainWindow.hasInstance();
-        if (loadInUI) { MainWindow.getInstance().setStatusLine(
-            "Preparing proof slicing", 2); }
+        if (loadInUI) {
+            MainWindow.getInstance().setStatusLine(
+                "Preparing proof slicing", 2);
+        }
         Path tmpFile = Files.createTempFile("proof", ".proof");
         ProofSaver.saveProofObligationToFile(tmpFile.toFile(), originalProof);
-        if (progressMonitor != null) { progressMonitor.setProgress(1); }
+        if (progressMonitor != null) {
+            progressMonitor.setProgress(1);
+        }
 
         var bootClassPath = originalProof.getEnv().getJavaModel().getBootClassPath();
         AbstractProblemLoader problemLoader = new SingleThreadProblemLoader(
@@ -127,7 +131,9 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
             false,
             control, false, null);
         problemLoader.load();
-        if (progressMonitor != null) { progressMonitor.setProgress(2); }
+        if (progressMonitor != null) {
+            progressMonitor.setProgress(2);
+        }
         Files.delete(tmpFile);
         Proof proof = problemLoader.getProof();
 
@@ -148,8 +154,10 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
     public File slice()
             throws IntermediateProofReplayer.BuiltInConstructionException, IOException {
         boolean loadInUI = MainWindow.hasInstance();
-        if (loadInUI) { MainWindow.getInstance().setStatusLine(
-            "Slicing proof", results.usefulSteps.size()); }
+        if (loadInUI) {
+            MainWindow.getInstance().setStatusLine(
+                "Slicing proof", results.usefulSteps.size());
+        }
 
         // queue of open goals in the new proof
         Deque<Goal> openGoals = new ArrayDeque<>();
@@ -182,9 +190,13 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
             }
             // only re-apply useful steps, and only re-apply each step once (relevant if this node
             // has been de-duplicated and was applied earlier as part of a branch stack)
-            if (!results.usefulSteps.contains(node) || appliedSteps.containsKey(node)) { continue; }
+            if (!results.usefulSteps.contains(node) || appliedSteps.containsKey(node)) {
+                continue;
+            }
             appliedSteps.put(node, true);
-            if (loadInUI && progressMonitor != null) { progressMonitor.setProgress(appliedSteps.size()); }
+            if (loadInUI && progressMonitor != null) {
+                progressMonitor.setProgress(appliedSteps.size());
+            }
             Goal openGoal = openGoals.removeFirst();
 
             // copy over metadata
@@ -203,7 +215,9 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
             ImmutableList<Goal> nextGoals = reApplyRuleApp(node, openGoal);
             for (Goal newGoal : nextGoals) {
                 boolean closedGoal = newGoal.node().isClosed();
-                if (!closedGoal) { openGoals.addFirst(newGoal); }
+                if (!closedGoal) {
+                    openGoals.addFirst(newGoal);
+                }
             }
         }
 

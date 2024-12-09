@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public abstract class TestCommons {
     protected static final String folder =
         HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
-                + File.separator + "tacletTranslation" + File.separator;
+            + File.separator + "tacletTranslation" + File.separator;
     /**
      * The set of taclets
      */
@@ -125,8 +125,12 @@ public abstract class TestCommons {
      */
     protected Collection<Taclet> getTaclets() {
         if (taclets.isEmpty()) {
-            if (initConfig == null) { parse(); }
-            for (Taclet t : initConfig.getTaclets()) { taclets.add(t); }
+            if (initConfig == null) {
+                parse();
+            }
+            for (Taclet t : initConfig.getTaclets()) {
+                taclets.add(t);
+            }
         }
         return taclets;
     }
@@ -134,7 +138,9 @@ public abstract class TestCommons {
     protected HashSet<String> getTacletNames() {
         Collection<Taclet> set = getTaclets();
         HashSet<String> names = new HashSet<>();
-        for (Taclet taclet : set) { names.add(taclet.name().toString()); }
+        for (Taclet taclet : set) {
+            names.add(taclet.name().toString());
+        }
         return names;
     }
 
@@ -168,7 +174,9 @@ public abstract class TestCommons {
         try {
             KeYUserProblemFile po =
                 new KeYUserProblemFile(file.getName(), file.toPath(), null, pro);
-            if (initializer == null) { initializer = new ProblemInitializer(po.getProfile()); }
+            if (initializer == null) {
+                initializer = new ProblemInitializer(po.getProfile());
+            }
             initConfig = initializer.prepare(po);
             result = initializer.startProver(initConfig, po);
             services = initConfig.getServices();

@@ -101,7 +101,9 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
             Services services, ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
-        } else if (subs.length == 2) { return isResponsible(op, subs[0], subs[1], services, ec); }
+        } else if (subs.length == 2) {
+            return isResponsible(op, subs[0], subs[1], services, ec);
+        }
         return false;
     }
 
@@ -193,7 +195,9 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
     @Override
     public FloatLiteral translateTerm(Term t, ExtList children, Services services) {
-        if (!containsFunction((Function) t.op())) { return null; }
+        if (!containsFunction((Function) t.op())) {
+            return null;
+        }
 
         Function f = (Function) t.op();
         IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();

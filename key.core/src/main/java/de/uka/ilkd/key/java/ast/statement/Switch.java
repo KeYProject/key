@@ -97,8 +97,12 @@ public class Switch extends BranchStatement
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null) { result++; }
-        if (branches != null) { result += branches.size(); }
+        if (expression != null) {
+            result++;
+        }
+        if (branches != null) {
+            result += branches.size();
+        }
         return result;
     }
 
@@ -114,10 +118,14 @@ public class Switch extends BranchStatement
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0) { return expression; }
+            if (index == 0) {
+                return expression;
+            }
             index--;
         }
-        if (branches != null) { return branches.get(index); }
+        if (branches != null) {
+            return branches.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -142,7 +150,9 @@ public class Switch extends BranchStatement
      */
 
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) { return expression; }
+        if (expression != null && index == 0) {
+            return expression;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -178,7 +188,9 @@ public class Switch extends BranchStatement
      */
 
     public Branch getBranchAt(int index) {
-        if (branches != null) { return branches.get(index); }
+        if (branches != null) {
+            return branches.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

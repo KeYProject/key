@@ -77,7 +77,9 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                 for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(
                         ifInst.getConstrainedFormula().formula().getLabels());
-                    if (ifLabel != null) { ifLabels.put(ifInst.getConstrainedFormula(), ifLabel); }
+                    if (ifLabel != null) {
+                        ifLabels.put(ifInst.getConstrainedFormula(), ifLabel);
+                    }
                 }
                 if (!ifLabels.isEmpty()) {
                     if (TruthValueTracingUtil.isLogicOperator(newTerm.op(), newTerm.subs())

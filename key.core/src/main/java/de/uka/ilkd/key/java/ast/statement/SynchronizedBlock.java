@@ -177,7 +177,9 @@ public class SynchronizedBlock extends JavaStatement
      */
 
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) { return expression; }
+        if (expression != null && index == 0) {
+            return expression;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -200,8 +202,12 @@ public class SynchronizedBlock extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null) { result++; }
-        if (body != null) { result++; }
+        if (expression != null) {
+            result++;
+        }
+        if (body != null) {
+            result++;
+        }
         return result;
     }
 
@@ -217,10 +223,16 @@ public class SynchronizedBlock extends JavaStatement
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0) { return expression; }
+            if (index == 0) {
+                return expression;
+            }
             index--;
         }
-        if (body != null) { if (index == 0) { return body; } }
+        if (body != null) {
+            if (index == 0) {
+                return body;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -256,7 +268,9 @@ public class SynchronizedBlock extends JavaStatement
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) { return body; }
+        if (body != null && index == 0) {
+            return body;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

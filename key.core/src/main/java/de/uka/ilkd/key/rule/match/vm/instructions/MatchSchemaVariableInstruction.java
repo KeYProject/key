@@ -35,7 +35,9 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
     protected final MatchConditions addInstantiation(Term term, MatchConditions matchCond,
             Services services) {
 
-        if (op.isRigid() && !term.isRigid()) { return null; }
+        if (op.isRigid() && !term.isRigid()) {
+            return null;
+        }
 
         final SVInstantiations inst = matchCond.getInstantiations();
 

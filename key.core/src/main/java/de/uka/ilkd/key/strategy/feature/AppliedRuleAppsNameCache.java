@@ -70,7 +70,9 @@ public class AppliedRuleAppsNameCache {
                     // If this is an inner node, we hope we will never revisit it, remove it from
                     // the
                     // cache
-                    if (node.parent().childrenCount() <= 1) { cache.remove(node.parent()); }
+                    if (node.parent().childrenCount() <= 1) {
+                        cache.remove(node.parent());
+                    }
                 } else {
                     // Check all earlier rule applications
                     Node current = node;
@@ -121,7 +123,9 @@ public class AppliedRuleAppsNameCache {
             readLock.unlock();
         }
 
-        if (nodeCache == null) { nodeCache = fillCacheForNode(node); }
+        if (nodeCache == null) {
+            nodeCache = fillCacheForNode(node);
+        }
 
         List<RuleApp> apps = nodeCache.get(name);
         return apps == null ? Collections.emptyList() : Collections.unmodifiableList(apps);

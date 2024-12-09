@@ -131,7 +131,9 @@ public class SExpr implements Writable {
 
     private static List<SExpr> asSExprs(String[] children) {
         List<SExpr> result = new ArrayList<>();
-        for (String child : children) { result.add(new SExpr(child)); }
+        for (String child : children) {
+            result.add(new SExpr(child));
+        }
         return result;
     }
 
@@ -229,7 +231,9 @@ public class SExpr implements Writable {
         if (name.length() > 0 && name.charAt(0) == '|' && name.charAt(name.length() - 1) == '|') {
             return name; // already escaped
         }
-        if (type == Type.VERBATIM) { return name; }
+        if (type == Type.VERBATIM) {
+            return name;
+        }
         if (EXTRACHAR_PATTERN.matcher(name).find()) {
             return "|" + name + "|";
         } else {

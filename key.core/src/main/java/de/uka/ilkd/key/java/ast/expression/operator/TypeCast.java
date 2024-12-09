@@ -60,8 +60,12 @@ public class TypeCast extends TypeOperator {
 
     public int getChildCount() {
         int result = 0;
-        if (typeReference != null) { result++; }
-        if (children != null) { result += children.size(); }
+        if (typeReference != null) {
+            result++;
+        }
+        if (children != null) {
+            result += children.size();
+        }
         return result;
     }
 
@@ -78,12 +82,16 @@ public class TypeCast extends TypeOperator {
     public ProgramElement getChildAt(int index) {
         int len;
         if (typeReference != null) {
-            if (index == 0) { return typeReference; }
+            if (index == 0) {
+                return typeReference;
+            }
             index--;
         }
         if (children != null) {
             len = children.size();
-            if (len > index) { return children.get(index); }
+            if (len > index) {
+                return children.get(index);
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

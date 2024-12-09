@@ -115,7 +115,9 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
             getMethodCall().getExplicitConstructorMethodReference();
         String call = explicitConstructorMR != null ? explicitConstructorMR.toString()
                 : getMethodCall().getMethodReference().toString();
-        if (call.endsWith(";")) { call = call.substring(0, call.length() - 1); }
+        if (call.endsWith(";")) {
+            call = call.substring(0, call.length() - 1);
+        }
         return call;
     }
 
@@ -124,7 +126,9 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      */
     @Override
     public String getNameIncludingReturnValue() throws ProofInputException {
-        if (nameIncludingReturnValue == null) { nameIncludingReturnValue = lazyComputeNameIncludingReturnValue(); }
+        if (nameIncludingReturnValue == null) {
+            nameIncludingReturnValue = lazyComputeNameIncludingReturnValue();
+        }
         return nameIncludingReturnValue;
     }
 
@@ -208,7 +212,9 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      */
     @Override
     public IExecutionMethodReturnValue[] getReturnValues() throws ProofInputException {
-        if (returnValues == null) { returnValues = lazyComputeReturnValues(); }
+        if (returnValues == null) {
+            returnValues = lazyComputeReturnValues();
+        }
         return returnValues;
     }
 
@@ -325,7 +331,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                     } finally {
                         SymbolicExecutionSideProofUtil
                                 .disposeOrStore("Return value computation on method return node "
-                                        + methodReturnNode.serialNr() + ".",
+                                    + methodReturnNode.serialNr() + ".",
                                     info);
                     }
                 } else {
@@ -357,7 +363,9 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                 if ("methodCallReturn".equals(MiscTools.getRuleDisplayName(node))) {
                     SymbolicExecutionTermLabel currentLabel =
                         SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
-                    if (origianlLabel.equals(currentLabel)) { resultNode = node; }
+                    if (origianlLabel.equals(currentLabel)) {
+                        resultNode = node;
+                    }
                 }
                 node = node.parent();
             }
@@ -376,9 +384,9 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      */
     public static String createMethodReturnName(Object returnValue, String methodName) {
         return INTERNAL_NODE_NAME_START + "return"
-                + (returnValue != null ? " " + returnValue + "as result" : "")
-                + (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "")
-                + INTERNAL_NODE_NAME_END;
+            + (returnValue != null ? " " + returnValue + "as result" : "")
+            + (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "")
+            + INTERNAL_NODE_NAME_END;
     }
 
     /**

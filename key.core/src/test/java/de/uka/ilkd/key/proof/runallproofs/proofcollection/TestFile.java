@@ -10,7 +10,7 @@ import java.util.List;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -151,7 +151,9 @@ public class TestFile implements Serializable {
 
             // Name resolution for the available KeY file.
             File keyFile = getKeYFile();
-            if (verbose) { LOGGER.info("Now processing file {}", keyFile); }
+            if (verbose) {
+                LOGGER.info("Now processing file {}", keyFile);
+            }
             // File that the created proof will be saved to.
             File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
 
@@ -160,10 +162,9 @@ public class TestFile implements Serializable {
             boolean success;
             try {
                 // Initialize KeY environment and load proof.
-                Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair =
-                    load(keyFile);
+                var pair = load(keyFile);
                 env = pair.first;
-                Pair<String, Location> script = pair.second;
+                ProofScriptEntry script = pair.second;
                 loadedProof = env.getLoadedProof();
                 ReplayResult replayResult;
 
@@ -194,7 +195,9 @@ public class TestFile implements Serializable {
 
                 // For a reload test we are done at this point. Loading was successful.
                 if (testProperty == TestProperty.LOADABLE) {
-                    if (verbose) { LOGGER.info("... success: loaded"); }
+                    if (verbose) {
+                        LOGGER.info("... success: loaded");
+                    }
                     return getRunAllProofsTestResult(catched, true);
                 }
 
@@ -207,11 +210,15 @@ public class TestFile implements Serializable {
                 }
                 boolean closed = loadedProof.closed();
                 success = (testProperty == TestProperty.PROVABLE) == closed;
-                if (verbose) { LOGGER.info("... finished proof: " + (closed ? "closed." : "open goal(s)")); }
+                if (verbose) {
+                    LOGGER.info("... finished proof: " + (closed ? "closed." : "open goal(s)"));
+                }
 
                 // Write statistics.
                 StatisticsFile statisticsFile = settings.getStatisticsFile();
-                if (statisticsFile != null) { statisticsFile.appendStatistics(loadedProof, keyFile); }
+                if (statisticsFile != null) {
+                    statisticsFile.appendStatistics(loadedProof, keyFile);
+                }
 
                 /*
                  * Testing proof reloading now. Saving and reloading proof only in case it was
@@ -220,11 +227,17 @@ public class TestFile implements Serializable {
                  */
                 reload(verbose, proofFile, loadedProof, success);
             } catch (Throwable t) {
-                if (verbose) { LOGGER.debug("Exception", t); }
+                if (verbose) {
+                    LOGGER.debug("Exception", t);
+                }
                 throw t;
             } finally {
-                if (loadedProof != null) { loadedProof.dispose(); }
-                if (env != null) { env.dispose(); }
+                if (loadedProof != null) {
+                    loadedProof.dispose();
+                }
+                if (env != null) {
+                    env.dispose();
+                }
             }
             return getRunAllProofsTestResult(catched, success);
         }
@@ -239,7 +252,9 @@ public class TestFile implements Serializable {
             // Save the available proof to a temporary file.
             ProofSaver.saveToFile(proofFile, loadedProof);
             reloadProof(proofFile);
-            if (verbose) { LOGGER.debug("... success: reloaded."); }
+            if (verbose) {
+                LOGGER.debug("... success: reloaded.");
+            }
         }
     }
 
@@ -248,14 +263,14 @@ public class TestFile implements Serializable {
      * want to use a different strategy.
      */
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            Pair<String, Location> script) throws Exception {
+            ProofScriptEntry script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
             env.getProofControl().startAndWaitForAutoMode(loadedProof);
         } else {
             // ... script
-            ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+            ProofScriptEngine pse = new ProofScriptEngine(script.script(), script.location());
             pse.execute(env.getUi(), env.getLoadedProof());
         }
     }
@@ -263,7 +278,7 @@ public class TestFile implements Serializable {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, ProofScriptEntry> load(
             File keyFile) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile.toPath());
         return new Pair<>(env, env.getProofScript());
@@ -290,7 +305,9 @@ public class TestFile implements Serializable {
 
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
-                for (Throwable ex : errorList) { LOGGER.warn("Replay exception", ex); }
+                for (Throwable ex : errorList) {
+                    LOGGER.warn("Replay exception", ex);
+                }
                 throw errorList.get(0);
             }
 
@@ -304,13 +321,17 @@ public class TestFile implements Serializable {
                     .toList();
             assertTrue(reloadedProof.closed(),
                 "Reloaded proof did not close: " + proofFile + ", open goals were " + goalsSerials
-                        + ", replay status: " + result.getStatus());
+                    + ", replay status: " + result.getStatus());
         } catch (Throwable t) {
             throw new Exception(
                 "Exception while loading proof (see cause for details): " + proofFile, t);
         } finally {
-            if (reloadedProof != null) { reloadedProof.dispose(); }
-            if (proofLoadEnvironment != null) { proofLoadEnvironment.dispose(); }
+            if (reloadedProof != null) {
+                reloadedProof.dispose();
+            }
+            if (proofLoadEnvironment != null) {
+                proofLoadEnvironment.dispose();
+            }
         }
     }
 

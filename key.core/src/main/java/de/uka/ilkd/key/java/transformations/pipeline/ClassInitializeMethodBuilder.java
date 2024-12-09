@@ -71,7 +71,9 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      */
     private boolean isConstantField(FieldDeclaration spec, VariableDeclarator decl) {
         boolean result = spec.isStatic() && spec.isFinal();
-        if (!result) { return false; }
+        if (!result) {
+            return false;
+        }
         ConstantExpressionEvaluator ce = services.getConstantEvaluator();
         try {
             Optional<Expression> init = decl.getInitializer();
@@ -126,7 +128,9 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         for (Node childNode : typeDeclaration.getChildNodes()) {
             if (childNode instanceof InitializerDeclaration) {
                 var init = (InitializerDeclaration) childNode;
-                if (init.isStatic()) { result.add(init.getBody().clone()); }
+                if (init.isStatic()) {
+                    result.add(init.getBody().clone());
+                }
             } else if (childNode instanceof FieldDeclaration) {
                 result.addAll(fieldInitializersToAssignments((FieldDeclaration) childNode));
             }

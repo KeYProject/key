@@ -69,6 +69,6 @@ public class RuleAppInfo {
 
     public String toString() {
         return "RuleApp: " + getRuleApp() + "\nNode: " + getOriginalNode() + "\nResulting nodes: "
-                + newNodes;
+            + newNodes;
     }
 }

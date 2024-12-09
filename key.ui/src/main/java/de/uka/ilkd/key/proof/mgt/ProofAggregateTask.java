@@ -60,7 +60,9 @@ public class ProofAggregateTask extends DefaultMutableTreeNode implements TaskTr
 
     public void insertNode(TaskTreeModel model, MutableTreeNode parentNode) {
         model.insertNodeInto(this, parentNode, model.getChildCount(parentNode));
-        for (TaskTreeNode proof : proofs) { proof.insertNode(model, this); }
+        for (TaskTreeNode proof : proofs) {
+            proof.insertNode(model, this);
+        }
     }
 
     public ProofStatus getStatus() {

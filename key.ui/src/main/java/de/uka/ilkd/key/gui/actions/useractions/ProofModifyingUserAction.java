@@ -77,7 +77,9 @@ public abstract class ProofModifyingUserAction extends UserAction {
 
     @Override
     public void undo() {
-        for (Node n : originalOpenGoals) { n.proof().pruneProof(n); }
+        for (Node n : originalOpenGoals) {
+            n.proof().pruneProof(n);
+        }
         mediator.getSelectionModel().setSelectedNode(originalSelection);
     }
 

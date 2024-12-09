@@ -32,7 +32,9 @@ public class InstantiationProposerCollection implements InstantiationProposer {
         for (InstantiationProposer proposer : proposers) {
             String proposal =
                 proposer.getProposal(app, var, services, undoAnchor, previousProposals);
-            if (proposal != null) { return proposal; }
+            if (proposal != null) {
+                return proposal;
+            }
         }
 
         return null;

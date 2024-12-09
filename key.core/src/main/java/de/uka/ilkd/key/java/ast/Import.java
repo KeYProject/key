@@ -98,7 +98,9 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (reference != null) { result++; }
+        if (reference != null) {
+            result++;
+        }
         return result;
     }
 
@@ -112,7 +114,11 @@ public class Import extends JavaNonTerminalProgramElement
      *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (reference != null) { if (index == 0) { return reference; } }
+        if (reference != null) {
+            if (index == 0) {
+                return reference;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -138,7 +144,9 @@ public class Import extends JavaNonTerminalProgramElement
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (reference instanceof TypeReference && index == 0) { return (TypeReference) reference; }
+        if (reference instanceof TypeReference && index == 0) {
+            return (TypeReference) reference;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

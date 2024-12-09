@@ -33,7 +33,9 @@ public abstract class GenericSortCondition {
     public static GenericSortCondition createCondition(SchemaVariable sv,
             InstantiationEntry<?> p_entry) {
 
-        if (!(p_entry instanceof TermInstantiation ti)) { return null; }
+        if (!(p_entry instanceof TermInstantiation ti)) {
+            return null;
+        }
 
         return createCondition(((OperatorSV) sv).sort(), ti.getInstantiation().sort(),
             !subSortsAllowed(sv));
@@ -48,7 +50,9 @@ public abstract class GenericSortCondition {
     public static GenericSortCondition createCondition(SortDependingFunction p0,
             SortDependingFunction p1) {
 
-        if (!p0.isSimilar(p1)) { return null; }
+        if (!p0.isSimilar(p1)) {
+            return null;
+        }
 
         return createCondition(p0.getSortDependingOn(), p1.getSortDependingOn(), true);
     }
@@ -79,14 +83,18 @@ public abstract class GenericSortCondition {
             // collection sorts; therefore identity has to be ensured
             p_identity = true;
 
-            if (!s0.getClass().equals(s1.getClass())) { return null; }
+            if (!s0.getClass().equals(s1.getClass())) {
+                return null;
+            }
 
             s0 = ((ArraySort) s0).elementSort();
             s1 = ((ArraySort) s1).elementSort();
         }
 
         if (!(s0 instanceof GenericSort gs) || s1 == JavaDLTheory.FORMULA
-                || s1 == JavaDLTheory.UPDATE) { return null; }
+                || s1 == JavaDLTheory.UPDATE) {
+            return null;
+        }
 
         if (p_identity) {
             return createIdentityCondition(gs, s1);
@@ -108,7 +116,9 @@ public abstract class GenericSortCondition {
 
         if (p_s instanceof GenericSort) {
             return createForceInstantiationCondition((GenericSort) p_s, p_maximum);
-        } else if (p_s instanceof ArraySort) { return forceInstantiation(((ArraySort) p_s).elementSort(), p_maximum); }
+        } else if (p_s instanceof ArraySort) {
+            return forceInstantiation(((ArraySort) p_s).elementSort(), p_maximum);
+        }
 
         return null;
     }
@@ -240,7 +250,7 @@ public abstract class GenericSortCondition {
         /** toString */
         public String toString() {
             return "Force instantiation: " + getGenericSort() + ", "
-                    + (getMaximum() ? "maximum" : "minimum");
+                + (getMaximum() ? "maximum" : "minimum");
         }
 
 

@@ -106,7 +106,9 @@ class ScriptLineParser {
             }
             pos++;
 
-            if (start == null && !Character.isWhitespace(c)) { start = getLocation(); }
+            if (start == null && !Character.isWhitespace(c)) {
+                start = getLocation();
+            }
 
             switch (c) {
             case -1 -> {
@@ -124,7 +126,8 @@ class ScriptLineParser {
                     sb.setLength(0);
                 }
                 case IN_QUOTE -> sb.append((char) c);
-                case IN_COMMENT -> {}
+                case IN_COMMENT -> {
+                }
                 default -> exc(c);
                 }
             }
@@ -142,12 +145,16 @@ class ScriptLineParser {
                     sb.setLength(0);
                 }
                 case IN_COMMENT -> {
-                    if (c == '\n') { state = stateBeforeComment; }
+                    if (c == '\n') {
+                        state = stateBeforeComment;
+                    }
                 }
-                default -> {}
+                default -> {
+                }
                 }
             }
-            case '\r' -> {}
+            case '\r' -> {
+            }
             case '"', '\'' -> {
                 switch (state) {
                 case INIT -> {
@@ -168,14 +175,16 @@ class ScriptLineParser {
                         sb.append((char) c);
                     }
                 }
-                case IN_COMMENT -> {}
+                case IN_COMMENT -> {
+                }
                 default -> exc(c);
                 }
             }
             case '#' -> {
                 switch (state) {
                 case IN_QUOTE -> sb.append((char) c);
-                case IN_COMMENT -> {}
+                case IN_COMMENT -> {
+                }
                 default -> {
                     stateBeforeComment = state;
                     state = State.IN_COMMENT;
@@ -185,7 +194,8 @@ class ScriptLineParser {
             case ';' -> {
                 switch (state) {
                 case IN_QUOTE -> sb.append((char) c);
-                case IN_COMMENT, INIT -> {}
+                case IN_COMMENT, INIT -> {
+                }
                 case IN_ID -> result.put("#" + (impCounter++), sb.toString());
                 case IN_UNQUOTE -> result.put(key, sb.toString());
                 default -> exc(c);
@@ -200,23 +210,30 @@ class ScriptLineParser {
                 switch (state) {
                 case INIT, IN_ID -> {
                     state = State.IN_ID; // fallthru intended!
-                    if (!isIDChar(c)) { exc(c); }
+                    if (!isIDChar(c)) {
+                        exc(c);
+                    }
                     sb.append((char) c);
                 }
                 case IN_UNQUOTE, AFTER_EQ -> {
                     state = State.IN_UNQUOTE;
-                    if (!isIDChar(c)) { exc(c); }
+                    if (!isIDChar(c)) {
+                        exc(c);
+                    }
                     sb.append((char) c);
                 }
                 case IN_QUOTE -> sb.append((char) c);
-                case IN_COMMENT -> {}
+                case IN_COMMENT -> {
+                }
                 default -> {
                     assert false;
                 }
                 }
             }
             }
-            if (state != State.IN_COMMENT) { cmdBuilder.append((char) c); }
+            if (state != State.IN_COMMENT) {
+                cmdBuilder.append((char) c);
+            }
         }
     }
 

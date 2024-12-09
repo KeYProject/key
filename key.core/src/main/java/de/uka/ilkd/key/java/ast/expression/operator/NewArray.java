@@ -169,9 +169,15 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     public int getChildCount() {
         int result = 0;
-        if (typeReference != null) { result++; }
-        if (children != null) { result += children.size(); }
-        if (arrayInitializer != null) { result++; }
+        if (typeReference != null) {
+            result++;
+        }
+        if (children != null) {
+            result += children.size();
+        }
+        if (arrayInitializer != null) {
+            result++;
+        }
         return result;
     }
 
@@ -188,15 +194,23 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     public ProgramElement getChildAt(int index) {
         int len;
         if (typeReference != null) {
-            if (index == 0) { return typeReference; }
+            if (index == 0) {
+                return typeReference;
+            }
             index--;
         }
         if (children != null) {
             len = children.size();
-            if (len > index) { return children.get(index); }
+            if (len > index) {
+                return children.get(index);
+            }
             index -= len;
         }
-        if (arrayInitializer != null) { if (index == 0) { return arrayInitializer; } }
+        if (arrayInitializer != null) {
+            if (index == 0) {
+                return arrayInitializer;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -208,8 +222,12 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     public int getExpressionCount() {
         int result = 0;
-        if (children != null) { result += children.size(); }
-        if (arrayInitializer != null) { result++; }
+        if (children != null) {
+            result += children.size();
+        }
+        if (arrayInitializer != null) {
+            result++;
+        }
         return result;
     }
 
@@ -227,10 +245,16 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
         int len;
         if (children != null) {
             len = children.size();
-            if (len > index) { return children.get(index); }
+            if (len > index) {
+                return children.get(index);
+            }
             index -= len;
         }
-        if (arrayInitializer != null) { if (index == 0) { return arrayInitializer; } }
+        if (arrayInitializer != null) {
+            if (index == 0) {
+                return arrayInitializer;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

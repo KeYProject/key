@@ -97,7 +97,9 @@ public class JmlMarkerDecision {
 
         try {
             // matching the expected start of the comment
-            if (consume(expectedCommentStart)) { return false; }
+            if (consume(expectedCommentStart)) {
+                return false;
+            }
 
             // consume until '@' is hit, or else it is not a JML comment
             StringBuilder markerBuilder = new StringBuilder();
@@ -151,7 +153,9 @@ public class JmlMarkerDecision {
             enabledPlusKeyFound = enabledPlusKeyFound || isPositive(marker) && isEnabled(marker);
             enabledNegativeKeyFound =
                 enabledNegativeKeyFound || isNegative(marker) && isEnabled(marker);
-            if ("-".equals(marker) || "+".equals(marker)) { return false; }
+            if ("-".equals(marker) || "+".equals(marker)) {
+                return false;
+            }
         }
 
         return (!plusKeyFound || enabledPlusKeyFound) && !enabledNegativeKeyFound;

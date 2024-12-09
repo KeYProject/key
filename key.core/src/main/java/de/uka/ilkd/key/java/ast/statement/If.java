@@ -114,7 +114,9 @@ public class If extends BranchStatement implements ExpressionContainer {
      */
 
     public int getChildCount() {
-        if (elseBranch != null) { return 3; }
+        if (elseBranch != null) {
+            return 3;
+        }
         return 2;
     }
 
@@ -129,14 +131,22 @@ public class If extends BranchStatement implements ExpressionContainer {
      */
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0) { return expression; }
+            if (index == 0) {
+                return expression;
+            }
             index--;
         }
         if (thenBranch != null) {
-            if (index == 0) { return thenBranch; }
+            if (index == 0) {
+                return thenBranch;
+            }
             index--;
         }
-        if (elseBranch != null) { if (index == 0) { return elseBranch; } }
+        if (elseBranch != null) {
+            if (index == 0) {
+                return elseBranch;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -159,7 +169,9 @@ public class If extends BranchStatement implements ExpressionContainer {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (index == 0) { return expression; }
+        if (index == 0) {
+            return expression;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -198,7 +210,9 @@ public class If extends BranchStatement implements ExpressionContainer {
      */
     public int getBranchCount() {
         int result = 1;
-        if (elseBranch != null) { result += 1; }
+        if (elseBranch != null) {
+            result += 1;
+        }
         return result;
     }
 
@@ -212,8 +226,12 @@ public class If extends BranchStatement implements ExpressionContainer {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Branch getBranchAt(int index) {
-        if (index == 0) { return thenBranch; }
-        if (elseBranch != null && index == 1) { return elseBranch; }
+        if (index == 0) {
+            return thenBranch;
+        }
+        if (elseBranch != null && index == 1) {
+            return elseBranch;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

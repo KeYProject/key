@@ -29,8 +29,8 @@ public class HandlerUtil {
     public static final SMTHandlerProperty.BooleanProperty PROPERTY_NOBINDERS =
         new SMTHandlerProperty.BooleanProperty("NoBinders", "Disable binder translation",
             "To translate binders (like seqDef or bsum),"
-                    + "a new function symbol must be introduced for every term."
-                    + "This may make the translation slow.");
+                + "a new function symbol must be introduced for every term."
+                + "This may make the translation slow.");
 
     /**
      * A user SMT property to decide whether the type hierarchy is translated at all. It introduces
@@ -39,8 +39,8 @@ public class HandlerUtil {
     public static final SMTHandlerProperty.BooleanProperty PROPERTY_NO_TYPE_HIERARCHY =
         new BooleanProperty("NoTypeHierarchy", "Disable type hierarchy encoding",
             "Type hierarchy is encoded with a number of quantified "
-                    + "axioms. They make the translation more precise, but may "
-                    + "also cost efficiency.");
+                + "axioms. They make the translation more precise, but may "
+                + "also cost efficiency.");
 
     public static final SMTHandlerProperty.BooleanProperty NO_QUANTIFIERS = new BooleanProperty(
         "NoQuantifiers", "Reduce the number of introduced universal quantifiers", "TODO");

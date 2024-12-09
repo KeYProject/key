@@ -77,7 +77,9 @@ public final class Watchdog {
              */
 
             for (Thread thread : threads) {
-                if (thread == null || IGNORED_THREADS.contains(thread.getName())) { continue; }
+                if (thread == null || IGNORED_THREADS.contains(thread.getName())) {
+                    continue;
+                }
                 switch (thread.getState()) {
                 case NEW, RUNNABLE -> anyProgress = true;
                 case WAITING, BLOCKED, TIMED_WAITING, TERMINATED -> {
@@ -95,7 +97,9 @@ public final class Watchdog {
                 LOGGER.error("Watchdog detected deadlock!");
                 LOGGER.info("Current thread state:");
                 for (Thread thread : threads) {
-                    if (thread == null || IGNORED_THREADS.contains(thread.getName())) { continue; }
+                    if (thread == null || IGNORED_THREADS.contains(thread.getName())) {
+                        continue;
+                    }
                     LOGGER.info("{} {}", thread.getName(), thread.getState());
                     var trace = thread.getStackTrace();
                     for (int j = 0; j < trace.length; j++) {

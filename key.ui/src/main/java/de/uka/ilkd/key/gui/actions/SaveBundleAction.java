@@ -34,7 +34,7 @@ public final class SaveBundleAction extends MainWindowAction {
         setName("Save Proof as Bundle...");
         setIcon(IconFactory.saveBundle(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Save current proof as a bundle containing all files to successfully reload "
-                + "the proof (disabled when option \"Allow proof bundle saving\" is set).");
+            + "the proof (disabled when option \"Allow proof bundle saving\" is set).");
 
         // react to setting changes
         GeneralSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();

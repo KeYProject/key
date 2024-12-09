@@ -41,7 +41,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     @Override
     public String getDescription() {
         return "<html><ol><li>Finish symbolic execution" + "<li>Separate proof obligations"
-                + "<li>Expand invariant definitions</ol>";
+            + "<li>Expand invariant definitions</ol>";
     }
 
     @Override
@@ -51,11 +51,15 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     public static boolean isAdmittedRule(Rule rule) {
         String name = rule.name().toString();
-        if (ADMITTED_RULES.contains(name)) { return true; }
+        if (ADMITTED_RULES.contains(name)) {
+            return true;
+        }
 
         if (rule instanceof Taclet taclet) {
             for (RuleSet rs : taclet.getRuleSets()) {
-                if (ADMITTED_RULE_SETS.contains(rs.name().toString())) { return true; }
+                if (ADMITTED_RULE_SETS.contains(rs.name().toString())) {
+                    return true;
+                }
             }
         }
         return false;
@@ -98,20 +102,26 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 MutableState mState) {
 
             Rule rule = app.rule();
-            if (FinishSymbolicExecutionMacro.isForbiddenRule(rule)) { return TopRuleAppCost.INSTANCE; }
+            if (FinishSymbolicExecutionMacro.isForbiddenRule(rule)) {
+                return TopRuleAppCost.INSTANCE;
+            }
 
             if (modalityCache.hasModality(goal.node().sequent())) {
                 return delegate.computeCost(app, pio, goal, mState);
             }
 
-            if (isAdmittedRule(rule)) { return NumberRuleAppCost.getZeroCost(); }
+            if (isAdmittedRule(rule)) {
+                return NumberRuleAppCost.getZeroCost();
+            }
 
             // apply OSS to <inv>() calls.
             if (rule instanceof OneStepSimplifier) {
                 Term target = pio.subTerm();
                 if (target.op() instanceof UpdateApplication) {
                     Operator updatedOp = target.sub(1).op();
-                    if (updatedOp instanceof ObserverFunction) { return NumberRuleAppCost.getZeroCost(); }
+                    if (updatedOp instanceof ObserverFunction) {
+                        return NumberRuleAppCost.getZeroCost();
+                    }
                 }
             }
 

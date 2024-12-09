@@ -67,7 +67,9 @@ public class ContextStatementBlock extends StatementBlock {
 
     public int getChildCount() {
         int count = 0;
-        if (executionContext != null) { count++; }
+        if (executionContext != null) {
+            count++;
+        }
         count += super.getChildCount();
         return count;
     }
@@ -83,7 +85,9 @@ public class ContextStatementBlock extends StatementBlock {
      */
     public ProgramElement getChildAt(int index) {
         if (executionContext != null) {
-            if (index == 0) { return executionContext; }
+            if (index == 0) {
+                return executionContext;
+            }
             index--;
         }
         return super.getChildAt(index);
@@ -103,9 +107,9 @@ public class ContextStatementBlock extends StatementBlock {
     /* toString */
     public String toString() {
         return ".." +
-                super.toString() +
-                "\n" +
-                "...";
+            super.toString() +
+            "\n" +
+            "...";
     }
 
     public int getTypeDeclarationCount() {
@@ -147,7 +151,9 @@ public class ContextStatementBlock extends StatementBlock {
             prefix = (ProgramPrefix) src;
             final int srcPrefixLength = prefix.getPrefixLength();
 
-            if (getPrefixLength() > srcPrefixLength) { return null; }
+            if (getPrefixLength() > srcPrefixLength) {
+                return null;
+            }
 
             pos = srcPrefixLength - getPrefixLength();
 
@@ -181,12 +187,16 @@ public class ContextStatementBlock extends StatementBlock {
         matchCond =
             matchInnerExecutionContext(matchCond, services, lastExecutionContext, prefix, pos, src);
 
-        if (matchCond == null) { return null; }
+        if (matchCond == null) {
+            return null;
+        }
 
         // matching children
         matchCond = matchChildren(newSource, matchCond, executionContext == null ? 0 : 1);
 
-        if (matchCond == null) { return null; }
+        if (matchCond == null) {
+            return null;
+        }
 
         matchCond =
             makeContextInfoComplete(matchCond, newSource, prefix, pos, relPos, src, services);
@@ -255,7 +265,9 @@ public class ContextStatementBlock extends StatementBlock {
         if (executionContext != null) {
             matchCond =
                 executionContext.match(new SourceData(innerContext, -1, services), matchCond);
-            if (matchCond == null) { return null; }
+            if (matchCond == null) {
+                return null;
+            }
         }
 
         matchCond = matchCond.setInstantiations(
@@ -283,7 +295,9 @@ public class ContextStatementBlock extends StatementBlock {
             int i = 0;
             while (i <= pos) {
                 final IntIterator it = currentPrefix.getFirstActiveChildPos().iterator();
-                while (it.hasNext()) { prefixEnd = prefixEnd.down(it.next()); }
+                while (it.hasNext()) {
+                    prefixEnd = prefixEnd.down(it.next());
+                }
                 i++;
                 if (i <= pos) {
                     // as fail-fast measure I do not test here using
@@ -302,7 +316,9 @@ public class ContextStatementBlock extends StatementBlock {
 
     private static ProgramPrefix getPrefixElementAt(ProgramPrefix prefix, int i) {
         ProgramPrefix current = prefix;
-        for (int pos = 0; pos < i; pos++) { current = current.getNextPrefixElement(); }
+        for (int pos = 0; pos < i; pos++) {
+            current = current.getNextPrefixElement();
+        }
         return current;
     }
 }

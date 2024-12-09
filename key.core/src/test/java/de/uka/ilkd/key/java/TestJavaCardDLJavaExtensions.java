@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 public class TestJavaCardDLJavaExtensions {
 
     public static final String testpath = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-            + "javacardDLExtensions" + File.separator;
+        + "javacardDLExtensions" + File.separator;
 
 
     public TestJavaCardDLJavaExtensions() {
@@ -25,8 +25,8 @@ public class TestJavaCardDLJavaExtensions {
     @Test
     public void testTypeNotInScopeShouldNotBeFound() {
         var message = "Something with type resolution in method frames is corrupt. "
-                + "The type Test should not be found in the default scope as it is "
-                + "declared inside package test.";
+            + "The type Test should not be found in the default scope as it is "
+            + "declared inside package test.";
         Assertions.assertThrows(BuildingException.class,
             () -> HelperClassForTests
                     .parseThrowException(new File(testpath + "typeResolutionInMethodFrame.key")),

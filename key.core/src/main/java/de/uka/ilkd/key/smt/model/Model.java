@@ -166,7 +166,10 @@ public class Model {
      */
     public void processObjectNames() {
         for (Heap h : heaps) {
-            for (ObjectVal ov : h.getObjects()) { String newName = processObjectID(ov.getName()); ov.setName(newName); }
+            for (ObjectVal ov : h.getObjects()) {
+                String newName = processObjectID(ov.getName());
+                ov.setName(newName);
+            }
         }
     }
 
@@ -174,7 +177,10 @@ public class Model {
      * Rewrite the sequence names from binary/hexadecimal to a human readable form.
      */
     public void processSequenceNames() {
-        for (Sequence s : sequences) { String newName = processSeqID(s.getName()); s.setName(newName); }
+        for (Sequence s : sequences) {
+            String newName = processSeqID(s.getName());
+            s.setName(newName);
+        }
     }
 
     /**
@@ -226,7 +232,9 @@ public class Model {
             String value = e.getValue();
             String constant = e.getKey();
 
-            if (reversedConstants.containsKey(value)) { constant = reversedConstants.get(value) + "/" + constant; }
+            if (reversedConstants.containsKey(value)) {
+                constant = reversedConstants.get(value) + "/" + constant;
+            }
             reversedConstants.put(value, constant);
         }
     }
@@ -306,7 +314,9 @@ public class Model {
      *         the decimal value of the constant
      */
     public String processConstantValue(String val, SMTSort s) {
-        if (val.equals("true") || val.equals("false")) { return val; }
+        if (val.equals("true") || val.equals("false")) {
+            return val;
+        }
 
         if (val.startsWith("#x")) {
             val = val.replace("#", "").replace("x", "");
@@ -318,7 +328,9 @@ public class Model {
 
         if (s.getId().equals(SMTObjTranslator.BINT_SORT)) {
             long intBound = types.getSort(SMTObjTranslator.BINT_SORT).getBound();
-            if (x >= intBound / 2) { x = (int) (x - intBound); }
+            if (x >= intBound / 2) {
+                x = (int) (x - intBound);
+            }
             val = Integer.toString(x);
             return val;
         }
@@ -337,7 +349,9 @@ public class Model {
      * @return the formatted value
      */
     public String processAnyValue(String val) {
-        if (val == null) { return null; }
+        if (val == null) {
+            return null;
+        }
         // if val is in hexadecimal transform it to binary first
         if (val.startsWith("#x")) {
             val = val.replace("#", "");
@@ -347,7 +361,9 @@ public class Model {
             long anySize = types.getSort(SMTObjTranslator.ANY_SORT).getBitSize();
             StringBuilder binString = new StringBuilder(Integer.toBinaryString(x));
 
-            while (binString.length() < anySize) { binString.insert(0, "0"); }
+            while (binString.length() < anySize) {
+                binString.insert(0, "0");
+            }
             val = "#b" + binString;
         }
         // remove #b prefix of binary string
@@ -366,7 +382,9 @@ public class Model {
             val = val.substring(val.length() - (int) intSize);
             int x = Integer.parseInt(val, 2);
 
-            if (x >= intBound / 2) { x = (int) (x - intBound); }
+            if (x >= intBound / 2) {
+                x = (int) (x - intBound);
+            }
             val = Integer.toString(x);
         } else if (val.startsWith(types.getPrefixForSort(SMTSort.BOOL))) {
             // val is of type bool
@@ -407,10 +425,14 @@ public class Model {
         for (Heap h : heaps) {
             for (ObjectVal o : h.getObjects()) {
                 Sort s = o.getSort();
-                if (s == null) { continue; }
+                if (s == null) {
+                    continue;
+                }
 
                 String sortname = s.name().toString();
-                if (!sortname.endsWith("[]")) { continue; }
+                if (!sortname.endsWith("[]")) {
+                    continue;
+                }
 
                 for (int i = 0; i < o.getLength(); ++i) {
                     String val = o.getArrayValue(i);
@@ -426,7 +448,10 @@ public class Model {
      */
     public void processSeqValues() {
         for (Sequence s : sequences) {
-            for (int i = 0; i < s.getLength(); ++i) { String val = processAnyValue(s.get(i)); s.set(i, val); }
+            for (int i = 0; i < s.getLength(); ++i) {
+                String val = processAnyValue(s.get(i));
+                s.set(i, val);
+            }
         }
     }
 
@@ -447,7 +472,9 @@ public class Model {
     public void addAliases() {
         for (Heap h : heaps) {
             for (ObjectVal o : h.getObjects()) {
-                if (reversedConstants.containsKey(o.getName())) { o.setName(getAliasedName(o.getName())); }
+                if (reversedConstants.containsKey(o.getName())) {
+                    o.setName(getAliasedName(o.getName()));
+                }
                 Map<String, String> newFieldValues = extractFieldValuesFor(o);
                 o.setFieldvalues(newFieldValues);
                 if (o.getSort() != null && o.getSort().name().toString().endsWith("[]")) {
@@ -460,7 +487,9 @@ public class Model {
         }
 
         for (LocationSet ls : locsets) {
-            if (reversedConstants.containsKey(ls.getName())) { ls.setName(getAliasedName(ls.getName())); }
+            if (reversedConstants.containsKey(ls.getName())) {
+                ls.setName(getAliasedName(ls.getName()));
+            }
             List<Location> newLocations = new LinkedList<>();
             for (Location l : ls.getLocations()) {
                 String newObjectID =
@@ -475,9 +504,13 @@ public class Model {
         }
 
         for (Sequence s : sequences) {
-            if (reversedConstants.containsKey(s.getName())) { s.setName(getAliasedName(s.getName())); }
+            if (reversedConstants.containsKey(s.getName())) {
+                s.setName(getAliasedName(s.getName()));
+            }
             for (int i = 0; i < s.getLength(); ++i) {
-                if (reversedConstants.containsKey(s.get(i))) { s.set(i, getAliasedName(s.get(i))); }
+                if (reversedConstants.containsKey(s.get(i))) {
+                    s.set(i, getAliasedName(s.get(i)));
+                }
             }
         }
     }
@@ -553,13 +586,19 @@ public class Model {
         String nullString = "#o0";
 
         Heap heap = null;
-        for (Heap h : heaps) { if (h.getName().equals("heap")) { heap = h; } }
+        for (Heap h : heaps) {
+            if (h.getName().equals("heap")) {
+                heap = h;
+            }
+        }
         ObjectVal o = getObject(constants.get(objName), heap);
         int i = 1;
         while (!o.getName().equals(nullString) && i < l.length) {
             result.add(o);
             String pointed = o.getFieldUsingSimpleName(l[i]);
-            if (pointed == null) { break; }
+            if (pointed == null) {
+                break;
+            }
             o = getObject(pointed, heap);
             i++;
         }
@@ -580,12 +619,18 @@ public class Model {
         String nullString = "#o0";
 
         Heap heap = null;
-        for (Heap h : heaps) { if (h.getName().equals("heap")) { heap = h; } }
+        for (Heap h : heaps) {
+            if (h.getName().equals("heap")) {
+                heap = h;
+            }
+        }
         ObjectVal o = getObject(constants.get(objName), heap);
         int i = 1;
         while (!o.getName().equals(nullString) && i < l.length) {
             String pointed = o.getFieldUsingSimpleName(l[i]);
-            if (pointed == null) { break; }
+            if (pointed == null) {
+                break;
+            }
 
             o = getObject(pointed, heap);
             i++;
@@ -601,7 +646,9 @@ public class Model {
         Set<String> objConstants = new HashSet<>();
         for (var pair : constants.entrySet()) {
             var c = pair.getKey();
-            if (types.getTypeForConstant(c) == null) { continue; }
+            if (types.getTypeForConstant(c) == null) {
+                continue;
+            }
             if (types.getTypeForConstant(c).getId().equals(SMTObjTranslator.OBJECT_SORT)) {
                 objConstants.add(pair.getValue());
             }
@@ -609,7 +656,9 @@ public class Model {
 
         for (Heap h : heaps) {
             Set<ObjectVal> reachable = new HashSet<>();
-            for (String o : objConstants) { reachable.addAll(getReachableObjects(o, h)); }
+            for (String o : objConstants) {
+                reachable.addAll(getReachableObjects(o, h));
+            }
 
             h.getObjects().clear();
             h.getObjects().addAll(reachable);
@@ -633,14 +682,18 @@ public class Model {
 
         ObjectVal init = getObject(name, heap);
 
-        if (init == null) { return null; }
+        if (init == null) {
+            return null;
+        }
 
         scheduled.push(init);
 
         while (!scheduled.isEmpty()) {
             ObjectVal o = scheduled.pop();
 
-            if (result.contains(o)) { continue; }
+            if (result.contains(o)) {
+                continue;
+            }
 
             result.add(o);
 
@@ -648,7 +701,9 @@ public class Model {
 
             for (ObjectVal p : pointed) {
 
-                if (result.contains(p)) { continue; }
+                if (result.contains(p)) {
+                    continue;
+                }
 
                 scheduled.push(p);
 
@@ -675,14 +730,18 @@ public class Model {
 
         ObjectVal o = getObject(name, heap);
 
-        if (o == null) { return result; }
+        if (o == null) {
+            return result;
+        }
 
         for (Entry<String, String> e : o.getFieldvalues().entrySet()) {
 
             String val = e.getValue();
             ObjectVal pointed = getObject(val, heap);
 
-            if (pointed != null) { result.add(pointed); }
+            if (pointed != null) {
+                result.add(pointed);
+            }
         }
 
         for (Entry<Integer, String> e : o.getArrayValues().entrySet()) {
@@ -690,7 +749,9 @@ public class Model {
             String val = e.getValue();
             ObjectVal pointed = getObject(val, heap);
 
-            if (pointed != null) { result.add(pointed); }
+            if (pointed != null) {
+                result.add(pointed);
+            }
 
         }
 
@@ -707,7 +768,11 @@ public class Model {
      * @return the object of the given name found in the heap
      */
     public ObjectVal getObject(String name, Heap heap) {
-        for (ObjectVal o : heap.getObjects()) { if (o.getName().startsWith(name)) { return o; } }
+        for (ObjectVal o : heap.getObjects()) {
+            if (o.getName().startsWith(name)) {
+                return o;
+            }
+        }
 
         return null;
     }
@@ -721,9 +786,13 @@ public class Model {
      *         removed
      */
     public static String removePipes(String s) {
-        if (s.startsWith("|")) { s = s.substring(1); }
+        if (s.startsWith("|")) {
+            s = s.substring(1);
+        }
 
-        if (s.endsWith("|")) { s = s.substring(0, s.length() - 1); }
+        if (s.endsWith("|")) {
+            s = s.substring(0, s.length() - 1);
+        }
 
         return s;
     }
@@ -779,15 +848,23 @@ public class Model {
         result.append("\n");
         result.append("\nHeaps");
         result.append("\n-----------");
-        for (Heap h : heaps) { result.append("\n"); result.append(h.toString()); }
+        for (Heap h : heaps) {
+            result.append("\n");
+            result.append(h.toString());
+        }
         result.append("\n");
         result.append("\nLocation Sets");
         result.append("\n-----------");
-        for (LocationSet ls : locsets) { result.append("\n"); result.append(ls.toString()); }
+        for (LocationSet ls : locsets) {
+            result.append("\n");
+            result.append(ls.toString());
+        }
         result.append("\n");
         result.append("\nSequences");
         result.append("\n-----------");
-        for (Sequence s : sequences) { result.append("\n").append(s); }
+        for (Sequence s : sequences) {
+            result.append("\n").append(s);
+        }
 
         return result.toString();
 

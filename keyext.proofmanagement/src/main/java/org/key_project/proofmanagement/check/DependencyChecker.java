@@ -74,7 +74,7 @@ public class DependencyChecker implements Checker {
         // check if graph contains illegal cycles
         if (hasIllegalCycles(graph)) {
             data.print(LogLevel.WARNING, "Illegal cyclic dependency found" +
-                    " (further illegal cycles may exist but will not be reported)!");
+                " (further illegal cycles may exist but will not be reported)!");
         } else {
             data.print(LogLevel.INFO, "No illegal dependencies found.");
         }
@@ -95,7 +95,7 @@ public class DependencyChecker implements Checker {
             }
         } else {
             data.print(LogLevel.INFO, "Replay is disabled. Skipping check for unproven" +
-                    "dependencies");
+                "dependencies");
         }
 
         data.print(LogLevel.INFO, "Dependency checks completed!");
@@ -129,7 +129,7 @@ public class DependencyChecker implements Checker {
                             // update status in data object
                             entry.dependencyState = CheckerData.DependencyState.OK;
                             data.print(LogLevel.INFO, "Proof is closed and has no" +
-                                    " unproven dependencies: " + entry.proof.name());
+                                " unproven dependencies: " + entry.proof.name());
 
                             changed = true;
                         }
@@ -151,7 +151,7 @@ public class DependencyChecker implements Checker {
                     && entry.replayState == CheckerData.ReplayState.SUCCESS) {
                 entry.dependencyState = CheckerData.DependencyState.UNPROVEN_DEP;
                 data.print(LogLevel.WARNING, "Unproven dependencies found for proof "
-                        + entry.proof.name());
+                    + entry.proof.name());
                 hasUnprovenDeps = true;
             }
         }
@@ -229,7 +229,7 @@ public class DependencyChecker implements Checker {
                 if (node.getDependencies().get(next) == TERMINATION_SENSITIVE
                         && !next.getContract().hasMby()) {
                     data.print(LogLevel.WARNING, "Illegal cycle/SCC, contract has no termination"
-                            + " argument: " + node.getContract().getName());
+                        + " argument: " + node.getContract().getName());
                     data.print(LogLevel.WARNING, "The illegal SCC is: " + scc);
                     return false;
                 }

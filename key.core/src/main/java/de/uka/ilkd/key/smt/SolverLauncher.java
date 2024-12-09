@@ -224,7 +224,9 @@ public class SolverLauncher implements SolverListener {
         for (SolverType type : factories) {
             if (type.isInstalled(false)) {
                 installedSolvers.add(type);
-                if (settings.checkForSupport()) { type.checkForSupport(); }
+                if (settings.checkForSupport()) {
+                    type.checkForSupport();
+                }
             }
         }
         prepareSolvers(installedSolvers, problems, services);
@@ -232,14 +234,18 @@ public class SolverLauncher implements SolverListener {
     }
 
     private void checkLaunchCall() {
-        if (launcherHasBeenUsed) { throw new IllegalStateException("Every launcher object can be used only once."); }
+        if (launcherHasBeenUsed) {
+            throw new IllegalStateException("Every launcher object can be used only once.");
+        }
         launcherHasBeenUsed = true;
     }
 
     private void launchIntern(Collection<SMTProblem> problems, Collection<SolverType> factories) {
 
         LinkedList<SMTSolver> solvers = new LinkedList<>();
-        for (SMTProblem problem : problems) { solvers.addAll(problem.getSolvers()); }
+        for (SMTProblem problem : problems) {
+            solvers.addAll(problem.getSolvers());
+        }
         launchSolvers(solvers, problems, factories);
     }
 
@@ -296,7 +302,9 @@ public class SolverLauncher implements SolverListener {
 
     private void notifyListenersOfStart(Collection<SMTProblem> problems,
             Collection<SolverType> solverTypes) {
-        for (SolverLauncherListener listener : listeners) { listener.launcherStarted(problems, solverTypes, this); }
+        for (SolverLauncherListener listener : listeners) {
+            listener.launcherStarted(problems, solverTypes, this);
+        }
     }
 
     /**
@@ -346,7 +354,11 @@ public class SolverLauncher implements SolverListener {
      * set.
      */
     private void cleanUp(Collection<SMTSolver> solvers) {
-        if (isInterrupted()) { for (SMTSolver solver : solvers) { solver.interrupt(ReasonOfInterruption.User); } }
+        if (isInterrupted()) {
+            for (SMTSolver solver : solvers) {
+                solver.interrupt(ReasonOfInterruption.User);
+            }
+        }
     }
 
     private void notifyListenersOfStop() {
@@ -354,12 +366,18 @@ public class SolverLauncher implements SolverListener {
         Collection<SMTSolver> finishedSolvers = session.getFinishedSolvers();
 
         for (SMTSolver solver : problemSolvers) {
-            if (!finishedSolvers.contains(solver)) { finishedSolvers.add(solver); }
+            if (!finishedSolvers.contains(solver)) {
+                finishedSolvers.add(solver);
+            }
         }
 
-        for (SolverLauncherListener listener : listeners) { listener.launcherStopped(this, finishedSolvers); }
+        for (SolverLauncherListener listener : listeners) {
+            listener.launcherStopped(this, finishedSolvers);
+        }
 
-        if (!problemSolvers.isEmpty() && listeners.isEmpty()) { throw new SolverException(problemSolvers); }
+        if (!problemSolvers.isEmpty() && listeners.isEmpty()) {
+            throw new SolverException(problemSolvers);
+        }
     }
 
     /**
@@ -445,7 +463,9 @@ class Session {
         try {
             lock.lock();
             int i = currentlyRunning.indexOf(solver);
-            if (i >= 0) { currentlyRunning.remove(i); }
+            if (i >= 0) {
+                currentlyRunning.remove(i);
+            }
         } finally {
             lock.unlock();
         }
@@ -480,7 +500,9 @@ class Session {
     public void interruptAll(ReasonOfInterruption reason) {
         try {
             lock.lock();
-            for (SMTSolver solver : currentlyRunning) { solver.interrupt(reason); }
+            for (SMTSolver solver : currentlyRunning) {
+                solver.interrupt(reason);
+            }
         } finally {
             lock.unlock();
         }

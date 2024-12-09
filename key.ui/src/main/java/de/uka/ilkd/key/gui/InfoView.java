@@ -82,7 +82,9 @@ public class InfoView extends JSplitPane implements TabPanel {
             public void componentShown(ComponentEvent e) {
                 if (mediator.getSelectedProof() != null) {
                     Goal goal = mediator.getSelectedGoal();
-                    if (goal != null) { updateModel(mediator.getSelectedGoal()); }
+                    if (goal != null) {
+                        updateModel(mediator.getSelectedGoal());
+                    }
                 }
             }
 
@@ -121,7 +123,9 @@ public class InfoView extends JSplitPane implements TabPanel {
                     Rule selected = infoTree.getLastSelectedPathComponent().getRule();
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
                         DefaultContextMenuKind.TACLET_INFO, selected, mediator);
-                    if (menu.getComponentCount() > 0) { menu.show(InfoView.this, e.getX(), e.getY()); }
+                    if (menu.getComponentCount() > 0) {
+                        menu.show(InfoView.this, e.getX(), e.getY());
+                    }
                 }
             }
         });
@@ -146,7 +150,9 @@ public class InfoView extends JSplitPane implements TabPanel {
 
     public void setMediator(KeYMediator m) {
         assert m != null;
-        if (mediator != null) { mediator.removeKeYSelectionListener(selectionListener); }
+        if (mediator != null) {
+            mediator.removeKeYSelectionListener(selectionListener);
+        }
         m.addKeYSelectionListener(selectionListener);
         mediator = m;
     }

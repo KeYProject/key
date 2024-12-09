@@ -116,7 +116,9 @@ public class PosTacletApp extends TacletApp {
     private static ImmutableSet<QuantifiableVariable> varsBoundAboveFindPos(Taclet taclet,
             PosInOccurrence pos) {
 
-        if (!(taclet instanceof RewriteTaclet)) { return DefaultImmutableSet.nil(); }
+        if (!(taclet instanceof RewriteTaclet)) {
+            return DefaultImmutableSet.nil();
+        }
 
         return collectBoundVarsAbove(pos);
     }
@@ -130,7 +132,9 @@ public class PosTacletApp extends TacletApp {
 
     @Override
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
-        if (!taclet().getPrefix(sv).context()) { return DefaultImmutableSet.nil(); }
+        if (!taclet().getPrefix(sv).context()) {
+            return DefaultImmutableSet.nil();
+        }
         return varsBoundAboveFindPos(taclet(), posInOccurrence());
     }
 
@@ -300,7 +304,9 @@ public class PosTacletApp extends TacletApp {
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o)) { return false; }
+        if (!super.equals(o)) {
+            return false;
+        }
         return ((PosTacletApp) o).posInOccurrence().equals(posInOccurrence());
     }
 
@@ -311,7 +317,9 @@ public class PosTacletApp extends TacletApp {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object o) {
-        if (!super.equalsModProofIrrelevancy(o) || !(o instanceof PosTacletApp)) { return false; }
+        if (!super.equalsModProofIrrelevancy(o) || !(o instanceof PosTacletApp)) {
+            return false;
+        }
         PosInOccurrence posA = ((PosTacletApp) o).pos;
         PosInOccurrence posB = pos;
         if (posA == null && posB == null) {

@@ -44,12 +44,16 @@ public class SquigglyUnderlinePainter implements Highlighter.HighlightPainter {
     @Override
     public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
         // don't render if empty
-        if (offs0 == offs1) { return; }
+        if (offs0 == offs1) {
+            return;
+        }
 
         if (bounds != null) {
             try {
                 g.setColor(highlightColor);
-                if (g instanceof Graphics2D) { ((Graphics2D) g).setStroke(stroke); }
+                if (g instanceof Graphics2D) {
+                    ((Graphics2D) g).setStroke(stroke);
+                }
                 TextUI mapper = c.getUI();
                 Rectangle p0 = mapper.modelToView(c, offs0);
                 Rectangle p1 = mapper.modelToView(c, offs1);

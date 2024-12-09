@@ -48,7 +48,9 @@ public class TermLabelsProperty implements Property<Term> {
      */
     @Override
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
-        if (term2 == term1) { return true; }
+        if (term2 == term1) {
+            return true;
+        }
 
         if (!(term1.op().equals(term2.op()) && term1.boundVars().equals(term2.boundVars())
                 && term1.javaBlock().equals(term2.javaBlock()))) {
@@ -59,7 +61,9 @@ public class TermLabelsProperty implements Property<Term> {
         final ImmutableArray<Term> term2Subs = term2.subs();
         final int numOfSubs = term1Subs.size();
         for (int i = 0; i < numOfSubs; ++i) {
-            if (!term1Subs.get(i).equalsModProperty(term2Subs.get(i), TERM_LABELS_PROPERTY)) { return false; }
+            if (!term1Subs.get(i).equalsModProperty(term2Subs.get(i), TERM_LABELS_PROPERTY)) {
+                return false;
+            }
         }
         return true;
     }

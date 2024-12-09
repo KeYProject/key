@@ -75,7 +75,9 @@ public class NoPosTacletApp extends TacletApp {
             "If instantiations list has wrong size");
 
         SVInstantiations inst = resolveCollisionVarSV(taclet, instantiations, services);
-        if (checkVarCondNotFreeIn(taclet, inst)) { return new NoPosTacletApp(taclet, inst, ifInstantiations); }
+        if (checkVarCondNotFreeIn(taclet, inst)) {
+            return new NoPosTacletApp(taclet, inst, ifInstantiations);
+        }
         return null;
     }
 
@@ -94,7 +96,9 @@ public class NoPosTacletApp extends TacletApp {
             SVInstantiations instantiations, Services services) {
         NoPosTacletApp res = createNoPosTacletApp(taclet, instantiations, null, services);
         // Make the given SVs fixed
-        if (res != null) { res.updateContextFixed = true; }
+        if (res != null) {
+            res.updateContextFixed = true;
+        }
         return res;
     }
 
@@ -146,12 +150,16 @@ public class NoPosTacletApp extends TacletApp {
             }
 
             final TacletPrefix prefix = taclet.getPrefix(sv);
-            if (prefix.context()) { continue; }
+            if (prefix.context()) {
+                continue;
+            }
 
             final ImmutableSet<QuantifiableVariable> boundVarSet =
                 boundAtOccurrenceSet(prefix, instantiations);
             final Term inst = (Term) instantiations.getInstantiation(sv);
-            if (!inst.freeVars().subset(boundVarSet)) { return false; }
+            if (!inst.freeVars().subset(boundVarSet)) {
+                return false;
+            }
         }
 
         return true;
@@ -324,18 +332,24 @@ public class NoPosTacletApp extends TacletApp {
      */
     @Nullable
     public NoPosTacletApp matchFind(PosInOccurrence pos, Services services, Term t) {
-        if ((t == null) && (pos != null)) { t = pos.subTerm(); }
+        if ((t == null) && (pos != null)) {
+            t = pos.subTerm();
+        }
 
         MatchConditions mc = setupMatchConditions(pos, services);
 
-        if (mc == null) { return null; }
+        if (mc == null) {
+            return null;
+        }
 
         MatchConditions res;
         if (taclet() instanceof FindTaclet) {
             res = taclet().getMatcher().matchFind(t, mc, services);
             // the following check will partly be repeated within the
             // constructor; this could be optimised
-            if (res == null || !checkVarCondNotFreeIn(taclet(), res.getInstantiations(), pos)) { return null; }
+            if (res == null || !checkVarCondNotFreeIn(taclet(), res.getInstantiations(), pos)) {
+                return null;
+            }
         } else {
             res = mc;
         }
@@ -343,7 +357,9 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     private NoPosTacletApp evalCheckRes(MatchConditions res, Services services) {
-        if (res == null) { return null; }
+        if (res == null) {
+            return null;
+        }
 
         if (updateContextFixed && !updateContextCompatible(res)) {
             /*
@@ -368,7 +384,9 @@ public class NoPosTacletApp extends TacletApp {
             mc = new MatchConditions(svInst, RenameTable.EMPTY_TABLE);
         }
 
-        if (taclet() instanceof RewriteTaclet) { mc = ((RewriteTaclet) taclet()).checkPrefix(pos, mc); }
+        if (taclet() instanceof RewriteTaclet) {
+            mc = ((RewriteTaclet) taclet()).checkPrefix(pos, mc);
+        }
 
         return mc;
     }

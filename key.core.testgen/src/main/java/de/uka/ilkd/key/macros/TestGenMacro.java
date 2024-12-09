@@ -67,7 +67,9 @@ class TestGenStrategy extends FilterStrategy {
     }
 
     private static boolean isUnwindRule(Rule rule) {
-        if (rule == null) { return false; }
+        if (rule == null) {
+            return false;
+        }
         final String name = rule.name().toString();
         return TestGenStrategy.unwindRules.contains(name);
     }
@@ -80,7 +82,9 @@ class TestGenStrategy extends FilterStrategy {
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
             MutableState mState) {
-        if (TestGenStrategy.isUnwindRule(app.rule())) { return NumberRuleAppCost.create(TestGenStrategy.UNWIND_COST); }
+        if (TestGenStrategy.isUnwindRule(app.rule())) {
+            return NumberRuleAppCost.create(TestGenStrategy.UNWIND_COST);
+        }
         return super.computeCost(app, pio, goal, mState);
     }
 
@@ -91,7 +95,9 @@ class TestGenStrategy extends FilterStrategy {
             final RuleApp app = node.getAppliedRuleApp();
             if (app != null) {
                 final Rule rule = app.rule();
-                if (TestGenStrategy.isUnwindRule(rule)) { ++totalUnwinds; }
+                if (TestGenStrategy.isUnwindRule(rule)) {
+                    ++totalUnwinds;
+                }
             }
             node = node.parent();
         }
@@ -100,7 +106,9 @@ class TestGenStrategy extends FilterStrategy {
 
     @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-        if (!modalityCache.hasModality(goal.node().sequent())) { return false; }
+        if (!modalityCache.hasModality(goal.node().sequent())) {
+            return false;
+        }
         if (TestGenStrategy.isUnwindRule(app.rule())) {
             final int noUnwindRules = computeUnwindRules(goal);
             return noUnwindRules < limit;

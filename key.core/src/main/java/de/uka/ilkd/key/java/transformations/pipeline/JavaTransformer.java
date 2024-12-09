@@ -65,7 +65,9 @@ public abstract class JavaTransformer {
     public void apply(TypeDeclaration<?> td) {}
 
     public void apply(CompilationUnit cu) {
-        for (TypeDeclaration<?> type : cu.getTypes()) { apply(type); }
+        for (TypeDeclaration<?> type : cu.getTypes()) {
+            apply(type);
+        }
     }
 
     public static RuntimeException reportError(Node node, String message, Object... args) {

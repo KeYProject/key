@@ -58,7 +58,9 @@ public final class FindResources {
             dirURL = classLoader.getResource(me);
         }
 
-        if (dirURL == null) { return null; }
+        if (dirURL == null) {
+            return null;
+        }
 
         if ("jar".equals(dirURL.getProtocol())) {
             /* A JAR path */
@@ -86,7 +88,9 @@ public final class FindResources {
         if (classLoader == null)
             return null;
         URL dirURL = classLoader.getResource(path);
-        if (dirURL != null && dirURL.getProtocol().equals("file")) { return new File(dirURL.toURI()).toPath(); }
+        if (dirURL != null && dirURL.getProtocol().equals("file")) {
+            return new File(dirURL.toURI()).toPath();
+        }
 
         if (dirURL == null) {
             /*
@@ -97,7 +101,9 @@ public final class FindResources {
             dirURL = classLoader.getResource(me);
         }
 
-        if (dirURL == null) { return null; }
+        if (dirURL == null) {
+            return null;
+        }
 
         if (dirURL.getProtocol().equals("jar")) {
             /* A JAR path */
@@ -146,9 +152,16 @@ public final class FindResources {
     public static @Nullable File findFolder(boolean exists, String property, String... candidates) {
         if (System.getProperty(property) != null) {
             File f = new File(System.getProperty(property));
-            if (f.exists() || !exists) { return f; }
+            if (f.exists() || !exists) {
+                return f;
+            }
         }
-        for (String c : candidates) { File f = new File(c); if (f.exists() || !exists) { return f; } }
+        for (String c : candidates) {
+            File f = new File(c);
+            if (f.exists() || !exists) {
+                return f;
+            }
+        }
         return null;
     }
 

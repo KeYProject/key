@@ -121,7 +121,9 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      */
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (!super.isApplicable(goal, pio)) { return false; }
+        if (!super.isApplicable(goal, pio)) {
+            return false;
+        }
 
         final Term progPost = splitUpdates(pio.subTerm(), goal.proof().getServices()).second;
         final var kind = ((Modality) progPost.op()).<Modality.JavaModalityKind>kind();

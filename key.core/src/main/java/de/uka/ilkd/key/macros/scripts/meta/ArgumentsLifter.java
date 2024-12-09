@@ -36,7 +36,9 @@ public final class ArgumentsLifter {
                     args.add(lift(flag, field));
                 } else {
                     Varargs vargs = field.getDeclaredAnnotation(Varargs.class);
-                    if (vargs != null) { args.add(lift(vargs, field)); }
+                    if (vargs != null) {
+                        args.add(lift(vargs, field));
+                    }
                 }
             }
         }

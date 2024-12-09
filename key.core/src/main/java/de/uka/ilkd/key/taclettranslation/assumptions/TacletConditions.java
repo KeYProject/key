@@ -76,7 +76,9 @@ class TacletConditions {
 
         for (ArrayComponentTypeCondition cond : arrayComponentCondition) {
 
-            if (cond.isCheckReferenceType()) { return true; }
+            if (cond.isCheckReferenceType()) {
+                return true;
+            }
 
         }
         return false;
@@ -109,7 +111,9 @@ class TacletConditions {
             if ((negated && cond.isNegated()) || (!negated && !cond.isNegated())) {
                 if (cond.getTypeResolver() instanceof GenericSortResolver res) {
 
-                    if (res.getGenericSort().equals(s)) { return true; }
+                    if (res.getGenericSort().equals(s)) {
+                        return true;
+                    }
 
                 }
 
@@ -163,7 +167,9 @@ class TacletConditions {
             TypeComparisonCondition.Mode mode) {
 
         for (TypeComparisonCondition tcc : comparisionCondition) {
-            if (containsComparisionCondition(tcc, s1, s2, mode)) { return true; }
+            if (containsComparisionCondition(tcc, s1, s2, mode)) {
+                return true;
+            }
         }
 
         return false;
@@ -185,7 +191,9 @@ class TacletConditions {
 
         if (first != null && second != null) {
             if (tcc.getMode() == mode) {
-                if (first.getGenericSort().equals(s1) && second.getGenericSort().equals(s2)) { return true; }
+                if (first.getGenericSort().equals(s1) && second.getGenericSort().equals(s2)) {
+                    return true;
+                }
                 return first.getGenericSort().equals(s2) && second.getGenericSort().equals(s1);
             }
         }
@@ -203,8 +211,12 @@ class TacletConditions {
                     if (first.getGenericSort().equals(gen)) {
                         Sort superType =
                             ((NonGenericSortResolver) tcc.getSecondResolver()).getSort();
-                        if (inst.extendsTrans(superType) && mode == Mode.NOT_IS_SUBTYPE) { return false; }
-                        if (!inst.extendsTrans(superType) && mode == Mode.IS_SUBTYPE) { return false; }
+                        if (inst.extendsTrans(superType) && mode == Mode.NOT_IS_SUBTYPE) {
+                            return false;
+                        }
+                        if (!inst.extendsTrans(superType) && mode == Mode.IS_SUBTYPE) {
+                            return false;
+                        }
                     }
 
 
@@ -237,7 +249,9 @@ class TacletConditions {
                 res = (GenericSortResolver) cond.getResolver();
                 if (res.getGenericSort().equals(s)) {
                     if (cond.getIsReference()) {
-                        if (cond.getNonNull()) { return NULL_LEGAL; }
+                        if (cond.getNonNull()) {
+                            return NULL_LEGAL;
+                        }
                         return NULL_ILLEGAL;
                     }
 

@@ -35,7 +35,12 @@ public final class ArrayUtil {
     public static <T extends @Nullable Object> @Nullable T search(T[] array, Predicate<T> filter) {
         T result = null;
         int i = 0;
-        while (result == null && i < array.length) { if (filter.test(array[i])) { result = array[i]; } i++; }
+        while (result == null && i < array.length) {
+            if (filter.test(array[i])) {
+                result = array[i];
+            }
+            i++;
+        }
         return result;
     }
 
@@ -167,7 +172,9 @@ public final class ArrayUtil {
     public static <T extends @Nullable Object> T[] insert(T[] array, T toInsert, int index) {
         T[] result = (T[]) java.lang.reflect.Array
                 .newInstance(getComponentType(array), array.length + 1);
-        if (index >= 1) { System.arraycopy(array, 0, result, 0, index); }
+        if (index >= 1) {
+            System.arraycopy(array, 0, result, 0, index);
+        }
         result[index] = toInsert;
         System.arraycopy(array, index, result, index + 1, array.length - index);
         return result;
@@ -202,7 +209,11 @@ public final class ArrayUtil {
      */
     public static <T extends @Nullable Object> int indexOf(T[] array, T toSearch) {
         int index = -1;
-        for (int i = 0; i < array.length; i++) { if (Objects.equals(array[i], toSearch)) { return i; } }
+        for (int i = 0; i < array.length; i++) {
+            if (Objects.equals(array[i], toSearch)) {
+                return i;
+            }
+        }
         return index;
     }
 
@@ -219,7 +230,11 @@ public final class ArrayUtil {
     @SuppressWarnings("unchecked")
     public static <T extends @Nullable Object> T[] remove(T[] array, T toRemove) {
         List<T> result = new LinkedList<>();
-        for (T element : array) { if (!Objects.equals(element, toRemove)) { result.add(element); } }
+        for (T element : array) {
+            if (!Objects.equals(element, toRemove)) {
+                result.add(element);
+            }
+        }
         return (T[]) result.toArray((T[]) java.lang.reflect.Array
                 .newInstance(getComponentType(array), result.size()));
     }

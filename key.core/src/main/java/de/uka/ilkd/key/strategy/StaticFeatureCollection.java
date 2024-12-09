@@ -237,7 +237,9 @@ public abstract class StaticFeatureCollection {
 
     protected static TermFeature or(TermFeature... features) {
         TermFeature orFeature = inftyTermConst();
-        for (var f : features) { orFeature = or(orFeature, f); }
+        for (var f : features) {
+            orFeature = or(orFeature, f);
+        }
         return orFeature;
     }
 
@@ -251,7 +253,9 @@ public abstract class StaticFeatureCollection {
 
     protected static Feature or(Feature... features) {
         Feature orFeature = inftyConst();
-        for (Feature f : features) { orFeature = or(orFeature, f); }
+        for (Feature f : features) {
+            orFeature = or(orFeature, f);
+        }
         return orFeature;
     }
 

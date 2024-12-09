@@ -27,7 +27,9 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
     @Override
     public void execute(Parameters args) throws ScriptException, InterruptedException {
         File root = state.getBaseFileName();
-        if (!root.isDirectory()) { root = root.getParentFile(); }
+        if (!root.isDirectory()) {
+            root = root.getParentFile();
+        }
         File file = new File(root, args.filename);
 
         LOGGER.info("Included script " + file);

@@ -57,7 +57,9 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
      */
     protected void checkBoundInIfAndFind() {
         final BoundUniquenessChecker ch = new BoundUniquenessChecker(ifSequent());
-        if (!ch.correct()) { throw new TacletBuilderException(this, "A bound SchemaVariable occurs twice in if."); }
+        if (!ch.correct()) {
+            throw new TacletBuilderException(this, "A bound SchemaVariable occurs twice in if.");
+        }
     }
 
 

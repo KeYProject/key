@@ -913,7 +913,9 @@ public abstract class KeYJavaASTFactory {
      */
     public static StatementBlock insertStatementInBlock(StatementBlock stmnt, StatementBlock b) {
         Statement[] stmnts = new Statement[stmnt.getStatementCount()];
-        for (int i = 0; i < stmnt.getStatementCount(); i++) { stmnts[i] = stmnt.getStatementAt(i); }
+        for (int i = 0; i < stmnt.getStatementCount(); i++) {
+            stmnts[i] = stmnt.getStatementAt(i);
+        }
         return insertStatementInBlock(stmnts, b);
     }
 
@@ -2126,7 +2128,9 @@ public abstract class KeYJavaASTFactory {
         final IProgramMethod method = model.getProgramMethod(classType, methodName, arguments);
         MethodBodyStatement methodBody = null;
 
-        if (method != null) { methodBody = KeYJavaASTFactory.methodBody(result, reference, method, arguments); }
+        if (method != null) {
+            methodBody = KeYJavaASTFactory.methodBody(result, reference, method, arguments);
+        }
 
         return methodBody;
     }

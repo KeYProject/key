@@ -112,14 +112,20 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
 
     @Override
     public void mouseExited(MouseEvent e) {
-        if (sequentView.refreshHighlightning) { sequentView.disableHighlights(); }
+        if (sequentView.refreshHighlightning) {
+            sequentView.disableHighlights();
+        }
 
-        if (sequentView.isInUserSelectionHighlight(null)) { highlightOriginInSourceView(null); }
+        if (sequentView.isInUserSelectionHighlight(null)) {
+            highlightOriginInSourceView(null);
+        }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (!sequentView.isMainSequentView()) { return; }
+        if (!sequentView.isMainSequentView()) {
+            return;
+        }
 
         if (SwingUtilities.isMiddleMouseButton(e)
                 || e.isControlDown() && SwingUtilities.isLeftMouseButton(e)) {
@@ -160,7 +166,9 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
         originHighlights.forEach(sourceView::removeHighlight);
         originHighlights.clear();
 
-        if (pos == null || pos.getPosInOccurrence() == null) { return; }
+        if (pos == null || pos.getPosInOccurrence() == null) {
+            return;
+        }
 
         FileOrigin origin;
         Set<FileOrigin> subtermOrigins;

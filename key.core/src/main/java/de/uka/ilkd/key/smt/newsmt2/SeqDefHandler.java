@@ -71,7 +71,9 @@ public class SeqDefHandler implements SMTHandler {
             (Map<Term, SExpr>) state.computeIfAbsent("SEQDEF_MAP", x -> new LinkedHashMap<>());
 
         for (Entry<Term, SExpr> entry : seqDefMap.entrySet()) {
-            if (entry.getKey().equalsModProperty(term, RENAMING_TERM_PROPERTY)) { return entry.getValue(); }
+            if (entry.getKey().equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
+                return entry.getValue();
+            }
         }
 
         int number = (int) state.getOrDefault("SEQDEF_COUNTER", 0) + 1;
@@ -110,9 +112,13 @@ public class SeqDefHandler implements SMTHandler {
         }
 
         ImmutableSet<QuantifiableVariable> localBind = boundVars;
-        for (QuantifiableVariable boundVar : term.boundVars()) { localBind = localBind.add(boundVar); }
+        for (QuantifiableVariable boundVar : term.boundVars()) {
+            localBind = localBind.add(boundVar);
+        }
 
-        for (Term sub : term.subs()) { collectVars(sub, vars, localBind); }
+        for (Term sub : term.subs()) {
+            collectVars(sub, vars, localBind);
+        }
 
     }
 

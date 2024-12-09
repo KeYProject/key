@@ -54,7 +54,9 @@ public final class SMTFocusResults {
     public static boolean focus(SMTProblem smtProblem, Services services) {
 
         ImmutableList<PosInOccurrence> unsatCore = getUnsatCore(smtProblem);
-        if (unsatCore == null) { return false; }
+        if (unsatCore == null) {
+            return false;
+        }
 
         Goal goal = smtProblem.getGoal();
         // cache the goal node, because we will apply rules on the goal
@@ -119,7 +121,9 @@ public final class SMTFocusResults {
 
         SMTSolver solver = problem.getSuccessfulSolver();
 
-        if (solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) { return null; }
+        if (solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
+            return null;
+        }
 
         String[] lines = solver.getRawSolverOutput().split("\n");
         String lastLine = lines[lines.length - 1];
@@ -177,7 +181,9 @@ public final class SMTFocusResults {
 
         String[] labels = lastLine.trim().split(" +");
         Integer[] numbers = new Integer[labels.length];
-        for (int i = 0; i < numbers.length; i++) { numbers[i] = Integer.parseInt(labels[i].substring(2)); }
+        for (int i = 0; i < numbers.length; i++) {
+            numbers[i] = Integer.parseInt(labels[i].substring(2));
+        }
         return numbers;
     }
 

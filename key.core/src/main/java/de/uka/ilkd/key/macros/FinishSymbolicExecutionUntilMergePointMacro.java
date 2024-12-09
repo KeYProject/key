@@ -69,7 +69,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     @Override
     public String getDescription() {
         return "Continue automatic strategy application until a "
-                + "merge point is reached or there is no more modality in the sequent.";
+            + "merge point is reached or there is no more modality in the sequent.";
     }
 
     @Override
@@ -101,7 +101,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
         for (Goal goal : proof.openEnabledGoals()) {
 
-            if (!hasBreakPoint(goal.sequent().succedent())) { continue; }
+            if (!hasBreakPoint(goal.sequent().succedent())) {
+                continue;
+            }
 
             Node lastNode = goal.node();
             do {
@@ -180,11 +182,17 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if (!modalityCache.hasModality(goal.node().sequent())) { return false; }
+            if (!modalityCache.hasModality(goal.node().sequent())) {
+                return false;
+            }
 
-            if (FinishSymbolicExecutionMacro.isForbiddenRule(app.rule())) { return false; }
+            if (FinishSymbolicExecutionMacro.isForbiddenRule(app.rule())) {
+                return false;
+            }
 
-            if (hasBreakPoint(goal.sequent().succedent())) { return false; }
+            if (hasBreakPoint(goal.sequent().succedent())) {
+                return false;
+            }
 
             if (pio != null) {
                 JavaBlock theJavaBlock = MergeRuleUtils.getJavaBlockRecursive(pio.subTerm());
@@ -197,7 +205,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
                     // statement block multiple times. However, we have
                     // to consider it if it is a break point, of course.
                     return super.isApprovedApp(app, pio, goal);
-                } else if (!theJavaBlock.equals(JavaBlock.EMPTY_JAVABLOCK)) { alreadySeen.add(theJavaBlock); }
+                } else if (!theJavaBlock.equals(JavaBlock.EMPTY_JAVABLOCK)) {
+                    alreadySeen.add(theJavaBlock);
+                }
 
                 // Find break points
                 blockElems.addAll(findMergePoints((StatementBlock) theJavaBlock.program(),
@@ -237,7 +247,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
                 // method frame.
                 SourceElement stmt = stmts.get(0);
                 while (!stmt.getFirstElement().equals(stmt)) {
-                    for (StatementBlock body : getBodies(stmt)) { result.addAll(findMergePoints(body, services)); }
+                    for (StatementBlock body : getBodies(stmt)) {
+                        result.addAll(findMergePoints(body, services));
+                    }
                     stmt = stmt.getFirstElement();
                 }
             }
@@ -262,7 +274,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
                     FindBreakVisitor visitor =
                         new FindBreakVisitor(getBodies(stmt).element(), services);
                     visitor.start();
-                    if (visitor.containsBreak()) { result.add(stmts.get(i + 1)); }
+                    if (visitor.containsBreak()) {
+                        result.add(stmts.get(i + 1));
+                    }
                 }
             }
 
@@ -346,7 +360,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
             LinkedList<StatementBlock> result = new LinkedList<>(getBodies(elem.getThen()));
 
-            if (elem.getElse() != null) { result.addAll(getBodies(elem.getElse())); }
+            if (elem.getElse() != null) {
+                result.addAll(getBodies(elem.getElse()));
+            }
 
             return result;
         }
@@ -362,7 +378,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement thenBody = elem.getBody();
-            if (thenBody instanceof StatementBlock) { result.add((StatementBlock) thenBody); }
+            if (thenBody instanceof StatementBlock) {
+                result.add((StatementBlock) thenBody);
+            }
 
             return result;
         }
@@ -378,7 +396,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement elseBody = elem.getBody();
-            if (elseBody instanceof StatementBlock) { result.add((StatementBlock) elseBody); }
+            if (elseBody instanceof StatementBlock) {
+                result.add((StatementBlock) elseBody);
+            }
 
             return result;
         }
@@ -396,10 +416,14 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
             if (elem instanceof Try) {
                 StatementBlock tryBody = elem.getBody();
-                if (tryBody instanceof StatementBlock) { result.add(tryBody); }
+                if (tryBody instanceof StatementBlock) {
+                    result.add(tryBody);
+                }
 
                 ImmutableArray<Branch> branches = elem.getBranchList();
-                for (Branch branch : branches) { result.addAll(getBodies(branch)); }
+                for (Branch branch : branches) {
+                    result.addAll(getBodies(branch));
+                }
             }
 
             return result;
@@ -416,7 +440,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             StatementBlock catchBody = elem.getBody();
-            if (catchBody instanceof StatementBlock) { result.add(catchBody); }
+            if (catchBody instanceof StatementBlock) {
+                result.add(catchBody);
+            }
 
             return result;
         }
@@ -432,7 +458,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             StatementBlock finallyBody = elem.getBody();
-            if (finallyBody instanceof StatementBlock) { result.add(finallyBody); }
+            if (finallyBody instanceof StatementBlock) {
+                result.add(finallyBody);
+            }
 
             return result;
         }
@@ -448,7 +476,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             StatementBlock methodFrameBody = elem.getBody();
-            if (methodFrameBody instanceof StatementBlock) { result.add(methodFrameBody); }
+            if (methodFrameBody instanceof StatementBlock) {
+                result.add(methodFrameBody);
+            }
 
             return result;
         }
@@ -465,7 +495,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
             ImmutableArray<Statement> caseBodies = elem.getBody();
             for (Statement body : caseBodies) {
-                if (body instanceof StatementBlock) { result.add((StatementBlock) body); }
+                if (body instanceof StatementBlock) {
+                    result.add((StatementBlock) body);
+                }
             }
 
             return result;
@@ -482,7 +514,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement catchBody = elem.getBody();
-            if (catchBody instanceof StatementBlock) { result.add((StatementBlock) catchBody); }
+            if (catchBody instanceof StatementBlock) {
+                result.add((StatementBlock) catchBody);
+            }
 
             return result;
         }
@@ -498,7 +532,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement thenBody = elem.getBody();
-            if (thenBody instanceof StatementBlock) { result.add((StatementBlock) thenBody); }
+            if (thenBody instanceof StatementBlock) {
+                result.add((StatementBlock) thenBody);
+            }
 
             return result;
         }
@@ -514,7 +550,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement thenBody = elem.getBody();
-            if (thenBody instanceof StatementBlock) { result.add((StatementBlock) thenBody); }
+            if (thenBody instanceof StatementBlock) {
+                result.add((StatementBlock) thenBody);
+            }
 
             return result;
         }
@@ -530,7 +568,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             StatementBlock thenBody = elem.getBody();
-            if (thenBody instanceof StatementBlock) { result.add(thenBody); }
+            if (thenBody instanceof StatementBlock) {
+                result.add(thenBody);
+            }
 
             return result;
         }

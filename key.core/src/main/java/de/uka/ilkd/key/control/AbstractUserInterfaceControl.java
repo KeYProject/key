@@ -57,7 +57,9 @@ public abstract class AbstractUserInterfaceControl
      */
     @Override
     public void addProverTaskListener(ProverTaskListener ptl) {
-        if (ptl != null) { proverTaskListener.add(ptl); }
+        if (ptl != null) {
+            proverTaskListener.add(ptl);
+        }
     }
 
     /**
@@ -65,7 +67,9 @@ public abstract class AbstractUserInterfaceControl
      */
     @Override
     public void removeProverTaskListener(ProverTaskListener ptl) {
-        if (ptl != null) { proverTaskListener.remove(ptl); }
+        if (ptl != null) {
+            proverTaskListener.remove(ptl);
+        }
     }
 
     /**
@@ -77,7 +81,9 @@ public abstract class AbstractUserInterfaceControl
      */
     protected void fireTaskStarted(TaskStartedInfo info) {
         synchronized (proverTaskListener) {
-            for (ProverTaskListener l : proverTaskListener) { l.taskStarted(info); }
+            for (ProverTaskListener l : proverTaskListener) {
+                l.taskStarted(info);
+            }
         }
     }
 
@@ -89,7 +95,9 @@ public abstract class AbstractUserInterfaceControl
      */
     protected void fireTaskProgress(int position) {
         synchronized (proverTaskListener) {
-            for (ProverTaskListener l : proverTaskListener) { l.taskProgress(position); }
+            for (ProverTaskListener l : proverTaskListener) {
+                l.taskProgress(position);
+            }
         }
     }
 
@@ -102,7 +110,9 @@ public abstract class AbstractUserInterfaceControl
     protected void fireTaskFinished(TaskFinishedInfo info) {
         try {
             synchronized (proverTaskListener) {
-                for (ProverTaskListener l : proverTaskListener) { l.taskFinished(info); }
+                for (ProverTaskListener l : proverTaskListener) {
+                    l.taskFinished(info);
+                }
             }
         } catch (Exception e) {
             LOGGER.error("failed to fire task finished event ", e);
@@ -191,7 +201,9 @@ public abstract class AbstractUserInterfaceControl
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {
-            if (info instanceof ProofMacroFinishedInfo) { macroFinished((ProofMacroFinishedInfo) info); }
+            if (info instanceof ProofMacroFinishedInfo) {
+                macroFinished((ProofMacroFinishedInfo) info);
+            }
         }
     }
 
@@ -214,11 +226,15 @@ public abstract class AbstractUserInterfaceControl
             }
             return loader;
         } catch (ProblemLoaderException e) {
-            if (loader.getProof() != null) { loader.getProof().dispose(); }
+            if (loader.getProof() != null) {
+                loader.getProof().dispose();
+            }
             // rethrow that exception
             throw e;
         } catch (Throwable e) {
-            if (loader != null && loader.getProof() != null) { loader.getProof().dispose(); }
+            if (loader != null && loader.getProof() != null) {
+                loader.getProof().dispose();
+            }
             throw new ProblemLoaderException(loader, "Load failed", e);
         }
     }

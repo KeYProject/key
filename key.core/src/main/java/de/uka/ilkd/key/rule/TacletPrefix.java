@@ -95,8 +95,12 @@ public class TacletPrefix {
     }
 
     public boolean equals(Object o) {
-        if (o == this) { return true; }
-        if (!(o instanceof TacletPrefix other)) { return false; }
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof TacletPrefix other)) {
+            return false;
+        }
         return (other.prefix().equals(prefix())) && (other.context() == context());
     }
 

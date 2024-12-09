@@ -256,7 +256,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         // leave this away. This is not needed, if interpreted int
         // functions are typed by the second type u
         start = toReturn.size();
-        if (!this.isMultiSorted()) { toReturn.addAll(this.getSpecialSortPredicates(services)); }
+        if (!this.isMultiSorted()) {
+            toReturn.addAll(this.getSpecialSortPredicates(services));
+        }
         assumptionTypes.add(new ContextualBlock(start, toReturn.size() - 1,
             ContextualBlock.ASSUMPTION_SORT_PREDICATES));
 
@@ -402,7 +404,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     form = buildGeneralHierarchyPredicate(swChild, swParent);
                 }
 
-                if (form.length() > 0) { toReturn.add(form); }
+                if (form.length() > 0) {
+                    toReturn.add(form);
+                }
             }
         }
 
@@ -457,7 +461,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         // add the type predicates for constant values like number
         // symbols
-        if (!this.isMultiSorted()) { toReturn.addAll(this.constantTypePreds.values()); }
+        if (!this.isMultiSorted()) {
+            toReturn.addAll(this.constantTypePreds.values());
+        }
 
         return toReturn;
     }
@@ -496,7 +502,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
             // left hand side of the type implication
             if (!this.isMultiSorted()) {
-                if (qVar.size() > 0) { toReturn = this.getTypePredicate(sorts.get(0), qVar.get(0)); }
+                if (qVar.size() > 0) {
+                    toReturn = this.getTypePredicate(sorts.get(0), qVar.get(0));
+                }
                 for (int i = 1; i < qVar.size(); i++) {
                     StringBuilder temp = getTypePredicate(sorts.get(i), qVar.get(i));
                     toReturn = this.translateLogicalAnd(toReturn, temp);
@@ -606,7 +614,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             element.add(uninterpretedBindingFunctionNames.get(t));
             Function f = (Function) t.op();
             for (int i = 0; i < f.arity(); i++) {
-                if (!f.bindVarsAt(i)) { element.add(usedDisplaySort.get(f.argSort(i))); }
+                if (!f.bindVarsAt(i)) {
+                    element.add(usedDisplaySort.get(f.argSort(i)));
+                }
             }
             // add the sort definitions for the free variables of the bound terms
             for (int j = 0; j < f.arity(); j++) {
@@ -616,7 +626,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     while (iter.hasNext()) {
                         QuantifiableVariable q = iter.next();
                         boolean isBound = false;
-                        for (QuantifiableVariable temp : bv) { isBound = isBound || temp.equals(q); }
+                        for (QuantifiableVariable temp : bv) {
+                            isBound = isBound || temp.equals(q);
+                        }
                         if (!isBound) {
                             // add on position 1, since position 0 is used for the function name
                             element.add(1, usedDisplaySort.get(q.sort()));
@@ -664,7 +676,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         for (Operator op : this.predicateDecls.keySet()) {
             ArrayList<StringBuilder> element = new ArrayList<>();
             element.add(usedPredicateNames.get(op));
-            for (Sort s : predicateDecls.get(op)) { element.add(usedDisplaySort.get(s)); }
+            for (Sort s : predicateDecls.get(op)) {
+                element.add(usedDisplaySort.get(s));
+            }
             toReturn.add(element);
         }
 
@@ -673,7 +687,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             ArrayList<StringBuilder> element = new ArrayList<>();
             element.add(uninterpretedBindingPredicateNames.get(t));
             for (int i = 0; i < t.op().arity(); i++) {
-                if (!t.op().bindVarsAt(i)) { element.add(usedDisplaySort.get(t.sub(i).sort())); }
+                if (!t.op().bindVarsAt(i)) {
+                    element.add(usedDisplaySort.get(t.sub(i).sort()));
+                }
             }
 
             // add the sort definitions for the free variables of the bound terms
@@ -684,7 +700,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     while (iter.hasNext()) {
                         QuantifiableVariable q = iter.next();
                         boolean isBound = false;
-                        for (QuantifiableVariable temp : bv) { isBound = isBound || (temp.equals(q)); }
+                        for (QuantifiableVariable temp : bv) {
+                            isBound = isBound || (temp.equals(q));
+                        }
                         if (!isBound) {
                             // add on position 1, because position 0 is ised for the predicate name
                             element.add(1, usedDisplaySort.get(q.sort()));
@@ -742,7 +760,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         break;
                     }
                 }
-                if (!alreadyIn) { toReturn.add(newSort); }
+                if (!alreadyIn) {
+                    toReturn.add(newSort);
+                }
             }
         } else {
             // add the two sorts needed as maximum
@@ -760,7 +780,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         for (FunctionWrapper function : usedFunctions) {
             if (function.getFunction().isUnique()) {
                 StringBuilder buffer = translateUniqueness(function, usedFunctions, services);
-                if (buffer != null) { distinct.add(buffer); }
+                if (buffer != null) {
+                    distinct.add(buffer);
+                }
 
             }
         }
@@ -870,7 +892,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             throws IllegalFormulaException {
         HashMap<Long, StringBuilder> map = getRightConstantContainer(integer);
         StringBuilder buf = map.get(integer);
-        if (buf != null) { return buf; }
+        if (buf != null) {
+            return buf;
+        }
         StringBuilder name = translateFunctionName(getNameForIntegerConstant(services, integer));
         buf = translateFunction(name, new ArrayList<>());
         map.put(integer, buf);
@@ -1361,7 +1385,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     protected StringBuilder translateUniqueness(FunctionWrapper function,
             Collection<FunctionWrapper> distinct, Services services)
             throws IllegalFormulaException {
-        if (!function.getFunction().isUnique()) { return null; }
+        if (!function.getFunction().isUnique()) {
+            return null;
+        }
 
         function.setUsedForUnique(true);
 
@@ -1382,7 +1408,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     protected StringBuilder buildInjectiveFunctionAssumption(FunctionWrapper fw,
             Services services) {
-        if (fw.getFunction().arity() == 0) { return translateLogicalTrue(); }
+        if (fw.getFunction().arity() == 0) {
+            return translateLogicalTrue();
+        }
         StringBuilder result;
         ArrayList<StringBuilder> vars1 = createGenericVariables(fw.getFunction().arity(), 0);
         ArrayList<StringBuilder> vars2 = createGenericVariables(fw.getFunction().arity(), 0);
@@ -1403,7 +1431,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     private ArrayList<Sort> getArgSorts(Function function) {
         ArrayList<Sort> sorts = new ArrayList<>();
-        for (Sort sort : function.argSorts()) { sorts.add(sort); }
+        for (Sort sort : function.argSorts()) {
+            sorts.add(sort);
+        }
         return sorts;
     }
 
@@ -1413,7 +1443,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     protected ArrayList<StringBuilder> createGenericVariables(int count, int start) {
         ArrayList<StringBuilder> list = new ArrayList<>();
-        for (int i = 0; i < count; i++) { list.add(createGenericVariable(i + start)); }
+        for (int i = 0; i < count; i++) {
+            list.add(createGenericVariable(i + start));
+        }
         return list;
     }
 
@@ -1679,7 +1711,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     // as uniterpreted predicate
                     // check whether it binds variables
                     boolean bindsVars = false;
-                    for (int i = 0; i < op.arity(); i++) { bindsVars = bindsVars || op.bindVarsAt(i); }
+                    for (int i = 0; i < op.arity(); i++) {
+                        bindsVars = bindsVars || op.bindVarsAt(i);
+                    }
                     if (bindsVars) {
                         return translateAsBindingUninterpretedPredicate(term, fun, quantifiedVars,
                             term.subs(), services);
@@ -1696,7 +1730,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                             subterms.add(subterm);
                         }
                         ArrayList<Sort> sorts = new ArrayList<>();
-                        for (int i = 0; i < fun.arity(); i++) { sorts.add(fun.argSort(i)); }
+                        for (int i = 0; i < fun.arity(); i++) {
+                            sorts.add(fun.argSort(i));
+                        }
                         this.addPredicate(fun, sorts, services);
 
                         return translatePred(op, subterms);
@@ -1803,7 +1839,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     return translateBprodFunction(term, subterms);
                 } else {
                     boolean bindsVars = false;
-                    for (int i = 0; i < fun.arity(); i++) { bindsVars = bindsVars || fun.bindVarsAt(i); }
+                    for (int i = 0; i < fun.arity(); i++) {
+                        bindsVars = bindsVars || fun.bindVarsAt(i);
+                    }
                     if (bindsVars) {
                         return translateAsBindingUninterpretedFunction(term, fun, quantifiedVars,
                             term.subs(), services);
@@ -1856,7 +1894,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // the terms also match, if the entire sequence matches
             termsMatch = (termsMatch || t.equalsModProperty(term, RENAMING_TERM_PROPERTY));
 
-            if (termsMatch) { used = t; }
+            if (termsMatch) {
+                used = t;
+            }
         }
         if (used != null) {
             // The term was aready used. reuse the function name.
@@ -1870,8 +1910,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     while (iter.hasNext()) {
                         QuantifiableVariable fv = iter.next();
                         boolean isBound = false;
-                        for (QuantifiableVariable temp : qv) { isBound = isBound || temp.equals(fv); }
-                        if (!isBound) { subterms.add(0, translateVariable(fv)); }
+                        for (QuantifiableVariable temp : qv) {
+                            isBound = isBound || temp.equals(fv);
+                        }
+                        if (!isBound) {
+                            subterms.add(0, translateVariable(fv));
+                        }
                     }
                 }
             }
@@ -1900,8 +1944,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     while (iter.hasNext()) {
                         QuantifiableVariable fv = iter.next();
                         boolean isBound = false;
-                        for (QuantifiableVariable temp : qv) { isBound = isBound || temp.equals(fv); }
-                        if (!isBound) { subterms.add(0, translateVariable(fv)); }
+                        for (QuantifiableVariable temp : qv) {
+                            isBound = isBound || temp.equals(fv);
+                        }
+                        if (!isBound) {
+                            subterms.add(0, translateVariable(fv));
+                        }
                     }
                 }
             }
@@ -1959,7 +2007,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // the terms also match, if the entire terms match
             termsMatch = (termsMatch || t.equalsModProperty(term, RENAMING_TERM_PROPERTY));
 
-            if (termsMatch) { used = t; }
+            if (termsMatch) {
+                used = t;
+            }
         }
         if (used != null) {
             // The term was aready used. reuse the function name.
@@ -1972,8 +2022,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     while (iter.hasNext()) {
                         QuantifiableVariable fv = iter.next();
                         boolean isBound = false;
-                        for (QuantifiableVariable temp : qv) { isBound = isBound || temp.equals(fv); }
-                        if (!isBound) { subterms.add(0, translateVariable(fv)); }
+                        for (QuantifiableVariable temp : qv) {
+                            isBound = isBound || temp.equals(fv);
+                        }
+                        if (!isBound) {
+                            subterms.add(0, translateVariable(fv));
+                        }
                     }
                 }
             }
@@ -2002,8 +2056,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     while (iter.hasNext()) {
                         QuantifiableVariable fv = iter.next();
                         boolean isBound = false;
-                        for (QuantifiableVariable temp : qv) { isBound = isBound || temp.equals(fv); }
-                        if (!isBound) { subterms.add(0, translateVariable(fv)); }
+                        for (QuantifiableVariable temp : qv) {
+                            isBound = isBound || temp.equals(fv);
+                        }
+                        if (!isBound) {
+                            subterms.add(0, translateVariable(fv));
+                        }
                     }
                 }
             }
@@ -2074,15 +2132,17 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     private StringBuilder castIfNeccessary(StringBuilder formula, Sort formulaSort, Sort targetSort,
             Services services) {
-        if (!this.isMultiSorted()) { return formula; }
+        if (!this.isMultiSorted()) {
+            return formula;
+        }
         if (isSomeIntegerSort(formulaSort, services) && !isSomeIntegerSort(targetSort, services)) {
             return this.cast(formula);
         } else if (!isSomeIntegerSort(formulaSort, services)
                 && isSomeIntegerSort(targetSort, services)) {
             throw new RuntimeException("Error while translation.\n"
-                    + "Not possible to perform a typecast\n" + "for the formula " + formula + "\n"
-                    + "from type " + formulaSort.toString() + "\n" + "to type " + targetSort.toString()
-                    + "\n" + "Heavy internal error. Notify the administrator of the KeY tool.");
+                + "Not possible to perform a typecast\n" + "for the formula " + formula + "\n"
+                + "from type " + formulaSort.toString() + "\n" + "to type " + targetSort.toString()
+                + "\n" + "Heavy internal error. Notify the administrator of the KeY tool.");
         } else {
             return formula;
         }
@@ -2121,7 +2181,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             Services services) throws IllegalFormulaException {
         // check, if the modality was already translated.
         for (Term toMatch : modalityPredicates.keySet()) {
-            if (toMatch.equalsModProperty(t, RENAMING_TERM_PROPERTY)) { return modalityPredicates.get(toMatch); }
+            if (toMatch.equalsModProperty(t, RENAMING_TERM_PROPERTY)) {
+                return modalityPredicates.get(toMatch);
+            }
         }
 
         // if the program comes here, term has to be translated.
@@ -2200,9 +2262,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // predicate
             LOGGER.debug("Translated as uninterpreted predicate: {}", term);
             ArrayList<StringBuilder> subterms = new ArrayList<>();
-            for (int i = 0; i < op.arity(); i++) { subterms.add(translateTerm(term.sub(i), quantifiedVars, services)); }
+            for (int i = 0; i < op.arity(); i++) {
+                subterms.add(translateTerm(term.sub(i), quantifiedVars, services));
+            }
             ArrayList<Sort> sorts = new ArrayList<>();
-            for (int i = 0; i < op.arity(); i++) { sorts.add(term.sub(i).sort()); }
+            for (int i = 0; i < op.arity(); i++) {
+                sorts.add(term.sub(i).sort());
+            }
             this.addPredicate(op, sorts, services);
 
             return translatePred(op, subterms);
@@ -2210,7 +2276,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // function
             LOGGER.debug("Translated as uninterpreted function: {}", term);
             ArrayList<StringBuilder> subterms = new ArrayList<>();
-            for (int i = 0; i < op.arity(); i++) { subterms.add(translateTerm(term.sub(i), quantifiedVars, services)); }
+            for (int i = 0; i < op.arity(); i++) {
+                subterms.add(translateTerm(term.sub(i), quantifiedVars, services));
+            }
             ArrayList<Sort> sorts = new ArrayList<>();
             for (int i = 0; i < op.arity(); i++) {
                 if (term.sub(i).sort() != JavaDLTheory.FORMULA) {
@@ -2251,7 +2319,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         } else {
             name = translateFunctionName(new StringBuilder(o.name().toString()));
             usedFunctionNames.put(o, name);
-            if (o instanceof JFunction) { usedFunctions.add(new FunctionWrapper(name, (Function) o)); }
+            if (o instanceof JFunction) {
+                usedFunctions.add(new FunctionWrapper(name, (Function) o));
+            }
         }
         return translateFunction(name, sub);
     }
@@ -2268,7 +2338,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             ArrayList<StringBuilder> sub) {
         StringBuilder name = null;
         for (Term t : usedBsumTerms.keySet()) {
-            if (t.equalsModProperty(bsumterm, RENAMING_TERM_PROPERTY)) { name = usedBsumTerms.get(t); }
+            if (t.equalsModProperty(bsumterm, RENAMING_TERM_PROPERTY)) {
+                name = usedBsumTerms.get(t);
+            }
         }
         if (name == null) {
             // the term wasnt used yet. Create a new functionsymbol
@@ -2305,7 +2377,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             ArrayList<StringBuilder> sub) {
         StringBuilder name = null;
         for (Term t : usedBprodTerms.keySet()) {
-            if (t.equalsModProperty(bprodterm, RENAMING_TERM_PROPERTY)) { name = usedBprodTerms.get(t); }
+            if (t.equalsModProperty(bprodterm, RENAMING_TERM_PROPERTY)) {
+                name = usedBprodTerms.get(t);
+            }
         }
         if (name == null) {
             // the term wasnt used yet. Create a new functionsymbol
@@ -2341,7 +2415,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             sorts.add(result);
             this.functionDecls.put(op, sorts);
             // add all sorts
-            for (Sort s : sorts) { this.translateSort(s, services); }
+            for (Sort s : sorts) {
+                this.translateSort(s, services);
+            }
         }
     }
 
@@ -2349,7 +2425,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         if (!this.predicateDecls.containsKey(op)) {
             this.predicateDecls.put(op, sorts);
             // add all sorts
-            for (Sort s : sorts) { this.translateSort(s, services); }
+            for (Sort s : sorts) {
+                this.translateSort(s, services);
+            }
         }
     }
 
@@ -2502,7 +2580,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         Collection<Taclet> taclets = settings.getTaclets();
 
         ArrayList<StringBuilder> result = new ArrayList<>();
-        if (!settings.makesUseOfTaclets() || taclets == null || taclets.isEmpty()) { return result; }
+        if (!settings.makesUseOfTaclets() || taclets == null || taclets.isEmpty()) {
+            return result;
+        }
 
         tacletSetTranslation = new DefaultTacletSetTranslation(services, settings);
 
@@ -2518,7 +2598,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 tempSorts.add(s);
             }
             if (op instanceof LocationVariable lv) {
-                if (lv.getContainerType() != null) { tempSorts.add(lv.getContainerType().getSort()); }
+                if (lv.getContainerType() != null) {
+                    tempSorts.add(lv.getContainerType().getSort());
+                }
 
             }
         }

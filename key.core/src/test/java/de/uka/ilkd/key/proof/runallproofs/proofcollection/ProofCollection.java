@@ -50,7 +50,9 @@ public final class ProofCollection {
         Set<String> testCaseNames = new LinkedHashSet<>();
         for (ProofCollectionUnit proofCollectionUnit : units) {
 
-            if (activeGroups != null && !activeGroups.contains(proofCollectionUnit.getName())) { continue; }
+            if (activeGroups != null && !activeGroups.contains(proofCollectionUnit.getName())) {
+                continue;
+            }
 
             final String proposedTestCaseName = proofCollectionUnit.getName();
             String testCaseName = proposedTestCaseName;
@@ -67,7 +69,9 @@ public final class ProofCollection {
         }
 
         Set<String> enabledTestCaseNames = settings.getEnabledTestCaseNames();
-        if (enabledTestCaseNames != null) { ret.removeIf(unit -> !enabledTestCaseNames.contains(unit.getTestName())); }
+        if (enabledTestCaseNames != null) {
+            ret.removeIf(unit -> !enabledTestCaseNames.contains(unit.getTestName()));
+        }
         return ret;
     }
 

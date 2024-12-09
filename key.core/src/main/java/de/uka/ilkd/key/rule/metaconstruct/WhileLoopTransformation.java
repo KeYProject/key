@@ -137,7 +137,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         Guard guard;
         if (x.getGuard() != null) {
             guard = (Guard) changeList.removeFirst();
-            if (guard.getExpression() == null) { guard = KeYJavaASTFactory.trueGuard(); }
+            if (guard.getExpression() == null) {
+                guard = KeYJavaASTFactory.trueGuard();
+            }
         } else {
             guard = KeYJavaASTFactory.trueGuard();
         }
@@ -224,9 +226,15 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     @Override
     protected void walk(ProgramElement node) {
         stack.push(new ExtList());
-        if ((node instanceof LoopStatement) || (node instanceof Switch)) { replaceBreakWithNoLabel++; }
-        if (node instanceof LabeledStatement) { labelStack.push(((LabeledStatement) node).getLabel()); }
-        if (node instanceof MethodFrame) { methodStack.push((MethodFrame) node); }
+        if ((node instanceof LoopStatement) || (node instanceof Switch)) {
+            replaceBreakWithNoLabel++;
+        }
+        if (node instanceof LabeledStatement) {
+            labelStack.push(((LabeledStatement) node).getLabel());
+        }
+        if (node instanceof MethodFrame) {
+            methodStack.push((MethodFrame) node);
+        }
 
         super.walk(node);
         if (runMode == CHECK) {
@@ -236,7 +244,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 return;
             }
         }
-        if (node instanceof LoopStatement || node instanceof Switch) { replaceBreakWithNoLabel--; }
+        if (node instanceof LoopStatement || node instanceof Switch) {
+            replaceBreakWithNoLabel--;
+        }
     }
 
     @Override
@@ -271,7 +281,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 final ImmutableArray<?> aope = (ImmutableArray<?>) buffer;
                 for (int iterate = 0; iterate < aope.size(); iterate++) {
                     ProgramElement pe = (Statement) aope.get(iterate);
-                    if (pe != null) { walk(pe); }
+                    if (pe != null) {
+                        walk(pe);
+                    }
                 }
             }
         }
@@ -329,7 +341,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
     protected boolean replaceJumpStatement(LabelJumpStatement x) {
-        if (replaceBreakWithNoLabel == 0 && x.getProgramElementName() == null) { return true; }
+        if (replaceBreakWithNoLabel == 0 && x.getProgramElementName() == null) {
+            return true;
+        }
         return labelList.contains(x.getProgramElementName());
     }
 
@@ -457,16 +471,22 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         ExtList changeList = stack.peek();
         if (replaceBreakWithNoLabel == 0) {
             // most outer for loop
-            if (changeList.getFirst() == CHANGED) { changeList.removeFirst(); }
+            if (changeList.getFirst() == CHANGED) {
+                changeList.removeFirst();
+            }
             ILoopInit inits = null;
             IForUpdates updates = null;
             // the unchanged updates need to be extracted to initialize the
             // remaining 'for' statement
             IForUpdates unchangedUpdates = x.getIForUpdates();
             Statement body = null;
-            if (changeList.get(0) instanceof ILoopInit) { inits = (ILoopInit) changeList.removeFirst(); }
+            if (changeList.get(0) instanceof ILoopInit) {
+                inits = (ILoopInit) changeList.removeFirst();
+            }
             Guard guard = getForGuard(x, changeList);
-            if (changeList.get(0) instanceof IForUpdates) { updates = (IForUpdates) changeList.removeFirst(); }
+            if (changeList.get(0) instanceof IForUpdates) {
+                updates = (IForUpdates) changeList.removeFirst();
+            }
             body = (Statement) changeList.removeFirst();
             For remainder = KeYJavaASTFactory.forLoop(x.getGuard(), unchangedUpdates, x.getBody());
             if (innerLabelNeeded() && breakInnerLabel != null) {
@@ -553,7 +573,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         if (replaceBreakWithNoLabel == 0) {
             // the most outer while loop
             // get guard
-            if (changeList.getFirst() == CHANGED) { changeList.removeFirst(); }
+            if (changeList.getFirst() == CHANGED) {
+                changeList.removeFirst();
+            }
             Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
 
@@ -612,7 +634,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         ExtList changeList = stack.peek();
         if (replaceBreakWithNoLabel == 0) {
             // the most outer do loop
-            if (changeList.getFirst() == CHANGED) { changeList.removeFirst(); }
+            if (changeList.getFirst() == CHANGED) {
+                changeList.removeFirst();
+            }
             Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
             Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement unwindedBody = null;
@@ -693,7 +717,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
-            if (x.getLabel() != null) { l = (Label) changeList.removeFirst(); }
+            if (x.getLabel() != null) {
+                l = (Label) changeList.removeFirst();
+            }
             addChild(KeYJavaASTFactory.labeledStatement(changeList, l, x.getPositionInfo()));
             changed();
         } else {
@@ -776,7 +802,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
-            if (x.getExpression() != null) { e = (Expression) changeList.removeFirst(); }
+            if (x.getExpression() != null) {
+                e = (Expression) changeList.removeFirst();
+            }
             addChild(KeYJavaASTFactory.caseBlock(changeList, e, x.getPositionInfo()));
             changed();
         } else {
@@ -823,7 +851,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
     protected void changed() {
         ExtList list = stack.peek();
-        if (list.getFirst() != CHANGED) { list.addFirst(CHANGED); }
+        if (list.getFirst() != CHANGED) {
+            list.addFirst(CHANGED);
+        }
     }
 
     protected void addChild(SourceElement x) {

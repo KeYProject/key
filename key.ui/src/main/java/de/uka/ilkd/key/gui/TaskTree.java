@@ -70,7 +70,9 @@ public class TaskTree extends JPanel {
          */
         @Override
         public void valueChanged(TreeSelectionEvent e) {
-            if (e.getSource() == delegateView) { problemChosen(); }
+            if (e.getSource() == delegateView) {
+                problemChosen();
+            }
         }
     };
 
@@ -127,7 +129,9 @@ public class TaskTree extends JPanel {
 
     public void removeTask(Proof p) {
         TaskTreeNode taskForProof = model.getTaskForProof(p);
-        if (taskForProof instanceof BasicTask) { taskForProof = ((BasicTask) taskForProof).getRootTask(); }
+        if (taskForProof instanceof BasicTask) {
+            taskForProof = ((BasicTask) taskForProof).getRootTask();
+        }
         removeTask(taskForProof);
     }
 
@@ -175,7 +179,9 @@ public class TaskTree extends JPanel {
     /** returns all selected basic tasks */
     public BasicTask[] getAllSelectedBasicTasks() {
         TreePath[] paths = delegateView.getSelectionModel().getSelectionPaths();
-        if (paths == null) { return new BasicTask[0]; }
+        if (paths == null) {
+            return new BasicTask[0];
+        }
         final List<BasicTask> result = new LinkedList<>();
         for (TreePath path : paths) {
             if (path.getLastPathComponent() instanceof BasicTask) {
@@ -218,7 +224,9 @@ public class TaskTree extends JPanel {
                 int j = 0;
                 while (!contains && j < envNode.getChildCount()) {
                     Object envChild = envNode.getChildAt(j);
-                    if (envChild instanceof TaskTreeNode taskChild) { contains = taskChild.proof() == proof; }
+                    if (envChild instanceof TaskTreeNode taskChild) {
+                        contains = taskChild.proof() == proof;
+                    }
                     j++;
                 }
             }
@@ -252,7 +260,9 @@ public class TaskTree extends JPanel {
                 for (int i = 0; i < envNode.getChildCount(); i++) {
                     Object child = envNode.getChildAt(i);
                     if (child instanceof TaskTreeNode taskChild) {
-                        if (taskChild.proof() == proof) { removeTask(taskChild); }
+                        if (taskChild.proof() == proof) {
+                            removeTask(taskChild);
+                        }
                     }
                 }
             }
@@ -396,7 +406,9 @@ public class TaskTree extends JPanel {
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
         public void selectedProofChanged(KeYSelectionEvent e) {
-            if (e.getSource().getSelectedProof() == null) { return; }
+            if (e.getSource().getSelectedProof() == null) {
+                return;
+            }
             TaskTreeNode ttn = model.getTaskForProof(e.getSource().getSelectedProof());
             delegateView.setSelectionPath(new TreePath(ttn.getPath()));
             validate();

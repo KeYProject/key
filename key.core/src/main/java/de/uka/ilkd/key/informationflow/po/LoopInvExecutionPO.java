@@ -72,14 +72,17 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
         this.guardTerm = guardTerm;
 
         // consistency check
-        assert preAndPostExpressionsEqual() : "Information flow loop invariant malformed. Pre expressions"
-                + "do not match post expressions.";
+        assert preAndPostExpressionsEqual()
+                : "Information flow loop invariant malformed. Pre expressions"
+                    + "do not match post expressions.";
     }
 
 
     private boolean preAndPostExpressionsEqual() {
         for (InfFlowSpec infFlowSpec : loopInvariant.getInfFlowSpecs(environmentServices)) {
-            if (infFlowSpec.preExpressions == infFlowSpec.postExpressions) { return false; }
+            if (infFlowSpec.preExpressions == infFlowSpec.postExpressions) {
+                return false;
+            }
         }
         return true;
     }
@@ -114,7 +117,9 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof LoopInvExecutionPO lPO)) { return false; }
+        if (!(po instanceof LoopInvExecutionPO lPO)) {
+            return false;
+        }
         return loopInvariant.equals(lPO.loopInvariant);
     }
 
@@ -225,7 +230,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
         ProofOblInput initiatingPO =
             initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
         assert initiatingPO instanceof AbstractInfFlowPO : "Information flow auxiliary "
-                + "proof started from within non-information flow proof!?!";
+            + "proof started from within non-information flow proof!?!";
         return (AbstractInfFlowPO) initiatingPO;
     }
 

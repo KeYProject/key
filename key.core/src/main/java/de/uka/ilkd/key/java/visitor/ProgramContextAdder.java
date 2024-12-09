@@ -121,7 +121,9 @@ public class ProgramContextAdder {
 
         final int childrenToAdd = putInLength + childLeft;
 
-        if (childLeft == 0 || lastChild == -1) { return putIn; }
+        if (childLeft == 0 || lastChild == -1) {
+            return putIn;
+        }
 
         final Statement[] body = new Statement[childrenToAdd];
 
@@ -161,7 +163,9 @@ public class ProgramContextAdder {
             Statement[] body = new Statement[childrenCount > 0 ? childrenCount : 1];
             /* reconstruct block */
             body[0] = (Statement) replacement;
-            if (childrenCount - 1 > 0) { wrapper.getBody().arraycopy(1, body, 1, childrenCount - 1); }
+            if (childrenCount - 1 > 0) {
+                wrapper.getBody().arraycopy(1, body, 1, childrenCount - 1);
+            }
             return new StatementBlock(new ImmutableArray<>(body));
         }
     }

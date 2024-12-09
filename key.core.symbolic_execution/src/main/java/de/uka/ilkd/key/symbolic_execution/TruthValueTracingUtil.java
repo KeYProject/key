@@ -166,7 +166,9 @@ public final class TruthValueTracingUtil {
     public static boolean isIfThenElseFormula(Operator operator, ImmutableArray<Term> subs) {
         if (operator == IfThenElse.IF_THEN_ELSE) {
             Sort[] sorts = new Sort[subs.size()];
-            for (int i = 0; i < sorts.length; i++) { sorts[i] = subs.get(i).sort(); }
+            for (int i = 0; i < sorts.length; i++) {
+                sorts[i] = subs.get(i).sort();
+            }
             Sort sort = operator.sort(sorts);
             return sort == JavaDLTheory.FORMULA;
         } else {
@@ -214,7 +216,9 @@ public final class TruthValueTracingUtil {
             evaluateNode(node, useUnicode, usePrettyPrinting, next, childIndexOnParnt,
                 termLabelName, nodeResults, result, services);
             // Remove no longer needed child result of returned nodes
-            for (int i = 0; i < iterator.getReturnedParents(); i++) { evaluationStack.removeFirst(); }
+            for (int i = 0; i < iterator.getReturnedParents(); i++) {
+                evaluationStack.removeFirst();
+            }
         }
         return result;
     }
@@ -299,7 +303,8 @@ public final class TruthValueTracingUtil {
                 // Compare last PIO with PIO in child sequent (Attention: Child PIO is computed with
                 // help of the PIO of the OSS)
                 if (parentPio != null) {
-                    assert 1 == parent.childrenCount() : "Implementaton of the OneStepSimplifierRule has changed.";
+                    assert 1 == parent.childrenCount()
+                            : "Implementaton of the OneStepSimplifierRule has changed.";
                     PosInOccurrence childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(
                         parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(0));
                     updatePredicateResultBasedOnNewMinorIdsOSS(childPio, parentPio, termLabelName,
@@ -452,10 +457,14 @@ public final class TruthValueTracingUtil {
                 tacletApp, services);
             if (replaceTerm.op() == Junctor.TRUE) {
                 // Find term is replaced by true
-                for (LabelOccurrence occurrence : labels) { updatePredicateResult(occurrence.label(), true, results); }
+                for (LabelOccurrence occurrence : labels) {
+                    updatePredicateResult(occurrence.label(), true, results);
+                }
             } else if (replaceTerm.op() == Junctor.FALSE) {
                 // Find term is replaced by false
-                for (LabelOccurrence occurrence : labels) { updatePredicateResult(occurrence.label(), false, results); }
+                for (LabelOccurrence occurrence : labels) {
+                    updatePredicateResult(occurrence.label(), false, results);
+                }
             }
         }
     }
@@ -520,7 +529,9 @@ public final class TruthValueTracingUtil {
         if (label instanceof FormulaTermLabel) {
             Term replacement = checkForNewMinorIdsOSS(onlyChangedChildSF, (FormulaTermLabel) label,
                 parentPio.isInAntec(), tb);
-            if (replacement != null) { updatePredicateResult((FormulaTermLabel) label, replacement, results); }
+            if (replacement != null) {
+                updatePredicateResult((FormulaTermLabel) label, replacement, results);
+            }
         }
     }
 
@@ -628,7 +639,9 @@ public final class TruthValueTracingUtil {
         if (label instanceof FormulaTermLabel) {
             Term replacement =
                 checkForNewMinorIds(childNode, (FormulaTermLabel) label, parentPio.isInAntec(), tb);
-            if (replacement != null) { updatePredicateResult((FormulaTermLabel) label, replacement, results); }
+            if (replacement != null) {
+                updatePredicateResult((FormulaTermLabel) label, replacement, results);
+            }
         }
     }
 
@@ -686,7 +699,9 @@ public final class TruthValueTracingUtil {
 
             @Override
             public void visit(Term visited) {
-                if (hasLabelOfInterest(visited)) { resultToFill.add(visited); }
+                if (hasLabelOfInterest(visited)) {
+                    resultToFill.add(visited);
+                }
             }
 
             private boolean hasLabelOfInterest(Term visited) {
@@ -932,7 +947,7 @@ public final class TruthValueTracingUtil {
         @Override
         public String toString() {
             return "true=" + evaluatesToTrue + ", false=" + evaluatesToFalse + ", instruction="
-                    + instructionTerm;
+                + instructionTerm;
         }
 
         /**
@@ -944,9 +959,9 @@ public final class TruthValueTracingUtil {
          */
         public String toPrettyString(Services services) {
             return "true=" + evaluatesToTrue + ", false=" + evaluatesToFalse
-                    + (instructionTerm != null
-                            ? ", instruction:\n" + ProofSaver.printTerm(instructionTerm, services)
-                            : "");
+                + (instructionTerm != null
+                        ? ", instruction:\n" + ProofSaver.printTerm(instructionTerm, services)
+                        : "");
         }
 
         /**
@@ -989,7 +1004,9 @@ public final class TruthValueTracingUtil {
             // Return direct label result if available
             if (label instanceof FormulaTermLabel) {
                 MultiEvaluationResult instruction = results.get(((FormulaTermLabel) label).getId());
-                if (instruction != null) { return instruction.evaluate(termLabelName, results); }
+                if (instruction != null) {
+                    return instruction.evaluate(termLabelName, results);
+                }
             }
             // If direct label result is not available try to compute it. (e.g. because of or/and
             // label was replaced by sequent top level formuals)
@@ -1095,7 +1112,9 @@ public final class TruthValueTracingUtil {
          *        The {@link BranchResult} to add.
          */
         public void addBranchResult(BranchResult result) {
-            if (result != null) { branchResults.add(result); }
+            if (result != null) {
+                branchResults.add(result);
+            }
         }
 
         /**

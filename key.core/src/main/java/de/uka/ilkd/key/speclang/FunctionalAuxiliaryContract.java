@@ -82,7 +82,9 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
         this.contract = contract;
         this.id = id;
 
-        if (id != Contract.INVALID_ID) { contract.setFunctionalContract(this); }
+        if (id != Contract.INVALID_ID) {
+            contract.setFunctionalContract(this);
+        }
 
         name = generateName(contract.getBaseName(),
             str -> ContractFactory.generateContractName(str, getKJT(), getTarget(), getKJT(), id));
@@ -219,7 +221,9 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
 
             if (result == null) {
                 result = p;
-            } else if (p != null) { result = tb.and(result, p); }
+            } else if (p != null) {
+                result = tb.and(result, p);
+            }
         }
 
         return result;

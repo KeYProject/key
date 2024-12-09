@@ -78,7 +78,9 @@ public class ThisReference extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int count = 0;
-        if (prefix != null) { count++; }
+        if (prefix != null) {
+            count++;
+        }
         return count;
     }
 
@@ -92,7 +94,11 @@ public class ThisReference extends JavaNonTerminalProgramElement
      *         if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (prefix != null) { if (index == 0) { return prefix; } }
+        if (prefix != null) {
+            if (index == 0) {
+                return prefix;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -126,7 +132,9 @@ public class ThisReference extends JavaNonTerminalProgramElement
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (prefix instanceof TypeReference && index == 0) { return (TypeReference) prefix; }
+        if (prefix instanceof TypeReference && index == 0) {
+            return (TypeReference) prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

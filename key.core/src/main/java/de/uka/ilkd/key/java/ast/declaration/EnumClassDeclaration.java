@@ -67,7 +67,9 @@ public class EnumClassDeclaration extends ClassDeclaration {
         for (int i = 0; i < members.size(); i++) {
             if (members.get(i) instanceof FieldDeclaration fd) {
                 FieldSpecification fs = fd.getFieldSpecifications().get(0);
-                if (fs.getName().equals(completeName)) { return fs.getProgramVariable(); }
+                if (fs.getName().equals(completeName)) {
+                    return fs.getProgramVariable();
+                }
             }
         }
         throw new IllegalStateException(
@@ -78,7 +80,11 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * is pv a enum constant of THIS enum?
      */
     private boolean isLocalEnumConstant(IProgramVariable pv) {
-        for (IProgramVariable cnst : constants) { if (cnst.equals(pv)) { return true; } }
+        for (IProgramVariable cnst : constants) {
+            if (cnst.equals(pv)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -90,7 +96,11 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * @return -1 if not found, otherwise the 0-based index.
      */
     private int localIndexOf(ProgramVariable pv) {
-        for (int i = 0; i < constants.size(); i++) { if (constants.get(i).equals(pv)) { return i; } }
+        for (int i = 0; i < constants.size(); i++) {
+            if (constants.get(i).equals(pv)) {
+                return i;
+            }
+        }
         return -1;
     }
 

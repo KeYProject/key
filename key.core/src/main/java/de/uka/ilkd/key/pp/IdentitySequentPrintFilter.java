@@ -16,7 +16,9 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
      * filters the sequent, creating SequentPrintFilterEntries from the sequent formulae.
      */
     protected void filterSequent() {
-        if (antec != null) { return; }
+        if (antec != null) {
+            return;
+        }
         filterIdentity();
     }
 

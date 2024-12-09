@@ -973,7 +973,9 @@ public interface AuxiliaryContract extends SpecificationElement {
         public boolean equals(Object obj) {
             if (this == obj) {
                 return true;
-            } else if (obj == null || getClass() != obj.getClass()) { return false; }
+            } else if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
             Variables other = (Variables) obj;
             if (breakFlags == null && other.breakFlags != null) {
                 return false;
@@ -1186,7 +1188,9 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private Set<Label> collectLabels(final List<? extends LabelJumpStatement> jumps) {
             final Set<Label> result = new LinkedHashSet<>();
-            for (LabelJumpStatement jump : jumps) { result.add(jump.getLabel()); }
+            for (LabelJumpStatement jump : jumps) {
+                result.add(jump.getLabel());
+            }
             return result;
         }
 
@@ -1263,7 +1267,9 @@ public interface AuxiliaryContract extends SpecificationElement {
                 first = statement.getFirstElement();
             }
 
-            while (first instanceof LabeledStatement s) { first = s.getBody(); }
+            while (first instanceof LabeledStatement s) {
+                first = s.getBody();
+            }
 
             if (first instanceof For) {
                 ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
@@ -1312,7 +1318,9 @@ public interface AuxiliaryContract extends SpecificationElement {
             if (statement instanceof LoopStatement) {
             } else {
                 first = statement.getFirstElement();
-                while (first instanceof LabeledStatement s) { first = s.getBody(); }
+                while (first instanceof LabeledStatement s) {
+                    first = s.getBody();
+                }
 
                 if (first instanceof For) {
                     ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();

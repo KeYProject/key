@@ -62,9 +62,13 @@ public class TestLeftistHeapOfInteger {
     private boolean equals(Iterator<Integer> t0, Iterator<Integer> t1) {
         ExtList l0 = new ExtList(), l1 = new ExtList();
 
-        while (t0.hasNext()) { l0.add(t0.next()); }
+        while (t0.hasNext()) {
+            l0.add(t0.next());
+        }
 
-        while (t1.hasNext()) { l1.add(t1.next()); }
+        while (t1.hasNext()) {
+            l1.add(t1.next());
+        }
 
         Object[] a0 = l0.collect(Object.class);
         Object[] a1 = l1.collect(Object.class);
@@ -117,7 +121,9 @@ public class TestLeftistHeapOfInteger {
     }
 
     private ImmutableHeap<Integer> removeAll(ImmutableHeap<Integer> h, Iterator<Integer> elements) {
-        while (elements.hasNext()) { h = h.removeAll(elements.next()); }
+        while (elements.hasNext()) {
+            h = h.removeAll(elements.next());
+        }
         return h;
     }
 
@@ -189,7 +195,9 @@ public class TestLeftistHeapOfInteger {
         ImmutableList<Integer> l = ImmutableSLList.nil();
 
         int i = 1000;
-        while (i-- != 0) { l = l.prepend(rand.nextInt(1000000)); }
+        while (i-- != 0) {
+            l = l.prepend(rand.nextInt(1000000));
+        }
 
         h = h.insert(l.iterator());
 

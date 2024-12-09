@@ -117,7 +117,9 @@ public final class GoalBackAction extends MainWindowAction {
             final Goal goal = findNewestGoal(getMediator().getSelectedNode());
             if (goal != null && goal.node() != null && goal.node().parent() != null) {
                 RuleApp app = goal.node().parent().getAppliedRuleApp();
-                if (app != null) { appliedRule = " (" + app.rule().displayName() + ")"; }
+                if (app != null) {
+                    appliedRule = " (" + app.rule().displayName() + ")";
+                }
             }
         }
         putValue(NAME, "Undo Last Rule Application" + appliedRule);
@@ -132,7 +134,9 @@ public final class GoalBackAction extends MainWindowAction {
          * selected node
          */
         Goal selGoal = getMediator().getSelectedGoal();
-        if (selGoal == null && selNode != null) { selGoal = findNewestGoal(selNode); }
+        if (selGoal == null && selNode != null) {
+            selGoal = findNewestGoal(selNode);
+        }
 
         if (selGoal != null) {
             getMediator().setBack(selGoal);
@@ -152,7 +156,9 @@ public final class GoalBackAction extends MainWindowAction {
      *         (which means that the closedGoals list is empty) and the given subtree is closed.
      */
     private Goal findNewestGoal(Node subtree) {
-        if (subtree == null) { return null; }
+        if (subtree == null) {
+            return null;
+        }
 
         final Proof proof = subtree.proof();
 

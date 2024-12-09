@@ -178,15 +178,25 @@ public final class Main {
             // add file tree to result
             globalResult.setFileTree(pbh.getFileTree());
 
-            if (missing) { new MissingProofsChecker().check(pbh, globalResult); }
-            if (settings) { new SettingsChecker().check(pbh, globalResult); }
-            if (replay) { new ReplayChecker().check(pbh, globalResult); }
-            if (dependency) { new DependencyChecker().check(pbh, globalResult); }
+            if (missing) {
+                new MissingProofsChecker().check(pbh, globalResult);
+            }
+            if (settings) {
+                new SettingsChecker().check(pbh, globalResult);
+            }
+            if (replay) {
+                new ReplayChecker().check(pbh, globalResult);
+            }
+            if (dependency) {
+                new DependencyChecker().check(pbh, globalResult);
+            }
             globalResult.print("All checks done!");
             globalResult.print("Global result: " + globalResult.getGlobalState());
 
             // generate report
-            if (reportPath != null) { generateReport(globalResult, reportPath); }
+            if (reportPath != null) {
+                generateReport(globalResult, reportPath);
+            }
         } catch (IOException e) {
             globalResult.print(LogLevel.ERROR, e.getMessage());
             globalResult.print("Error while accessing the proof bundle!");
@@ -247,7 +257,9 @@ public final class Main {
 
         // convert Strings to Paths (for input and output)
         List<Path> inputs = new ArrayList<>();
-        for (int i = 0; i < arguments.size() - 1; i++) { inputs.add(Paths.get(arguments.get(i))); }
+        for (int i = 0; i < arguments.size() - 1; i++) {
+            inputs.add(Paths.get(arguments.get(i)));
+        }
         Path output = Paths.get(arguments.get(arguments.size() - 1));
 
         // Usually, the merging process is cancelled if there are conflicting files in both bundles.

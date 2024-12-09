@@ -70,7 +70,11 @@ public class Else extends BranchImp {
      *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (body != null) { if (index == 0) { return body; } }
+        if (body != null) {
+            if (index == 0) {
+                return body;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -93,7 +97,9 @@ public class Else extends BranchImp {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) { return body; }
+        if (body != null && index == 0) {
+            return body;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

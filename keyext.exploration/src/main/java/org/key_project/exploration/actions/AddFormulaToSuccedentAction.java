@@ -31,7 +31,9 @@ public class AddFormulaToSuccedentAction extends ExplorationAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         Term t = promptForTerm(mainWindow, null);
-        if (t == null) { return; }
+        if (t == null) {
+            return;
+        }
         ProofExplorationService service = ProofExplorationService.get(getMediator());
         @NonNull
         Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, false);

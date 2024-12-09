@@ -43,7 +43,9 @@ public class PathNode extends Node<Path> {
         // directories first!
         if (Files.isDirectory(myPath) && !Files.isDirectory(otherPath)) {
             return -1;
-        } else if (!Files.isDirectory(myPath) && Files.isDirectory(otherPath)) { return 1; }
+        } else if (!Files.isDirectory(myPath) && Files.isDirectory(otherPath)) {
+            return 1;
+        }
         // both paths denote files or both denote directories
         return myPath.compareTo(otherPath);
     }

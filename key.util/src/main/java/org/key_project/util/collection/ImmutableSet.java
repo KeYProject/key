@@ -118,7 +118,9 @@ public interface ImmutableSet<T extends @Nullable Object>
 
     default ImmutableSet<T> add(Iterable<T> seq) {
         ImmutableSet<T> cur = this;
-        for (T item : seq) { cur = cur.add(item); }
+        for (T item : seq) {
+            cur = cur.add(item);
+        }
         return cur;
     }
 }

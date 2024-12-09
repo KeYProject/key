@@ -145,9 +145,15 @@ public class TestLineBreakpointStopConditionSimpleWithConditions
         } finally {
             setOneStepSimplificationEnabled(null, originalOneStepSimplification);
             restoreTacletOptions(originalTacletOptions);
-            if (envMain != null) { envMain.dispose(); }
-            if (envSomethingMain != null) { envSomethingMain.dispose(); }
-            if (envSomethingLocalMain != null) { envSomethingLocalMain.dispose(); }
+            if (envMain != null) {
+                envMain.dispose();
+            }
+            if (envSomethingMain != null) {
+                envSomethingMain.dispose();
+            }
+            if (envSomethingLocalMain != null) {
+                envSomethingLocalMain.dispose();
+            }
         }
     }
 }

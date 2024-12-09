@@ -68,7 +68,7 @@ public class ReflectionClassCreator {
         result.append(footer());
         if (!checkBraces(result)) {
             throw new IllegalStateException("ReflectionClassCreator.createClass(): "
-                    + "Problem: the number of opening and closing braces of the generated RFL file is not equal!");
+                + "Problem: the number of opening and closing braces of the generated RFL file is not equal!");
         }
         return result;
     }
@@ -100,7 +100,9 @@ public class ReflectionClassCreator {
                         .contains(" " + sort + " ")) {
                     sort = sort.substring(1);
                 }
-                if (!isPrimitiveType(sort)) { result.add(sort); }
+                if (!isPrimitiveType(sort)) {
+                    result.add(sort);
+                }
             }
         }
         for (String sort : usedObjectSortsStrings) {
@@ -110,7 +112,9 @@ public class ReflectionClassCreator {
                         .contains(" " + sort + " ")) {
                     sort = sort.substring(1);
                 }
-                if (!isPrimitiveType(sort)) { result.add(sort); }
+                if (!isPrimitiveType(sort)) {
+                    result.add(sort);
+                }
             }
         }
         return result;
@@ -150,7 +154,9 @@ public class ReflectionClassCreator {
         r.append(" * @author mbender").append(NEW_LINE);
         r.append(" */").append(NEW_LINE);
         r.append("public ");
-        if (staticClass) { r.append("static "); }
+        if (staticClass) {
+            r.append("static ");
+        }
         r.append("class " + NAME_OF_CLASS + " {").append(NEW_LINE);
         return r;
     }
@@ -241,7 +247,9 @@ public class ReflectionClassCreator {
         final StringBuilder r = new StringBuilder();
         r.append(NEW_LINE).append("  // ---The methods for object creation---").append(NEW_LINE)
                 .append(NEW_LINE);
-        for (final String sort : sorts) { r.append(newRef(sort)); }
+        for (final String sort : sorts) {
+            r.append(newRef(sort));
+        }
         r.append(NEW_LINE);
         return r;
     }
@@ -270,8 +278,12 @@ public class ReflectionClassCreator {
                 .contains(" " + s + " ")) {
             s = s.substring(1);
         }
-        while (s.contains(".")) { s = s.substring(0, s.indexOf('.')) + "_" + s.substring(s.indexOf('.') + 1); }
-        while (s.contains("[]")) { s = s.substring(0, s.indexOf("[]")) + ARRAY + s.substring(s.indexOf("[]") + 2); }
+        while (s.contains(".")) {
+            s = s.substring(0, s.indexOf('.')) + "_" + s.substring(s.indexOf('.') + 1);
+        }
+        while (s.contains("[]")) {
+            s = s.substring(0, s.indexOf("[]")) + ARRAY + s.substring(s.indexOf("[]") + 2);
+        }
         return s;
     }
 
@@ -310,7 +322,11 @@ public class ReflectionClassCreator {
     }
 
     private boolean isPrimitiveType(String sort) {
-        for (String s : PRIMITIVE_TYPES) { if (s.equals(sort)) { return true; } }
+        for (String s : PRIMITIVE_TYPES) {
+            if (s.equals(sort)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -339,7 +355,7 @@ public class ReflectionClassCreator {
         final String cmd =
             "      " + (prim
                     ? "f.set" + Character.toUpperCase(sort.charAt(0)) + sort.substring(1)
-                            + "(obj, val);" + NEW_LINE
+                        + "(obj, val);" + NEW_LINE
                     : "f.set(obj, val);" + NEW_LINE);
         r.append(NEW_LINE);
         r.append("  public static void " + SET_PREFIX).append(cleanTypeName(sort))
@@ -377,7 +393,7 @@ public class ReflectionClassCreator {
         final String cmd =
             "      " + (prim
                     ? "return f.get" + Character.toUpperCase(sort.charAt(0)) + sort.substring(1)
-                            + "(obj);" + NEW_LINE
+                        + "(obj);" + NEW_LINE
                     : "return (" + sort + ") f.get(obj);" + NEW_LINE);
         r.append(NEW_LINE);
         r.append("  public static ").append(sort).append(" ").append(GET_PREFIX)

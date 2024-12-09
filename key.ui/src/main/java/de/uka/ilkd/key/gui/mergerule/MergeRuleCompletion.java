@@ -59,7 +59,9 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
             chosenDistForm = dialog.getChosenDistinguishingFormula();
         }
 
-        if (chosenCandidates == null || chosenCandidates.size() < 1) { return null; }
+        if (chosenCandidates == null || chosenCandidates.size() < 1) {
+            return null;
+        }
 
         final MergeRuleBuiltInRuleApp result = new MergeRuleBuiltInRuleApp(app.rule(), pio);
         result.setMergePartners(chosenCandidates);

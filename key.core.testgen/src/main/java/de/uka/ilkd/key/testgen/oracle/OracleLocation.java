@@ -37,7 +37,9 @@ public class OracleLocation {
 
     public boolean equals(Object o) {
 
-        if (o instanceof OracleLocation l) { return object.equals(l.object) && field.equals(l.field); }
+        if (o instanceof OracleLocation l) {
+            return object.equals(l.object) && field.equals(l.field);
+        }
 
         return false;
 

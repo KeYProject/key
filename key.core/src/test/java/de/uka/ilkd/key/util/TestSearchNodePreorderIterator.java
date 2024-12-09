@@ -113,9 +113,15 @@ public class TestSearchNodePreorderIterator {
         // List children
         NodePreorderIterator iter = new NodePreorderIterator(root);
         ImmutableList<Node> childList = ImmutableSLList.nil();
-        while (iter.hasNext()) { Node next = iter.next(); childList = childList.append(next); }
+        while (iter.hasNext()) {
+            Node next = iter.next();
+            childList = childList.append(next);
+        }
         // Test each child
-        while (!childList.isEmpty()) { assertPreorder(childList.head(), childList); childList = childList.take(1); }
+        while (!childList.isEmpty()) {
+            assertPreorder(childList.head(), childList);
+            childList = childList.take(1);
+        }
     }
 
     /**

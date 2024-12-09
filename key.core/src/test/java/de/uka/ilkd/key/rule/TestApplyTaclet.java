@@ -67,7 +67,9 @@ public class TestApplyTaclet {
 
 
     private static Semisequent parseTermForSemisequent(String t) {
-        if ("".equals(t)) { return Semisequent.EMPTY_SEMISEQUENT; }
+        if ("".equals(t)) {
+            return Semisequent.EMPTY_SEMISEQUENT;
+        }
         SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
         return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
     }
@@ -162,7 +164,7 @@ public class TestApplyTaclet {
                     || (seq2.succedent().get(1) != null
                             && seq2.succedent().get(1).formula().equals(aimpb)),
             "A->B should be in the succedent of one of the new goals now, "
-                    + "it's in the antecedent, anyway.");
+                + "it's in the antecedent, anyway.");
     }
 
 
@@ -317,7 +319,7 @@ public class TestApplyTaclet {
                 "D is not in antecedent and not in succedent " + "of first new goal");
             assertEquals(seq2.antecedent().getFirst().formula(), t_c,
                 "D is in succedent of first new goal, but not in antecedent "
-                        + "of second new goal");
+                    + "of second new goal");
         }
     }
 
@@ -616,7 +618,9 @@ public class TestApplyTaclet {
         while (appIt.hasNext()) {
             TacletApp a =
                 appIt.next().setIfFormulaInstantiations(ifInsts, TacletForTests.services());
-            if (a != null) { appList = appList.prepend(a); }
+            if (a != null) {
+                appList = appList.prepend(a);
+            }
         }
 
         assertEquals(1, appList.size(), "Expected one match.");
@@ -739,8 +743,8 @@ public class TestApplyTaclet {
 
         assertTrue(resultFormula.equalsModProperty(correctFormula, RENAMING_TERM_PROPERTY),
             "Wrong result. Expected:"
-                    + ProofSaver.printAnything(correctFormula, TacletForTests.services()) + " But was:"
-                    + ProofSaver.printAnything(resultFormula, TacletForTests.services()));
+                + ProofSaver.printAnything(correctFormula, TacletForTests.services()) + " But was:"
+                + ProofSaver.printAnything(resultFormula, TacletForTests.services()));
         assertEquals(resultFormula.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             correctFormula.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             "Hash codes of formulas should be equal modulo renaming");
@@ -766,10 +770,13 @@ public class TestApplyTaclet {
         coll.visit(t, false);
         ImmutableSet<SchemaVariable> collSet = DefaultImmutableSet.nil();
         Iterator<SchemaVariable> it = coll.varIterator();
-        while (it.hasNext()) { SchemaVariable sv = it.next(); collSet = collSet.add(sv); }
+        while (it.hasNext()) {
+            SchemaVariable sv = it.next();
+            collSet = collSet.add(sv);
+        }
 
         assertEquals(4, collSet.size(), "Expected four uninstantiated variables in taclet " + t
-                + ", but found " + collSet.size());
+            + ", but found " + collSet.size());
     }
 
     /**
@@ -839,7 +846,7 @@ public class TestApplyTaclet {
         // the content of the diamond must not have changed
         ProgramElement expected =
             TacletForTests.parsePrg("{try{ ; while (1==1) {if (1==2) {break;}} return 1==3; "
-                    + "int i=17; } catch (Exception e) { return null;}}");
+                + "int i=17; } catch (Exception e) { return null;}}");
 
         ProgramElement is =
             goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
@@ -880,7 +887,7 @@ public class TestApplyTaclet {
         // the content of the diamond must not have changed
         ProgramElement expected =
             TacletForTests.parsePrg("{try{while (1==1) {if (1==2) {break;}} return 1==3; "
-                    + "int i=17; } catch (Exception e) { return null;}}");
+                + "int i=17; } catch (Exception e) { return null;}}");
 
         ProgramElement is =
             goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();

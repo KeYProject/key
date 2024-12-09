@@ -163,7 +163,9 @@ public class TestTermLabelManager {
     protected void compareTerms(Term expected, Term current, boolean changed,
             RefactoringScope scope) {
         assertEquals(expected.arity(), current.arity());
-        for (int i = 0; i < expected.arity(); i++) { compareTerms(expected.sub(i), current.sub(i), changed, scope); }
+        for (int i = 0; i < expected.arity(); i++) {
+            compareTerms(expected.sub(i), current.sub(i), changed, scope);
+        }
         assertSame(expected.op(), current.op());
         assertSame(expected.boundVars(), current.boundVars());
         assertSame(expected.javaBlock(), current.javaBlock());
@@ -589,7 +591,9 @@ public class TestTermLabelManager {
                 env = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY,
                     "termLabels/flatSteps/FlatSteps.java").toPath(), null, null, null);
             } finally {
-                if (env != null) { env.dispose(); }
+                if (env != null) {
+                    env.dispose();
+                }
             }
             CONFIG = env.getInitConfig();
         }
@@ -619,10 +623,14 @@ public class TestTermLabelManager {
                         childAndGrandchildTermLabelPolicies.prepend(childAndGrandchildPolicy);
                 }
                 ImmutableList<TermLabelUpdate> termLabelUpdates = ImmutableSLList.nil();
-                if (update != null) { termLabelUpdates = termLabelUpdates.prepend(update); }
+                if (update != null) {
+                    termLabelUpdates = termLabelUpdates.prepend(update);
+                }
                 ImmutableList<TermLabelRefactoring> termLabelRefactorings =
                     ImmutableSLList.nil();
-                if (refactoring != null) { termLabelRefactorings = termLabelRefactorings.prepend(refactoring); }
+                if (refactoring != null) {
+                    termLabelRefactorings = termLabelRefactorings.prepend(refactoring);
+                }
 
                 ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
                 result = result.prepend(new TermLabelConfiguration(new Name("ONE"),
@@ -663,7 +671,9 @@ public class TestTermLabelManager {
 
         public LoggingTermLabelRefactoring(RefactoringScope scope, String... supportedRules) {
             this.scope = scope;
-            for (String rule : supportedRules) { supportedRuleNames = supportedRuleNames.prepend(new Name(rule)); }
+            for (String rule : supportedRules) {
+                supportedRuleNames = supportedRuleNames.prepend(new Name(rule));
+            }
         }
 
         @Override
@@ -704,7 +714,9 @@ public class TestTermLabelManager {
 
         public LoggingTermLabelUpdate(TermLabel toAdd, String... supportedRules) {
             this.toAdd = toAdd;
-            for (String rule : supportedRules) { supportedRuleNames = supportedRuleNames.prepend(new Name(rule)); }
+            for (String rule : supportedRules) {
+                supportedRuleNames = supportedRuleNames.prepend(new Name(rule));
+            }
         }
 
         @Override
@@ -727,7 +739,9 @@ public class TestTermLabelManager {
         private final List<TermLabel> log = new LinkedList<>();
 
         public LoggingChildTermLabelPolicy(String... supportedRules) {
-            for (String rule : supportedRules) { supportedRuleNames = supportedRuleNames.prepend(new Name(rule)); }
+            for (String rule : supportedRules) {
+                supportedRuleNames = supportedRuleNames.prepend(new Name(rule));
+            }
         }
 
         @Override

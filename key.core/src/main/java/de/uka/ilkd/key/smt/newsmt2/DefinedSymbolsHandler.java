@@ -83,8 +83,8 @@ public class DefinedSymbolsHandler implements SMTHandler {
     private static final SMTHandlerProperty.BooleanProperty PROPERTY_AXIOMATISATION =
         new BooleanProperty("Axiomatisations", "Exclude axiomatisations",
             "SMT axioms may be present for symbols and included in the translation. "
-                    + "These axioms make the translation more powerful, but may also lead the "
-                    + "solver astray.");
+                + "These axioms make the translation more powerful, but may also lead the "
+                + "solver astray.");
 
     private final Set<String> supportedFunctions = new HashSet<>();
     private Services services;
@@ -104,7 +104,9 @@ public class DefinedSymbolsHandler implements SMTHandler {
         // properties.
         for (String prop : handlerSnippets.stringPropertyNames()) {
             int dot = prop.lastIndexOf('.');
-            if (dot < 0) { continue; }
+            if (dot < 0) {
+                continue;
+            }
             String ext = prop.substring(dot);
             SymbolIntroducer introduceSymbol = this::introduceSymbol;
             if (SUPPORTED_SUFFIXES.contains(ext)) {
@@ -129,7 +131,9 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     private boolean introduceSymbol(MasterHandler trans, String name, SortedOperator op)
             throws SMTTranslationException {
-        if (trans.isKnownSymbol(name)) { return true; }
+        if (trans.isKnownSymbol(name)) {
+            return true;
+        }
 
         // Now ... this is the first encounter of name.
         // We have to add axioms and typing and declaration ...
@@ -206,7 +210,9 @@ public class DefinedSymbolsHandler implements SMTHandler {
         String[] strTaclets = snippets.getProperty(name + TACLETS_SUFFIX).trim().split(" *, *");
         for (String str : strTaclets) {
             Taclet taclet = services.getProof().getInitConfig().lookupActiveTaclet(new Name(str));
-            if (taclet == null) { throw new SMTTranslationException("Unknown taclet: " + str); }
+            if (taclet == null) {
+                throw new SMTTranslationException("Unknown taclet: " + str);
+            }
             SMTTacletTranslator tacletTranslator = new SMTTacletTranslator(services);
             Term formula = tacletTranslator.translate(taclet);
             SExpr smt = trans.translate(formula);
@@ -219,7 +225,9 @@ public class DefinedSymbolsHandler implements SMTHandler {
         String axioms = snippets.getProperty(name + AXIOMS_SUFFIX);
         trans.addAxiom(new VerbatimSMT(axioms));
         String[] deps = snippets.getProperty(name + ".deps", "").trim().split(", *");
-        for (String dep : deps) { trans.introduceSymbol(dep); }
+        for (String dep : deps) {
+            trans.introduceSymbol(dep);
+        }
     }
 
     private void handleDLAxioms(String name, MasterHandler trans) throws SMTTranslationException {

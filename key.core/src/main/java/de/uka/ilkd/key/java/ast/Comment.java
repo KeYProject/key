@@ -60,8 +60,12 @@ public class Comment extends JavaSourceElement {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true; }
-        if (!(o instanceof Comment cmp)) { return false; }
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Comment cmp)) {
+            return false;
+        }
         return (getText().equals(cmp.getText()));
     }
 

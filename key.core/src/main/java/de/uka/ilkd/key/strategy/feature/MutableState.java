@@ -44,7 +44,9 @@ public class MutableState {
      *        the Term which is assigned as the value
      */
     public void assign(TermBuffer v, Term value) {
-        if (content == null) { content = new HashMap<>(); }
+        if (content == null) {
+            content = new HashMap<>();
+        }
         content.put(v, value);
     }
 
@@ -56,7 +58,9 @@ public class MutableState {
      * @return the current value of the {@link TermBuffer} or {@code null} if there is none
      */
     public Term read(TermBuffer v) {
-        if (content == null) { return null; }
+        if (content == null) {
+            return null;
+        }
         return content.get(v);
     }
 
@@ -66,7 +70,9 @@ public class MutableState {
      * @return the backtracking manager
      */
     public BackTrackingManager getBacktrackingManager() {
-        if (btManager == null) { btManager = new BackTrackingManager(); }
+        if (btManager == null) {
+            btManager = new BackTrackingManager();
+        }
         return btManager;
     }
 }

@@ -62,7 +62,9 @@ public final class CloseByReference extends KeyAction {
             nodes.add(node);
         } else {
             node.subtreeIterator().forEachRemaining(n -> {
-                if (n.leaf() && !n.isClosed()) { nodes.add(n); }
+                if (n.leaf() && !n.isClosed()) {
+                    nodes.add(n);
+                }
             });
         }
         List<Integer> mismatches = new ArrayList<>();
@@ -77,7 +79,9 @@ public final class CloseByReference extends KeyAction {
                 mismatches.add(n.serialNr());
             }
         }
-        if (!nodes.isEmpty()) { cachingExtension.updateGUIState(nodes.get(0).proof()); }
+        if (!nodes.isEmpty()) {
+            cachingExtension.updateGUIState(nodes.get(0).proof());
+        }
         if (!mismatches.isEmpty()) {
             // since e.getSource() is the popup menu, it is better to use the MainWindow
             // instance here as a parent

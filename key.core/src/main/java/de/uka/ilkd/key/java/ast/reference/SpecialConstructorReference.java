@@ -101,7 +101,9 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (arguments != null) { return arguments.get(index); }
+        if (arguments != null) {
+            return arguments.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -125,7 +127,9 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (arguments != null) { return arguments.get(index); }
+        if (arguments != null) {
+            return arguments.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

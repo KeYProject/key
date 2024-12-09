@@ -199,11 +199,15 @@ public final class ExampleChooser extends JDialog {
 
         private DefaultMutableTreeNode findChild(DefaultMutableTreeNode root, String[] path,
                 int from) {
-            if (from == path.length) { return root; }
+            if (from == path.length) {
+                return root;
+            }
             Enumeration<?> en = root.children();
             while (en.hasMoreElements()) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
-                if (node.getUserObject().equals(path[from])) { return findChild(node, path, from + 1); }
+                if (node.getUserObject().equals(path[from])) {
+                    return findChild(node, path, from + 1);
+                }
             }
             // not found ==> add new
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(path[from]);
@@ -234,7 +238,9 @@ public final class ExampleChooser extends JDialog {
         // create example list
         final DefaultTreeModel model = new DefaultTreeModel(new DefaultMutableTreeNode());
         List<Example> examples = listExamples(examplesDir);
-        for (Example example : examples) { example.addToTreeModel(model); }
+        for (Example example : examples) {
+            example.addToTreeModel(model);
+        }
 
         exampleList = new JTree();
         exampleList.setModel(model);
@@ -247,7 +253,9 @@ public final class ExampleChooser extends JDialog {
                 int row = exampleList.getRowForLocation(e.getX(), e.getY());
 
                 // Check that it is a double click on an item, not a folder or the background
-                if (e.getClickCount() != 2 || row == -1 || selectedExample == null) { return; }
+                if (e.getClickCount() != 2 || row == -1 || selectedExample == null) {
+                    return;
+                }
                 loadButton.doClick();
             }
         });
@@ -283,7 +291,9 @@ public final class ExampleChooser extends JDialog {
         // create "load" button
         loadButton = new JButton("Load Example");
         loadButton.addActionListener(e -> {
-            if (selectedExample == null) { throw new RuntimeException("No example selected"); }
+            if (selectedExample == null) {
+                throw new RuntimeException("No example selected");
+            }
             fileToLoad = selectedExample.getObligationFile();
             setVisible(false);
         });
@@ -293,8 +303,12 @@ public final class ExampleChooser extends JDialog {
         // create "load proof" button
         loadProofButton = new JButton("Load Proof");
         loadProofButton.addActionListener(e -> {
-            if (selectedExample == null) { throw new IllegalStateException("No example selected"); }
-            if (!selectedExample.hasProof()) { throw new IllegalStateException("Selected example has no proof."); }
+            if (selectedExample == null) {
+                throw new IllegalStateException("No example selected");
+            }
+            if (!selectedExample.hasProof()) {
+                throw new IllegalStateException("Selected example has no proof.");
+            }
             fileToLoad = selectedExample.getProofFile();
             setVisible(false);
         });
@@ -329,11 +343,15 @@ public final class ExampleChooser extends JDialog {
 
     public static File lookForExamples() {
         // weigl: using java properties: -Dkey.examples.dir="..."
-        if (System.getProperty(KEY_EXAMPLE_DIR) != null) { return new File(System.getProperty(KEY_EXAMPLE_DIR)); }
+        if (System.getProperty(KEY_EXAMPLE_DIR) != null) {
+            return new File(System.getProperty(KEY_EXAMPLE_DIR));
+        }
 
         // greatly simplified version without parent path lookup.
         File folder = new File(IOUtil.getProjectRoot(ExampleChooser.class), EXAMPLES_PATH);
-        if (!folder.exists()) { folder = new File(IOUtil.getClassLocation(ExampleChooser.class), EXAMPLES_PATH); }
+        if (!folder.exists()) {
+            folder = new File(IOUtil.getClassLocation(ExampleChooser.class), EXAMPLES_PATH);
+        }
         return folder;
     }
 
@@ -362,7 +380,9 @@ public final class ExampleChooser extends JDialog {
                         // ignore
                     } else {
                         String[] entry = trimmed.split(" *[:=] *", 2);
-                        if (entry.length > 1) { properties.put(entry[0], entry[1]); }
+                        if (entry.length > 1) {
+                            properties.put(entry[0], entry[1]);
+                        }
                     }
                 }
             }
@@ -377,7 +397,9 @@ public final class ExampleChooser extends JDialog {
     private void updateDescription() {
 
         TreePath selectionPath = exampleList.getSelectionModel().getSelectionPath();
-        if (selectionPath == null) { return; }
+        if (selectionPath == null) {
+            return;
+        }
 
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
         Object nodeObj = node.getUserObject();
@@ -389,8 +411,12 @@ public final class ExampleChooser extends JDialog {
                 addTab(example.getDescription(), "Description", true);
                 final String fileAsString = fileAsString(example.getObligationFile());
                 final int p = fileAsString.lastIndexOf("\\problem");
-                if (p >= 0) { addTab(fileAsString.substring(p), "Proof Obligation", false); }
-                for (File file : example.getAdditionalFiles()) { addTab(fileAsString(file), file.getName(), false); }
+                if (p >= 0) {
+                    addTab(fileAsString.substring(p), "Proof Obligation", false);
+                }
+                for (File file : example.getAdditionalFiles()) {
+                    addTab(fileAsString(file), file.getName(), false);
+                }
                 loadButton.setEnabled(true);
                 loadProofButton.setEnabled(example.hasProof());
                 selectedExample = example;
@@ -433,14 +459,16 @@ public final class ExampleChooser extends JDialog {
         if (!examplesDir.isDirectory()) {
             JOptionPane.showMessageDialog(MainWindow.getInstance(),
                 "The examples directory cannot be found.\n" + "Please install them at "
-                        + (examplesDirString == null ? IOUtil.getProjectRoot(ExampleChooser.class) + "/"
-                                : examplesDirString),
+                    + (examplesDirString == null ? IOUtil.getProjectRoot(ExampleChooser.class) + "/"
+                            : examplesDirString),
                 "Error loading examples", JOptionPane.ERROR_MESSAGE);
             return null;
         }
 
         // show dialog
-        if (instance == null) { instance = new ExampleChooser(examplesDir); }
+        if (instance == null) {
+            instance = new ExampleChooser(examplesDir);
+        }
         instance.setLocationRelativeTo(instance.getOwner());
         instance.setVisible(true);
 
@@ -465,7 +493,9 @@ public final class ExampleChooser extends JDialog {
             new BufferedReader(new FileReader(index, StandardCharsets.UTF_8))) {
             while ((line = br.readLine()) != null) {
                 line = line.trim();
-                if (line.startsWith("#") || line.length() == 0) { continue; }
+                if (line.startsWith("#") || line.length() == 0) {
+                    continue;
+                }
                 File f = new File(examplesDir, line);
                 try {
                     result.add(new Example(f));

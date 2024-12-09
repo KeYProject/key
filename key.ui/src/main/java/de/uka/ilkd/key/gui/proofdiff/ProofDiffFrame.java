@@ -149,7 +149,9 @@ public class ProofDiffFrame extends JFrame {
     private void setSelectedNode() {
         try {
             Node node = mainWindow.getMediator().getSelectedNode();
-            if (node == null) { throw new IllegalArgumentException("There is no selected proof node or no proof!"); }
+            if (node == null) {
+                throw new IllegalArgumentException("There is no selected proof node or no proof!");
+            }
 
             from.setText("");
             to.setText(Integer.toString(node.serialNr()));
@@ -230,19 +232,29 @@ public class ProofDiffFrame extends JFrame {
     }
 
     private boolean onlySpaces(CharSequence text) {
-        for (int i = 0; i < text.length(); i++) { if (!Character.isWhitespace(text.charAt(i))) { return false; } }
+        for (int i = 0; i < text.length(); i++) {
+            if (!Character.isWhitespace(text.charAt(i))) {
+                return false;
+            }
+        }
         return true;
     }
 
     private int getParent(int no) {
         Proof proof = mainWindow.getMediator().getSelectedProof();
-        if (proof == null) { throw new IllegalArgumentException("There is no open proof!"); }
+        if (proof == null) {
+            throw new IllegalArgumentException("There is no open proof!");
+        }
 
         Node node = findNode(proof.root(), no);
-        if (node == null) { throw new IllegalArgumentException(no + " is not a node in the proof"); }
+        if (node == null) {
+            throw new IllegalArgumentException(no + " is not a node in the proof");
+        }
 
         Node parent = node.parent();
-        if (parent == null) { throw new IllegalArgumentException(no + " has no parent node"); }
+        if (parent == null) {
+            throw new IllegalArgumentException(no + " has no parent node");
+        }
 
         return parent.serialNr();
     }
@@ -276,11 +288,15 @@ public class ProofDiffFrame extends JFrame {
 
         Proof proof = mainWindow.getMediator().getSelectedProof();
 
-        if (proof == null) { throw new IllegalArgumentException("There is no open proof!"); }
+        if (proof == null) {
+            throw new IllegalArgumentException("There is no open proof!");
+        }
 
         Node node = findNode(proof.root(), nodeNumber);
 
-        if (node == null) { throw new IllegalArgumentException(nodeNumber + " does not denote a valid node"); }
+        if (node == null) {
+            throw new IllegalArgumentException(nodeNumber + " does not denote a valid node");
+        }
 
         return LogicPrinter.quickPrintSequent(node.sequent(), proof.getServices());
     }
@@ -289,18 +305,26 @@ public class ProofDiffFrame extends JFrame {
 
     // This must have been implemented already, somewhere
     private Node findNode(Node node, int number) {
-        if (node.serialNr() == number) { return node; }
+        if (node.serialNr() == number) {
+            return node;
+        }
 
-        while ((node.serialNr() != number) && (node.childrenCount() == 1)) { node = node.child(0); }
+        while ((node.serialNr() != number) && (node.childrenCount() == 1)) {
+            node = node.child(0);
+        }
 
-        if (node.serialNr() == number) { return node; }
+        if (node.serialNr() == number) {
+            return node;
+        }
 
         Iterator<Node> it = node.childrenIterator();
         while (it.hasNext()) {
             Node n = it.next();
             if (n.serialNr() <= number) {
                 Node result = findNode(n, number);
-                if (result != null) { return result; }
+                if (result != null) {
+                    return result;
+                }
             }
         }
 
@@ -309,20 +333,20 @@ public class ProofDiffFrame extends JFrame {
 
     private String getHelpText() {
         return "<h1>Visual diff between sequences of Proof Nodes</h1>"
-                + "<p>This window can be used to select one or two sequents of an "
-                + "ongoing or closed proof. All actions refer to the currently selected proof.</p>"
-                + "<p>The textarea shows the <i>in-place diff</i> between two pretty printed "
-                + "sequences. Parts in <span style='background-color: #ff8080;'>red</span>"
-                + " are only present in the parent sequent and "
-                + "parts in <span style='background-color: #80ff80;'>green</span> are added in the "
-                + "second proof node.</p>" + "<h3>One node mode</h3>"
-                + "<p>If you keep the left field (parent node) empty, the difference between the"
-                + "proof node and its direct predecessor is displayed in the text area.</p>"
-                + "<h3>Two node mode</h3>"
-                + "<p>If you specify two nodes, the difference between the declared sequents "
-                + "are displayed.</p>" + "<h3>'Show selected node'</h3>"
-                + "<p>Use this button to use the currently selected proof node of the proof "
-                + "component as displayed proof node.";
+            + "<p>This window can be used to select one or two sequents of an "
+            + "ongoing or closed proof. All actions refer to the currently selected proof.</p>"
+            + "<p>The textarea shows the <i>in-place diff</i> between two pretty printed "
+            + "sequences. Parts in <span style='background-color: #ff8080;'>red</span>"
+            + " are only present in the parent sequent and "
+            + "parts in <span style='background-color: #80ff80;'>green</span> are added in the "
+            + "second proof node.</p>" + "<h3>One node mode</h3>"
+            + "<p>If you keep the left field (parent node) empty, the difference between the"
+            + "proof node and its direct predecessor is displayed in the text area.</p>"
+            + "<h3>Two node mode</h3>"
+            + "<p>If you specify two nodes, the difference between the declared sequents "
+            + "are displayed.</p>" + "<h3>'Show selected node'</h3>"
+            + "<p>Use this button to use the currently selected proof node of the proof "
+            + "component as displayed proof node.";
     }
 
     // Use this to test the layout of this class.

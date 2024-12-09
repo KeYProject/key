@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ContractFactoryTest {
     /** the filename of the key file which is needed to create Services and JavaInfo */
     private static final String TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-            + "speclang" + File.separator + "testFile.key";
+        + "speclang" + File.separator + "testFile.key";
 
     /** JavaInfo containing information about the available datatypes and methods */
     private JavaInfo javaInfo;
@@ -145,8 +145,8 @@ public class ContractFactoryTest {
                 @*/""";
         Term woLabels = calculateCombinedModifiableWOLabels(contract);
         assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
-                + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
-                + "allLocs))",
+            + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
+            + "allLocs))",
             woLabels.toString());
     }
 
@@ -180,7 +180,10 @@ public class ContractFactoryTest {
 
         FunctionalOperationContract[] cs = new FunctionalOperationContract[contractSet.size()];
         int i = 0;
-        for (Contract c : contractSet) { cs[i] = (FunctionalOperationContract) c; i++; }
+        for (Contract c : contractSet) {
+            cs[i] = (FunctionalOperationContract) c;
+            i++;
+        }
 
         // combine exceptional with normal contract
         ContractFactory cf = new ContractFactory(services);

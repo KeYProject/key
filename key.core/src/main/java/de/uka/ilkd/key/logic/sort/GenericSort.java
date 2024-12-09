@@ -74,7 +74,9 @@ public final class GenericSort extends SortImpl {
             s = it.next();
             if (s instanceof ArraySort) {
                 t = ((ArraySort) s).elementSort();
-                while (t instanceof ArraySort) { t = ((ArraySort) t).elementSort(); }
+                while (t instanceof ArraySort) {
+                    t = ((ArraySort) t).elementSort();
+                }
                 if (t instanceof GenericSort) {
                     throw new GenericSupersortException(
                         "Illegal supersort " + s + " for generic sort " + name(), s);
@@ -112,9 +114,13 @@ public final class GenericSort extends SortImpl {
         while (it.hasNext()) {
             ss = it.next();
             if (ss instanceof GenericSort) {
-                if (!((GenericSort) ss).checkNonGenericSupersorts(p_s)) { return false; }
+                if (!((GenericSort) ss).checkNonGenericSupersorts(p_s)) {
+                    return false;
+                }
             } else {
-                if (!p_s.extendsTrans(ss)) { return false; }
+                if (!p_s.extendsTrans(ss)) {
+                    return false;
+                }
             }
         }
 

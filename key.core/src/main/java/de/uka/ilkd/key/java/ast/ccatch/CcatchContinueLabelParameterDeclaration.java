@@ -42,7 +42,11 @@ public class CcatchContinueLabelParameterDeclaration extends CcatchNonstandardPa
 
     @Override
     public ProgramElement getChildAt(int index) {
-        if (label != null) { if (index == 0) { return label; } }
+        if (label != null) {
+            if (index == 0) {
+                return label;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

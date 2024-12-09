@@ -53,7 +53,9 @@ class StorePrinter extends FieldPrinter {
 
         lp.layouter.print("]");
 
-        if (closingBrace) { lp.layouter.end(); }
+        if (closingBrace) {
+            lp.layouter.end();
+        }
     }
 
     void printStore(LogicPrinter lp, Term t, boolean closingBrace) {

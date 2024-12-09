@@ -93,7 +93,9 @@ public abstract class AbstractBetaFeature implements Feature {
 
     private static class MaxPosPathHelper extends MaxPathHelper {
         protected int computeDefault(Term p_t, boolean p_positive) {
-            if (alwaysReplace(p_t)) { return 1; }
+            if (alwaysReplace(p_t)) {
+                return 1;
+            }
 
             return p_positive ? 0 : 1;
         }
@@ -146,7 +148,9 @@ public abstract class AbstractBetaFeature implements Feature {
                     && hasPurePosPath(p_t.sub(1), p_positive, caches))
                     || (hasPurePosPath(p_t.sub(0), p_positive, caches)
                             && hasPurePosPath(p_t.sub(1), !p_positive, caches));
-        } else if (alwaysReplace(p_t)) { return true; }
+        } else if (alwaysReplace(p_t)) {
+            return true;
+        }
 
         return !p_positive;
     }
@@ -160,7 +164,9 @@ public abstract class AbstractBetaFeature implements Feature {
         } else if (p_t.op() == Junctor.IMP) {
             return containsNegAtom(p_t.sub(0), !p_positive, caches)
                     || containsNegAtom(p_t.sub(1), p_positive, caches);
-        } else if (p_t.op() == Equality.EQV || alwaysReplace(p_t)) { return true; }
+        } else if (p_t.op() == Equality.EQV || alwaysReplace(p_t)) {
+            return true;
+        }
 
         return !p_positive;
     }

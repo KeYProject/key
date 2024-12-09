@@ -55,7 +55,9 @@ public class FormulaTagManager {
      */
     public PosInOccurrence getPosForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
-        if (info == null) { return null; }
+        if (info == null) {
+            return null;
+        }
         return info.pio;
     }
 
@@ -66,7 +68,9 @@ public class FormulaTagManager {
      */
     public long getAgeForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
-        if (info == null) { return 0; }
+        if (info == null) {
+            return 0;
+        }
         return info.age;
     }
 
@@ -206,7 +210,9 @@ public class FormulaTagManager {
     ////////////////////////////////////////////////////////////////////////////
 
     private FormulaInfo getFormulaInfo(FormulaTag p_tag) {
-        if (lastTagQueried != p_tag) { putInQueryCache(p_tag, tagToFormulaInfo.get(p_tag)); }
+        if (lastTagQueried != p_tag) {
+            putInQueryCache(p_tag, tagToFormulaInfo.get(p_tag));
+        }
         return lastQueryResult;
     }
 
@@ -225,7 +231,7 @@ public class FormulaTagManager {
         @Override
         public String toString() {
             return "FormulaInfo [pio=" + pio + ", modifications=" + modifications + ", age=" + age
-                    + "]";
+                + "]";
         }
 
         public final PosInOccurrence pio;

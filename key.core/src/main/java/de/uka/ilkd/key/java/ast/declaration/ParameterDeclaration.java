@@ -137,9 +137,15 @@ public class ParameterDeclaration extends VariableDeclaration {
      */
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) { result += modArray.size(); }
-        if (typeReference != null) { result++; }
-        if (varSpec != null) { result++; }
+        if (modArray != null) {
+            result += modArray.size();
+        }
+        if (typeReference != null) {
+            result++;
+        }
+        if (varSpec != null) {
+            result++;
+        }
         return result;
     }
 
@@ -157,14 +163,22 @@ public class ParameterDeclaration extends VariableDeclaration {
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) { return modArray.get(index); }
+            if (len > index) {
+                return modArray.get(index);
+            }
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0) { return typeReference; }
+            if (index == 0) {
+                return typeReference;
+            }
             index--;
         }
-        if (varSpec != null) { if (index == 0) { return varSpec.get(0); } }
+        if (varSpec != null) {
+            if (index == 0) {
+                return varSpec.get(0);
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

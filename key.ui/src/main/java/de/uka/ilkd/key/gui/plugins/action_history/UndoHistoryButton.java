@@ -118,7 +118,9 @@ public class UndoHistoryButton {
      *        true iff the action button should be enabled
      */
     public void setEnabled(boolean b) {
-        if (items.isEmpty()) { b = false; }
+        if (items.isEmpty()) {
+            b = false;
+        }
         getAction().setEnabled(b);
         getSelectionButton().setEnabled(b);
     }
@@ -193,7 +195,9 @@ public class UndoHistoryButton {
      * @return the popup menu opened by the selection button
      */
     protected JPopupMenu getMenu() {
-        if (menu == null) { menu = new JPopupMenu(); }
+        if (menu == null) {
+            menu = new JPopupMenu();
+        }
         return menu;
     }
 
@@ -244,7 +248,9 @@ public class UndoHistoryButton {
          * just expect the text to be completely on the left).
          */
         menu = null;
-        for (JMenuItem item : newMenuItems) { getMenu().add(item); }
+        for (JMenuItem item : newMenuItems) {
+            getMenu().add(item);
+        }
         getMenu().pack();
     }
 
@@ -285,7 +291,9 @@ public class UndoHistoryButton {
         @Override
         public void actionPerformed(ActionEvent e) {
             setItems(actionSupplier.get());
-            if (!items.isEmpty()) { callback.accept(items.get(items.size() - 1)); }
+            if (!items.isEmpty()) {
+                callback.accept(items.get(items.size() - 1));
+            }
         }
     }
 }

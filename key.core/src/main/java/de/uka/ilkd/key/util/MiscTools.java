@@ -137,9 +137,13 @@ public final class MiscTools {
 
         result.add(services.getTypeConverter().getHeapLDT().getHeap());
 
-        if (isTransaction(modalityKind)) { result.add(services.getTypeConverter().getHeapLDT().getSavedHeap()); }
+        if (isTransaction(modalityKind)) {
+            result.add(services.getTypeConverter().getHeapLDT().getSavedHeap());
+        }
 
-        if (isPermissions(services)) { result.add(services.getTypeConverter().getHeapLDT().getPermissionHeap()); }
+        if (isPermissions(services)) {
+            result.add(services.getTypeConverter().getHeapLDT().getPermissionHeap());
+        }
         return result;
     }
 
@@ -254,7 +258,9 @@ public final class MiscTools {
             final Sort s = obs.isStatic() ? obs.getContainerType().getSort() : t.sub(1).sort();
             result = result.add(new Pair<>(s, obs));
         }
-        for (Term sub : t.subs()) { result = result.union(collectObservers(sub)); }
+        for (Term sub : t.subs()) {
+            result = result.union(collectObservers(sub));
+        }
         return result;
     }
 
@@ -470,7 +476,9 @@ public final class MiscTools {
      */
     public static String getRuleDisplayName(Node node) {
         String name = null;
-        if (node != null) { name = getRuleDisplayName(node.getAppliedRuleApp()); }
+        if (node != null) {
+            name = getRuleDisplayName(node.getAppliedRuleApp());
+        }
         return name;
     }
 
@@ -491,7 +499,9 @@ public final class MiscTools {
         String name = null;
         if (ruleApp != null) {
             Rule rule = ruleApp.rule();
-            if (rule != null) { name = rule.displayName(); }
+            if (rule != null) {
+                name = rule.displayName();
+            }
         }
         return name;
     }
@@ -512,7 +522,9 @@ public final class MiscTools {
      */
     public static String getRuleName(Node node) {
         String name = null;
-        if (node != null) { name = getRuleName(node.getAppliedRuleApp()); }
+        if (node != null) {
+            name = getRuleName(node.getAppliedRuleApp());
+        }
         return name;
     }
 
@@ -533,7 +545,9 @@ public final class MiscTools {
         String name = null;
         if (ruleApp != null) {
             Rule rule = ruleApp.rule();
-            if (rule != null) { name = rule.name().toString(); }
+            if (rule != null) {
+                name = rule.name().toString();
+            }
         }
         return name;
     }
@@ -582,7 +596,9 @@ public final class MiscTools {
                 if (node.getRenamingTable() != null) {
                     for (RenamingTable rt : node.getRenamingTable()) {
                         ProgramVariable renamedVar = (ProgramVariable) rt.getRenaming(originalVar);
-                        if (renamedVar != null || !node.getLocalProgVars().contains(originalVar)) { return renamedVar; }
+                        if (renamedVar != null || !node.getLocalProgVars().contains(originalVar)) {
+                            return renamedVar;
+                        }
                     }
                 }
                 node = node.parent();
@@ -615,7 +631,9 @@ public final class MiscTools {
         @Override
         protected void doDefaultAction(SourceElement node) {
             if (node instanceof LocationVariable pv) {
-                if (!pv.isMember() && !declaredPVs.contains(pv)) { result = result.add(pv); }
+                if (!pv.isMember() && !declaredPVs.contains(pv)) {
+                    result = result.add(pv);
+                }
             } else if (node instanceof VariableSpecification vs) {
                 var pv = (LocationVariable) vs.getProgramVariable();
                 if (!pv.isMember()) {
@@ -653,7 +671,9 @@ public final class MiscTools {
             if (node instanceof Assignment) {
                 ProgramElement lhs = ((Assignment) node).getChildAt(0);
                 if (lhs instanceof LocationVariable pv) {
-                    if (!pv.isMember() && !declaredPVs.contains(pv)) { writtenPVs = writtenPVs.add(pv); }
+                    if (!pv.isMember() && !declaredPVs.contains(pv)) {
+                        writtenPVs = writtenPVs.add(pv);
+                    }
                 }
             } else if (node instanceof VariableSpecification vs) {
                 var pv = (LocationVariable) vs.getProgramVariable();
@@ -698,14 +718,20 @@ public final class MiscTools {
         StringBuilder sb = new StringBuilder();
         byte[] buffer = new byte[2048];
         int read;
-        while ((read = is.read(buffer)) > 0) { sb.append(new String(buffer, 0, read, StandardCharsets.UTF_8)); }
+        while ((read = is.read(buffer)) > 0) {
+            sb.append(new String(buffer, 0, read, StandardCharsets.UTF_8));
+        }
         return sb.toString();
     }
 
     public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
             ImmutableList<Term> localOuts) {
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (Term localIn : localIns) { if (!localOuts.contains(localIn)) { result = result.append(localIn); } }
+        for (Term localIn : localIns) {
+            if (!localOuts.contains(localIn)) {
+                result = result.append(localIn);
+            }
+        }
         return result;
     }
 
@@ -789,7 +815,9 @@ public final class MiscTools {
     }
 
     public static @Nullable URI getURIFromTokenSource(String source) {
-        if (IntStream.UNKNOWN_SOURCE_NAME.equals(source)) { return null; }
+        if (IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
+            return null;
+        }
 
         try {
             URI uri = new URI(source);
@@ -836,7 +864,9 @@ public final class MiscTools {
      *         protocol or illegal format
      */
     public static URL parseURL(final String input) throws MalformedURLException {
-        if (input == null) { throw new NullPointerException("No URL can be created from null!"); }
+        if (input == null) {
+            throw new NullPointerException("No URL can be created from null!");
+        }
 
         String scheme = "";
         String schemeSpecPart = "";

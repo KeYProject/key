@@ -70,7 +70,9 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode {
     /** returns the upper most task this basic task belongs to. */
     public TaskTreeNode getRootTask() {
         TaskTreeNode tn = this;
-        while (!(tn.getParent() instanceof EnvNode)) { tn = (TaskTreeNode) tn.getParent(); }
+        while (!(tn.getParent() instanceof EnvNode)) {
+            tn = (TaskTreeNode) tn.getParent();
+        }
         return tn;
     }
 

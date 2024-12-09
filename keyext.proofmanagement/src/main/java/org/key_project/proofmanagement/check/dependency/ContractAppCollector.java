@@ -139,7 +139,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
             if (classType == null) {
                 // still no hit -> critical error
                 throw new NullPointerException("KeYJavaType still is null for class with name "
-                        + className);
+                    + className);
             }
         }
 
@@ -200,7 +200,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
             // in default case (e.g. legacy proofs without saved modality information)
             // we assume diamond modality but print a warning
             logger.print(LogLevel.WARNING, "No saved modality information was found!" +
-                    " Assuming \"diamond\" (incomplete for box contracts)!");
+                " Assuming \"diamond\" (incomplete for box contracts)!");
             edgeType = TERMINATION_SENSITIVE;
         } else if (modalityKind.terminationSensitive()) {
             edgeType = TERMINATION_SENSITIVE;
@@ -212,7 +212,9 @@ public class ContractAppCollector extends NodeIntermediateWalker {
             // if an application of this contract has already been found, we update only if the
             // more recently found termination type is stronger
             DependencyGraph.EdgeType current = result.get(contract.getName());
-            if (current == null || current == TERMINATION_INSENSITIVE) { result.put(contract.getName(), edgeType); }
+            if (current == null || current == TERMINATION_INSENSITIVE) {
+                result.put(contract.getName(), edgeType);
+            }
         }
     }
 }

@@ -32,6 +32,8 @@ public class ScriptLineParserTest {
 
         ScriptLineParser mlp = new ScriptLineParser(new StringReader(arg), null);
         ScriptLineParser.ParsedCommand command;
-        while ((command = mlp.parseCommand()) != null) { LOGGER.info(String.valueOf(command.args())); }
+        while ((command = mlp.parseCommand()) != null) {
+            LOGGER.info(String.valueOf(command.args()));
+        }
     }
 }

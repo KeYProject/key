@@ -301,7 +301,9 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ElementWrapper<?> other) { return key.equalsModProperty(other.key, property); }
+            if (obj instanceof ElementWrapper<?> other) {
+                return key.equalsModProperty(other.key, property);
+            }
             return false;
         }
 

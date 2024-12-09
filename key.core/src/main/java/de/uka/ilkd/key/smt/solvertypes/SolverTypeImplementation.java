@@ -264,7 +264,7 @@ public final class SolverTypeImplementation implements SolverType {
                 | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.warn(
                 String.format("Using default ModularSMTLib2Translator for SMT translation due to"
-                        + " exception: %n %s",
+                    + " exception: %n %s",
                     e.getMessage()));
             return new ModularSMTLib2Translator();
         }
@@ -283,10 +283,14 @@ public final class SolverTypeImplementation implements SolverType {
      */
     public static boolean isInstalled(@Nullable String cmd) {
 
-        if (cmd == null || cmd.isEmpty()) { return false; }
+        if (cmd == null || cmd.isEmpty()) {
+            return false;
+        }
         try {
             Path cmdPath = Paths.get(cmd);
-            if (cmdPath.isAbsolute()) { return checkPath(cmdPath); }
+            if (cmdPath.isAbsolute()) {
+                return checkPath(cmdPath);
+            }
             return checkEnvVariable(cmd + getOSDefaultExtension());
 
         } catch (InvalidPathException e) {
@@ -305,7 +309,9 @@ public final class SolverTypeImplementation implements SolverType {
             Path parentPath = Paths.get(parent);
             Path childPath = Paths.get(cmd);
             Path completePath = parentPath.resolve(childPath);
-            if (checkPath(completePath)) { return true; }
+            if (checkPath(completePath)) {
+                return true;
+            }
         }
 
         return false;
@@ -318,9 +324,13 @@ public final class SolverTypeImplementation implements SolverType {
         final String linuxDefaultExt = "";
         final String maxDefaultExt = "";
 
-        if (osIsWindows()) { return windowsDefaultExt; }
+        if (osIsWindows()) {
+            return windowsDefaultExt;
+        }
 
-        if (osIsLinux()) { return linuxDefaultExt; }
+        if (osIsLinux()) {
+            return linuxDefaultExt;
+        }
         return maxDefaultExt;
     }
 
@@ -353,7 +363,9 @@ public final class SolverTypeImplementation implements SolverType {
             String cmd = getSolverCommand();
 
             isInstalled = isInstalled(cmd);
-            if (isInstalled) { installWasChecked = true; }
+            if (isInstalled) {
+                installWasChecked = true;
+            }
 
         }
         return isInstalled;
@@ -446,7 +458,9 @@ public final class SolverTypeImplementation implements SolverType {
         if (isInstalled(true)) {
             String version =
                 VersionChecker.INSTANCE.getVersionFor(getSolverCommand(), getVersionParameter());
-            if (version == null) { version = "unknown version"; }
+            if (version == null) {
+                version = "unknown version";
+            }
             return version;
         } else {
             return null;
@@ -455,7 +469,9 @@ public final class SolverTypeImplementation implements SolverType {
 
     @Override
     public boolean isSupportedVersion() {
-        if (!supportHasBeenChecked) { checkForSupport(); }
+        if (!supportHasBeenChecked) {
+            checkForSupport();
+        }
         return isSupportedVersion;
     }
 
@@ -472,7 +488,9 @@ public final class SolverTypeImplementation implements SolverType {
      */
     @Override
     public boolean checkForSupport() {
-        if (!isInstalled) { return false; }
+        if (!isInstalled) {
+            return false;
+        }
         supportHasBeenChecked = true;
         installedVersion = getRawVersion();
         if (installedVersion == null) {

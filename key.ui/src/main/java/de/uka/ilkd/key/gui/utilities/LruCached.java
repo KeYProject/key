@@ -38,7 +38,9 @@ public class LruCached<A, T> {
      */
     public T get(A args) {
         T value = lru.get(args);
-        if (value != null) { return value; }
+        if (value != null) {
+            return value;
+        }
         value = update.apply(args);
         lru.put(args, value);
         return value;

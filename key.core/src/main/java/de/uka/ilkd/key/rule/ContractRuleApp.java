@@ -56,7 +56,9 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 
     @Override
     public ContractRuleApp tryToInstantiate(Goal goal) {
-        if (complete()) { return this; }
+        if (complete()) {
+            return this;
+        }
         Services services = goal.proof().getServices();
         ImmutableSet<FunctionalOperationContract> contracts =
             UseOperationContractRule.getApplicableContracts(UseOperationContractRule
@@ -72,7 +74,9 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 
     @Override
     public ContractRuleApp forceInstantiate(Goal goal) {
-        if (complete()) { return this; }
+        if (complete()) {
+            return this;
+        }
         Services services = goal.proof().getServices();
         ImmutableSet<FunctionalOperationContract> contracts =
             UseOperationContractRule.getApplicableContracts(UseOperationContractRule
@@ -97,7 +101,9 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     }
 
     public Term programTerm() {
-        if (posInOccurrence() != null) { return TermBuilder.goBelowUpdates(posInOccurrence().subTerm()); }
+        if (posInOccurrence() != null) {
+            return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
+        }
         return null;
     }
 

@@ -113,7 +113,9 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                 if (value == null) {
                     // Get the number of executed set nodes on the current goal
                     Integer executedNumberOfSetNodes = executedNumberOfSetNodesPerGoal.get(goal);
-                    if (executedNumberOfSetNodes == null) { executedNumberOfSetNodes = 0; }
+                    if (executedNumberOfSetNodes == null) {
+                        executedNumberOfSetNodes = 0;
+                    }
                     // Check if limit of set nodes of the current goal is exceeded
                     if (executedNumberOfSetNodes
                             + 1 > maximalNumberOfSetNodesToExecutePerGoal) {
@@ -211,7 +213,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
             long startTime, int countApplied, Goal goal) {
         if (maximalNumberOfSetNodesToExecutePerGoal > 1) {
             return "Maximal limit of " + maximalNumberOfSetNodesToExecutePerGoal
-                    + " symbolic execution tree nodes reached.";
+                + " symbolic execution tree nodes reached.";
         } else {
             return "Maximal limit of one symbolic execution tree node reached.";
         }

@@ -68,7 +68,9 @@ public class InfFlowProofSymbols {
 
     private InfFlowProofSymbols getLabeledSymbols() {
         InfFlowProofSymbols symbols = new InfFlowProofSymbols();
-        if (!isFreshContract()) { symbols.useProofSymbols(); }
+        if (!isFreshContract()) {
+            symbols.useProofSymbols();
+        }
         symbols.sorts = getLabeledSorts();
         symbols.predicates = getLabeledPredicates();
         symbols.functions = getLabeledFunctions();
@@ -82,7 +84,9 @@ public class InfFlowProofSymbols {
         ImmutableSet<Pair<Sort, Boolean>> labeledSorts =
             DefaultImmutableSet.nil();
         for (Pair<Sort, Boolean> s : sorts) {
-            if (s.second) { labeledSorts = labeledSorts.add(new Pair<>(s.first, false)); }
+            if (s.second) {
+                labeledSorts = labeledSorts.add(new Pair<>(s.first, false));
+            }
         }
         return labeledSorts;
     }
@@ -91,8 +95,10 @@ public class InfFlowProofSymbols {
         ImmutableSet<Pair<Function, Boolean>> labeledPredicates =
             DefaultImmutableSet.nil();
         for (Pair<Function, Boolean> p : predicates) {
-            if (p.second) { labeledPredicates =
-                labeledPredicates.add(new Pair<>(p.first, false)); }
+            if (p.second) {
+                labeledPredicates =
+                    labeledPredicates.add(new Pair<>(p.first, false));
+            }
         }
         return labeledPredicates;
     }
@@ -101,8 +107,10 @@ public class InfFlowProofSymbols {
         ImmutableSet<Pair<Function, Boolean>> labeledFunctions =
             DefaultImmutableSet.nil();
         for (Pair<Function, Boolean> f : functions) {
-            if (f.second) { labeledFunctions =
-                labeledFunctions.add(new Pair<>(f.first, false)); }
+            if (f.second) {
+                labeledFunctions =
+                    labeledFunctions.add(new Pair<>(f.first, false));
+            }
         }
         return labeledFunctions;
     }
@@ -111,8 +119,10 @@ public class InfFlowProofSymbols {
         ImmutableSet<Pair<ProgramVariable, Boolean>> labeledProgramVariables =
             DefaultImmutableSet.nil();
         for (Pair<ProgramVariable, Boolean> pv : programVariables) {
-            if (pv.second) { labeledProgramVariables = labeledProgramVariables
-                    .add(new Pair<>(pv.first, false)); }
+            if (pv.second) {
+                labeledProgramVariables = labeledProgramVariables
+                        .add(new Pair<>(pv.first, false));
+            }
         }
         return labeledProgramVariables;
     }
@@ -121,8 +131,10 @@ public class InfFlowProofSymbols {
         ImmutableSet<Pair<SchemaVariable, Boolean>> labeledSchemaVariables =
             DefaultImmutableSet.nil();
         for (Pair<SchemaVariable, Boolean> sv : schemaVariables) {
-            if (sv.second) { labeledSchemaVariables =
-                labeledSchemaVariables.add(new Pair<>(sv.first, false)); }
+            if (sv.second) {
+                labeledSchemaVariables =
+                    labeledSchemaVariables.add(new Pair<>(sv.first, false));
+            }
         }
         return labeledSchemaVariables;
     }
@@ -131,7 +143,9 @@ public class InfFlowProofSymbols {
         ImmutableSet<Pair<Taclet, Boolean>> labeledTaclets =
             DefaultImmutableSet.nil();
         for (Pair<Taclet, Boolean> t : taclets) {
-            if (t.second) { labeledTaclets = labeledTaclets.add(new Pair<>(t.first, false)); }
+            if (t.second) {
+                labeledTaclets = labeledTaclets.add(new Pair<>(t.first, false));
+            }
         }
         return labeledTaclets;
     }
@@ -139,7 +153,11 @@ public class InfFlowProofSymbols {
     private boolean containsSort(Sort s) {
         ImmutableSet<Pair<Sort, Boolean>> ps = DefaultImmutableSet.<Pair<Sort, Boolean>>nil()
                 .add(new Pair<>(s, true)).add(new Pair<>(s, false));
-        for (Pair<Sort, Boolean> p : sorts) { if (ps.contains(p)) { return true; } }
+        for (Pair<Sort, Boolean> p : sorts) {
+            if (ps.contains(p)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -151,7 +169,11 @@ public class InfFlowProofSymbols {
                 && !f.name().toString().startsWith("EXECUTION_OF")) {
             return false;
         }
-        for (Pair<Function, Boolean> p : predicates) { if (ps.contains(p)) { return true; } }
+        for (Pair<Function, Boolean> p : predicates) {
+            if (ps.contains(p)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -159,7 +181,11 @@ public class InfFlowProofSymbols {
         ImmutableSet<Pair<Function, Boolean>> ps = DefaultImmutableSet
                 .<Pair<Function, Boolean>>nil().add(new Pair<>(f, true))
                 .add(new Pair<>(f, false));
-        for (Pair<Function, Boolean> p : functions) { if (ps.contains(p)) { return true; } }
+        for (Pair<Function, Boolean> p : functions) {
+            if (ps.contains(p)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -168,7 +194,11 @@ public class InfFlowProofSymbols {
             DefaultImmutableSet.<Pair<ProgramVariable, Boolean>>nil()
                     .add(new Pair<>(pv, true))
                     .add(new Pair<>(pv, false));
-        for (Pair<ProgramVariable, Boolean> p : programVariables) { if (ps.contains(p)) { return true; } }
+        for (Pair<ProgramVariable, Boolean> p : programVariables) {
+            if (ps.contains(p)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -177,23 +207,35 @@ public class InfFlowProofSymbols {
             DefaultImmutableSet.<Pair<SchemaVariable, Boolean>>nil()
                     .add(new Pair<>(sv, true))
                     .add(new Pair<>(sv, false));
-        for (Pair<SchemaVariable, Boolean> p : schemaVariables) { if (ps.contains(p)) { return true; } }
+        for (Pair<SchemaVariable, Boolean> p : schemaVariables) {
+            if (ps.contains(p)) {
+                return true;
+            }
+        }
         return false;
     }
 
     private boolean containsTaclet(Taclet t) {
         ImmutableSet<Pair<Taclet, Boolean>> ps = DefaultImmutableSet.<Pair<Taclet, Boolean>>nil()
                 .add(new Pair<>(t, true)).add(new Pair<>(t, false));
-        for (Pair<Taclet, Boolean> p : taclets) { if (ps.contains(p)) { return true; } }
+        for (Pair<Taclet, Boolean> p : taclets) {
+            if (ps.contains(p)) {
+                return true;
+            }
+        }
         return false;
     }
 
     private void addTaclet(Taclet t, boolean labeled) {
-        if (!containsTaclet(t)) { taclets = taclets.add(new Pair<>(t, !labeled)); }
+        if (!containsTaclet(t)) {
+            taclets = taclets.add(new Pair<>(t, !labeled));
+        }
     }
 
     private void addSort(Sort s, boolean labeled) {
-        if (!(s instanceof NullSort) && !containsSort(s)) { sorts = sorts.add(new Pair<>(s, !labeled)); }
+        if (!(s instanceof NullSort) && !containsSort(s)) {
+            sorts = sorts.add(new Pair<>(s, !labeled));
+        }
     }
 
     private boolean isPredicate(Operator f) {
@@ -203,11 +245,15 @@ public class InfFlowProofSymbols {
     }
 
     private void addPredicate(Function p, boolean labeled) {
-        if (!containsPredicate(p)) { predicates = predicates.add(new Pair<>(p, !labeled)); }
+        if (!containsPredicate(p)) {
+            predicates = predicates.add(new Pair<>(p, !labeled));
+        }
     }
 
     private void addFunction(Function f, boolean labeled) {
-        if (!containsFunction(f)) { functions = functions.add(new Pair<>(f, !labeled)); }
+        if (!containsFunction(f)) {
+            functions = functions.add(new Pair<>(f, !labeled));
+        }
     }
 
     private void addFunc(JFunction f, boolean labeled) {
@@ -219,12 +265,16 @@ public class InfFlowProofSymbols {
     }
 
     private void addSchemaVariable(SchemaVariable sv, boolean labeled) {
-        if (!containsSchemaVariable(sv)) { schemaVariables = schemaVariables.add(new Pair<>(sv, !labeled)); }
+        if (!containsSchemaVariable(sv)) {
+            schemaVariables = schemaVariables.add(new Pair<>(sv, !labeled));
+        }
     }
 
     private void addProgramVariable(ProgramVariable pv, boolean labeled) {
-        if (!containsProgramVariable(pv)) { programVariables =
-            programVariables.add(new Pair<>(pv, !labeled)); }
+        if (!containsProgramVariable(pv)) {
+            programVariables =
+                programVariables.add(new Pair<>(pv, !labeled));
+        }
     }
 
     public void useProofSymbols() {
@@ -239,7 +289,9 @@ public class InfFlowProofSymbols {
         Namespace<IProgramVariable> ns = services.getNamespaces().programVariables();
         IProgramVariable n = ns.lookup(s);
         int i = 0;
-        while (n == null && i < 1000) { n = ns.lookup(s + "_" + i); }
+        while (n == null && i < 1000) {
+            n = ns.lookup(s + "_" + i);
+        }
         assert n instanceof ProgramVariable;
         return (ProgramVariable) n;
     }
@@ -256,42 +308,74 @@ public class InfFlowProofSymbols {
             final SortedOperator s = (SortedOperator) symb;
             addSort(s.sort(), l);
         }
-        if (symb instanceof JFunction f) { addFunc(f, l); }
-        if (symb instanceof ProgramVariable pv) { addProgramVariable(pv, l); }
-        if (symb instanceof SchemaVariable sv) { addSchemaVariable(sv, l); }
-        if (symb instanceof Taclet t) { addTaclet(t, l); }
+        if (symb instanceof JFunction f) {
+            addFunc(f, l);
+        }
+        if (symb instanceof ProgramVariable pv) {
+            addProgramVariable(pv, l);
+        }
+        if (symb instanceof SchemaVariable sv) {
+            addSchemaVariable(sv, l);
+        }
+        if (symb instanceof Taclet t) {
+            addTaclet(t, l);
+        }
     }
 
     public void addLabeled(Named symb) {
         assert symb != null;
         boolean l = true;
 
-        if (symb instanceof Sort sort) { addSort(sort, l); }
-        if (symb instanceof SortedOperator op) { addSort(op.sort(), l); }
-        if (symb instanceof JFunction f) { addFunc(f, l); }
-        if (symb instanceof ProgramVariable pv) { addProgramVariable(pv, l); }
-        if (symb instanceof SchemaVariable sv) { addSchemaVariable(sv, l); }
-        if (symb instanceof Taclet t) { addTaclet(t, l); }
+        if (symb instanceof Sort sort) {
+            addSort(sort, l);
+        }
+        if (symb instanceof SortedOperator op) {
+            addSort(op.sort(), l);
+        }
+        if (symb instanceof JFunction f) {
+            addFunc(f, l);
+        }
+        if (symb instanceof ProgramVariable pv) {
+            addProgramVariable(pv, l);
+        }
+        if (symb instanceof SchemaVariable sv) {
+            addSchemaVariable(sv, l);
+        }
+        if (symb instanceof Taclet t) {
+            addTaclet(t, l);
+        }
     }
 
     public void add(Term t) {
         assert t != null;
         t = TermBuilder.goBelowUpdates(t);
-        if (!isPredicate(t.op())) { if (t.arity() > 0) { for (final Term s : t.subs()) { add(s); } } }
+        if (!isPredicate(t.op())) {
+            if (t.arity() > 0) {
+                for (final Term s : t.subs()) {
+                    add(s);
+                }
+            }
+        }
         add(t.op());
     }
 
     public void addLabeled(Term t) {
         assert t != null;
         t = TermBuilder.goBelowUpdates(t);
-        if (t.arity() > 0) { for (final Term s : t.subs()) { addLabeled(s); } }
+        if (t.arity() > 0) {
+            for (final Term s : t.subs()) {
+                addLabeled(s);
+            }
+        }
         addLabeled(t.op());
     }
 
     public InfFlowProofSymbols union(InfFlowProofSymbols symbols) {
         assert symbols != null;
         InfFlowProofSymbols result = new InfFlowProofSymbols();
-        if (!isFreshContract() || !symbols.isFreshContract()) { result.useProofSymbols(); }
+        if (!isFreshContract() || !symbols.isFreshContract()) {
+            result.useProofSymbols();
+        }
         result.sorts = sorts.union(symbols.sorts);
         result.predicates = predicates.union(symbols.predicates);
         result.functions = functions.union(symbols.functions);
@@ -305,7 +389,9 @@ public class InfFlowProofSymbols {
         assert symbols != null;
         symbols = symbols.getLabeledSymbols();
         InfFlowProofSymbols result = new InfFlowProofSymbols();
-        if (!isFreshContract() || !symbols.isFreshContract()) { result.useProofSymbols(); }
+        if (!isFreshContract() || !symbols.isFreshContract()) {
+            result.useProofSymbols();
+        }
         result.sorts = sorts.union(symbols.sorts);
         result.predicates = predicates.union(symbols.predicates);
         result.functions = functions.union(symbols.functions);
@@ -321,9 +407,15 @@ public class InfFlowProofSymbols {
             addTotalTerm(UpdateApplication.getUpdate(t));
             addTotalTerm(UpdateApplication.getTarget(t));
         }
-        if (t.op() instanceof ElementaryUpdate) { add(((ElementaryUpdate) t.op()).lhs()); }
+        if (t.op() instanceof ElementaryUpdate) {
+            add(((ElementaryUpdate) t.op()).lhs());
+        }
         t = TermBuilder.goBelowUpdates(t);
-        if (t.arity() > 0) { for (final Term s : t.subs()) { addTotalTerm(s); } }
+        if (t.arity() > 0) {
+            for (final Term s : t.subs()) {
+                addTotalTerm(s);
+            }
+        }
         add(t.op());
     }
 
@@ -333,15 +425,23 @@ public class InfFlowProofSymbols {
             addLabeledTotalTerm(UpdateApplication.getUpdate(t));
             addLabeledTotalTerm(UpdateApplication.getTarget(t));
         }
-        if (t.op() instanceof ElementaryUpdate) { addLabeled(((ElementaryUpdate) t.op()).lhs()); }
+        if (t.op() instanceof ElementaryUpdate) {
+            addLabeled(((ElementaryUpdate) t.op()).lhs());
+        }
         t = TermBuilder.goBelowUpdates(t);
-        if (t.arity() > 0) { for (final Term s : t.subs()) { addLabeledTotalTerm(s); } }
+        if (t.arity() > 0) {
+            for (final Term s : t.subs()) {
+                addLabeledTotalTerm(s);
+            }
+        }
         addLabeled(t.op());
     }
 
     private ImmutableSet<Sort> getSorts() {
         ImmutableSet<Sort> sorts = DefaultImmutableSet.nil();
-        for (Pair<Sort, Boolean> s : this.sorts) { sorts = sorts.add(s.first); }
+        for (Pair<Sort, Boolean> s : this.sorts) {
+            sorts = sorts.add(s.first);
+        }
         return sorts;
     }
 
@@ -357,15 +457,21 @@ public class InfFlowProofSymbols {
             }
             if (!added) {
                 sortContainers.add(new TreeSet<>((s1, s2) -> {
-                    if (s1.extendsTrans(s2)) { return 1; }
-                    if (s2.extendsTrans(s1)) { return -1; }
+                    if (s1.extendsTrans(s2)) {
+                        return 1;
+                    }
+                    if (s2.extendsTrans(s1)) {
+                        return -1;
+                    }
                     return 0;
                 }));
                 sortContainers.getLast().add(sort);
             }
         }
         LinkedList<Sort> sorts = new LinkedList<>();
-        for (final TreeSet<Sort> container : sortContainers) { sorts.addAll(container); }
+        for (final TreeSet<Sort> container : sortContainers) {
+            sorts.addAll(container);
+        }
         return sorts;
     }
 
@@ -376,13 +482,17 @@ public class InfFlowProofSymbols {
 
     private ImmutableSet<Function> getPredicates() {
         ImmutableSet<Function> predicates = DefaultImmutableSet.nil();
-        for (Pair<Function, Boolean> p : this.predicates) { predicates = predicates.add(p.first); }
+        for (Pair<Function, Boolean> p : this.predicates) {
+            predicates = predicates.add(p.first);
+        }
         return predicates;
     }
 
     private ImmutableSet<Function> getFunctions() {
         ImmutableSet<Function> functions = DefaultImmutableSet.nil();
-        for (Pair<Function, Boolean> f : this.functions) { functions = functions.add(f.first); }
+        for (Pair<Function, Boolean> f : this.functions) {
+            functions = functions.add(f.first);
+        }
         return functions;
     }
 
@@ -404,7 +514,9 @@ public class InfFlowProofSymbols {
 
     private ImmutableSet<Taclet> getTaclets() {
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
-        for (Pair<Taclet, Boolean> t : this.taclets) { taclets = taclets.add(t.first); }
+        for (Pair<Taclet, Boolean> t : this.taclets) {
+            taclets = taclets.add(t.first);
+        }
         return taclets;
     }
 
@@ -413,7 +525,9 @@ public class InfFlowProofSymbols {
     }
 
     private void printSorts(StringBuilder result) {
-        if (getSorts().isEmpty()) { return; }
+        if (getSorts().isEmpty()) {
+            return;
+        }
 
         result.append("\\sorts{\n");
         LinkedList<Sort> sortsList = ensureRightOrderOfSorts(getSorts());
@@ -453,15 +567,21 @@ public class InfFlowProofSymbols {
     }
 
     private void printPredicates(StringBuilder result) {
-        if (getPredicates().isEmpty()) { return; }
+        if (getPredicates().isEmpty()) {
+            return;
+        }
 
         result.append("\\predicates{\n");
-        for (final Function pred : getPredicates()) { printPredicate(result, pred); }
+        for (final Function pred : getPredicates()) {
+            printPredicate(result, pred);
+        }
         result.append("}\n\n");
     }
 
     private void printFunctions(StringBuilder result) {
-        if (getFunctions().isEmpty()) { return; }
+        if (getFunctions().isEmpty()) {
+            return;
+        }
 
         result.append("\\functions{\n");
         for (final Function f : getFunctions()) {
@@ -472,7 +592,9 @@ public class InfFlowProofSymbols {
     }
 
     private void printProgramVariables(StringBuilder result) {
-        if (getProgramVariables().isEmpty()) { return; }
+        if (getProgramVariables().isEmpty()) {
+            return;
+        }
 
         result.append("\\programVariables{\n");
         for (final ProgramVariable pv : getProgramVariables()) {
@@ -485,7 +607,9 @@ public class InfFlowProofSymbols {
 
     @SuppressWarnings("unused")
     private void printSchemaVariables(StringBuilder result) {
-        if (getSchemaVariables().isEmpty()) { return; }
+        if (getSchemaVariables().isEmpty()) {
+            return;
+        }
 
         result.append("\\schemaVariables{\n");
         for (final SchemaVariable sv : getSchemaVariables()) {
@@ -502,7 +626,9 @@ public class InfFlowProofSymbols {
     }
 
     private void printTaclets(StringBuilder result) {
-        if (getTaclets().isEmpty()) { return; }
+        if (getTaclets().isEmpty()) {
+            return;
+        }
 
         result.append("\\rules{");
         for (final Taclet taclet : getTaclets()) {

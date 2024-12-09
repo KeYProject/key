@@ -70,7 +70,9 @@ public class CompoundStopCondition implements StopCondition {
     public int getMaximalWork(int maxApplications, long timeout, Proof proof) {
         // Get maximal work on each child because they might use this method for initialization
         // purpose.
-        for (StopCondition child : children) { child.getMaximalWork(maxApplications, timeout, proof); }
+        for (StopCondition child : children) {
+            child.getMaximalWork(maxApplications, timeout, proof);
+        }
         lastGoalAllowedChild = null;
         lastShouldStopChild = null;
         return 0;

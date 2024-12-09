@@ -50,7 +50,9 @@ public class ExitMainAction extends MainWindowAction {
         if (vs.confirmExit()) {
             final int option = JOptionPane.showConfirmDialog(mainWindow, "Really Quit?\n", "Exit",
                 JOptionPane.YES_NO_OPTION);
-            if (option == JOptionPane.YES_OPTION) { exitMainWithoutInteraction(); }
+            if (option == JOptionPane.YES_OPTION) {
+                exitMainWithoutInteraction();
+            }
         } else {
             exitMainWithoutInteraction();
         }

@@ -103,8 +103,12 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      */
     public String getDotExecutable() {
         String path = dotExecutable.get();
-        if (path != null) { return path; }
-        if (System.getProperty("os.name").startsWith("Windows")) { return "dot.exe"; }
+        if (path != null) {
+            return path;
+        }
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            return "dot.exe";
+        }
         return "dot";
     }
 

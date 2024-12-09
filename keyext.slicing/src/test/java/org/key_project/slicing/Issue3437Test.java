@@ -24,7 +24,8 @@ public class Issue3437Test {
         GeneralSettings.noPruningClosed = false;
 
         var file = new File(testCaseDirectory,
-            "issues/3437/Newnames(Newnames__createArray()).JML normal_behavior operation contract.0.proof").toPath();
+            "issues/3437/Newnames(Newnames__createArray()).JML normal_behavior operation contract.0.proof")
+                .toPath();
         var env = KeYEnvironment.load(file);
         var proof = env.getLoadedProof();
         var tracker = new DependencyTracker(proof);

@@ -66,8 +66,12 @@ public class PackageReference extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null) { result++; }
-        if (name != null) { result++; }
+        if (prefix != null) {
+            result++;
+        }
+        if (name != null) {
+            result++;
+        }
         return result;
     }
 
@@ -82,10 +86,16 @@ public class PackageReference extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0) { return prefix; }
+            if (index == 0) {
+                return prefix;
+            }
             index--;
         }
-        if (name != null) { if (index == 0) { return name; } }
+        if (name != null) {
+            if (index == 0) {
+                return name;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -142,8 +152,12 @@ public class PackageReference extends JavaNonTerminalProgramElement
     }
 
     public boolean equals(Object o) {
-        if (o == this) { return true; }
-        if (!(o instanceof PackageReference pr)) { return false; }
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof PackageReference pr)) {
+            return false;
+        }
         return pr.name.equals(name) && (pr.prefix == null && prefix == null
                 || pr.prefix != null && prefix != null && pr.prefix.equals(prefix));
     }

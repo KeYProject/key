@@ -44,7 +44,9 @@ public class SumProdHandler implements SMTHandler {
         Operator op = term.op();
         if (op == bsumOp) {
             for (Term t : usedBsumTerms.keySet()) {
-                if (t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) { return usedBsumTerms.get(t); }
+                if (t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
+                    return usedBsumTerms.get(t);
+                }
             }
             List<SExpr> exprs = new LinkedList<>();
             exprs.add(trans.translate(term.sub(0)));
@@ -56,7 +58,9 @@ public class SumProdHandler implements SMTHandler {
             return ret;
         } else if (op == bprodOp) {
             for (Term t : usedBprodTerms.keySet()) {
-                if (t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) { return usedBprodTerms.get(t); }
+                if (t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
+                    return usedBprodTerms.get(t);
+                }
             }
             List<SExpr> exprs = new LinkedList<>();
             exprs.add(trans.translate(term.sub(0)));

@@ -626,12 +626,12 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         String pres = getHtmlPres(baseHeap, heapLDT, services);
         String posts = getHtmlPosts(baseHeap, heapLDT, services);
         return "<html>" + "<i>" + LogicPrinter.escapeHTML(stringBuilder.toString(), false) + "</i>"
-                + pres + posts + modifiables + "<br><b>termination</b> " + getModalityKind()
-                /*
-                 * + (transactionApplicableContract() ? "<br><b>transactionApplicable applicable</b>" :
-                 * "")
-                 */
-                + "</html>";
+            + pres + posts + modifiables + "<br><b>termination</b> " + getModalityKind()
+            /*
+             * + (transactionApplicableContract() ? "<br><b>transactionApplicable applicable</b>" :
+             * "")
+             */
+            + "</html>";
     }
 
     @Override
@@ -678,7 +678,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        } else if (obj == null || getClass() != obj.getClass()) { return false; }
+        } else if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
         AbstractAuxiliaryContractImpl other = (AbstractAuxiliaryContractImpl) obj;
         if ((block == null && other.block != null)
                 || (block != null && !block.equals(other.block))) {
@@ -1204,7 +1206,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             final Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 // Add JML precondition to precondition
-                if (requires.get(heap) != null) { result.put(heap, convertToFormula(requires.get(heap))); }
+                if (requires.get(heap) != null) {
+                    result.put(heap, convertToFormula(requires.get(heap)));
+                }
 
                 // Add measured by term to precondition
                 Term old = result.get(heap);
@@ -1238,7 +1242,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 // (FIXME: a bit hacky for now, but works)
                 if (old == null && (infFlowSpecs == null || infFlowSpecs.size() <= 0)) {
                     result.put(heap, mbyTerm);
-                } else if (infFlowSpecs == null || infFlowSpecs.size() <= 0) { result.put(heap, and(mbyTerm, old)); }
+                } else if (infFlowSpecs == null || infFlowSpecs.size() <= 0) {
+                    result.put(heap, and(mbyTerm, old));
+                }
             }
             return result;
         }
@@ -1251,7 +1257,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             final Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 // Add JML precondition to precondition
-                if (requiresFree.get(heap) != null) { result.put(heap, convertToFormula(requiresFree.get(heap))); }
+                if (requiresFree.get(heap) != null) {
+                    result.put(heap, convertToFormula(requiresFree.get(heap)));
+                }
             }
             return result;
         }
@@ -1264,7 +1272,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             final Map<LocationVariable, Term> postconditions =
                 new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
-                if (ensures.get(heap) != null) { postconditions.put(heap, buildPostcondition(heap)); }
+                if (ensures.get(heap) != null) {
+                    postconditions.put(heap, buildPostcondition(heap));
+                }
             }
             return postconditions;
         }
@@ -1277,7 +1287,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             final Map<LocationVariable, Term> freePostconditions =
                 new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
-                if (ensuresFree.get(heap) != null) { freePostconditions.put(heap, buildFreePostcondition(heap)); }
+                if (ensuresFree.get(heap) != null) {
+                    freePostconditions.put(heap, buildFreePostcondition(heap));
+                }
             }
             return freePostconditions;
         }
@@ -1467,7 +1479,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private Term buildAbruptTerminationCondition(final Map<Label, LocationVariable> flags) {
             Term result = ff();
-            for (Label label : flags.keySet()) { result = or(result, buildFlagIsCondition(flags.get(label), TRUE())); }
+            for (Label label : flags.keySet()) {
+                result = or(result, buildFlagIsCondition(flags.get(label), TRUE()));
+            }
             return result;
         }
 
@@ -1481,7 +1495,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private Term buildFlagIsCondition(final LocationVariable flag, final Term truth) {
             Term result = tt();
-            if (flag != null) { result = equals(var(flag), truth); }
+            if (flag != null) {
+                result = equals(var(flag), truth);
+            }
             return result;
         }
 

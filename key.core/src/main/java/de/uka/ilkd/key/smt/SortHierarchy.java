@@ -51,7 +51,9 @@ class SortWrapper {
     void computeParentSorts(LinkedList<SortWrapper> sorts, boolean explicitNullHierarchy,
             boolean explicitHierarchy, Services services) {
         for (SortWrapper sw : sorts) {
-            if (this.extendsTrans(sw)) { addParent(sw, explicitNullHierarchy, explicitHierarchy, services); }
+            if (this.extendsTrans(sw)) {
+                addParent(sw, explicitNullHierarchy, explicitHierarchy, services);
+            }
         }
     }
 
@@ -73,7 +75,9 @@ class SortWrapper {
 
         for (SortWrapper sw : parentSorts) {
             // only add the sort as parent, if it is a direct super sort.
-            if (sw.extendsTrans(parent)) { return false; }
+            if (sw.extendsTrans(parent)) {
+                return false;
+            }
         }
         parentSorts.add(parent);
 

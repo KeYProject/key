@@ -72,7 +72,9 @@ public class OriginTermLabel implements TermLabel {
      * @return the term's origin, or the origin of one of its parents.
      */
     public static Origin getOrigin(PosInSequent pis) {
-        if (pis == null) { return null; }
+        if (pis == null) {
+            return null;
+        }
 
         return getOrigin(pis.getPosInOccurrence());
     }
@@ -86,7 +88,9 @@ public class OriginTermLabel implements TermLabel {
      * @return the term's origin, or the origin of one of its parents.
      */
     public static Origin getOrigin(PosInOccurrence pio) {
-        if (pio == null) { return null; }
+        if (pio == null) {
+            return null;
+        }
 
         Term term = pio.subTerm();
 
@@ -285,7 +289,9 @@ public class OriginTermLabel implements TermLabel {
      * @return the transformed term.
      */
     public static Term removeOriginLabels(Term term, Services services) {
-        if (term == null) { return null; }
+        if (term == null) {
+            return null;
+        }
 
         List<TermLabel> labels = term.getLabels().toList();
         final TermLabel originTermLabel = term.getLabel(NAME);
@@ -293,9 +299,13 @@ public class OriginTermLabel implements TermLabel {
         final ImmutableArray<Term> oldSubs = term.subs();
         Term[] newSubs = new Term[oldSubs.size()];
 
-        if (originTermLabel != null) { labels.remove(originTermLabel); }
+        if (originTermLabel != null) {
+            labels.remove(originTermLabel);
+        }
 
-        for (int i = 0; i < newSubs.length; ++i) { newSubs[i] = removeOriginLabels(oldSubs.get(i), services); }
+        for (int i = 0; i < newSubs.length; ++i) {
+            newSubs[i] = removeOriginLabels(oldSubs.get(i), services);
+        }
 
         return tf.createTerm(term.op(), newSubs, term.boundVars(),
             new ImmutableArray<>(labels));
@@ -309,7 +319,9 @@ public class OriginTermLabel implements TermLabel {
      * @return the computed common origin
      */
     public static Origin computeCommonFileOrigin(final Set<FileOrigin> origins) {
-        if (origins.isEmpty()) { return new Origin(SpecType.NONE); }
+        if (origins.isEmpty()) {
+            return new Origin(SpecType.NONE);
+        }
 
         SpecType commonSpecType = null;
         URI commonFileName = null;
@@ -318,15 +330,21 @@ public class OriginTermLabel implements TermLabel {
         for (FileOrigin origin : origins) {
             if (commonSpecType == null) {
                 commonSpecType = origin.specType;
-            } else if (commonSpecType != origin.specType) { return new Origin(SpecType.NONE); }
+            } else if (commonSpecType != origin.specType) {
+                return new Origin(SpecType.NONE);
+            }
 
             if (commonFileName == null) {
                 commonFileName = origin.fileName;
-            } else if (!commonFileName.equals(origin.fileName)) { return new Origin(SpecType.NONE); }
+            } else if (!commonFileName.equals(origin.fileName)) {
+                return new Origin(SpecType.NONE);
+            }
 
             if (commonLine == -1) {
                 commonLine = origin.line;
-            } else if (commonLine != origin.line) { return new Origin(SpecType.NONE); }
+            } else if (commonLine != origin.line) {
+                return new Origin(SpecType.NONE);
+            }
         }
 
         if (commonFileName == null) {
@@ -345,7 +363,9 @@ public class OriginTermLabel implements TermLabel {
      * @return the computed common origin
      */
     public static Origin computeCommonNodeOrigin(final Set<NodeOrigin> origins) {
-        if (origins.isEmpty()) { return new Origin(SpecType.NONE); }
+        if (origins.isEmpty()) {
+            return new Origin(SpecType.NONE);
+        }
 
         SpecType commonSpecType = SpecType.NONE;
         String commonRuleName = null;
@@ -354,15 +374,21 @@ public class OriginTermLabel implements TermLabel {
         for (NodeOrigin origin : origins) {
             if (commonSpecType == null) {
                 commonSpecType = origin.specType;
-            } else if (commonSpecType != origin.specType) { return new Origin(SpecType.NONE); }
+            } else if (commonSpecType != origin.specType) {
+                return new Origin(SpecType.NONE);
+            }
 
             if (commonRuleName == null) {
                 commonRuleName = origin.ruleName;
-            } else if (!commonRuleName.equals(origin.ruleName)) { return new Origin(SpecType.NONE); }
+            } else if (!commonRuleName.equals(origin.ruleName)) {
+                return new Origin(SpecType.NONE);
+            }
 
             if (commonNr == -1) {
                 commonNr = origin.nodeNr;
-            } else if (commonNr != origin.nodeNr) { return new Origin(SpecType.NONE); }
+            } else if (commonNr != origin.nodeNr) {
+                return new Origin(SpecType.NONE);
+            }
         }
 
         return new NodeOrigin(commonSpecType, commonRuleName, commonNr);
@@ -377,12 +403,18 @@ public class OriginTermLabel implements TermLabel {
      */
     @SuppressWarnings("unchecked")
     public static Origin computeCommonOrigin(final Set<? extends Origin> origins) {
-        if (origins.isEmpty()) { return new Origin(SpecType.NONE); }
+        if (origins.isEmpty()) {
+            return new Origin(SpecType.NONE);
+        }
 
         Iterator<? extends Origin> it = origins.iterator();
         Class<? extends Origin> clazz = it.next().getClass();
 
-        while (it.hasNext()) { if (!it.next().getClass().equals(clazz)) { return new Origin(SpecType.NONE); } }
+        while (it.hasNext()) {
+            if (!it.next().getClass().equals(clazz)) {
+                return new Origin(SpecType.NONE);
+            }
+        }
 
         if (clazz.equals(FileOrigin.class)) {
             return computeCommonFileOrigin((Set<FileOrigin>) origins);
@@ -394,7 +426,9 @@ public class OriginTermLabel implements TermLabel {
             for (Origin origin : origins) {
                 if (commonSpecType == SpecType.NONE) {
                     commonSpecType = origin.specType;
-                } else if (commonSpecType != origin.specType) { return new Origin(SpecType.NONE); }
+                } else if (commonSpecType != origin.specType) {
+                    return new Origin(SpecType.NONE);
+                }
             }
 
             return new Origin(commonSpecType);
@@ -412,7 +446,9 @@ public class OriginTermLabel implements TermLabel {
      * @return the transformed term.
      */
     public static Term collectSubtermOrigins(Term term, Services services) {
-        if (!canAddLabel(term, services)) { return term; }
+        if (!canAddLabel(term, services)) {
+            return term;
+        }
 
         SubTermOriginData newSubs = getSubTermOriginData(term.subs(), services);
         final ImmutableArray<TermLabel> labels =
@@ -643,11 +679,19 @@ public class OriginTermLabel implements TermLabel {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) { return true; }
-            if (!super.equals(obj)) { return false; }
-            if (getClass() != obj.getClass()) { return false; }
+            if (this == obj) {
+                return true;
+            }
+            if (!super.equals(obj)) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
             NodeOrigin other = (NodeOrigin) obj;
-            if (nodeNr != other.nodeNr) { return false; }
+            if (nodeNr != other.nodeNr) {
+                return false;
+            }
             if (ruleName == null) {
                 return other.ruleName == null;
             } else {
@@ -731,13 +775,23 @@ public class OriginTermLabel implements TermLabel {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) { return true; }
-            if (!super.equals(obj)) { return false; }
-            if (getClass() != obj.getClass()) { return false; }
+            if (this == obj) {
+                return true;
+            }
+            if (!super.equals(obj)) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
             FileOrigin other = (FileOrigin) obj;
             if (fileName == null) {
-                if (other.fileName != null) { return false; }
-            } else if (!fileName.equals(other.fileName)) { return false; }
+                if (other.fileName != null) {
+                    return false;
+                }
+            } else if (!fileName.equals(other.fileName)) {
+                return false;
+            }
             return line == other.line;
         }
     }

@@ -34,16 +34,22 @@ public class LoopVariantCondition implements VariableCondition {
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
-        if (svInst.getInstantiation(variantSV) != null) { return matchCond; }
+        if (svInst.getInstantiation(variantSV) != null) {
+            return matchCond;
+        }
 
         final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
         final LoopSpecification loopSpec = services.getSpecificationRepository().getLoopSpec(loop);
 
-        if (loopSpec == null) { return null; }
+        if (loopSpec == null) {
+            return null;
+        }
         final Term variant = loopSpec.getVariant(loopSpec.getInternalSelfTerm(),
             loopSpec.getInternalAtPres(), services);
 
-        if (variant == null) { return null; }
+        if (variant == null) {
+            return null;
+        }
 
         return matchCond.setInstantiations(//
             svInst.add(variantSV, variant, services));

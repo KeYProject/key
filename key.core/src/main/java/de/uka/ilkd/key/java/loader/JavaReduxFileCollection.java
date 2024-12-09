@@ -76,13 +76,17 @@ public class JavaReduxFileCollection implements FileCollection {
         URL jlURL =
             KeYResourceManager.getManager().getResourceFile(JavaService.class, resourceString);
 
-        if (jlURL == null) { throw new FileNotFoundException("Resource " + resourceString + " cannot be opened."); }
+        if (jlURL == null) {
+            throw new FileNotFoundException("Resource " + resourceString + " cannot be opened.");
+        }
 
         try (final BufferedReader r =
             new BufferedReader(new InputStreamReader(jlURL.openStream(), StandardCharsets.UTF_8))) {
             for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
                 // ignore comments and empty lines
-                if ((jl.length() == 0) || (jl.charAt(0) == '#')) { continue; }
+                if ((jl.length() == 0) || (jl.charAt(0) == '#')) {
+                    continue;
+                }
                 resources.add(jl);
             }
         }
@@ -160,7 +164,9 @@ public class JavaReduxFileCollection implements FileCollection {
         }
 
         public InputStream openCurrent() throws IOException, NoSuchElementException {
-            if (current == null) { throw new NoSuchElementException(); }
+            if (current == null) {
+                throw new NoSuchElementException();
+            }
 
             if (currentURL == null) {
                 throw new FileNotFoundException("cannot find " + resourceLocation + "/" + current);

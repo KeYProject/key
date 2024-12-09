@@ -158,14 +158,18 @@ public class KeYFile implements EnvInput {
 
     protected InputStream getNewStream() throws FileNotFoundException {
         close();
-        if (!file.isAvailable()) { throw new FileNotFoundException("File/Resource " + file + " not found."); }
+        if (!file.isAvailable()) {
+            throw new FileNotFoundException("File/Resource " + file + " not found.");
+        }
         // open a stream to the file (via FileRepo if possible)
         InputStream input = null;
         try {
             if (fileRepo != null) {
                 input = fileRepo.getInputStream(file);
                 // fallback (e.g. used for *.proof.gz files)
-                if (input == null) { input = file.getNewStream(); }
+                if (input == null) {
+                    input = file.getNewStream();
+                }
             } else {
                 input = file.getNewStream();
             }
@@ -196,7 +200,9 @@ public class KeYFile implements EnvInput {
     }
 
     public ProofSettings readPreferences() {
-        if (file.isDirectory()) { return null; }
+        if (file.isDirectory()) {
+            return null;
+        }
         KeyAst.File ctx = getParseContext();
         return ctx.findProofSettings();
     }
@@ -238,7 +244,9 @@ public class KeYFile implements EnvInput {
         @NonNull
         ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
-        if (bootClassPath == null) { return null; }
+        if (bootClassPath == null) {
+            return null;
+        }
         Path bootClassPathFile = Path.of(bootClassPath);
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
@@ -269,7 +277,9 @@ public class KeYFile implements EnvInput {
                 fileList.add(null);
             } else {
                 var f = Path.of(cp);
-                if (!f.isAbsolute()) { f = parentDirectory.resolve(cp); }
+                if (!f.isAbsolute()) {
+                    f = parentDirectory.resolve(cp);
+                }
                 fileList.add(f);
             }
         }
@@ -313,7 +323,9 @@ public class KeYFile implements EnvInput {
      * @return list of parser warnings
      */
     public ImmutableSet<PositionedString> readExtendedSignature() {
-        if (initConfig == null) { throw new IllegalStateException("KeYFile: InitConfig not set."); }
+        if (initConfig == null) {
+            throw new IllegalStateException("KeYFile: InitConfig not set.");
+        }
         // read .key file
         ChoiceInformation ci = getParseContext().getChoices();
         initConfig.addCategory2DefaultChoices(ci.getDefaultOptions());
@@ -374,7 +386,9 @@ public class KeYFile implements EnvInput {
      * @return warnings during the interpretation of the AST constructs
      */
     public List<PositionedString> readFuncAndPred() {
-        if (file == null) { return null; }
+        if (file == null) {
+            return null;
+        }
         LOGGER.debug("Activate functions and predicates of {}", file);
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
@@ -447,7 +461,9 @@ public class KeYFile implements EnvInput {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || o.getClass() != this.getClass()) { return false; }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
         KeYFile kf = (KeYFile) o;
         return kf.file.getExternalForm().equals(file.getExternalForm());
 
@@ -457,7 +473,9 @@ public class KeYFile implements EnvInput {
     @Override
     public int hashCode() {
         final String externalForm = file.getExternalForm();
-        if (externalForm == null) { return -1; }
+        if (externalForm == null) {
+            return -1;
+        }
         return externalForm.hashCode();
     }
 

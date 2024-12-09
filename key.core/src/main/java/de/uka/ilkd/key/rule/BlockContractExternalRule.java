@@ -249,7 +249,9 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
 
         final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
                 .getInitConfig().getJustifInfo().getJustification(this);
-        for (Contract c : contract.getFunctionalContracts()) { cjust.add(application, new RuleJustificationBySpec(c)); }
+        for (Contract c : contract.getFunctionalContracts()) {
+            cjust.add(application, new RuleJustificationBySpec(c));
+        }
 
         return result;
     }

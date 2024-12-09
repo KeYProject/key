@@ -17,7 +17,7 @@ public class MinimizeInteraction extends KeYMenuCheckBox {
     public static final String NAME = "Minimize Interaction";
     public static final String TOOL_TIP =
         "If not ticked, applying a taclet manually will require you to instantiate " +
-                "all schema variables.";
+            "all schema variables.";
 
     /**
      *

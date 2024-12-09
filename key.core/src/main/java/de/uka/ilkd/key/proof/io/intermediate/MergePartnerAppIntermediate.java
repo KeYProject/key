@@ -37,7 +37,8 @@ public class MergePartnerAppIntermediate extends BuiltInAppIntermediate {
         super(ruleName, pos, null, null, null, newNames);
 
         assert ruleName.equals(CloseAfterMerge.INSTANCE.name()
-                .toString()) : "Check if something should be changed when implementing a new rule for merge partners.";
+                .toString())
+                : "Check if something should be changed when implementing a new rule for merge partners.";
 
         this.mergeNodeId = mergeNodeId;
     }

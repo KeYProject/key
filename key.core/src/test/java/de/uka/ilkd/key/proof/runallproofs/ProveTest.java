@@ -10,7 +10,7 @@ import java.util.List;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -103,18 +103,20 @@ public class ProveTest {
         try {
             LOGGER.info("({}) Start proving", caseId);
             // Initialize KeY environment and load proof.
-            Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair =
+            Pair<KeYEnvironment<DefaultUserInterfaceControl>, ProofScriptEntry> pair =
                 load(keyFile);
             LOGGER.info("({}) Proving done", caseId);
 
             env = pair.first;
-            Pair<String, Location> script = pair.second;
+            ProofScriptEntry script = pair.second;
             loadedProof = env.getLoadedProof();
 
             AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
             if (replayResult.hasErrors() && verbose) {
                 LOGGER.info("({}) {} Error(s) while loading", caseId, replayResult.getErrorList());
-                for (Throwable error : replayResult.getErrorList()) { LOGGER.info("({}) Error", caseId, error); }
+                for (Throwable error : replayResult.getErrorList()) {
+                    LOGGER.info("({}) Error", caseId, error);
+                }
             }
 
             if (testProperty == TestProperty.NOTLOADABLE) {
@@ -135,12 +137,18 @@ public class ProveTest {
                     LOGGER.info("({}) Finished proof: {}", caseId,
                         (closed ? "closed." : "open goal(s)"));
                     appendStatistics(loadedProof, keyFile);
-                    if (success) { reload(proofFile, loadedProof); }
+                    if (success) {
+                        reload(proofFile, loadedProof);
+                    }
                 }
             }
         } finally {
-            if (loadedProof != null) { loadedProof.dispose(); }
-            if (env != null) { env.dispose(); }
+            if (loadedProof != null) {
+                loadedProof.dispose();
+            }
+            if (env != null) {
+                env.dispose();
+            }
         }
 
         String message = String.format("(%s) %sVerifying property \"%s\"%sfor file: %s",
@@ -148,7 +156,9 @@ public class ProveTest {
             success ? "pass: " : "FAIL: ", testProperty.toString().toLowerCase(),
             success ? " was successful " : " failed ", keyFile);
 
-        if (!success) { fail(message); }
+        if (!success) {
+            fail(message);
+        }
     }
 
     /**
@@ -172,14 +182,14 @@ public class ProveTest {
      * want to use a different strategy.
      */
     private void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            Pair<String, Location> script) throws Exception {
+            ProofScriptEntry script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
             env.getProofControl().startAndWaitForAutoMode(loadedProof);
         } else {
             // ... script
-            ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+            ProofScriptEngine pse = new ProofScriptEngine(script.script(), script.location());
             pse.execute(env.getUi(), env.getLoadedProof());
         }
     }
@@ -187,7 +197,7 @@ public class ProveTest {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, ProofScriptEntry> load(
             File keyFile) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile.toPath());
         return new Pair<>(env, env.getProofScript());
@@ -213,7 +223,9 @@ public class ProveTest {
             AbstractProblemLoader.ReplayResult result = proofLoadEnvironment.getReplayResult();
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
-                for (Throwable ex : errorList) { LOGGER.error("Error", ex); }
+                for (Throwable ex : errorList) {
+                    LOGGER.error("Error", ex);
+                }
                 throw errorList.get(0);
             }
 
@@ -223,8 +235,12 @@ public class ProveTest {
             throw new Exception(
                 "Exception while loading proof (see cause for details): " + proofFile, t);
         } finally {
-            if (reloadedProof != null) { reloadedProof.dispose(); }
-            if (proofLoadEnvironment != null) { proofLoadEnvironment.dispose(); }
+            if (reloadedProof != null) {
+                reloadedProof.dispose();
+            }
+            if (proofLoadEnvironment != null) {
+                proofLoadEnvironment.dispose();
+            }
         }
     }
 
@@ -243,13 +259,17 @@ public class ProveTest {
         // Write statistics.
         try {
             StatisticsFile statisticsFile = getStatisticsFile();
-            if (statisticsFile != null) { statisticsFile.appendStatistics(loadedProof, keyFile); }
+            if (statisticsFile != null) {
+                statisticsFile.appendStatistics(loadedProof, keyFile);
+            }
         } catch (IOException e) {
             LOGGER.warn("Failed to append stats", e);
         }
     }
 
     private void debugOut(String format, Object... args) {
-        if (verbose) { System.err.format(format, args); }
+        if (verbose) {
+            System.err.format(format, args);
+        }
     }
 }

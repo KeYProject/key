@@ -127,8 +127,12 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
     public int getExpressionCount() {
         int c = 0;
-        if (prefix instanceof Expression) { c += 1; }
-        if (inits != null) { c += inits.size(); }
+        if (prefix instanceof Expression) {
+            c += 1;
+        }
+        if (inits != null) {
+            c += inits.size();
+        }
         return c;
     }
 
@@ -144,10 +148,14 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     public Expression getExpressionAt(int index) {
         if (prefix instanceof Expression) {
-            if (index == 0) { return (Expression) prefix; }
+            if (index == 0) {
+                return (Expression) prefix;
+            }
             index--;
         }
-        if (inits != null) { return inits.get(index); }
+        if (inits != null) {
+            return inits.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -172,7 +180,9 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (prefix instanceof TypeReference && index == 0) { return (TypeReference) prefix; }
+        if (prefix instanceof TypeReference && index == 0) {
+            return (TypeReference) prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -193,8 +203,12 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null) { result++; }
-        if (inits != null) { result += inits.size(); }
+        if (prefix != null) {
+            result++;
+        }
+        if (inits != null) {
+            result += inits.size();
+        }
         return result;
     }
 
@@ -209,10 +223,14 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0) { return prefix; }
+            if (index == 0) {
+                return prefix;
+            }
             index--;
         }
-        if (inits != null) { return inits.get(index); }
+        if (inits != null) {
+            return inits.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

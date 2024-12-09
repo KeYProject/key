@@ -34,11 +34,17 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         ImmutableList<Term> posts = ImmutableSLList.nil();
-        if (poVars.post.self != null) { posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self)); }
+        if (poVars.post.self != null) {
+            posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
+        }
         Iterator<Term> localVars = d.origVars.localVars.iterator();
         Iterator<Term> localPostVars = poVars.post.localVars.iterator();
-        while (localVars.hasNext()) { posts = posts.append(d.tb.equals(localPostVars.next(), localVars.next())); }
-        if (poVars.post.result != null) { posts = posts.append(d.tb.equals(poVars.post.result, poVars.pre.result)); }
+        while (localVars.hasNext()) {
+            posts = posts.append(d.tb.equals(localPostVars.next(), localVars.next()));
+        }
+        if (poVars.post.result != null) {
+            posts = posts.append(d.tb.equals(poVars.post.result, poVars.pre.result));
+        }
         if (poVars.pre.exception != null && poVars.post.exception != null) {
             posts = posts.append(d.tb.equals(poVars.post.exception, poVars.pre.exception));
         }

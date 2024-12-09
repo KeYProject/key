@@ -78,7 +78,9 @@ public class Lookup {
      */
     public <T> Collection<T> lookupAll(Class<T> service) {
         ArrayList<T> t = new ArrayList<>(getList(service));
-        if (parent != null) { t.addAll(parent.lookupAll(service)); }
+        if (parent != null) {
+            t.addAll(parent.lookupAll(service));
+        }
         return t;
     }
 
@@ -117,19 +119,27 @@ public class Lookup {
 
     public <T> void deregister(T obj, Class<T> service) {
         boolean b = getList(service).remove(obj);
-        if (b) { firePropertyChange(service); }
-        if (parent != null) { parent.deregister(obj, service); }
+        if (b) {
+            firePropertyChange(service);
+        }
+        if (parent != null) {
+            parent.deregister(obj, service);
+        }
     }
 
     public <T> void deregister(Class<T> service) {
         getList(service).clear();
         firePropertyChange(service);
-        if (parent != null) { parent.deregister(service); }
+        if (parent != null) {
+            parent.deregister(service);
+        }
     }
 
 
     public void dispose() {
-        if (parent != null) { parent.children.remove(this); }
+        if (parent != null) {
+            parent.children.remove(this);
+        }
     }
 
     public List<LookupListener> getListeners(Class<?> name) {
@@ -156,12 +166,16 @@ public class Lookup {
         getListeners(name).forEach(it -> it.update(name, this));
         children.forEach(it -> {
             Lookup child = it.get();
-            if (child != null) { child.firePropertyChange(name); }
+            if (child != null) {
+                child.firePropertyChange(name);
+            }
         });
         getListeners(ALL.class).forEach(it -> it.update(name, this));
         children.forEach(it -> {
             Lookup child = it.get();
-            if (child != null) { child.firePropertyChange(ALL.class); }
+            if (child != null) {
+                child.firePropertyChange(ALL.class);
+            }
         });
     }
 
@@ -193,7 +207,9 @@ public class Lookup {
         for (Constructor<?> ctor : clazz.getConstructors()) {
             if (ctor.getAnnotation(Inject.class) != null) {
                 T instance = (T) tryToInject(ctor);
-                if (instance != null) { return instance; }
+                if (instance != null) {
+                    return instance;
+                }
             }
         }
         return null;
@@ -237,7 +253,9 @@ public class Lookup {
     public void inject(Object instance) throws InjectionException {
         Class<?> clazz = instance.getClass();
         for (Method setter : clazz.getMethods()) {
-            if (setter.getAnnotation(Inject.class) != null) { inject(instance, setter); }
+            if (setter.getAnnotation(Inject.class) != null) {
+                inject(instance, setter);
+            }
         }
     }
 
@@ -247,11 +265,15 @@ public class Lookup {
      * @throws InjectionException
      */
     protected void inject(Object instance, Method setter) throws InjectionException {
-        if (setter.getParameterCount() != 1) { throw new IllegalStateException(); }
+        if (setter.getParameterCount() != 1) {
+            throw new IllegalStateException();
+        }
 
         Class<?> pClazz = setter.getParameters()[0].getType();
         Object o = get(pClazz);
-        if (o == null) { throw new IllegalStateException("Implementation for X not registered."); }
+        if (o == null) {
+            throw new IllegalStateException("Implementation for X not registered.");
+        }
         try {
             setter.invoke(instance, o);
         } catch (IllegalAccessException | InvocationTargetException e) {

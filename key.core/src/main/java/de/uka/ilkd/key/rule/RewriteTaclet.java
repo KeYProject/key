@@ -198,12 +198,18 @@ public class RewriteTaclet extends FindTaclet {
                     svi = svi.addUpdate(update, t.getLabels());
                 }
             } else if (getApplicationRestriction() != NONE
-                    && (op instanceof Modality)) { return null; }
+                    && (op instanceof Modality)) {
+                return null;
+            }
 
-            if (polarity != 0) { polarity = polarity(op, it, polarity); }
+            if (polarity != 0) {
+                polarity = polarity(op, it, polarity);
+            }
         }
 
-        if (getApplicationRestriction() == NONE) { return p_mc; }
+        if (getApplicationRestriction() == NONE) {
+            return p_mc;
+        }
         if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1)
                 || ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
             return null;
@@ -241,8 +247,12 @@ public class RewriteTaclet extends FindTaclet {
     @Override
     protected StringBuffer toStringFind(StringBuffer sb) {
         StringBuffer res = super.toStringFind(sb);
-        if ((getApplicationRestriction() & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) { res.append("\\sameUpdateLevel"); }
-        if ((getApplicationRestriction() & RewriteTaclet.IN_SEQUENT_STATE) != 0) { res.append("\\inSequentState"); }
+        if ((getApplicationRestriction() & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
+            res.append("\\sameUpdateLevel");
+        }
+        if ((getApplicationRestriction() & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
+            res.append("\\inSequentState");
+        }
         if ((getApplicationRestriction() & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
             res.append("\\antecedentPolarity");
         }

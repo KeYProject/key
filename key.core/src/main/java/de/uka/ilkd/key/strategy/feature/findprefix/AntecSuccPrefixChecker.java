@@ -59,7 +59,9 @@ class AntecSuccPrefixChecker implements Checker {
         int pol = pio.isInAntec() ? -1 : 1;
         if (pio.posInTerm() != null) {
             final PIOPathIterator it = pio.iterator();
-            while (pol != 0 && it.next() != -1) { pol = checkOperator(pio.subTerm().op(), it.getChild(), pol); }
+            while (pol != 0 && it.next() != -1) {
+                pol = checkOperator(pio.subTerm().op(), it.getChild(), pol);
+            }
         }
 
         return (polarity != Polarity.ANTECEDENT || pol == -1)

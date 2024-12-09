@@ -60,7 +60,9 @@ public abstract class AbstractBlockContractBuiltInRuleApp
      */
     public AbstractBlockContractBuiltInRuleApp tryToInstantiate(final Goal goal,
             final AbstractBlockContractRule rule) {
-        if (complete() || cannotComplete(goal)) { return this; }
+        if (complete() || cannotComplete(goal)) {
+            return this;
+        }
         final Services services = goal.proof().getServices();
         final AbstractBlockContractRule.Instantiation instantiation =
             rule.instantiate(posInOccurrence().subTerm(), goal, services);

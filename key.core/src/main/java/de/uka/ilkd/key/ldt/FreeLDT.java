@@ -76,7 +76,9 @@ public final class FreeLDT extends LDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (t.op() instanceof JFunction && hasLiteralFunction((JFunction) t.op())) { return FreeLiteral.INSTANCE; }
+        if (t.op() instanceof JFunction && hasLiteralFunction((JFunction) t.op())) {
+            return FreeLiteral.INSTANCE;
+        }
         assert false;
         return null;
     }

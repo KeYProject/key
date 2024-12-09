@@ -62,7 +62,9 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
-        if (var != expression) { return true; }
+        if (var != expression) {
+            return true;
+        }
 
 
 
@@ -99,7 +101,9 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
 
         @Override
         protected void doDefaultAction(SourceElement node) {
-            if (node instanceof Assignment) { result = true; }
+            if (node instanceof Assignment) {
+                result = true;
+            }
         }
 
         public boolean result() {

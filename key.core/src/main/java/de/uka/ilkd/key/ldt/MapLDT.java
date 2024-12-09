@@ -72,7 +72,9 @@ public final class MapLDT extends LDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (t.op().equals(mapEmpty)) { return EmptyMapLiteral.INSTANCE; }
+        if (t.op().equals(mapEmpty)) {
+            return EmptyMapLiteral.INSTANCE;
+        }
         assert false;
         return null;
     }

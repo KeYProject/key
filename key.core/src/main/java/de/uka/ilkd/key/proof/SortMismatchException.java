@@ -26,7 +26,7 @@ public class SortMismatchException extends SVInstantiationExceptionWithPosition 
     public String getMessage() {
         String errmsg = super.getMessage();
         errmsg += "\n Sort of instantiation given for " + toInstantiate + ", " + givenSort
-                + ", is illegal at this place.";
+            + ", is illegal at this place.";
         return errmsg;
     }
 

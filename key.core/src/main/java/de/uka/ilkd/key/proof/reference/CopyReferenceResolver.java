@@ -39,11 +39,17 @@ public class CopyReferenceResolver {
         for (Goal g : goals) {
             Node node = g.node();
             ClosedBy c = node.lookup(ClosedBy.class);
-            if (c == null) { continue; }
-            if (referencedFrom != null && referencedFrom != c.proof()) { continue; }
+            if (c == null) {
+                continue;
+            }
+            if (referencedFrom != null && referencedFrom != c.proof()) {
+                continue;
+            }
             todo.add(g);
         }
-        if (callbackTotal != null) { callbackTotal.accept(todo.size()); }
+        if (callbackTotal != null) {
+            callbackTotal.accept(todo.size());
+        }
         for (Goal g : todo) {
             toComplete.reOpenGoal(g);
             ClosedBy c = g.node().lookup(ClosedBy.class);
@@ -53,7 +59,9 @@ public class CopyReferenceResolver {
             } catch (IntermediateProofReplayer.BuiltInConstructionException e) {
                 throw new RuntimeException(e);
             }
-            if (callbackBranch != null) { callbackBranch.run(); }
+            if (callbackBranch != null) {
+                callbackBranch.run();
+            }
         }
     }
 }

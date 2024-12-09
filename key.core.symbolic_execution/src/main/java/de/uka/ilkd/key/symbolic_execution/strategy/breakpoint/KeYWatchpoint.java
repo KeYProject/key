@@ -100,7 +100,9 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
                 IExecutionContext ec =
                     JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
                 // put values into map which have to be replaced
-                if (ec != null) { getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance()); }
+                if (ec != null) {
+                    getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
+                }
                 // replace renamings etc.
                 OpReplacer replacer = new OpReplacer(getVariableNamingMap(),
                     getProof().getServices().getTermFactory());

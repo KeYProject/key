@@ -102,7 +102,9 @@ public class StateVars {
     private ImmutableList<Term> appendIfNotNull(ImmutableList<Term> list,
             ImmutableList<Term> list2) {
         ImmutableList<Term> result = list;
-        for (Term t : list2) { result = appendIfNotNull(result, t); }
+        for (Term t : list2) {
+            result = appendIfNotNull(result, t);
+        }
         return result;
     }
 
@@ -143,7 +145,9 @@ public class StateVars {
     private static ImmutableList<Term> copyVariables(ImmutableList<Term> ts, String postfix,
             Services services) {
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (Term t : ts) { result = result.append(copyVariable(t, postfix, services)); }
+        for (Term t : ts) {
+            result = result.append(copyVariable(t, postfix, services));
+        }
         return result;
     }
 
@@ -162,7 +166,9 @@ public class StateVars {
 
 
     private static Term newVariable(Term t, String name, Services services) {
-        if (t == null) { return null; }
+        if (t == null) {
+            return null;
+        }
 
         assert t.op() instanceof ProgramVariable : "Expected a program " + "variable.";
 
@@ -190,7 +196,9 @@ public class StateVars {
 
 
     private static Term newHeapSymbol(Term t, String name, Services services) {
-        if (t == null) { return null; }
+        if (t == null) {
+            return null;
+        }
         if (!(t.op() instanceof JFunction)) {
             // Sometimes the heap term operator is a location variable (for
             // instance if it is the base heap). Create a location variable
@@ -206,7 +214,9 @@ public class StateVars {
 
 
     private static Term newFunction(Term t, String name, Services services) {
-        if (t == null) { return null; }
+        if (t == null) {
+            return null;
+        }
         final TermBuilder tb = services.getTermBuilder();
         final JFunction newFunc = new JFunction(new Name(name), t.sort());
         register(newFunc, services);
@@ -286,7 +296,9 @@ public class StateVars {
 
     private static Term buildSelfVar(Services services, IProgramMethod pm, KeYJavaType kjt,
             String postfix) {
-        if (pm.isStatic()) { return null; }
+        if (pm.isStatic()) {
+            return null;
+        }
         final TermBuilder tb = services.getTermBuilder();
         Term selfVar = tb.var(tb.selfVar(pm, kjt, true, postfix));
         register(selfVar.op(ProgramVariable.class), services);
@@ -304,7 +316,9 @@ public class StateVars {
 
 
     private static Term buildResultVar(IProgramMethod pm, Services services, String postfix) {
-        if (pm.isVoid() || pm.isConstructor()) { return null; }
+        if (pm.isVoid() || pm.isConstructor()) {
+            return null;
+        }
         final TermBuilder tb = services.getTermBuilder();
         Term resultVar = tb.var(tb.resultVar("result" + postfix, pm, true));
         register(resultVar.op(ProgramVariable.class), services);
@@ -348,12 +362,16 @@ public class StateVars {
 
     static void register(ProgramVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
-        if (pv != null && progVarNames.lookup(pv.name()) == null) { progVarNames.addSafely(pv); }
+        if (pv != null && progVarNames.lookup(pv.name()) == null) {
+            progVarNames.addSafely(pv);
+        }
     }
 
 
     static void register(ImmutableList<ProgramVariable> pvs, Services services) {
-        for (ProgramVariable pv : pvs) { register(pv, services); }
+        for (ProgramVariable pv : pvs) {
+            register(pv, services);
+        }
     }
 
 
@@ -373,7 +391,9 @@ public class StateVars {
     static <T> ImmutableList<T> ops(ImmutableList<Term> terms, Class<T> opClass)
             throws IllegalArgumentException {
         ImmutableList<T> ops = ImmutableSLList.nil();
-        for (Term t : terms) { ops = ops.append(t.op(opClass)); }
+        for (Term t : terms) {
+            ops = ops.append(t.op(opClass));
+        }
         return ops;
     }
 

@@ -67,10 +67,10 @@ public class ViewSelector extends JDialog {
         maxTooltipLinesInputField = new NumberInputField(maxLinesInt, 4);
         maxTooltipLinesInputField.setMaximumSize(new Dimension(40, 30));
         maxLinesPanel.add(new JLabel("<html><font color=\"#000000\">"
-                + "Maximum size (line count) of the tooltips of applicable rules"
-                + "<br> with schema variable instantiations displayed. "
-                + "In case of longer <br>tooltips the instantiation will be "
-                + "suppressed. </font></html>"));
+            + "Maximum size (line count) of the tooltips of applicable rules"
+            + "<br> with schema variable instantiations displayed. "
+            + "In case of longer <br>tooltips the instantiation will be "
+            + "suppressed. </font></html>"));
         maxLinesPanel.add(maxTooltipLinesInputField);
 
         JPanel showUninstantiatedTacletPanel = new JPanel();
@@ -162,9 +162,15 @@ public class ViewSelector extends JDialog {
         private static final long serialVersionUID = -5423315366275141764L;
 
         public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
-            if (str == null) { return; }
+            if (str == null) {
+                return;
+            }
             char[] upper = str.toCharArray();
-            for (char anUpper : upper) { if (anUpper < '0' || anUpper > '9') { return; } }
+            for (char anUpper : upper) {
+                if (anUpper < '0' || anUpper > '9') {
+                    return;
+                }
+            }
             super.insertString(offs, new String(upper), a);
         }
 

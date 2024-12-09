@@ -32,7 +32,6 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
@@ -63,16 +62,15 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
  * Base for implementing merge rules. Extend this class, implement method mergeValuesInStates(...)
  * and register in class JavaProfile.
  * <p>
- *
+ * <p>
  * The rule is applicable if the chosen subterm has the form { x := v || ... } PHI and there are
  * potential merge candidates.
  * <p>
- *
+ * <p>
  * Any rule application returned will be incomplete; completion is handled by
  * de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion.
  *
  * @author Dominic Scheurer
- *
  * @see MergeRuleUtils
  * @see MergeTotalWeakening
  * @see MergeByIfThenElse
@@ -96,7 +94,7 @@ public class MergeRule implements BuiltInRule {
     /**
      * Thresholds the maximum depth of right sides in updates for which an equivalence proof is
      * started.
-     *
+     * <p>
      * We skip the check for equal valuation of this variable if the depth threshold is exceeded by
      * one of the right sides. Experiments show a very big time overhead from a depth of about 8-10
      * on, or sometimes even earlier.
@@ -112,7 +110,8 @@ public class MergeRule implements BuiltInRule {
     /**
      * {@link MergeRule} is a Singleton class, therefore constructor only package-wide visible.
      */
-    MergeRule() {}
+    MergeRule() {
+    }
 
     @Override
     public Name name() {
@@ -136,7 +135,9 @@ public class MergeRule implements BuiltInRule {
 
         final MergeRuleBuiltInRuleApp mergeRuleApp = (MergeRuleBuiltInRuleApp) ruleApp;
 
-        if (!mergeRuleApp.complete()) { throw new RuleAbortException("Merge rule not complete"); }
+        if (!mergeRuleApp.complete()) {
+            throw new RuleAbortException("Merge rule not complete");
+        }
 
         // The number of goals needed for side conditions related to
         // manually chosen lattice elements.
@@ -163,7 +164,8 @@ public class MergeRule implements BuiltInRule {
 
         // The merge loop
         SymbolicExecutionState mergedState =
-            new SymbolicExecutionState(thisSEState.first, thisSEState.second, newGoal.node());
+            new SymbolicExecutionState(thisSEState.symbolicState(), thisSEState.pathCondition(),
+                newGoal.node());
         LinkedHashSet<Name> newNames = new LinkedHashSet<>();
         LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<>();
         HashMap<Node, SymbolicExecutionState> mergePartnerNodesToStates = new HashMap<>();
@@ -180,13 +182,13 @@ public class MergeRule implements BuiltInRule {
 
             mergePartnerNodesToStates.put(state.getCorrespondingNode(), state);
 
-            Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> mergeResult =
-                mergeStates(mergeRule, mergedState, state, thisSEState.third,
+            MergeStateEntry mergeResult =
+                mergeStates(mergeRule, mergedState, state, thisSEState.programCounter(),
                     mergeRuleApp.getDistinguishingFormula(), services);
-            newNames.addAll(mergeResult.second);
-            sideConditionsToProve.addAll(mergeResult.third);
+            newNames.addAll(mergeResult.newIntroducedNames);
+            sideConditionsToProve.addAll(mergeResult.sideConditionsToProve);
 
-            mergedState = mergeResult.first;
+            mergedState = mergeResult.newSymbolicState;
             mergedState.setCorrespondingNode(newGoal.node());
         }
 
@@ -204,7 +206,7 @@ public class MergeRule implements BuiltInRule {
         for (MergePartner mergePartner : mergePartners) {
             closeMergePartnerGoal(newGoal.node(), mergePartner.getGoal(), mergePartner.getPio(),
                 mergedState, mergePartnerNodesToStates.get(mergePartner.getGoal().node()),
-                thisSEState.third, newNames);
+                thisSEState.programCounter(), newNames);
         }
 
         // Delete previous sequents
@@ -237,7 +239,7 @@ public class MergeRule implements BuiltInRule {
         }
 
         // Add new succedent (symbolic state & program counter)
-        final Term succedentFormula = tb.apply(mergedState.first, thisSEState.third);
+        final Term succedentFormula = tb.apply(mergedState.first, thisSEState.programCounter());
         final SequentFormula newSuccedent = new SequentFormula(succedentFormula);
         newGoal.addFormula(newSuccedent,
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
@@ -250,10 +252,12 @@ public class MergeRule implements BuiltInRule {
         services.saveNameRecorder(currentNode);
 
         // Register new names
-        for (Name newName : newNames) { services.addNameProposal(newName); }
+        for (Name newName : newNames) {
+            services.addNameProposal(newName);
+        }
 
         // Add new goals for side conditions that have to be proven
-        if (sideConditionsToProve.size() > 0) {
+        if (!sideConditionsToProve.isEmpty()) {
             final Iterator<Term> sideCondIt = sideConditionsToProve.iterator();
 
             int i = 0;
@@ -287,28 +291,22 @@ public class MergeRule implements BuiltInRule {
      * The <code>programCounter</code> must be the same in both states, so it is supplied
      * separately.
      * <p>
-     *
+     * <p>
      * Override this method for special merge procedures.
      *
-     * @param mergeRule
-     *        The merge procedure to use for the merge.
-     * @param state1
-     *        First state to merge.
-     * @param state2
-     *        Second state to merge.
-     * @param programCounter
-     *        The formula \&lt;{ ... }\&gt; phi consisting of the common program
+     * @param mergeRule The merge procedure to use for the merge.
+     * @param state1 First state to merge.
+     * @param state2 Second state to merge.
+     * @param programCounter The formula \&lt;{ ... }\&gt; phi consisting of the common program
      *        counter and the post condition.
-     * @param distinguishingFormula
-     *        The user-specified distinguishing formula. May be null (for
+     * @param distinguishingFormula The user-specified distinguishing formula. May be null (for
      *        automatic generation).
-     * @param services
-     *        The services object.
+     * @param services The services object.
      * @return A new merged SE state (U*,C*) which is a weakening of the original states.
      */
     @SuppressWarnings("unused")
     /* For deactivated equiv check */
-    protected Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> mergeStates(
+    protected MergeStateEntry mergeStates(
             MergeProcedure mergeRule, SymbolicExecutionState state1, SymbolicExecutionState state2,
             Term programCounter, Term distinguishingFormula, Services services) {
 
@@ -346,9 +344,13 @@ public class MergeRule implements BuiltInRule {
             Term rightSide1 = getUpdateRightSideFor(state1.first, v);
             Term rightSide2 = getUpdateRightSideFor(state2.first, v);
 
-            if (rightSide1 == null) { rightSide1 = tb.var(v); }
+            if (rightSide1 == null) {
+                rightSide1 = tb.var(v);
+            }
 
-            if (rightSide2 == null) { rightSide2 = tb.var(v); }
+            if (rightSide2 == null) {
+                rightSide2 = tb.var(v);
+            }
 
             // Check if location v is set to different value in both states.
 
@@ -375,7 +377,7 @@ public class MergeRule implements BuiltInRule {
 
             if (proofClosed) {
 
-                // Arbitrary choice: Take value of first state if
+                // Arbitrary choice: Take value of distinguishingFormula state if
                 // this does not equal the program variable itself
                 if (!rightSide1.equals(tb.var(v))) {
                     newElementaryUpdates =
@@ -435,7 +437,7 @@ public class MergeRule implements BuiltInRule {
         // Note: We apply the symbolic state to the new constraints to enable
         // merge techniques, in particular predicate abstraction, to make
         // references to the values of other variables involved in the merge.
-        return new Triple<>(
+        return new MergeStateEntry(
             new SymbolicExecutionState(newSymbolicState,
                 newAdditionalConstraints == null ? newPathCondition
                         : tb.and(newPathCondition,
@@ -448,24 +450,17 @@ public class MergeRule implements BuiltInRule {
      * Merges two heaps in a zip-like procedure. The fallback is an if-then-else construct that is
      * tried to be shifted as far inwards as possible.
      * <p>
-     *
+     * <p>
      * Override this method for specialized heap merge procedures.
      *
-     * @param heapVar
-     *        The heap variable for which the values should be merged.
-     * @param heap1
-     *        The first heap term.
-     * @param heap2
-     *        The second heap term.
-     * @param state1
-     *        SE state for the first heap term.
-     * @param state2
-     *        SE state for the second heap term
-     * @param services
-     *        The services object.
-     * @param distinguishingFormula
-     *        The user-specified distinguishing formula. May be null (for
-     *        automatic generation).
+     * @param heapVar The heap variable for which the values should be merged.
+     * @param heap1 The first heap term.
+     * @param heap2 The second heap term.
+     * @param state1 SE state for the first heap term.
+     * @param state2 SE state for the second heap term
+     * @param services The services object.
+     * @param distinguishingFormula The user-specified distinguishing formula.
+     *        Maybe null (for automatic generation).
      * @return A merged heap term.
      */
     protected ValuesMergeResult mergeHeaps(final MergeProcedure mergeRule,
@@ -590,10 +585,8 @@ public class MergeRule implements BuiltInRule {
      * We admit top level formulas of the form \&lt;{ ... }\&gt; phi and U \&lt;{ ... }\&gt; phi,
      * where U must be an update in normal form, i.e. a parallel update of elementary updates.
      *
-     * @param goal
-     *        Current goal.
-     * @param pio
-     *        Position of selected sequent formula.
+     * @param goal Current goal.
+     * @param pio Position of selected sequent formula.
      * @return true iff a suitable top level formula for merging.
      */
     @Override
@@ -606,12 +599,9 @@ public class MergeRule implements BuiltInRule {
      * where U must be an update in normal form, i.e. a parallel update of elementary updates. We
      * require that phi does not contain a Java block.
      *
-     * @param goal
-     *        Current goal.
-     * @param pio
-     *        Position of selected sequent formula.
-     * @param doMergePartnerCheck
-     *        Checks for available merge partners iff this flag is set to true.
+     * @param goal Current goal.
+     * @param pio Position of selected sequent formula.
+     * @param doMergePartnerCheck Checks for available merge partners iff this flag is set to true.
      * @return true iff a suitable top level formula for merging.
      */
     public static boolean isOfAdmissibleForm(Goal goal, PosInOccurrence pio,
@@ -621,7 +611,9 @@ public class MergeRule implements BuiltInRule {
         // in normal form, i.e. a parallel update of elementary
         // updates.
 
-        if (pio == null || !pio.isTopLevel()) { return false; }
+        if (pio == null || !pio.isTopLevel()) {
+            return false;
+        }
 
         Term selected = pio.subTerm();
 
@@ -651,9 +643,11 @@ public class MergeRule implements BuiltInRule {
         if (termAfterUpdate.op() instanceof Modality
                 && !termAfterUpdate.sub(0).javaBlock().equals(JavaBlock.EMPTY_JAVABLOCK)) {
             return false;
-        } else if (termAfterUpdate.op() instanceof UpdateApplication) { return false; }
+        } else if (termAfterUpdate.op() instanceof UpdateApplication) {
+            return false;
+        }
 
-        return !doMergePartnerCheck || findPotentialMergePartners(goal, pio).size() > 0;
+        return !doMergePartnerCheck || !findPotentialMergePartners(goal, pio).isEmpty();
 
     }
 
@@ -670,10 +664,8 @@ public class MergeRule implements BuiltInRule {
     /**
      * Finds all suitable merge partners
      *
-     * @param goal
-     *        Current goal to merge.
-     * @param pio
-     *        Position of update-program counter formula in goal.
+     * @param goal Current goal to merge.
+     * @param pio Position of update-program counter formula in goal.
      * @return A list of suitable merge partners. May be empty if none exist.
      */
     public static ImmutableList<MergePartner> findPotentialMergePartners(Goal goal,
@@ -683,7 +675,8 @@ public class MergeRule implements BuiltInRule {
 
         final ImmutableList<Goal> allGoals = services.getProof().openGoals();
 
-        final Triple<Term, Term, Term> ownSEState = sequentToSETriple(goal.node(), pio, services);
+        final SymbolicExecutionStateWithProgCnt ownSEState =
+            sequentToSETriple(goal.node(), pio, services);
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
@@ -699,10 +692,10 @@ public class MergeRule implements BuiltInRule {
 
                     final PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
                     if (isOfAdmissibleForm(g, gPio, false)) {
-                        final Triple<Term, Term, Term> partnerSEState =
+                        final SymbolicExecutionStateWithProgCnt partnerSEState =
                             sequentToSETriple(g.node(), gPio, services);
 
-                        if (ownSEState.third.equals(partnerSEState.third)) {
+                        if (ownSEState.programCounter().equals(partnerSEState.programCounter())) {
 
                             potentialPartners =
                                 potentialPartners.prepend(new MergePartner(g, gPio));
@@ -721,4 +714,17 @@ public class MergeRule implements BuiltInRule {
         void signalProgress(int progress);
     }
 
+    /**
+     * Represents the result for merging to states.
+     *
+     * @param newSymbolicState the new state
+     * @param newIntroducedNames newly introduced names
+     * @param sideConditionsToProve side condition required for merging
+     * @see #mergeStates(MergeProcedure, SymbolicExecutionState, SymbolicExecutionState, Term, Term,
+     *      Services)
+     */
+    public record MergeStateEntry(SymbolicExecutionState newSymbolicState,
+            LinkedHashSet<Name> newIntroducedNames,
+            LinkedHashSet<Term> sideConditionsToProve) {
+    }
 }

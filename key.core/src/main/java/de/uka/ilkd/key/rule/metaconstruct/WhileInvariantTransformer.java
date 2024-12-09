@@ -120,7 +120,9 @@ public final class WhileInvariantTransformer {
             getNewLocalvariable("thrownExc", "java.lang.Throwable", services);
 
         ProgramVariable returnExpression = null;
-        if (returnType != null) { returnExpression = getNewLocalvariable("returnExpr", returnType, services); }
+        if (returnType != null) {
+            returnExpression = getNewLocalvariable("returnExpr", returnType, services);
+        }
 
         Term contFlagTerm = null;
         Term returnFlagTerm = null;
@@ -175,7 +177,9 @@ public final class WhileInvariantTransformer {
             resultSubterms.add(returnCase(termLabelState, returnFlag, returnType, returnExpression,
                 post, rule, ruleApp, goal, applicationPos, services));
 
-            if (returnType != null) { stmnt.add(KeYJavaASTFactory.declare(returnExpression, returnType)); }
+            if (returnType != null) {
+                stmnt.add(KeYJavaASTFactory.declare(returnExpression, returnType));
+            }
         }
 
         // break case
@@ -308,8 +312,12 @@ public final class WhileInvariantTransformer {
             javaInfo == null ? null : javaInfo.getServices());
         w.start();
         instantiations = ImmutableSLList.nil();
-        if (w.innerLabelNeeded()) { instantiations = instantiations.prepend(innerLabel); }
-        if (w.outerLabelNeeded()) { instantiations = instantiations.prepend(outerLabel); }
+        if (w.innerLabelNeeded()) {
+            instantiations = instantiations.prepend(innerLabel);
+        }
+        if (w.outerLabelNeeded()) {
+            instantiations = instantiations.prepend(outerLabel);
+        }
         breakList = w.breakList();
         return instantiations;
     }
@@ -388,9 +396,15 @@ public final class WhileInvariantTransformer {
 
         ArrayList<Term> al = new ArrayList<>();
 
-        if (returnFlagTerm != null) { al.add(TB.equals(returnFlagTerm, TRUE_TERM)); }
-        if (breakFlagTerm != null) { al.add(TB.equals(breakFlagTerm, TRUE_TERM)); }
-        if (excFlagTerm != null) { al.add(TB.equals(excFlagTerm, TRUE_TERM)); }
+        if (returnFlagTerm != null) {
+            al.add(TB.equals(returnFlagTerm, TRUE_TERM));
+        }
+        if (breakFlagTerm != null) {
+            al.add(TB.equals(breakFlagTerm, TRUE_TERM));
+        }
+        if (excFlagTerm != null) {
+            al.add(TB.equals(excFlagTerm, TRUE_TERM));
+        }
 
         if (al.size() == 0) {
             if (contFlagTerm == null) {
@@ -406,7 +420,9 @@ public final class WhileInvariantTransformer {
             }
         } else {
             Term premiss = TB.not(createLongJunctorTerm(Junctor.OR, al));
-            if (contFlagTerm != null) { premiss = TB.imp(contFlagTerm, premiss); }
+            if (contFlagTerm != null) {
+                premiss = TB.imp(contFlagTerm, premiss);
+            }
 
             ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState,
                 services, applicationPos, rule, ruleApp, goal, Junctor.IMP,

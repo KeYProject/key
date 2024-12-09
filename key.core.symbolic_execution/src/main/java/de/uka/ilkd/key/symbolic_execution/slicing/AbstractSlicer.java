@@ -111,7 +111,7 @@ public abstract class AbstractSlicer {
             SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
         if (label == null) {
             throw new IllegalStateException("Modality at applied rule does not have the "
-                    + SymbolicExecutionTermLabel.NAME + " term label.");
+                + SymbolicExecutionTermLabel.NAME + " term label.");
         }
         // Perform slicing
         return doSlicing(seedNode, seedLocation, sec);
@@ -272,7 +272,9 @@ public abstract class AbstractSlicer {
                 for (Term term : terms) {
                     if (SymbolicExecutionUtil.hasReferenceSort(services, term)) {
                         Location location = toLocation(services, term);
-                        if (location != null) { locations.add(location); }
+                        if (location != null) {
+                            locations.add(location);
+                        }
                     }
                 }
                 if (locations.size() >= 2) {
@@ -306,7 +308,9 @@ public abstract class AbstractSlicer {
             Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         for (SequentFormula sf : sequent.antecedent()) {
             Term term = sf.formula();
-            if (Equality.EQUALS == term.op()) { analyzeEquality(services, term, aliases, thisReference); }
+            if (Equality.EQUALS == term.op()) {
+                analyzeEquality(services, term, aliases, thisReference);
+            }
         }
         for (SequentFormula sf : sequent.succedent()) {
             Term term = sf.formula();
@@ -340,7 +344,9 @@ public abstract class AbstractSlicer {
                 && SymbolicExecutionUtil.hasReferenceSort(services, secondSub)) {
             Location first = toLocation(services, firstSub);
             Location second = toLocation(services, secondSub);
-            if (first != null && second != null) { updateAliases(services, first, second, aliases, thisReference); }
+            if (first != null && second != null) {
+                updateAliases(services, first, second, aliases, thisReference);
+            }
         }
     }
 
@@ -405,7 +411,9 @@ public abstract class AbstractSlicer {
             if (SymbolicExecutionUtil.isHeap(target, heapLDT)) {
                 analyzeHeapUpdate(term.sub(0), services, heapLDT, aliases, thisReference);
             } else {
-                if (target instanceof ProgramVariable) { localValues.put((ProgramVariable) target, term.sub(0)); }
+                if (target instanceof ProgramVariable) {
+                    localValues.put((ProgramVariable) target, term.sub(0));
+                }
                 Location sourceLocation = toLocation(services, term.sub(0));
                 if (target instanceof ReferencePrefix && sourceLocation != null) {
                     Location targetLocation =
@@ -601,7 +609,9 @@ public abstract class AbstractSlicer {
                                     goal.sequent(), operatorTerm.sub(i), services);
                                 if (valueTerm.arity() >= 1) {
                                     Term heap = valueTerm.sub(0);
-                                    if (anonHeap.equals(heap)) { listToFill.add(resultLocations.get(i)); }
+                                    if (anonHeap.equals(heap)) {
+                                        listToFill.add(resultLocations.get(i));
+                                    }
                                 }
                             }
                         }
@@ -719,7 +729,9 @@ public abstract class AbstractSlicer {
             aliases.put(first, values);
         } else if (firstValues != null && secondValues != null) { // both are not null
             values = firstValues;
-            for (Location existingLocation : secondValues) { aliases.put(existingLocation, values); }
+            for (Location existingLocation : secondValues) {
+                aliases.put(existingLocation, values);
+            }
             values.addAll(secondValues);
         } else {
             // Can not happen!
@@ -786,7 +798,9 @@ public abstract class AbstractSlicer {
     protected Location normalizeAlias(Services services, Location location, SequentInfo info) {
         ImmutableList<Access> normalizedAccesses = ImmutableSLList.nil();
         for (Access access : location.getAccesses()) {
-            if (access.isArrayIndex()) { access = normalizeArrayIndex(access, info); }
+            if (access.isArrayIndex()) {
+                access = normalizeArrayIndex(access, info);
+            }
             normalizedAccesses = normalizedAccesses.append(access);
             Location oldLocation = new Location(normalizedAccesses);
             Location newLocation = computeRepresentativeAlias(oldLocation, info.getAliases());
@@ -813,7 +827,9 @@ public abstract class AbstractSlicer {
             Term oldTerm = oldTerms.get(i);
             if (oldTerm.op() instanceof ProgramVariable) {
                 Term value = info.getLocalValues().get((ProgramVariable) oldTerm.op());
-                if (value != null) { oldTerm = value; }
+                if (value != null) {
+                    oldTerm = value;
+                }
             }
             newTerms[i] = oldTerm;
         }
@@ -1023,7 +1039,10 @@ public abstract class AbstractSlicer {
             ImmutableArray<Expression> expressions, ExecutionContext ec) {
         Term[] terms = new Term[expressions.size()];
         int i = 0;
-        for (Expression expression : expressions) { terms[i] = AbstractSlicer.toTerm(services, expression, ec); i++; }
+        for (Expression expression : expressions) {
+            terms[i] = AbstractSlicer.toTerm(services, expression, ec);
+            i++;
+        }
         return new ImmutableArray<>(terms);
     }
 
@@ -1117,7 +1136,9 @@ public abstract class AbstractSlicer {
         Iterator<ImmutableList<T>> iter = candidates.iterator();
         while (commonLength < 1 && iter.hasNext()) {
             ImmutableList<T> next = iter.next();
-            if (startsWith(toCheck, next)) { commonLength = next.size(); }
+            if (startsWith(toCheck, next)) {
+                commonLength = next.size();
+            }
         }
         return commonLength;
     }
@@ -1140,7 +1161,9 @@ public abstract class AbstractSlicer {
             while (same && prefixIter.hasNext()) {
                 T listNext = listIter.next();
                 T prefixNext = prefixIter.next();
-                if (!Objects.equals(listNext, prefixNext)) { same = false; }
+                if (!Objects.equals(listNext, prefixNext)) {
+                    same = false;
+                }
             }
             return same;
         } else {

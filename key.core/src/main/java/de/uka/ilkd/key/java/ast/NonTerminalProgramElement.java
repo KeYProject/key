@@ -33,7 +33,9 @@ public interface NonTerminalProgramElement extends ProgramElement {
 
     default Stream<ProgramElement> stream() {
         Stream<ProgramElement> s = Stream.<ProgramElement>empty();
-        for (int i = 0; i < getChildCount(); i++) { s = Stream.concat(s, Stream.of(getChildAt(i))); }
+        for (int i = 0; i < getChildCount(); i++) {
+            s = Stream.concat(s, Stream.of(getChildAt(i)));
+        }
         return s;
     }
 

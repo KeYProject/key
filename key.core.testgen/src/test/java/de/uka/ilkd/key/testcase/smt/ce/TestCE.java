@@ -47,7 +47,7 @@ public class TestCE extends TestCommons {
                 if (!getSolverType().checkForSupport()) {
                     LOGGER.warn(
                         "Warning: The version of the solver {} "
-                                + "used for the following tests may not be supported.",
+                            + "used for the following tests may not be supported.",
                         getSolverType().getName());
                 }
             }
@@ -60,7 +60,9 @@ public class TestCE extends TestCommons {
         SolverType type = SolverTypes.Z3_CE_SOLVER;
         // SolverType type = SolverType.Z3_SOLVER;
         String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
-        if (solverPathProperty != null && !solverPathProperty.isEmpty()) { type.setSolverCommand(solverPathProperty); }
+        if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
+            type.setSolverCommand(solverPathProperty);
+        }
         return type;
     }
 

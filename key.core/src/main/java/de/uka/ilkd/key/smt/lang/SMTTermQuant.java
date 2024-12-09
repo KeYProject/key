@@ -44,7 +44,9 @@ public class SMTTermQuant extends SMTTerm {
         this.sub = sub;
         this.pats = pats;
         this.sub.upp = this;
-        for (SMTTermVariable var : this.bindVars) { var.quant = this; }
+        for (SMTTermVariable var : this.bindVars) {
+            var.quant = this;
+        }
     }
 
     public SMTTermQuant(Quant quant, List<SMTTermVariable> bindVars, SMTTerm sub, SMTTerm pat) {
@@ -53,7 +55,9 @@ public class SMTTermQuant extends SMTTerm {
         this.sub = sub;
         this.pats = toList(toList(pat));
         this.sub.upp = this;
-        for (SMTTermVariable var : this.bindVars) { var.quant = this; }
+        for (SMTTermVariable var : this.bindVars) {
+            var.quant = this;
+        }
     }
 
 
@@ -108,7 +112,9 @@ public class SMTTermQuant extends SMTTerm {
     @Override
     public List<SMTTermVariable> getUQVars() {
         List<SMTTermVariable> vars = sub.getUQVars();
-        if (quant.equals(Quant.FORALL)) { vars.addAll(bindVars); }
+        if (quant.equals(Quant.FORALL)) {
+            vars.addAll(bindVars);
+        }
         return vars;
     }
 
@@ -116,7 +122,9 @@ public class SMTTermQuant extends SMTTerm {
     @Override
     public List<SMTTermVariable> getEQVars() {
         List<SMTTermVariable> vars = sub.getEQVars();
-        if (quant.equals(Quant.EXISTS)) { vars.addAll(bindVars); }
+        if (quant.equals(Quant.EXISTS)) {
+            vars.addAll(bindVars);
+        }
         return vars;
     }
 
@@ -138,7 +146,11 @@ public class SMTTermQuant extends SMTTerm {
     public boolean occurs(SMTTermVariable a) {
         // TODO: we should check for variable id value equality: \exists x \in bindVars |
         // x.id.equals(a.id)
-        for (SMTTermVariable v : bindVars) { if (a.getId().equals(v.getId())) { return true; } }
+        for (SMTTermVariable v : bindVars) {
+            if (a.getId().equals(v.getId())) {
+                return true;
+            }
+        }
         return sub.occurs(a);
     }
 
@@ -147,7 +159,11 @@ public class SMTTermQuant extends SMTTerm {
     public boolean occurs(String id) {
         // TODO: we should check for variable id value equality: \exists x \in bindVars |
         // x.id.equals(a.id)
-        for (SMTTermVariable var : bindVars) { if (var.getId().equals(id)) { return true; } }
+        for (SMTTermVariable var : bindVars) {
+            if (var.getId().equals(id)) {
+                return true;
+            }
+        }
         return sub.occurs(id);
     }
 
@@ -156,7 +172,11 @@ public class SMTTermQuant extends SMTTerm {
     public SMTTerm substitute(SMTTermVariable a, SMTTerm b) {
         // TODO: we should check for variable id value equality: \exists x \in bindVars |
         // x.id.equals(a.id)
-        for (SMTTermVariable v : bindVars) { if (v.equals(a)) { return this; } }
+        for (SMTTermVariable v : bindVars) {
+            if (v.equals(a)) {
+                return this;
+            }
+        }
         // return new TermQuant(quant, bindVars,sub.substitute(a, b), pats);
         return sub.substitute(a, b).quant(quant, bindVars, pats);
     }
@@ -165,11 +185,17 @@ public class SMTTermQuant extends SMTTerm {
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
 
-        if (this.equals(a)) { return b; }
+        if (this.equals(a)) {
+            return b;
+        }
 
         // TODO: we should check for variable id value equality: \exists x \in bindVars |
         // x.id.equals(a.id)
-        for (SMTTermVariable v : bindVars) { if (v.equals(a)) { return this; } }
+        for (SMTTermVariable v : bindVars) {
+            if (v.equals(a)) {
+                return this;
+            }
+        }
         // return new TermQuant(quant, bindVars,(Term) sub.substitute(a, b), pats);
         return sub.substitute(a, b).quant(quant, bindVars, pats);
     }
@@ -192,23 +218,31 @@ public class SMTTermQuant extends SMTTerm {
         }
 
         List<SMTTermVariable> newVars = new LinkedList<>();
-        for (SMTTermVariable v : bindVars) { if (!v.equals(a)) { newVars.add(v); } }
+        for (SMTTermVariable v : bindVars) {
+            if (!v.equals(a)) {
+                newVars.add(v);
+            }
+        }
 
-        if (newVars.isEmpty()) { return sub.instantiate(a, b); }
+        if (newVars.isEmpty()) {
+            return sub.instantiate(a, b);
+        }
 
         if (newVars.size() < bindVars.size())
-                                             /*
-                                              * 1. Some SMT solvers like Z3 requires patterns to contains all binded
-                                              * variables 2.
-                                              * Some terms of the patterns can contains more that one variable 3.
-                                              * Instantiation of
-                                              * quantified variables should can destroy the well-sortedness of patterns
-                                              * term. Because
-                                              * of 1-3 and for simplicity, we just drop the entry pattern its the
-                                              * quantifier is
-                                              * instantiated.
-                                              */
-        { return sub.instantiate(a, b).quant(quant, newVars); }
+        /*
+         * 1. Some SMT solvers like Z3 requires patterns to contains all binded
+         * variables 2.
+         * Some terms of the patterns can contains more that one variable 3.
+         * Instantiation of
+         * quantified variables should can destroy the well-sortedness of patterns
+         * term. Because
+         * of 1-3 and for simplicity, we just drop the entry pattern its the
+         * quantifier is
+         * instantiated.
+         */
+        {
+            return sub.instantiate(a, b).quant(quant, newVars);
+        }
         return sub.instantiate(a, b).quant(quant, newVars, pats);
 
 
@@ -218,22 +252,34 @@ public class SMTTermQuant extends SMTTerm {
     public SMTTermQuant copy() {
 
         List<SMTTermVariable> newVariables = new LinkedList<>();
-        for (SMTTermVariable var : bindVars) { newVariables.add(var.copy()); }
+        for (SMTTermVariable var : bindVars) {
+            newVariables.add(var.copy());
+        }
 
         return new SMTTermQuant(this.quant, newVariables, this.sub.copy(), this.pats);
     }
 
     @Override
     public boolean equals(Object term) {
-        if (term == null) { return false; }
+        if (term == null) {
+            return false;
+        }
 
-        if (this == term) { return true; }
+        if (this == term) {
+            return true;
+        }
 
-        if (!(term instanceof SMTTermQuant qt)) { return false; }
+        if (!(term instanceof SMTTermQuant qt)) {
+            return false;
+        }
 
-        if (!this.quant.equals(qt.quant)) { return false; }
+        if (!this.quant.equals(qt.quant)) {
+            return false;
+        }
 
-        if (this.bindVars.size() != qt.bindVars.size()) { return false; }
+        if (this.bindVars.size() != qt.bindVars.size()) {
+            return false;
+        }
 
 
         // TODO: Variable ordering do not affect equality
@@ -244,7 +290,9 @@ public class SMTTermQuant extends SMTTerm {
             // if (!this.bindVars.get(i).id.equals(qt.bindVars.get(i).id))
             // return false;
 
-            if (!qt.getBindVars().contains(bindVar)) { return false; }
+            if (!qt.getBindVars().contains(bindVar)) {
+                return false;
+            }
         }
 
         return this.sub.equals(qt.sub);
@@ -306,7 +354,9 @@ public class SMTTermQuant extends SMTTerm {
     public int hashCode() {
         int ret = quant.hashCode();
 
-        for (SMTTermVariable var : bindVars) { ret = ret + var.hashCode() * 10; }
+        for (SMTTermVariable var : bindVars) {
+            ret = ret + var.hashCode() * 10;
+        }
 
         return ret + sub.hashCode() * 100;
     }
@@ -317,12 +367,16 @@ public class SMTTermQuant extends SMTTerm {
 
     public String toString(int nestPos) {
         StringBuffer tab = new StringBuffer();
-        for (int i = 0; i < nestPos; i++) { tab = tab.append(" "); }
+        for (int i = 0; i < nestPos; i++) {
+            tab = tab.append(" ");
+        }
 
         StringBuilder buff = new StringBuilder();
         buff.append(tab);
 
-        if (bindVars.size() == 0) { return sub.toString(nestPos); }
+        if (bindVars.size() == 0) {
+            return sub.toString(nestPos);
+        }
 
         if (quant == Quant.FORALL) {
             buff.append("(forall ");
@@ -346,7 +400,11 @@ public class SMTTermQuant extends SMTTerm {
         }
         buff.append(" )");
 
-        if (pats != null) { if (!pats.isEmpty()) { buff.append(" (! "); } }
+        if (pats != null) {
+            if (!pats.isEmpty()) {
+                buff.append(" (! ");
+            }
+        }
 
         buff.append("\n");
 
@@ -371,7 +429,10 @@ public class SMTTermQuant extends SMTTerm {
                 for (List<SMTTerm> patList : pats) {
                     buff.append(tab).append(" ").append(" ").append(":pattern ( ");
 
-                    for (SMTTerm pat : patList) { buff.append(pat.toString(0)); buff.append(" "); }
+                    for (SMTTerm pat : patList) {
+                        buff.append(pat.toString(0));
+                        buff.append(" ");
+                    }
 
                     buff.append(")");
                     buff.append("\n");

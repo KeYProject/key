@@ -58,11 +58,17 @@ public class SMTTermVariable extends SMTTerm {
 
     @Override
     public boolean equals(Object term) {
-        if (term == null) { return false; }
+        if (term == null) {
+            return false;
+        }
 
-        if (this == term) { return true; }
+        if (this == term) {
+            return true;
+        }
 
-        if (!(term instanceof SMTTermVariable tv)) { return false; }
+        if (!(term instanceof SMTTermVariable tv)) {
+            return false;
+        }
 
         return this.sort.equals(tv.sort) && this.id.equals(tv.id);
     }
@@ -103,7 +109,9 @@ public class SMTTermVariable extends SMTTerm {
 
     public String toString(int nestPos) {
         StringBuffer tab = new StringBuffer();
-        for (int i = 0; i < nestPos; i++) { tab = tab.append(" "); }
+        for (int i = 0; i < nestPos; i++) {
+            tab = tab.append(" ");
+        }
 
         return tab + id;
     }

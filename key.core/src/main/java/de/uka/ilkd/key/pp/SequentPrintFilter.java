@@ -85,10 +85,14 @@ public abstract class SequentPrintFilter {
     protected void filterIdentity() {
         antec = ImmutableSLList.nil();
         Iterator<SequentFormula> it = originalSequent.antecedent().iterator();
-        while (it.hasNext()) { antec = antec.append(new IdentityFilterEntry(it.next())); }
+        while (it.hasNext()) {
+            antec = antec.append(new IdentityFilterEntry(it.next()));
+        }
 
         succ = ImmutableSLList.nil();
         it = originalSequent.succedent().iterator();
-        while (it.hasNext()) { succ = succ.append(new IdentityFilterEntry(it.next())); }
+        while (it.hasNext()) {
+            succ = succ.append(new IdentityFilterEntry(it.next()));
+        }
     }
 }

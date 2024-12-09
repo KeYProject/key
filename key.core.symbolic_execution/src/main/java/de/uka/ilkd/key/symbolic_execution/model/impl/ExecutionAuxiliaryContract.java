@@ -87,16 +87,19 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
             }
         }
         Node usageNode = getProofNode().child(2);
-        assert "Usage".equals(usageNode.getNodeInfo().getBranchLabel()) : "Block Contract Rule has changed.";
+        assert "Usage".equals(usageNode.getNodeInfo().getBranchLabel())
+                : "Block Contract Rule has changed.";
         Term usagePrecondition = usageNode.sequent().antecedent()
                 .get(usageNode.sequent().antecedent().size() - 1).formula();
         // Find remembrance heaps and local variables
         while (applicationTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
-            assert applicationTerm.sub(0) == usagePrecondition.sub(0) : "Block Contract Rule has changed.";
+            assert applicationTerm.sub(0) == usagePrecondition.sub(0)
+                    : "Block Contract Rule has changed.";
             applicationTerm = applicationTerm.sub(1);
             usagePrecondition = usagePrecondition.sub(1);
         }
-        assert usagePrecondition.op() == UpdateApplication.UPDATE_APPLICATION : "Block Contract Rule has changed.";
+        assert usagePrecondition.op() == UpdateApplication.UPDATE_APPLICATION
+                : "Block Contract Rule has changed.";
         Map<LocationVariable, Term> remembranceHeaps = new LinkedHashMap<>();
         Map<LocationVariable, Term> remembranceLocalVariables =
             new LinkedHashMap<>();
@@ -104,7 +107,8 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
             remembranceLocalVariables);
         // Find remaining information
         Node validitiyNode = getProofNode().child(0);
-        assert "Validity".equals(validitiyNode.getNodeInfo().getBranchLabel()) : "Block Contract Rule has changed.";
+        assert "Validity".equals(validitiyNode.getNodeInfo().getBranchLabel())
+                : "Block Contract Rule has changed.";
         Term validitiyModalityTerm = TermBuilder.goBelowUpdates(SymbolicExecutionUtil
                 .posInOccurrenceInOtherNode(getProofNode(), getModalityPIO(), validitiyNode));
         MethodFrame mf =
@@ -125,7 +129,9 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
             }
         }
         Term exception = null;
-        if (variables.exception != null) { exception = declaredVariableAsTerm(sb, statementIndex); }
+        if (variables.exception != null) {
+            exception = declaredVariableAsTerm(sb, statementIndex);
+        }
         // getPlainText() does not use breakFlags, continueFlags, returnFlag,
         // remembranceLocalVariables, outerRemembrancevariables
         AuxiliaryContract.Terms terms = new AuxiliaryContract.Terms(self, null, null, returnFlag,
@@ -147,7 +153,8 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
      */
     protected Term declaredVariableAsTerm(StatementBlock sb, int statementIndex) {
         Statement resultInitStatement = sb.getStatementAt(statementIndex);
-        assert resultInitStatement instanceof LocalVariableDeclaration : "Block Contract Rule has changed.";
+        assert resultInitStatement instanceof LocalVariableDeclaration
+                : "Block Contract Rule has changed.";
         Named var = ((LocalVariableDeclaration) resultInitStatement).getVariables().get(0)
                 .getProgramVariable();
         assert var != null : "Block Contract Rule has changed.";

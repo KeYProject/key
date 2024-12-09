@@ -110,7 +110,9 @@ public class DependencyNode {
         DependencyGraph.EdgeType current = dependencies.get(targetNode);
         if (current != null) {
             // overwrite current edge type only if the given one is stronger
-            if (current != TERMINATION_SENSITIVE) { dependencies.put(targetNode, edgeType); }
+            if (current != TERMINATION_SENSITIVE) {
+                dependencies.put(targetNode, edgeType);
+            }
         } else {
             dependencies.put(targetNode, edgeType);
         }
@@ -134,7 +136,9 @@ public class DependencyNode {
         result.append(contract.getName()).append(" -> (");
         boolean first = true;
         for (DependencyNode currentNode : dependencies.keySet()) {
-            if (!first) { result.append(" "); }
+            if (!first) {
+                result.append(" ");
+            }
             result.append(currentNode.contract.getName());
             first = false;
         }

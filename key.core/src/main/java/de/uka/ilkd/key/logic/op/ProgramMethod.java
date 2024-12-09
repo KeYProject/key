@@ -260,7 +260,9 @@ public final class ProgramMethod extends ObserverFunction
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof IProgramMethod ipm)) { return false; }
+        if (!(obj instanceof IProgramMethod ipm)) {
+            return false;
+        }
 
         return method == ipm.getMethodDeclaration();
     }
@@ -310,9 +312,9 @@ public final class ProgramMethod extends ObserverFunction
     @Override
     public String getUniqueName() {
         return getName() + "_"
-                + Math.abs(ContractFactory
-                        .generateContractTypeName("", getContainerType(), this, getContainerType())
-                        .hashCode());
+            + Math.abs(ContractFactory
+                    .generateContractTypeName("", getContainerType(), this, getContainerType())
+                    .hashCode());
     } // Included HashCode to make IF-Predicates unique and still reproducible
 
     /*
@@ -453,7 +455,8 @@ public final class ProgramMethod extends ObserverFunction
         for (int i = numParams - 1; i >= 0; i--) {
             ParameterDeclaration pd = getParameterDeclarationAt(i);
             IProgramVariable paramProgVar = pd.getVariableSpecification().getProgramVariable();
-            assert paramProgVar instanceof LocationVariable : "Parameter declaration expected to be location var!";
+            assert paramProgVar instanceof LocationVariable
+                    : "Parameter declaration expected to be location var!";
             LocationVariable paramLocVar = (LocationVariable) paramProgVar;
             paramVars = paramVars.prepend(paramLocVar);
         }

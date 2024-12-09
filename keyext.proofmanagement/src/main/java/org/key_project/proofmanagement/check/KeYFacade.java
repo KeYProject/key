@@ -114,7 +114,9 @@ public final class KeYFacade {
 
     private static CheckerData.ProofEntry findProofLine(Path proofPath, CheckerData data) {
         for (CheckerData.ProofEntry line : data.getProofEntries()) {
-            if (line.proofFile != null && line.proofFile.equals(proofPath)) { return line; }
+            if (line.proofFile != null && line.proofFile.equals(proofPath)) {
+                return line;
+            }
         }
         return null;
     }
@@ -242,7 +244,9 @@ public final class KeYFacade {
             int ind = -1;
             for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
                 ind = chooseContract.indexOf("." + tag);
-                if (ind > 0) { break; }
+                if (ind > 0) {
+                    break;
+                }
                 proofNum++;
             }
             if (ind == -1) {
@@ -264,12 +268,14 @@ public final class KeYFacade {
             String poClass = properties.getString(IPersistablePO.PROPERTY_CLASS);
             if (poClass == null || poClass.isEmpty()) {
                 throw new IOException("Proof obligation class property \""
-                        + IPersistablePO.PROPERTY_CLASS + "\" is not defined or empty.");
+                    + IPersistablePO.PROPERTY_CLASS + "\" is not defined or empty.");
             }
             ServiceLoader<ProofObligationLoader> loader =
                 ServiceLoader.load(ProofObligationLoader.class);
             for (ProofObligationLoader poloader : loader) {
-                if (poloader.handles(poClass)) { return poloader.loadFrom(initConfig, proofObligation); }
+                if (poloader.handles(poClass)) {
+                    return poloader.loadFrom(initConfig, proofObligation);
+                }
             }
             throw new IllegalArgumentException(
                 "There is no builder that can build the PO for the id " + poClass);
@@ -308,7 +314,7 @@ public final class KeYFacade {
                         } catch (ProofInputException e) {
                             throw new ProofManagementException(
                                 "Could not replay proof from " + envInput
-                                        + System.lineSeparator() + e);
+                                    + System.lineSeparator() + e);
                         }
                     }
                 }
@@ -375,7 +381,9 @@ public final class KeYFacade {
             status +=
                 (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus()
                         : "Error while loading proof.");
-            if (replayResult != null) { errors.addAll(replayResult.getErrors()); }
+            if (replayResult != null) {
+                errors.addAll(replayResult.getErrors());
+            }
 
             // reset OSS
             StrategyProperties newProps = proof.getSettings().getStrategySettings()
@@ -421,10 +429,14 @@ public final class KeYFacade {
             ProofBundleHandler pbh = data.getPbh();
             var src = pbh.getPath("src");
             List<Path> cp = null;
-            if (!pbh.getClasspathFiles().isEmpty()) { cp = pbh.getClasspathFiles().stream()
-                    .toList(); }
+            if (!pbh.getClasspathFiles().isEmpty()) {
+                cp = pbh.getClasspathFiles().stream()
+                        .toList();
+            }
             Path bcp = null;
-            if (pbh.getBootclasspath() != null) { bcp = pbh.getBootclasspath(); }
+            if (pbh.getBootclasspath() != null) {
+                bcp = pbh.getBootclasspath();
+            }
 
             Profile profile = AbstractProfile.getDefaultProfile();
 
@@ -436,7 +448,7 @@ public final class KeYFacade {
         } catch (IOException e) {
             data.setSrcLoadingState(CheckerData.LoadingState.ERROR);
             throw new ProofManagementException("Java sources could not be loaded."
-                    + System.lineSeparator() + e.getMessage());
+                + System.lineSeparator() + e.getMessage());
         }
     }
 }

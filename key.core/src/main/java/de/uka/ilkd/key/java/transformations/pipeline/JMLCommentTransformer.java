@@ -20,8 +20,10 @@ import com.github.javaparser.utils.PositionUtils;
 import org.jspecify.annotations.NonNull;
 
 public class JMLCommentTransformer extends JavaTransformer {
-    public static final DataKey<List<Comment>> BEFORE_COMMENTS = new DataKey<>() {};
-    public static final DataKey<List<Comment>> AFTER_COMMENTS = new DataKey<>() {};
+    public static final DataKey<List<Comment>> BEFORE_COMMENTS = new DataKey<>() {
+    };
+    public static final DataKey<List<Comment>> AFTER_COMMENTS = new DataKey<>() {
+    };
 
     /**
      * creates a transformer for the recoder model
@@ -35,14 +37,20 @@ public class JMLCommentTransformer extends JavaTransformer {
     }
 
     private void attachComments(Node cu, List<Comment> allComments) {
-        if (!hasJmlCommentInside(cu)) { return; }
+        if (!hasJmlCommentInside(cu)) {
+            return;
+        }
 
         var orphan = cu.getOrphanComments();
-        for (Comment comment : orphan) { comment.setParentNode(cu); }
+        for (Comment comment : orphan) {
+            comment.setParentNode(cu);
+        }
         var filterComments = filterToplevel(allComments, cu);
         filterComments.addAll(orphan);
         PositionUtils.sortByBeginPosition(filterComments);
-        if (filterComments.isEmpty()) { return; }
+        if (filterComments.isEmpty()) {
+            return;
+        }
 
         // attach to next Node
         Iterator<Node> iter = cu.getChildNodes().iterator();
@@ -54,7 +62,9 @@ public class JMLCommentTransformer extends JavaTransformer {
             List<Comment> specs = new ArrayList<>();
             while (commentIdx < filterComments.size()) {
                 Comment c = filterComments.get(commentIdx);
-                if (PositionUtils.areInOrder(n, c)) { continue nextNode; }
+                if (PositionUtils.areInOrder(n, c)) {
+                    continue nextNode;
+                }
                 n.setData(BEFORE_COMMENTS, specs);
                 specs.add(c);
                 allComments.remove(c);
@@ -82,11 +92,21 @@ public class JMLCommentTransformer extends JavaTransformer {
             return true;
         if (cu instanceof BlockStmt)
             return true;
-        if (cu instanceof LabeledStmt) { return true; }
-        if (cu instanceof WhileStmt) { return true; }
-        if (cu instanceof ForStmt) { return true; }
-        if (cu instanceof ForEachStmt) { return true; }
-        if (cu instanceof DoStmt) { return true; }
+        if (cu instanceof LabeledStmt) {
+            return true;
+        }
+        if (cu instanceof WhileStmt) {
+            return true;
+        }
+        if (cu instanceof ForStmt) {
+            return true;
+        }
+        if (cu instanceof ForEachStmt) {
+            return true;
+        }
+        if (cu instanceof DoStmt) {
+            return true;
+        }
         if (cu instanceof MethodDeclaration)
             return true;
         return false;
@@ -105,6 +125,8 @@ public class JMLCommentTransformer extends JavaTransformer {
     public void apply(CompilationUnit cu) {
         var comments = cu.getAllComments();
         cu.walk(it -> attachComments(it, comments));
-        if (!comments.isEmpty()) { throw new IllegalStateException("Some comments were not attached to nodes"); }
+        if (!comments.isEmpty()) {
+            throw new IllegalStateException("Some comments were not attached to nodes");
+        }
     }
 }

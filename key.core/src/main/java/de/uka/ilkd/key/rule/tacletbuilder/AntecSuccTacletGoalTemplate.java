@@ -76,7 +76,9 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o)) { return false; }
+        if (!super.equals(o)) {
+            return false;
+        }
         final AntecSuccTacletGoalTemplate other = (AntecSuccTacletGoalTemplate) o;
         return replacewith.equals(other.replacewith);
     }

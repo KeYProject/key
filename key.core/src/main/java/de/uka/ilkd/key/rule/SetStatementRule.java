@@ -44,12 +44,18 @@ public final class SetStatementRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
-        if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) { return false; }
+        if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) {
+            return false;
+        }
         // abort if inside of transformer
-        if (Transformer.inTransformer(occurrence)) { return false; }
+        if (Transformer.inTransformer(occurrence)) {
+            return false;
+        }
 
         Term target = occurrence.subTerm();
-        if (target.op() instanceof UpdateApplication) { target = UpdateApplication.getTarget(target); }
+        if (target.op() instanceof UpdateApplication) {
+            target = UpdateApplication.getTarget(target);
+        }
         final SourceElement activeStatement = JavaTools.getActiveStatement(target.javaBlock());
         return activeStatement instanceof SetStatement;
     }
@@ -75,7 +81,8 @@ public final class SetStatementRule implements BuiltInRule {
         final PosInOccurrence occurrence = ruleApp.posInOccurrence();
         final Term formula = occurrence.subTerm();
         assert formula
-                .op() instanceof UpdateApplication : "Currently, this can only be applied if there is an update application in front of the modality";
+                .op() instanceof UpdateApplication
+                : "Currently, this can only be applied if there is an update application in front of the modality";
 
         Term update = UpdateApplication.getUpdate(formula);
         Term target = UpdateApplication.getTarget(formula);

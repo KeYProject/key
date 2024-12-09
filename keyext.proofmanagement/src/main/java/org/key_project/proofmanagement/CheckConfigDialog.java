@@ -230,7 +230,7 @@ class CheckConfigDialog extends JDialog {
         JButton chooseReportLocationButton = new JButton("Choose report location...");
         chooseReportLocationButton
                 .setToolTipText("Choose the location or file for the HTML report. " +
-                        "By default, the filename will be \"report.html\".");
+                    "By default, the filename will be \"report.html\".");
         reportCheck.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 chooseReportLocationButton.setEnabled(true);

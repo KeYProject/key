@@ -51,11 +51,17 @@ public class ImmutableFixedLengthBitSet {
      * @return The integer value represented by this {@link ImmutableFixedLengthBitSet}.
      */
     public/* @ pure @ */int getValue() {
-        if (value > -1) { return value; }
+        if (value > -1) {
+            return value;
+        }
 
         int result = 0;
 
-        for (int i = 0; i < bitSet.length; i++) { if (bitSet[i]) { result |= intPow(2, i); } }
+        for (int i = 0; i < bitSet.length; i++) {
+            if (bitSet[i]) {
+                result |= intPow(2, i);
+            }
+        }
 
         return result;
     }
@@ -71,7 +77,10 @@ public class ImmutableFixedLengthBitSet {
         assert value > -1 : "Only non-negative values are allowed.";
 
         boolean[] newBitSet = new boolean[this.bitSet.length];
-        for (int i = 0; i < newBitSet.length; i++) { int bit = intPow(2, i); newBitSet[i] = (value & bit) != 0; }
+        for (int i = 0; i < newBitSet.length; i++) {
+            int bit = intPow(2, i);
+            newBitSet[i] = (value & bit) != 0;
+        }
 
         return new ImmutableFixedLengthBitSet(newBitSet, value);
     }
@@ -90,7 +99,11 @@ public class ImmutableFixedLengthBitSet {
     public/* @ pure @ */int getNumOfZeroBits() {
         int result = 0;
 
-        for (boolean b : bitSet) { if (!b) { result++; } }
+        for (boolean b : bitSet) {
+            if (!b) {
+                result++;
+            }
+        }
 
         return result;
     }
@@ -100,7 +113,11 @@ public class ImmutableFixedLengthBitSet {
      */
     public ArrayList<Integer> getNonzeroPositions() {
         ArrayList<Integer> result = new ArrayList<>();
-        for (int i = 0; i < bitSet.length; i++) { if (bitSet[i]) { result.add(i); } }
+        for (int i = 0; i < bitSet.length; i++) {
+            if (bitSet[i]) {
+                result.add(i);
+            }
+        }
 
         return result;
     }
@@ -116,7 +133,10 @@ public class ImmutableFixedLengthBitSet {
 
         result.append(getValue()).append(" [");
 
-        for (boolean bit : bitSet) { result.append(bit ? "1" : 0); result.append(","); }
+        for (boolean bit : bitSet) {
+            result.append(bit ? "1" : 0);
+            result.append(",");
+        }
 
         result.deleteCharAt(result.length() - 1);
         result.append("]");

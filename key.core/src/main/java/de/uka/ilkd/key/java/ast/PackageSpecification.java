@@ -53,7 +53,9 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (reference != null) { result++; }
+        if (reference != null) {
+            result++;
+        }
         return result;
     }
 
@@ -68,7 +70,11 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
      */
 
     public ProgramElement getChildAt(int index) {
-        if (reference != null) { if (index == 0) { return reference; } }
+        if (reference != null) {
+            if (index == 0) {
+                return reference;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

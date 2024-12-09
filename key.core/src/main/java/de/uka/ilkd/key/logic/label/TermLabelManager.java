@@ -183,7 +183,9 @@ public class TermLabelManager {
      *        The {@link TermLabelMerger} to use.
      */
     private void analyzeMerger(Name termLabelName, TermLabelMerger termLabelMerger) {
-        if (termLabelMerger != null) { mergerMap.put(termLabelName, termLabelMerger); }
+        if (termLabelMerger != null) {
+            mergerMap.put(termLabelName, termLabelMerger);
+        }
     }
 
     /**
@@ -203,7 +205,11 @@ public class TermLabelManager {
      */
     private void analyzeTermPolicies(Name termLabelName, ImmutableList<TermLabelPolicy> policies,
             Map<Name, TermLabelPolicy> policyMap) {
-        if (policies != null) { for (TermLabelPolicy policy : policies) { policyMap.put(termLabelName, policy); } }
+        if (policies != null) {
+            for (TermLabelPolicy policy : policies) {
+                policyMap.put(termLabelName, policy);
+            }
+        }
     }
 
     /**
@@ -267,7 +273,9 @@ public class TermLabelManager {
                 } else {
                     for (Name rule : supportedRules) {
                         ImmutableList<TermLabelUpdate> ruleUpdates = ruleSpecificUpdates.get(rule);
-                        if (ruleUpdates == null) { ruleUpdates = ImmutableSLList.nil(); }
+                        if (ruleUpdates == null) {
+                            ruleUpdates = ImmutableSLList.nil();
+                        }
                         ruleUpdates = ruleUpdates.prepend(update);
                         ruleSpecificUpdates.put(rule, ruleUpdates);
                     }
@@ -296,7 +304,9 @@ public class TermLabelManager {
                     for (Name rule : supportedRules) {
                         ImmutableList<TermLabelRefactoring> ruleRefactorings =
                             ruleSpecificRefactorings.get(rule);
-                        if (ruleRefactorings == null) { ruleRefactorings = ImmutableSLList.nil(); }
+                        if (ruleRefactorings == null) {
+                            ruleRefactorings = ImmutableSLList.nil();
+                        }
                         ruleRefactorings = ruleRefactorings.prepend(refactoring);
                         ruleSpecificRefactorings.put(rule, ruleRefactorings);
                     }
@@ -317,7 +327,9 @@ public class TermLabelManager {
         TermLabelManager result = null;
         if (services != null) {
             Profile profile = services.getProfile();
-            if (profile != null) { result = profile.getTermLabelManager(); }
+            if (profile != null) {
+                result = profile.getTermLabelManager();
+            }
         }
         return result;
     }
@@ -637,7 +649,9 @@ public class TermLabelManager {
     private void addLabelsBasedOnApplicationTerm(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term newTerm, Set<TermLabel> newLabels) {
-        if (applicationTerm == null) { return; }
+        if (applicationTerm == null) {
+            return;
+        }
         // Re-add exiting application term labels based on application term policies.
         performTermLabelPolicies(state, services, applicationPosInOccurrence, applicationTerm, rule,
             goal, hint, tacletTerm, newTerm, applicationTermPolicyMap, newLabels);
@@ -719,7 +733,9 @@ public class TermLabelManager {
         // Instantiate empty result
         Set<TermLabel> newLabels = new LinkedHashSet<>();
         // Add labels from taclet
-        if (tacletTerm != null && tacletTerm.hasLabels()) { performTacletTerm(tacletTerm, newLabels); }
+        if (tacletTerm != null && tacletTerm.hasLabels()) {
+            performTacletTerm(tacletTerm, newLabels);
+        }
         addLabelsBasedOnApplicationTerm(state, services, applicationPosInOccurrence,
             applicationTerm, rule, goal, hint, tacletTerm, newTerm, newLabels);
         // Re-add exiting modality term labels based on symbolic execution term policies.
@@ -758,7 +774,9 @@ public class TermLabelManager {
      *        The result {@link Set} with the {@link TermLabel}s of the new {@link Term}.
      */
     protected void performTacletTerm(Term tacletTerm, Set<TermLabel> newLabels) {
-        for (TermLabel label : tacletTerm.getLabels()) { newLabels.add(label); }
+        for (TermLabel label : tacletTerm.getLabels()) {
+            newLabels.add(label);
+        }
     }
 
     /**
@@ -858,7 +876,9 @@ public class TermLabelManager {
         if (policy != null) {
             label = policy.keepLabel(state, services, applicationPosInOccurrence, applicationTerm,
                 rule, goal, hint, tacletTerm, newTerm, label);
-            if (label != null) { newLabels.add(label); }
+            if (label != null) {
+                newLabels.add(label);
+            }
         }
     }
 
@@ -1855,7 +1875,9 @@ public class TermLabelManager {
                 newSubs[i] = refactorLabelsRecursive(state, services, applicationPosInOccurrence,
                     applicationTerm, rule, goal, hint, tacletTerm, sub,
                     allChildAndGrandchildRefactorings);
-                if (!newSubs[i].equals(sub)) { changed = true; }
+                if (!newSubs[i].equals(sub)) {
+                    changed = true;
+                }
             }
             newApplicationTerm = changed ? tf.createTerm(newApplicationTerm.op(), newSubs,
                 newApplicationTerm.boundVars(),
@@ -2006,7 +2028,9 @@ public class TermLabelManager {
             Term oldSub = term.sub(i);
             newSubs[i] = refactorLabelsRecursive(state, services, applicationPosInOccurrence,
                 applicationTerm, rule, goal, hint, tacletTerm, oldSub, activeRefactorings);
-            if (!newSubs[i].equals(oldSub)) { subsChanged = true; }
+            if (!newSubs[i].equals(oldSub)) {
+                subsChanged = true;
+            }
         }
         ImmutableArray<TermLabel> newLabels =
             performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule,
@@ -2289,7 +2313,9 @@ public class TermLabelManager {
      */
     public static void mergeLabels(SequentChangeInfo currentSequent, Services services) {
         TermLabelManager manager = getTermLabelManager(services);
-        if (manager != null) { manager.mergeLabels(services, currentSequent); }
+        if (manager != null) {
+            manager.mergeLabels(services, currentSequent);
+        }
     }
 
     /**

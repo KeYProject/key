@@ -97,15 +97,23 @@ public class DelayedCutProcessor implements Runnable {
     }
 
     private Goal find(Proof proof, Node node) {
-        for (Goal goal : proof.openGoals()) { if (goal.node() == node) { return goal; } }
+        for (Goal goal : proof.openGoals()) {
+            if (goal.node() == node) {
+                return goal;
+            }
+        }
         return null;
     }
 
     public DelayedCut cut() {
-        if (used) { throw new IllegalStateException(
-            "For each cut a new object of this class must be created."); }
+        if (used) {
+            throw new IllegalStateException(
+                "For each cut a new object of this class must be created.");
+        }
         used = true;
-        for (DelayedCutListener listener : listeners) { listener.eventCutting(); }
+        for (DelayedCutListener listener : listeners) {
+            listener.eventCutting();
+        }
         // do not change the order of the following two statements!
         RuleApp firstAppliedRuleApp = node.getAppliedRuleApp();
         ImmutableList<Node> subtrees = proof.pruneProof(node, false);
@@ -129,7 +137,9 @@ public class DelayedCutProcessor implements Runnable {
         // uncover the decision predicate.
         uncoverDecisionPredicate(delayedCut, openLeaves);
 
-        for (DelayedCutListener listener : listeners) { listener.eventEnd(delayedCut); }
+        for (DelayedCutListener listener : listeners) {
+            listener.eventEnd(delayedCut);
+        }
 
         return delayedCut;
     }
@@ -200,7 +210,9 @@ public class DelayedCutProcessor implements Runnable {
             if (goal[i].node().getNodeInfo().getBranchLabel().endsWith(side)) {
                 SequentFormula formula =
                     getSequentFormula(goal[i], cut.isDecisionPredicateInAntecendet());
-                if (formula.formula() == cut.getFormula()) { return i; }
+                if (formula.formula() == cut.getFormula()) {
+                    return i;
+                }
             }
         }
         throw new IllegalStateException(
@@ -228,7 +240,9 @@ public class DelayedCutProcessor implements Runnable {
             apply(cut.getNode(), goal, cut.getFirstAppliedRuleApp(), cut.getServices()));
 
         int totalNumber = 0;
-        for (NodeGoalPair pair : pairs) { totalNumber += pair.node.countNodes(); }
+        for (NodeGoalPair pair : pairs) {
+            totalNumber += pair.node.countNodes();
+        }
 
         int currentNumber = 0;
         while (!pairs.isEmpty()) {
@@ -278,7 +292,9 @@ public class DelayedCutProcessor implements Runnable {
         // if(childs == null){
         // return goals;
         // }
-        for (Goal child : childs) { goals.addFirst(child); }
+        for (Goal child : childs) {
+            goals.addFirst(child);
+        }
         return goals;
     }
 
@@ -320,10 +336,14 @@ public class DelayedCutProcessor implements Runnable {
     }
 
     private void check(Goal goal, final RuleApp app, PosInOccurrence newPos, Services services) {
-        if (newPos == null) { return; }
+        if (newPos == null) {
+            return;
+        }
         if (app instanceof IBuiltInRuleApp) {
             BuiltInRule rule = (BuiltInRule) app.rule();
-            if (rule.isApplicable(goal, newPos)) { return; }
+            if (rule.isApplicable(goal, newPos)) {
+                return;
+            }
             // for(RuleApp newApp: goal.ruleAppIndex().getBuiltInRules(goal,
             // newPos)){
             // if(app.rule().name().compareTo(newApp.rule().name()) == 0){
@@ -359,13 +379,15 @@ public class DelayedCutProcessor implements Runnable {
         }
 
         throw new RuntimeException("App is neither a BuiltInApp nor a TacletApp, it's  of type"
-                + app.getClass().getName());
+            + app.getClass().getName());
 
     }
 
     private PosInOccurrence translate(NodeGoalPair pair, TermServices services) {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
-        if (oldRuleApp == null || oldRuleApp.posInOccurrence() == null) { return null; }
+        if (oldRuleApp == null || oldRuleApp.posInOccurrence() == null) {
+            return null;
+        }
         int formulaNumber =
             pair.node.sequent().formulaNumberInSequent(oldRuleApp.posInOccurrence().isInAntec(),
                 oldRuleApp.posInOccurrence().sequentFormula());
@@ -382,7 +404,9 @@ public class DelayedCutProcessor implements Runnable {
             Iterator<Node> iterator, LinkedList<Goal> goals) {
 
         int leafNumber = 0;
-        if (goals.isEmpty()) { return leafNumber; }
+        if (goals.isEmpty()) {
+            return leafNumber;
+        }
         while (iterator.hasNext()) {
             Goal matchedGoal = goals.pollFirst();
             Node child = iterator.next();
@@ -390,7 +414,9 @@ public class DelayedCutProcessor implements Runnable {
             if (!child.leaf()) {
                 pairs.add(new NodeGoalPair(child, matchedGoal));
             } else {
-                if (!matchedGoal.node().isClosed()) { openLeaves.add(new NodeGoalPair(child, matchedGoal)); }
+                if (!matchedGoal.node().isClosed()) {
+                    openLeaves.add(new NodeGoalPair(child, matchedGoal));
+                }
                 leafNumber++;
             }
         }
@@ -415,7 +441,9 @@ public class DelayedCutProcessor implements Runnable {
         try {
             cut();
         } catch (Throwable throwable) {
-            for (DelayedCutListener listener : listeners) { listener.eventException(throwable); }
+            for (DelayedCutListener listener : listeners) {
+                listener.eventException(throwable);
+            }
         }
     }
 }

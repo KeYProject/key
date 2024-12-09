@@ -134,10 +134,14 @@ public abstract class VariableNamer implements InstantiationProposer {
      * returns the subterm containing a java block, or null (helper for getProgramFromPIO())
      */
     private Term findProgramInTerm(Term term) {
-        if (!term.javaBlock().isEmpty()) { return term; }
+        if (!term.javaBlock().isEmpty()) {
+            return term;
+        }
         for (int i = 0; i < term.arity(); i++) {
             Term subterm = findProgramInTerm(term.sub(i));
-            if (subterm != null) { return subterm; }
+            if (subterm != null) {
+                return subterm;
+            }
         }
         return null;
     }
@@ -179,7 +183,9 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         for (ProgramElementName name : globals) {
             BasenameAndIndex bai = getBasenameAndIndex(name);
-            if (bai.basename.equals(basename) && bai.index > result) { result = bai.index; }
+            if (bai.basename.equals(basename) && bai.index > result) {
+                result = bai.index;
+            }
         }
 
         return result;
@@ -205,7 +211,9 @@ public abstract class VariableNamer implements InstantiationProposer {
                     ProgramElementName name = var.getProgramElementName();
                     if (!(name instanceof TempIndProgramElementName)) {
                         BasenameAndIndex bai = getBasenameAndIndex(name);
-                        if (bai.basename.equals(basename) && bai.index > maxCounter) { maxCounter = bai.index; }
+                        if (bai.basename.equals(basename) && bai.index > maxCounter) {
+                            maxCounter = bai.index;
+                        }
                     }
                 }
             }
@@ -228,7 +236,11 @@ public abstract class VariableNamer implements InstantiationProposer {
      * tells whether a name is unique in the passed list of global variables
      */
     protected boolean isUniqueInGlobals(String name, Iterable<ProgramElementName> globals) {
-        for (ProgramElementName n : globals) { if (n.toString().equals(name)) { return false; } }
+        for (ProgramElementName n : globals) {
+            if (n.toString().equals(name)) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -249,7 +261,9 @@ public abstract class VariableNamer implements InstantiationProposer {
             protected void doAction(ProgramElement node) {
                 if (node instanceof ProgramVariable var) {
                     ProgramElementName varname = var.getProgramElementName();
-                    if (varname.getProgramName().equals(nameToFind)) { foundIt = true; }
+                    if (varname.getProgramName().equals(nameToFind)) {
+                        foundIt = true;
+                    }
                 }
             }
         }
@@ -272,7 +286,9 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     protected Iterable<ProgramElementName> wrapGlobals(Iterable<? extends Named> globals) {
         List<ProgramElementName> result = new ArrayList<>();
-        for (Named named : globals) { result.add((ProgramElementName) named.name()); }
+        for (Named named : globals) {
+            result.add((ProgramElementName) named.name());
+        }
         return result;
     }
 
@@ -351,7 +367,9 @@ public abstract class VariableNamer implements InstantiationProposer {
             Sort svSort = psv.sort();
 
             if (svSort == ProgramSVSort.VARIABLE) {
-                if (basename == null || basename.isEmpty()) { basename = DEFAULT_BASENAME; }
+                if (basename == null || basename.isEmpty()) {
+                    basename = DEFAULT_BASENAME;
+                }
                 int cnt =
                     getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
                             + 1;
@@ -399,7 +417,9 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @return the name proposal
      */
     public ProgramElementName getTemporaryNameProposal(String basename) {
-        if (basename == null || basename.isEmpty()) { basename = DEFAULT_BASENAME; }
+        if (basename == null || basename.isEmpty()) {
+            basename = DEFAULT_BASENAME;
+        }
         int cnt = services.getCounter(TEMPCOUNTER_NAME).getCountPlusPlus();
         // using null as undo anchor should be okay, since the name which the
         // the counter is used for is only temporary and will be changed
@@ -569,7 +589,9 @@ public abstract class VariableNamer implements InstantiationProposer {
     public String getSuggestiveNameProposalForProgramVariable(SchemaVariable sv, TacletApp app,
             Services services, ImmutableList<String> previousProposals) {
 
-        if (suggestive_off) { return getProposal(app, sv, services, null, previousProposals); }
+        if (suggestive_off) {
+            return getProposal(app, sv, services, null, previousProposals);
+        }
 
         String proposal;
         try {
@@ -600,7 +622,9 @@ public abstract class VariableNamer implements InstantiationProposer {
                 }
 
             }
-            if ("".equals(name)) { throw new Exception(); }
+            if ("".equals(name)) {
+                throw new Exception();
+            }
             proposal = "[" + name + "]";
         } catch (Exception e) {
             LOGGER.info("", e);
@@ -611,7 +635,9 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 
     public String getSuggestiveNameProposalForSchemaVariable(Expression e) {
-        if (suggestive_off) { return getTemporaryNameProposal(DEFAULT_BASENAME).toString(); }
+        if (suggestive_off) {
+            return getTemporaryNameProposal(DEFAULT_BASENAME).toString();
+        }
         return "[" + ProofSaver.printProgramElement(e) + "]";
     }
 
@@ -705,7 +731,9 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         CustomJavaASTWalker(ProgramElement program, PosInProgram posOfDeclaration) {
             super(program);
-            if (posOfDeclaration != null) { declarationNode = PosInProgram.getProgramAt(posOfDeclaration, program); }
+            if (posOfDeclaration != null) {
+                declarationNode = PosInProgram.getProgramAt(posOfDeclaration, program);
+            }
         }
 
         protected void walk(ProgramElement node) {
@@ -719,7 +747,9 @@ public abstract class VariableNamer implements InstantiationProposer {
                 currentScopeDepth = depth();
             } else if (node == declarationNode) {
                 declarationScopeDepth = currentScopeDepth;
-            } else if (depth() <= declarationScopeDepth) { return; }
+            } else if (depth() <= declarationScopeDepth) {
+                return;
+            }
 
             super.walk(node);
         }
@@ -735,7 +765,9 @@ public abstract class VariableNamer implements InstantiationProposer {
     }
 
     public static Name getBasename(Name name) {
-        if (name instanceof IndProgramElementName) { return new Name(((IndProgramElementName) name).getBaseName()); }
+        if (name instanceof IndProgramElementName) {
+            return new Name(((IndProgramElementName) name).getBaseName());
+        }
         return name;
     }
 }

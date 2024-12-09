@@ -81,7 +81,11 @@ public abstract class AbstractUpdateExtractor {
         if (Junctor.AND == pathCondition.op()) {
             // Path condition with multiple terms combined via AND
             List<Term> newTerms = new LinkedList<>();
-            for (Term sub : pathCondition.subs()) { if (!containsImplicitProgramVariable(sub)) { newTerms.add(sub); } }
+            for (Term sub : pathCondition.subs()) {
+                if (!containsImplicitProgramVariable(sub)) {
+                    newTerms.add(sub);
+                }
+            }
             return getServices().getTermBuilder().and(newTerms);
         } else {
             // Only one term in path condition
@@ -106,7 +110,11 @@ public abstract class AbstractUpdateExtractor {
                 && isImplicitProgramVariable((ProgramVariable) term.op())) {
             return true;
         }
-        for (int i = 0; i < term.arity(); i++) { if (containsImplicitProgramVariable(term.sub(i))) { return true; } }
+        for (int i = 0; i < term.arity(); i++) {
+            if (containsImplicitProgramVariable(term.sub(i))) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -153,7 +161,9 @@ public abstract class AbstractUpdateExtractor {
             Sequent sequent = getRoot().sequent();
             for (SequentFormula sf : sequent.succedent()) {
                 Term term = sf.formula();
-                if (Junctor.IMP.equals(term.op())) { fillInitialObjectsToIgnoreRecursively(term.sub(1), result); }
+                if (Junctor.IMP.equals(term.op())) {
+                    fillInitialObjectsToIgnoreRecursively(term.sub(1), result);
+                }
             }
         }
         return result;
@@ -173,9 +183,13 @@ public abstract class AbstractUpdateExtractor {
             Term updateTerm = UpdateApplication.getUpdate(term);
             fillInitialObjectsToIgnoreRecursively(updateTerm, toFill);
         } else if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
-            for (int i = 0; i < term.arity(); i++) { fillInitialObjectsToIgnoreRecursively(term.sub(i), toFill); }
+            for (int i = 0; i < term.arity(); i++) {
+                fillInitialObjectsToIgnoreRecursively(term.sub(i), toFill);
+            }
         } else if (term.op() instanceof ElementaryUpdate eu) {
-            if (eu.lhs() instanceof ProgramVariable) { toFill.add(term.sub(0)); }
+            if (eu.lhs() instanceof ProgramVariable) {
+                toFill.add(term.sub(0));
+            }
         }
     }
 
@@ -515,7 +529,9 @@ public abstract class AbstractUpdateExtractor {
                     toFill.add(new ExtractLocationParameter(var, term.sub(0)));
                 }
             } else {
-                for (Term sub : term.subs()) { collectLocationsFromTerm(toFill, sub, objectsToIgnore); }
+                for (Term sub : term.subs()) {
+                    collectLocationsFromTerm(toFill, sub, objectsToIgnore);
+                }
             }
         }
     }
@@ -593,7 +609,9 @@ public abstract class AbstractUpdateExtractor {
         }
         Term[] arguments = argumentsList.toArray(new Term[0]);
         Sort[] sorts = new Sort[arguments.length];
-        for (int i = 0; i < sorts.length; i++) { sorts[i] = arguments[i].sort(); }
+        for (int i = 0; i < sorts.length; i++) {
+            sorts[i] = arguments[i].sort();
+        }
         // Create predicate which will be used in formulas to store the value interested in.
         JFunction newPredicate =
             new JFunction(new Name(getServices().getTermBuilder().newName("LayoutPredicate")),
@@ -1084,7 +1102,7 @@ public abstract class AbstractUpdateExtractor {
         public String toString() {
             if (isArrayRange()) {
                 return "[" + arrayStartIndex + " to " + arrayEndIndex + "] "
-                        + (parentTerm != null ? " of " + parentTerm : "");
+                    + (parentTerm != null ? " of " + parentTerm : "");
             } else if (isArrayIndex()) {
                 return "[" + arrayIndex + "] " + (parentTerm != null ? " of " + parentTerm : "");
             } else {
@@ -1200,7 +1218,9 @@ public abstract class AbstractUpdateExtractor {
                         // Replace pre variable with original target
                         if (value.op() instanceof LocationVariable) {
                             Term originalTarget = preUpdateMap.get(value.op());
-                            if (originalTarget != null) { value = originalTarget; }
+                            if (originalTarget != null) {
+                                value = originalTarget;
+                            }
                         } else if (SymbolicExecutionUtil.isSelect(goal.proof().getServices(),
                             value)) {
                             Term object = value.sub(1);
@@ -1288,7 +1308,7 @@ public abstract class AbstractUpdateExtractor {
         } finally {
             SymbolicExecutionSideProofUtil.disposeOrStore(
                 "Layout computation on node " + node.serialNr() + " with layout term "
-                        + ProofSaver.printAnything(layoutTerm, getServices()) + ".",
+                    + ProofSaver.printAnything(layoutTerm, getServices()) + ".",
                 info);
         }
     }
@@ -1459,7 +1479,10 @@ public abstract class AbstractUpdateExtractor {
         // Go back to parent with at least two open branches
         Node child = force ? nodeToStartAt.getParent() : nodeToStartAt.getCurrentNode();
         Node parent = child.parent();
-        while (parent != null && countOpenChildren(parent) == 1) { child = parent; parent = child.parent(); }
+        while (parent != null && countOpenChildren(parent) == 1) {
+            child = parent;
+            parent = child.parent();
+        }
         // Store result
         if (parent != null) {
             return new NodeGoal(child, nodeToStartAt.getStartingGoals());
@@ -1479,7 +1502,9 @@ public abstract class AbstractUpdateExtractor {
         int openChildCount = 0;
         for (int i = 0; i < node.childrenCount(); i++) {
             Node child = node.child(i);
-            if (!child.isClosed()) { openChildCount++; }
+            if (!child.isClosed()) {
+                openChildCount++;
+            }
         }
         return openChildCount;
     }
@@ -1907,20 +1932,20 @@ public abstract class AbstractUpdateExtractor {
         public String toString() {
             if (isArrayRange()) {
                 return "[" + getArrayIndex() + "]" + " between " + getArrayStartIndex() + " and "
-                        + getArrayEndIndex() + (getParent() != null ? " of " + getParent() : "")
-                        + " is " + getValue()
-                        + (getCondition() != null ? " under condition " + getCondition() : "")
-                        + " at goal " + goalNode.serialNr();
+                    + getArrayEndIndex() + (getParent() != null ? " of " + getParent() : "")
+                    + " is " + getValue()
+                    + (getCondition() != null ? " under condition " + getCondition() : "")
+                    + " at goal " + goalNode.serialNr();
             } else if (isArrayIndex()) {
                 return "[" + getArrayIndex() + "]"
-                        + (getParent() != null ? " of " + getParent() : "") + " is " + getValue()
-                        + (getCondition() != null ? " under condition " + getCondition() : "")
-                        + " at goal " + goalNode.serialNr();
+                    + (getParent() != null ? " of " + getParent() : "") + " is " + getValue()
+                    + (getCondition() != null ? " under condition " + getCondition() : "")
+                    + " at goal " + goalNode.serialNr();
             } else {
                 return getProgramVariable() + (getParent() != null ? " of " + getParent() : "")
-                        + " is " + getValue()
-                        + (getCondition() != null ? " under condition " + getCondition() : "")
-                        + " at goal " + goalNode.serialNr();
+                    + " is " + getValue()
+                    + (getCondition() != null ? " under condition " + getCondition() : "")
+                    + " at goal " + goalNode.serialNr();
             }
         }
     }

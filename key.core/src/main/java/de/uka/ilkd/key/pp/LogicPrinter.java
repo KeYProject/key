@@ -97,7 +97,9 @@ public class LogicPrinter {
     public LogicPrinter(NotationInfo notationInfo, Services services, PosTableLayouter layouter) {
         this.notationInfo = notationInfo;
         this.services = services;
-        if (services != null) { notationInfo.refresh(services); }
+        if (services != null) {
+            notationInfo.refresh(services);
+        }
         storePrinter = new StorePrinter(this.services);
         selectPrinter = new SelectPrinter(this.services);
         this.layouter = layouter;
@@ -125,7 +127,9 @@ public class LogicPrinter {
     public static SequentViewLogicPrinter quickPrinter(Services services,
             boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
-        if (services != null) { ni.refresh(services, usePrettyPrinting, useUnicodeSymbols); }
+        if (services != null) {
+            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
+        }
 
         // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
         // because the SequentViewLogicPrinter respects default TermLabel visibility
@@ -238,7 +242,9 @@ public class LogicPrinter {
     public void update(SequentPrintFilter filter, int lineWidth) {
         setLineWidth(lineWidth);
         reset();
-        if (filter != null) { printFilteredSequent(filter); }
+        if (filter != null) {
+            printFilteredSequent(filter);
+        }
     }
 
     /**
@@ -267,7 +273,9 @@ public class LogicPrinter {
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
 
         layouter.beginC();
-        if (showWholeTaclet) { layouter.print(taclet.name().toString()).print(" {"); }
+        if (showWholeTaclet) {
+            layouter.print(taclet.name().toString()).print(" {");
+        }
         if (declareSchemaVars) {
             Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
             for (SchemaVariable schemaVar : schemaVars) {
@@ -277,10 +285,14 @@ public class LogicPrinter {
             }
             layouter.nl();
         }
-        if (!(taclet.ifSequent().isEmpty())) { printTextSequent(taclet.ifSequent(), "\\assumes"); }
+        if (!(taclet.ifSequent().isEmpty())) {
+            printTextSequent(taclet.ifSequent(), "\\assumes");
+        }
         if (showWholeTaclet) {
             printFind(taclet);
-            if (taclet instanceof RewriteTaclet) { printRewriteAttributes((RewriteTaclet) taclet); }
+            if (taclet instanceof RewriteTaclet) {
+                printRewriteAttributes((RewriteTaclet) taclet);
+            }
             printVarCond(taclet);
         }
         printGoalTemplates(taclet);
@@ -289,8 +301,12 @@ public class LogicPrinter {
             printTriggers(taclet);
         }
         printAttribs(taclet);
-        if (showWholeTaclet) { printDisplayName(taclet); }
-        if (showWholeTaclet) { layouter.brk(1, -2).print("}"); }
+        if (showWholeTaclet) {
+            printDisplayName(taclet);
+        }
+        if (showWholeTaclet) {
+            layouter.brk(1, -2).print("}");
+        }
         layouter.end();
         instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.NORMAL;
@@ -331,7 +347,9 @@ public class LogicPrinter {
         if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
             layouter.nl().print("\\sameUpdateLevel");
         }
-        if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) { layouter.nl().print("\\inSequentState"); }
+        if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
+            layouter.nl().print("\\inSequentState");
+        }
         if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
             layouter.nl().print("\\antecedentPolarity");
         }
@@ -433,12 +451,16 @@ public class LogicPrinter {
     }
 
     protected void printHeuristics(Taclet taclet) {
-        if (taclet.getRuleSets().isEmpty()) { return; }
+        if (taclet.getRuleSets().isEmpty()) {
+            return;
+        }
         layouter.nl().beginRelativeC().print("\\heuristics(").brk(0);
         for (Iterator<RuleSet> it = taclet.getRuleSets().iterator(); it.hasNext();) {
             RuleSet tgt = it.next();
             printHeuristic(tgt);
-            if (it.hasNext()) { layouter.print(",").brk(); }
+            if (it.hasNext()) {
+                layouter.print(",").brk();
+            }
         }
         layouter.end().print(")");
     }
@@ -448,7 +470,9 @@ public class LogicPrinter {
     }
 
     protected void printTriggers(Taclet taclet) {
-        if (!taclet.hasTrigger()) { return; }
+        if (!taclet.hasTrigger()) {
+            return;
+        }
         layouter.nl().beginC().print("\\trigger {");
         Trigger trigger = taclet.getTrigger();
         printSchemaVariable(trigger.triggerVar());
@@ -461,14 +485,18 @@ public class LogicPrinter {
             while (itTerms.hasNext()) {
                 Term cond = itTerms.next();
                 printTerm(cond);
-                if (itTerms.hasNext()) { layouter.print(", "); }
+                if (itTerms.hasNext()) {
+                    layouter.print(", ");
+                }
             }
         }
         layouter.print(";").end();
     }
 
     protected void printFind(Taclet taclet) {
-        if (!(taclet instanceof FindTaclet)) { return; }
+        if (!(taclet instanceof FindTaclet)) {
+            return;
+        }
         layouter.nl().beginC().print("\\find(").brk(0);
         if (taclet instanceof SuccTaclet) {
             printSequentArrow();
@@ -488,39 +516,57 @@ public class LogicPrinter {
         layouter.nl();
 
         layouter.beginC().print(text).print("(").brk(0);
-        if (seq != null) { printSequentInExistingBlock(seq); }
+        if (seq != null) {
+            printSequentInExistingBlock(seq);
+        }
         layouter.brk(0, -2).print(")").end();
     }
 
     protected void printGoalTemplates(Taclet taclet) {
-        if (taclet.closeGoal()) { layouter.nl().print("\\closegoal").brk(); }
+        if (taclet.closeGoal()) {
+            layouter.nl().print("\\closegoal").brk();
+        }
 
         for (final Iterator<TacletGoalTemplate> it = taclet.goalTemplates().reverse().iterator(); it
                 .hasNext();) {
             printGoalTemplate(it.next());
-            if (it.hasNext()) { layouter.print(";"); }
+            if (it.hasNext()) {
+                layouter.print(";");
+            }
         }
     }
 
     protected void printGoalTemplate(TacletGoalTemplate tgt) {
         // layouter.beginC(0);
         if (tgt.name() != null) {
-            if (!tgt.name().isEmpty()) { layouter.nl().beginC().print("\"" + tgt.name() + "\"").print(":"); }
+            if (!tgt.name().isEmpty()) {
+                layouter.nl().beginC().print("\"" + tgt.name() + "\"").print(":");
+            }
 
         }
         if (tgt instanceof AntecSuccTacletGoalTemplate) {
             printTextSequent(((AntecSuccTacletGoalTemplate) tgt).replaceWith(), "\\replacewith");
         }
-        if (tgt instanceof RewriteTacletGoalTemplate) { printRewrite(((RewriteTacletGoalTemplate) tgt).replaceWith()); }
+        if (tgt instanceof RewriteTacletGoalTemplate) {
+            printRewrite(((RewriteTacletGoalTemplate) tgt).replaceWith());
+        }
 
-        if (!(tgt.sequent().isEmpty())) { printTextSequent(tgt.sequent(), "\\add"); }
-        if (!tgt.rules().isEmpty()) { printRules(tgt.rules()); }
+        if (!(tgt.sequent().isEmpty())) {
+            printTextSequent(tgt.sequent(), "\\add");
+        }
+        if (!tgt.rules().isEmpty()) {
+            printRules(tgt.rules());
+        }
         if (!tgt.addedProgVars().isEmpty()) {
             layouter.nl();
             printAddProgVars(tgt.addedProgVars());
         }
 
-        if (tgt.name() != null) { if (!tgt.name().isEmpty()) { layouter.end(); } }
+        if (tgt.name() != null) {
+            if (!tgt.name().isEmpty()) {
+                layouter.end();
+            }
+        }
     }
 
     protected void printRules(ImmutableList<Taclet> rules) {
@@ -708,7 +754,9 @@ public class LogicPrinter {
             layouter.markStartSub();
             printConstrainedFormula(semiseq.get(i));
             layouter.markEndSub();
-            if (i != semiseq.size() - 1) { layouter.print(",").brk(); }
+            if (i != semiseq.size() - 1) {
+                layouter.print(",").brk();
+            }
         }
     }
 
@@ -721,7 +769,9 @@ public class LogicPrinter {
             layouter.markStartSub();
             printConstrainedFormula(entry.getFilteredFormula());
             layouter.markEndSub();
-            if (size != 0) { layouter.print(",").brk(); }
+            if (size != 0) {
+                layouter.print(",").brk();
+            }
         }
     }
 
@@ -757,7 +807,9 @@ public class LogicPrinter {
                 layouter.print(")");
             }
         }
-        if (t.hasLabels()) { printLabels(t); }
+        if (t.hasLabels()) {
+            printLabels(t);
+        }
     }
 
     /**
@@ -782,7 +834,9 @@ public class LogicPrinter {
     void printLabels(Term t, String left, String right) {
 
         ImmutableArray<TermLabel> termLabelList = getVisibleTermLabels(t);
-        if (termLabelList.isEmpty()) { return; }
+        if (termLabelList.isEmpty()) {
+            return;
+        }
 
         layouter.beginC().print(left);
         boolean afterFirst = false;
@@ -798,7 +852,9 @@ public class LogicPrinter {
                 layouter.print("(").beginC();
                 for (int i = 0; i < l.getTLChildCount(); i++) {
                     layouter.print("\"" + l.getTLChild(i).toString() + "\"");
-                    if (i < l.getTLChildCount() - 1) { layouter.print(",").ind(1, 2); }
+                    if (i < l.getTLChildCount() - 1) {
+                        layouter.print(",").ind(1, 2);
+                    }
                 }
                 layouter.end().print(")");
             }
@@ -815,7 +871,12 @@ public class LogicPrinter {
     public void printTerm(ImmutableSet<Term> terms) {
         layouter.print("{");
         Iterator<Term> it = terms.iterator();
-        while (it.hasNext()) { printTerm(it.next()); if (it.hasNext()) { layouter.print(", "); } }
+        while (it.hasNext()) {
+            printTerm(it.next());
+            if (it.hasNext()) {
+                layouter.print(", ");
+            }
+        }
         layouter.print("}");
     }
 
@@ -850,7 +911,9 @@ public class LogicPrinter {
                 && notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
             layouter.print(")");
         }
-        if (t.hasLabels()) { printLabels(t); }
+        if (t.hasLabels()) {
+            printLabels(t);
+        }
     }
 
     /**
@@ -880,9 +943,13 @@ public class LogicPrinter {
             String name = t.op().name().toString();
             int index = name.lastIndexOf('.');
             String prettyFieldName = name.substring(index + 1);
-            if (isKeyword) { layouter.markStartKeyword(); }
+            if (isKeyword) {
+                layouter.markStartKeyword();
+            }
             layouter.print(prettyFieldName);
-            if (isKeyword) { layouter.markEndKeyword(); }
+            if (isKeyword) {
+                layouter.markEndKeyword();
+            }
         } else {
             String name = t.op().name().toString();
             layouter.startTerm(t.arity());
@@ -895,9 +962,15 @@ public class LogicPrinter {
                     alreadyPrinted = true;
                 }
             }
-            if (isKeyword) { layouter.markStartKeyword(); }
-            if (!alreadyPrinted) { layouter.print(name); }
-            if (isKeyword) { layouter.markEndKeyword(); }
+            if (isKeyword) {
+                layouter.markStartKeyword();
+            }
+            if (!alreadyPrinted) {
+                layouter.print(name);
+            }
+            if (isKeyword) {
+                layouter.markEndKeyword();
+            }
             if (!t.boundVars().isEmpty()) {
                 layouter.print("{").beginC(0);
                 printVariables(t.boundVars(), quantifiableVariablePrintMode);
@@ -910,7 +983,9 @@ public class LogicPrinter {
                     printTerm(t.sub(i));
                     layouter.markEndSub();
 
-                    if (i < n - 1) { layouter.print(",").brk(1, 0); }
+                    if (i < n - 1) {
+                        layouter.print(",").brk(1, 0);
+                    }
                 }
                 layouter.print(")").end();
             }
@@ -964,14 +1039,22 @@ public class LogicPrinter {
             } else {
                 layouter.beginC(0);
             }
-            if (t.op() == getHeapLDT().getCreated()) { layouter.markStartKeyword(); }
+            if (t.op() == getHeapLDT().getCreated()) {
+                layouter.markStartKeyword();
+            }
             layouter.print("[" + opName + "(").beginC(0);
-            if (t.op() == getHeapLDT().getCreated()) { layouter.markEndKeyword(); }
+            if (t.op() == getHeapLDT().getCreated()) {
+                layouter.markEndKeyword();
+            }
             for (int i = 1; i < t.arity(); i++) {
                 // do not print anon_heap if parsability is not required
-                if (getNotationInfo().isHidePackagePrefix() && "anon".equals(opName) && i == 2) { break; }
+                if (getNotationInfo().isHidePackagePrefix() && "anon".equals(opName) && i == 2) {
+                    break;
+                }
 
-                if (i > 1) { layouter.print(",").brk(1, 0); }
+                if (i > 1) {
+                    layouter.print(",").brk(1, 0);
+                }
                 layouter.markStartSub();
                 printTerm(t.sub(i));
                 layouter.markEndSub();
@@ -979,7 +1062,9 @@ public class LogicPrinter {
 
             layouter.print(")]").end();
 
-            if (closingBrace) { layouter.end(); }
+            if (closingBrace) {
+                layouter.end();
+            }
 
         } else {
             printFunctionTerm(t);
@@ -1023,7 +1108,9 @@ public class LogicPrinter {
     public void printSeqGet(Term t) {
         if (notationInfo.isPrettySyntax()) {
             layouter.startTerm(2);
-            if (!t.sort().equals(JavaDLTheory.ANY)) { layouter.print("(" + t.sort().toString() + ")"); }
+            if (!t.sort().equals(JavaDLTheory.ANY)) {
+                layouter.print("(" + t.sort().toString() + ")");
+            }
             layouter.markStartSub();
             printTerm(t.sub(0));
             layouter.markEndSub();
@@ -1074,7 +1161,9 @@ public class LogicPrinter {
 
         if (printFancy) {
 
-            if (tacitHeap == null) { tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap()); }
+            if (tacitHeap == null) {
+                tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap());
+            }
 
             // this needs not be 1 in general:
             int totalHeaps = 1;
@@ -1094,7 +1183,9 @@ public class LogicPrinter {
             String fieldName = obs.isStatic() ? HeapLDT.getClassName((Function) t.op()) + "." : "";
             fieldName += HeapLDT.getPrettyFieldName(t.op());
             boolean isKeyword = false;
-            if (services != null) { isKeyword = (obs == services.getJavaInfo().getInv()); }
+            if (services != null) {
+                isKeyword = (obs == services.getJavaInfo().getInv());
+            }
 
             if (obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
                 JavaInfo javaInfo = services.getJavaInfo();
@@ -1127,16 +1218,22 @@ public class LogicPrinter {
                 layouter.print("(").beginC(0);
                 int startIndex = totalHeaps + (obs.isStatic() ? 0 : 1);
                 for (int i = startIndex; i < obs.arity(); i++) {
-                    if (i != startIndex) { layouter.print(",").brk(1, 0); }
+                    if (i != startIndex) {
+                        layouter.print(",").brk(1, 0);
+                    }
                     layouter.markStartSub(i);
                     printTerm(t.sub(i));
                     layouter.markEndSub();
                 }
                 layouter.print(")").end();
             } else {
-                if (isKeyword) { layouter.markStartKeyword(); }
+                if (isKeyword) {
+                    layouter.markStartKeyword();
+                }
                 layouter.print(fieldName);
-                if (isKeyword) { layouter.markEndKeyword(); }
+                if (isKeyword) {
+                    layouter.markEndKeyword();
+                }
             }
 
             // must the heap be printed at all: no, if default heap.
@@ -1256,9 +1353,13 @@ public class LogicPrinter {
      */
     public void printPrefixTerm(String name, Term t, Term sub, int ass) {
         layouter.startTerm(1);
-        if (t.op() == Junctor.NOT) { layouter.markStartKeyword(); }
+        if (t.op() == Junctor.NOT) {
+            layouter.markStartKeyword();
+        }
         layouter.print(name);
-        if (t.op() == Junctor.NOT) { layouter.markEndKeyword(); }
+        if (t.op() == Junctor.NOT) {
+            layouter.markEndKeyword();
+        }
         maybeParens(sub, ass);
     }
 
@@ -1343,9 +1444,13 @@ public class LogicPrinter {
         layouter.ind();
         maybeParens(l, assLeft);
         layouter.brk(1, -indent);
-        if (isKeyword) { layouter.markStartKeyword(); }
+        if (isKeyword) {
+            layouter.markStartKeyword();
+        }
         layouter.print(name);
-        if (isKeyword) { layouter.markEndKeyword(); }
+        if (isKeyword) {
+            layouter.markEndKeyword();
+        }
         layouter.ind(1, 0);
         maybeParens(r, assRight);
     }
@@ -1461,7 +1566,9 @@ public class LogicPrinter {
             } else {
                 layouter.print(v.name().toString());
             }
-            if (j < size - 1) { layouter.print(", "); }
+            if (j < size - 1) {
+                layouter.print(", ");
+            }
         }
         layouter.print(";");
     }
@@ -1596,9 +1703,13 @@ public class LogicPrinter {
             isKeyword = (t.op() == Junctor.FALSE || t.op() == Junctor.TRUE
                     || t.op() == getHeapLDT().getCreated());
         }
-        if (isKeyword) { layouter.markStartKeyword(); }
+        if (isKeyword) {
+            layouter.markStartKeyword();
+        }
         layouter.print(s);
-        if (isKeyword) { layouter.markEndKeyword(); }
+        if (isKeyword) {
+            layouter.markEndKeyword();
+        }
     }
 
     /**
@@ -1632,7 +1743,9 @@ public class LogicPrinter {
                     layouter.print(notationInfo.getAbbrevMap().getAbbrev(phi));
                 } else {
                     Term[] ta = new Term[phi.arity()];
-                    for (int i = 0; i < phi.arity(); i++) { ta[i] = phi.sub(i); }
+                    for (int i = 0; i < phi.arity(); i++) {
+                        ta[i] = phi.sub(i);
+                    }
                     final Modality m =
                         Modality.getModality((Modality.JavaModalityKind) o, mod.program());
                     final Term term = services.getTermFactory().createTerm(m, ta,
@@ -1658,7 +1771,9 @@ public class LogicPrinter {
                 layouter.markStartSub();
                 printTerm(phi.sub(i));
                 layouter.markEndSub();
-                if (i < phi.arity() - 1) { layouter.print(",").brk(1, 0); }
+                if (i < phi.arity() - 1) {
+                    layouter.print(",").brk(1, 0);
+                }
             }
             layouter.print(")");
         }
@@ -1804,7 +1919,9 @@ public class LogicPrinter {
      * @return true if the attribute is uniquely determined
      */
     public static boolean printInShortForm(String programName, Sort sort, Services services) {
-        if (!(services != null && sort.extendsTrans(services.getJavaInfo().objectSort()))) { return false; }
+        if (!(services != null && sort.extendsTrans(services.getJavaInfo().objectSort()))) {
+            return false;
+        }
         final KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
         assert kjt != null : "Did not find KeYJavaType for " + sort;
         return services.getJavaInfo().getAllAttributes(programName, kjt).size() == 1;

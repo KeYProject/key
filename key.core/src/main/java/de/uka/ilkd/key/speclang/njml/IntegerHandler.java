@@ -32,7 +32,9 @@ public class IntegerHandler extends LDTHandler {
     public IntegerHandler(Services services, SpecMathMode specMathMode) {
         super(services);
 
-        if (specMathMode == null) { throw new IllegalArgumentException("specMathMode cannot be null"); }
+        if (specMathMode == null) {
+            throw new IllegalArgumentException("specMathMode cannot be null");
+        }
 
         this.specMathMode = specMathMode;
 
@@ -175,7 +177,9 @@ public class IntegerHandler extends LDTHandler {
         var isIntLike = PrimitiveType.JAVA_INT.equals(promotedType)
                 || PrimitiveType.JAVA_LONG.equals(promotedType)
                 || PrimitiveType.JAVA_BIGINT.equals(promotedType);
-        if (!isIntLike) { return null; }
+        if (!isIntLike) {
+            return null;
+        }
 
         if (this.specMathMode == SpecMathMode.BIGINT) {
             // Always use bigint operator

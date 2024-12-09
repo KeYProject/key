@@ -88,7 +88,9 @@ public final class TypeCondition extends VariableConditionAdapter {
                 for (Sort extSort : s.extendsSorts()) {
                     // same as:
                     // extends && isReference || !extends && !isReference
-                    if (extSort.extendsTrans(objectSort) == isReference) { return true; }
+                    if (extSort.extendsTrans(objectSort) == isReference) {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -99,7 +101,9 @@ public final class TypeCondition extends VariableConditionAdapter {
     @Override
     public String toString() {
         String prefix = "\\isReference";
-        if (isReference && nonNull) { prefix += "[non_null]"; }
+        if (isReference && nonNull) {
+            prefix += "[non_null]";
+        }
         return (isReference ? "" : "\\not") + prefix + "( " + resolver + " )";
     }
 

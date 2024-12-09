@@ -353,7 +353,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             Set<Term> objectsToIgnore) throws ProofInputException {
         Set<Term> result = new LinkedHashSet<>();
         for (Term symbolicObject : objectsToFilter) {
-            if (!objectsToIgnore.contains(symbolicObject)) { result.add(symbolicObject); }
+            if (!objectsToIgnore.contains(symbolicObject)) {
+                result.add(symbolicObject);
+            }
         }
         return result;
     }
@@ -419,7 +421,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         ImmutableList<Goal> goals = starter.getProof().openEnabledGoals();
         if (!goals.isEmpty()) {
             int proofSteps = maxProofSteps / goals.size();
-            if (proofSteps < 300) { proofSteps = 300; }
+            if (proofSteps < 300) {
+                proofSteps = 300;
+            }
             starter.setMaxRuleApplications(maxProofSteps);
             for (final Goal g : goals) {
                 final NoPosTacletApp c = g.indexOfTaclets().lookup("cut");
@@ -460,7 +464,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             throws ProofInputException {
         Set<ImmutableSet<Term>> resultSet = new LinkedHashSet<>();
         Node root = proof.root();
-        for (Goal goal : proof.openGoals()) { resultSet.add(extractAppliedCutsSet(goal.node(), root)); }
+        for (Goal goal : proof.openGoals()) {
+            resultSet.add(extractAppliedCutsSet(goal.node(), root));
+        }
         return new ArrayList<>(resultSet);
     }
 
@@ -491,7 +497,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                     Term inst = (Term) npta.instantiations()
                             .lookupEntryForSV(new Name("cutFormula")).value().getInstantiation();
                     inst = TermBuilder.goBelowUpdates(inst);
-                    if (goalnode.child(1) == oldNode) { inst = getServices().getTermBuilder().not(inst); }
+                    if (goalnode.child(1) == oldNode) {
+                        inst = getServices().getTermBuilder().not(inst);
+                    }
                     result = result.add(inst);
                 }
             }
@@ -654,7 +662,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         if (!locations.isEmpty()) {
             final TermBuilder tb = getServices().getTermBuilder();
             List<Term> updateConditions = new ArrayList<>(layout.size());
-            for (Term term : layout) { updateConditions.add(tb.applyParallel(updates, term)); }
+            for (Term term : layout) {
+                updateConditions.add(tb.applyParallel(updates, term));
+            }
             Term layoutCondition = tb.and(updateConditions);
             Set<ExtractLocationParameter> locationsAccordingToEquivalentClass =
                 updateLocationsAccordingtoEquivalentClass(locations, equivalentClasses);
@@ -801,13 +811,17 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
 
                 final Iterator<Term> iter = term.subs().iterator();
                 ISymbolicEquivalenceClass ec = null;
-                while (ec == null && iter.hasNext()) { ec = findEquivalentClass(result, iter.next()); }
+                while (ec == null && iter.hasNext()) {
+                    ec = findEquivalentClass(result, iter.next());
+                }
                 if (ec == null) {
                     ec = new SymbolicEquivalenceClass(getServices(), settings);
                     result = result.append(ec);
                 }
                 for (Term sub : term.subs()) {
-                    if (!ec.containsTerm(sub)) { ((SymbolicEquivalenceClass) ec).addTerm(sub); }
+                    if (!ec.containsTerm(sub)) {
+                        ((SymbolicEquivalenceClass) ec).addTerm(sub);
+                    }
                 }
             }
         }
@@ -884,7 +898,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                 // Check if the term is in an equivalent class, in this case use the representative
                 // term instead of the term itself.
                 ISymbolicEquivalenceClass eq = findEquivalentClass(equivalentClasses, valueTerm);
-                if (eq != null) { valueTerm = eq.getRepresentative(); }
+                if (eq != null) {
+                    valueTerm = eq.getRepresentative();
+                }
                 // Check if it is an association
                 SymbolicObject target = objects.get(valueTerm);
                 if (target != null) {
@@ -912,7 +928,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                         if (!Objects.equals(association.getTarget(),
                             existingAssociation.getTarget())) {
                             throw new ProofInputException("Multiple association targets found: "
-                                    + association + " and " + existingAssociation + ".");
+                                + association + " and " + existingAssociation + ".");
                         }
                     }
                 } else {
@@ -968,7 +984,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                 && SymbolicExecutionUtil.hasReferenceSort(getServices(), objectTerm)) {
             ISymbolicEquivalenceClass equivalentClass =
                 findEquivalentClass(equivalentClasses, objectTerm);
-            if (equivalentClass != null) { objectTerm = equivalentClass.getRepresentative(); }
+            if (equivalentClass != null) {
+                objectTerm = equivalentClass.getRepresentative();
+            }
             SymbolicObject object = objects.get(objectTerm);
             if (object == null) {
                 object = new SymbolicObject(getServices(), objectTerm, settings);

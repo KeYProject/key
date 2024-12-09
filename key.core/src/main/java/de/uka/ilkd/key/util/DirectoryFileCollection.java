@@ -53,7 +53,9 @@ public class DirectoryFileCollection implements FileCollection {
     private static void sortFiles(List<Path> files) {
         for (int a = 0; a < files.size() - 1; a++) {
             for (int b = a + 1; b < files.size(); b++) {
-                if (!(a < b)) { throw new RuntimeException("Incorrect sorting algorithms."); }
+                if (!(a < b)) {
+                    throw new RuntimeException("Incorrect sorting algorithms.");
+                }
                 Path fa = files.get(a);
                 Path fb = files.get(b);
 

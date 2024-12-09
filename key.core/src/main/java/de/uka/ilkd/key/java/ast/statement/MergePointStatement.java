@@ -89,7 +89,9 @@ public class MergePointStatement extends JavaStatement
      *         if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (identifier != null && index == 0) { return (Expression) identifier; }
+        if (identifier != null && index == 0) {
+            return (Expression) identifier;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

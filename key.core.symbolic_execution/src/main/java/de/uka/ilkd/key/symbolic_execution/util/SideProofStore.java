@@ -206,7 +206,9 @@ public final class SideProofStore {
      *        The {@link ISideProofStoreListener} to register.
      */
     public void addProofStoreListener(ISideProofStoreListener l) {
-        if (l != null) { listener.add(l); }
+        if (l != null) {
+            listener.add(l);
+        }
     }
 
     /**
@@ -216,7 +218,9 @@ public final class SideProofStore {
      *        The {@link ISideProofStoreListener} to unregister.
      */
     public void removeProofStoreListener(ISideProofStoreListener l) {
-        if (l != null) { listener.remove(l); }
+        if (l != null) {
+            listener.remove(l);
+        }
     }
 
     /**
@@ -236,7 +240,9 @@ public final class SideProofStore {
      */
     private void fireEntriesAdded(SideProofStoreEvent e) {
         ISideProofStoreListener[] listener = getProofStoreListener();
-        for (ISideProofStoreListener l : listener) { l.entriesAdded(e); }
+        for (ISideProofStoreListener l : listener) {
+            l.entriesAdded(e);
+        }
     }
 
     /**
@@ -247,7 +253,9 @@ public final class SideProofStore {
      */
     private void fireEntriesRemoved(SideProofStoreEvent e) {
         ISideProofStoreListener[] listener = getProofStoreListener();
-        for (ISideProofStoreListener l : listener) { l.entriesRemoved(e); }
+        for (ISideProofStoreListener l : listener) {
+            l.entriesRemoved(e);
+        }
     }
 
     /**

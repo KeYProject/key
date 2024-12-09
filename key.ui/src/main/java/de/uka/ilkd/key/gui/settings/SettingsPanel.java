@@ -95,7 +95,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JComboBox<T> comboBox = new JComboBox<>(elements);
         comboBox.addActionListener(e -> {
             try {
-                if (validator != null) { validator.validate((T) comboBox.getSelectedItem()); }
+                if (validator != null) {
+                    validator.validate((T) comboBox.getSelectedItem());
+                }
                 demarkComponentAsErrornous(comboBox);
             } catch (Exception ex) {
                 markComponentAsErrornous(comboBox, ex.getMessage());
@@ -134,7 +136,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JTextField textField = new JTextField(file);
         textField.addActionListener(e -> {
             try {
-                if (validator != null) { validator.validate(textField.getText()); }
+                if (validator != null) {
+                    validator.validate(textField.getText());
+                }
                 demarkComponentAsErrornous(textField);
             } catch (Exception ex) {
                 markComponentAsErrornous(textField, ex.getMessage());
@@ -197,7 +201,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         comboBox.setSelectedIndex(selectionIndex);
         comboBox.addActionListener(e -> {
             try {
-                if (validator != null) { validator.validate((T) comboBox.getSelectedItem()); }
+                if (validator != null) {
+                    validator.validate((T) comboBox.getSelectedItem());
+                }
                 demarkComponentAsErrornous(comboBox);
             } catch (Exception ex) {
                 markComponentAsErrornous(comboBox, ex.getMessage());
@@ -352,6 +358,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @return non-null
      */
     protected <T> Validator<T> emptyValidator() {
-        return s -> {};
+        return s -> {
+        };
     }
 }

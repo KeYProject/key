@@ -41,7 +41,9 @@ public interface ImmutableList<T extends @Nullable Object>
     static <T extends @Nullable Object> ImmutableList<T> fromList(Collection<T> list) {
         ImmutableList<T> result = ImmutableSLList.nil();
 
-        for (T el : list) { result = result.append(el); }
+        for (T el : list) {
+            result = result.append(el);
+        }
 
         return result;
     }
@@ -116,7 +118,9 @@ public interface ImmutableList<T extends @Nullable Object>
      */
     static <T extends @Nullable Object> ImmutableList<T> of(T... es) {
         ImmutableList<T> result = ImmutableSLList.nil();
-        for (int i = es.length - 1; i >= 0; i--) { result = result.prepend(es[i]); }
+        for (int i = es.length - 1; i >= 0; i--) {
+            result = result.prepend(es[i]);
+        }
         return result;
     }
 
@@ -290,7 +294,9 @@ public interface ImmutableList<T extends @Nullable Object>
      */
     default List<T> toList() {
         List<T> result = new ArrayList<>();
-        for (T t : this) { result.add(t); }
+        for (T t : this) {
+            result.add(t);
+        }
         return result;
     }
 
@@ -329,8 +335,12 @@ public interface ImmutableList<T extends @Nullable Object>
      * @return whether this list starts with the elements of the provided prefix
      */
     default boolean hasPrefix(ImmutableList<? extends T> other) {
-        if (other.size() > this.size()) { return false; }
-        if (other.size() == 0) { return true; }
+        if (other.size() > this.size()) {
+            return false;
+        }
+        if (other.size() == 0) {
+            return true;
+        }
         if (Objects.equals(head(), other.head())) {
             return tail().hasPrefix(other.tail());
         } else {
@@ -348,8 +358,12 @@ public interface ImmutableList<T extends @Nullable Object>
      *         if the provided prefix is not a prefix of this list
      */
     default ImmutableList<T> stripPrefix(ImmutableList<? extends T> prefix) {
-        if (prefix.isEmpty()) { return this; }
-        if (!Objects.equals(head(), prefix.head())) { throw new IllegalArgumentException("not a prefix of this list"); }
+        if (prefix.isEmpty()) {
+            return this;
+        }
+        if (!Objects.equals(head(), prefix.head())) {
+            throw new IllegalArgumentException("not a prefix of this list");
+        }
         return this.tail().stripPrefix(prefix.tail());
     }
 
@@ -360,9 +374,13 @@ public interface ImmutableList<T extends @Nullable Object>
      * @return last element of this list
      */
     default T last() {
-        if (isEmpty()) { throw new IllegalStateException("last() called on empty list"); }
+        if (isEmpty()) {
+            throw new IllegalStateException("last() called on empty list");
+        }
         ImmutableList<T> remainder = this;
-        while (!remainder.tail().isEmpty()) { remainder = remainder.tail(); }
+        while (!remainder.tail().isEmpty()) {
+            remainder = remainder.tail();
+        }
         T result = remainder.head();
         assert result != null : "@AssumeAssertion(nullness): this should never be null";
         return result;

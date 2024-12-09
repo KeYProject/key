@@ -86,8 +86,12 @@ public class Extension<T> implements Comparable<Extension<T>> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (!(o instanceof Extension<?> extension)) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Extension<?> extension)) {
+            return false;
+        }
         return clazz.equals(extension.clazz);
     }
 

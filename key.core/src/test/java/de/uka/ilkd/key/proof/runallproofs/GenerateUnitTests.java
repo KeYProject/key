@@ -55,7 +55,9 @@ public class GenerateUnitTests {
         out.mkdirs();
 
         for (var col : collections) {
-            for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) { createUnitClass(unit); }
+            for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) {
+                createUnitClass(unit);
+            }
         }
     }
 
@@ -149,7 +151,9 @@ public class GenerateUnitTests {
                     .replaceAll("\\.key", "")
                     .replaceAll("[^a-zA-Z0-9]+", "_");
 
-            if (usedMethodNames.contains(testName)) { testName += "_" + (++clashCounter); }
+            if (usedMethodNames.contains(testName)) {
+                testName += "_" + (++clashCounter);
+            }
             usedMethodNames.add(testName);
 
             // int timeout = 0; (timeout <= 0 ? parent.timeout : 0)
@@ -181,7 +185,10 @@ public class GenerateUnitTests {
         Pattern regex = Pattern.compile("[$](\\w+)");
         Matcher m = regex.matcher(TEMPLATE_CONTENT);
         StringBuilder sb = new StringBuilder();
-        while (m.find()) { String key = m.group(1); m.appendReplacement(sb, vars.getOrDefault(key, "/*not-found*/")); }
+        while (m.find()) {
+            String key = m.group(1);
+            m.appendReplacement(sb, vars.getOrDefault(key, "/*not-found*/"));
+        }
         m.appendTail(sb);
         File folder = new File(outputFolder, packageName.replace('.', '/'));
         folder.mkdirs();

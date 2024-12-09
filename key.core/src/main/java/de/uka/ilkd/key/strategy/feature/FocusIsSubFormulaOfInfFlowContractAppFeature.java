@@ -41,15 +41,21 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;
 
-        if (!app.ifInstsComplete()) { return NumberRuleAppCost.getZeroCost(); }
+        if (!app.ifInstsComplete()) {
+            return NumberRuleAppCost.getZeroCost();
+        }
 
         final Term focusFor = pos.sequentFormula().formula();
         ImmutableList<Term> contractAppls =
             goal.getStrategyInfo(InfFlowContractAppTacletExecutor.INF_FLOW_CONTRACT_APPL_PROPERTY);
-        if (contractAppls == null) { return TopRuleAppCost.INSTANCE; }
+        if (contractAppls == null) {
+            return TopRuleAppCost.INSTANCE;
+        }
 
         for (Term appl : contractAppls) {
-            if (isSubFormula(focusFor, appl)) { return NumberRuleAppCost.getZeroCost(); }
+            if (isSubFormula(focusFor, appl)) {
+                return NumberRuleAppCost.getZeroCost();
+            }
         }
 
         return TopRuleAppCost.INSTANCE;

@@ -46,10 +46,14 @@ public final class HtmlFactory {
             Optional<String[]> alignment,
             Collection<Collection<String>> rows,
             IndexFactory indexFactory) {
-        if (columnNames.size() != clickable.length) { throw new IllegalArgumentException(); }
+        if (columnNames.size() != clickable.length) {
+            throw new IllegalArgumentException();
+        }
 
         StringBuilder stats = new StringBuilder("<table><thead>");
-        for (String a : columnNames) { stats.append("<td>").append(a).append("</td>"); }
+        for (String a : columnNames) {
+            stats.append("<td>").append(a).append("</td>");
+        }
         stats.append("</thead><tbody>");
 
         for (Collection<String> row : rows) {
@@ -59,9 +63,11 @@ public final class HtmlFactory {
                 stats.append("<td");
                 if (alignment.isPresent()) {
                     String align = alignment.get()[i];
-                    if (align != null) { stats.append(" style='text-align:")
-                            .append(align)
-                            .append("'"); }
+                    if (align != null) {
+                        stats.append(" style='text-align:")
+                                .append(align)
+                                .append("'");
+                    }
                 }
                 stats.append(">");
                 if (clickable[i]) {
@@ -77,7 +83,9 @@ public final class HtmlFactory {
                 } else {
                     stats.append(escapeText(cell));
                 }
-                if (clickable[i]) { stats.append("</a>"); }
+                if (clickable[i]) {
+                    stats.append("</a>");
+                }
                 stats.append("</td>");
                 i++;
             }

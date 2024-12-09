@@ -82,7 +82,9 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
             throws TermCreationException {
         super.validTopLevelException(term);
         for (int i = 0, n = arity(); i < n; i++) {
-            if (!possibleSub(i, (Term) term.sub(i))) { throw new TermCreationException(this, term); }
+            if (!possibleSub(i, (Term) term.sub(i))) {
+                throw new TermCreationException(this, term);
+            }
         }
     }
 }

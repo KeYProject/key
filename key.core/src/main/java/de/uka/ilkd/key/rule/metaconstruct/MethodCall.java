@@ -207,7 +207,9 @@ public class MethodCall extends ProgramTransformer {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
         LOGGER.trace("method-call: called for {}", pe);
-        if (resultVar != null) { pvar = (ProgramVariable) svInst.getInstantiation(resultVar); }
+        if (resultVar != null) {
+            pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
+        }
 
         execContext =
             execContextSV == null ? svInst.getContextInstantiation().activeStatementContext()
@@ -228,7 +230,9 @@ public class MethodCall extends ProgramTransformer {
                 ? methRef.method(services, staticPrefixType,
                     methRef.getMethodSignature(services, null))
                 : methRef.method(services, staticPrefixType, execContext);
-        if (pm == null) { Debug.fail("methodcall:No implementation available for ", methRef); }
+        if (pm == null) {
+            Debug.fail("methodcall:No implementation available for ", methRef);
+        }
 
         newContext = methRef.getReferencePrefix();
         if (newContext == null) {
@@ -288,11 +292,11 @@ public class MethodCall extends ProgramTransformer {
             // private methods or constructor invocations are bound
             // statically
             LOGGER.trace("method-call: invocation of private method detected."
-                    + "Requires static resolving.");
+                + "Requires static resolving.");
             result = makeMbs(staticPrefixType, services);
         } else {
             LOGGER.trace("method-call: invocation of non-private" + " instance method detected."
-                    + "Requires dynamic resolving.");
+                + "Requires dynamic resolving.");
             ImmutableList<KeYJavaType> imps =
                 services.getJavaInfo().getKeYProgModelInfo().findImplementations(staticPrefixType,
                     methRef.getName(), getTypes(arguments, services));
@@ -342,7 +346,9 @@ public class MethodCall extends ProgramTransformer {
             }
 
             result = KeYJavaASTFactory.methodBody(pvar, localContext, meth, arguments);
-            if (castedThisVar != null) { result = KeYJavaASTFactory.block(castedThisVar, result); }
+            if (castedThisVar != null) {
+                result = KeYJavaASTFactory.block(castedThisVar, result);
+            }
 
         } else {
             result = KeYJavaASTFactory.methodBody(pvar, newContext, meth, arguments);
@@ -448,7 +454,9 @@ public class MethodCall extends ProgramTransformer {
         int args = methRef.getArguments().size();
         Expression[] exps = new Expression[args - params + 1];
 
-        for (int i = 0; i < exps.length; i++) { exps[i] = methRef.getArgumentAt(params - 1 + i); }
+        for (int i = 0; i < exps.length; i++) {
+            exps[i] = methRef.getArgumentAt(params - 1 + i);
+        }
 
         Type type = originalSpec.getType();
 
@@ -478,7 +486,9 @@ public class MethodCall extends ProgramTransformer {
 
     private ImmutableArray<Expression> getVariables(VariableSpecification[] varspecs) {
         Expression[] vars = new Expression[varspecs.length];
-        for (int i = 0; i < varspecs.length; i++) { vars[i] = (Expression) varspecs[i].getProgramVariable(); }
+        for (int i = 0; i < varspecs.length; i++) {
+            vars[i] = (Expression) varspecs[i].getProgramVariable();
+        }
         return new ImmutableArray<>(vars);
     }
 

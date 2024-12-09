@@ -204,7 +204,10 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         loopLabels.add(outerLabel);
 
         SourceElement first = block.getFirstElement();
-        while (first instanceof LabeledStatement s) { loopLabels.add(s.getLabel()); first = s.getBody(); }
+        while (first instanceof LabeledStatement s) {
+            loopLabels.add(s.getLabel());
+            first = s.getBody();
+        }
 
         EnhancedForElimination enhancedForElim = null;
 
@@ -222,8 +225,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             loop = enhancedForElim.getLoop();
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
-                    + "loop may have a loop contract! \n" + "This block begins with "
-                    + block.getFirstElement());
+                + "loop may have a loop contract! \n" + "This block begins with "
+                + block.getFirstElement());
         }
 
         if (enhancedForElim == null) {
@@ -420,9 +423,13 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         if (loop instanceof For) {
             ExtList headStatements = new ExtList();
 
-            if (enhancedForElim != null) { headStatements.add(enhancedForElim.getHead()); }
+            if (enhancedForElim != null) {
+                headStatements.add(enhancedForElim.getHead());
+            }
 
-            for (Statement statement : loop.getInitializers()) { headStatements.add(statement); }
+            for (Statement statement : loop.getInitializers()) {
+                headStatements.add(statement);
+            }
 
             sb = new StatementBlock(headStatements);
         } else if (loop instanceof While) {
@@ -433,8 +440,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             }
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
-                    + "loop may have a loop contract! \n" + "This block begins with "
-                    + block.getFirstElement());
+                + "loop may have a loop contract! \n" + "This block begins with "
+                + block.getFirstElement());
         }
 
         return sb;
@@ -475,15 +482,17 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                     outerLabel, innerLabel, services).replace();
 
             ExtList updateStatements = new ExtList();
-            for (Expression statement : loop.getUpdates()) { updateStatements.add(statement); }
+            for (Expression statement : loop.getUpdates()) {
+                updateStatements.add(statement);
+            }
 
             sb = new StatementBlock(new StatementBlock(
                 new LabeledStatement(innerLabel, innerBody, PositionInfo.UNDEFINED),
                 new StatementBlock(updateStatements)));
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
-                    + "loop may have a loop contract! \n" + "This block begins with "
-                    + block.getFirstElement());
+                + "loop may have a loop contract! \n" + "This block begins with "
+                + block.getFirstElement());
         }
 
         return sb;
@@ -503,13 +512,15 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         if (loop instanceof For || loop instanceof While) {
             ExtList tailStatements = new ExtList();
 
-            for (int i = 1; i < block.getStatementCount(); ++i) { tailStatements.add(block.getStatementAt(i)); }
+            for (int i = 1; i < block.getStatementCount(); ++i) {
+                tailStatements.add(block.getStatementAt(i));
+            }
 
             sb = new StatementBlock(tailStatements);
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
-                    + "loop may have a loop contract! \n" + "This block begins with "
-                    + block.getFirstElement());
+                + "loop may have a loop contract! \n" + "This block begins with "
+                + block.getFirstElement());
         }
 
         return sb;
@@ -582,7 +593,11 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         }
 
         public static LoopContractImpl.ReplaceTypes fromClass(Class<?> cls) {
-            for (ReplaceTypes c : values()) { if (c.targetClass.isAssignableFrom(cls)) { return c; } }
+            for (ReplaceTypes c : values()) {
+                if (c.targetClass.isAssignableFrom(cls)) {
+                    return c;
+                }
+            }
 
             throw new AssertionError();
         }
@@ -754,10 +769,10 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     public String getUniqueName() {
         if (getTarget() != null) {
             return "Loop Contract " + getBlock().getStartPosition().line() + " "
-                    + getTarget().getUniqueName();
+                + getTarget().getUniqueName();
         } else {
             return "Loop Contract " + getBlock().getStartPosition().line() + " "
-                    + Math.abs(getBlock().hashCode());
+                + Math.abs(getBlock().hashCode());
         }
     }
 
@@ -833,7 +848,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     @Override
     public LoopContract replaceEnhancedForVariables(StatementBlock newBlock, Services services) {
-        if (replacedEnhancedForVars != null) { return replacedEnhancedForVars; }
+        if (replacedEnhancedForVars != null) {
+            return replacedEnhancedForVars;
+        }
 
         if (index == null && values == null) {
             replacedEnhancedForVars = (LoopContractImpl) update(newBlock, preconditions,
@@ -860,7 +877,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final Term newDecreases = replacer.replace(decreases);
 
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) { continue; }
+                if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
+                    continue;
+                }
                 newPreconditions.put(heap, replacer.replace(getPrecondition(heap, services)));
                 newFreePreconditions.put(heap,
                     replacer.replace(getFreePrecondition(heap, services)));
@@ -885,7 +904,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     @Override
     public LoopContract setBlock(StatementBlock newBlock) {
-        if (newBlock.equals(block)) { return this; }
+        if (newBlock.equals(block)) {
+            return this;
+        }
 
         LoopContractImpl result = new LoopContractImpl(baseName, newBlock, labels, method,
             modalityKind,
@@ -899,7 +920,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
     @Override
     public LoopContract setLoop(LoopStatement newLoop) {
-        if (newLoop.equals(loop)) { return this; }
+        if (newLoop.equals(loop)) {
+            return this;
+        }
 
         LoopContractImpl result = new LoopContractImpl(
             baseName, newLoop, labels, method, modalityKind,
@@ -916,7 +939,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         assert newPM instanceof IProgramMethod;
         assert newKJT.equals(newPM.getContainerType());
 
-        if (newPM.equals(method)) { return this; }
+        if (newPM.equals(method)) {
+            return this;
+        }
 
         LoopContractImpl result = new LoopContractImpl(
             baseName, block, labels, (IProgramMethod) newPM, modalityKind,
@@ -930,11 +955,11 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     @Override
     public String toString() {
         return "SimpleLoopContract [block=" + block + ", labels=" + labels + ", method=" + method
-                + ", modality=" + modalityKind + ", instantiationSelf=" + instantiationSelf
-                + ", preconditions=" + preconditions + ", postconditions=" + postconditions
-                + ", modifiableClauses=" + modifiableClauses + ", infFlowSpecs=" + infFlowSpecs
-                + ", variables=" + variables + ", transactionApplicable=" + transactionApplicable
-                + ", hasModifiable=" + hasModifiable + "]";
+            + ", modality=" + modalityKind + ", instantiationSelf=" + instantiationSelf
+            + ", preconditions=" + preconditions + ", postconditions=" + postconditions
+            + ", modifiableClauses=" + modifiableClauses + ", infFlowSpecs=" + infFlowSpecs
+            + ", variables=" + variables + ", transactionApplicable=" + transactionApplicable
+            + ", hasModifiable=" + hasModifiable + "]";
     }
 
     /**
@@ -1134,7 +1159,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         protected Map<LocationVariable, Term> buildPreconditions() {
             final Map<LocationVariable, Term> result = super.buildPreconditions();
 
-            if (decreases != null) { result.replaceAll((k, v) -> and(v, geq(decreases, zero()))); }
+            if (decreases != null) {
+                result.replaceAll((k, v) -> and(v, geq(decreases, zero())));
+            }
 
             return result;
         }
@@ -1161,7 +1188,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         @Override
         protected LoopContract combine() {
             assert contracts.length > 0;
-            if (contracts.length == 1) { return contracts[0]; }
+            if (contracts.length == 1) {
+                return contracts[0];
+            }
 
             final LoopContract head = contracts[0];
             StringBuilder baseName = new StringBuilder(head.getBaseName());

@@ -79,7 +79,9 @@ public class PreviewDialog extends JDialog implements WindowListener {
     }
 
     private void stopWorker() {
-        if (worker != null) { worker.cancel(true); }
+        if (worker != null) {
+            worker.cancel(true);
+        }
     }
 
     private void workerDone(GraphvizResult result) {

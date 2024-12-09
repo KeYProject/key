@@ -132,7 +132,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
                     mapping = (Term param) -> {
                         if (param.sort() != fInputSort) {
                             throw new IllegalArgumentException("Input must be of sort \""
-                                    + fInputSort + "\", given: \"" + param.sort() + "\".");
+                                + fInputSort + "\", given: \"" + param.sort() + "\".");
                         }
 
                         return OpReplacer.replace(tb.var(placeholder), param, predicate, tf,
@@ -231,7 +231,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
 
             for (int i = 1; i < m.groupCount(); i += 2) {
                 assert i + 1 <= m.groupCount() : "Wrong format of join abstraction predicates: "
-                        + "There should always be pairs of placeholders and predicate terms.";
+                    + "There should always be pairs of placeholders and predicate terms.";
 
                 final String phStr = m.group(i);
                 final String predStr = m.group(i + 1);
@@ -252,14 +252,18 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
             }
         }
 
-        if (!matched) { throw new ParserException("Wrong format of join abstraction predicates", null); }
+        if (!matched) {
+            throw new ParserException("Wrong format of join abstraction predicates", null);
+        }
 
         return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof AbstractionPredicate otherPred)) { return false; }
+        if (!(obj instanceof AbstractionPredicate otherPred)) {
+            return false;
+        }
 
         return otherPred.placeholderVariable.equals(placeholderVariable)
                 && otherPred.predicateFormWithPlaceholder.equals(predicateFormWithPlaceholder);

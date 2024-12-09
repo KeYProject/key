@@ -123,7 +123,9 @@ public abstract class NodeInfoVisualizer extends JComponent
         Node node = vis.getNode();
         if (instances.get(node.proof().name()).get(node.serialNr()).remove(vis)) {
             synchronized (listeners) {
-                for (NodeInfoVisualizerListener listener : listeners) { listener.visualizerUnregistered(vis); }
+                for (NodeInfoVisualizerListener listener : listeners) {
+                    listener.visualizerUnregistered(vis);
+                }
             }
         }
     }
@@ -141,7 +143,9 @@ public abstract class NodeInfoVisualizer extends JComponent
         map.get(nodeNr).add(vis);
 
         synchronized (listeners) {
-            for (NodeInfoVisualizerListener listener : listeners) { listener.visualizerRegistered(vis); }
+            for (NodeInfoVisualizerListener listener : listeners) {
+                listener.visualizerRegistered(vis);
+            }
         }
     }
 

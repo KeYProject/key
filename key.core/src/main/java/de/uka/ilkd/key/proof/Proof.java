@@ -227,7 +227,9 @@ public class Proof implements Named {
         openGoals = openGoals.prepend(firstGoal);
         setRoot(rootNode);
 
-        if (closed()) { fireProofClosed(); }
+        if (closed()) {
+            fireProofClosed();
+        }
     }
 
     public Proof(String name, Sequent problem, String header, InitConfig initConfig,
@@ -259,12 +261,16 @@ public class Proof implements Named {
      * a reference to this proof object.
      */
     public void dispose() {
-        if (isDisposed()) { return; }
+        if (isDisposed()) {
+            return;
+        }
         fireProofDisposing(new ProofDisposedEvent(this));
         clearAndDetachRuleAppIndexes();
 
         // Do required cleanup
-        if (getServices() != null) { getServices().getSpecificationRepository().removeProof(this); }
+        if (getServices() != null) {
+            getServices().getSpecificationRepository().removeProof(this);
+        }
         if (localMgt != null) {
             localMgt.removeProofListener(); // This is strongly required because the listener is
             // contained in a static List
@@ -356,7 +362,9 @@ public class Proof implements Named {
      */
     public void setNamespaces(NamespaceSet ns) {
         getServices().setNamespaces(ns);
-        if (!root.leaf()) { throw new IllegalStateException("Proof: ProgVars set too late"); }
+        if (!root.leaf()) {
+            throw new IllegalStateException("Proof: ProgVars set too late");
+        }
 
         Goal fstGoal = openGoals().head();
         fstGoal.makeLocalNamespacesFrom(ns);
@@ -376,7 +384,9 @@ public class Proof implements Named {
 
 
     public Strategy getActiveStrategy() {
-        if (activeStrategy == null) { initStrategy(); }
+        if (activeStrategy == null) {
+            initStrategy();
+        }
         return activeStrategy;
     }
 
@@ -395,14 +405,18 @@ public class Proof implements Named {
     private void updateStrategyOnGoals() {
         Strategy ourStrategy = getActiveStrategy();
 
-        for (Goal goal : openGoals()) { goal.setGoalStrategy(ourStrategy); }
+        for (Goal goal : openGoals()) {
+            goal.setGoalStrategy(ourStrategy);
+        }
     }
 
 
     public void clearAndDetachRuleAppIndexes() {
         // Taclet indices of the particular goals have to
         // be rebuilt
-        for (Goal goal : openGoals()) { goal.clearAndDetachRuleAppIndex(); }
+        for (Goal goal : openGoals()) {
+            goal.clearAndDetachRuleAppIndex();
+        }
     }
 
 
@@ -489,7 +503,11 @@ public class Proof implements Named {
      */
     private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
         ImmutableList<Goal> enabledGoals = ImmutableSLList.nil();
-        for (Goal g : goals) { if (g.isAutomatic() && !g.isLinked()) { enabledGoals = enabledGoals.prepend(g); } }
+        for (Goal g : goals) {
+            if (g.isAutomatic() && !g.isLinked()) {
+                enabledGoals = enabledGoals.prepend(g);
+            }
+        }
         return enabledGoals;
     }
 
@@ -534,7 +552,9 @@ public class Proof implements Named {
             goal = getOpenGoal(it.next());
             if (goal != null) {
                 b = true;
-                if (!GeneralSettings.noPruningClosed) { closedGoals = closedGoals.prepend(goal); }
+                if (!GeneralSettings.noPruningClosed) {
+                    closedGoals = closedGoals.prepend(goal);
+                }
                 remove(goal);
             }
         }
@@ -612,7 +632,9 @@ public class Proof implements Named {
      */
     public void add(ImmutableList<Goal> goals) {
         ImmutableList<Goal> newOpenGoals = openGoals.prepend(goals);
-        if (openGoals != newOpenGoals) { openGoals = newOpenGoals; }
+        if (openGoals != newOpenGoals) {
+            openGoals = newOpenGoals;
+        }
 
         // For the moment it is necessary to fire the message ALWAYS
         // in order to detect branch closing.
@@ -633,13 +655,19 @@ public class Proof implements Named {
     public void setStepIndices() {
         int stepIndex = 0;
         Iterator<Node> nodeIterator = this.root().subtreeIterator();
-        while (nodeIterator.hasNext()) { Node node = nodeIterator.next(); node.setStepIndex(stepIndex); stepIndex++; }
+        while (nodeIterator.hasNext()) {
+            Node node = nodeIterator.next();
+            node.setStepIndex(stepIndex);
+            stepIndex++;
+        }
     }
 
     void removeOpenGoals(Collection<Node> toBeRemoved) {
         ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
         for (Goal openGoal : openGoals()) {
-            if (!toBeRemoved.contains(openGoal.node())) { newGoalList = newGoalList.append(openGoal); }
+            if (!toBeRemoved.contains(openGoal.node())) {
+                newGoalList = newGoalList.append(openGoal);
+            }
         }
         openGoals = newGoalList;
     }
@@ -655,7 +683,9 @@ public class Proof implements Named {
     void removeClosedGoals(Collection<Node> toBeRemoved) {
         ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
         for (Goal closedGoal : closedGoals) {
-            if (!toBeRemoved.contains(closedGoal.node())) { newGoalList = newGoalList.prepend(closedGoal); }
+            if (!toBeRemoved.contains(closedGoal.node())) {
+                newGoalList = newGoalList.prepend(closedGoal);
+            }
         }
         closedGoals = newGoalList;
     }
@@ -668,7 +698,9 @@ public class Proof implements Named {
      *        the Goal where the last rule application gets undone
      */
     public synchronized void pruneProof(Goal goal) {
-        if (goal.node().parent() != null) { pruneProof(goal.node().parent()); }
+        if (goal.node().parent() != null) {
+            pruneProof(goal.node().parent());
+        }
     }
 
     /**
@@ -686,12 +718,18 @@ public class Proof implements Named {
 
     public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint, boolean fireChanges) {
         assert cuttingPoint.proof() == this;
-        if (getOpenGoal(cuttingPoint) != null) { return null; }
+        if (getOpenGoal(cuttingPoint) != null) {
+            return null;
+        }
         // abort pruning if the node is closed and pruning in closed branches is disabled
-        if (cuttingPoint.isClosed() && GeneralSettings.noPruningClosed) { return null; }
+        if (cuttingPoint.isClosed() && GeneralSettings.noPruningClosed) {
+            return null;
+        }
 
         ProofPruner pruner = new ProofPruner(this);
-        if (fireChanges) { fireProofIsBeingPruned(cuttingPoint); }
+        if (fireChanges) {
+            fireProofIsBeingPruned(cuttingPoint);
+        }
         ImmutableList<Node> result = pruner.prune(cuttingPoint);
         if (fireChanges) {
             fireProofGoalsChanged();
@@ -711,7 +749,9 @@ public class Proof implements Named {
         while (!queue.isEmpty()) {
             Node currentNode = queue.poll();
             Iterator<Node> it = currentNode.childrenIterator();
-            while (it.hasNext()) { queue.add(it.next()); }
+            while (it.hasNext()) {
+                queue.add(it.next());
+            }
             visitor.visit(this, currentNode);
         }
     }
@@ -729,16 +769,23 @@ public class Proof implements Named {
         queue.add(root);
         while (!queue.isEmpty()) {
             Node cur = queue.poll();
-            if (pred.test(cur)) { return cur; }
+            if (pred.test(cur)) {
+                return cur;
+            }
             Iterator<Node> iter = cur.childrenIterator();
-            while (iter.hasNext()) { queue.add(iter.next()); }
+            while (iter.hasNext()) {
+                queue.add(iter.next());
+            }
         }
         return null;
     }
 
 
     public void traverseFromChildToParent(Node child, Node parent, ProofVisitor visitor) {
-        do { visitor.visit(this, child); child = child.parent(); } while (child != parent);
+        do {
+            visitor.visit(this, child);
+            child = child.parent();
+        } while (child != parent);
     }
 
     /**
@@ -747,7 +794,9 @@ public class Proof implements Named {
     public void fireProofExpanded(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) { listener.proofExpanded(e); }
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofExpanded(e);
+            }
         }
     }
 
@@ -757,7 +806,9 @@ public class Proof implements Named {
     protected void fireProofIsBeingPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) { listener.proofIsBeingPruned(e); }
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofIsBeingPruned(e);
+            }
         }
     }
 
@@ -767,7 +818,9 @@ public class Proof implements Named {
     protected void fireProofPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) { listener.proofPruned(e); }
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofPruned(e);
+            }
         }
     }
 
@@ -778,7 +831,9 @@ public class Proof implements Named {
     public void fireProofStructureChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) { listener.proofStructureChanged(e); }
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofStructureChanged(e);
+            }
         }
     }
 
@@ -789,7 +844,9 @@ public class Proof implements Named {
     protected void fireProofGoalRemoved(Goal goal) {
         ProofTreeEvent e = new ProofTreeEvent(this, goal);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) { listener.proofGoalRemoved(e); }
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofGoalRemoved(e);
+            }
         }
     }
 
@@ -800,7 +857,9 @@ public class Proof implements Named {
     protected void fireProofGoalsAdded(ImmutableList<Goal> goals) {
         ProofTreeEvent e = new ProofTreeEvent(this, goals);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) { listener.proofGoalsAdded(e); }
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofGoalsAdded(e);
+            }
         }
     }
 
@@ -819,7 +878,9 @@ public class Proof implements Named {
     public void fireProofGoalsChanged() {
         ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) { listener.proofGoalsChanged(e); }
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofGoalsChanged(e);
+            }
         }
     }
 
@@ -829,10 +890,14 @@ public class Proof implements Named {
      * event when the last goal in list is removed.
      */
     protected void fireProofClosed() {
-        if (mutedProofCloseEvents) { return; }
+        if (mutedProofCloseEvents) {
+            return;
+        }
         ProofTreeEvent e = new ProofTreeEvent(this);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) { listener.proofClosed(e); }
+            for (ProofTreeListener listener : listenerList) {
+                listener.proofClosed(e);
+            }
         }
     }
 
@@ -845,7 +910,9 @@ public class Proof implements Named {
     protected void fireNotesChanged(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
         synchronized (listenerList) {
-            for (ProofTreeListener listener : listenerList) { listener.notesChanged(e); }
+            for (ProofTreeListener listener : listenerList) {
+                listener.notesChanged(e);
+            }
         }
     }
 
@@ -899,7 +966,11 @@ public class Proof implements Named {
      * @return the goal that belongs to the given node or null if the node is an inner one
      */
     public Goal getOpenGoal(Node node) {
-        for (final Goal result : openGoals) { if (result.node() == node) { return result; } }
+        for (final Goal result : openGoals) {
+            if (result.node() == node) {
+                return result;
+            }
+        }
         return null;
     }
 
@@ -922,7 +993,11 @@ public class Proof implements Named {
      *         an open goal
      */
     public Goal getClosedGoal(Node node) {
-        for (final Goal result : closedGoals) { if (result.node() == node) { return result; } }
+        for (final Goal result : closedGoals) {
+            if (result.node() == node) {
+                return result;
+            }
+        }
         return null;
     }
 
@@ -964,7 +1039,9 @@ public class Proof implements Named {
         List<Node> leaves = node.getLeaves();
         for (final Goal goal : fromGoals) {
             // if list contains node, remove it to make the list faster later
-            if (leaves.remove(goal.node())) { result = result.prepend(goal); }
+            if (leaves.remove(goal.node())) {
+                result = result.prepend(goal);
+            }
         }
         return result;
     }
@@ -988,7 +1065,9 @@ public class Proof implements Named {
      * @return true iff the given node is found in the proof tree
      */
     public boolean find(Node node) {
-        if (root == null) { return false; }
+        if (root == null) {
+            return false;
+        }
         return root.find(node);
     }
 
@@ -1008,12 +1087,16 @@ public class Proof implements Named {
      * general way to control the contents of the rule app index
      */
     public void setRuleAppIndexToAutoMode() {
-        for (final Goal g : openGoals) { g.ruleAppIndex().autoModeStarted(); }
+        for (final Goal g : openGoals) {
+            g.ruleAppIndex().autoModeStarted();
+        }
     }
 
 
     public void setRuleAppIndexToInteractiveMode() {
-        for (final Goal g : openGoals) { g.ruleAppIndex().autoModeStopped(); }
+        for (final Goal g : openGoals) {
+            g.ruleAppIndex().autoModeStopped();
+        }
     }
 
     /**
@@ -1057,12 +1140,16 @@ public class Proof implements Named {
      */
     protected void fireRuleApplied(ProofEvent p_e) {
         synchronized (ruleAppListenerList) {
-            for (RuleAppListener ral : ruleAppListenerList) { ral.ruleApplied(p_e); }
+            for (RuleAppListener ral : ruleAppListenerList) {
+                ral.ruleApplied(p_e);
+            }
         }
     }
 
     public void addRuleAppListener(RuleAppListener p) {
-        if (p == null) { return; }
+        if (p == null) {
+            return;
+        }
         synchronized (ruleAppListenerList) {
             ruleAppListenerList.add(p);
         }
@@ -1081,7 +1168,9 @@ public class Proof implements Named {
      *        The {@link ProofDisposedListener} to register.
      */
     public void addProofDisposedListener(ProofDisposedListener l) {
-        if (l != null) { proofDisposedListener.add(l); }
+        if (l != null) {
+            proofDisposedListener.add(l);
+        }
     }
 
     /**
@@ -1092,7 +1181,9 @@ public class Proof implements Named {
      *        The {@link ProofDisposedListener} to register.
      */
     public void addProofDisposedListenerFirst(ProofDisposedListener l) {
-        if (l != null) { proofDisposedListener.add(0, l); }
+        if (l != null) {
+            proofDisposedListener.add(0, l);
+        }
     }
 
     /**
@@ -1102,7 +1193,9 @@ public class Proof implements Named {
      *        The {@link ProofDisposedListener} to unregister.
      */
     public void removeProofDisposedListener(ProofDisposedListener l) {
-        if (l != null) { proofDisposedListener.remove(l); }
+        if (l != null) {
+            proofDisposedListener.remove(l);
+        }
     }
 
     /**
@@ -1124,7 +1217,9 @@ public class Proof implements Named {
      */
     protected void fireProofDisposed(ProofDisposedEvent e) {
         ProofDisposedListener[] listener = getProofDisposedListeners();
-        for (ProofDisposedListener l : listener) { l.proofDisposed(e); }
+        for (ProofDisposedListener l : listener) {
+            l.proofDisposed(e);
+        }
     }
 
     /**
@@ -1136,7 +1231,9 @@ public class Proof implements Named {
      */
     protected void fireProofDisposing(ProofDisposedEvent e) {
         ProofDisposedListener[] listener = getProofDisposedListeners();
-        for (ProofDisposedListener l : listener) { l.proofDisposing(e); }
+        for (ProofDisposedListener l : listener) {
+            l.proofDisposing(e);
+        }
     }
 
     public InitConfig getInitConfig() {
@@ -1189,7 +1286,9 @@ public class Proof implements Named {
      */
     public <T> T lookup(Class<T> service) {
         try {
-            if (userData == null) { return null; }
+            if (userData == null) {
+                return null;
+            }
             return userData.get(service);
         } catch (IllegalStateException ignored) {
             return null;
@@ -1221,7 +1320,9 @@ public class Proof implements Named {
      *        type of the object to unregister
      */
     public <T> void deregister(T obj, Class<T> service) {
-        if (userData != null) { userData.deregister(obj, service); }
+        if (userData != null) {
+            userData.deregister(obj, service);
+        }
     }
 
     /**
@@ -1230,7 +1331,9 @@ public class Proof implements Named {
      * @return the associated lookup
      */
     public @NonNull Lookup getUserData() {
-        if (userData == null) { userData = new Lookup(); }
+        if (userData == null) {
+            userData = new Lookup();
+        }
         return userData;
     }
 
@@ -1257,11 +1360,17 @@ public class Proof implements Named {
         for (Goal g : goals) {
             Node node = g.node();
             ClosedBy c = node.lookup(ClosedBy.class);
-            if (c == null) { continue; }
-            if (referencedFrom != null && referencedFrom != c.proof()) { continue; }
+            if (c == null) {
+                continue;
+            }
+            if (referencedFrom != null && referencedFrom != c.proof()) {
+                continue;
+            }
             todo.add(g);
         }
-        if (callbackTotal != null) { callbackTotal.accept(todo.size()); }
+        if (callbackTotal != null) {
+            callbackTotal.accept(todo.size());
+        }
         for (Goal g : todo) {
             reOpenGoal(g);
             ClosedBy c = g.node().lookup(ClosedBy.class);
@@ -1271,7 +1380,9 @@ public class Proof implements Named {
             } catch (IntermediateProofReplayer.BuiltInConstructionException e) {
                 throw new RuntimeException(e);
             }
-            if (callbackBranch != null) { callbackBranch.run(); }
+            if (callbackBranch != null) {
+                callbackBranch.run();
+            }
         }
     }
 }

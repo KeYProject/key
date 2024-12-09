@@ -97,7 +97,9 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     @Override
     public ImmutableSet<T> add(T element) {
         complainAboutSize();
-        if (elementList.contains(element)) { return this; }
+        if (elementList.contains(element)) {
+            return this;
+        }
         return new DefaultImmutableSet<>(elementList.prepend(element));
     }
 
@@ -136,10 +138,16 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     }
 
     private DefaultImmutableSet<T> originalUnion(ImmutableSet<? extends T> set) {
-        if (set.isEmpty()) { return this; }
+        if (set.isEmpty()) {
+            return this;
+        }
 
         ImmutableList<T> unionElements = this.elementList;
-        for (T otherEl : set) { if (!contains(otherEl)) { unionElements = unionElements.prepend(otherEl); } }
+        for (T otherEl : set) {
+            if (!contains(otherEl)) {
+                unionElements = unionElements.prepend(otherEl);
+            }
+        }
         return new DefaultImmutableSet<>(unionElements);
     }
 
@@ -154,7 +162,11 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
         }
 
         ImmutableList<T> intersectElements = ImmutableSLList.nil();
-        for (T el : set) { if (contains(el)) { intersectElements = intersectElements.prepend(el); } }
+        for (T el : set) {
+            if (contains(el)) {
+                intersectElements = intersectElements.prepend(el);
+            }
+        }
 
         if (intersectElements.isEmpty()) {
             return DefaultImmutableSet.nil();
@@ -187,7 +199,11 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
         if (size() > s.size()) {
             return false;
         } else {
-            for (T el : this) { if (!s.contains(el)) { return false; } }
+            for (T el : this) {
+                if (!s.contains(el)) {
+                    return false;
+                }
+            }
         }
         return true;
     }
@@ -227,8 +243,12 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
      */
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (obj == this) { return true; }
-        if (!(obj instanceof ImmutableSet)) { return false; }
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof ImmutableSet)) {
+            return false;
+        }
         @SuppressWarnings("unchecked")
         ImmutableSet<T> o = (ImmutableSet<T>) obj;
         return (o.subset(this) && this.subset(o));

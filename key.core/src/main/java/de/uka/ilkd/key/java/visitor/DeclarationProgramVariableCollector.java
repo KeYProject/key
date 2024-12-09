@@ -48,7 +48,9 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
      * adds the given variable if we are currently at top level
      */
     protected void addVariable(IProgramVariable var) {
-        if (depth() == 1) { result.add(var); }
+        if (depth() == 1) {
+            result.add(var);
+        }
     }
 
     protected void doDefaultAction(SourceElement x) {}

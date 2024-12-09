@@ -59,11 +59,15 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         final Monomial sourceM = Monomial.create(source.toTerm(app, pos, goal, mState), services);
         final Monomial targetM = Monomial.create(target.toTerm(app, pos, goal, mState), services);
 
-        if (targetM.divides(sourceM)) { return toIterator(targetM.reduce(sourceM).toTerm(services)); }
+        if (targetM.divides(sourceM)) {
+            return toIterator(targetM.reduce(sourceM).toTerm(services));
+        }
 
         final List<CofactorPolynomial> cofactorPolys = extractPolys(goal, services);
 
-        if (cofactorPolys.isEmpty()) { return ImmutableSLList.<Term>nil().iterator(); }
+        if (cofactorPolys.isEmpty()) {
+            return ImmutableSLList.<Term>nil().iterator();
+        }
 
         return computeMultiples(sourceM, targetM, cofactorPolys, services).iterator();
     }

@@ -30,7 +30,9 @@ public class SingleProof extends ProofAggregate {
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o)) { return false; }
+        if (!super.equals(o)) {
+            return false;
+        }
         final SingleProof other = (SingleProof) o;
 
         return proof == other.proof;

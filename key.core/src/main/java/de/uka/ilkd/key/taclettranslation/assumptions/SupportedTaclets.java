@@ -41,7 +41,9 @@ public final class SupportedTaclets {
 
         for (String taclet : selected) {
             TreeItem item = tacletNames.get(taclet);
-            if (item != null) { item.setMode(SelectionMode.all); }
+            if (item != null) {
+                item.setMode(SelectionMode.all);
+            }
         }
         this.validateSelectionModes();
     }
@@ -68,7 +70,9 @@ public final class SupportedTaclets {
     public void selectTaclets(String... taclets) {
         for (String taclet : taclets) {
             TreeItem item = tacletNames.get(taclet);
-            if (item != null) { item.setMode(SelectionMode.all); }
+            if (item != null) {
+                item.setMode(SelectionMode.all);
+            }
         }
         validateSelectionMode((TreeItem) model.getRoot());
     }
@@ -78,7 +82,9 @@ public final class SupportedTaclets {
         Enumeration<?> en = ((TreeItem) model.getRoot()).breadthFirstEnumeration();
         while (en.hasMoreElements()) {
             TreeItem item = (TreeItem) en.nextElement();
-            if (item.isLeaf() && item.isSelected()) { list.add(item.text); }
+            if (item.isLeaf() && item.isSelected()) {
+                list.add(item.text);
+            }
 
         }
         String[] result = new String[list.size()];
@@ -146,7 +152,9 @@ public final class SupportedTaclets {
     }
 
     private void selectNothing() {
-        for (TreeItem item : tacletNames.values()) { item.setMode(TreeItem.SelectionMode.nothing); }
+        for (TreeItem item : tacletNames.values()) {
+            item.setMode(TreeItem.SelectionMode.nothing);
+        }
 
     }
 
@@ -162,14 +170,18 @@ public final class SupportedTaclets {
             return true;
         }
         for (int i = 0; i < node.getChildCount(); i++) {
-            if (selectCategory(cat, (TreeItem) node.getChildAt(i))) { return true; }
+            if (selectCategory(cat, (TreeItem) node.getChildAt(i))) {
+                return true;
+            }
         }
         return false;
     }
 
     private void selectAll(TreeItem node) {
         node.setMode(TreeItem.SelectionMode.all);
-        for (int i = 0; i < node.getChildCount(); i++) { selectAll((TreeItem) node.getChildAt(i)); }
+        for (int i = 0; i < node.getChildCount(); i++) {
+            selectAll((TreeItem) node.getChildAt(i));
+        }
     }
 
     public void validateSelectionModes() {
@@ -196,7 +208,9 @@ public final class SupportedTaclets {
             TreeItem.SelectionMode childMode = validateSelectionMode((TreeItem) child);
             if (childMode.equals(TreeItem.SelectionMode.all)) {
                 iAll++;
-            } else if (childMode.equals(TreeItem.SelectionMode.nothing)) { iNothing++; }
+            } else if (childMode.equals(TreeItem.SelectionMode.nothing)) {
+                iNothing++;
+            }
             TreeItem childItem = (TreeItem) child;
 
 
@@ -235,7 +249,9 @@ public final class SupportedTaclets {
     }
 
     private void addTaclet(TreeItem node, String... taclets) {
-        for (String taclet : taclets) { addTaclet(node, taclet); }
+        for (String taclet : taclets) {
+            addTaclet(node, taclet);
+        }
     }
 
     private void addTaclet(TreeItem node, String taclet, boolean checked, int genericCount) {
@@ -284,7 +300,9 @@ public final class SupportedTaclets {
      */
     public TreeModel getTreeModel() {
 
-        if (model != null) { return model; }
+        if (model != null) {
+            return model;
+        }
 
         TreeItem root = new TreeItem("Supported taclets", Category.ALL_SUPPORTED);
 
@@ -486,7 +504,9 @@ public final class SupportedTaclets {
                     break;
                 }
             }
-            if (!found) { list.add(name); }
+            if (!found) {
+                list.add(name);
+            }
         }
         return list;
     }

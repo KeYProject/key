@@ -86,14 +86,20 @@ public final class SameObserverCondition implements VariableCondition {
             return null;
         }
 
-        if (term1 == null || term2 == null) { return mc; }
+        if (term1 == null || term2 == null) {
+            return mc;
+        }
 
         IObserverFunction obs1 = (IObserverFunction) term1.op();
         IObserverFunction obs2 = (IObserverFunction) term2.op();
 
-        if (obs1 != obs2) { return null; }
+        if (obs1 != obs2) {
+            return null;
+        }
 
-        if (obs1.getHeapCount(services) != 1 || obs1.getStateCount() != 1) { return null; }
+        if (obs1.getHeapCount(services) != 1 || obs1.getStateCount() != 1) {
+            return null;
+        }
 
         KeYJavaType kjt = obs1.isStatic() ? obs1.getContainerType()
                 : services.getTypeConverter().getKeYJavaType(term1.sub(1));
@@ -101,7 +107,9 @@ public final class SameObserverCondition implements VariableCondition {
         ImmutableSet<Contract> contracts =
             UseDependencyContractRule.getApplicableContracts(services, kjt, obs1);
 
-        if (contracts == null || contracts.isEmpty()) { return null; }
+        if (contracts == null || contracts.isEmpty()) {
+            return null;
+        }
 
         return mc;
     }

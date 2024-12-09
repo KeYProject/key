@@ -34,7 +34,9 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
     private static Map<String, SolverType> computeSolverMap() {
         Map<String, SolverType> result = new HashMap<>();
 
-        for (SolverType type : SolverTypes.getSolverTypes()) { result.put(type.getName(), type); }
+        for (SolverType type : SolverTypes.getSolverTypes()) {
+            result.put(type.getName(), type);
+        }
 
         return Collections.unmodifiableMap(result);
     }
@@ -61,7 +63,9 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
             goals = ImmutableSLList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
         }
 
-        for (Goal goal : goals) { runSMT(args, su, goal); }
+        for (Goal goal : goals) {
+            runSMT(args, su, goal);
+        }
     }
 
     private void runSMT(SMTCommandArguments args, SolverTypeCollection su, Goal goal) {
@@ -70,7 +74,9 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                 goal.proof().getSettings().getNewSMTSettings(), goal.proof());
 
-        if (args.timeout >= 0) { settings = new SMTSettingsTimeoutWrapper(settings, args.timeout); }
+        if (args.timeout >= 0) {
+            settings = new SMTSettingsTimeoutWrapper(settings, args.timeout);
+        }
 
         SolverLauncher launcher = new SolverLauncher(settings);
         Collection<SMTProblem> probList = new LinkedList<>();
@@ -87,7 +93,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
                 problem.getGoal().apply(app);
             }
             LOGGER.info("Finished run on goal " + goal.node().serialNr() + " in "
-                    + timerListener.getRuntime() + "ms, result is " + finalResult);
+                + timerListener.getRuntime() + "ms, result is " + finalResult);
         }
     }
 
@@ -96,7 +102,9 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         List<SolverType> types = new ArrayList<>();
         for (String name : parts) {
             SolverType type = SOLVER_MAP.get(name);
-            if (type == null) { throw new ScriptException("Unknown SMT solver: " + name); }
+            if (type == null) {
+                throw new ScriptException("Unknown SMT solver: " + name);
+            }
             types.add(type);
         }
         return new SolverTypeCollection(value, 1, types);

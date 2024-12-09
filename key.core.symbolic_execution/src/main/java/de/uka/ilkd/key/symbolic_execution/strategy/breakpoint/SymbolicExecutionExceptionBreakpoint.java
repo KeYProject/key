@@ -156,7 +156,11 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
             Node node) {
         Node parent = null;
-        for (Node parents : exceptionNodes) { if (isParentNode(node, parents)) { parent = parents; } }
+        for (Node parents : exceptionNodes) {
+            if (isParentNode(node, parents)) {
+                parent = parents;
+            }
+        }
         if (parent != null && SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)
                 && !exceptionParentNodes.isEmpty()) {
             if (SymbolicExecutionUtil.isTerminationNode(node, ruleApp) && uncaught) {

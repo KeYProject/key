@@ -36,7 +36,9 @@ class SequentViewChangeListener
             // Update the search results, they are lost otherwise! (MU)
             // But only update them if we have the correct SequentView
             // (i.e., the main window's sequent view) (lanzinger)
-            if (sequentView.isMainSequentView()) { MainWindow.getInstance().setSequentView(sequentView); }
+            if (sequentView.isMainSequentView()) {
+                MainWindow.getInstance().setSequentView(sequentView);
+            }
         }
 
         sequentView.recalculateUserSelectionRange();

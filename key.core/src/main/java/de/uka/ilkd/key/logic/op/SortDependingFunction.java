@@ -104,14 +104,20 @@ public final class SortDependingFunction extends JFunction {
      * @return the variant for the given sort
      */
     public synchronized SortDependingFunction getInstanceFor(Sort sort, TermServices services) {
-        if (sort == this.sortDependingOn) { return this; }
+        if (sort == this.sortDependingOn) {
+            return this;
+        }
 
         SortDependingFunction n = (SortDependingFunction) services.getNamespaces()
                 .lookup(instantiateName(getKind(), sort));
 
 
-        if (sort instanceof ProgramSVSort) { throw new AssertionError(); }
-        if (sort == AbstractTermTransformer.METASORT) { throw new AssertionError(); }
+        if (sort instanceof ProgramSVSort) {
+            throw new AssertionError();
+        }
+        if (sort == AbstractTermTransformer.METASORT) {
+            throw new AssertionError();
+        }
 
         final NamespaceSet namespaces = services.getNamespaces();
         Namespace<JFunction> functions = namespaces.functions();
@@ -138,7 +144,9 @@ public final class SortDependingFunction extends JFunction {
                 // Sort depending on functions are to be added to the "root" namespace, however.
                 // Therefore, let's rewind to the root (MU, 2017-03)
                 synchronized (functions) {
-                    while (functions.parent() != null) { functions = functions.parent(); }
+                    while (functions.parent() != null) {
+                        functions = functions.parent();
+                    }
                     synchronized (functions) {
                         functions.addSafely(result);
                     }
@@ -151,8 +159,12 @@ public final class SortDependingFunction extends JFunction {
                 String.format("%s depends on %s (hash %d) but should depend on %s (hash %d)",
                     result, result.getSortDependingOn(), result.hashCode(), sort, sort.hashCode()));
         }
-        if (!isSimilar(result)) { throw new AssertionError(result + " should be similar to " + this); }
-        if (namespaces.lookup(instantiateName(getKind(), sort)) != result) { throw new AssertionError(); }
+        if (!isSimilar(result)) {
+            throw new AssertionError(result + " should be similar to " + this);
+        }
+        if (namespaces.lookup(instantiateName(getKind(), sort)) != result) {
+            throw new AssertionError();
+        }
 
         return result;
     }
@@ -187,7 +199,9 @@ public final class SortDependingFunction extends JFunction {
 
     @Override
     public SyntaxElement getChild(int n) {
-        if (n == 0) { return sortDependingOn; }
+        if (n == 0) {
+            return sortDependingOn;
+        }
         throw new IndexOutOfBoundsException(
             "SortDependingFunction " + name() + " has only one child");
     }

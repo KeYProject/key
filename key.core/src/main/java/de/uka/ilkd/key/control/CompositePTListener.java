@@ -26,19 +26,29 @@ public class CompositePTListener implements ProverTaskListener {
 
     @Override
     public void taskStarted(TaskStartedInfo info) {
-        for (ProverTaskListener l : listeners) { if (l != null) { l.taskStarted(info); } }
+        for (ProverTaskListener l : listeners) {
+            if (l != null) {
+                l.taskStarted(info);
+            }
+        }
     }
 
     @Override
     public void taskProgress(int position) {
-        for (ProverTaskListener l : listeners) { if (l != null) { l.taskProgress(position); } }
+        for (ProverTaskListener l : listeners) {
+            if (l != null) {
+                l.taskProgress(position);
+            }
+        }
     }
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
         for (int i = listeners.length - 1; 0 <= i; i--) {
             ProverTaskListener l = listeners[i];
-            if (l != null) { l.taskFinished(info); }
+            if (l != null) {
+                l.taskFinished(info);
+            }
         }
     }
 }

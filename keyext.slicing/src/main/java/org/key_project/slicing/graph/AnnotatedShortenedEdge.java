@@ -51,7 +51,9 @@ public class AnnotatedShortenedEdge extends AnnotatedEdge {
             sb.append(" ... ");
         }
         RuleApp ruleApp2 = last.getAppliedRuleApp();
-        if (ruleApp2 != null) { sb.append(ruleApp2.rule().displayName()).append("_").append(last.serialNr()); }
+        if (ruleApp2 != null) {
+            sb.append(ruleApp2.rule().displayName()).append("_").append(last.serialNr());
+        }
         return sb.toString();
     }
 

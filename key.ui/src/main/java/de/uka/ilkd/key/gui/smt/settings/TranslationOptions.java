@@ -41,8 +41,8 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
                 type_of_B(null)""";
     private static final String infoUseBuiltInUniqueness =
         "Some solvers support the uniqueness of functions by built-in mechanisms. If this option is selected "
-                + "those mechanisms are used, otherwise some assumptions are added by using normal FOL.\n"
-                + "Note: The uniqueness of functions is needed for translating attributes and arrays.";
+            + "those mechanisms are used, otherwise some assumptions are added by using normal FOL.\n"
+            + "Note: The uniqueness of functions is needed for translating attributes and arrays.";
     private static final String infoUseUIMultiplication =
         """
                 Some solvers support only simple multiplications. For example Yices supports only multiplications of type a*b where a or b must be a number.
@@ -131,9 +131,13 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     protected JSpinner createMaxField() {
         JSpinner max = addNumberField("Maximum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "", e -> {
-            if (settings != null) { settings.setMaxInteger(e.longValue()); }
+            if (settings != null) {
+                settings.setMaxInteger(e.longValue());
+            }
             long result = 0;
-            if (maxField == null) { return; }
+            if (maxField == null) {
+                return;
+            }
             try {
                 result = (long) maxField.getValue();
                 maxField.setForeground(Color.BLACK);

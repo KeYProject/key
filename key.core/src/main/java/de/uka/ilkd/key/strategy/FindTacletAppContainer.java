@@ -90,7 +90,9 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // of the rule app object
                 return false;
             }
-            if (!independentSubformulas(info.positionOfModification(), newFormula)) { return true; }
+            if (!independentSubformulas(info.positionOfModification(), newFormula)) {
+                return true;
+            }
         }
 
         return false;
@@ -117,7 +119,9 @@ public class FindTacletAppContainer extends TacletAppContainer {
             final int changeIndex = changePIO.next();
             final int appIndex = appPIO.next();
 
-            if (appIndex == -1) { return false; }
+            if (appIndex == -1) {
+                return false;
+            }
 
             if (changeIndex == -1) {
                 final Term beforeChangeTerm = changePIO.getSubTerm();

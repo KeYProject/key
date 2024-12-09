@@ -137,7 +137,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio == null || !pio.isTopLevel() || pio.isInAntec() || Transformer.inTransformer(pio)) { return false; }
+        if (pio == null || !pio.isTopLevel() || pio.isInAntec() || Transformer.inTransformer(pio)) {
+            return false;
+        }
 
         final Term progPost = splitUpdates(pio.subTerm(), goal.proof().getServices()).second;
         JavaBlock javaBlock = progPost.javaBlock();
@@ -408,7 +410,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Term progPost = update.second;
 
         // focus (below update) must be modality term
-        if (!isModalityTerm(progPost)) { return null; }
+        if (!isModalityTerm(progPost)) {
+            return null;
+        }
 
         // active statement must be while loop
         final While loop = app.getLoopStatement();
@@ -423,7 +427,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         // collect self, execution context
         final MethodFrame innermostMethodFrame =
             JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
-        if (innermostMethodFrame != null) { spec = spec.setTarget(innermostMethodFrame.getProgramMethod()); }
+        if (innermostMethodFrame != null) {
+            spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
+        }
 
         final Term selfTerm = innermostMethodFrame == null ? null
                 : MiscTools.getSelfTerm(innermostMethodFrame, services);
@@ -514,7 +520,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         Term anonUpdate = createLocalAnonUpdate(localOuts, services);
         // can still be null
-        if (anonUpdate == null) { anonUpdate = tb.skip(); }
+        if (anonUpdate == null) {
+            anonUpdate = tb.skip();
+        }
 
         Term wellFormedAnon = null;
         Term frameCondition = null;

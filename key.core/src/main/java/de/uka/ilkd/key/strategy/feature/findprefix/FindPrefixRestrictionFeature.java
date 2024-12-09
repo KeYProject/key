@@ -135,7 +135,11 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
      */
     private boolean checkPrefix(PosInOccurrence pos) {
         // iterate through the prefix and let the prefix checkers do their work
-        for (PrefixChecker prefixChecker : prefixCheckers) { if (!prefixChecker.check(pos)) { return false; } }
+        for (PrefixChecker prefixChecker : prefixCheckers) {
+            if (!prefixChecker.check(pos)) {
+                return false;
+            }
+        }
         return true;
     }
 }

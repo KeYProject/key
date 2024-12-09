@@ -39,7 +39,7 @@ public class ExecutionNodeSymbolicLayoutExtractor extends SymbolicLayoutExtracto
     protected String computeInitialStateName() {
         try {
             return SymbolicExecutionUtil.getRoot(executionNode).getName() + " resulting in "
-                    + computeCurrentStateName();
+                + computeCurrentStateName();
         } catch (ProofInputException e) {
             return e.getMessage();
         }

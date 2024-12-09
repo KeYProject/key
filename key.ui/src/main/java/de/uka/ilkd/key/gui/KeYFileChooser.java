@@ -125,7 +125,9 @@ public final class KeYFileChooser extends JFileChooser {
     @Override
     public void approveSelection() {
         File file = getSelectedFile();
-        if (saveDialog && file.exists() && showOverwriteDialog(file) != JOptionPane.YES_OPTION) { return; }
+        if (saveDialog && file.exists() && showOverwriteDialog(file) != JOptionPane.YES_OPTION) {
+            return;
+        }
         super.approveSelection();
     }
 
@@ -133,11 +135,17 @@ public final class KeYFileChooser extends JFileChooser {
         File selFile = getSelectedFile();
 
         if (selFile == null) {
-            if (getCurrentDirectory() == null) { setCurrentDirectory(HOME_DIR); }
+            if (getCurrentDirectory() == null) {
+                setCurrentDirectory(HOME_DIR);
+            }
         } else if (selFile.isFile()) { // present & not dir.
             String filename = selFile.getAbsolutePath();
-            if (!filename.endsWith(".proof")) { setSelectedFile(new File(filename + ".proof")); }
-        } else if (selFile.isDirectory()) { setCurrentDirectory(selFile); }
+            if (!filename.endsWith(".proof")) {
+                setSelectedFile(new File(filename + ".proof"));
+            }
+        } else if (selFile.isDirectory()) {
+            setCurrentDirectory(selFile);
+        }
     }
 
     @Override
@@ -233,11 +241,15 @@ public final class KeYFileChooser extends JFileChooser {
             }
         }
 
-        if (resetFile == null) { resetFile = getCurrentDirectory(); }
+        if (resetFile == null) {
+            resetFile = getCurrentDirectory();
+        }
 
         setSaveDialog(true);
         int result = super.showSaveDialog(parent);
-        if (result != APPROVE_OPTION) { resetPath(); }
+        if (result != APPROVE_OPTION) {
+            resetPath();
+        }
         return result;
     }
 

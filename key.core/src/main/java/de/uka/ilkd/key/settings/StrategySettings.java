@@ -117,9 +117,9 @@ public class StrategySettings extends AbstractSettings {
                 numSteps = Integer.parseInt(numString);
             } catch (NumberFormatException e) {
                 LOGGER.debug("StrategySettings: failure while converting the string "
-                        + "with the allowed steps of heuristics applications to int."
-                        + "Use default value 1000 instead."
-                        + "\nThe String that has been tried to convert was {}",
+                    + "with the allowed steps of heuristics applications to int."
+                    + "Use default value 1000 instead."
+                    + "\nThe String that has been tried to convert was {}",
                     numString);
             }
         }
@@ -129,14 +129,16 @@ public class StrategySettings extends AbstractSettings {
                 localTimeout = Long.parseLong(timeoutString);
             } catch (NumberFormatException e) {
                 LOGGER.debug("StrategySettings: failure while converting the string "
-                        + "with rule application timeout. "
-                        + "\nThe String that has been tried to convert was {}",
+                    + "with rule application timeout. "
+                    + "\nThe String that has been tried to convert was {}",
                     timeoutString);
             }
         }
 
         // set active strategy
-        if (strategyString != null) { activeStrategy = new Name(strategyString); }
+        if (strategyString != null) {
+            activeStrategy = new Name(strategyString);
+        }
 
         // set strategy options
         setStrategyProperties(StrategyProperties.read(props));
@@ -168,7 +170,9 @@ public class StrategySettings extends AbstractSettings {
             // not defined.
             setStrategy(JavaCardDLStrategyFactory.NAME);
         }
-        if (maxSteps < 0) { setMaxSteps(10000); }
+        if (maxSteps < 0) {
+            setMaxSteps(10000);
+        }
         props.setProperty("[" + CATEGORY + "]" + STRATEGY_KEY, getStrategy().toString());
         props.setProperty("[" + CATEGORY + "]" + STEPS_KEY, String.valueOf(getMaxSteps()));
         props.setProperty("[" + CATEGORY + "]" + TIMEOUT_KEY, String.valueOf(getTimeout()));
@@ -178,15 +182,17 @@ public class StrategySettings extends AbstractSettings {
     @Override
     public void readSettings(Configuration props) {
         props = props.getSection(CATEGORY);
-        if (props == null) { return; }
+        if (props == null) {
+            return;
+        }
 
         try {
             setMaxSteps(props.getInt(STEPS_KEY));
         } catch (NumberFormatException | NullPointerException e) {
             LOGGER.debug("StrategySettings: failure while converting the string "
-                    + "with the allowed steps of heuristics applications to int."
-                    + "Use default value 1000 instead."
-                    + "\nThe String that has been tried to convert was {}",
+                + "with the allowed steps of heuristics applications to int."
+                + "Use default value 1000 instead."
+                + "\nThe String that has been tried to convert was {}",
                 props.get(STEPS_KEY));
         }
 
@@ -194,14 +200,16 @@ public class StrategySettings extends AbstractSettings {
             setTimeout(props.getInt(TIMEOUT_KEY));
         } catch (NumberFormatException | NullPointerException e) {
             LOGGER.debug("StrategySettings: failure while converting the string "
-                    + "with rule application timeout. "
-                    + "\nThe String that has been tried to convert was {}",
+                + "with rule application timeout. "
+                + "\nThe String that has been tried to convert was {}",
                 props.get(TIMEOUT_KEY));
         }
 
         // set active strategy
         var strategy = props.getString(STRATEGY_KEY);
-        if (strategy != null) { activeStrategy = new Name(strategy); }
+        if (strategy != null) {
+            activeStrategy = new Name(strategy);
+        }
 
         setStrategyProperties(StrategyProperties.read(props));
     }
@@ -209,8 +217,12 @@ public class StrategySettings extends AbstractSettings {
     @Override
     public void writeSettings(Configuration props) {
         props = props.getOrCreateSection(CATEGORY);
-        if (getStrategy() == null) { setStrategy(JavaCardDLStrategyFactory.NAME); }
-        if (maxSteps < 0) { setMaxSteps(10000); }
+        if (getStrategy() == null) {
+            setStrategy(JavaCardDLStrategyFactory.NAME);
+        }
+        if (maxSteps < 0) {
+            setMaxSteps(10000);
+        }
 
         props.set(STRATEGY_KEY, getStrategy().toString());
         props.set(STEPS_KEY, getMaxSteps());

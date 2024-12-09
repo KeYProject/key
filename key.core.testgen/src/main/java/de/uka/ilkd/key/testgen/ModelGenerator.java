@@ -160,7 +160,9 @@ public class ModelGenerator implements SolverLauncherListener {
 
     private void finish() {
         LOGGER.info("Finished: found {}", models.size());
-        for (Model m : models) { LOGGER.info("\t{}", m.toString()); }
+        for (Model m : models) {
+            LOGGER.info("\t{}", m.toString());
+        }
     }
 
     @Override
@@ -173,11 +175,15 @@ public class ModelGenerator implements SolverLauncherListener {
 
         final TermBuilder tb = services.getTermBuilder();
         ante = ante.append(tb.tt());
-        for (SequentFormula f : s.antecedent()) { ante = ante.append(f.formula()); }
+        for (SequentFormula f : s.antecedent()) {
+            ante = ante.append(f.formula());
+        }
 
         ImmutableList<Term> succ = ImmutableSLList.nil();
         succ = succ.append(tb.ff());
-        for (SequentFormula f : s.succedent()) { succ = succ.append(f.formula()); }
+        for (SequentFormula f : s.succedent()) {
+            succ = succ.append(f.formula());
+        }
 
         return tb.imp(tb.and(ante), tb.or(succ));
 

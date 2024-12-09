@@ -206,9 +206,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         if (resultVar == null) {
             assert (pm.isVoid() || pm.isConstructor()) : "resultVar == null for method " + pm;
         } else {
-            assert (!pm.isVoid() && !pm.isConstructor()) : "non-null result variable for void method or constructor "
-                    + pm
-                    + " with return type " + pm.getReturnType();
+            assert (!pm.isVoid() && !pm.isConstructor())
+                    : "non-null result variable for void method or constructor "
+                        + pm
+                        + " with return type " + pm.getReturnType();
         }
         assert pm.isModel() || excVar != null;
         assert atPreVars.size() != 0;
@@ -449,7 +450,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         // make sure ghost parameters are present
         ImmutableList<LocationVariable> ghostParams = ImmutableSLList.nil();
         for (LocationVariable param : originalParamVars) {
-            if (param.isGhost()) { ghostParams = ghostParams.append(param); }
+            if (param.isGhost()) {
+                ghostParams = ghostParams.append(param);
+            }
         }
         paramVars = paramVars.append(ghostParams);
         return paramVars;
@@ -460,7 +463,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         // make sure ghost parameters are present
         ImmutableList<Term> ghostParams = ImmutableSLList.nil();
         for (LocationVariable param : originalParamVars) {
-            if (param.isGhost()) { ghostParams = ghostParams.append(tb.var(param)); }
+            if (param.isGhost()) {
+                ghostParams = ghostParams.append(tb.var(param));
+            }
         }
         paramVars = paramVars.append(ghostParams);
         return paramVars;
@@ -557,7 +562,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         for (LocationVariable heap : heapContext) {
             final Term p =
                 getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
-            if (p == null) { continue; }
+            if (p == null) {
+                continue;
+            }
             if (result == null) {
                 result = p;
             } else {
@@ -594,7 +601,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             final Term p = getFreePre(heap, selfVar, paramVars, atPreVars, services);
             if (result == null) {
                 result = p;
-            } else if (p != null) { result = tb.and(result, p); }
+            } else if (p != null) {
+                result = tb.and(result, p);
+            }
         }
         return result;
     }
@@ -698,7 +707,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final TermBuilder tb = services.getTermBuilder();
 
         Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
-        for (LocationVariable h : heapContext) { heapTerms.put(h, tb.var(h)); }
+        for (LocationVariable h : heapContext) {
+            heapTerms.put(h, tb.var(h));
+        }
 
         Term originalMby = contract.hasMby()
                 ? contract.getMby(heapTerms, contractSelf, contractParams, atPres, services)
@@ -713,7 +724,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         Map<LocationVariable, Boolean> hasRealModifiable =
             new HashMap<>();
-        for (LocationVariable heap : heapContext) { hasRealModifiable.put(heap, contract.hasModifiable(heap)); }
+        for (LocationVariable heap : heapContext) {
+            hasRealModifiable.put(heap, contract.hasModifiable(heap));
+        }
 
         Term globalDefs =
             contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf, contractParams, services);
@@ -800,7 +813,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 sig.append(subst).append(", ");
             }
         }
-        if (!originalParamVars.isEmpty()) { sig.setLength(sig.length() - 2); }
+        if (!originalParamVars.isEmpty()) {
+            sig.setLength(sig.length() - 2);
+        }
         sig.append(")");
         if (!pm.isModel()) {
             sig.append(" catch(");
@@ -853,9 +868,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             final String printUpdates = LogicPrinter.quickPrintTerm(globalDefs, services,
                 usePrettyPrinting, useUnicodeSymbols);
             globalUpdates = (includeHtmlMarkup ? "<br><b>" : "\n") + "defs"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates, false)
-                            : printUpdates.trim());
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates, false)
+                        : printUpdates.trim());
         }
         return globalUpdates;
     }
@@ -875,7 +890,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 if (!hasRealModifiable.get(h)) {
                     modifiables =
                         modifiables + (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
-                                + (includeHtmlMarkup ? "</b>" : "");
+                            + (includeHtmlMarkup ? "</b>" : "");
                 }
             }
         }
@@ -936,13 +951,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final String clauses = globalUpdates + pres + freePres + posts + freePosts + modifiables;
         if (includeHtmlMarkup) {
             return "<html>" + "<i>" + LogicPrinter.escapeHTML(sig, false) + "</i>" + clauses
-                    + (hasMby ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, false) : "")
-                    + "<br><b>termination</b> " + modalityKind.name()
-                    + (transaction ? "<br><b>transaction applicable</b>" : "") + "</html>";
+                + (hasMby ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, false) : "")
+                + "<br><b>termination</b> " + modalityKind.name()
+                + (transaction ? "<br><b>transaction applicable</b>" : "") + "</html>";
 
         } else {
             return sig + clauses + (hasMby ? "\nmeasured-by: " + mby : "") + "\ntermination: "
-                    + modalityKind + (transaction ? "\ntransaction applicable:" : "");
+                + modalityKind + (transaction ? "\ntransaction applicable:" : "");
         }
     }
 
@@ -961,11 +976,15 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         // print var decls
         sb.append("  \\programVariables {\n");
-        if (originalSelfVar != null) { sb.append("    ").append(originalSelfVar.proofToString()); }
+        if (originalSelfVar != null) {
+            sb.append("    ").append(originalSelfVar.proofToString());
+        }
         for (LocationVariable originalParamVar : originalParamVars) {
             sb.append("    ").append(originalParamVar.proofToString());
         }
-        if (originalResultVar != null) { sb.append("    ").append(originalResultVar.proofToString()); }
+        if (originalResultVar != null) {
+            sb.append("    ").append(originalResultVar.proofToString());
+        }
         sb.append("    ").append(originalExcVar.proofToString());
         sb.append("    ").append(originalAtPreVars.get(baseHeap).proofToString());
         sb.append("  }\n");
@@ -973,7 +992,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         // prepare Java program
         final Expression[] args = new LocationVariable[originalParamVars.size()];
         int i = 0;
-        for (LocationVariable arg : originalParamVars) { args[i++] = arg; }
+        for (LocationVariable arg : originalParamVars) {
+            args[i++] = arg;
+        }
         final MethodReference mr = new MethodReference(new ImmutableArray<>(args),
             pm.getProgramElementName(), originalSelfVar);
         final Statement callStatement;
@@ -1084,7 +1105,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         for (LocationVariable heap : heapContext) {
             final Term p = getPost(heap, heapTerms.get(heap), selfTerm, paramTerms, resultTerm,
                 excTerm, atPres, services);
-            if (p == null) { continue; }
+            if (p == null) {
+                continue;
+            }
             if (result == null) {
                 result = p;
             } else {
@@ -1145,7 +1168,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         for (LocationVariable heap : heapContext) {
             final Term p = getFreePost(heap, heapTerms.get(heap), selfTerm, paramTerms, resultTerm,
                 excTerm, atPres, services);
-            if (p == null) { continue; }
+            if (p == null) {
+                continue;
+            }
             if (result == null) {
                 result = p;
             } else {
@@ -1179,15 +1204,17 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         assert (selfVar == null) == (originalSelfVar == null) : "Illegal instantiation:"
-                + (originalSelfVar == null
-                        ? "this is a static contract, instantiated with self variable '" + selfVar + "'"
-                        : "this is an instance contract, instantiated without a self variable");
+            + (originalSelfVar == null
+                    ? "this is a static contract, instantiated with self variable '" + selfVar + "'"
+                    : "this is an instance contract, instantiated without a self variable");
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert (resultVar == null) == (originalResultVar == null);
         assert atPreVars.size() != 0;
         assert services != null;
-        if (originalAxioms == null) { return null; }
+        if (originalAxioms == null) {
+            return null;
+        }
         final Map<LocationVariable, LocationVariable> replaceMap =
             getReplaceMap(selfVar, paramVars, resultVar, null, atPreVars, services);
         final OpReplacer or =
@@ -1276,14 +1303,18 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public boolean hasModifiable(LocationVariable heap) {
         Boolean result = this.hasRealModifiable.get(heap);
-        if (result == null) { return false; }
+        if (result == null) {
+            return false;
+        }
         return result;
     }
 
     @Override
     public boolean hasFreeModifiable(LocationVariable heap) {
         Boolean result = this.hasRealFreeModifiable.get(heap);
-        if (result == null) { return false; }
+        if (result == null) {
+            return false;
+        }
         return result;
     }
 
@@ -1312,7 +1343,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
         Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
-        if (originalSelfVar != null) { map.put(originalSelfVar, selfVar); }
+        if (originalSelfVar != null) {
+            map.put(originalSelfVar, selfVar);
+        }
         for (LocationVariable originalParamVar : originalParamVars) {
             map.put(originalParamVar, paramVars.head());
             paramVars = paramVars.tail();
@@ -1339,7 +1372,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert services != null;
         Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         map.put(tb.var(heap), heapTerm);
-        if (originalSelfVar != null) { map.put(tb.var(originalSelfVar), selfTerm); }
+        if (originalSelfVar != null) {
+            map.put(tb.var(originalSelfVar), selfTerm);
+        }
         for (LocationVariable originalParamVar : originalParamVars) {
             map.put(tb.var(originalParamVar), paramTerms.head());
             paramTerms = paramTerms.tail();
@@ -1364,7 +1399,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Services services) {
-        if (globalDefs == null) { return null; }
+        if (globalDefs == null) {
+            return null;
+        }
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
         assert paramTerms != null;
@@ -1383,22 +1420,22 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final LocationVariable heap =
             ((Services) services).getTypeConverter().getHeapLDT().getHeap();
         return (globalDefs == null ? "" : "defs: " + globalDefs + "; ") + "pre: " + originalPres
-                + (originalFreePres.get(heap) != null
-                        && !originalFreePres.get(heap).equalsModProperty(tb.tt(),
-                            RENAMING_TERM_PROPERTY)
-                                    ? "free pre: " + originalFreePres
-                                    : "")
-                + "; mby: " + originalMby + "; post: " + originalPosts
-                + (originalFreePosts.get(heap) != null
-                        && !originalFreePosts.get(heap).equalsModProperty(tb.tt(),
-                            RENAMING_TERM_PROPERTY)
-                                    ? "free post: " + originalFreePosts
-                                    : "")
-                + "; modifiable: " + originalModifiables + "; hasModifiable: " + hasRealModifiable
-                + (originalAxioms != null && originalAxioms.size() > 0 ? ("; axioms: " + originalAxioms)
-                        : "")
-                + "; termination: " + getModalityKind() + "; transaction: "
-                + transactionApplicableContract();
+            + (originalFreePres.get(heap) != null
+                    && !originalFreePres.get(heap).equalsModProperty(tb.tt(),
+                        RENAMING_TERM_PROPERTY)
+                                ? "free pre: " + originalFreePres
+                                : "")
+            + "; mby: " + originalMby + "; post: " + originalPosts
+            + (originalFreePosts.get(heap) != null
+                    && !originalFreePosts.get(heap).equalsModProperty(tb.tt(),
+                        RENAMING_TERM_PROPERTY)
+                                ? "free post: " + originalFreePosts
+                                : "")
+            + "; modifiable: " + originalModifiables + "; hasModifiable: " + hasRealModifiable
+            + (originalAxioms != null && originalAxioms.size() > 0 ? ("; axioms: " + originalAxioms)
+                    : "")
+            + "; termination: " + getModalityKind() + "; transaction: "
+            + transactionApplicableContract();
     }
 
     @Override
@@ -1480,13 +1517,15 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public Term getPre() {
-        assert originalPres.values().size() == 1 : "information flow extension not compatible with multi-heap setting";
+        assert originalPres.values().size() == 1
+                : "information flow extension not compatible with multi-heap setting";
         return originalPres.values().iterator().next();
     }
 
     @Override
     public Term getPost() {
-        assert originalPosts.values().size() == 1 : "information flow extension not compatible with multi-heap setting";
+        assert originalPosts.values().size() == 1
+                : "information flow extension not compatible with multi-heap setting";
         return originalPosts.values().iterator().next();
     }
 
@@ -1516,19 +1555,25 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public ImmutableList<Term> getParams() {
-        if (originalParamVars == null) { return null; }
+        if (originalParamVars == null) {
+            return null;
+        }
         return tb.var(originalParamVars);
     }
 
     @Override
     public Term getResult() {
-        if (originalResultVar == null) { return null; }
+        if (originalResultVar == null) {
+            return null;
+        }
         return tb.var(originalResultVar);
     }
 
     @Override
     public Term getExc() {
-        if (originalExcVar == null) { return null; }
+        if (originalExcVar == null) {
+            return null;
+        }
         return tb.var(originalExcVar);
     }
 
@@ -1541,7 +1586,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     public OriginalVariables getOrigVars() {
         Map<LocationVariable, LocationVariable> atPreVars =
             new LinkedHashMap<>();
-        for (LocationVariable h : originalAtPreVars.keySet()) { atPreVars.put(h, originalAtPreVars.get(h)); }
+        for (LocationVariable h : originalAtPreVars.keySet()) {
+            atPreVars.put(h, originalAtPreVars.get(h));
+        }
         return new OriginalVariables(originalSelfVar, originalResultVar, originalExcVar, atPreVars,
             originalParamVars);
     }

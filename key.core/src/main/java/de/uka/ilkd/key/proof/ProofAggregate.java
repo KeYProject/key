@@ -30,7 +30,9 @@ public abstract class ProofAggregate {
         }
         if (proofs.length > 1) {
             SingleProof[] singles = new SingleProof[proofs.length];
-            for (int i = 0; i < proofs.length; i++) { singles[i] = new SingleProof(proofs[i], name); }
+            for (int i = 0; i < proofs.length; i++) {
+                singles[i] = new SingleProof(proofs[i], name);
+            }
             return new CompoundProof(name, singles);
         } else {
             return new SingleProof(proofs[0], name);
@@ -49,7 +51,9 @@ public abstract class ProofAggregate {
 
     public void setProofEnv(ProofEnvironment env) {
         Proof[] proofs = getProofs();
-        for (Proof proof : proofs) { proof.setEnv(env); }
+        for (Proof proof : proofs) {
+            proof.setEnv(env);
+        }
     }
 
     public abstract int size();
@@ -60,7 +64,9 @@ public abstract class ProofAggregate {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || o.getClass() != this.getClass()) { return false; }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
         final ProofAggregate other = (ProofAggregate) o;
 
         return size() == other.size() && name.equals(other.name);

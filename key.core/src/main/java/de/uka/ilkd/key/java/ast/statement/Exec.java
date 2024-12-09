@@ -154,8 +154,12 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     @Override
     public int getChildCount() {
         int result = 0;
-        if (body != null) { result++; }
-        if (branches != null) { result += branches.size(); }
+        if (body != null) {
+            result++;
+        }
+        if (branches != null) {
+            result += branches.size();
+        }
         return result;
     }
 
@@ -171,10 +175,14 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     @Override
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0) { return body; }
+            if (index == 0) {
+                return body;
+            }
             index--;
         }
-        if (branches != null) { return branches.get(index); }
+        if (branches != null) {
+            return branches.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -209,7 +217,9 @@ public class Exec extends BranchStatement implements StatementContainer, Program
      */
     @Override
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) { return body; }
+        if (body != null && index == 0) {
+            return body;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -234,7 +244,9 @@ public class Exec extends BranchStatement implements StatementContainer, Program
      */
     @Override
     public Branch getBranchAt(int index) {
-        if (branches != null) { return branches.get(index); }
+        if (branches != null) {
+            return branches.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

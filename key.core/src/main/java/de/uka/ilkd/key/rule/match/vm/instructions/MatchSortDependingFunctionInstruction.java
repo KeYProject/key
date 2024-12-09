@@ -56,7 +56,9 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
                     result = null;
                 }
             }
-        } else if (op.getSortDependingOn() == dependingSortToMatch) { result = matchConditions; }
+        } else if (op.getSortDependingOn() == dependingSortToMatch) {
+            result = matchConditions;
+        }
         return result;
     }
 
@@ -80,7 +82,9 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
             Services services) {
         MatchConditions result = null;
         if (instantiationCandidate.op() instanceof SortDependingFunction sdp) {
-            if (op.isSimilar(sdp)) { result = matchSorts(sdp.getSortDependingOn(), matchConditions, services); }
+            if (op.isSimilar(sdp)) {
+                result = matchSorts(sdp.getSortDependingOn(), matchConditions, services);
+            }
         }
         return result;
     }
@@ -93,7 +97,9 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
-        if (result != null) { termPosition.gotoNext(); }
+        if (result != null) {
+            termPosition.gotoNext();
+        }
         return result;
     }
 

@@ -68,7 +68,9 @@ public class LemmataAutoModeOptions {
                 this.timeout = cl.getLong(Main.JTIMEOUT, DEFAULT_TIMEOUT);
                 LOGGER.info("We are in cons 1 and timeout is " + timeout);
             }
-            if (cl.isSet(Main.JMAX_RULES)) { this.maxRules = cl.getInteger(Main.JMAX_RULES, DEFAULT_MAXRULES); }
+            if (cl.isSet(Main.JMAX_RULES)) {
+                this.maxRules = cl.getInteger(Main.JMAX_RULES, DEFAULT_MAXRULES);
+            }
             if (cl.isSet(Main.JPATH_OF_RESULT) && cl.isSet(Main.JUSTIFY_RULES)) {
                 this.pathOfResult =
                     generatePath(cl.getString(Main.JPATH_OF_RESULT, null), pathOfRuleFile);
@@ -76,7 +78,7 @@ public class LemmataAutoModeOptions {
         } catch (CommandLineException cle) {
             LOGGER.info(
                 "There was a problem reading the command line options. An argument is missing either for option "
-                        + Main.JTIMEOUT + " or " + Main.JMAX_RULES + ".");
+                    + Main.JTIMEOUT + " or " + Main.JMAX_RULES + ".");
         }
         this.internalVersion = internalVersion;
         checkForValidity();// throws an exception if a parameter is not
@@ -86,7 +88,9 @@ public class LemmataAutoModeOptions {
     public LemmataAutoModeOptions(CommandLine cl, String internalVersion, String homePath) {
         this.internalVersion = internalVersion;
 
-        if (cl.isSet(Main.JUSTIFY_RULES)) { this.pathOfRuleFile = cl.getString(Main.JUSTIFY_RULES, null); }
+        if (cl.isSet(Main.JUSTIFY_RULES)) {
+            this.pathOfRuleFile = cl.getString(Main.JUSTIFY_RULES, null);
+        }
         LOGGER.info("We are in cons 2");
         read(cl);
         pathOfResult = generatePath(pathOfResult, pathOfRuleFile);
@@ -102,8 +106,12 @@ public class LemmataAutoModeOptions {
                 LOGGER.info("Commandline argument for option " + Main.JMAX_RULES + "is missing.");
             }
         }
-        if (cl.isSet(Main.JPATH_OF_RESULT)) { pathOfResult = cl.getString(Main.JPATH_OF_RESULT, null); }
-        if (cl.isSet(Main.JUSTIFY_RULES)) { pathOfRuleFile = cl.getString(Main.JUSTIFY_RULES, null); }
+        if (cl.isSet(Main.JPATH_OF_RESULT)) {
+            pathOfResult = cl.getString(Main.JPATH_OF_RESULT, null);
+        }
+        if (cl.isSet(Main.JUSTIFY_RULES)) {
+            pathOfRuleFile = cl.getString(Main.JUSTIFY_RULES, null);
+        }
         if (cl.isSet(Main.JTIMEOUT)) {
             try {
                 timeout = cl.getLong(Main.JTIMEOUT, DEFAULT_TIMEOUT);
@@ -117,7 +125,9 @@ public class LemmataAutoModeOptions {
             saveResultsToFile =
                 readBoolean(cl.getString(Main.JSAVE_RESULTS_TO_FILE, "false"), saveResultsToFile);
         }
-        if (cl.isSet(Main.JFILE_FOR_AXIOMS)) { filesForAxioms.add(cl.getString(Main.JFILE_FOR_AXIOMS, null)); }
+        if (cl.isSet(Main.JFILE_FOR_AXIOMS)) {
+            filesForAxioms.add(cl.getString(Main.JFILE_FOR_AXIOMS, null));
+        }
         if (cl.isSet(Main.JFILE_FOR_DEFINITION)) {
             pathOfDefinitionFile = cl.getString(Main.JFILE_FOR_DEFINITION, null);
         }
@@ -126,7 +136,9 @@ public class LemmataAutoModeOptions {
     private boolean readBoolean(String value, boolean def) {
         if (value.equals("true")) {
             return true;
-        } else if (value.equals("false")) { return false; }
+        } else if (value.equals("false")) {
+            return false;
+        }
         return def;
     }
 
@@ -167,7 +179,7 @@ public class LemmataAutoModeOptions {
         File test = new File(pathOfRuleFile);
         if (!test.isFile()) {
             throwError(String.format("Error while setting the file containing the rules:\n"
-                    + "'%s' is not a valid file in your system.",
+                + "'%s' is not a valid file in your system.",
                 pathOfRuleFile));
         }
         test = new File(pathOfResult);

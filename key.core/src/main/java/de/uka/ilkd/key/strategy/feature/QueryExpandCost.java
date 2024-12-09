@@ -90,7 +90,9 @@ public class QueryExpandCost implements Feature {
         if (useExperimentalHeuristics) {
             // If the factor is too small, then higher cost has no effect for some reason.
             int litcost = maxIntliteralInArgumentsTimesTwo(t, integerLDT, services);
-            if (litcost > CONSIDERED_AS_BIG_LITERAL * 2) { return TOP_COST; }
+            if (litcost > CONSIDERED_AS_BIG_LITERAL * 2) {
+                return TOP_COST;
+            }
         }
 
         if (maxRepetitionsOnSameTerm != -1 && maxRepetitionsOnSameTerm < Integer.MAX_VALUE) {
@@ -108,7 +110,7 @@ public class QueryExpandCost implements Feature {
                 cost += qtime * termAgeFactor;
             } else {
                 LOGGER.info("QueryExpandCost::compute. Time of query should have been set already."
-                        + "The query was: {}",
+                    + "The query was: {}",
                     t);
             }
         }
@@ -130,7 +132,9 @@ public class QueryExpandCost implements Feature {
         // E.g., don't calculate int literals in the heap parameter.
         for (int i = 0; i < t.arity(); i++) {
             Term arg = t.sub(i);
-            if (arg.sort() == intSort) { cost = Math.max(cost, sumOfAbsLiteralsTimesTwo(arg, iLDT, serv)); }
+            if (arg.sort() == intSort) {
+                cost = Math.max(cost, sumOfAbsLiteralsTimesTwo(arg, iLDT, serv));
+            }
         }
         return cost;
     }
@@ -157,7 +161,9 @@ public class QueryExpandCost implements Feature {
             }
         } else {
             int sum = 0;
-            for (int i = 0; i < t.arity(); i++) { sum += sumOfAbsLiteralsTimesTwo(t.sub(i), iLDT, serv); }
+            for (int i = 0; i < t.arity(); i++) {
+                sum += sumOfAbsLiteralsTimesTwo(t.sub(i), iLDT, serv);
+            }
             return sum;
         }
     }
@@ -188,7 +194,9 @@ public class QueryExpandCost implements Feature {
                             && oldterm.equalsModProperty(curterm,
                                 IRRELEVANT_TERM_LABELS_PROPERTY)) {
                         count++;
-                        if (count > maxRepetitionsOnSameTerm) { break; }
+                        if (count > maxRepetitionsOnSameTerm) {
+                            break;
+                        }
                     }
                 }
             }

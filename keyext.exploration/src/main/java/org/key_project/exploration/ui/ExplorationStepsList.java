@@ -67,8 +67,12 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
      *        a proof or null
      */
     public void setProof(@Nullable Proof proof) {
-        if (currentProof != null) { currentProof.removeRuleAppListener(ruleAppListener); }
-        if (proof != null) { proof.addRuleAppListener(ruleAppListener); }
+        if (currentProof != null) {
+            currentProof.removeRuleAppListener(ruleAppListener);
+        }
+        if (proof != null) {
+            proof.addRuleAppListener(ruleAppListener);
+        }
         currentProof = proof;
         createModel(proof);
     }
@@ -76,7 +80,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     public void setEnabled(boolean enabled) {
         var old = this.enabled;
         this.enabled = enabled;
-        if (old != enabled) { createModel(currentProof); }
+        if (old != enabled) {
+            createModel(currentProof);
+        }
     }
 
     public Proof getProof() {
@@ -157,7 +163,11 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             }
 
             reached.add(n);
-            for (Node child : n) { if (!reached.contains(child)) { nodes.push(child); } }
+            for (Node child : n) {
+                if (!reached.contains(child)) {
+                    nodes.push(child);
+                }
+            }
         }
     }
 
@@ -170,7 +180,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
                 Node selected = listExplorations.getSelectedValue();
                 if (selected != null) {
                     TreePath treePath = getTreePath(selected);
-                    if (treePath != null) { treeExploration.setSelectionPath(treePath); }
+                    if (treePath != null) {
+                        treeExploration.setSelectionPath(treePath);
+                    }
                     mediator.getSelectionModel().setSelectedNode(selected);
                 }
             }
@@ -189,7 +201,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             if (selectedNode != null) {
                 mediator.getSelectionModel().setSelectedNode(selectedNode.getData());
                 int selectionIndex = getSelectionIndex(selectedNode.getData());
-                if (selectionIndex > -1) { listExplorations.setSelectedIndex(selectionIndex); }
+                if (selectionIndex > -1) {
+                    listExplorations.setSelectedIndex(selectionIndex);
+                }
             }
         });
         treeExploration.setShowsRootHandles(true);
@@ -227,16 +241,22 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     // region Tree and ListUtils
     private void setTreeExpandedState(JTree tree, boolean expanded) {
         MyTreeNode node = (MyTreeNode) tree.getModel().getRoot();
-        if (node != null) { setNodeExpanded(tree, node, expanded); }
+        if (node != null) {
+            setNodeExpanded(tree, node, expanded);
+        }
     }
 
     private void setNodeExpanded(JTree tree, MyTreeNode node, boolean expanded) {
         ArrayList<MyTreeNode> list = new ArrayList<>();
         if (node.children() != null) {
             Enumeration<TreeNode> children = node.children();
-            while (children.hasMoreElements()) { list.add((MyTreeNode) children.nextElement()); }
+            while (children.hasMoreElements()) {
+                list.add((MyTreeNode) children.nextElement());
+            }
             list.forEach(myTreeNode -> setNodeExpanded(tree, myTreeNode, expanded));
-            if (!expanded && node.isRoot()) { return; }
+            if (!expanded && node.isRoot()) {
+                return;
+            }
             TreePath path = new TreePath(node.getPath());
             if (expanded) {
                 tree.expandPath(path);
@@ -251,14 +271,18 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         Enumeration<TreeNode> treeNodeEnumeration = rootNode.depthFirstEnumeration();
         while (treeNodeEnumeration.hasMoreElements()) {
             TreeNode treeNode = treeNodeEnumeration.nextElement();
-            if (((MyTreeNode) treeNode).getData().equals(n)) { return new TreePath(treeNode); }
+            if (((MyTreeNode) treeNode).getData().equals(n)) {
+                return new TreePath(treeNode);
+            }
         }
         return null;
     }
 
     private int getSelectionIndex(Node n) {
         for (int i = 0; i < listModelExploration.size(); i++) {
-            if (listModelExploration.getElementAt(i).equals(n)) { return i; }
+            if (listModelExploration.getElementAt(i).equals(n)) {
+                return i;
+            }
         }
         return -1;
 
@@ -297,7 +321,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             if (n.isRoot()) {
                 if (expData != null && expData.getExplorationAction() != null) {
                     lbl.setText("Root Node" + n.getData().serialNr() + " "
-                            + expData.getExplorationAction());
+                        + expData.getExplorationAction());
                 } else {
                     lbl.setText("Root Node");
                 }
@@ -358,7 +382,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             }
             if (selectedValue != null) {
                 mediator.getUI().getProofControl().pruneTo(selectedValue);
-                if (explorationNode == null) { explorationNode = selectedValue; }
+                if (explorationNode == null) {
+                    explorationNode = selectedValue;
+                }
             }
 
             if (explorationNode != null) {
@@ -381,7 +407,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
         public void actionPerformed(ActionEvent e) {
             Node selectedValue = listExplorations.getSelectedValue();
-            if (selectedValue != null) { mediator.getSelectionModel().setSelectedNode(selectedValue); }
+            if (selectedValue != null) {
+                mediator.getSelectionModel().setSelectedNode(selectedValue);
+            }
         }
     }
     // endregion

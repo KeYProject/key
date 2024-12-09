@@ -135,9 +135,13 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      * updates to highlight
      */
     void updateUpdateHighlights() {
-        if (getLogicPrinter() == null) { return; }
+        if (getLogicPrinter() == null) {
+            return;
+        }
 
-        for (Object updateHighlight : updateHighlights) { removeHighlight(updateHighlight); }
+        for (Object updateHighlight : updateHighlights) {
+            removeHighlight(updateHighlight);
+        }
 
         updateHighlights.clear();
         InitialPositionTable ipt = getInitialPositionTable();
@@ -191,7 +195,9 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
 
         setLineWidth(computeLineWidth());
 
-        if (getLogicPrinter() != null) { updateSequent(getMainWindow().getMediator().getSelectedNode()); }
+        if (getLogicPrinter() != null) {
+            updateSequent(getMainWindow().getMediator().getSelectedNode());
+        }
 
         updateUpdateHighlights();
         updateHeatMapHighlights();

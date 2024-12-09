@@ -143,7 +143,9 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
     private static ImmutableList<Goal> setDifference(ImmutableList<Goal> goals1,
             ImmutableList<Goal> goals2) {
         ImmutableList<Goal> difference = goals1;
-        for (Goal goal : goals2) { difference = difference.removeFirst(goal); }
+        for (Goal goal : goals2) {
+            difference = difference.removeFirst(goal);
+        }
         return difference;
     }
 }

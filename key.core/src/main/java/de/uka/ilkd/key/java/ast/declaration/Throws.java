@@ -73,7 +73,9 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     }
 
     public SourceElement getLastElement() {
-        if (exceptions == null) { return this; }
+        if (exceptions == null) {
+            return this;
+        }
         return exceptions.get(exceptions.size() - 1);
     }
 
@@ -84,7 +86,9 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      */
     public int getChildCount() {
         int result = 0;
-        if (exceptions != null) { result += exceptions.size(); }
+        if (exceptions != null) {
+            result += exceptions.size();
+        }
         return result;
     }
 
@@ -98,7 +102,9 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      *         if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (exceptions != null) { return exceptions.get(index); }
+        if (exceptions != null) {
+            return exceptions.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -131,7 +137,9 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (exceptions != null) { return exceptions.get(index); }
+        if (exceptions != null) {
+            return exceptions.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

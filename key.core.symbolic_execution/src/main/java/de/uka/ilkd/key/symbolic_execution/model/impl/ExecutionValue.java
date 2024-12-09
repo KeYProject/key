@@ -121,7 +121,9 @@ public class ExecutionValue extends AbstractExecutionValue {
     @Override
     public IExecutionVariable[] getChildVariables() throws ProofInputException {
         synchronized (this) {
-            if (childVariables == null) { childVariables = lazyComputeChildVariables(); }
+            if (childVariables == null) {
+                childVariables = lazyComputeChildVariables();
+            }
             return childVariables;
         }
     }

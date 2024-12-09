@@ -1179,7 +1179,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
             StringBuilder sb) throws ProofInputException {
         if (saveConstraints) {
             IExecutionConstraint[] constraints = value.getConstraints();
-            for (IExecutionConstraint constraint : constraints) { appendConstraint(level, constraint, sb); }
+            for (IExecutionConstraint constraint : constraints) {
+                appendConstraint(level, constraint, sb);
+            }
         }
     }
 
@@ -1201,7 +1203,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
             StringBuilder sb) throws ProofInputException {
         if (saveConstraints) {
             IExecutionConstraint[] constraints = node.getConstraints();
-            for (IExecutionConstraint constraint : constraints) { appendConstraint(level, constraint, sb); }
+            for (IExecutionConstraint constraint : constraints) {
+                appendConstraint(level, constraint, sb);
+            }
         }
     }
 
@@ -1323,7 +1327,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
     protected void appendValues(int level, IExecutionVariable variable, boolean saveConstraints,
             StringBuilder sb) throws ProofInputException {
         IExecutionValue[] values = variable.getValues();
-        for (IExecutionValue value : values) { appendValue(level, value, saveConstraints, sb); }
+        for (IExecutionValue value : values) {
+            appendValue(level, value, saveConstraints, sb);
+        }
     }
 
     /**
@@ -1403,7 +1409,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
      */
     protected void appendOutgoingLinks(int level, IExecutionNode<?> node, StringBuilder sb) {
         if (!node.getOutgoingLinks().isEmpty()) {
-            for (IExecutionLink link : node.getOutgoingLinks()) { appendOutgoingLink(level, link, sb); }
+            for (IExecutionLink link : node.getOutgoingLinks()) {
+                appendOutgoingLink(level, link, sb);
+            }
         }
     }
 
@@ -1539,7 +1547,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
                 }
                 int index = ArrayUtil.indexOf(parent.getChildren(), node);
                 assert index >= 0 : "Node \"" + node + "\" is not contained in parents children \""
-                        + Arrays.toString(parent.getChildren()) + "\".";
+                    + Arrays.toString(parent.getChildren()) + "\".";
                 sb.insert(0, index);
             } else {
                 sb.insert(0, PATH_SEPARATOR);

@@ -176,7 +176,9 @@ public class TestProofBundleIO {
         AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
         if (replayResult.hasErrors()) {
             LOGGER.debug("Error(s) while loading");
-            for (Throwable error : replayResult.getErrorList()) { LOGGER.debug("Error ", error); }
+            for (Throwable error : replayResult.getErrorList()) {
+                LOGGER.debug("Error ", error);
+            }
         }
         assertNotNull(env);
 

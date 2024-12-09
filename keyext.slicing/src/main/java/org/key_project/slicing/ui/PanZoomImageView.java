@@ -71,7 +71,9 @@ public class PanZoomImageView extends JComponent
         double scale = 1.0;
         float scaleX = (float) width / imageWidth;
         float scaleY = (float) height / imageHeight;
-        if (scaleX < 1.0 || scaleY < 1.0) { scale = Math.min(scaleX, scaleY); }
+        if (scaleX < 1.0 || scaleY < 1.0) {
+            scale = Math.min(scaleX, scaleY);
+        }
         double x = (width - scale * imageWidth) / 2;
         double y = (height - scale * imageHeight) / 2;
         at = AffineTransform.getScaleInstance(scale, scale);

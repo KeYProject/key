@@ -75,7 +75,9 @@ public class ClausesGraph {
     }
 
     private ImmutableSet<Term> getTransitiveConnections(ImmutableSet<Term> formulas) {
-        for (Term formula : formulas) { formulas = formulas.union(getConnections(formula)); }
+        for (Term formula : formulas) {
+            formulas = formulas.union(getConnections(formula));
+        }
         return formulas;
     }
 
@@ -88,14 +90,18 @@ public class ClausesGraph {
     boolean connected(Term formula0, Term formula1) {
         final ImmutableSet<Term> subFormulas1 = computeClauses(formula1);
         for (Term term : computeClauses(formula0)) {
-            if (intersect(getConnections(term), subFormulas1).size() > 0) { return true; }
+            if (intersect(getConnections(term), subFormulas1).size() > 0) {
+                return true;
+            }
         }
         return false;
     }
 
     boolean isFullGraph() {
         final Iterator<Term> it = clauses.iterator();
-        if (it.hasNext()) { return getConnections(it.next()).size() >= clauses.size(); }
+        if (it.hasNext()) {
+            return getConnections(it.next()).size() >= clauses.size();
+        }
         return true;
     }
 
@@ -128,7 +134,9 @@ public class ClausesGraph {
         ImmutableSet<Term> res = DefaultImmutableSet.nil();
         for (Term clause1 : clauses) {
             final Term clause = clause1;
-            if (directlyConnected(clause, formula)) { res = res.add(clause); }
+            if (directlyConnected(clause, formula)) {
+                res = res.add(clause);
+            }
         }
         return res;
     }
@@ -172,8 +180,12 @@ public class ClausesGraph {
      */
     private ImmutableSet<QuantifiableVariable> existentialVars(Term formula) {
         final Operator op = formula.op();
-        if (op == Quantifier.ALL) { return existentialVars(formula.sub(0)); }
-        if (op == Quantifier.EX) { return existentialVars(formula.sub(0)).add(formula.varsBoundHere(0).last()); }
+        if (op == Quantifier.ALL) {
+            return existentialVars(formula.sub(0));
+        }
+        if (op == Quantifier.EX) {
+            return existentialVars(formula.sub(0)).add(formula.varsBoundHere(0).last());
+        }
         return DefaultImmutableSet.nil();
     }
 
@@ -194,8 +206,15 @@ public class ClausesGraph {
      */
     private ImmutableSet<Term> intersect(ImmutableSet<Term> set0, ImmutableSet<Term> set1) {
         ImmutableSet<Term> res = DefaultImmutableSet.nil();
-        if (set0 == null || set1 == null) { return res; }
-        for (Term aSet0 : set0) { final Term el = aSet0; if (set1.contains(el)) { res = res.add(el); } }
+        if (set0 == null || set1 == null) {
+            return res;
+        }
+        for (Term aSet0 : set0) {
+            final Term el = aSet0;
+            if (set1.contains(el)) {
+                res = res.add(el);
+            }
+        }
         return res;
     }
 

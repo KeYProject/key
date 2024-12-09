@@ -38,7 +38,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
      * @return the modifier
      */
     public static JMLModifier modifierFromToken(Token token) {
-        if (token == null) { return null; }
+        if (token == null) {
+            return null;
+        }
 
         return switch (token.getType()) {
         case JmlLexer.ABSTRACT -> JMLModifier.ABSTRACT;
@@ -144,7 +146,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Name[] visitTargetHeap(JmlParser.TargetHeapContext ctx) {
-        if (ctx == null || ctx.SPECIAL_IDENT().isEmpty()) { return new Name[] { HeapLDT.BASE_HEAP_NAME }; }
+        if (ctx == null || ctx.SPECIAL_IDENT().isEmpty()) {
+            return new Name[] { HeapLDT.BASE_HEAP_NAME };
+        }
         Name[] heaps = new Name[ctx.SPECIAL_IDENT().size()];
         for (int i = 0; i < ctx.SPECIAL_IDENT().size(); i++) {
             String t = ctx.SPECIAL_IDENT(i).getText();
@@ -162,7 +166,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
                 isFree ? OriginTermLabel.SpecType.ENSURES_FREE : OriginTermLabel.SpecType.ENSURES,
                 attachOriginLabel);
-        for (Name heap : heaps) { methodContract.addClause(isFree ? ENSURES_FREE : ENSURES, heap, ctx2); }
+        for (Name heap : heaps) {
+            methodContract.addClause(isFree ? ENSURES_FREE : ENSURES, heap, ctx2);
+        }
         return null;
     }
 
@@ -256,7 +262,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
                     : OriginTermLabel.SpecType.ASSIGNABLE,
                 attachOriginLabel);
         for (Name heap : heaps) {
-            if (methodContract != null) { methodContract.addClause(isFree ? ASSIGNABLE_FREE : ASSIGNABLE, heap, ctx2); }
+            if (methodContract != null) {
+                methodContract.addClause(isFree ? ASSIGNABLE_FREE : ASSIGNABLE, heap, ctx2);
+            }
             if (loopContract != null) {
                 loopContract.addClause(
                     isFree ? TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE
@@ -403,12 +411,16 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     private void acceptAll(Iterable<? extends ParserRuleContext> ctxs) {
-        for (ParserRuleContext ctx : ctxs) { accept(ctx); }
+        for (ParserRuleContext ctx : ctxs) {
+            accept(ctx);
+        }
     }
 
     @SuppressWarnings("unchecked")
     private <T> T accept(ParserRuleContext ctx) {
-        if (ctx == null) { return null; }
+        if (ctx == null) {
+            return null;
+        }
         return (T) ctx.accept(this);
     }
 
@@ -524,7 +536,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitBlock_loop_specification(JmlParser.Block_loop_specificationContext ctx) {
         acceptAll(ctx.spec_case());
-        for (TextualJMLConstruct construct : constructs) { construct.setLoopContract(true); }
+        for (TextualJMLConstruct construct : constructs) {
+            construct.setLoopContract(true);
+        }
         return null;
     }
 }

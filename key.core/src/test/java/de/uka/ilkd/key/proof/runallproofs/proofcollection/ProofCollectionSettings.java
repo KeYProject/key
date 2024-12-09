@@ -230,14 +230,16 @@ public class ProofCollectionSettings implements Serializable {
         if (tempDirString == null) {
             throw new IOException(
                 "No temporary directory specified in RunAllProofs configuration file. "
-                        + "Cannot run in forked mode. " + "To solve this, specify setting \"" + TEMP_DIR
-                        + "\" in file ");
+                    + "Cannot run in forked mode. " + "To solve this, specify setting \"" + TEMP_DIR
+                    + "\" in file ");
         }
         File tempDir = new File(tempDirString);
-        if (!tempDir.isAbsolute()) { tempDir = new File(getBaseDirectory(), tempDirString); }
+        if (!tempDir.isAbsolute()) {
+            tempDir = new File(getBaseDirectory(), tempDirString);
+        }
         if (tempDir.isFile()) {
             throw new IOException("Specified temporary directory is a file: " + tempDir + "\n"
-                    + "Configure temporary directory in file to solve this.");
+                + "Configure temporary directory in file to solve this.");
         }
         return tempDir;
     }
@@ -252,7 +254,9 @@ public class ProofCollectionSettings implements Serializable {
      */
     public Set<String> getEnabledTestCaseNames() {
         String testCases = get("testCases");
-        if (testCases == null || testCases.length() == 0) { return null; }
+        if (testCases == null || testCases.length() == 0) {
+            return null;
+        }
 
         Set<String> enabledTestCaseNames = new LinkedHashSet<>();
         String[] testCaseList = testCases.split(",");

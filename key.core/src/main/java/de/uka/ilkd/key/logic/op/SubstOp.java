@@ -51,10 +51,14 @@ public abstract class SubstOp extends AbstractOperator implements Operator {
     public <T extends org.key_project.logic.Term> void validTopLevelException(T term)
             throws TermCreationException {
         super.validTopLevelException(term);
-        if (term.varsBoundHere(1).size() != 1) { throw new TermCreationException(this, term); }
+        if (term.varsBoundHere(1).size() != 1) {
+            throw new TermCreationException(this, term);
+        }
         Sort substSort = term.sub(0).sort();
         Sort varSort = term.varsBoundHere(1).get(0).sort();
-        if (!substSort.extendsTrans(varSort)) { throw new TermCreationException(this, term); }
+        if (!substSort.extendsTrans(varSort)) {
+            throw new TermCreationException(this, term);
+        }
     }
 
     /**

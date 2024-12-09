@@ -165,7 +165,9 @@ public class TermBuilder {
 
         int i = 0;
         String result = baseName;
-        while (localNamespace.lookup(new Name(result)) != null) { result = baseName + "_" + i++; }
+        while (localNamespace.lookup(new Name(result)) != null) {
+            result = baseName + "_" + i++;
+        }
 
         services.getNameRecorder().addProposal(new Name(result));
 
@@ -365,7 +367,9 @@ public class TermBuilder {
      */
     public LocationVariable locationVariable(String baseName, KeYJavaType kjt,
             boolean makeNameUnique) {
-        if (makeNameUnique) { baseName = newName(baseName); }
+        if (makeNameUnique) {
+            baseName = newName(baseName);
+        }
         return new LocationVariable(new ProgramElementName(baseName), kjt);
     }
 
@@ -393,13 +397,17 @@ public class TermBuilder {
 
     public ImmutableList<Term> var(ProgramVariable... vs) {
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (ProgramVariable v : vs) { result = result.append(var(v)); }
+        for (ProgramVariable v : vs) {
+            result = result.append(var(v));
+        }
         return result;
     }
 
     public ImmutableList<Term> var(Iterable<? extends ProgramVariable> vs) {
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (ProgramVariable v : vs) { result = result.append(var(v)); }
+        for (ProgramVariable v : vs) {
+            result = result.append(var(v));
+        }
         return result;
     }
 
@@ -495,7 +503,9 @@ public class TermBuilder {
      * Construct a term with the \ifEx operator.
      */
     public Term ifEx(ImmutableList<QuantifiableVariable> qvs, Term cond, Term _then, Term _else) {
-        if (qvs.isEmpty()) { throw new TermCreationException("no quantifiable variables in ifEx term"); }
+        if (qvs.isEmpty()) {
+            throw new TermCreationException("no quantifiable variables in ifEx term");
+        }
         if (qvs.size() == 1) {
             return ifEx(qvs.head(), cond, _then, _else);
         } else {
@@ -522,7 +532,9 @@ public class TermBuilder {
 
     public Term all(Iterable<QuantifiableVariable> qvs, Term t) {
         Term result = t;
-        for (QuantifiableVariable fv : qvs) { result = all(fv, result); }
+        for (QuantifiableVariable fv : qvs) {
+            result = all(fv, result);
+        }
         return result;
     }
 
@@ -549,7 +561,9 @@ public class TermBuilder {
 
     public Term ex(Iterable<QuantifiableVariable> qvs, Term t) {
         Term result = t;
-        for (QuantifiableVariable fv : qvs) { result = ex(fv, result); }
+        for (QuantifiableVariable fv : qvs) {
+            result = ex(fv, result);
+        }
         return result;
     }
 
@@ -566,7 +580,9 @@ public class TermBuilder {
         final Iterator<LogicVariable> it = qvs.iterator();
         Term res = func(sum, new Term[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
-        while (it.hasNext()) { res = func(sum, new Term[] { TRUE(), res }, new ImmutableArray<>(it.next())); }
+        while (it.hasNext()) {
+            res = func(sum, new Term[] { TRUE(), res }, new ImmutableArray<>(it.next()));
+        }
         return res;
     }
 
@@ -587,8 +603,10 @@ public class TermBuilder {
         final Iterator<LogicVariable> it = qvs.iterator();
         Term res = func(prod, new Term[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
-        while (it.hasNext()) { res = func(prod, new Term[] { TRUE(), res },
-            new ImmutableArray<>(it.next())); }
+        while (it.hasNext()) {
+            res = func(prod, new Term[] { TRUE(), res },
+                new ImmutableArray<>(it.next()));
+        }
         return res;
     }
 
@@ -601,8 +619,10 @@ public class TermBuilder {
         final Iterator<? extends QuantifiableVariable> it = qvs.iterator();
         Term res = func(min, new Term[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
-        while (it.hasNext()) { res = func(min, new Term[] { TRUE(), res },
-            new ImmutableArray<>(it.next())); }
+        while (it.hasNext()) {
+            res = func(min, new Term[] { TRUE(), res },
+                new ImmutableArray<>(it.next()));
+        }
         return res;
     }
 
@@ -615,7 +635,9 @@ public class TermBuilder {
         final Iterator<? extends QuantifiableVariable> it = qvs.iterator();
         Term res = func(max, new Term[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
-        while (it.hasNext()) { res = func(max, new Term[] { TRUE(), res }, new ImmutableArray<>(it.next())); }
+        while (it.hasNext()) {
+            res = func(max, new Term[] { TRUE(), res }, new ImmutableArray<>(it.next()));
+        }
         return res;
     }
 
@@ -654,28 +676,41 @@ public class TermBuilder {
 
     public Term and(Term... subTerms) {
         Term result = tt();
-        for (Term sub : subTerms) { result = and(result, sub); }
+        for (Term sub : subTerms) {
+            result = and(result, sub);
+        }
         return result;
     }
 
     public Term andSC(Term... subTerms) {
         Term result = tt();
-        if (subTerms.length == 1) { return and(subTerms); }
-        for (Term sub : subTerms) { result = andSC(result, sub); }
+        if (subTerms.length == 1) {
+            return and(subTerms);
+        }
+        for (Term sub : subTerms) {
+            result = andSC(result, sub);
+        }
         return result;
     }
 
     public Term and(Iterable<Term> subTerms) {
         Term result = tt();
-        for (Term sub : subTerms) { result = and(result, sub); }
+        for (Term sub : subTerms) {
+            result = and(result, sub);
+        }
         return result;
     }
 
     public Term andSC(Iterable<Term> subTerms) {
         Term result = tt();
         int i = 0;
-        for (Term sub : subTerms) { result = andSC(result, sub); i++; }
-        if (i == 1) { return and(subTerms); }
+        for (Term sub : subTerms) {
+            result = andSC(result, sub);
+            i++;
+        }
+        if (i == 1) {
+            return and(subTerms);
+        }
         return result;
     }
 
@@ -702,28 +737,41 @@ public class TermBuilder {
 
     public Term or(Term... subTerms) {
         Term result = ff();
-        for (Term sub : subTerms) { result = or(result, sub); }
+        for (Term sub : subTerms) {
+            result = or(result, sub);
+        }
         return result;
     }
 
     public Term orSC(Term... subTerms) {
         Term result = ff();
-        if (subTerms.length == 1) { return or(subTerms); }
-        for (Term sub : subTerms) { result = orSC(result, sub); }
+        if (subTerms.length == 1) {
+            return or(subTerms);
+        }
+        for (Term sub : subTerms) {
+            result = orSC(result, sub);
+        }
         return result;
     }
 
     public Term or(Iterable<Term> subTerms) {
         Term result = ff();
-        for (Term sub : subTerms) { result = or(result, sub); }
+        for (Term sub : subTerms) {
+            result = or(result, sub);
+        }
         return result;
     }
 
     public Term orSC(Iterable<Term> subTerms) {
         Term result = ff();
         int i = 0;
-        for (Term sub : subTerms) { result = orSC(result, sub); i++; }
-        if (i == 1) { return or(subTerms); }
+        for (Term sub : subTerms) {
+            result = orSC(result, sub);
+            i++;
+        }
+        if (i == 1) {
+            return or(subTerms);
+        }
         return result;
     }
 
@@ -800,7 +848,7 @@ public class TermBuilder {
         final JFunction f = funcNS.lookup(new Name("pair"));
         if (f == null) {
             throw new RuntimeException("LDT: Function pair not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         }
 
         return func(f, first, second);
@@ -812,7 +860,7 @@ public class TermBuilder {
         final JFunction f = funcNS.lookup(new Name("prec"));
         if (f == null) {
             throw new RuntimeException("LDT: Function prec not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         }
 
         return func(f, mby, mbyAtPre);
@@ -823,7 +871,7 @@ public class TermBuilder {
         final JFunction f = funcNS.lookup(new Name("measuredByCheck"));
         if (f == null) {
             throw new RuntimeException("LDT: Function measuredByCheck not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         }
         return func(f, mby);
     }
@@ -833,7 +881,7 @@ public class TermBuilder {
         final JFunction f = funcNS.lookup(new Name("measuredBy"));
         if (f == null) {
             throw new RuntimeException("LDT: Function measuredBy not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         }
         return func(f, mby);
     }
@@ -843,7 +891,7 @@ public class TermBuilder {
         final JFunction f = funcNS.lookup(new Name("measuredByEmpty"));
         if (f == null) {
             throw new RuntimeException("LDT: Function measuredByEmpty not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         }
         return f;
     }
@@ -857,8 +905,12 @@ public class TermBuilder {
      */
     public Term convertToFormula(Term a) {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
-        if (booleanLDT == null) { throw new IllegalStateException("boolean ldt is not set in services"); }
-        if (a == null) { throw new NullPointerException(); }
+        if (booleanLDT == null) {
+            throw new IllegalStateException("boolean ldt is not set in services");
+        }
+        if (a == null) {
+            throw new NullPointerException();
+        }
         if (a.sort() == JavaDLTheory.FORMULA) {
             return a;
         } else if (a.sort() == booleanLDT.targetSort()) {
@@ -890,7 +942,9 @@ public class TermBuilder {
             return a;
         } else if (a.sort() == JavaDLTheory.FORMULA) {
             // special case where a is the result of convertToFormula
-            if (a.op() == Equality.EQUALS && a.sub(1).op() == booleanLDT.getTrueConst()) { return a.sub(0); }
+            if (a.op() == Equality.EQUALS && a.sub(1).op() == booleanLDT.getTrueConst()) {
+                return a.sub(0);
+            }
             return ife(a, TRUE(), FALSE());
         } else {
             throw new TermCreationException(
@@ -929,8 +983,8 @@ public class TermBuilder {
             // { ({a:=1} b) :=a}
             // The latter is (currently) not supported, hence the exception.
             throw new TermCreationException("lhs cannot have a nested update. "
-                    + "If you have a nested update like '{{a:=1} b:=a}', "
-                    + "replace it with the bracketed version '{{a:=1} (b:=a)}'.");
+                + "If you have a nested update like '{{a:=1} b:=a}', "
+                + "replace it with the bracketed version '{{a:=1} (b:=a)}'.");
         } else {
             throw new TermCreationException("Not a legal lhs: " + lhs);
         }
@@ -947,16 +1001,22 @@ public class TermBuilder {
     public Term parallel(Term u1, Term u2) {
         if (u1.sort() != JavaDLTheory.UPDATE) {
             throw new TermCreationException("Not an update: " + u1);
-        } else if (u2.sort() != JavaDLTheory.UPDATE) { throw new TermCreationException("Not an update: " + u2); }
+        } else if (u2.sort() != JavaDLTheory.UPDATE) {
+            throw new TermCreationException("Not an update: " + u2);
+        }
         if (u1.op() == UpdateJunctor.SKIP) {
             return u2;
-        } else if (u2.op() == UpdateJunctor.SKIP) { return u1; }
+        } else if (u2.op() == UpdateJunctor.SKIP) {
+            return u1;
+        }
         return tf.createTerm(UpdateJunctor.PARALLEL_UPDATE, u1, u2);
     }
 
     public Term parallel(Term... updates) {
         Term result = skip();
-        for (Term update : updates) { result = parallel(result, update); }
+        for (Term update : updates) {
+            result = parallel(result, update);
+        }
         return result;
     }
 
@@ -967,10 +1027,12 @@ public class TermBuilder {
     public Term parallel(Term[] lhss, Term[] values) {
         if (lhss.length != values.length) {
             throw new TermCreationException("Tried to create parallel update with " + lhss.length
-                    + " locs and " + values.length + " values");
+                + " locs and " + values.length + " values");
         }
         Term[] updates = new Term[lhss.length];
-        for (int i = 0; i < updates.length; i++) { updates[i] = elementary(lhss[i], values[i]); }
+        for (int i = 0; i < updates.length; i++) {
+            updates[i] = elementary(lhss[i], values[i]);
+        }
         return parallel(updates);
     }
 
@@ -994,7 +1056,9 @@ public class TermBuilder {
             return skip();
         } else {
             Term result = updates[updates.length - 1];
-            for (int i = updates.length - 2; i >= 0; i--) { result = sequential(updates[i], result); }
+            for (int i = updates.length - 2; i >= 0; i--) {
+                result = sequential(updates[i], result);
+            }
             return result;
         }
     }
@@ -1015,7 +1079,9 @@ public class TermBuilder {
 
     public ImmutableList<Term> apply(Term update, ImmutableList<Term> targets) {
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (Term target : targets) { result = result.append(apply(update, target)); }
+        for (Term target : targets) {
+            result = result.append(apply(update, target));
+        }
         return result;
     }
 
@@ -1041,7 +1107,9 @@ public class TermBuilder {
 
     public ImmutableList<Term> applyElementary(Term heap, Iterable<Term> targets) {
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (Term target : targets) { result = result.append(apply(elementary(heap), target, null)); }
+        for (Term target : targets) {
+            result = result.append(apply(elementary(heap), target, null));
+        }
         return result;
     }
 
@@ -1170,7 +1238,9 @@ public class TermBuilder {
             }
             numberLiteralTerm = func(intLDT.getNumberLiteralFor(digit), numberLiteralTerm);
         }
-        if (negate) { numberLiteralTerm = func(intLDT.getNegativeNumberSign(), numberLiteralTerm); }
+        if (negate) {
+            numberLiteralTerm = func(intLDT.getNegativeNumberSign(), numberLiteralTerm);
+        }
 
         // return the raw number literal term ('C', 'Z' or 'R' must still be added)
         return numberLiteralTerm;
@@ -1321,13 +1391,17 @@ public class TermBuilder {
 
     public Term union(Term... subTerms) {
         Term result = empty();
-        for (Term sub : subTerms) { result = union(result, sub); }
+        for (Term sub : subTerms) {
+            result = union(result, sub);
+        }
         return result;
     }
 
     public Term union(Iterable<Term> subTerms) {
         Term result = empty();
-        for (Term sub : subTerms) { result = union(result, sub); }
+        for (Term sub : subTerms) {
+            result = union(result, sub);
+        }
         return result;
     }
 
@@ -1346,13 +1420,17 @@ public class TermBuilder {
 
     public Term intersect(Term... subTerms) {
         Term result = allLocs();
-        for (Term sub : subTerms) { result = intersect(result, sub); }
+        for (Term sub : subTerms) {
+            result = intersect(result, sub);
+        }
         return result;
     }
 
     public Term intersect(Iterable<Term> subTerms) {
         Term result = allLocs();
-        for (Term sub : subTerms) { result = intersect(result, sub); }
+        for (Term sub : subTerms) {
+            result = intersect(result, sub);
+        }
         return result;
     }
 
@@ -1458,13 +1536,17 @@ public class TermBuilder {
 
     public ImmutableList<Term> wd(Iterable<Term> l) {
         ImmutableList<Term> res = ImmutableSLList.nil();
-        for (Term t : l) { res = res.append(wd(t)); }
+        for (Term t : l) {
+            res = res.append(wd(t));
+        }
         return res;
     }
 
     public Term[] wd(Term[] l) {
         Term[] res = new Term[l.length];
-        for (int i = 0; i < l.length; i++) { res[i] = wd(l[i]); }
+        for (int i = 0; i < l.length; i++) {
+            res[i] = wd(l[i]);
+        }
         return res;
     }
 
@@ -1514,7 +1596,9 @@ public class TermBuilder {
         List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i = 0;
-        for (LocationVariable heap : heaps) { hs[i++] = var(heap); }
+        for (LocationVariable heap : heaps) {
+            hs[i++] = var(heap);
+        }
         return inv(hs, o);
     }
 
@@ -1526,7 +1610,9 @@ public class TermBuilder {
         List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i = 0;
-        for (LocationVariable heap : heaps) { hs[i++] = var(heap); }
+        for (LocationVariable heap : heaps) {
+            hs[i++] = var(heap);
+        }
         return func(services.getJavaInfo().getStaticInv(t), hs);
     }
 
@@ -1541,7 +1627,9 @@ public class TermBuilder {
         List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i = 0;
-        for (LocationVariable heap : heaps) { hs[i++] = var(heap); }
+        for (LocationVariable heap : heaps) {
+            hs[i++] = var(heap);
+        }
         return invFree(hs, o);
     }
 
@@ -1553,7 +1641,9 @@ public class TermBuilder {
         List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i = 0;
-        for (LocationVariable heap : heaps) { hs[i++] = var(heap); }
+        for (LocationVariable heap : heaps) {
+            hs[i++] = var(heap);
+        }
         return func(services.getJavaInfo().getStaticInvFree(t), hs);
     }
 
@@ -1627,7 +1717,9 @@ public class TermBuilder {
         ImmutableArray<Term> oldSubs = term.subs();
         Term[] newSubs = new Term[oldSubs.size()];
 
-        for (int i = 0; i < newSubs.length; ++i) { newSubs[i] = addLabelToAllSubs(oldSubs.get(i), labels); }
+        for (int i = 0; i < newSubs.length; ++i) {
+            newSubs[i] = addLabelToAllSubs(oldSubs.get(i), labels);
+        }
 
 
         Term result =
@@ -1751,7 +1843,9 @@ public class TermBuilder {
 
     public Term unlabelRecursive(Term term) {
         Term[] subs = new Term[term.arity()];
-        for (int i = 0; i < subs.length; i++) { subs[i] = unlabelRecursive(term.sub(i)); }
+        for (int i = 0; i < subs.length; i++) {
+            subs[i] = unlabelRecursive(term.sub(i));
+        }
         return tf.createTerm(term.op(), subs, term.boundVars(), null);
     }
 
@@ -1759,7 +1853,7 @@ public class TermBuilder {
         if (ref == null || idx == null) {
             throw new TermCreationException(
                 "Tried to build an array access " + "term without providing an "
-                        + (ref == null ? "array reference." : "index.") + "(" + ref + "[" + idx + "])");
+                    + (ref == null ? "array reference." : "index.") + "(" + ref + "[" + idx + "])");
         }
 
         final Sort elementSort;
@@ -1768,7 +1862,7 @@ public class TermBuilder {
         } else {
             throw new TermCreationException(String.format(
                 "Tried to build an array access on an inacceptable sort: "
-                        + "Sort: %s : %s with %s[%s] ",
+                    + "Sort: %s : %s with %s[%s] ",
                 ref.sort(), ref.sort().getClass().getSimpleName(), ref, idx));
         }
 
@@ -2007,13 +2101,17 @@ public class TermBuilder {
 
     public Term seq(Term... terms) {
         Term result = seqEmpty();
-        for (Term term : terms) { result = seqConcat(result, seqSingleton(term)); }
+        for (Term term : terms) {
+            result = seqConcat(result, seqSingleton(term));
+        }
         return result;
     }
 
     public Term seq(ImmutableList<Term> terms) {
         Term result = seqEmpty();
-        for (Term term : terms) { result = seqConcat(result, seqSingleton(term)); }
+        for (Term term : terms) {
+            result = seqConcat(result, seqSingleton(term));
+        }
         return result;
     }
 
@@ -2050,7 +2148,9 @@ public class TermBuilder {
     }
 
     private Term replace(Term term, PosInTerm pos, Term replacement, int depth) {
-        if (depth == pos.depth()) { return replacement; }
+        if (depth == pos.depth()) {
+            return replacement;
+        }
 
         ImmutableArray<Term> oldSubs = term.subs();
         Term[] newSubs = new Term[oldSubs.size()];
@@ -2089,7 +2189,9 @@ public class TermBuilder {
      * Removes leading updates from the passed term.
      */
     public static Term goBelowUpdates(Term term) {
-        while (term.op() instanceof UpdateApplication) { term = UpdateApplication.getTarget(term); }
+        while (term.op() instanceof UpdateApplication) {
+            term = UpdateApplication.getTarget(term);
+        }
         return term;
     }
 
@@ -2123,7 +2225,9 @@ public class TermBuilder {
      */
     public ImmutableList<Sort> getSorts(Iterable<Term> terms) {
         ImmutableList<Sort> result = ImmutableSLList.nil();
-        for (Term t : terms) { result = result.append(t.sort()); }
+        for (Term t : terms) {
+            result = result.append(t.sort());
+        }
         return result;
     }
 
@@ -2180,7 +2284,9 @@ public class TermBuilder {
      */
     public Term andPreserveLabels(Iterable<Term> subTerms) {
         Term result = tt();
-        for (Term sub : subTerms) { result = andPreserveLabels(result, sub); }
+        for (Term sub : subTerms) {
+            result = andPreserveLabels(result, sub);
+        }
         return result;
     }
 
@@ -2217,7 +2323,9 @@ public class TermBuilder {
      */
     public Term orPreserveLabels(Iterable<Term> subTerms) {
         Term result = ff();
-        for (Term sub : subTerms) { result = orPreserveLabels(result, sub); }
+        for (Term sub : subTerms) {
+            result = orPreserveLabels(result, sub);
+        }
         return result;
     }
 
@@ -2273,7 +2381,9 @@ public class TermBuilder {
      */
     public Term addLabelToAllSubs(Term term, OriginTermLabel.Origin origin) {
         final OriginTermLabelFactory originFactory = services.getOriginFactory();
-        if (originFactory != null) { return addLabelToAllSubs(term, originFactory.createOriginTermLabel(origin)); }
+        if (originFactory != null) {
+            return addLabelToAllSubs(term, originFactory.createOriginTermLabel(origin));
+        }
         return term;
     }
 
@@ -2289,7 +2399,9 @@ public class TermBuilder {
      */
     public Term addLabel(Term term, OriginTermLabel.Origin origin) {
         final OriginTermLabelFactory originFactory = services.getOriginFactory();
-        if (originFactory != null) { return addLabel(term, originFactory.createOriginTermLabel(origin)); }
+        if (originFactory != null) {
+            return addLabel(term, originFactory.createOriginTermLabel(origin));
+        }
         return term;
     }
 

@@ -29,8 +29,12 @@ public class OracleMethodCall implements OracleTerm {
     public String toString() {
         String methodName = method.getMethodName();
         StringBuilder aString = new StringBuilder();
-        for (OracleTerm arg : args) { aString.append(" ").append(arg.toString()).append(","); }
-        if (!args.isEmpty()) { aString = new StringBuilder(aString.substring(0, aString.length() - 1)); }
+        for (OracleTerm arg : args) {
+            aString.append(" ").append(arg.toString()).append(",");
+        }
+        if (!args.isEmpty()) {
+            aString = new StringBuilder(aString.substring(0, aString.length() - 1));
+        }
         if (caller != null) {
             return caller + "." + methodName + "(" + aString + ")";
         } else {

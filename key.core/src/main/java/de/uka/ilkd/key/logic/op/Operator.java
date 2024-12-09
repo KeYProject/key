@@ -33,8 +33,12 @@ public interface Operator
 
     @Override
     default boolean equalsModProofIrrelevancy(Object obj) {
-        if (this == obj) { return true; }
-        if (!(obj instanceof Operator that)) { return false; }
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Operator that)) {
+            return false;
+        }
         // assume name and arity uniquely identifies operator
         return arity() == that.arity() && name().equals(that.name());
     }

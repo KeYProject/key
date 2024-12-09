@@ -100,7 +100,9 @@ public abstract class AbstractProofReplayer {
         ImmutableList<Goal> nextGoals;
         if (ruleApp.rule() instanceof BuiltInRule) {
             IBuiltInRuleApp builtInRuleApp = constructBuiltinApp(node, openGoal);
-            if (!builtInRuleApp.complete()) { builtInRuleApp = builtInRuleApp.tryToInstantiate(openGoal); }
+            if (!builtInRuleApp.complete()) {
+                builtInRuleApp = builtInRuleApp.tryToInstantiate(openGoal);
+            }
             nextGoals = openGoal.apply(builtInRuleApp);
         } else if (ruleApp.rule() instanceof Taclet) {
             nextGoals = openGoal.apply(constructTacletApp(node, openGoal));
@@ -164,7 +166,9 @@ public abstract class AbstractProofReplayer {
                                                                           // pos
             PosInOccurrence oldPos = originalStep.getAppliedRuleApp().posInOccurrence();
             pos = findInNewSequent(oldPos, currGoal.sequent());
-            if (pos == null) { throw new IllegalStateException("failed to find new formula"); }
+            if (pos == null) {
+                throw new IllegalStateException("failed to find new formula");
+            }
         }
 
         if (currContract != null) {
@@ -191,7 +195,9 @@ public abstract class AbstractProofReplayer {
                 ourApp = contractApp;
             }
 
-            if (builtinIfInsts != null) { ourApp = ourApp.setIfInsts(builtinIfInsts); }
+            if (builtinIfInsts != null) {
+                ourApp = ourApp.setIfInsts(builtinIfInsts);
+            }
             return ourApp;
         }
 
@@ -201,13 +207,13 @@ public abstract class AbstractProofReplayer {
             if (ruleApps.isEmpty()) {
                 throw new IntermediateProofReplayer.BuiltInConstructionException(
                     ruleName + " is missing. Most probably the binary "
-                            + "for this built-in rule is not in your path or "
-                            + "you do not have the permission to execute it.");
+                        + "for this built-in rule is not in your path or "
+                        + "you do not have the permission to execute it.");
             } else {
                 throw new IntermediateProofReplayer.BuiltInConstructionException(
                     ruleName + ": found " + ruleApps.size()
-                            + " applications. Don't know what to do !\n" + "@ "
-                            + pos);
+                        + " applications. Don't know what to do !\n" + "@ "
+                        + pos);
             }
         }
         ourApp = ruleApps.iterator().next();
@@ -248,7 +254,9 @@ public abstract class AbstractProofReplayer {
                     break;
                 }
             }
-            if (ourApp == null) { ourApp = currGoal.indexOfTaclets().lookup(tacletName); }
+            if (ourApp == null) {
+                ourApp = currGoal.indexOfTaclets().lookup(tacletName);
+            }
             if (ourApp == null) {
                 throw new IllegalStateException(
                     "proof replayer failed to find dynamically added taclet");
@@ -319,7 +327,9 @@ public abstract class AbstractProofReplayer {
                 "slicing encountered null rule app of %s after instantiating ifInsts", tacletName));
         }
 
-        if (!ourApp.complete()) { ourApp = ourApp.tryToInstantiate(proof.getServices()); }
+        if (!ourApp.complete()) {
+            ourApp = ourApp.tryToInstantiate(proof.getServices());
+        }
 
         return ourApp;
     }
@@ -365,7 +375,7 @@ public abstract class AbstractProofReplayer {
             if (!(value instanceof Term || value instanceof ProgramElement
                     || value instanceof Name)) {
                 throw new IllegalStateException("Saving failed.\n"
-                        + "FIXME: Unhandled instantiation type: " + value.getClass());
+                    + "FIXME: Unhandled instantiation type: " + value.getClass());
             }
 
             String singleInstantiation =

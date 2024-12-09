@@ -67,7 +67,9 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      */
     final static ImmutableList<LocationVariable> convertParams(ImmutableSet<LocationVariable> set) {
         ImmutableList<LocationVariable> list = ImmutableSLList.nil();
-        for (LocationVariable pv : set) { list = list.append(pv); }
+        for (LocationVariable pv : set) {
+            list = list.append(pv);
+        }
         return list;
     }
 

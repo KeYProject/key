@@ -77,7 +77,9 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
 
         public void setVar(String var, Term term) throws ScriptException {
 
-            if (!var.matches("@[a-zA-Z0-9_]")) { throw new ScriptException("Is not a variable name: " + var); }
+            if (!var.matches("@[a-zA-Z0-9_]")) {
+                throw new ScriptException("Is not a variable name: " + var);
+            }
 
             var = var.substring(1);
             try {

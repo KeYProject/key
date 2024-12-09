@@ -59,7 +59,9 @@ public class BranchLocation {
                     break;
                 }
             }
-            if (!keepGoing) { break; }
+            if (!keepGoing) {
+                break;
+            }
             Pair<Node, Integer> x = locations[0].get(i);
             for (int j = 1; j < locations.length; j++) {
                 if (!locations[j].get(i).equals(x)) {
@@ -160,8 +162,12 @@ public class BranchLocation {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         BranchLocation that = (BranchLocation) o;
         return Objects.equals(location, that.location);
     }

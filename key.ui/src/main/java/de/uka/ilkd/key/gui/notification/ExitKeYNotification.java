@@ -32,7 +32,9 @@ public class ExitKeYNotification extends NotificationTask {
     public void execute(NotificationEvent event, NotificationManager manager) {
         // if we are in automode execute task only if it is
         // automode enabled
-        if (manager.inAutoMode() && !automodeEnabledTask()) { return; }
+        if (manager.inAutoMode() && !automodeEnabledTask()) {
+            return;
+        }
         // notify thread safe
 
         if (SwingUtilities.isEventDispatchThread()) {

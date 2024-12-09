@@ -48,7 +48,9 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
 
     @Override
     public void execute(Parameters s) throws ScriptException, InterruptedException {
-        if (s == null) { throw new ScriptException("Missing 'sequent' argument for focus"); }
+        if (s == null) {
+            throw new ScriptException("Missing 'sequent' argument for focus");
+        }
 
         Sequent toKeep = s.toKeep;
 

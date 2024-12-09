@@ -85,7 +85,9 @@ public class DebugJmlLexer {
     }
 
     public void run() {
-        for (JmlLexer l : lexer) { run(l); }
+        for (JmlLexer l : lexer) {
+            run(l);
+        }
     }
 
     private void run(JmlLexer toks) {

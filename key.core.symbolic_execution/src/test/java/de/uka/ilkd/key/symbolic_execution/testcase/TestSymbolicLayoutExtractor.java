@@ -613,7 +613,9 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             // Restore original options
             setOneStepSimplificationEnabled(null, originalOneStepSimplification);
             restoreTacletOptions(originalTacletOptions);
-            if (env != null) { env.dispose(); }
+            if (env != null) {
+                env.dispose();
+            }
         }
     }
 
@@ -657,7 +659,9 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
                 currentStatesOraclePrefix, currentStatesOracleFileExtension, precondition,
                 numberOfReturnNodeInMostLeftBranch, expectedNumberOfLayouts, onReturnStatementNode);
         } finally {
-            if (env != null) { env.dispose(); }
+            if (env != null) {
+                env.dispose();
+            }
         }
     }
 
@@ -673,7 +677,9 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
         while (foundReturnStatement < numberOfReturnNodeInMostLeftBranch
                 && returnNode.getChildren().length >= 1) {
             returnNode = returnNode.getChildren()[0];
-            if (returnNode instanceof IExecutionMethodReturn) { foundReturnStatement++; }
+            if (returnNode instanceof IExecutionMethodReturn) {
+                foundReturnStatement++;
+            }
         }
         assertTrue(returnNode instanceof IExecutionMethodReturn);
         IExecutionNode<?> nodeToTest;
@@ -681,7 +687,9 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             // Get the return statement which is returned in returnNode
             IExecutionNode<?> returnStatement = returnNode.getParent();
             while (!(returnStatement instanceof IExecutionStatement)) {
-                if (returnStatement instanceof IExecutionStatement) { foundReturnStatement++; }
+                if (returnStatement instanceof IExecutionStatement) {
+                    foundReturnStatement++;
+                }
                 returnStatement = returnStatement.getParent();
             }
             assertNotNull(returnStatement);
@@ -823,7 +831,9 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             assertEquals(expected.getNameString(), current.getNameString());
             assertEquals(expected.getTypeString(), current.getTypeString());
             assertValues(expected.getValues(), current.getValues());
-            if (compareAssociations) { assertAssociations(expected.getAssociations(), current.getAssociations()); }
+            if (compareAssociations) {
+                assertAssociations(expected.getAssociations(), current.getAssociations());
+            }
         } else {
             assertNull(current);
         }
@@ -938,7 +948,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
                 StringUtil.equalIgnoreWhiteSpace(expected.getValueString(),
                     current.getValueString()),
                 "\"" + expected.getValueString() + "\" does not match \"" + current.getValueString()
-                        + "\"");
+                    + "\"");
             assertEquals(expected.getTypeString(), current.getTypeString());
             assertEquals(expected.getConditionString(), current.getConditionString());
         } else {

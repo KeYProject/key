@@ -92,14 +92,22 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true; }
-        if (o == null || o.getClass() != this.getClass()) { return false; }
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
 
         final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) o;
-        if (jnte.getChildCount() != getChildCount()) { return false; }
+        if (jnte.getChildCount() != getChildCount()) {
+            return false;
+        }
 
         for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equals(jnte.getChildAt(i))) { return false; }
+            if (!getChildAt(i).equals(jnte.getChildAt(i))) {
+                return false;
+            }
         }
 
         return (this.getStartPosition().equals(Position.UNDEFINED) || // why do we care here
@@ -120,7 +128,10 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         final ArrayList<ProgramPrefix> prefix = new ArrayList<>();
         prefix.add(current);
 
-        while (current.hasNextPrefixElement()) { current = current.getNextPrefixElement(); prefix.add(current); }
+        while (current.hasNextPrefixElement()) {
+            current = current.getNextPrefixElement();
+            prefix.add(current);
+        }
 
         return new ImmutableArray<>(prefix);
     }
@@ -194,7 +205,11 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      */
     public int getTypeDeclarationCount() {
         int count = 0;
-        for (int i = body.size() - 1; i >= 0; i -= 1) { if (body.get(i) instanceof TypeDeclaration) { count += 1; } }
+        for (int i = body.size() - 1; i >= 0; i -= 1) {
+            if (body.get(i) instanceof TypeDeclaration) {
+                count += 1;
+            }
+        }
         return count;
     }
 
@@ -215,7 +230,9 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         for (int i = 0; i < s && index >= 0; i++) {
             Statement st = body.get(i);
             if (st instanceof TypeDeclaration) {
-                if (index == 0) { return (TypeDeclaration) st; }
+                if (index == 0) {
+                    return (TypeDeclaration) st;
+                }
                 index -= 1;
             }
         }
@@ -236,7 +253,9 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     @NonNull
     public SourceElement getFirstElement() {
-        if (isEmpty()) { return this; }
+        if (isEmpty()) {
+            return this;
+        }
         final SourceElement e = getBody().get(0);
         return (e instanceof StatementBlock) ? e.getFirstElement() : e;
     }

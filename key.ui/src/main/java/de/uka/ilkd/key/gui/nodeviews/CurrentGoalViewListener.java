@@ -57,7 +57,9 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
                     } else if (macroActive && SwingUtilities.isRightMouseButton(me)) {
                         ProofMacroMenu macroMenu =
                             new ProofMacroMenu(mediator, mousePos.getPosInOccurrence());
-                        if (macroMenu.isEmpty()) { macroMenu.add(new JLabel("No strategies available")); }
+                        if (macroMenu.isEmpty()) {
+                            macroMenu.add(new JLabel("No strategies available"));
+                        }
                         JPopupMenu popupMenu = macroMenu.getPopupMenu();
                         popupMenu.setLabel("Strategy Macros");
                         popupMenu.show(getSequentView(), me.getX() - 5, me.getY() - 5);

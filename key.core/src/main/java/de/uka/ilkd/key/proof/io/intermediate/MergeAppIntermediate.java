@@ -64,9 +64,10 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
         super(ruleName, pos, null, null, null, newNames);
 
         String mergeRuleName = MergeRule.INSTANCE.name().toString();
-        assert ruleName.equals(mergeRuleName) : "This was somehow unexpected; are there other join rules than "
-                + mergeRuleName
-                + "?";
+        assert ruleName.equals(mergeRuleName)
+                : "This was somehow unexpected; are there other join rules than "
+                    + mergeRuleName
+                    + "?";
 
         this.id = id;
         this.mergeProc = joinProc;

@@ -79,7 +79,11 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (typeReference != null) { if (index == 0) { return typeReference; } }
+        if (typeReference != null) {
+            if (index == 0) {
+                return typeReference;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -113,7 +117,9 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (typeReference != null && index == 0) { return typeReference; }
+        if (typeReference != null && index == 0) {
+            return typeReference;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -153,7 +159,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         throw new IllegalStateException("Metaclass references are not supported by KeY as"
-                + "'java.lang.Class' is not part of the Java Card standard");
+            + "'java.lang.Class' is not part of the Java Card standard");
     }
 
 }

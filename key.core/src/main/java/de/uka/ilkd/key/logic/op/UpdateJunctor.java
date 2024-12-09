@@ -25,7 +25,9 @@ public final class UpdateJunctor extends AbstractSortedOperator {
 
     private static Sort[] createUpdateSortArray(int arity) {
         Sort[] result = new Sort[arity];
-        for (int i = 0; i < arity; i++) { result[i] = JavaDLTheory.UPDATE; }
+        for (int i = 0; i < arity; i++) {
+            result[i] = JavaDLTheory.UPDATE;
+        }
         return result;
     }
 

@@ -35,7 +35,9 @@ public class LabelCollection {
      *        the list of {@link TermLabel}s for this collections
      */
     public LabelCollection(ImmutableArray<TermLabel> p_labels) {
-        for (int i = 0, sz = p_labels.size(); i < sz; i++) { labels.add(p_labels.get(i)); }
+        for (int i = 0, sz = p_labels.size(); i < sz; i++) {
+            labels.add(p_labels.get(i));
+        }
         modified = false;
     }
 
@@ -110,7 +112,11 @@ public class LabelCollection {
      *        the type of the label to be retrieved
      */
     public <S> S getFirst(Class<S> termLabelClass) {
-        for (var label : labels) { if (termLabelClass.isInstance(label)) { return (S) label; } }
+        for (var label : labels) {
+            if (termLabelClass.isInstance(label)) {
+                return (S) label;
+            }
+        }
         return null;
     }
 

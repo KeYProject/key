@@ -126,7 +126,9 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     @Override
     public ExecutionValue[] getValues() throws ProofInputException {
         synchronized (this) {
-            if (values == null) { values = lazyComputeValues(); }
+            if (values == null) {
+                values = lazyComputeValues();
+            }
             return values;
         }
     }
@@ -231,7 +233,9 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                 // Compute value condition
                 Term condition = computeValueCondition(tb, valueEntry.getValue(), initConfig);
                 String conditionString = null;
-                if (condition != null) { conditionString = formatTerm(condition, services); }
+                if (condition != null) {
+                    conditionString = formatTerm(condition, services);
+                }
                 // Update result
                 result.add(new ExecutionValue(getProofNode(), this, false, value, valueString,
                     typeString, condition, conditionString));
@@ -242,7 +246,9 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             // Compute value condition
             Term condition = computeValueCondition(tb, unknownValues, initConfig);
             String conditionString = null;
-            if (condition != null) { conditionString = formatTerm(condition, services); }
+            if (condition != null) {
+                conditionString = formatTerm(condition, services);
+            }
             // Update result
             result.add(new ExecutionValue(getProofNode(), this, true,
                 null, null, null, condition, conditionString));

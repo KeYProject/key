@@ -98,11 +98,15 @@ public class EvaluateArgs extends ProgramTransformer {
 
         ImmutableArray<? extends Expression> args = mr.getArguments();
         Expression[] newArgs = new Expression[args.size()];
-        for (int i = 0; i < args.size(); i++) { newArgs[i] = evaluate(args.get(i), evalstat, services, ec); }
+        for (int i = 0; i < args.size(); i++) {
+            newArgs[i] = evaluate(args.get(i), evalstat, services, ec);
+        }
 
         Statement[] res = new Statement[1 + evalstat.size()];
         final Iterator<Statement> it = evalstat.iterator();
-        for (int i = 0; i < evalstat.size(); i++) { res[i] = it.next(); }
+        for (int i = 0; i < evalstat.size(); i++) {
+            res[i] = it.next();
+        }
 
         final MethodOrConstructorReference resMR;
         if (mr instanceof MethodReference) {

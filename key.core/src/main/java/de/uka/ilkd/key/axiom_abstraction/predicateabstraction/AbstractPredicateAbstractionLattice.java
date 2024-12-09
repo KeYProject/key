@@ -55,11 +55,17 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
         AbstractPredicateAbstractionDomainElement pade2 =
             (AbstractPredicateAbstractionDomainElement) b;
 
-        if (pade1.isTopElem() || pade2.isTopElem()) { return getTopElem(); }
+        if (pade1.isTopElem() || pade2.isTopElem()) {
+            return getTopElem();
+        }
 
-        if (pade1 == getBottomElem()) { return pade2; }
+        if (pade1 == getBottomElem()) {
+            return pade2;
+        }
 
-        if (pade2 == getBottomElem()) { return pade1; }
+        if (pade2 == getBottomElem()) {
+            return pade1;
+        }
 
         ImmutableSet<AbstractionPredicate> preds1 = pade1.getPredicates();
         ImmutableSet<AbstractionPredicate> preds2 = pade2.getPredicates();
@@ -115,7 +121,9 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
             // conjunction.
 
             // Initialize the list.
-            for (int i = 0; i < numApplPreds + 1; i++) { bitSetsByNumZeroes.add(new ArrayList<>()); }
+            for (int i = 0; i < numApplPreds + 1; i++) {
+                bitSetsByNumZeroes.add(new ArrayList<>());
+            }
 
             // bitSet initially represents the number 0.
             ImmutableFixedLengthBitSet bitSet = new ImmutableFixedLengthBitSet(numApplPreds);
@@ -124,7 +132,9 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
                 int numZeroes = bitSet.getNumOfZeroBits();
                 bitSetsByNumZeroes.get(numZeroes).add(bitSet);
 
-                if (i < MergeRuleUtils.intPow(2, numApplPreds) - 1) { bitSet = bitSet.inc(); }
+                if (i < MergeRuleUtils.intPow(2, numApplPreds) - 1) {
+                    bitSet = bitSet.inc();
+                }
             }
         }
 

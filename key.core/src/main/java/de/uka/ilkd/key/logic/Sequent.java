@@ -36,7 +36,9 @@ public class Sequent implements Iterable<SequentFormula> {
      *         EMPTY_SEMISEQUENT
      */
     public static Sequent createAnteSequent(Semisequent ante) {
-        if (ante.isEmpty()) { return EMPTY_SEQUENT; }
+        if (ante.isEmpty()) {
+            return EMPTY_SEQUENT;
+        }
         return new Sequent(ante, Semisequent.EMPTY_SEMISEQUENT);
     }
 
@@ -51,7 +53,9 @@ public class Sequent implements Iterable<SequentFormula> {
      *         EMPTY_SEMISEQUENT
      */
     public static Sequent createSequent(Semisequent ante, Semisequent succ) {
-        if (ante.isEmpty() && succ.isEmpty()) { return EMPTY_SEQUENT; }
+        if (ante.isEmpty() && succ.isEmpty()) {
+            return EMPTY_SEQUENT;
+        }
         return new Sequent(ante, succ);
     }
 
@@ -64,7 +68,9 @@ public class Sequent implements Iterable<SequentFormula> {
      *         EMPTY_SEMISEQUENT
      */
     public static Sequent createSuccSequent(Semisequent succ) {
-        if (succ.isEmpty()) { return EMPTY_SEQUENT; }
+        if (succ.isEmpty()) {
+            return EMPTY_SEQUENT;
+        }
         return new Sequent(Semisequent.EMPTY_SEMISEQUENT, succ);
     }
 
@@ -267,10 +273,14 @@ public class Sequent implements Iterable<SequentFormula> {
         if (semiSeq.isEmpty()) {
             if (!antec && antecedent.isEmpty()) {
                 return EMPTY_SEQUENT;
-            } else if (antec && succedent.isEmpty()) { return EMPTY_SEQUENT; }
+            } else if (antec && succedent.isEmpty()) {
+                return EMPTY_SEQUENT;
+            }
         }
 
-        if ((antec && semiSeq == antecedent) || (!antec && semiSeq == succedent)) { return this; }
+        if ((antec && semiSeq == antecedent) || (!antec && semiSeq == succedent)) {
+            return this;
+        }
 
         return new Sequent(antec ? semiSeq : antecedent, antec ? succedent : semiSeq);
     }
@@ -286,8 +296,12 @@ public class Sequent implements Iterable<SequentFormula> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (!(o instanceof Sequent o1)) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Sequent o1)) {
+            return false;
+        }
         return antecedent.equals(o1.antecedent) && succedent.equals(o1.succedent);
     }
 
@@ -306,7 +320,12 @@ public class Sequent implements Iterable<SequentFormula> {
         int n = inAntec ? 0 : antecedent.size();
         final Iterator<SequentFormula> formIter =
             inAntec ? antecedent.iterator() : succedent.iterator();
-        while (formIter.hasNext()) { n++; if (formIter.next().equals(cfma)) { return n; } }
+        while (formIter.hasNext()) {
+            n++;
+            if (formIter.next().equals(cfma)) {
+                return n;
+            }
+        }
         throw new RuntimeException(
             "Ghost formula " + cfma + " in sequent " + this + " [antec=" + inAntec + "]");
     }
@@ -335,7 +354,9 @@ public class Sequent implements Iterable<SequentFormula> {
      */
     public SequentFormula getFormulabyNr(int formulaNumber) {
         checkFormulaIndex(formulaNumber);
-        if (formulaNumber <= antecedent.size()) { return antecedent.get(formulaNumber - 1); }
+        if (formulaNumber <= antecedent.size()) {
+            return antecedent.get(formulaNumber - 1);
+        }
         return succedent.get((formulaNumber - 1) - antecedent.size());
     }
 
@@ -424,7 +445,9 @@ public class Sequent implements Iterable<SequentFormula> {
         for (SequentFormula sequentFormula : this) {
             final BoundVarsVisitor bvv = new BoundVarsVisitor();
             sequentFormula.formula().execPostOrder(bvv);
-            if (bvv.getBoundVariables().contains(v)) { return true; }
+            if (bvv.getBoundVariables().contains(v)) {
+                return true;
+            }
         }
         return false;
     }
@@ -482,7 +505,9 @@ public class Sequent implements Iterable<SequentFormula> {
 
         @Override
         public SequentFormula next() {
-            if (anteIt.hasNext()) { return anteIt.next(); }
+            if (anteIt.hasNext()) {
+                return anteIt.next();
+            }
             return succIt.next();
         }
 
@@ -501,9 +526,15 @@ public class Sequent implements Iterable<SequentFormula> {
     private static Set<Name> getLabelsForTermRecursively(Term term) {
         Set<Name> result = new HashSet<>();
 
-        if (term.hasLabels()) { for (TermLabel label : term.getLabels()) { result.add(label.name()); } }
+        if (term.hasLabels()) {
+            for (TermLabel label : term.getLabels()) {
+                result.add(label.name());
+            }
+        }
 
-        for (final Term subTerm : term.subs()) { result.addAll(getLabelsForTermRecursively(subTerm)); }
+        for (final Term subTerm : term.subs()) {
+            result.addAll(getLabelsForTermRecursively(subTerm));
+        }
 
         return result;
     }
@@ -513,7 +544,9 @@ public class Sequent implements Iterable<SequentFormula> {
      */
     public Set<Name> getOccuringTermLabels() {
         final Set<Name> result = new HashSet<>();
-        for (final SequentFormula sf : this) { result.addAll(getLabelsForTermRecursively(sf.formula())); }
+        for (final SequentFormula sf : this) {
+            result.addAll(getLabelsForTermRecursively(sf.formula()));
+        }
         return result;
     }
 

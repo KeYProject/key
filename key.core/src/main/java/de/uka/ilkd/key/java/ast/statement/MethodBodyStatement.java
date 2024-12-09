@@ -80,8 +80,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         this.useSpecification = false;
 
         assert methodReference != null : "Missing methodreference";
-        assert methodReference.getReferencePrefix() != null : "Method reference of a method body statement needs an "
-                + "explicit reference prefix.";
+        assert methodReference.getReferencePrefix() != null
+                : "Method reference of a method body statement needs an "
+                    + "explicit reference prefix.";
         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
     }
 
@@ -92,8 +93,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         this.methodReference = list.get(MethodReference.class);
 
         assert methodReference != null : "Missing methodreference";
-        assert methodReference.getReferencePrefix() != null : "Method reference of a method body statement needs an "
-                + "explicit reference prefix.";
+        assert methodReference.getReferencePrefix() != null
+                : "Method reference of a method body statement needs an "
+                    + "explicit reference prefix.";
         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
         this.useSpecification = false;
     }
@@ -144,7 +146,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
                     && !((LocationVariable) argument).isMember())
                     || argument instanceof SchemaVariable)) {
                 throw new IllegalArgumentException("Only local variables or schemavariables "
-                        + "allowed as arguments of a method body statement.");
+                    + "allowed as arguments of a method body statement.");
             }
         }
     }
@@ -165,7 +167,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
      * @return the Statement
      */
     public Statement getBody(Services services) {
-        if (method == null) { resolveMethod(services); }
+        if (method == null) {
+            resolveMethod(services);
+        }
         return method.getBody();
     }
 
@@ -176,9 +180,15 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int i = 0;
-        if (bodySource != null) { i++; }
-        if (resultVar != null) { i++; }
-        if (methodReference != null) { i++; }
+        if (bodySource != null) {
+            i++;
+        }
+        if (resultVar != null) {
+            i++;
+        }
+        if (methodReference != null) {
+            i++;
+        }
         return i;
     }
 
@@ -201,22 +211,32 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (bodySource != null) {
-            if (index == 0) { return bodySource; }
+            if (index == 0) {
+                return bodySource;
+            }
             index--;
         }
 
         if (resultVar != null) {
-            if (index == 0) { return resultVar; }
+            if (index == 0) {
+                return resultVar;
+            }
             index--;
         }
 
-        if (methodReference != null) { if (index == 0) { return methodReference; } }
+        if (methodReference != null) {
+            if (index == 0) {
+                return methodReference;
+            }
+        }
 
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public boolean isStatic(Services services) {
-        if (method == null) { resolveMethod(services); }
+        if (method == null) {
+            resolveMethod(services);
+        }
         return method.isStatic();
     }
 
@@ -246,7 +266,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
 
 
     public IProgramMethod getProgramMethod(Services services) {
-        if (method == null) { resolveMethod(services); }
+        if (method == null) {
+            resolveMethod(services);
+        }
         return method;
     }
 

@@ -55,7 +55,9 @@ public final class SideProofUtil {
         final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, false));
         // Set modified taclet options in which runtime exceptions are banned.
         ImmutableSet<Choice> choices = sourceInitConfig.getActivatedChoices();
-        for (Choice enabled : enableChoices) { choices = activateChoice(choices, enabled); }
+        for (Choice enabled : enableChoices) {
+            choices = activateChoice(choices, enabled);
+        }
         initConfig.setActivatedChoices(choices);
         // Initialize InitConfig with settings from the original InitConfig.
         final ProofSettings clonedSettings = sourceInitConfig.getSettings() != null
@@ -101,9 +103,13 @@ public final class SideProofUtil {
         for (Choice choice : choices) {
             if (choiceToActivate.equals(choice)) {
                 alreadySet = true;
-            } else if (choice.category().equals(choiceToActivate.category())) { choices = choices.remove(choice); }
+            } else if (choice.category().equals(choiceToActivate.category())) {
+                choices = choices.remove(choice);
+            }
         }
-        if (!alreadySet) { choices = choices.add(choiceToActivate); }
+        if (!alreadySet) {
+            choices = choices.add(choiceToActivate);
+        }
         return choices;
     }
 

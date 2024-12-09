@@ -21,12 +21,16 @@ public class Z3Socket extends AbstractSolverSocket {
         SolverCommunication sc = pipe.getSolverCommunication();
         if (msg.startsWith("(error")) {
             sc.addMessage(msg, SolverCommunication.MessageType.ERROR);
-            if (msg.contains("WARNING:")) { return; }
+            if (msg.contains("WARNING:")) {
+                return;
+            }
             throw new IOException("Error while executing " + getName() + ": " + msg);
         }
 
         // used only to steer the interaction with the solver and thus filtered out currently
-        if (!msg.equals("success")) { sc.addMessage(msg, SolverCommunication.MessageType.OUTPUT); }
+        if (!msg.equals("success")) {
+            sc.addMessage(msg, SolverCommunication.MessageType.OUTPUT);
+        }
 
         switch (sc.getState()) {
         case WAIT_FOR_RESULT -> {
@@ -53,7 +57,8 @@ public class Z3Socket extends AbstractSolverSocket {
                 sc.setState(WAIT_FOR_DETAILS);
             }
         }
-        case WAIT_FOR_DETAILS -> {}
+        case WAIT_FOR_DETAILS -> {
+        }
         // Currently we rely on the solver to terminate after receiving "(exit)". If this does
         // not work in future, it may be that we have to forcibly close the pipe.
         // if (msg.equals("success")) {

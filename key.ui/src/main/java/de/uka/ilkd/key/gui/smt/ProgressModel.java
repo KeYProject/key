@@ -130,7 +130,9 @@ class ProgressModel extends AbstractTableModel {
 
         public void setEditable(boolean b) {
             isEditable = b;
-            for (ProcessData datum : data) { datum.isEditable = b; }
+            for (ProcessData datum : data) {
+                datum.isEditable = b;
+            }
         }
 
         @Override
@@ -197,7 +199,9 @@ class ProgressModel extends AbstractTableModel {
 
     public void setEditable(boolean b) {
         for (Column column : columns) {
-            if (column instanceof ProcessColumn) { ((ProcessColumn) column).setEditable(b); }
+            if (column instanceof ProcessColumn) {
+                ((ProcessColumn) column).setEditable(b);
+            }
         }
     }
 

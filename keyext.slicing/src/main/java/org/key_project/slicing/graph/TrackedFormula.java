@@ -70,21 +70,29 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
 
     @Override
     public String toString(boolean abbreviated, boolean omitBranch) {
-        if (abbreviated) { return Integer.toHexString(hashCode()); }
+        if (abbreviated) {
+            return Integer.toHexString(hashCode());
+        }
         String term = LogicPrinter.quickPrintTerm(
             formula.formula(),
             services,
             true, // pretty print
             true // using unicode symbols
         ).trim();
-        if (!omitBranch) { term = term + branchLocation.toString(); }
+        if (!omitBranch) {
+            term = term + branchLocation.toString();
+        }
         return !inAntec ? (SEQ_ARROW + " " + term) : (term + " " + SEQ_ARROW);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         TrackedFormula that = (TrackedFormula) o;
         return inAntec == that.inAntec
                 && formula == that.formula
@@ -98,8 +106,12 @@ public class TrackedFormula extends GraphNode implements EqualsModProofIrrelevan
 
     @Override
     public boolean equalsModProofIrrelevancy(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         TrackedFormula that = (TrackedFormula) o;
         return inAntec == that.inAntec
                 && formula.equalsModProofIrrelevancy(that.formula)

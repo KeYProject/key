@@ -61,7 +61,8 @@ public final class JMLTransformer extends JavaTransformer {
             JMLModifier.PROTECTED,
             JMLModifier.PUBLIC, JMLModifier.STATIC);
 
-    public static final DataKey<TextualJMLConstruct> KEY_CONSTRUCT = new DataKey<>() {};
+    public static final DataKey<TextualJMLConstruct> KEY_CONSTRUCT = new DataKey<>() {
+    };
 
     private static ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
     private static final Logger LOGGER = LoggerFactory.getLogger(JMLTransformer.class);
@@ -102,7 +103,9 @@ public final class JMLTransformer extends JavaTransformer {
     private String concatenate(Iterable<Comment> comments) {
         StringBuilder sb = new StringBuilder();
         var iter = comments.iterator();
-        if (!iter.hasNext()) { return sb.toString(); }
+        if (!iter.hasNext()) {
+            return sb.toString();
+        }
         var first = iter.next();
         if (first instanceof BlockComment) {
             sb.append("/*").append(first.getContent()).append("*/");
@@ -155,7 +158,9 @@ public final class JMLTransformer extends JavaTransformer {
         sb.append(getFullText(ctx));
         // TODO this is garbage, see Throwable::cause, protected is not contained in ctx
         int column = ctx.start.getCharPositionInLine() - sb.toString().length();
-        if (column <= 0) { column = 1; }
+        if (column <= 0) {
+            column = 1;
+        }
         var pos = de.uka.ilkd.key.java.Position.newOneBased(ctx.start.getLine(), column);
         var location = new Location(
             MiscTools.getURIFromTokenSource(ctx.start.getTokenSource().getSourceName()), pos);
@@ -168,7 +173,11 @@ public final class JMLTransformer extends JavaTransformer {
      */
     private BlockComment getJMLModComment(ImmutableList<JMLModifier> mods) {
         StringBuilder sb = new StringBuilder("@");
-        for (var mod : mods) { if (!JAVA_MODS.contains(mod)) { sb.append(mod.toString()).append(" "); } }
+        for (var mod : mods) {
+            if (!JAVA_MODS.contains(mod)) {
+                sb.append(mod.toString()).append(" ");
+            }
+        }
         sb.append("@");
         return new BlockComment(sb.toString());
     }
@@ -187,7 +196,9 @@ public final class JMLTransformer extends JavaTransformer {
             pe.setRange(range.withBegin(newPos));
 
             // recurse to children
-            for (Node childNode : pe.getChildNodes()) { updatePositionInformation(childNode, pos); }
+            for (Node childNode : pe.getChildNodes()) {
+                updatePositionInformation(childNode, pos);
+            }
         }
     }
 
@@ -290,7 +301,9 @@ public final class JMLTransformer extends JavaTransformer {
         var block = services.getParser().parseBlock(
             fillWithWhitespaces(declWithMods.location.getPosition(),
                 "{" + declWithMods.text + "}"));
-        if (!block.isSuccessful()) { throw new SLTranslationException("", declWithMods.location); }
+        if (!block.isSuccessful()) {
+            throw new SLTranslationException("", declWithMods.location);
+        }
         List<Statement> declStatement = block.getResult().get().getStatements();
         assert declStatement.size() == 1;
         // updatePositionInformation(fieldDecl, declWithMods.pos);
@@ -327,16 +340,22 @@ public final class JMLTransformer extends JavaTransformer {
         MethodDeclaration methodDecl;
         var md = services.getParser()
                 .parseMethodDeclaration(declWithMods.text);
-        if (md.getResult().isEmpty()) { throw new SLTranslationException(
-            "could not parse", declWithMods.location); }
+        if (md.getResult().isEmpty()) {
+            throw new SLTranslationException(
+                "could not parse", declWithMods.location);
+        }
         methodDecl = md.getResult().get();
         updatePositionInformation(methodDecl, declWithMods.location.getPosition());
         // about the 0 see the comment in transformFieldDecl() above
 
         // add model modifier
         methodDecl.addModifier(Modifier.Keyword.MODEL);
-        if (decl.getModifiers().contains(JMLModifier.TWO_STATE)) { methodDecl.addModifier(Modifier.Keyword.TWO_STATE); }
-        if (decl.getModifiers().contains(JMLModifier.NO_STATE)) { methodDecl.addModifier(Modifier.Keyword.NO_STATE); }
+        if (decl.getModifiers().contains(JMLModifier.TWO_STATE)) {
+            methodDecl.addModifier(Modifier.Keyword.TWO_STATE);
+        }
+        if (decl.getModifiers().contains(JMLModifier.NO_STATE)) {
+            methodDecl.addModifier(Modifier.Keyword.NO_STATE);
+        }
 
         // set comments: the original list of comments with the declaration,
         // and the JML modifiers
@@ -414,10 +433,14 @@ public final class JMLTransformer extends JavaTransformer {
             throws SLTranslationException {
         List<Comment> comments = extractData(child, JMLCommentTransformer.BEFORE_COMMENTS)
                 .orElse(new ArrayList<>());
-        if (!comments.isEmpty()) { child.setAssociatedSpecificationComments(new NodeList<>(comments)); }
+        if (!comments.isEmpty()) {
+            child.setAssociatedSpecificationComments(new NodeList<>(comments));
+        }
         comments.addAll(extractData(child, JMLCommentTransformer.AFTER_COMMENTS)
                 .orElse(Collections.emptyList()));
-        if (comments.isEmpty()) { return; }
+        if (comments.isEmpty()) {
+            return;
+        }
         // concatenate comments of child, determine position
         String concatenatedComment = concatenate(comments);
         Position astPos = comments.get(0).getRange().get().begin;
@@ -443,8 +466,12 @@ public final class JMLTransformer extends JavaTransformer {
     private static Optional<BlockStmt> findInnermostBlock(Node node) {
         while (true) {
             node = node.getParentNode().get();
-            if (node instanceof BlockStmt) { return Optional.of((BlockStmt) node); }
-            if (node.getParentNode().isEmpty()) { return Optional.empty(); }
+            if (node instanceof BlockStmt) {
+                return Optional.of((BlockStmt) node);
+            }
+            if (node.getParentNode().isEmpty()) {
+                return Optional.empty();
+            }
         }
     }
 
@@ -489,7 +516,9 @@ public final class JMLTransformer extends JavaTransformer {
             throws SLTranslationException {
         // recurse to all pre-existing children
         var children = pe.getChildNodes().toArray(new Node[0]);
-        for (Node aChildren : children) { transformMethodLevelCommentsHelper(aChildren, fileName); }
+        for (Node aChildren : children) {
+            transformMethodLevelCommentsHelper(aChildren, fileName);
+        }
 
         // get comments
         var before = extractData(pe, JMLCommentTransformer.BEFORE_COMMENTS);
@@ -576,7 +605,9 @@ public final class JMLTransformer extends JavaTransformer {
         class TypesCollector extends VoidVisitorWithDefaults<Void> {
             @Override
             public void defaultAction(Node n, Void arg) {
-                if (n instanceof TypeDeclaration) { seq.add((TypeDeclaration<?>) n); }
+                if (n instanceof TypeDeclaration) {
+                    seq.add((TypeDeclaration<?>) n);
+                }
             }
         }
         unit.accept(new TypesCollector(), null);
@@ -586,7 +617,9 @@ public final class JMLTransformer extends JavaTransformer {
     @Override
     public void apply(CompilationUnit cu) {
         // abort if JML is disabled
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isUseJML()) { return; }
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isUseJML()) {
+            return;
+        }
 
         try {
             URI resource = cu.getStorage()

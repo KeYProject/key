@@ -201,7 +201,9 @@ public class JavaService {
         }
 
         var errors = new ArrayList<BuildingIssue>(result.getProblems().size());
-        for (Problem problem : result.getProblems()) { errors.add(buildingIssueFromProblem(source, problem)); }
+        for (Problem problem : result.getProblems()) {
+            errors.add(buildingIssueFromProblem(source, problem));
+        }
 
         throw new BuildingExceptions(errors);
     }
@@ -216,7 +218,9 @@ public class JavaService {
         }
         try (BufferedReader br = new BufferedReader(is)) {
             ParseResult<CompilationUnit> cu = programFactory.parseCompilationUnit(br);
-            if (cu.getResult().isPresent()) { cu.getResult().get().setStorage(filename); }
+            if (cu.getResult().isPresent()) {
+                cu.getResult().get().setStorage(filename);
+            }
             return cu;
         }
     }
@@ -251,7 +255,9 @@ public class JavaService {
         programFactory.addUserClasses(cus);
         transformModel(Collections.unmodifiableList(cus));
         var result = new ArrayList<de.uka.ilkd.key.java.ast.CompilationUnit>(cus.size());
-        for (CompilationUnit cu : cus) { result.add(converter.processCompilationUnit(cu)); }
+        for (CompilationUnit cu : cus) {
+            result.add(converter.processCompilationUnit(cu));
+        }
         return result;
     }
 
@@ -276,20 +282,28 @@ public class JavaService {
     // ----- parsing libraries
 
     private static void fixupPackageDeclaration(CompilationUnit cu, String relativePath) {
-        if (cu.getPackageDeclaration().isPresent()) { return; }
-        if (relativePath == null) { throw new NullPointerException(); }
+        if (cu.getPackageDeclaration().isPresent()) {
+            return;
+        }
+        if (relativePath == null) {
+            throw new NullPointerException();
+        }
         var pkg = relativePath;
-        if (pkg.endsWith(".java")) { pkg = pkg.substring(0, pkg.length() - 5); }
+        if (pkg.endsWith(".java")) {
+            pkg = pkg.substring(0, pkg.length() - 5);
+        }
         pkg = pkg.replace('\\', '.').replace('/', '.');
         var lastDot = pkg.lastIndexOf('.');
-        if (lastDot == -1) { return; }
+        if (lastDot == -1) {
+            return;
+        }
         pkg = pkg.substring(0, lastDot);
         try {
             cu.setPackageDeclaration(pkg);
         } catch (ParseProblemException ignored) {
             LOGGER.warn("Failed to construct a package name for the java file " + relativePath
-                    + ", it might contain invalid characters. "
-                    + "Add a package declaration to the file or rename its folder");
+                + ", it might contain invalid characters. "
+                + "Add a package declaration to the file or rename its folder");
         }
     }
 
@@ -480,7 +494,9 @@ public class JavaService {
             parseLibraryPaths(fileRepo);
 
             // Make sure some required types are registered
-            for (var type : ResolvedPrimitiveType.values()) { typeConverter.getKeYJavaType(type); }
+            for (var type : ResolvedPrimitiveType.values()) {
+                typeConverter.getKeYJavaType(type);
+            }
             typeConverter.getKeYJavaType(NullType.INSTANCE);
             typeConverter.getKeYJavaType(ResolvedVoidType.INSTANCE);
         } catch (IOException e) {
@@ -501,7 +517,9 @@ public class JavaService {
          * specialClasses.addAll(dynamicallyCreatedCompilationUnits);
          */
 
-        for (CompilationUnit cu : libraryClasses) { converter.processCompilationUnit(cu); }
+        for (CompilationUnit cu : libraryClasses) {
+            converter.processCompilationUnit(cu);
+        }
         LOGGER.debug("Finished processing library classes");
     }
 
@@ -529,12 +547,19 @@ public class JavaService {
                         .orElse(false))
                 .findFirst()
                 .orElse(null);
-        if (object != null) { converter.processCompilationUnit(object); }
+        if (object != null) {
+            converter.processCompilationUnit(object);
+        }
 
         var obj = typeConverter.getObjectType();
         assert obj != null && obj.getJavaType() != null : "java.lang.Object has to be available";
 
-        for (CompilationUnit cu : bootClasses) { if (cu == object) { continue; } converter.processCompilationUnit(cu); }
+        for (CompilationUnit cu : bootClasses) {
+            if (cu == object) {
+                continue;
+            }
+            converter.processCompilationUnit(cu);
+        }
         LOGGER.debug("Finished processing internal classes");
     }
 
@@ -650,7 +675,9 @@ public class JavaService {
         Set<String> names = new HashSet<>();
 
         for (ProgramVariable var : vars) {
-            if (names.contains(var.name().toString())) { continue; }
+            if (names.contains(var.name().toString())) {
+                continue;
+            }
             names.add(var.name().toString());
 
             if (var.getKeYJavaType() == null) {
@@ -664,7 +691,9 @@ public class JavaService {
             }
 
             Type javaType = var.getKeYJavaType().getJavaType();
-            if (javaType == null) { continue; }
+            if (javaType == null) {
+                continue;
+            }
 
             var existingSpec = lookupVarSpec(var);
             FieldSpecification keySpec;

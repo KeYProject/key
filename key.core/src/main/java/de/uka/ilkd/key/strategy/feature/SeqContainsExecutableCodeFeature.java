@@ -40,7 +40,9 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
             Services services) {
         while (it.hasNext()) {
             if (tf.compute(it.next().formula(), mState, services)
-                    .equals(BinaryTermFeature.ZERO_COST)) { return true; }
+                    .equals(BinaryTermFeature.ZERO_COST)) {
+                return true;
+            }
         }
         return false;
     }

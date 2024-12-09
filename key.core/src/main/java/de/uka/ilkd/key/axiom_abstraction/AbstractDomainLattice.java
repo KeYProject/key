@@ -47,7 +47,9 @@ public abstract class AbstractDomainLattice
         for (AbstractDomainElement elem : this) {
             Term toProve = getSideConditionForAxiom(state, term, elem, services);
 
-            if (isProvableWithSplitting(toProve, services, AXIOM_PROVE_TIMEOUT_MS)) { return elem; }
+            if (isProvableWithSplitting(toProve, services, AXIOM_PROVE_TIMEOUT_MS)) {
+                return elem;
+            }
         }
 
         return Top.getInstance();
@@ -91,7 +93,9 @@ public abstract class AbstractDomainLattice
 
     @Override
     public PartialComparisonResult compare(AbstractDomainElement a, AbstractDomainElement b) {
-        if (a.equals(b)) { return PartialComparisonResult.EQ; }
+        if (a.equals(b)) {
+            return PartialComparisonResult.EQ;
+        }
 
         AbstractDomainElement joinRes = join(a, b);
         if (joinRes.equals(a)) {
@@ -127,7 +131,11 @@ public abstract class AbstractDomainLattice
      *         if s cannot be parsed.
      */
     public AbstractDomainElement fromString(String s, Services services) {
-        for (AbstractDomainElement elem : this) { if (elem.toParseableString(services).equals(s)) { return elem; } }
+        for (AbstractDomainElement elem : this) {
+            if (elem.toParseableString(services).equals(s)) {
+                return elem;
+            }
+        }
 
         throw new RuntimeException("No element is represented by the given String '" + s + "'.");
     }

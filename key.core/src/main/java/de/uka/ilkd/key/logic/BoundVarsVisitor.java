@@ -39,7 +39,9 @@ public class BoundVarsVisitor implements DefaultVisitor {
      * visits a sequent
      */
     public void visit(Sequent visited) {
-        for (SequentFormula cf : visited) { visit(cf.formula()); }
+        for (SequentFormula cf : visited) {
+            visit(cf.formula());
+        }
     }
 
     /**

@@ -89,7 +89,9 @@ public class StatisticsFile implements Serializable {
         @Override
         String[] computeSumAndAverage(List<String> list) {
             long sum = 0;
-            for (String s : list) { sum += Long.parseLong(s); }
+            for (String s : list) {
+                sum += Long.parseLong(s);
+            }
             double avg = ((double) sum) / ((double) list.size());
             return new String[] { "" + sum, "" + avg };
         }
@@ -104,7 +106,9 @@ public class StatisticsFile implements Serializable {
         @Override
         String[] computeSumAndAverage(List<String> list) {
             double sum = 0.0;
-            for (String s : list) { sum += Double.parseDouble(s); }
+            for (String s : list) {
+                sum += Double.parseDouble(s);
+            }
             double avg = sum / ((double) list.size());
             return new String[] { "" + sum, "" + avg };
         }
@@ -136,7 +140,9 @@ public class StatisticsFile implements Serializable {
         boolean printHeader = !statisticsFile.exists();
 
         // Create parent directory if it does not exist yet.
-        if (!statisticsFile.getParentFile().exists()) { statisticsFile.getParentFile().mkdirs(); }
+        if (!statisticsFile.getParentFile().exists()) {
+            statisticsFile.getParentFile().mkdirs();
+        }
 
         // Delete old statistics file if it exists already.
         if (delete && statisticsFile.exists()) {
@@ -148,7 +154,9 @@ public class StatisticsFile implements Serializable {
         if (printHeader) {
             // Write column names in the first line of statistics file.
             List<String> columnNames = new LinkedList<>();
-            for (Column<?> column : columns) { columnNames.add(column.name); }
+            for (Column<?> column : columns) {
+                columnNames.add(column.name);
+            }
             writeLine(columnNames);
         }
     }
@@ -168,7 +176,11 @@ public class StatisticsFile implements Serializable {
         final PrintWriter statPrinter = new PrintWriter(statisticsFileWriter);
         StringBuilder line = new StringBuilder();
         boolean first = true;
-        for (String entry : entries) { line.append(first ? "" : "|"); line.append(entry); first = false; }
+        for (String entry : entries) {
+            line.append(first ? "" : "|");
+            line.append(entry);
+            first = false;
+        }
         statPrinter.println(line);
         statPrinter.close();
         statisticsFileWriter.close();
@@ -189,7 +201,9 @@ public class StatisticsFile implements Serializable {
         Statistics statistics = proof.getStatistics();
         boolean proofClosed = proof.closed();
         List<String> entries = new LinkedList<>();
-        for (Column<?> column : columns) { entries.add(column.addEntry(statistics, keyFile, proofClosed).toString()); }
+        for (Column<?> column : columns) {
+            entries.add(column.addEntry(statistics, keyFile, proofClosed).toString());
+        }
         writeLine(entries);
     }
 
@@ -205,14 +219,18 @@ public class StatisticsFile implements Serializable {
             // Convert statistics table into an array of lists.
             @SuppressWarnings("unchecked")
             List<String>[] lists = new List[columns.length];
-            for (int i = 0; i < lists.length; i++) { lists[i] = new LinkedList<>(); }
+            for (int i = 0; i < lists.length; i++) {
+                lists[i] = new LinkedList<>();
+            }
             for (String row; (row = br.readLine()) != null;) {
                 String[] column = row.split("\\|");
                 if (column.length != columns.length) {
                     throw new RuntimeException(
                         "Wrong number of columns after parsing statistics table.");
                 }
-                for (int i = 0; i < lists.length; i++) { lists[i].add(column[i]); }
+                for (int i = 0; i < lists.length; i++) {
+                    lists[i].add(column[i]);
+                }
             }
 
             /*
@@ -225,7 +243,8 @@ public class StatisticsFile implements Serializable {
             for (int i = 1 /* Omit first column. */; i < columns.length; i++) {
                 Column<?> column = columns[i];
                 String[] sumAndAverage = column.computeSumAndAverage(lists[i]);
-                assert sumAndAverage.length == 2 : "Expecting exactly 2 strings returned by computeSumAndAverage()";
+                assert sumAndAverage.length == 2
+                        : "Expecting exactly 2 strings returned by computeSumAndAverage()";
                 sums.add(sumAndAverage[0]);
                 if (i != 6) {
                     avgs.add(sumAndAverage[1]);
@@ -253,7 +272,9 @@ public class StatisticsFile implements Serializable {
              * Create *.sum.properties and *.avg.properties files for Jenkins.
              */
             String jobName = System.getenv("JOB_NAME");
-            if (jobName == null) { jobName = "local"; }
+            if (jobName == null) {
+                jobName = "local";
+            }
             String url =
                 "URL=http://hudson.se.informatik.tu-darmstadt.de/userContent/statistics-" + jobName;
             File statisticsDir = statisticsFile.getParentFile();
@@ -303,7 +324,9 @@ public class StatisticsFile implements Serializable {
         @Override
         String[] computeSumAndAverage(List<String> list) {
             long sum = 0;
-            for (String s : list) { sum += Long.parseLong(s); }
+            for (String s : list) {
+                sum += Long.parseLong(s);
+            }
             double avg = ((double) sum) / ((double) list.size());
             return new String[] { "" + sum, "" + avg };
         }

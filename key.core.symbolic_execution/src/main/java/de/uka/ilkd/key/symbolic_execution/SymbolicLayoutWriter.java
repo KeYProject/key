@@ -191,7 +191,9 @@ public class SymbolicLayoutWriter extends AbstractWriter {
             appendEquivalenceClass(level + 1, ec, sb);
         }
         appendState(level + 1, model, model.getState(), sb);
-        for (ISymbolicObject object : model.getObjects()) { appendObject(level + 1, model, object, sb); }
+        for (ISymbolicObject object : model.getObjects()) {
+            appendObject(level + 1, model, object, sb);
+        }
         appendEndTag(level, TAG_MODEL, sb);
     }
 
@@ -237,7 +239,9 @@ public class SymbolicLayoutWriter extends AbstractWriter {
         Map<String, String> attributeValues = new LinkedHashMap<>();
         attributeValues.put(ATTRIBUTE_NAME, state.getName());
         appendStartTag(level, TAG_STATE, attributeValues, sb);
-        for (ISymbolicValue value : state.getValues()) { appendValue(level + 1, value, sb); }
+        for (ISymbolicValue value : state.getValues()) {
+            appendValue(level + 1, value, sb);
+        }
         for (ISymbolicAssociation association : state.getAssociations()) {
             appendAssociation(level + 1, model, association, sb);
         }
@@ -264,7 +268,9 @@ public class SymbolicLayoutWriter extends AbstractWriter {
         attributeValues.put(ATTRIBUTE_NAME, object.getNameString());
         attributeValues.put(ATTRIBUTE_TYPE, object.getTypeString());
         appendStartTag(level, TAG_OBJECT, attributeValues, sb);
-        for (ISymbolicValue value : object.getValues()) { appendValue(level + 1, value, sb); }
+        for (ISymbolicValue value : object.getValues()) {
+            appendValue(level + 1, value, sb);
+        }
         for (ISymbolicAssociation association : object.getAssociations()) {
             appendAssociation(level + 1, model, association, sb);
         }
@@ -338,7 +344,9 @@ public class SymbolicLayoutWriter extends AbstractWriter {
         Iterator<ISymbolicObject> iter = model.getObjects().iterator();
         while (index < 0 && iter.hasNext()) {
             ISymbolicObject next = iter.next();
-            if (next == object) { index = i; }
+            if (next == object) {
+                index = i;
+            }
             i++;
         }
         return "o" + (index + 1);

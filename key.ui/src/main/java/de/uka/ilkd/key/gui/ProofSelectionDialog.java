@@ -95,7 +95,9 @@ public final class ProofSelectionDialog extends JDialog {
             dispose();
         });
         // disable "Ok" button if no proof was found
-        if (list.getModel().getSize() == 0) { okButton.setEnabled(false); }
+        if (list.getModel().getSize() == 0) {
+            okButton.setEnabled(false);
+        }
         buttonPanel.add(okButton);
         getRootPane().setDefaultButton(okButton);
 
@@ -136,7 +138,9 @@ public final class ProofSelectionDialog extends JDialog {
 
         // show the list in a JList
         DefaultListModel<Path> model = new DefaultListModel<>();
-        for (Path p : proofs) { model.addElement(p); }
+        for (Path p : proofs) {
+            model.addElement(p);
+        }
         JList<Path> list = new JList<>(model);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
@@ -228,7 +232,9 @@ public final class ProofSelectionDialog extends JDialog {
      *         the given path does not denote a bundle
      */
     public static Path chooseProofToLoad(Path bundlePath) {
-        if (isProofBundle(bundlePath)) { return showDialog(bundlePath); }
+        if (isProofBundle(bundlePath)) {
+            return showDialog(bundlePath);
+        }
         return null;
     }
 

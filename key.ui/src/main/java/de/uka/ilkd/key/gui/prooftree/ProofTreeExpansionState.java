@@ -180,7 +180,9 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     public void disconnect() {
         tree.removeTreeExpansionListener(listener);
         TreeModel data = tree.getModel();
-        if (data != null) { data.removeTreeModelListener(listener); }
+        if (data != null) {
+            data.removeTreeModelListener(listener);
+        }
     }
 
     @Override
@@ -246,11 +248,15 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     public static void collapseAll(JTree tree) {
         TreeModel data = tree.getModel();
 
-        if (data == null) { return; }
+        if (data == null) {
+            return;
+        }
 
         Object root = data.getRoot();
 
-        if (root == null || data.isLeaf(root)) { return; }
+        if (root == null || data.isLeaf(root)) {
+            return;
+        }
 
         TreePath rootPath = new TreePath(root);
 
@@ -258,7 +264,9 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
         collapseAllBelow(tree, rootPath);
 
-        if (rootExpanded && !tree.isRootVisible()) { tree.expandPath(rootPath); }
+        if (rootExpanded && !tree.isRootVisible()) {
+            tree.expandPath(rootPath);
+        }
     }
 
     /**
@@ -277,7 +285,9 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         for (int count = data.getChildCount(node), i = 0; i < count; i++) {
             Object child = data.getChild(node, i);
 
-            if (!data.isLeaf(child)) { collapseAllBelow(tree, path.pathByAddingChild(child)); }
+            if (!data.isLeaf(child)) {
+                collapseAllBelow(tree, path.pathByAddingChild(child));
+            }
         }
 
         // cannot check, since we cannot assume all ancestors
@@ -301,11 +311,15 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     public static void expandAll(JTree tree, Predicate<TreePath> filter) {
         TreeModel data = tree.getModel();
 
-        if (data == null) { return; }
+        if (data == null) {
+            return;
+        }
 
         Object root = data.getRoot();
 
-        if (root == null || data.isLeaf(root)) { return; }
+        if (root == null || data.isLeaf(root)) {
+            return;
+        }
 
         expandAllBelow(tree, new TreePath(root), filter);
     }
@@ -327,11 +341,17 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         // paths set) before expanding
         TreeExpansionListener[] expansionListeners = tree.getTreeExpansionListeners();
         for (TreeExpansionListener exl : expansionListeners) {
-            if (!(exl instanceof Listener)) { tree.removeTreeExpansionListener(exl); }
+            if (!(exl instanceof Listener)) {
+                tree.removeTreeExpansionListener(exl);
+            }
         }
-        for (TreePath tp : extremalPaths(tree.getModel(), path, filter)) { tree.expandPath(tp); }
+        for (TreePath tp : extremalPaths(tree.getModel(), path, filter)) {
+            tree.expandPath(tp);
+        }
         for (TreeExpansionListener exl : expansionListeners) {
-            if (!(exl instanceof Listener)) { tree.addTreeExpansionListener(exl); }
+            if (!(exl instanceof Listener)) {
+                tree.addTreeExpansionListener(exl);
+            }
         }
         // inform the listeners for drawing
         tree.fireTreeExpanded(path);
@@ -377,12 +397,16 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
         if (!hasNonLeafChildren) {
             // filtered out nodes (e.g. OSS nodes) must not be expanded
-            if (filter.test(path)) { result.add(path); }
+            if (filter.test(path)) {
+                result.add(path);
+            }
         } else {
             for (int i = 0; i < count; i++) {
                 Object child = data.getChild(node, i);
 
-                if (!data.isLeaf(child)) { extremalPathsImpl(data, path.pathByAddingChild(child), result, filter); }
+                if (!data.isLeaf(child)) {
+                    extremalPathsImpl(data, path.pathByAddingChild(child), result, filter);
+                }
             }
         }
     }
@@ -403,23 +427,31 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
         TreeModel data = tree.getModel();
 
-        if (data == null) { return result; }
+        if (data == null) {
+            return result;
+        }
 
         Object root = data.getRoot();
 
-        if (root == null || data.isLeaf(root)) { return result; }
+        if (root == null || data.isLeaf(root)) {
+            return result;
+        }
 
         /*
          * To avoid unnecessary events caused by temporary expansion, we disable the listeners. This
          * makes the method an order of a magnitude faster for large proofs.
          */
         TreeExpansionListener[] treeExpansionListeners = tree.getTreeExpansionListeners();
-        for (TreeExpansionListener tel : treeExpansionListeners) { tree.removeTreeExpansionListener(tel); }
+        for (TreeExpansionListener tel : treeExpansionListeners) {
+            tree.removeTreeExpansionListener(tel);
+        }
 
         pathsImpl(tree, data, new TreePath(root), result);
 
         // reenable listeners
-        for (TreeExpansionListener tel : treeExpansionListeners) { tree.addTreeExpansionListener(tel); }
+        for (TreeExpansionListener tel : treeExpansionListeners) {
+            tree.addTreeExpansionListener(tel);
+        }
 
         return result;
     }
@@ -439,10 +471,14 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         for (int count = data.getChildCount(node), i = 0; i < count; i++) {
             Object child = data.getChild(node, i);
 
-            if (!data.isLeaf(child)) { pathsImpl(tree, data, path.pathByAddingChild(child), result); }
+            if (!data.isLeaf(child)) {
+                pathsImpl(tree, data, path.pathByAddingChild(child), result);
+            }
         }
 
-        if (!expanded) { tree.collapsePath(path); }
+        if (!expanded) {
+            tree.collapsePath(path);
+        }
     }
 
 
@@ -459,23 +495,31 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
     public static void setPaths(@NonNull JTree tree, @NonNull Collection<TreePath> paths) {
         TreeModel data = tree.getModel();
 
-        if (data == null) { return; }
+        if (data == null) {
+            return;
+        }
 
         Object root = data.getRoot();
 
-        if (root == null || data.isLeaf(root)) { return; }
+        if (root == null || data.isLeaf(root)) {
+            return;
+        }
 
         // temporarily disable the listeners to avoid flooding them with events
         TreeExpansionListener[] expansionListeners = tree.getTreeExpansionListeners();
         for (TreeExpansionListener exl : expansionListeners) {
-            if (!(exl instanceof Listener)) { tree.removeTreeExpansionListener(exl); }
+            if (!(exl instanceof Listener)) {
+                tree.removeTreeExpansionListener(exl);
+            }
         }
 
         setPathsImpl(tree, data, new TreePath(root), Integer.MAX_VALUE, paths);
 
         // reenable listeners
         for (TreeExpansionListener exl : expansionListeners) {
-            if (!(exl instanceof Listener)) { tree.addTreeExpansionListener(exl); }
+            if (!(exl instanceof Listener)) {
+                tree.addTreeExpansionListener(exl);
+            }
         }
 
         // inform the listeners for redrawing
@@ -500,11 +544,15 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         // Since this is post-order, it doesn't matter that the ancestors are
         // also expanded. They will be handled afterwards.
         if (paths.contains(start)) {
-            if (!tree.isExpanded(start)) { tree.expandPath(start); }
+            if (!tree.isExpanded(start)) {
+                tree.expandPath(start);
+            }
         } else {
             // The ancestors are always expanded, so isCollapse() won't give
             // wrong results.
-            if (!tree.isCollapsed(start)) { tree.collapsePath(start); }
+            if (!tree.isCollapsed(start)) {
+                tree.collapsePath(start);
+            }
         }
     }
 
@@ -533,7 +581,9 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
             Object[] children = e.getChildren();
 
-            for (Object aChildren : children) { removeDescendants(parent.pathByAddingChild(aChildren)); }
+            for (Object aChildren : children) {
+                removeDescendants(parent.pathByAddingChild(aChildren));
+            }
         }
 
         @Override
@@ -555,7 +605,9 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
             } else {
                 removeDescendants(path);
 
-                if (tree.isExpanded(path)) { paths.add(path); }
+                if (tree.isExpanded(path)) {
+                    paths.add(path);
+                }
             }
         }
 

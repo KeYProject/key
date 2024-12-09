@@ -68,7 +68,9 @@ public class ValueInjector {
      * @see #createDefault()
      */
     public static ValueInjector getInstance() {
-        if (instance == null) { instance = createDefault(); }
+        if (instance == null) {
+            instance = createDefault();
+        }
         return instance;
     }
 

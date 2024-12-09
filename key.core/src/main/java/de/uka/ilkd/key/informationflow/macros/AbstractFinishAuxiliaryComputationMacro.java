@@ -86,7 +86,11 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
     }
 
     private final <E extends Named> void mergeNamespace(Namespace<E> tar, Namespace<E> src) {
-        for (E el : src.allElements()) { if (!tar.contains(el)) { tar.add(el); } }
+        for (E el : src.allElements()) {
+            if (!tar.contains(el)) {
+                tar.add(el);
+            }
+        }
     }
 
     private static Term[] buildExecution(ProofObligationVars c, Map<Term, Term> vsMap,
@@ -107,7 +111,10 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
     private static Term[] buildFormulasFromGoals(ImmutableList<Goal> symbExecGoals) {
         Term[] result = new Term[symbExecGoals.size()];
         int i = 0;
-        for (final Goal symbExecGoal : symbExecGoals) { result[i] = buildFormulaFromGoal(symbExecGoal); i++; }
+        for (final Goal symbExecGoal : symbExecGoals) {
+            result[i] = buildFormulaFromGoal(symbExecGoal);
+            i++;
+        }
         return result;
     }
 
@@ -115,7 +122,9 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         final TermBuilder tb = symbExecGoal.proof().getServices().getTermBuilder();
         final TermFactory tf = symbExecGoal.proof().getServices().getTermFactory();
         Term result = tb.tt();
-        for (final SequentFormula f : symbExecGoal.sequent().antecedent()) { result = tb.and(result, f.formula()); }
+        for (final SequentFormula f : symbExecGoal.sequent().antecedent()) {
+            result = tb.and(result, f.formula());
+        }
         for (final SequentFormula f : symbExecGoal.sequent().succedent()) {
             result = tb.and(result, tb.not(f.formula()));
         }

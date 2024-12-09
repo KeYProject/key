@@ -38,7 +38,9 @@ public class JoinIsApplicable {
      *         applicable).
      */
     public List<ProspectivePartner> isApplicable(Goal goal, PosInOccurrence pio) {
-        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) { return new LinkedList<>(); }
+        if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
+            return new LinkedList<>();
+        }
         return computeProspecitvePartner(goal, pio);
     }
 
@@ -58,7 +60,9 @@ public class JoinIsApplicable {
         for (Goal g2 : goal.proof().openGoals()) {
             if (g2 != goal) {
                 ProspectivePartner pair = areProspectivePartners(goal, pio, g2);
-                if (pair != null) { partners.add(pair); }
+                if (pair != null) {
+                    partners.add(pair);
+                }
             }
         }
 

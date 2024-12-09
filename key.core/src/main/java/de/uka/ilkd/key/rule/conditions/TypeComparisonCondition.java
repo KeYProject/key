@@ -111,20 +111,30 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                 return fstSort == sndSort;
             }
             case IS_SUBTYPE -> {
-                if (proxy2) { return false; }
-                // If one of the extended types is a subtype to sndSort, then so
-                // is the proxy sort.
-                assert proxy1;
-                for (Sort extSort : fstSort.extendsSorts()) { if (extSort.extendsTrans(sndSort)) { return true; } }
-                return false;
-            }
-            case STRICT_SUBTYPE -> {
-                if (proxy2) { return false; }
+                if (proxy2) {
+                    return false;
+                }
                 // If one of the extended types is a subtype to sndSort, then so
                 // is the proxy sort.
                 assert proxy1;
                 for (Sort extSort : fstSort.extendsSorts()) {
-                    if (extSort != sndSort && extSort.extendsTrans(sndSort)) { return true; }
+                    if (extSort.extendsTrans(sndSort)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            case STRICT_SUBTYPE -> {
+                if (proxy2) {
+                    return false;
+                }
+                // If one of the extended types is a subtype to sndSort, then so
+                // is the proxy sort.
+                assert proxy1;
+                for (Sort extSort : fstSort.extendsSorts()) {
+                    if (extSort != sndSort && extSort.extendsTrans(sndSort)) {
+                        return true;
+                    }
                 }
                 return false;
             }
@@ -195,7 +205,9 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
      */
     private boolean checkDisjointness(Sort fstSort, Sort sndSort, Services services) {
         // sorts identical?
-        if (fstSort == sndSort) { return false; }
+        if (fstSort == sndSort) {
+            return false;
+        }
 
         // result cached?
         Boolean result = lookupInCache(fstSort, sndSort, services.getCaches());

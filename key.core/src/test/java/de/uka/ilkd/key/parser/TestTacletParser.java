@@ -107,8 +107,12 @@ public class TestTacletParser {
     public Sequent sequent(String a, String s) {
         Semisequent ass = Semisequent.EMPTY_SEMISEQUENT;
         Semisequent sss = Semisequent.EMPTY_SEMISEQUENT;
-        if (a != null) { ass = sseq(a); }
-        if (s != null) { sss = sseq(s); }
+        if (a != null) {
+            ass = sseq(a);
+        }
+        if (s != null) {
+            sss = sseq(s);
+        }
         return Sequent.createSequent(ass, sss);
     }
 
@@ -253,7 +257,7 @@ public class TestTacletParser {
         Taclet exconjsplit = builder.getRewriteTaclet();
         String exconjsplitString =
             "exists_conj_split{" + "\\find(\\exists z; ( b & b0 )) \\varcond(\\notFreeIn(z, b)) \n"
-                    + "\\replacewith( b & \\exists z; b0 )}";
+                + "\\replacewith( b & \\exists z; b0 )}";
         assertEquals(exconjsplit, parseTaclet(exconjsplitString), "ex-conj-split");
     }
 
@@ -292,14 +296,14 @@ public class TestTacletParser {
         builder.setName(new Name("make_insert_eq"));
         Taclet makeinserteq = builder.getAntecTaclet();
         String makeinserteqString = "make_insert_eq" + "{\\find (x = x0 ==>)"
-                + "\\addrules ( insert_eq{\\find (x) \\replacewith (x0)} )}";
+            + "\\addrules ( insert_eq{\\find (x) \\replacewith (x0)} )}";
         assertEquals(makeinserteq, parseTaclet(makeinserteqString), "make-insert-eq");
     }
 
     @Test
     public void testSchemaJava0() {
         parseTaclet("while_right { \\find (\\<{.. while(#e2) {#p1} ...}\\>post)"
-                + "\\replacewith (\\<{.. #unwind-loop (#inner, #outer, while(#e2) {#p1});  ...}\\>post) } ");
+            + "\\replacewith (\\<{.. #unwind-loop (#inner, #outer, while(#e2) {#p1});  ...}\\>post) } ");
 
     }
 
@@ -307,7 +311,7 @@ public class TestTacletParser {
     public void testSchemaJava4() {
         FindTaclet taclet =
             (FindTaclet) parseTaclet("variable_declaration{ \\find (\\<{.. #typ #v0; ...}\\>post)"
-                    + " \\replacewith (\\<{.. #typ #v0; if (true); ...}\\>post)	}");
+                + " \\replacewith (\\<{.. #typ #v0; if (true); ...}\\>post)	}");
         Term find = taclet.find();
         JavaBlock jb = find.javaBlock();
 
@@ -327,7 +331,7 @@ public class TestTacletParser {
     public void testSchemaJava6() {
         FindTaclet taclet =
             (FindTaclet) parseTaclet("xy{ \\find (\\<{.. boolean #boolv; ...}\\>post)"
-                    + " \\replacewith (\\<{.. if (true); ...}\\>post)	}");
+                + " \\replacewith (\\<{.. if (true); ...}\\>post)	}");
         Term find = taclet.find();
         JavaBlock jb = find.javaBlock();
 
@@ -341,7 +345,7 @@ public class TestTacletParser {
     public void testSchemaJava8() {
         FindTaclet taclet =
             (FindTaclet) parseTaclet("break_test {\\find(\\<{.. #lb0:{ break #lb1; } ...}\\>post)"
-                    + " \\replacewith (\\<{..  ...}\\>post)}");
+                + " \\replacewith (\\<{..  ...}\\>post)}");
         Term find = taclet.find();
         JavaBlock jb = find.javaBlock();
         ContextStatementBlock ct = (ContextStatementBlock) jb.program();
@@ -356,18 +360,22 @@ public class TestTacletParser {
         ContextStatementBlock ct = (ContextStatementBlock) jb.program();
         CopyAssignment ca = (CopyAssignment) ct.getChildAt(0);
         ArrayReference ar = (ArrayReference) ca.getChildAt(0);
-        for (int i = 0; i < 2; i++) { assertNotNull(ar.getChildAt(i)); }
+        for (int i = 0; i < 2; i++) {
+            assertNotNull(ar.getChildAt(i));
+        }
         ar = (ArrayReference) ar.getChildAt(0);
-        for (int i = 0; i < 2; i++) { assertNotNull(ar.getChildAt(i)); }
+        for (int i = 0; i < 2; i++) {
+            assertNotNull(ar.getChildAt(i));
+        }
     }
 
     @Test
     public void testSchemaJava11() {
         parseTaclet("eval_order_array_access_right{" + " \\find(\\<{..#v=#ar[#e];...}\\>post)"
-                + "\\varcond(\\newTypeOf(#ar1, #ar)," + "\\newTypeOf(#v0, #e), \\newTypeOf(#k, #e))"
-                + "\\replacewith(\\<{..for(#k=0;#k<#length-reference(#ar);#k++){" + "#ar1[#k]=#ar[#k];}"
-                + "#v0=#e; #v=#ar1[#v0];...}\\>post)"
-                + "\\displayname \"eval_order_array_access_right\"}");
+            + "\\varcond(\\newTypeOf(#ar1, #ar)," + "\\newTypeOf(#v0, #e), \\newTypeOf(#k, #e))"
+            + "\\replacewith(\\<{..for(#k=0;#k<#length-reference(#ar);#k++){" + "#ar1[#k]=#ar[#k];}"
+            + "#v0=#e; #v=#ar1[#v0];...}\\>post)"
+            + "\\displayname \"eval_order_array_access_right\"}");
     }
 
 
@@ -390,7 +398,7 @@ public class TestTacletParser {
         boolean thrown = false;
         try {
             parseTaclet("xyz { find (<{.. int j=0; for(#i;j<9;j++)" + "; ...}>post)"
-                    + "replacewith (<{.. #unwind-loop (while(#e2) {#p1});" + "  ...}>post) } ");
+                + "replacewith (<{.. #unwind-loop (while(#e2) {#p1});" + "  ...}>post) } ");
         } catch (RuntimeException e) {
             thrown = true;
         }
@@ -403,7 +411,7 @@ public class TestTacletParser {
         boolean thrown = false;
         try {
             parseTaclet("xyz { find (<{.. int j=0; for(#lab;j<42;j++) ; ...}>post)"
-                    + "replacewith (<{.. #unwind-loop (while(#e2) {#p1});  ...}>post) } ");
+                + "replacewith (<{.. #unwind-loop (while(#e2) {#p1});  ...}>post) } ");
         } catch (RuntimeException e) {
             thrown = true;
         }

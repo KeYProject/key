@@ -70,7 +70,9 @@ public final class GenericSortInstantiations {
         // Find the generic sorts within "p_instantiations" and
         // "p_conditions", create the conditions
 
-        for (it = p_conditions.iterator(); it.hasNext();) { sorts = sorts.prepend(it.next().getGenericSort()); }
+        for (it = p_conditions.iterator(); it.hasNext();) {
+            sorts = sorts.prepend(it.next().getGenericSort());
+        }
 
         while (p_instantiations.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry =
@@ -99,7 +101,9 @@ public final class GenericSortInstantiations {
     public static GenericSortInstantiations create(ImmutableList<GenericSort> p_sorts,
             ImmutableList<GenericSortCondition> p_conditions, Services services) {
 
-        if (p_sorts.isEmpty()) { return EMPTY_INSTANTIATIONS; }
+        if (p_sorts.isEmpty()) {
+            return EMPTY_INSTANTIATIONS;
+        }
 
         return new GenericSortInstantiations(solve(p_sorts, p_conditions, services));
     }
@@ -111,10 +115,14 @@ public final class GenericSortInstantiations {
      *         choosing the right generic sort instantiations
      */
     public Boolean checkSorts(OperatorSV sv, InstantiationEntry<?> p_entry) {
-        if (!(p_entry instanceof TermInstantiation) || sv instanceof ProgramSV) { return Boolean.TRUE; }
+        if (!(p_entry instanceof TermInstantiation) || sv instanceof ProgramSV) {
+            return Boolean.TRUE;
+        }
 
         final GenericSortCondition c = GenericSortCondition.createCondition(sv, p_entry);
-        if (c != null) { return checkCondition(c); }
+        if (c != null) {
+            return checkCondition(c);
+        }
 
         final Term term = ((TermInstantiation) p_entry).getInstantiation();
 
@@ -134,7 +142,9 @@ public final class GenericSortInstantiations {
     public Boolean checkCondition(GenericSortCondition p_condition) {
         Sort s = insts.get(p_condition.getGenericSort());
 
-        if (s == null) { return null; }
+        if (s == null) {
+            return null;
+        }
 
         return p_condition.check(s, this) ? Boolean.TRUE : null;
     }
@@ -185,7 +195,9 @@ public final class GenericSortInstantiations {
     public Sort getRealSort(Sort p_s, TermServices services) {
         if (p_s instanceof GenericSort) {
             p_s = getInstantiation((GenericSort) p_s);
-            if (p_s == null) { throw new GenericSortException("Generic sort is not yet instantiated", null); }
+            if (p_s == null) {
+                throw new GenericSortException("Generic sort is not yet instantiated", null);
+            }
         }
 
         return p_s;
@@ -255,7 +267,9 @@ public final class GenericSortInstantiations {
             ImmutableList<GenericSortCondition> p_conditions,
             ImmutableList<GenericSort> p_pushedBack, Services services) {
 
-        if (p_remainingSorts.isEmpty()) { return solveForcedInst(p_pushedBack, p_curRes, p_conditions, services); }
+        if (p_remainingSorts.isEmpty()) {
+            return solveForcedInst(p_pushedBack, p_curRes, p_conditions, services);
+        }
 
         // next generic sort to seek an instantiation for
         final GenericSort gs = p_remainingSorts.head();
@@ -321,11 +335,15 @@ public final class GenericSortInstantiations {
             ImmutableList<Sort> p_subsorts, ImmutableList<Sort> p_chosenList, Services services) {
         for (Sort chosen : p_chosenList) {
             if (!isSupersortOf(chosen, p_subsorts) // this test is unnecessary in some cases
-                    || !p_gs.isPossibleInstantiation(chosen)) { continue; }
+                    || !p_gs.isPossibleInstantiation(chosen)) {
+                continue;
+            }
 
             final ImmutableMap<GenericSort, Sort> res = solveHelp(p_remainingSorts,
                 p_curRes.put(p_gs, chosen), p_conditions, p_pushedBack, services);
-            if (res != null) { return res; }
+            if (res != null) {
+                return res;
+            }
         }
         return null;
     }
@@ -341,14 +359,20 @@ public final class GenericSortInstantiations {
 
             // other identity conditions must lead to the same
             // instantiation
-            while (itC.hasNext()) { if (chosen != condSort(itC)) { throw FAIL_EXCEPTION; } }
+            while (itC.hasNext()) {
+                if (chosen != condSort(itC)) {
+                    throw FAIL_EXCEPTION;
+                }
+            }
 
             return ImmutableSLList.<Sort>nil().prepend(chosen);
         } else {
             // if a list of possible instantiations of the generic
             // sort has been given, use it
             final ImmutableList<Sort> res = toList(p_gs.getOneOf());
-            if (res.isEmpty()) { return null; }
+            if (res.isEmpty()) {
+                return null;
+            }
             return res;
         }
     }
@@ -357,7 +381,9 @@ public final class GenericSortInstantiations {
     private static ImmutableList<Sort> toList(ImmutableSet<Sort> p_set) {
         ImmutableList<Sort> res;
         res = ImmutableSLList.nil();
-        for (Sort sort : p_set) { res = res.prepend(sort); }
+        for (Sort sort : p_set) {
+            res = res.prepend(sort);
+        }
         return res;
     }
 
@@ -371,7 +397,9 @@ public final class GenericSortInstantiations {
             ImmutableMap<GenericSort, Sort> p_curRes, GenericSort p_gs,
             ImmutableList<Sort> p_subsorts) {
         for (final ImmutableMapEntry<GenericSort, Sort> entry : p_curRes) {
-            if (entry.key().extendsTrans(p_gs)) { p_subsorts = p_subsorts.prepend(entry.value()); }
+            if (entry.key().extendsTrans(p_gs)) {
+                p_subsorts = p_subsorts.prepend(entry.value());
+            }
         }
         return p_subsorts;
     }
@@ -401,7 +429,9 @@ public final class GenericSortInstantiations {
 
         // reverse the order of the sorts, to start with the most
         // general one
-        while (it.hasNext()) { p_remainingSorts = p_remainingSorts.prepend(it.next()); }
+        while (it.hasNext()) {
+            p_remainingSorts = p_remainingSorts.prepend(it.next());
+        }
 
         return solveForcedInstHelp(p_remainingSorts, p_curRes, services);
     }
@@ -443,7 +473,9 @@ public final class GenericSortInstantiations {
 
             // insert into the working list (set)
             it = gs.extendsSorts(services).iterator();
-            while (it.hasNext()) { todo.add(it.next()); }
+            while (it.hasNext()) {
+                todo.add(it.next());
+            }
 
             while (!todo.isEmpty()) {
                 it = null;
@@ -453,7 +485,9 @@ public final class GenericSortInstantiations {
 
                 if (cur instanceof GenericSort) {
                     cand = p_curRes.get((GenericSort) cur);
-                    if (cand == null) { it = cur.extendsSorts(services).iterator(); }
+                    if (cand == null) {
+                        it = cur.extendsSorts(services).iterator();
+                    }
                 } else {
                     it = cur.extendsSorts(services).iterator();
                     cand = cur;
@@ -461,11 +495,18 @@ public final class GenericSortInstantiations {
 
                 if (cand != null && isPossibleInstantiation(gs, cand, p_curRes)) {
                     res = solveForcedInstHelp(p_remainingSorts, p_curRes.put(gs, cand), services);
-                    if (res != null) { return res; }
+                    if (res != null) {
+                        return res;
+                    }
                 }
 
                 if (it != null) {
-                    while (it.hasNext()) { cur = it.next(); if (!done.contains(cur)) { todo.add(cur); } }
+                    while (it.hasNext()) {
+                        cur = it.next();
+                        if (!done.contains(cur)) {
+                            todo.add(cur);
+                        }
+                    }
                 }
             }
         }
@@ -527,7 +568,9 @@ public final class GenericSortInstantiations {
             Services services) {
 
         // if the list only consists of a single sort, return this sort
-        if (p_sorts.size() == 1) { return p_sorts; }
+        if (p_sorts.size() == 1) {
+            return p_sorts;
+        }
 
         final Iterator<Sort> p_itSorts = p_sorts.iterator();
         HashSet<Sort> inside = new LinkedHashSet<>();
@@ -569,7 +612,9 @@ public final class GenericSortInstantiations {
      * Find all minimal elements of the given set <code>p_inside</code>
      */
     private static ImmutableList<Sort> findMinimalElements(Set<Sort> p_inside) {
-        if (p_inside.size() == 1) { return ImmutableSLList.<Sort>nil().prepend(p_inside.iterator().next()); }
+        if (p_inside.size() == 1) {
+            return ImmutableSLList.<Sort>nil().prepend(p_inside.iterator().next());
+        }
 
         ImmutableList<Sort> res = ImmutableSLList.nil();
         final Iterator<Sort> it = p_inside.iterator();
@@ -581,7 +626,9 @@ public final class GenericSortInstantiations {
             for (Sort oldMinimal : res) {
                 if (oldMinimal.extendsTrans(sort)) {
                     continue mainloop;
-                } else if (!sort.extendsTrans(oldMinimal)) { res2 = res2.prepend(oldMinimal); }
+                } else if (!sort.extendsTrans(oldMinimal)) {
+                    res2 = res2.prepend(oldMinimal);
+                }
             }
 
             res = res2.prepend(sort);
@@ -599,7 +646,9 @@ public final class GenericSortInstantiations {
 
 
     private static void addSortsToSet(Set<Sort> p_set, ImmutableSet<Sort> p_sorts) {
-        for (Sort p_sort : p_sorts) { p_set.add(p_sort); }
+        for (Sort p_sort : p_sorts) {
+            p_set.add(p_sort);
+        }
     }
 
 
@@ -609,7 +658,11 @@ public final class GenericSortInstantiations {
      */
     private static boolean isSupersortOf(Sort p_s, ImmutableList<Sort> p_subsorts) {
 
-        for (Sort p_subsort : p_subsorts) { if (!p_subsort.extendsTrans(p_s)) { return false; } }
+        for (Sort p_subsort : p_subsorts) {
+            if (!p_subsort.extendsTrans(p_s)) {
+                return false;
+            }
+        }
 
         return true;
     }
@@ -622,7 +675,9 @@ public final class GenericSortInstantiations {
     private static boolean isPossibleInstantiation(GenericSort p_gs, Sort p_s,
             ImmutableMap<GenericSort, Sort> p_curRes) {
 
-        if (!p_gs.isPossibleInstantiation(p_s)) { return false; }
+        if (!p_gs.isPossibleInstantiation(p_s)) {
+            return false;
+        }
 
         // check whether the new instantiation is consistent with the
         // already chosen instantiations
@@ -642,7 +697,9 @@ public final class GenericSortInstantiations {
         String res = "";
 
         for (final ImmutableMapEntry<GenericSort, Sort> entry : insts) {
-            if (!res.isEmpty()) { res += ", "; }
+            if (!res.isEmpty()) {
+                res += ", ";
+            }
 
             res += entry.key() + "=" + entry.value();
         }

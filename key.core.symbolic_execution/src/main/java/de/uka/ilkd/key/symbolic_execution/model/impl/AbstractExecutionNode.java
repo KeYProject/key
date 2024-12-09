@@ -148,7 +148,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      *        A new child {@link AbstractExecutionNode}.
      */
     public void addChild(AbstractExecutionNode<?> child) {
-        if (child != null) { children.add(child); }
+        if (child != null) {
+            children.add(child);
+        }
     }
 
     /**
@@ -225,7 +227,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     @Override
     public IExecutionConstraint[] getConstraints() {
         synchronized (this) {
-            if (constraints == null) { constraints = lazyComputeConstraints(); }
+            if (constraints == null) {
+                constraints = lazyComputeConstraints();
+            }
             return constraints;
         }
     }
@@ -260,7 +264,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     @Override
     public IExecutionVariable[] getVariables() throws ProofInputException {
         synchronized (this) {
-            if (variables == null) { variables = lazyComputeVariables(); }
+            if (variables == null) {
+                variables = lazyComputeVariables();
+            }
             return variables;
         }
     }
@@ -311,7 +317,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      */
     public ExecutionNodeSymbolicLayoutExtractor getLayoutExtractor() throws ProofInputException {
         synchronized (this) {
-            if (layoutExtractor == null) { layoutExtractor = lazyComputeLayoutExtractor(); }
+            if (layoutExtractor == null) {
+                layoutExtractor = lazyComputeLayoutExtractor();
+            }
             return layoutExtractor;
         }
     }
@@ -370,7 +378,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      */
     @Override
     public PosInOccurrence getModalityPIO() {
-        if (modalityPIO == null) { modalityPIO = lazyComputeModalityPIO(); }
+        if (modalityPIO == null) {
+            modalityPIO = lazyComputeModalityPIO();
+        }
         return modalityPIO;
     }
 
@@ -435,7 +445,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
             throws ProofInputException {
         Term result = blockCompletionConditions.get(completedNode);
-        if (result == null) { result = (Term) lazyComputeBlockCompletionCondition(completedNode, false); }
+        if (result == null) {
+            result = (Term) lazyComputeBlockCompletionCondition(completedNode, false);
+        }
         return result;
     }
 
@@ -446,7 +458,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     public String getFormatedBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
             throws ProofInputException {
         String result = formattedBlockCompletionConditions.get(completedNode);
-        if (result == null) { result = (String) lazyComputeBlockCompletionCondition(completedNode, true); }
+        if (result == null) {
+            result = (String) lazyComputeBlockCompletionCondition(completedNode, true);
+        }
         return result;
     }
 

@@ -33,7 +33,9 @@ public class Throw extends ExpressionJumpStatement {
 
     public Throw(Expression expr) {
         super(expr);
-        if (expr == null) { throw new IllegalArgumentException("Throw requires one argument"); }
+        if (expr == null) {
+            throw new IllegalArgumentException("Throw requires one argument");
+        }
     }
 
     /**

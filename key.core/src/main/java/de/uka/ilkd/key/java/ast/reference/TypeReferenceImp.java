@@ -85,8 +85,12 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null) { result++; }
-        if (name != null) { result++; }
+        if (prefix != null) {
+            result++;
+        }
+        if (name != null) {
+            result++;
+        }
         return result;
     }
 
@@ -101,10 +105,16 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0) { return prefix; }
+            if (index == 0) {
+                return prefix;
+            }
             index--;
         }
-        if (name != null) { if (index == 0) { return name; } }
+        if (name != null) {
+            if (index == 0) {
+                return name;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -128,7 +138,9 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (prefix instanceof TypeReference && index == 0) { return (TypeReference) prefix; }
+        if (prefix instanceof TypeReference && index == 0) {
+            return (TypeReference) prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -151,7 +163,9 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (prefix instanceof Expression && index == 0) { return (Expression) prefix; }
+        if (prefix instanceof Expression && index == 0) {
+            return (Expression) prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -219,7 +233,9 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement pe = source.getSource();
         if (!(pe instanceof TypeReference)
-                || ((TypeReference) pe).getDimensions() != getDimensions()) { return null; }
+                || ((TypeReference) pe).getDimensions() != getDimensions()) {
+            return null;
+        }
 
         return super.match(source, matchCond);
     }

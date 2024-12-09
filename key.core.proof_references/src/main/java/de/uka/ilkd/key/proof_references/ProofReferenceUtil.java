@@ -185,7 +185,9 @@ public final class ProofReferenceUtil {
             for (IProofReferencesAnalyst analyst : analysts) {
                 LinkedHashSet<IProofReference<?>> analystResult =
                     analyst.computeReferences(node, services);
-                if (analystResult != null) { merge(result, analystResult); }
+                if (analystResult != null) {
+                    merge(result, analystResult);
+                }
             }
         }
         return result;
@@ -201,7 +203,9 @@ public final class ProofReferenceUtil {
      */
     public static void merge(LinkedHashSet<IProofReference<?>> target,
             LinkedHashSet<IProofReference<?>> toAdd) {
-        for (IProofReference<?> reference : toAdd) { merge(target, reference); }
+        for (IProofReference<?> reference : toAdd) {
+            merge(target, reference);
+        }
     }
 
     /**

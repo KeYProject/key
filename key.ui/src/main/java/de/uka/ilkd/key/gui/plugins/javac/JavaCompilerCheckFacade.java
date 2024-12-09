@@ -90,12 +90,18 @@ public class JavaCompilerCheckFacade {
 
         // gather configured bootstrap classpath and regular classpath
         List<Path> paths = new ArrayList<>();
-        if (bootClassPath != null) { paths.add(bootClassPath); }
-        if (classPath != null && !classPath.isEmpty()) { paths.addAll(classPath); }
+        if (bootClassPath != null) {
+            paths.add(bootClassPath);
+        }
+        if (classPath != null && !classPath.isEmpty()) {
+            paths.addAll(classPath);
+        }
         paths.add(javaPath);
         ArrayList<Path> files = new ArrayList<>();
         for (Path path : paths) {
-            if (!Files.isDirectory(path)) { continue; }
+            if (!Files.isDirectory(path)) {
+                continue;
+            }
             try (var s = Files.walk(path)) {
                 s.filter(f -> !Files.isDirectory(f))
                         .filter(f -> f.getFileName().toString().endsWith(".java"))

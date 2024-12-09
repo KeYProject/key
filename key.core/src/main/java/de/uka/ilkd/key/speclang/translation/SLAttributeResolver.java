@@ -30,13 +30,15 @@ public final class SLAttributeResolver extends SLExpressionResolver {
 
     private ProgramVariable lookupVisibleAttribute(String name, KeYJavaType containingType) {
         assert containingType.getJavaType() instanceof TypeDeclaration : "type " + containingType
-                + " is primitive, lookup for " + name;
+            + " is primitive, lookup for " + name;
         final TypeDeclaration td = (TypeDeclaration) containingType.getJavaType();
         // lookup locally
         for (MemberDeclaration md : td.getMembers()) {
             if (md instanceof FieldDeclaration && isVisible(md, containingType)) {
                 for (FieldSpecification fs : ((FieldDeclaration) md).getFieldSpecifications()) {
-                    if (fs.getProgramName().equals(name)) { return (ProgramVariable) fs.getProgramVariable(); }
+                    if (fs.getProgramName().equals(name)) {
+                        return (ProgramVariable) fs.getProgramVariable();
+                    }
                 }
             }
         }
@@ -48,7 +50,9 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         }
         for (KeYJavaType sup : sups) {
             final ProgramVariable res = lookupVisibleAttribute(name, sup);
-            if (res != null) { return res; }
+            if (res != null) {
+                return res;
+            }
         }
 
         // not found
@@ -66,7 +70,9 @@ public final class SLAttributeResolver extends SLExpressionResolver {
     protected SLExpression doResolving(SLExpression receiver, String name, SLParameters parameters)
             throws SLTranslationException {
 
-        if (parameters != null) { return null; }
+        if (parameters != null) {
+            return null;
+        }
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 

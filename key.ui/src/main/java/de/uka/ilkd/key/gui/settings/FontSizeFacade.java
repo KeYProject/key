@@ -35,7 +35,9 @@ public final class FontSizeFacade {
     private static void saveCurrentFontSizes() {
         for (String k : KEYS) {
             Font f = UIManager.getFont(k);
-            if (f != null) { ORIGINAL_FONT_SIZES.put(k, (float) f.getSize()); }
+            if (f != null) {
+                ORIGINAL_FONT_SIZES.put(k, (float) f.getSize());
+            }
         }
     }
 
@@ -47,11 +49,15 @@ public final class FontSizeFacade {
      * @see SwingUtilities#updateComponentTreeUI(Component)
      */
     public static void resizeFonts(double factor) {
-        if (Math.abs(currentFactor - factor) <= 0.1) { return; }
+        if (Math.abs(currentFactor - factor) <= 0.1) {
+            return;
+        }
 
         currentFactor = factor;
 
-        if (ORIGINAL_FONT_SIZES.isEmpty()) { saveCurrentFontSizes(); }
+        if (ORIGINAL_FONT_SIZES.isEmpty()) {
+            saveCurrentFontSizes();
+        }
 
         ORIGINAL_FONT_SIZES.forEach((key, value) -> {
             Font f = UIManager.getFont(key);
@@ -59,10 +65,14 @@ public final class FontSizeFacade {
             if (f instanceof FontUIResource) {
                 UIManager.put(key,
                     new FontUIResource(f.getName(), f.getStyle(), (int) (value * factor)));
-            } else if (f != null) { UIManager.put(key, f.deriveFont((float) (value * factor))); }
+            } else if (f != null) {
+                UIManager.put(key, f.deriveFont((float) (value * factor)));
+            }
         });
 
         // redraw all frames and dialogs
-        for (Window w : Window.getWindows()) { SwingUtilities.updateComponentTreeUI(w); }
+        for (Window w : Window.getWindows()) {
+            SwingUtilities.updateComponentTreeUI(w);
+        }
     }
 }

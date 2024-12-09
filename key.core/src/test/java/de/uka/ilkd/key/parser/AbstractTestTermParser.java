@@ -128,8 +128,8 @@ public class AbstractTestTermParser {
         // check whether parsing pretty-syntax produces the correct term
         Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
         String message = "\nAssertion failed while parsing pretty syntax. " + "Parsed string \""
-                + expectedPrettySyntax + "\", which results in term:\n" + parsedPrettySyntax
-                + "\nBut expected parse result is:\n" + expectedParseResult + "\n";
+            + expectedPrettySyntax + "\", which results in term:\n" + parsedPrettySyntax
+            + "\nBut expected parse result is:\n" + expectedParseResult + "\n";
         assertEquals(expectedParseResult, parsedPrettySyntax, message);
     }
 
@@ -183,7 +183,7 @@ public class AbstractTestTermParser {
     protected Services getServices() {
         if (SERVICES == null) {
             File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-                    + "termParser" + File.separator + "parserTest.key");
+                + "termParser" + File.separator + "parserTest.key");
             SERVICES = HelperClassForTests.createServices(keyFile);
         }
         return SERVICES.copy(false);

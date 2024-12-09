@@ -176,7 +176,9 @@ public class ProofSaver extends OutputStreamProofSaver {
      *        The {@link ProofSaverListener} to add.
      */
     public static void addProofSaverListener(ProofSaverListener l) {
-        if (l != null) { listeners.add(l); }
+        if (l != null) {
+            listeners.add(l);
+        }
     }
 
     /**
@@ -186,7 +188,9 @@ public class ProofSaver extends OutputStreamProofSaver {
      *        The {@link ProofSaverListener} to remove.
      */
     public static void removeProofSaverListener(ProofSaverListener l) {
-        if (l != null) { listeners.remove(l); }
+        if (l != null) {
+            listeners.remove(l);
+        }
     }
 
     /**
@@ -197,7 +201,9 @@ public class ProofSaver extends OutputStreamProofSaver {
      */
     protected static void fireProofSaved(ProofSaverEvent e) {
         ProofSaverListener[] toInform = listeners.toArray(new ProofSaverListener[0]);
-        for (ProofSaverListener l : toInform) { l.proofSaved(e); }
+        for (ProofSaverListener l : toInform) {
+            l.proofSaved(e);
+        }
     }
 
     private String filename() {

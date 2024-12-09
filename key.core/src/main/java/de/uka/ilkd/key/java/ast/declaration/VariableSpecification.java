@@ -117,8 +117,12 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (var != null) { result++; }
-        if (initializer != null) { result++; }
+        if (var != null) {
+            result++;
+        }
+        if (initializer != null) {
+            result++;
+        }
         return result;
     }
 
@@ -133,10 +137,14 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (var != null) {
-            if (index == 0) { return var; }
+            if (index == 0) {
+                return var;
+            }
             index--;
         }
-        if (initializer != null && index == 0) { return initializer; }
+        if (initializer != null && index == 0) {
+            return initializer;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -166,7 +174,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (initializer != null && index == 0) { return initializer; }
+        if (initializer != null && index == 0) {
+            return initializer;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -269,21 +279,35 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true; }
-        if (o == null || o.getClass() != this.getClass()) { return false; }
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
 
         VariableSpecification vs = (VariableSpecification) o;
 
-        if (dimensions != vs.getDimensions()) { return false; }
+        if (dimensions != vs.getDimensions()) {
+            return false;
+        }
         if (type != null) {
-            if (!(type.equals(vs.getType()))) { return false; }
+            if (!(type.equals(vs.getType()))) {
+                return false;
+            }
         } else {
-            if (vs.getType() != null) { return false; }
+            if (vs.getType() != null) {
+                return false;
+            }
         }
 
-        if (vs.getChildCount() != getChildCount()) { return false; }
+        if (vs.getChildCount() != getChildCount()) {
+            return false;
+        }
         for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equals(vs.getChildAt(i))) { return false; }
+            if (!getChildAt(i).equals(vs.getChildAt(i))) {
+                return false;
+            }
         }
         return true;
     }
@@ -292,7 +316,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement pe = source.getSource();
         matchCond = super.match(source, matchCond);
-        if (matchCond != null && getDimensions() != ((VariableSpecification) pe).getDimensions()) { return null; }
+        if (matchCond != null && getDimensions() != ((VariableSpecification) pe).getDimensions()) {
+            return null;
+        }
         return matchCond;
     }
 }

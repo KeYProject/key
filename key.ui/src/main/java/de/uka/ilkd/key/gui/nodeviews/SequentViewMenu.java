@@ -92,7 +92,9 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
             KeYGuiExtensionFacade.getContextMenuItems(DefaultContextMenuKind.SEQUENT_VIEW, getPos(),
                 getSequentView().getMainWindow().getMediator());
 
-        for (Action action : actions) { add(action); }
+        for (Action action : actions) {
+            add(action);
+        }
     }
 
     /**

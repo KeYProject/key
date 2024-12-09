@@ -58,9 +58,13 @@ public final class TermFactory {
     public Term createTerm(@NonNull Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels) {
-        if (op == null) { throw new TermCreationException("Given operator is null."); }
+        if (op == null) {
+            throw new TermCreationException("Given operator is null.");
+        }
 
-        if (subs == null || subs.isEmpty()) { subs = NO_SUBTERMS; }
+        if (subs == null || subs.isEmpty()) {
+            subs = NO_SUBTERMS;
+        }
 
         return doCreateTerm(op, subs, boundVars, labels, "");
     }
@@ -149,9 +153,13 @@ public final class TermFactory {
     public @NonNull Term createTerm(@NonNull Operator junctor, @NonNull List<Term> terms) {
         if (terms.size() == 1) {
             return terms.get(0);
-        } else if (terms.size() == 2) { return createTerm(junctor, terms.get(0), terms.get(1)); }
+        } else if (terms.size() == 2) {
+            return createTerm(junctor, terms.get(0), terms.get(1));
+        }
         final Optional<Term> reduce = terms.stream().reduce((a, b) -> createTerm(junctor, a, b));
-        if (reduce.isPresent()) { return reduce.get(); }
+        if (reduce.isPresent()) {
+            return reduce.get();
+        }
         throw new IllegalArgumentException("list of terms is empty.");
     }
 

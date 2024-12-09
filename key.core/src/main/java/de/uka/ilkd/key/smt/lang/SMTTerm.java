@@ -40,11 +40,17 @@ public abstract class SMTTerm {
 
     public static SMTTerm ite(SMTTerm condition, SMTTerm trueCase, SMTTerm falseCase) {
 
-        if (condition == TRUE) { return trueCase; }
+        if (condition == TRUE) {
+            return trueCase;
+        }
 
-        if (condition == FALSE) { return falseCase; }
+        if (condition == FALSE) {
+            return falseCase;
+        }
 
-        if (trueCase.equals(falseCase)) { return trueCase; }
+        if (trueCase.equals(falseCase)) {
+            return trueCase;
+        }
 
         return new SMTTermITE(condition, trueCase, falseCase);
 
@@ -128,8 +134,12 @@ public abstract class SMTTerm {
             SMTTerm... moreArgs) {
         List<SMTTerm> argsList = new LinkedList<>();
 
-        if (args != null) { argsList.addAll(args); }
-        if (moreArgs != null) { Collections.addAll(argsList, moreArgs); }
+        if (args != null) {
+            argsList.addAll(args);
+        }
+        if (moreArgs != null) {
+            Collections.addAll(argsList, moreArgs);
+        }
 
         return new SMTTermCall(func, argsList);
     }
@@ -156,7 +166,11 @@ public abstract class SMTTerm {
         List<SMTTerm> argsList = new LinkedList<>();
 
         if (args != null) {
-            for (SMTTerm[] termList : args) { if (termList != null) { Collections.addAll(argsList, termList); } }
+            for (SMTTerm[] termList : args) {
+                if (termList != null) {
+                    Collections.addAll(argsList, termList);
+                }
+            }
         }
 
         return new SMTTermCall(func, argsList);
@@ -166,14 +180,20 @@ public abstract class SMTTerm {
         List<SMTTerm> argsList = new LinkedList<>();
 
         if (args != null) {
-            for (List<? extends SMTTerm> termList : args) { if (termList != null) { argsList.addAll(termList); } }
+            for (List<? extends SMTTerm> termList : args) {
+                if (termList != null) {
+                    argsList.addAll(termList);
+                }
+            }
         }
 
         return new SMTTermCall(func, argsList);
     }
 
     public static SMTTerm call(SMTFunction func, SMTTerm arg) {
-        if (func == null) { throw new RuntimeException("null call"); }
+        if (func == null) {
+            throw new RuntimeException("null call");
+        }
         List<SMTTerm> args = new LinkedList<>();
         args.add(arg);
         return new SMTTermCall(func, args);
@@ -241,12 +261,16 @@ public abstract class SMTTerm {
     }
 
     public static SMTTerm number(int n, int bitSize) {
-        if (bitSize < 0) { return new SMTTermNumber(n); }
+        if (bitSize < 0) {
+            return new SMTTermNumber(n);
+        }
         return new SMTTermNumber(n, bitSize, null);
     }
 
     public SMTTerms terms() {
-        if (this instanceof SMTTerms) { return (SMTTerms) this; }
+        if (this instanceof SMTTerms) {
+            return (SMTTerms) this;
+        }
 
         List<SMTTerm> termList = new LinkedList<>();
         termList.add(this);
@@ -268,8 +292,8 @@ public abstract class SMTTerm {
 
     public SMTTerm unaryOp(SMTTermUnaryOp.Op op) {
         return switch (op) {
-            case NOT -> this.not();
-            default -> new SMTTermUnaryOp(op, this);
+        case NOT -> this.not();
+        default -> new SMTTermUnaryOp(op, this);
         };
     }
 
@@ -282,12 +306,18 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm not() {
-        if (this == FALSE) { return TRUE; }
+        if (this == FALSE) {
+            return TRUE;
+        }
 
-        if (this == TRUE) { return FALSE; }
+        if (this == TRUE) {
+            return FALSE;
+        }
 
         if (this instanceof SMTTermUnaryOp ut) {
-            if (ut.getOperator().equals(SMTTermUnaryOp.Op.NOT)) { return ut.getSub(); }
+            if (ut.getOperator().equals(SMTTermUnaryOp.Op.NOT)) {
+                return ut.getSub();
+            }
         }
 
         return new SMTTermUnaryOp(SMTTermUnaryOp.Op.NOT, this);
@@ -325,14 +355,20 @@ public abstract class SMTTerm {
 
     public static SMTTerm or(List<SMTTerm> args) {
         SMTTerm ret = FALSE;
-        for (SMTTerm arg : args) { ret = ret.or(arg); }
+        for (SMTTerm arg : args) {
+            ret = ret.or(arg);
+        }
         return ret;
     }
 
     public SMTTerm or(SMTTerm right) {
-        if (right == TRUE) { return TRUE; }
+        if (right == TRUE) {
+            return TRUE;
+        }
 
-        if (right == FALSE) { return this; }
+        if (right == FALSE) {
+            return this;
+        }
 
         List<SMTTerm> subForms = new LinkedList<>();
 
@@ -365,14 +401,20 @@ public abstract class SMTTerm {
 
     public static SMTTerm and(List<SMTTerm> args) {
         SMTTerm ret = TRUE;
-        for (SMTTerm arg : args) { ret = ret.and(arg); }
+        for (SMTTerm arg : args) {
+            ret = ret.and(arg);
+        }
         return ret;
     }
 
     public SMTTerm and(SMTTerm right) {
-        if (right == FALSE) { return FALSE; }
+        if (right == FALSE) {
+            return FALSE;
+        }
 
-        if (right == TRUE) { return this; }
+        if (right == TRUE) {
+            return this;
+        }
 
         List<SMTTerm> subForms = new LinkedList<>();
 
@@ -498,42 +540,64 @@ public abstract class SMTTerm {
     }
 
     public static SMTTerm implies(List<SMTTerm> args) {
-        if (args.size() == 2) { return args.get(0).implies(args.get(1)); }
+        if (args.size() == 2) {
+            return args.get(0).implies(args.get(1));
+        }
         return new SMTTermMultOp(SMTTermMultOp.Op.IMPLIES, args);
     }
 
     public SMTTerm implies(SMTTerm right) {
-        if (right == TRUE) { return TRUE; }
+        if (right == TRUE) {
+            return TRUE;
+        }
 
-        if (right == FALSE) { return this.not(); }
+        if (right == FALSE) {
+            return this.not();
+        }
 
-        if (this == TRUE) { return right; }
+        if (this == TRUE) {
+            return right;
+        }
 
-        if (this == FALSE) { return TRUE; }
+        if (this == FALSE) {
+            return TRUE;
+        }
 
         // return new TermBinOp(TermBinOp.Op.IMPLIES, this, right);
         return defaultMultOp(SMTTermMultOp.Op.IMPLIES, right);
     }
 
     public static SMTTerm equal(List<SMTTerm> args) {
-        if (args.size() == 2) { return args.get(0).equal(args.get(1)); }
+        if (args.size() == 2) {
+            return args.get(0).equal(args.get(1));
+        }
         return new SMTTermMultOp(SMTTermMultOp.Op.EQUALS, args);
     }
 
     // For Term (e.g. Boolean valued terms), the equality "=" and equivalent
     // "iff" are in SMT the same. (I hope)
     public SMTTerm equal(SMTTerm right) {
-        if (this == right) { return TRUE; }
+        if (this == right) {
+            return TRUE;
+        }
 
         if (this.sort() == SMTSort.BOOL) {
 
-            if (this == SMTTerm.TRUE) { return right; }
+            if (this == SMTTerm.TRUE) {
+                return right;
+            }
 
-            if (this == SMTTerm.FALSE) { return right.not(); }
+            if (this == SMTTerm.FALSE) {
+                return right.not();
+            }
 
-            if (right == SMTTerm.TRUE) { return this; }
+            if (right == SMTTerm.TRUE) {
+                return this;
+            }
 
-            if (right == SMTTerm.FALSE) { return this.not(); }
+            if (right == SMTTerm.FALSE) {
+                return this.not();
+            }
 
         }
 
@@ -565,12 +629,20 @@ public abstract class SMTTerm {
         if (this instanceof SMTTermNumber ln) {
             if (ln.getIntValue() == 0)
             // return SMTTerm.number(0);
-            { return SMTTerm.number(0, (int) this.sort().getBitSize()); }
-            if (ln.getIntValue() == 1) { return right; }
+            {
+                return SMTTerm.number(0, (int) this.sort().getBitSize());
+            }
+            if (ln.getIntValue() == 1) {
+                return right;
+            }
         }
         if (right instanceof SMTTermNumber rn) {
-            if (rn.getIntValue() == 0) { return SMTTerm.number(0, (int) this.sort().getBitSize()); }
-            if (rn.getIntValue() == 1) { return this; }
+            if (rn.getIntValue() == 0) {
+                return SMTTerm.number(0, (int) this.sort().getBitSize());
+            }
+            if (rn.getIntValue() == 1) {
+                return this;
+            }
         }
 
         // return new TermBinOp(TermBinOp.Op.MUL, this, right);
@@ -579,9 +651,15 @@ public abstract class SMTTerm {
 
     public SMTTerm div(SMTTerm right) {
         if (this instanceof SMTTermNumber ln) {
-            if (ln.getIntValue() == 0) { return SMTTerm.number(0, (int) this.sort().getBitSize()); }
+            if (ln.getIntValue() == 0) {
+                return SMTTerm.number(0, (int) this.sort().getBitSize());
+            }
         }
-        if (right instanceof SMTTermNumber rn) { if (rn.getIntValue() == 1) { return this; } }
+        if (right instanceof SMTTermNumber rn) {
+            if (rn.getIntValue() == 1) {
+                return this;
+            }
+        }
 
         // return new TermBinOp(TermBinOp.Op.DIV, this, right);
         return defaultMultOp(SMTTermMultOp.Op.BVSDIV, right);
@@ -593,8 +671,16 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm plus(SMTTerm right) {
-        if (this instanceof SMTTermNumber ln) { if (ln.getIntValue() == 0) { return right; } }
-        if (right instanceof SMTTermNumber rn) { if (rn.getIntValue() == 0) { return this; } }
+        if (this instanceof SMTTermNumber ln) {
+            if (ln.getIntValue() == 0) {
+                return right;
+            }
+        }
+        if (right instanceof SMTTermNumber rn) {
+            if (rn.getIntValue() == 0) {
+                return this;
+            }
+        }
         // return new TermBinOp(TermBinOp.Op.PLUS, this, right);
         return defaultMultOp(SMTTermMultOp.Op.PLUS, right);
     }
@@ -602,7 +688,9 @@ public abstract class SMTTerm {
     public SMTTerm minus(SMTTerm right) {
         if (right instanceof SMTTermNumber rn) {
 
-            if (rn.getIntValue() == 0) { return this; }
+            if (rn.getIntValue() == 0) {
+                return this;
+            }
         }
         // return new TermBinOp(TermBinOp.Op.MINUS, this, right);
         return defaultMultOp(SMTTermMultOp.Op.MINUS, right);
@@ -610,16 +698,16 @@ public abstract class SMTTerm {
 
     public SMTTerm quant(SMTTermQuant.Quant quant, List<SMTTermVariable> bindVars) {
         return switch (quant) {
-            case FORALL -> this.forall(bindVars);
-            case EXISTS -> this.exists(bindVars);
+        case FORALL -> this.forall(bindVars);
+        case EXISTS -> this.exists(bindVars);
         };
     }
 
     public SMTTerm quant(SMTTermQuant.Quant quant, List<SMTTermVariable> bindVars,
             List<List<SMTTerm>> pats) {
         return switch (quant) {
-            case FORALL -> this.forall(bindVars, pats);
-            case EXISTS -> this.exists(bindVars, pats);
+        case FORALL -> this.forall(bindVars, pats);
+        case EXISTS -> this.exists(bindVars, pats);
         };
     }
 
@@ -629,13 +717,21 @@ public abstract class SMTTerm {
 
     public SMTTerm forall(SMTTerms terms) {
         List<SMTTermVariable> bindVars = new LinkedList<>();
-        for (SMTTerm t : terms.terms) { if (t instanceof SMTTermVariable) { bindVars.add((SMTTermVariable) t); } }
+        for (SMTTerm t : terms.terms) {
+            if (t instanceof SMTTermVariable) {
+                bindVars.add((SMTTermVariable) t);
+            }
+        }
         return this.forall(bindVars, null);
     }
 
     public SMTTerm forall(SMTTerms terms, SMTTerm pat) {
         List<SMTTermVariable> bindVars = new LinkedList<>();
-        for (SMTTerm t : terms.terms) { if (t instanceof SMTTermVariable) { bindVars.add((SMTTermVariable) t); } }
+        for (SMTTerm t : terms.terms) {
+            if (t instanceof SMTTermVariable) {
+                bindVars.add((SMTTermVariable) t);
+            }
+        }
         return this.forall(bindVars, toList(toList(pat)));
     }
 
@@ -652,7 +748,9 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm forall(List<SMTTermVariable> bindVars, List<List<SMTTerm>> pats) {
-        if (bindVars.isEmpty()) { return this; }
+        if (bindVars.isEmpty()) {
+            return this;
+        }
 
         // Correct possible wrong placement of patterns
         // TODO: A more general simplification, which will get ride of nested
@@ -662,8 +760,12 @@ public abstract class SMTTerm {
                 if (pats == null && subQt.pats != null) {
                     return subQt.sub.forall(bindVars, subQt.bindVars, subQt.pats);
                 }
-                if (subQt.pats == null && pats != null) { return subQt.sub.forall(bindVars, subQt.bindVars, pats); }
-                if (subQt.pats == null && pats == null) { return subQt.sub.forall(bindVars, subQt.bindVars, pats); }
+                if (subQt.pats == null && pats != null) {
+                    return subQt.sub.forall(bindVars, subQt.bindVars, pats);
+                }
+                if (subQt.pats == null && pats == null) {
+                    return subQt.sub.forall(bindVars, subQt.bindVars, pats);
+                }
             }
         }
 
@@ -675,7 +777,9 @@ public abstract class SMTTerm {
         List<SMTTermVariable> bindVars = new LinkedList<>();
         bindVars.addAll(bindVars1);
         bindVars.addAll(bindVars2);
-        if (bindVars.isEmpty()) { return this; }
+        if (bindVars.isEmpty()) {
+            return this;
+        }
 
         return this.forall(bindVars, pats);
     }
@@ -685,7 +789,9 @@ public abstract class SMTTerm {
         List<SMTTermVariable> bindVars = new LinkedList<>();
         bindVars.addAll(bindVars1);
         bindVars.addAll(bindVars2);
-        if (bindVars.isEmpty()) { return this; }
+        if (bindVars.isEmpty()) {
+            return this;
+        }
 
         return this.forall(bindVars, toList(toList(pat)));
     }
@@ -703,7 +809,9 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm exists(List<SMTTermVariable> bindVars, List<List<SMTTerm>> pats) {
-        if (bindVars.isEmpty()) { return this; }
+        if (bindVars.isEmpty()) {
+            return this;
+        }
 
         // Correct possible wrong placement of patterns
         // TODO: A more general simplification, which will get ride of nested
@@ -713,8 +821,12 @@ public abstract class SMTTerm {
                 if (pats == null && subQt.pats != null) {
                     return subQt.sub.exists(bindVars, subQt.bindVars, subQt.pats);
                 }
-                if (subQt.pats == null && pats != null) { return subQt.sub.exists(bindVars, subQt.bindVars, pats); }
-                if (subQt.pats == null && pats == null) { return subQt.sub.exists(bindVars, subQt.bindVars, pats); }
+                if (subQt.pats == null && pats != null) {
+                    return subQt.sub.exists(bindVars, subQt.bindVars, pats);
+                }
+                if (subQt.pats == null && pats == null) {
+                    return subQt.sub.exists(bindVars, subQt.bindVars, pats);
+                }
             }
         }
 
@@ -726,7 +838,9 @@ public abstract class SMTTerm {
         List<SMTTermVariable> bindVars = new LinkedList<>();
         bindVars.addAll(bindVars1);
         bindVars.addAll(bindVars2);
-        if (bindVars.isEmpty()) { return this; }
+        if (bindVars.isEmpty()) {
+            return this;
+        }
 
         return this.exists(bindVars, pats);
     }
@@ -928,7 +1042,9 @@ public abstract class SMTTerm {
 
     public static <T> List<T> toList(T e) {
 
-        if (e == null) { return null; }
+        if (e == null) {
+            return null;
+        }
 
         List<T> eToList = new LinkedList<>();
         eToList.add(e);
@@ -941,7 +1057,9 @@ public abstract class SMTTerm {
 
     public boolean isCons() {
 
-        if (this instanceof SMTTermNumber) { return true; }
+        if (this instanceof SMTTermNumber) {
+            return true;
+        }
 
         // if (Translator.restConstDef) {
         // if (this instanceof TermCall) {
@@ -955,17 +1073,29 @@ public abstract class SMTTerm {
 
         if (this instanceof SMTTermCall tc) {
 
-            for (SMTTerm arg : tc.args) { if (!arg.isCons()) { return false; } }
+            for (SMTTerm arg : tc.args) {
+                if (!arg.isCons()) {
+                    return false;
+                }
+            }
             return true;
 
         }
 
-        if (this instanceof SMTTermUnaryOp ut) { return ut.getSub().isCons(); }
+        if (this instanceof SMTTermUnaryOp ut) {
+            return ut.getSub().isCons();
+        }
 
-        if (this instanceof SMTTermBinOp bt) { return bt.getLeft().isCons() && bt.getRight().isCons(); }
+        if (this instanceof SMTTermBinOp bt) {
+            return bt.getLeft().isCons() && bt.getRight().isCons();
+        }
 
         if (this instanceof SMTTermMultOp lt) {
-            for (SMTTerm term : lt.getSubs()) { if (!term.isCons()) { return false; } }
+            for (SMTTerm term : lt.getSubs()) {
+                if (!term.isCons()) {
+                    return false;
+                }
+            }
 
             return true;
         }

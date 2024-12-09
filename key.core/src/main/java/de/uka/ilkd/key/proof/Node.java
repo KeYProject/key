@@ -241,7 +241,9 @@ public class Node implements Iterable<Node> {
     }
 
     public void addLocalProgVars(Iterable<? extends IProgramVariable> elements) {
-        for (IProgramVariable pv : elements) { localProgVars = localProgVars.prepend(pv); }
+        for (IProgramVariable pv : elements) {
+            localProgVars = localProgVars.prepend(pv);
+        }
     }
 
     /**
@@ -256,7 +258,9 @@ public class Node implements Iterable<Node> {
     }
 
     public void addLocalFunctions(Collection<? extends JFunction> elements) {
-        for (JFunction op : elements) { localFunctions = localFunctions.prepend(op); }
+        for (JFunction op : elements) {
+            localFunctions = localFunctions.prepend(op);
+        }
     }
 
     /**
@@ -292,7 +296,12 @@ public class Node implements Iterable<Node> {
         // we assume that the proof tree node is part of has proper
         // links
 
-        while (node != this) { if (node.root()) { return false; } node = node.parent(); }
+        while (node != this) {
+            if (node.root()) {
+                return false;
+            }
+            node = node.parent();
+        }
 
         return true;
     }
@@ -306,18 +315,28 @@ public class Node implements Iterable<Node> {
      * @return the most recent common ancestor of {@code this} and the specified node.
      */
     public Node commonAncestor(Node other) {
-        if (root()) { return this; }
-        if (other.root()) { return other; }
+        if (root()) {
+            return this;
+        }
+        if (other.root()) {
+            return other;
+        }
 
         HashSet<Node> paths = new LinkedHashSet<>();
         Node n = this;
 
         while (true) {
-            if (!paths.add(n)) { return n; }
-            if (n.root()) { break; }
+            if (!paths.add(n)) {
+                return n;
+            }
+            if (n.root()) {
+                break;
+            }
             n = n.parent();
 
-            if (!paths.add(other)) { return other; }
+            if (!paths.add(other)) {
+                return other;
+            }
             if (other.root()) {
                 other = n;
                 break;
@@ -325,7 +344,9 @@ public class Node implements Iterable<Node> {
             other = other.parent();
         }
 
-        while (!paths.contains(other)) { other = other.parent(); }
+        while (!paths.contains(other)) {
+            other = other.parent();
+        }
 
         return other;
     }
@@ -378,7 +399,9 @@ public class Node implements Iterable<Node> {
      * nothing happens. This is only used for testing purposes.
      */
     void remove() {
-        if (parent != null) { parent.remove(this); }
+        if (parent != null) {
+            parent.remove(this);
+        }
     }
 
     /**
@@ -393,7 +416,9 @@ public class Node implements Iterable<Node> {
         if (children.remove(child)) {
             child.parent = null;
             final ListIterator<Node> it = children.listIterator(child.siblingNr);
-            while (it.hasNext()) { it.next().siblingNr--; }
+            while (it.hasNext()) {
+                it.next().siblingNr--;
+            }
             child.siblingNr = -1;
             return true;
         } else {
@@ -475,7 +500,12 @@ public class Node implements Iterable<Node> {
         int res = 0;
         final Iterator<Node> it = childrenIterator();
 
-        while (it.hasNext()) { if (it.next() == child) { return res; } ++res; }
+        while (it.hasNext()) {
+            if (it.next() == child) {
+                return res;
+            }
+            ++res;
+        }
 
         return -1;
     }
@@ -488,7 +518,9 @@ public class Node implements Iterable<Node> {
         while (n != null) {
             c += n.localIntroducedRules.size();
 
-            if (n.parent != null && n.parent.childrenCount() > 1) { id.append(n.siblingNr); }
+            if (n.parent != null && n.parent.childrenCount() > 1) {
+                id.append(n.siblingNr);
+            }
 
             n = n.parent;
         }
@@ -558,7 +590,9 @@ public class Node implements Iterable<Node> {
         } else if (ownNr == maxNr && maxNr > 1) {
             // last node of level no further connection
             prefix += frontIndent + " " + backFill;
-        } else if (ownNr != maxNr && maxNr <= 1) { prefix = ""; }
+        } else if (ownNr != maxNr && maxNr <= 1) {
+            prefix = "";
+        }
 
         // print subtrees
         int childId = 0;
@@ -605,10 +639,14 @@ public class Node implements Iterable<Node> {
                 return cachedName;
             }
 
-            if (nodeInfo.getFirstStatementString() != null) { return nodeInfo.getFirstStatementString(); }
+            if (nodeInfo.getFirstStatementString() != null) {
+                return nodeInfo.getFirstStatementString();
+            }
 
             cachedName = rap.displayName();
-            if (cachedName == null) { cachedName = RULE_WITHOUT_NAME; }
+            if (cachedName == null) {
+                cachedName = RULE_WITHOUT_NAME;
+            }
         }
         return cachedName;
     }
@@ -622,12 +660,20 @@ public class Node implements Iterable<Node> {
      */
     public boolean sanityCheckDoubleLinks() {
         if (!root()) {
-            if (!parent().children.contains(this)) { return false; }
-            if (parent.proof() != proof()) { return false; }
+            if (!parent().children.contains(this)) {
+                return false;
+            }
+            if (parent.proof() != proof()) {
+                return false;
+            }
         }
         if (!leaf()) {
             final Iterator<Node> it = childrenIterator();
-            while (it.hasNext()) { if (!it.next().sanityCheckDoubleLinks()) { return false; } }
+            while (it.hasNext()) {
+                if (!it.next().sanityCheckDoubleLinks()) {
+                    return false;
+                }
+            }
         }
         return true;
     }
@@ -637,7 +683,11 @@ public class Node implements Iterable<Node> {
         closed = true;
         Node tmp = parent;
         Node result = this;
-        while (tmp != null && tmp.isCloseable()) { tmp.closed = true; result = tmp; tmp = tmp.parent(); }
+        while (tmp != null && tmp.isCloseable()) {
+            tmp.closed = true;
+            result = tmp;
+            tmp = tmp.parent();
+        }
         clearNameCache();
         return result;
     }
@@ -653,14 +703,21 @@ public class Node implements Iterable<Node> {
     void reopen() {
         closed = false;
         Node tmp = parent;
-        while (tmp != null && tmp.isClosed()) { tmp.closed = false; tmp = tmp.parent(); }
+        while (tmp != null && tmp.isClosed()) {
+            tmp.closed = false;
+            tmp = tmp.parent();
+        }
         clearNameCache();
     }
 
     /** @return true iff this inner node is closeable */
     private boolean isCloseable() {
         assert childrenCount() > 0;
-        for (Node child : children) { if (!child.isClosed()) { return false; } }
+        for (Node child : children) {
+            if (!child.isClosed()) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -674,7 +731,9 @@ public class Node implements Iterable<Node> {
     public int countNodes() {
         Iterator<Node> it = subtreeIterator();
         int res = 0;
-        for (; it.hasNext(); it.next()) { res++; }
+        for (; it.hasNext(); it.next()) {
+            res++;
+        }
         return res;
     }
 
@@ -728,7 +787,9 @@ public class Node implements Iterable<Node> {
      */
     public <T> T lookup(Class<T> service) {
         try {
-            if (userData == null) { return null; }
+            if (userData == null) {
+                return null;
+            }
             return userData.get(service);
         } catch (IllegalStateException ignored) {
             return null;
@@ -759,7 +820,9 @@ public class Node implements Iterable<Node> {
      *        arbitray object
      */
     public <T> void deregister(T obj, Class<T> service) {
-        if (userData != null) { userData.deregister(obj, service); }
+        if (userData != null) {
+            userData.deregister(obj, service);
+        }
     }
 
     /**
@@ -768,14 +831,18 @@ public class Node implements Iterable<Node> {
      * @return
      */
     public @NonNull Lookup getUserData() {
-        if (userData == null) { userData = new Lookup(); }
+        if (userData == null) {
+            userData = new Lookup();
+        }
         return userData;
     }
 
     public BranchLocation getBranchLocation() {
         if (branchLocation == null) {
             BranchLocation prev = parent != null ? parent.getBranchLocation() : BranchLocation.ROOT;
-            if (parent != null && parent.children.size() > 1) { prev = prev.append(new Pair<>(parent, siblingNr)); }
+            if (parent != null && parent.children.size() > 1) {
+                prev = prev.append(new Pair<>(parent, siblingNr));
+            }
             this.branchLocation = prev;
         }
         return branchLocation;

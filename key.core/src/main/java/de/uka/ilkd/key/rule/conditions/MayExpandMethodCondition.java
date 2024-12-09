@@ -106,7 +106,9 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     private static ImmutableArray<Expression> toExpArray(
             ImmutableArray<? extends ProgramElement> a) {
         Expression[] result = new Expression[a.size()];
-        for (int i = 0; i < a.size(); i++) { result[i] = (Expression) a.get(i); }
+        for (int i = 0; i < a.size(); i++) {
+            result[i] = (Expression) a.get(i);
+        }
         return new ImmutableArray<>(result);
     }
 
@@ -118,17 +120,23 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         Map<String, String> tacletOptions =
             services.getProof().getSettings().getChoiceSettings().getDefaultChoices();
 
-        if (tacletOptions.getOrDefault(TACLET_OPTION_KEY, "").equals(RELAXED_VALUE)) { return !negation; }
+        if (tacletOptions.getOrDefault(TACLET_OPTION_KEY, "").equals(RELAXED_VALUE)) {
+            return !negation;
+        }
 
         ExecutionContext ec = svInst.getContextInstantiation().activeStatementContext();
         ReferencePrefix rp = null;
-        if (receiver != null) { rp = (ReferencePrefix) svInst.getInstantiation(receiver); }
+        if (receiver != null) {
+            rp = (ReferencePrefix) svInst.getInstantiation(receiver);
+        }
 
         MethodName mn = (MethodName) svInst.getInstantiation(methname);
 
         ImmutableArray<Expression> ar =
             toExpArray((ImmutableArray<ProgramElement>) svInst.getInstantiation(args));
-        if (var == args) { ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst); }
+        if (var == args) {
+            ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst);
+        }
 
         if (mn == null) {
             // unusable method name falsifies the condition
@@ -157,13 +165,17 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
                 mr.method(services, prefixType, mr.getMethodSignature(services, ec));
         }
 
-        if (method == null) { return false; }
+        if (method == null) {
+            return false;
+        }
         return negation ^ cannotBeOverriden(method, services);
     }
 
     private boolean cannotBeOverriden(IProgramMethod method, Services services) {
 
-        if (method.isStatic() || method.isPrivate() || method.isFinal()) { return true; }
+        if (method.isStatic() || method.isPrivate() || method.isFinal()) {
+            return true;
+        }
 
         // bugfix (contributing to gitlab #1493)
         // see MethodCall.handleInstanceInvocation(...)
@@ -173,7 +185,8 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         }
 
         Type type = method.getContainerType().getJavaType();
-        assert type instanceof ClassType : "Calling a method on sth that does not have a class type";
+        assert type instanceof ClassType
+                : "Calling a method on sth that does not have a class type";
 
         ClassType classType = (ClassType) type;
 
@@ -184,6 +197,6 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     @Override
     public String toString() {
         return (negation ? "\\not " : "") + NAME + "(" + receiver + ", " + methname + ", " + args
-                + ")";
+            + ")";
     }
 }

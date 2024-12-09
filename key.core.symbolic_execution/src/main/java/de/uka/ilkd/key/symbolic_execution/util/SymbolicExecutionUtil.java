@@ -258,7 +258,11 @@ public final class SymbolicExecutionUtil {
      */
     public static ImmutableList<Term> listSemisequentTerms(Semisequent semisequent) {
         ImmutableList<Term> terms = ImmutableSLList.nil();
-        if (semisequent != null) { for (SequentFormula sf : semisequent) { terms = terms.append(sf.formula()); } }
+        if (semisequent != null) {
+            for (SequentFormula sf : semisequent) {
+                terms = terms.append(sf.formula());
+            }
+        }
         return terms;
     }
 
@@ -339,7 +343,9 @@ public final class SymbolicExecutionUtil {
             if (subOne.op() == integerLDT.getAdd()) {
                 if (isOne(subOne.sub(0), integerLDT)) {
                     term = tb.leq(term.sub(0), subOne.sub(1));
-                } else if (isOne(subOne.sub(1), integerLDT)) { term = tb.leq(term.sub(0), subOne.sub(0)); }
+                } else if (isOne(subOne.sub(1), integerLDT)) {
+                    term = tb.leq(term.sub(0), subOne.sub(0));
+                }
             }
         }
         // Improve readability: a >= 1 + b, a >= b + 1
@@ -348,7 +354,9 @@ public final class SymbolicExecutionUtil {
             if (subOne.op() == integerLDT.getAdd()) {
                 if (isOne(subOne.sub(0), integerLDT)) {
                     term = tb.gt(term.sub(0), subOne.sub(1));
-                } else if (isOne(subOne.sub(1), integerLDT)) { term = tb.gt(term.sub(0), subOne.sub(0)); }
+                } else if (isOne(subOne.sub(1), integerLDT)) {
+                    term = tb.gt(term.sub(0), subOne.sub(0));
+                }
             }
         }
         // Improve readability: a <= -1 + b, a <= 1 + -b, a <= 1 - b
@@ -357,9 +365,13 @@ public final class SymbolicExecutionUtil {
             if (subOne.op() == integerLDT.getAdd()) {
                 if (isMinusOne(subOne.sub(0), integerLDT)) {
                     term = tb.lt(term.sub(0), subOne.sub(1));
-                } else if (isMinusOne(subOne.sub(1), integerLDT)) { term = tb.lt(term.sub(0), subOne.sub(0)); }
+                } else if (isMinusOne(subOne.sub(1), integerLDT)) {
+                    term = tb.lt(term.sub(0), subOne.sub(0));
+                }
             } else if (subOne.op() == integerLDT.getSub()) {
-                if (isOne(subOne.sub(1), integerLDT)) { term = tb.lt(term.sub(0), subOne.sub(0)); }
+                if (isOne(subOne.sub(1), integerLDT)) {
+                    term = tb.lt(term.sub(0), subOne.sub(0));
+                }
             }
         }
         // Improve readability: a > -1 + b, a > 1 + -b, a > 1 - b
@@ -368,9 +380,13 @@ public final class SymbolicExecutionUtil {
             if (subOne.op() == integerLDT.getAdd()) {
                 if (isMinusOne(subOne.sub(0), integerLDT)) {
                     term = tb.geq(term.sub(0), subOne.sub(1));
-                } else if (isMinusOne(subOne.sub(1), integerLDT)) { term = tb.geq(term.sub(0), subOne.sub(0)); }
+                } else if (isMinusOne(subOne.sub(1), integerLDT)) {
+                    term = tb.geq(term.sub(0), subOne.sub(0));
+                }
             } else if (subOne.op() == integerLDT.getSub()) {
-                if (isOne(subOne.sub(1), integerLDT)) { term = tb.geq(term.sub(0), subOne.sub(0)); }
+                if (isOne(subOne.sub(1), integerLDT)) {
+                    term = tb.geq(term.sub(0), subOne.sub(0));
+                }
             }
         }
         // Improve readability: !a >= b, !a > b, !a <= b, !a < b
@@ -382,7 +398,9 @@ public final class SymbolicExecutionUtil {
                 term = tb.geq(sub.sub(0), sub.sub(1));
             } else if (sub.op() == integerLDT.getGreaterOrEquals()) {
                 term = tb.lt(sub.sub(0), sub.sub(1));
-            } else if (sub.op() == integerLDT.getGreaterThan()) { term = tb.leq(sub.sub(0), sub.sub(1)); }
+            } else if (sub.op() == integerLDT.getGreaterThan()) {
+                term = tb.leq(sub.sub(0), sub.sub(1));
+            }
         }
         return term;
     }
@@ -733,10 +751,15 @@ public final class SymbolicExecutionUtil {
     public static boolean containsSymbolicExecutionLabel(Term term) {
         boolean hasModality = false;
         term = TermBuilder.goBelowUpdates(term);
-        if (term.op() instanceof Modality) { hasModality = hasSymbolicExecutionLabel(term); }
+        if (term.op() instanceof Modality) {
+            hasModality = hasSymbolicExecutionLabel(term);
+        }
         if (!hasModality) {
             int i = 0;
-            while (!hasModality && i < term.arity()) { hasModality = containsSymbolicExecutionLabel(term.sub(i)); i++; }
+            while (!hasModality && i < term.arity()) {
+                hasModality = containsSymbolicExecutionLabel(term.sub(i));
+                i++;
+            }
         }
         return hasModality;
     }
@@ -819,21 +842,27 @@ public final class SymbolicExecutionUtil {
             List<IProgramVariable> variables = new LinkedList<>();
             // Add self variable
             IProgramVariable selfVar = findSelfTerm(proofNode, modalityPIO);
-            if (selfVar != null) { variables.add(selfVar); }
+            if (selfVar != null) {
+                variables.add(selfVar);
+            }
             // Add method parameters
             Node callNode = findMethodCallNode(proofNode, modalityPIO);
             if (callNode != null
                     && callNode.getNodeInfo()
                             .getActiveStatement() instanceof MethodBodyStatement mbs) {
                 for (Expression e : mbs.getArguments()) {
-                    if (e instanceof IProgramVariable) { variables.add((IProgramVariable) e); }
+                    if (e instanceof IProgramVariable) {
+                        variables.add((IProgramVariable) e);
+                    }
                 }
             }
             // Collect variables from updates
             List<IProgramVariable> variablesFromUpdates =
                 collectAllElementaryUpdateTerms(proofNode);
             for (IProgramVariable variable : variablesFromUpdates) {
-                if (!variables.contains(variable)) { variables.add(variable); }
+                if (!variables.contains(variable)) {
+                    variables.add(variable);
+                }
             }
             IExecutionVariable[] result = new IExecutionVariable[variables.size()];
             int i = 0;
@@ -893,10 +922,14 @@ public final class SymbolicExecutionUtil {
                 } else {
                     // Local variable
                     ElementaryUpdate eu = (ElementaryUpdate) term.op();
-                    if (eu.lhs() instanceof IProgramVariable) { result.add((IProgramVariable) eu.lhs()); }
+                    if (eu.lhs() instanceof IProgramVariable) {
+                        result.add((IProgramVariable) eu.lhs());
+                    }
                 }
             } else {
-                for (Term sub : term.subs()) { internalCollectAllElementaryUpdateTerms(services, result, sub); }
+                for (Term sub : term.subs()) {
+                    internalCollectAllElementaryUpdateTerms(services, result, sub);
+                }
             }
         }
     }
@@ -923,18 +956,24 @@ public final class SymbolicExecutionUtil {
                     Term locationTerm =
                         innerMostSelect != null ? innerMostSelect.sub(2) : subs.get(2);
                     ProgramVariable attribute = getProgramVariable(services, heapLDT, locationTerm);
-                    if (attribute != null && attribute.isStatic()) { result.add(attribute); }
+                    if (attribute != null && attribute.isStatic()) {
+                        result.add(attribute);
+                    }
                 }
             }
         } catch (Exception e) {
             // Can go wrong, nothing to do
         }
-        for (Term sub : term.subs()) { internalCollectStaticProgramVariablesOnHeap(services, result, sub); }
+        for (Term sub : term.subs()) {
+            internalCollectStaticProgramVariablesOnHeap(services, result, sub);
+        }
     }
 
     private static Term findInnerMostSelect(Term term, Services services) {
         if (isSelect(services, term)) {
-            while (isSelect(services, term.sub(1))) { term = term.sub(1); }
+            while (isSelect(services, term.sub(1))) {
+                term = term.sub(1);
+            }
             return term;
         } else {
             return null;
@@ -1905,7 +1944,7 @@ public final class SymbolicExecutionUtil {
                 improveReadability);
         } else {
             throw new ProofInputException("Unsupported RuleApp in branch computation \""
-                    + parent.getAppliedRuleApp() + "\".");
+                + parent.getAppliedRuleApp() + "\".");
         }
     }
 
@@ -1960,7 +1999,7 @@ public final class SymbolicExecutionUtil {
         if (!(parent.getAppliedRuleApp() instanceof ContractRuleApp)) {
             throw new ProofInputException(
                 "Only ContractRuleApp is allowed in branch computation but rule \""
-                        + parent.getAppliedRuleApp() + "\" was found.");
+                    + parent.getAppliedRuleApp() + "\" was found.");
         }
         int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
         if (childIndex >= 3) {
@@ -1972,12 +2011,12 @@ public final class SymbolicExecutionUtil {
             Term workingTerm = posInOccurrenceInOtherNode(parent, pio, node);
             if (workingTerm == null) {
                 throw new ProofInputException("Term not find in precondition branch, implementation"
-                        + " of UseOperationContractRule might have changed!");
+                    + " of UseOperationContractRule might have changed!");
             }
             workingTerm = TermBuilder.goBelowUpdates(workingTerm);
             if (workingTerm.op() != Junctor.AND) {
                 throw new ProofInputException("And operation expected, implementation of "
-                        + "UseOperationContractRule might have changed!");
+                    + "UseOperationContractRule might have changed!");
             }
             Term preconditions = workingTerm.sub(0);
             return services.getTermBuilder().not(preconditions);
@@ -2012,20 +2051,20 @@ public final class SymbolicExecutionUtil {
                 callerNotNullTerm = TermBuilder.goBelowUpdates(callerNotNullTerm);
                 if (callerNotNullTerm.op() != Junctor.NOT) {
                     throw new ProofInputException("Not operation expected, implementation of "
-                            + "UseOperationContractRule might have changed!");
+                        + "UseOperationContractRule might have changed!");
                 }
                 if (callerNotNullTerm.sub(0).op() != Equality.EQUALS) {
                     throw new ProofInputException("Equals operation expected, implementation of "
-                            + "UseOperationContractRule might have changed!");
+                        + "UseOperationContractRule might have changed!");
                 }
                 if (!(callerNotNullTerm.sub(0).sub(0).op() instanceof ProgramVariable)) {
                     throw new ProofInputException("ProgramVariable expected, implementation of "
-                            + "UseOperationContractRule might have changed!");
+                        + "UseOperationContractRule might have changed!");
                 }
                 if (!isNullSort(callerNotNullTerm.sub(0).sub(1).sort(),
                     parent.proof().getServices())) {
                     throw new ProofInputException("Null expected, implementation of "
-                            + "UseOperationContractRule might have changed!");
+                        + "UseOperationContractRule might have changed!");
                 }
                 result = services.getTermBuilder().and(callerNotNullTerm, result);
             }
@@ -2040,7 +2079,7 @@ public final class SymbolicExecutionUtil {
                     createSequentToProveWithNewSuccedent(parent, null, result, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                     RESULT_LABEL, "Operation contract branch condition computation on node "
-                            + parent.serialNr() + " for branch " + node.serialNr() + ".",
+                        + parent.serialNr() + " for branch " + node.serialNr() + ".",
                     StrategyProperties.SPLITTING_OFF);
             } else {
                 // Add updates (in the simplify branch the updates are added during side proof
@@ -2048,7 +2087,9 @@ public final class SymbolicExecutionUtil {
                 condition = services.getTermBuilder()
                         .applyParallel(search.getUpdatesAndTerm().first, result);
             }
-            if (improveReadability) { condition = improveReadability(condition, services); }
+            if (improveReadability) {
+                condition = improveReadability(condition, services);
+            }
             return condition;
         }
     }
@@ -2073,7 +2114,7 @@ public final class SymbolicExecutionUtil {
         // Treat general conditions
         if (search.getWorkingTerm().op() != Junctor.AND) {
             throw new ProofInputException("And operation expected, implementation of "
-                    + "UseOperationContractRule might have changed!");
+                + "UseOperationContractRule might have changed!");
         }
         Term specificationCasesTerm = search.getWorkingTerm().sub(1);
         Term excDefinition = search.getExceptionDefinition();
@@ -2162,7 +2203,9 @@ public final class SymbolicExecutionUtil {
                 } else {
                     Term excCondition = rightTerm;
                     // Check if right child is exception definition
-                    if (excCondition.op() == Junctor.AND) { excCondition = excCondition.sub(excCondition.arity() - 1); }
+                    if (excCondition.op() == Junctor.AND) {
+                        excCondition = excCondition.sub(excCondition.arity() - 1);
+                    }
                     if (excCondition.equalsModProperty(normalExcDefinition,
                         IRRELEVANT_TERM_LABELS_PROPERTY)) {
                         normalConditions.add(leftTerm);
@@ -2183,12 +2226,12 @@ public final class SymbolicExecutionUtil {
                                 exceptinalConditions.add(leftTerm);
                             } else {
                                 throw new ProofInputException("Exeptional condition expected, "
-                                        + "implementation of UseOperationContractRule might have "
-                                        + "changed!");
+                                    + "implementation of UseOperationContractRule might have "
+                                    + "changed!");
                             }
                         } else {
                             throw new ProofInputException("Exeptional condition expected, "
-                                    + "implementation of UseOperationContractRule might have changed!");
+                                + "implementation of UseOperationContractRule might have changed!");
                         }
                     }
                 }
@@ -2218,7 +2261,7 @@ public final class SymbolicExecutionUtil {
         workingTerm = updatesAndTerm.second;
         if (workingTerm.op() != Junctor.AND) {
             throw new ProofInputException("And operation expected, implementation of "
-                    + "UseOperationContractRule might have changed!");
+                + "UseOperationContractRule might have changed!");
         }
         workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is
                                           // the combination of all normal and exceptional
@@ -2228,7 +2271,7 @@ public final class SymbolicExecutionUtil {
         Term exceptionDefinition = searchExceptionDefinition(workingTerm, services);
         if (exceptionDefinition == null) {
             throw new ProofInputException("Exception definition not found, implementation of "
-                    + "UseOperationContractRule might have changed!");
+                + "UseOperationContractRule might have changed!");
         }
         // Make sure that exception equality was found
         Term exceptionEquality =
@@ -2258,7 +2301,10 @@ public final class SymbolicExecutionUtil {
         } else {
             Term result = null;
             int i = term.arity() - 1;
-            while (result == null && i >= 0) { result = searchExceptionDefinition(term.sub(i), services); i--; }
+            while (result == null && i >= 0) {
+                result = searchExceptionDefinition(term.sub(i), services);
+                i--;
+            }
             return result;
         }
     }
@@ -2381,7 +2427,7 @@ public final class SymbolicExecutionUtil {
         if (!(parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp)) {
             throw new ProofInputException(
                 "Only LoopInvariantBuiltInRuleApp is allowed in branch computation but rule \""
-                        + parent.getAppliedRuleApp() + "\" was found.");
+                    + parent.getAppliedRuleApp() + "\" was found.");
         }
         // Make sure that branch is supported
         int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
@@ -2448,12 +2494,14 @@ public final class SymbolicExecutionUtil {
                     modalityTerm, pair.first, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                     RESULT_LABEL, "Loop invariant branch condition computation on node "
-                            + parent.serialNr() + " for branch " + node.serialNr() + ".",
+                        + parent.serialNr() + " for branch " + node.serialNr() + ".",
                     StrategyProperties.SPLITTING_OFF);
             } else {
                 condition = services.getTermBuilder().applySequential(pair.first, modalityTerm);
             }
-            if (improveReadability) { condition = improveReadability(condition, services); }
+            if (improveReadability) {
+                condition = improveReadability(condition, services);
+            }
             return condition;
         } else {
             throw new ProofInputException(
@@ -2493,7 +2541,7 @@ public final class SymbolicExecutionUtil {
         // Make sure that a computation is possible
         if (!(parent.getAppliedRuleApp() instanceof AbstractBlockContractBuiltInRuleApp)) {
             throw new ProofInputException("Only AbstractBlockContractBuiltInRuleApp is allowed in "
-                    + "branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
+                + "branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
         }
 
         RuleApp app = parent.getAppliedRuleApp();
@@ -2519,10 +2567,12 @@ public final class SymbolicExecutionUtil {
                     condition, null, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                     RESULT_LABEL, "Block contract branch condition computation on node "
-                            + parent.serialNr() + " for branch " + node.serialNr() + ".",
+                        + parent.serialNr() + " for branch " + node.serialNr() + ".",
                     StrategyProperties.SPLITTING_OFF);
             }
-            if (improveReadability) { condition = improveReadability(condition, services); }
+            if (improveReadability) {
+                condition = improveReadability(condition, services);
+            }
             return condition;
         } else {
             throw new ProofInputException(
@@ -2660,7 +2710,7 @@ public final class SymbolicExecutionUtil {
         if (!(parent.getAppliedRuleApp() instanceof TacletApp app)) {
             throw new ProofInputException(
                 "Only TacletApp is allowed in branch computation but rule \""
-                        + parent.getAppliedRuleApp() + "\" was found.");
+                    + parent.getAppliedRuleApp() + "\" was found.");
         }
         Services services = node.proof().getServices();
         // List new sequent formulas in the child node.
@@ -2724,7 +2774,7 @@ public final class SymbolicExecutionUtil {
                     // Make sure that an PosTacletApp was applied
                     if (!(app instanceof PosTacletApp)) {
                         throw new ProofInputException("Only PosTacletApp are allowed with a replace"
-                                + " term in branch computation but rule \"" + app + "\" was found.");
+                            + " term in branch computation but rule \"" + app + "\" was found.");
                     }
                     // Create new lists
                     ImmutableList<Term> tempAntecedents = ImmutableSLList.nil();
@@ -2757,8 +2807,8 @@ public final class SymbolicExecutionUtil {
                 }
             } else if (goalTemplate.replaceWithExpressionAsObject() != null) {
                 throw new ProofInputException("Expected replacement as Sequent or Term during "
-                        + "branch condition computation but is \""
-                        + goalTemplate.replaceWithExpressionAsObject() + "\".");
+                    + "branch condition computation but is \""
+                    + goalTemplate.replaceWithExpressionAsObject() + "\".");
             }
         }
         // Compute branch condition
@@ -2778,12 +2828,14 @@ public final class SymbolicExecutionUtil {
                 newLeftAndRight, true);
             condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                 RESULT_LABEL, "Taclet branch condition computation on node " + parent.serialNr()
-                        + " for branch " + node.serialNr() + ".",
+                    + " for branch " + node.serialNr() + ".",
                 StrategyProperties.SPLITTING_OFF);
         } else {
             condition = newLeftAndRight;
         }
-        if (improveReadability) { condition = improveReadability(condition, services); }
+        if (improveReadability) {
+            condition = improveReadability(condition, services);
+        }
         return condition;
     }
 
@@ -2799,9 +2851,15 @@ public final class SymbolicExecutionUtil {
     private static ImmutableList<Term> listNewSemisequentTerms(Semisequent parent,
             Semisequent child) {
         Set<SequentFormula> parentSFs = new HashSet<>();
-        for (SequentFormula sf : parent) { parentSFs.add(sf); }
+        for (SequentFormula sf : parent) {
+            parentSFs.add(sf);
+        }
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (SequentFormula sf : child) { if (!parentSFs.contains(sf)) { result = result.append(sf.formula()); } }
+        for (SequentFormula sf : child) {
+            if (!parentSFs.contains(sf)) {
+                result = result.append(sf.formula());
+            }
+        }
         return result;
     }
 
@@ -3145,7 +3203,9 @@ public final class SymbolicExecutionUtil {
         Sequent sequent = root.sequent();
         for (SequentFormula sf : sequent.succedent()) {
             Term term = sf.formula();
-            if (Junctor.IMP.equals(term.op())) { result = result.prepend(collectElementaryUpdates(term.sub(1))); }
+            if (Junctor.IMP.equals(term.op())) {
+                result = result.prepend(collectElementaryUpdates(term.sub(1)));
+            }
         }
         return result;
     }
@@ -3163,7 +3223,9 @@ public final class SymbolicExecutionUtil {
             return collectElementaryUpdates(updateTerm);
         } else if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
             ImmutableList<Term> result = ImmutableSLList.nil();
-            for (int i = 0; i < term.arity(); i++) { result = result.prepend(collectElementaryUpdates(term.sub(i))); }
+            for (int i = 0; i < term.arity(); i++) {
+                result = result.prepend(collectElementaryUpdates(term.sub(i)));
+            }
             return result;
         } else if (term.op() instanceof ElementaryUpdate) {
             return ImmutableSLList.<Term>nil().prepend(term);
@@ -3318,7 +3380,9 @@ public final class SymbolicExecutionUtil {
      */
     private static Term addLabelRecursiveToNonSkolem(TermFactory tf, Term term, TermLabel label) {
         List<Term> newSubs = new LinkedList<>();
-        for (Term oldSub : term.subs()) { newSubs.add(addLabelRecursiveToNonSkolem(tf, oldSub, label)); }
+        for (Term oldSub : term.subs()) {
+            newSubs.add(addLabelRecursiveToNonSkolem(tf, oldSub, label));
+        }
         if (checkSkolemEquality(term) != 0 || isSkolemConstant(term)) {
             // Do not label skolem equality and skolem terms
             return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
@@ -3326,7 +3390,9 @@ public final class SymbolicExecutionUtil {
         } else {
             /// Label term which is not a skolem equality and not a skolem term
             List<TermLabel> newLabels = new LinkedList<>();
-            for (TermLabel oldLabel : term.getLabels()) { newLabels.add(oldLabel); }
+            for (TermLabel oldLabel : term.getLabels()) {
+                newLabels.add(oldLabel);
+            }
             newLabels.add(label);
             return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
                 new ImmutableArray<>(newLabels));
@@ -3348,11 +3414,17 @@ public final class SymbolicExecutionUtil {
         // Update children
         List<Term> newSubs = new LinkedList<>();
         ImmutableArray<Term> oldSubs = term.subs();
-        for (Term oldSub : oldSubs) { newSubs.add(removeLabelRecursive(tf, oldSub, label)); }
+        for (Term oldSub : oldSubs) {
+            newSubs.add(removeLabelRecursive(tf, oldSub, label));
+        }
         // Update label
         List<TermLabel> newLabels = new LinkedList<>();
         ImmutableArray<TermLabel> oldLabels = term.getLabels();
-        for (TermLabel oldLabel : oldLabels) { if (oldLabel != label) { newLabels.add(oldLabel); } }
+        for (TermLabel oldLabel : oldLabels) {
+            if (oldLabel != label) {
+                newLabels.add(oldLabel);
+            }
+        }
         return tf.createTerm(term.op(), new ImmutableArray<>(newSubs), term.boundVars(),
             new ImmutableArray<>(newLabels));
     }
@@ -3379,7 +3451,9 @@ public final class SymbolicExecutionUtil {
                 for (Term replacement : replacements) {
                     Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
                     for (Term checkConstant : checkResult) {
-                        if (result.add(checkConstant)) { toCheck.add(checkConstant); }
+                        if (result.add(checkConstant)) {
+                            toCheck.add(checkConstant);
+                        }
                     }
                 }
             }
@@ -3401,7 +3475,9 @@ public final class SymbolicExecutionUtil {
         term.execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
-                if (isSkolemConstant(visited)) { result.add(visited); }
+                if (isSkolemConstant(visited)) {
+                    result.add(visited);
+                }
             }
         });
         return result;
@@ -3461,8 +3537,12 @@ public final class SymbolicExecutionUtil {
         Term term = sf.formula();
         boolean remove = false;
         if (term.op() == Equality.EQUALS) {
-            if (isSkolemConstant(term.sub(0))) { remove = !skolemConstants.contains(term.sub(0)); }
-            if (!remove && isSkolemConstant(term.sub(1))) { remove = !skolemConstants.contains(term.sub(1)); }
+            if (isSkolemConstant(term.sub(0))) {
+                remove = !skolemConstants.contains(term.sub(0));
+            }
+            if (!remove && isSkolemConstant(term.sub(1))) {
+                remove = !skolemConstants.contains(term.sub(1));
+            }
         }
         if (remove) {
             return sequent
@@ -3495,8 +3575,12 @@ public final class SymbolicExecutionUtil {
      */
     public static int checkSkolemEquality(Term term) {
         if (term.op() == Equality.EQUALS) {
-            if (isSkolemConstant(term.sub(0))) { return -1; }
-            if (isSkolemConstant(term.sub(1))) { return 1; }
+            if (isSkolemConstant(term.sub(0))) {
+                return -1;
+            }
+            if (isSkolemConstant(term.sub(1))) {
+                return 1;
+            }
         }
         return 0;
     }
@@ -3520,7 +3604,9 @@ public final class SymbolicExecutionUtil {
             if (!replacements.isEmpty()) {
                 Term other = term.sub(1);
                 List<Term> newTerms = new LinkedList<>();
-                for (Term replacement : replacements) { newTerms.add(tb.equals(replacement, other)); }
+                for (Term replacement : replacements) {
+                    newTerms.add(tb.equals(replacement, other));
+                }
                 term = tb.and(newTerms);
                 return replaceSkolemConstants(sequent, term, services);
             } else {
@@ -3533,7 +3619,9 @@ public final class SymbolicExecutionUtil {
             if (!replacements.isEmpty()) {
                 Term other = term.sub(0);
                 List<Term> newTerms = new LinkedList<>();
-                for (Term replacement : replacements) { newTerms.add(tb.equals(other, replacement)); }
+                for (Term replacement : replacements) {
+                    newTerms.add(tb.equals(other, replacement));
+                }
                 term = tb.and(newTerms);
                 return replaceSkolemConstants(sequent, term, services);
             } else {
@@ -3555,7 +3643,9 @@ public final class SymbolicExecutionUtil {
                 for (int i = 0; i < term.arity(); i++) {
                     Term oldChild = term.sub(i);
                     Term newChild = replaceSkolemConstants(sequent, oldChild, services);
-                    if (newChild != oldChild) { changed = true; }
+                    if (newChild != oldChild) {
+                        changed = true;
+                    }
                     newChildren.add(newChild);
                 }
                 if (changed) {
@@ -3565,21 +3655,27 @@ public final class SymbolicExecutionUtil {
                         assert term.boundVars().isEmpty();
                         assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
                         Term result = services.getTermBuilder().not(newChildren.get(0));
-                        if (term.hasLabels()) { result = services.getTermBuilder().label(result, term.getLabels()); }
+                        if (term.hasLabels()) {
+                            result = services.getTermBuilder().label(result, term.getLabels());
+                        }
                         return result;
                     } else if (term.op() == Junctor.OR) {
                         // Create new OR term using build in simplification of TermBuilder.
                         assert term.boundVars().isEmpty();
                         assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
                         Term result = services.getTermBuilder().or(newChildren);
-                        if (term.hasLabels()) { result = services.getTermBuilder().label(result, term.getLabels()); }
+                        if (term.hasLabels()) {
+                            result = services.getTermBuilder().label(result, term.getLabels());
+                        }
                         return result;
                     } else if (term.op() == Junctor.AND) {
                         // Create new AND term using build in simplification of TermBuilder.
                         assert term.boundVars().isEmpty();
                         assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
                         Term result = services.getTermBuilder().and(newChildren);
-                        if (term.hasLabels()) { result = services.getTermBuilder().label(result, term.getLabels()); }
+                        if (term.hasLabels()) {
+                            result = services.getTermBuilder().label(result, term.getLabels());
+                        }
                         return result;
                     } else if (term.op() == Junctor.IMP) {
                         // Create new IMP term using build in simplification of TermBuilder.
@@ -3671,7 +3767,9 @@ public final class SymbolicExecutionUtil {
         Set<IProgramVariable> result = new LinkedHashSet<>();
         if (fd != null) {
             ImmutableArray<FieldSpecification> specifications = fd.getFieldSpecifications();
-            for (FieldSpecification spec : specifications) { result.add(spec.getProgramVariable()); }
+            for (FieldSpecification spec : specifications) {
+                result.add(spec.getProgramVariable());
+            }
         }
         return result;
     }
@@ -3831,7 +3929,9 @@ public final class SymbolicExecutionUtil {
      */
     public static IExecutionNode<?> getRoot(IExecutionNode<?> executionNode) {
         if (executionNode != null) {
-            while (executionNode.getParent() != null) { executionNode = executionNode.getParent(); }
+            while (executionNode.getParent() != null) {
+                executionNode = executionNode.getParent();
+            }
             return executionNode;
         } else {
             return null;
@@ -3861,7 +3961,9 @@ public final class SymbolicExecutionUtil {
                 Iterator<? extends Statement> iter = updateContentBody.iterator();
                 while (tryStatement == null && iter.hasNext()) {
                     Statement next = iter.next();
-                    if (next instanceof Try) { tryStatement = (Try) next; }
+                    if (next instanceof Try) {
+                        tryStatement = (Try) next;
+                    }
                 }
                 if (tryStatement != null) {
                     if (tryStatement.getBranchCount() == 1
@@ -3872,7 +3974,9 @@ public final class SymbolicExecutionUtil {
                             if (catchBlock.getBody().size() == 1
                                     && catchBlock.getBody()
                                             .get(0) instanceof Assignment assignment) {
-                                if (assignment.getFirstElement() instanceof IProgramVariable var) { return var; }
+                                if (assignment.getFirstElement() instanceof IProgramVariable var) {
+                                    return var;
+                                }
                             }
                         }
                     }
@@ -4159,7 +4263,9 @@ public final class SymbolicExecutionUtil {
             Deque<StatementBlock> blocks = new LinkedList<>();
             int methodFrameCount = 0;
             if (firstStatement != null) {
-                if (firstStatement instanceof StatementBlock) { blocks.addFirst((StatementBlock) firstStatement); }
+                if (firstStatement instanceof StatementBlock) {
+                    blocks.addFirst((StatementBlock) firstStatement);
+                }
                 SourceElement lastStatement = null;
                 while (firstStatement instanceof ProgramPrefix && lastStatement != firstStatement) {
                     lastStatement = firstStatement;
@@ -4168,12 +4274,16 @@ public final class SymbolicExecutionUtil {
                         blocks.clear(); // Only block of inner most method frames are of interest.
                         methodFrameCount++;
                     }
-                    if (firstStatement instanceof StatementBlock) { blocks.addFirst((StatementBlock) firstStatement); }
+                    if (firstStatement instanceof StatementBlock) {
+                        blocks.addFirst((StatementBlock) firstStatement);
+                    }
                 }
             }
             // Compute second statement
             StatementBlock block = null;
-            while (!blocks.isEmpty() && (block == null || block.getChildCount() < 2)) { block = blocks.removeFirst(); }
+            while (!blocks.isEmpty() && (block == null || block.getChildCount() < 2)) {
+                block = blocks.removeFirst();
+            }
             if (block != null && block.getChildCount() >= 2) {
                 return new Pair<>(methodFrameCount, block.getChildAt(1));
             } else {
@@ -4316,7 +4426,9 @@ public final class SymbolicExecutionUtil {
      */
     public static NotationInfo createNotationInfo(Proof proof) {
         NotationInfo notationInfo = new NotationInfo();
-        if (proof != null && !proof.isDisposed()) { notationInfo.setAbbrevMap(proof.abbreviations()); }
+        if (proof != null && !proof.isDisposed()) {
+            notationInfo.setAbbrevMap(proof.abbreviations());
+        }
         return notationInfo;
     }
 
@@ -4342,7 +4454,9 @@ public final class SymbolicExecutionUtil {
                                 .search(leaf.sequent().succedent(),
                                     element -> Operator.opEquals(toSearch.op(),
                                         element.formula().op()));
-                        if (topLevelPredicate == null) { verified = false; }
+                        if (topLevelPredicate == null) {
+                            verified = false;
+                        }
                     }
                 }
                 return verified;
@@ -4373,11 +4487,15 @@ public final class SymbolicExecutionUtil {
                     Node leaf = leafsIter.next();
                     if (!leaf.isClosed()) {
                         final Set<Operator> additinalOperatos = new HashSet<>();
-                        for (Term term : additinalPredicates) { additinalOperatos.add(term.op()); }
+                        for (Term term : additinalPredicates) {
+                            additinalOperatos.add(term.op());
+                        }
                         SequentFormula topLevelPredicate =
                             CollectionUtil.search(leaf.sequent().succedent(),
                                 element -> additinalOperatos.contains(element.formula().op()));
-                        if (topLevelPredicate == null) { verified = false; }
+                        if (topLevelPredicate == null) {
+                            verified = false;
+                        }
                     }
                 }
                 return verified;
@@ -4432,7 +4550,9 @@ public final class SymbolicExecutionUtil {
                 }
             }
             // An exceptional termination is found if the exceptional variable is not null
-            if (value != null && value.size() == 1) { result = value.get(0).sort(); }
+            if (value != null && value.size() == 1) {
+                result = value.get(0).sort();
+            }
         }
         return result;
     }
@@ -4452,10 +4572,14 @@ public final class SymbolicExecutionUtil {
             IProgramVariable variable) {
         ImmutableArray<Term> result = null;
         if (term.op() instanceof ElementaryUpdate update) {
-            if (Objects.equals(variable, update.lhs())) { result = term.subs(); }
+            if (Objects.equals(variable, update.lhs())) {
+                result = term.subs();
+            }
         } else if (term.op() instanceof UpdateJunctor) {
             Iterator<Term> iter = term.subs().iterator();
-            while (result == null && iter.hasNext()) { result = extractValueFromUpdate(iter.next(), variable); }
+            while (result == null && iter.hasNext()) {
+                result = extractValueFromUpdate(iter.next(), variable);
+            }
         }
         return result;
     }

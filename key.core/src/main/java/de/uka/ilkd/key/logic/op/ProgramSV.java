@@ -219,7 +219,9 @@ public final class ProgramSV extends OperatorSV
      */
     private MatchConditions addProgramInstantiation(ProgramElement pe, MatchConditions matchCond,
             Services services) {
-        if (matchCond == null) { return null; }
+        if (matchCond == null) {
+            return null;
+        }
 
         SVInstantiations insts = matchCond.getInstantiations();
 
@@ -261,7 +263,9 @@ public final class ProgramSV extends OperatorSV
      */
     private MatchConditions addProgramInstantiation(ProgramList list, MatchConditions matchCond,
             Services services) {
-        if (matchCond == null) { return null; }
+        if (matchCond == null) {
+            return null;
+        }
 
         SVInstantiations insts = matchCond.getInstantiations();
         final ProgramList pl = (ProgramList) insts.getInstantiation(this);
@@ -281,7 +285,9 @@ public final class ProgramSV extends OperatorSV
         final Services services = source.getServices();
         ProgramElement src = source.getSource();
 
-        if (src == null) { return addProgramInstantiation(EMPTY_LIST_INSTANTIATION, matchCond, services); }
+        if (src == null) {
+            return addProgramInstantiation(EMPTY_LIST_INSTANTIATION, matchCond, services);
+        }
 
         SVInstantiations instantiations = matchCond.getInstantiations();
 
@@ -291,7 +297,9 @@ public final class ProgramSV extends OperatorSV
             new java.util.ArrayList<>();
 
         while (src != null) {
-            if (!check(src, ec, services)) { break; }
+            if (!check(src, ec, services)) {
+                break;
+            }
             matchedElements.add(src);
             source.next();
             src = source.getSource();
@@ -313,13 +321,17 @@ public final class ProgramSV extends OperatorSV
      * @return true if the SchemaVariable can stand for the given element
      */
     private boolean check(ProgramElement match, ExecutionContext ec, Services services) {
-        if (match == null) { return false; }
+        if (match == null) {
+            return false;
+        }
         return ((ProgramSVSort) sort()).canStandFor(match, ec, services);
     }
 
     @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
-        if (isListSV()) { return matchListSV(source, matchCond); }
+        if (isListSV()) {
+            return matchListSV(source, matchCond);
+        }
 
         final Services services = source.getServices();
         final ProgramElement src = source.getSource();
@@ -328,7 +340,9 @@ public final class ProgramSV extends OperatorSV
 
         final ExecutionContext ec = instantiations.getExecutionContext();
 
-        if (!check(src, ec, services)) { return null; }
+        if (!check(src, ec, services)) {
+            return null;
+        }
 
         final Object instant = instantiations.getInstantiation(this);
         if (instant == null || instant.equals(src)
@@ -343,7 +357,7 @@ public final class ProgramSV extends OperatorSV
             }
         } else {
             LOGGER.debug("Match failed: Former match of "
-                    + " SchemaVariable incompatible with " + " the current match.");
+                + " SchemaVariable incompatible with " + " the current match.");
             return null; // FAILED mismatch
         }
         source.next();

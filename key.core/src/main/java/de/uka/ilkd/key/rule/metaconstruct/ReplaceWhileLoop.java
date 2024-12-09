@@ -84,7 +84,9 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
             theLoop = (LoopStatement) node;
             lastMethodFrameBeforeLoop = currentMethodFrame;
         }
-        if (node instanceof MethodFrame) { currentMethodFrame = depth(); }
+        if (node instanceof MethodFrame) {
+            currentMethodFrame = depth();
+        }
 
 
         super.walk(node);
@@ -96,7 +98,9 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
         walk(root());
         ExtList el = stack.peek();
         int i = 0;
-        while (!(el.get(i) instanceof ProgramElement)) { i++; }
+        while (!(el.get(i) instanceof ProgramElement)) {
+            i++;
+        }
         result = (ProgramElement) stack.peek().get(i);
     }
 
@@ -116,7 +120,9 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
     public void performActionOnMethodFrame(MethodFrame x) {
         if (lastMethodFrameBeforeLoop == depth()) {
             IProgramVariable res = x.getProgramVariable();
-            if (res != null) { returnType = res.getKeYJavaType(); }
+            if (res != null) {
+                returnType = res.getKeYJavaType();
+            }
         }
 
         super.performActionOnMethodFrame(x);

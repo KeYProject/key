@@ -80,13 +80,21 @@ public class ContextStatementBlockInstantiation {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof ContextStatementBlockInstantiation inst)) { return false; }
+        if (!(o instanceof ContextStatementBlockInstantiation inst)) {
+            return false;
+        }
 
-        if (isDifferent(suffixStart, inst.suffixStart)) { return false; }
+        if (isDifferent(suffixStart, inst.suffixStart)) {
+            return false;
+        }
 
-        if (isDifferent(prefixEnd, inst.prefixEnd)) { return false; }
+        if (isDifferent(prefixEnd, inst.prefixEnd)) {
+            return false;
+        }
 
-        if (isDifferent(activeStatementContext, inst.activeStatementContext)) { return false; }
+        if (isDifferent(activeStatementContext, inst.activeStatementContext)) {
+            return false;
+        }
 
         return !isDifferent(programElement, inst.programElement);
 
@@ -102,10 +110,18 @@ public class ContextStatementBlockInstantiation {
 
     public int hashCode() {
         int hashCode = 1;
-        if (prefixEnd != null) { hashCode = 17 * prefixEnd.hashCode(); }
-        if (suffixStart != null) { hashCode += 17 * suffixStart.hashCode(); }
-        if (activeStatementContext != null) { hashCode += 17 * activeStatementContext.hashCode(); }
-        if (programElement != null) { hashCode += 17 * programElement.hashCode(); }
+        if (prefixEnd != null) {
+            hashCode = 17 * prefixEnd.hashCode();
+        }
+        if (suffixStart != null) {
+            hashCode += 17 * suffixStart.hashCode();
+        }
+        if (activeStatementContext != null) {
+            hashCode += 17 * activeStatementContext.hashCode();
+        }
+        if (programElement != null) {
+            hashCode += 17 * programElement.hashCode();
+        }
         return hashCode;
     }
 

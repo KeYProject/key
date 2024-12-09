@@ -134,7 +134,9 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
             mediator.setInteractive(true);
             mediator.startInterface(true);
             mediator.getUI().getProofControl().fireAutoModeStopped(new ProofEvent(node.proof()));
-            if (SELECT_GOAL_AFTER_MACRO) { selectOpenGoalBelow(); }
+            if (SELECT_GOAL_AFTER_MACRO) {
+                selectOpenGoalBelow();
+            }
             emitProofMacroFinished(node, macro, posInOcc, info);
         }
     }

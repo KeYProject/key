@@ -37,7 +37,9 @@ public class SymbolicExecutionBreakpointStopCondition extends
      */
     public SymbolicExecutionBreakpointStopCondition(IBreakpoint... breakpoints) {
         super(Integer.MAX_VALUE);
-        if (breakpoints != null) { Collections.addAll(this.breakpoints, breakpoints); }
+        if (breakpoints != null) {
+            Collections.addAll(this.breakpoints, breakpoints);
+        }
     }
 
     /**

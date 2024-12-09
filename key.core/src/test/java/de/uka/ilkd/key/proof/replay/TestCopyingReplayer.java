@@ -37,7 +37,7 @@ class TestCopyingReplayer {
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
             KeYEnvironment.load(new File(testCaseDirectory,
                 "../../../../../key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof")
-                        .toPath());
+                    .toPath());
         Assertions.assertNotNull(env2.getLoadedProof());
         Assertions.assertTrue(env2.getLoadedProof().closed());
 

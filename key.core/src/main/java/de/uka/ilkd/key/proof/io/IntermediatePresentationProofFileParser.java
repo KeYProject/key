@@ -127,10 +127,13 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         case INSTANTIATION -> // inst
         {
             TacletInformation tacletInfo = (TacletInformation) ruleInfo;
-            if (tacletInfo.loadedInsts == null) { tacletInfo.loadedInsts = new LinkedList<>(); }
+            if (tacletInfo.loadedInsts == null) {
+                tacletInfo.loadedInsts = new LinkedList<>();
+            }
             tacletInfo.loadedInsts.add(str);
         }
-        case RULESET -> {} // heuristics
+        case RULESET -> {
+        } // heuristics
         case ASSUMES_FORMULA_IN_SEQUENT -> // ifseqformula
         {
             TacletInformation tacletInfo = (TacletInformation) ruleInfo;
@@ -142,15 +145,19 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             tacletInfo.ifDirectFormulaList = tacletInfo.ifDirectFormulaList.append(str);
         }
         case KeY_USER -> { // UserLog
-            if (proof.userLog == null) { proof.userLog = new ArrayList<>(); }
+            if (proof.userLog == null) {
+                proof.userLog = new ArrayList<>();
+            }
             proof.userLog.add(str);
         }
         case KeY_VERSION -> { // Version log
-            if (proof.keyVersionLog == null) { proof.keyVersionLog = new ArrayList<>(); }
+            if (proof.keyVersionLog == null) {
+                proof.keyVersionLog = new ArrayList<>();
+            }
             proof.keyVersionLog.add(str);
         }
         case KeY_SETTINGS -> // ProofSettings
-                loadPreferences(str);
+            loadPreferences(str);
         case BUILT_IN_RULE -> { // BuiltIn rules
             {
                 final AppNodeIntermediate newNode = new AppNodeIntermediate();
@@ -161,18 +168,22 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         }
         case CONTRACT -> ((BuiltinRuleInformation) ruleInfo).currContract = str;
         case MODALITY ->
-                // (additional information which can be used in external tools such as proof management)
-                ((BuiltinRuleInformation) ruleInfo).currContractModality = str;
+            // (additional information which can be used in external tools such as proof management)
+            ((BuiltinRuleInformation) ruleInfo).currContractModality = str;
         case ASSUMES_INST_BUILT_IN -> { // ifInst (for built in rules)
             BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
-            if (builtinInfo.builtinIfInsts == null) { builtinInfo.builtinIfInsts = ImmutableSLList.nil(); }
+            if (builtinInfo.builtinIfInsts == null) {
+                builtinInfo.builtinIfInsts = ImmutableSLList.nil();
+            }
             builtinInfo.currIfInstFormula = 0;
             builtinInfo.currIfInstPosInTerm = PosInTerm.getTopLevel();
         }
         case NEW_NAMES -> {
             final String[] newNames = str.split(",");
             ruleInfo.currNewNames = ImmutableSLList.nil();
-            for (String newName : newNames) { ruleInfo.currNewNames = ruleInfo.currNewNames.append(new Name(newName)); }
+            for (String newName : newNames) {
+                ruleInfo.currNewNames = ruleInfo.currNewNames.append(new Name(newName));
+            }
         }
         case AUTOMODE_TIME -> {
             try {
@@ -181,16 +192,16 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             }
         }
         case MERGE_PROCEDURE -> // merge procedure
-                ((BuiltinRuleInformation) ruleInfo).currMergeProc = str;
+            ((BuiltinRuleInformation) ruleInfo).currMergeProc = str;
         case NUMBER_MERGE_PARTNERS -> // number of merge partners
-                ((BuiltinRuleInformation) ruleInfo).currNrPartners = Integer.parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currNrPartners = Integer.parseInt(str);
         case MERGE_NODE -> // corresponding merge node id
-                ((BuiltinRuleInformation) ruleInfo).currCorrespondingMergeNodeId =
-                    Integer.parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currCorrespondingMergeNodeId =
+                Integer.parseInt(str);
         case MERGE_ID -> // merge node id
-                ((BuiltinRuleInformation) ruleInfo).currMergeNodeId = Integer.parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currMergeNodeId = Integer.parseInt(str);
         case MERGE_DIST_FORMULA -> // distinguishing formula for merges
-                ((BuiltinRuleInformation) ruleInfo).currDistFormula = str;
+            ((BuiltinRuleInformation) ruleInfo).currDistFormula = str;
         case MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE -> { // type of predicate
             // abstraction lattice
             try {
@@ -200,15 +211,19 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 errors.add(e);
             }
         }
-        case MERGE_ABSTRACTION_PREDICATES -> ((BuiltinRuleInformation) ruleInfo).currAbstractionPredicates =
-            str;
+        case MERGE_ABSTRACTION_PREDICATES ->
+            ((BuiltinRuleInformation) ruleInfo).currAbstractionPredicates =
+                str;
         case MERGE_USER_CHOICES -> ((BuiltinRuleInformation) ruleInfo).currUserChoices = str;
         case NOTES -> {
             ruleInfo.notes = str;
-            if (currNode != null) { ((AppNodeIntermediate) currNode).setNotes(ruleInfo.notes); }
+            if (currNode != null) {
+                ((AppNodeIntermediate) currNode).setNotes(ruleInfo.notes);
+            }
         }
         case SOLVERTYPE -> ((BuiltinRuleInformation) ruleInfo).solver = str;
-        default -> {}
+        default -> {
+        }
         }
 
     }
@@ -218,10 +233,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         switch (eid) {
         case BRANCH -> currNode = stack.pop();
         case USER_INTERACTION -> {
-            if (currNode != null) { ((AppNodeIntermediate) currNode).setInteractiveRuleApplication(true); }
+            if (currNode != null) {
+                ((AppNodeIntermediate) currNode).setInteractiveRuleApplication(true);
+            }
         }
         case PROOF_SCRIPT -> {
-            if (currNode != null) { ((AppNodeIntermediate) currNode).setScriptRuleApplication(true); }
+            if (currNode != null) {
+                ((AppNodeIntermediate) currNode).setScriptRuleApplication(true);
+            }
         }
         case RULE -> { // rule (taclet)
             ((AppNodeIntermediate) currNode).setIntermediateRuleApp(constructTacletApp());
@@ -237,7 +256,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 builtinInfo.builtinIfInsts.append(new Pair<>(
                     builtinInfo.currIfInstFormula, builtinInfo.currIfInstPosInTerm));
         }
-        default -> {}
+        default -> {
+        }
         }
     }
 

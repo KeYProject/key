@@ -61,7 +61,9 @@ class Instantiation {
 
     static Instantiation create(Term qf, Sequent seq, Services services) {
         synchronized (Instantiation.class) {
-            if (qf == lastQuantifiedFormula && seq == lastSequent) { return lastResult; }
+            if (qf == lastQuantifiedFormula && seq == lastSequent) {
+                return lastResult;
+            }
         }
         final Instantiation result = new Instantiation(qf, seq, services);
         synchronized (Instantiation.class) {
@@ -74,7 +76,9 @@ class Instantiation {
 
     private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
         ImmutableList<Term> res = ImmutableSLList.nil();
-        for (final SequentFormula cf : seq) { res = res.prepend(cf.formula()); }
+        for (final SequentFormula cf : seq) {
+            res = res.prepend(cf.formula());
+        }
         return DefaultImmutableSet.fromImmutableList(res);
     }
 
@@ -87,7 +91,9 @@ class Instantiation {
      */
     private void addInstances(ImmutableSet<Term> terms, Services services) {
         for (final Trigger t : triggersSet.getAllTriggers()) {
-            for (final Substitution sub : t.getSubstitutionsFromTerms(terms, services)) { addInstance(sub, services); }
+            for (final Substitution sub : t.getSubstitutionsFromTerms(terms, services)) {
+                addInstance(sub, services);
+            }
         }
         // if ( instancesWithCosts.isEmpty () )
         // ensure that there is always at least one instantiation
@@ -115,7 +121,9 @@ class Instantiation {
     private void addInstance(Substitution sub, Services services) {
         final long cost =
             PredictCostProver.computerInstanceCost(sub, getMatrix(), assumedLiterals, services);
-        if (cost != -1) { addInstance(sub, cost); }
+        if (cost != -1) {
+            addInstance(sub, cost);
+        }
     }
 
     /**
@@ -129,7 +137,9 @@ class Instantiation {
     private void addInstance(Substitution sub, long cost) {
         final Term inst = sub.getSubstitutedTerm(firstVar);
         final Long oldCost = instancesWithCosts.get(inst);
-        if (oldCost == null || oldCost >= cost) { instancesWithCosts.put(inst, cost); }
+        if (oldCost == null || oldCost >= cost) {
+            instancesWithCosts.put(inst, cost);
+        }
     }
 
     /**
@@ -143,7 +153,9 @@ class Instantiation {
         for (final SequentFormula cf : seq.antecedent()) {
             final Term atom = cf.formula();
             final Operator op = atom.op();
-            if (!(op == Quantifier.ALL || op == Quantifier.EX)) { assertLits = assertLits.prepend(atom); }
+            if (!(op == Quantifier.ALL || op == Quantifier.EX)) {
+                assertLits = assertLits.prepend(atom);
+            }
         }
         for (final SequentFormula cf : seq.succedent()) {
             final Term atom = cf.formula();
@@ -173,7 +185,9 @@ class Instantiation {
             // if (triggersSet)
             return TopRuleAppCost.INSTANCE;
         }
-        if (cost == -1) { return TopRuleAppCost.INSTANCE; }
+        if (cost == -1) {
+            return TopRuleAppCost.INSTANCE;
+        }
 
         return NumberRuleAppCost.create(cost);
     }
@@ -181,7 +195,9 @@ class Instantiation {
     /** get all instances from instancesCostCache subsCache */
     ImmutableSet<Term> getSubstitution() {
         ImmutableSet<Term> res = DefaultImmutableSet.nil();
-        for (final Term inst : instancesWithCosts.keySet()) { res = res.add(inst); }
+        for (final Term inst : instancesWithCosts.keySet()) {
+            res = res.add(inst);
+        }
         return res;
     }
 

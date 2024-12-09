@@ -50,7 +50,7 @@ public abstract class LDT implements Named {
         sort = services.getNamespaces().sorts().lookup(name);
         if (sort == null) {
             throw new RuntimeException("LDT " + name + " not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         }
         this.name = name;
     }
@@ -60,7 +60,7 @@ public abstract class LDT implements Named {
         sort = targetSort;
         if (sort == null) {
             throw new RuntimeException("LDT " + name + " not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         }
         this.name = name;
     }
@@ -91,7 +91,7 @@ public abstract class LDT implements Named {
         final JFunction f = funcNS.lookup(new Name(funcName));
         if (f == null) {
             throw new RuntimeException("LDT: Function " + funcName + " not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         }
         return addFunction(f);
     }

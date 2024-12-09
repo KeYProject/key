@@ -81,7 +81,9 @@ public final class CommandLine {
         @Override
         protected void print(PrintStream stream, int descriptionCol) {
             String s = image;
-            if (parameter != null) { s += " " + parameter; }
+            if (parameter != null) {
+                s += " " + parameter;
+            }
 
             indent(stream, indentSize);
             stream.print(s);
@@ -123,7 +125,9 @@ public final class CommandLine {
         @Override
         protected void print(PrintStream ps, int descriptionCol) {
             int indent = indentSize;
-            if (indentToDescriptionColumn) { indent += descriptionCol; }
+            if (indentToDescriptionColumn) {
+                indent += descriptionCol;
+            }
             indent(ps, indent);
             printIndentedMessage(ps, description, indent);
         }
@@ -264,7 +268,9 @@ public final class CommandLine {
                 "Parameters need to start with '" + MINUS + "': " + image);
         }
 
-        if (options.containsKey(image)) { throw new IllegalArgumentException(image + " has already been registered"); }
+        if (options.containsKey(image)) {
+            throw new IllegalArgumentException(image + " has already been registered");
+        }
 
         Option o = new Option();
         o.image = image;
@@ -362,12 +368,14 @@ public final class CommandLine {
             String current = args[cnt];
             Option option = options.get(current);
 
-            if (option == null) { throw new CommandLineException("Unknown command line option: " + current); }
+            if (option == null) {
+                throw new CommandLineException("Unknown command line option: " + current);
+            }
 
             if (option.parameter != null) {
                 if (cnt == args.length - 1) {
                     throw new CommandLineException("Command line option " + current
-                            + " expects a parameter but did not receive one");
+                        + " expects a parameter but did not receive one");
                 }
                 cnt++;
                 option.value = args[cnt];
@@ -378,7 +386,10 @@ public final class CommandLine {
             cnt++;
         }
 
-        while (cnt < args.length) { arguments.add(args[cnt]); cnt++; }
+        while (cnt < args.length) {
+            arguments.add(args[cnt]);
+            cnt++;
+        }
     }
 
     public List<String> getArguments() {
@@ -467,7 +478,9 @@ public final class CommandLine {
         assert option != null : param + " is unknown option";
 
         String value = option.value;
-        if (value == null) { return defaultValue; }
+        if (value == null) {
+            return defaultValue;
+        }
 
         try {
             return Integer.decode(value);
@@ -498,7 +511,9 @@ public final class CommandLine {
         assert option != null : param + " is unknown option";
 
         String value = option.value;
-        if (value == null) { return defaultValue; }
+        if (value == null) {
+            return defaultValue;
+        }
 
         try {
             return Long.decode(value);
@@ -529,13 +544,17 @@ public final class CommandLine {
 
         for (Option option : options.values()) {
             int len = option.image.length();
-            if (option.parameter != null) { len += 1 + option.parameter.length(); }
+            if (option.parameter != null) {
+                len += 1 + option.parameter.length();
+            }
             descriptionCol = Math.max(len, descriptionCol);
         }
 
         descriptionCol += 2;
 
-        for (HelpElement element : helpElements) { element.print(stream, descriptionCol); }
+        for (HelpElement element : helpElements) {
+            element.print(stream, descriptionCol);
+        }
 
         stream.flush();
     }
@@ -544,7 +563,9 @@ public final class CommandLine {
      * insert a number of spaces to the output stream
      */
     private void indent(PrintStream stream, int len) {
-        for (int i = len; i > 0; i--) { stream.print(" "); }
+        for (int i = len; i > 0; i--) {
+            stream.print(" ");
+        }
     }
 
     /*

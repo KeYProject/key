@@ -90,7 +90,9 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
     @Override
     public boolean isInitiallyValid() {
         boolean initiallyValid = false;
-        if (getProofNode().childrenCount() >= 1) { initiallyValid = getProofNode().child(0).isClosed(); }
+        if (getProofNode().childrenCount() >= 1) {
+            initiallyValid = getProofNode().child(0).isClosed();
+        }
         return initiallyValid;
     }
 }

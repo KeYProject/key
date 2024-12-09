@@ -25,7 +25,9 @@ public class ScriptTreeParser {
             var command = lineParser.parseCommand();
             int to = lineParser.getOffset();
 
-            if (command == null) { return root; }
+            if (command == null) {
+                return root;
+            }
 
             switch (command.args().get(ScriptLineParser.COMMAND_KEY)) {
             case "branches" -> branchStack.push(last);

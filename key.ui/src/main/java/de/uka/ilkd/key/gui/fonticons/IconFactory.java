@@ -211,7 +211,9 @@ public final class IconFactory {
     }
 
     private static ImageIcon scaleIcon(Image im, int x, int y) {
-        if (im.getWidth(null) == x && im.getHeight(null) == y) { return new ImageIcon(im); }
+        if (im.getWidth(null) == x && im.getHeight(null) == y) {
+            return new ImageIcon(im);
+        }
         Image scaledim = im.getScaledInstance(x, y, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledim);
     }
@@ -488,7 +490,9 @@ public final class IconFactory {
         Image original = keyLogo();
         int[] sizes = new int[] { 16, 20, 32, 40, 64, 128 };
         ArrayList<Image> images = new ArrayList<>(sizes.length);
-        for (int sz : sizes) { images.add(original.getScaledInstance(sz, sz, Image.SCALE_SMOOTH)); }
+        for (int sz : sizes) {
+            images.add(original.getScaledInstance(sz, sz, Image.SCALE_SMOOTH));
+        }
         return images;
     }
 }

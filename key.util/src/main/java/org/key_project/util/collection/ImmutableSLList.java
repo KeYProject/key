@@ -52,11 +52,16 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
      */
     @Override
     public ImmutableList<T> reverse() {
-        if (size() <= 1) { return this; }
+        if (size() <= 1) {
+            return this;
+        }
 
         ImmutableList<T> rest = this;
         ImmutableList<T> rev = nil();
-        while (!rest.isEmpty()) { rev = rev.prepend(rest.head()); rest = rest.tail(); }
+        while (!rest.isEmpty()) {
+            rev = rev.prepend(rest.head());
+            rest = rest.tail();
+        }
         return rev;
     }
 
@@ -68,13 +73,17 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         S[] result;
         if (array.length < size()) {
             Class<? extends Object[]> arrayClass = array.getClass();
-            assert arrayClass.isArray() : "@AssumeAssertion(nullness): This has indeed a component type";
+            assert arrayClass.isArray()
+                    : "@AssumeAssertion(nullness): This has indeed a component type";
             result = (S[]) Array.newInstance(arrayClass.getComponentType(), size());
         } else {
             result = array;
         }
         ImmutableList<T> rest = this;
-        for (int i = 0, sz = size(); i < sz; i++) { result[i] = (S) rest.head(); rest = rest.tail(); }
+        for (int i = 0, sz = size(); i < sz; i++) {
+            result[i] = (S) rest.head();
+            rest = rest.tail();
+        }
         return result;
     }
 
@@ -120,7 +129,9 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
      */
     protected ImmutableList<T> prepend(T[] array, int n) {
         ImmutableSLList<T> res = this;
-        while (n-- != 0) { res = new Cons<>(array[n], res); }
+        while (n-- != 0) {
+            res = new Cons<>(array[n], res);
+        }
         return res;
     }
 
@@ -128,14 +139,18 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
     @Override
     public ImmutableList<T> append(Iterable<T> collection) {
         ImmutableList<T> tmp = this;
-        for (T elem : collection) { tmp = tmp.append(elem); }
+        for (T elem : collection) {
+            tmp = tmp.append(elem);
+        }
         return tmp;
     }
 
     @Override
     public ImmutableList<T> prependReverse(Iterable<T> collection) {
         ImmutableSLList<T> tmp = this;
-        for (T elem : collection) { tmp = new Cons<>(elem, tmp); }
+        for (T elem : collection) {
+            tmp = new Cons<>(elem, tmp);
+        }
         return tmp;
     }
 
@@ -156,7 +171,9 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         ImmutableList<T> rest = this;
 
-        while (n-- != 0) { rest = rest.tail(); }
+        while (n-- != 0) {
+            rest = rest.tail();
+        }
 
         return rest;
     }
@@ -236,7 +253,9 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
                 }
                 Cons<S> result = this;
                 final Object[] listElements = list.toArray(new Object[sz]);
-                for (int i = sz - 1; i >= 0; i--) { result = new Cons<>((S) listElements[i], result); }
+                for (int i = sz - 1; i >= 0; i--) {
+                    result = new Cons<>((S) listElements[i], result);
+                }
                 return result;
             }
         }
@@ -273,7 +292,12 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         @Override
         public boolean exists(Predicate<? super S> predicate) {
             ImmutableList<S> list = this;
-            while (!list.isEmpty()) { if (predicate.test(list.head())) { return true; } list = list.tail(); }
+            while (!list.isEmpty()) {
+                if (predicate.test(list.head())) {
+                    return true;
+                }
+                list = list.tail();
+            }
             return false;
         }
 
@@ -365,7 +389,9 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             S t;
             while (!list.isEmpty()) {
                 t = list.head();
-                if (Objects.equals(t, obj)) { return true; }
+                if (Objects.equals(t, obj)) {
+                    return true;
+                }
                 list = list.tail();
             }
             return false;
@@ -433,16 +459,22 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         @Override
         public boolean equals(@Nullable Object o) {
-            if (!(o instanceof ImmutableList)) { return false; }
+            if (!(o instanceof ImmutableList)) {
+                return false;
+            }
             final ImmutableList<S> o1 = (ImmutableList<S>) o;
-            if (o1.size() != size()) { return false; }
+            if (o1.size() != size()) {
+                return false;
+            }
 
             final Iterator<S> p = iterator();
             final Iterator<S> q = o1.iterator();
             while (p.hasNext()) {
                 S ep = p.next();
                 S eq = q.next();
-                if ((ep == null && eq != null) || (ep != null && !ep.equals(eq))) { return false; }
+                if ((ep == null && eq != null) || (ep != null && !ep.equals(eq))) {
+                    return false;
+                }
             }
             return true;
         }
@@ -494,7 +526,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         @Override
         public void remove() {
             throw new UnsupportedOperationException("Removing elements via an iterator"
-                    + " is not supported for immutable datastructures.");
+                + " is not supported for immutable datastructures.");
         }
 
     }
@@ -649,7 +681,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             @Override
             public void remove() {
                 throw new UnsupportedOperationException("Removing elements via an iterator"
-                        + " is not supported for immutable datastructures.");
+                    + " is not supported for immutable datastructures.");
             }
         }
 

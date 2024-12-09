@@ -44,7 +44,10 @@ public class TaskTreeModel extends DefaultTreeModel {
 
     public synchronized void removeTask(TaskTreeNode p) {
         Proof[] allProofs = p.allProofs();
-        for (Proof allProof : allProofs) { proofToTask.remove(allProof); p.decoupleFromEnv(); }
+        for (Proof allProof : allProofs) {
+            proofToTask.remove(allProof);
+            p.decoupleFromEnv();
+        }
         ProofEnvironment env = p.getProofEnv();
         if (p.getParent().getChildCount() == 1) { // remove env if p is single
             env = null;
@@ -63,11 +66,15 @@ public class TaskTreeModel extends DefaultTreeModel {
 
     private void updateProofToTask(TaskTreeNode p) {
         proofToTask.put(p.proof(), p);
-        for (TaskTreeNode child : p.getChildren()) { updateProofToTask(child); }
+        for (TaskTreeNode child : p.getChildren()) {
+            updateProofToTask(child);
+        }
     }
 
     public synchronized TaskTreeNode getTaskForProof(Proof p) {
-        if (p == null) { return null; }
+        if (p == null) {
+            return null;
+        }
         return proofToTask.get(p);
     }
 

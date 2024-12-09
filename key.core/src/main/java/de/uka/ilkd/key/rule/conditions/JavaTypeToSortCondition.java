@@ -57,7 +57,9 @@ public final class JavaTypeToSortCondition implements VariableCondition {
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
             MatchConditions matchCond, Services services) {
-        if (var != exprOrTypeSV) { return matchCond; }
+        if (var != exprOrTypeSV) {
+            return matchCond;
+        }
 
         Debug.assertTrue(svSubst instanceof Expression || svSubst instanceof TypeReference
                 || svSubst instanceof Term);
@@ -91,6 +93,6 @@ public final class JavaTypeToSortCondition implements VariableCondition {
     @Override
     public String toString() {
         return "\\hasSort(" + (elemSort ? "\\elemSort(" + exprOrTypeSV + ")" : exprOrTypeSV) + ", "
-                + sort + ")";
+            + sort + ")";
     }
 }

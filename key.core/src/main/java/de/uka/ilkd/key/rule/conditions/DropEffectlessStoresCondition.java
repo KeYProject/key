@@ -77,7 +77,9 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
         Term fInst = (Term) svInst.getInstantiation(f);
         Term xInst = (Term) svInst.getInstantiation(x);
         Term resultInst = (Term) svInst.getInstantiation(result);
-        if (hInst == null || oInst == null || fInst == null || xInst == null) { return mc; }
+        if (hInst == null || oInst == null || fInst == null || xInst == null) {
+            return mc;
+        }
 
         final Term properResultInst = dropEffectlessStores(
             services.getTermBuilder().store(hInst, oInst, fInst, xInst), services);

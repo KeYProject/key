@@ -38,7 +38,7 @@ public class ShowUsedContractsAction extends MainWindowAction {
         if (currentProof == null) {
             mainWindow.notify(new GeneralInformationEvent("No contracts available.",
                 "If you wish to see the used contracts "
-                        + "for a proof you have to load one first"));
+                    + "for a proof you have to load one first"));
         } else {
             ProofManagementDialog.showInstance(getMediator().getSelectedProof().getInitConfig(),
                 getMediator().getSelectedProof());

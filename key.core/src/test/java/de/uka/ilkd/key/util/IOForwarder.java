@@ -53,7 +53,9 @@ public class IOForwarder extends Thread {
         try {
             byte[] buffer = new byte[4096];
             int read;
-            while ((read = from.read(buffer)) > 0) { to.write(buffer, 0, read); }
+            while ((read = from.read(buffer)) > 0) {
+                to.write(buffer, 0, read);
+            }
         } catch (IOException e) {
             LOGGER.warn("Forward failed", e);
         }

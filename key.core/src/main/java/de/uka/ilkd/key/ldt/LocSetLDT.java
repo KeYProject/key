@@ -185,7 +185,9 @@ public final class LocSetLDT extends LDT {
             return intersect;
         } else if (op instanceof SetMinus) {
             return setMinus;
-        } else if (op instanceof AllFields) { return allFields; }
+        } else if (op instanceof AllFields) {
+            return allFields;
+        }
         assert false;
         return null;
     }
@@ -199,7 +201,9 @@ public final class LocSetLDT extends LDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (t.op().equals(empty)) { return EmptySetLiteral.LOCSET; }
+        if (t.op().equals(empty)) {
+            return EmptySetLiteral.LOCSET;
+        }
         assert false;
         return null;
     }

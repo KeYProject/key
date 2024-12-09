@@ -81,7 +81,7 @@ public class RenameTable {
     private Integer createNewAbstractName() {
         if (max == Integer.MAX_VALUE) {
             throw new IllegalStateException("Overflow in renaming table. Why on earth "
-                    + "are there " + Integer.MAX_VALUE + " + 1 variables to be renamed?");
+                + "are there " + Integer.MAX_VALUE + " + 1 variables to be renamed?");
         }
 
         return max + 1;

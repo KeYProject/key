@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestJavaInfo {
 
     public static final String testfile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-            + "javainfo" + File.separator + "testJavaInfo.key";
+        + "javainfo" + File.separator + "testJavaInfo.key";
 
     private static Services services;
     private static JavaInfo javaInfo;
@@ -128,8 +128,8 @@ public class TestJavaInfo {
 
         assertNull(javaInfo.getAttribute(PipelineConstants.IMPLICIT_CREATED, rte),
             "Attribute " + PipelineConstants.IMPLICIT_CREATED
-                    + " is locally declared in class java.lang.Object and should not be "
-                    + "returned by this method for type java.lang.RuntimeException");
+                + " is locally declared in class java.lang.Object and should not be "
+                + "returned by this method for type java.lang.RuntimeException");
 
     }
 

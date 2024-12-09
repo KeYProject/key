@@ -45,7 +45,9 @@ public class DeleteFormulaAction extends ExplorationAction {
         }
 
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
-        if (pio == null) { return; }
+        if (pio == null) {
+            return;
+        }
         Term term = pio.subTerm();
         Goal g = getMediator().getSelectedGoal();
         ProofExplorationService service = ProofExplorationService.get(getMediator());

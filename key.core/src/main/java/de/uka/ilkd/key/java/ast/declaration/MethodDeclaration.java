@@ -252,7 +252,9 @@ public class MethodDeclaration extends JavaDeclaration
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) { return modArray.get(index); }
+            if (len > index) {
+                return modArray.get(index);
+            }
             index -= len;
         }
         if (returnType != null) {
@@ -267,7 +269,9 @@ public class MethodDeclaration extends JavaDeclaration
         }
         if (parameters != null) {
             len = parameters.size();
-            if (len > index) { return parameters.get(index); }
+            if (len > index) {
+                return parameters.get(index);
+            }
             index -= len;
         }
         if (exceptions != null) {
@@ -291,7 +295,9 @@ public class MethodDeclaration extends JavaDeclaration
 
     @Override
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) { return body; }
+        if (body != null && index == 0) {
+            return body;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -304,7 +310,9 @@ public class MethodDeclaration extends JavaDeclaration
 
     @Override
     public TypeReference getTypeReferenceAt(int index) {
-        if (returnType != null && index == 0) { return returnType; }
+        if (returnType != null && index == 0) {
+            return returnType;
+        }
         throw new IndexOutOfBoundsException();
     }
 
@@ -317,7 +325,9 @@ public class MethodDeclaration extends JavaDeclaration
 
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
-        if (parameters != null) { return parameters.get(index); }
+        if (parameters != null) {
+            return parameters.get(index);
+        }
         throw new IndexOutOfBoundsException();
     }
 

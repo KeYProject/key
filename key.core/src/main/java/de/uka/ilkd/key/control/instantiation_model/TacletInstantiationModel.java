@@ -163,7 +163,7 @@ public class TacletInstantiationModel {
         if (tacletApp == null) {
             throw new IfMismatchException(
                 "Mismatch of '\\assumes'-formulas.\n" + "Reasons may be: ambigous instantiation "
-                        + "of schemavariables or unsatisfiable constraints.");
+                    + "of schemavariables or unsatisfiable constraints.");
         }
 
         return tacletApp;
@@ -172,7 +172,9 @@ public class TacletInstantiationModel {
     public String getStatusString() {
         TacletApp rapp = app;
 
-        if (rapp == null) { return "Rule is not applicable."; }
+        if (rapp == null) {
+            return "Rule is not applicable.";
+        }
 
         try {
             rapp = createTacletApp();
@@ -193,7 +195,11 @@ public class TacletInstantiationModel {
     }
 
     private void informListenerAboutModelChange() {
-        for (ModelChangeListener listener : listeners) { if (listener != null) { listener.modelChanged(changeEvent); } }
+        for (ModelChangeListener listener : listeners) {
+            if (listener != null) {
+                listener.modelChanged(changeEvent);
+            }
+        }
     }
 
     /** sets the manual if-input */

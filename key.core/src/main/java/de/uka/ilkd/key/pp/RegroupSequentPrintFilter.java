@@ -43,7 +43,9 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
         }
 
         Pattern p = createPattern();
-        if (p == null) { return; }
+        if (p == null) {
+            return;
+        }
 
         antec = ImmutableSLList.nil();
         it = originalSequent.antecedent().iterator();

@@ -303,7 +303,11 @@ public class HTMLSyntaxHighlighter {
             StringTransformer strTransformer) {
         StringBuilder sb = new StringBuilder();
         boolean loopEntered = false;
-        for (Object str : strings) { sb.append(strTransformer.transform(str)); sb.append(delim); loopEntered = true; }
+        for (Object str : strings) {
+            sb.append(strTransformer.transform(str));
+            sb.append(delim);
+            loopEntered = true;
+        }
         return loopEntered ? sb.substring(0, sb.length() - delim.length()) : "";
     }
 
@@ -344,8 +348,12 @@ public class HTMLSyntaxHighlighter {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) { return true; }
-            if (o == null || getClass() != o.getClass()) { return false; }
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Args that = (Args) o;
             return useHtml == that.useHtml && Objects.equals(node.get(), that.node.get())
                     && text.equals(that.text);

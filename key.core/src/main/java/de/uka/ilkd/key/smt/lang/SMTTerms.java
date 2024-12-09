@@ -62,7 +62,9 @@ public class SMTTerms extends SMTTerm {
     @Override
     public boolean occurs(SMTTermVariable a) {
         boolean b = false;
-        for (SMTTerm term : terms) { b = b && term.occurs(a); }
+        for (SMTTerm term : terms) {
+            b = b && term.occurs(a);
+        }
         return b;
     }
 
@@ -73,7 +75,11 @@ public class SMTTerms extends SMTTerm {
      */
     @Override
     public boolean occurs(String id) {
-        for (SMTTerm term : terms) { if (term.occurs(id)) { return true; } }
+        for (SMTTerm term : terms) {
+            if (term.occurs(id)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -86,28 +92,36 @@ public class SMTTerms extends SMTTerm {
     @Override
     public SMTTerm substitute(SMTTermVariable a, SMTTerm b) {
         List<SMTTerm> ret = new LinkedList<>();
-        for (SMTTerm term : terms) { ret.add(term.substitute(a, b)); }
+        for (SMTTerm term : terms) {
+            ret.add(term.substitute(a, b));
+        }
         return new SMTTerms(ret);
     }
 
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
         List<SMTTerm> ret = new LinkedList<>();
-        for (SMTTerm term : terms) { ret.add(term.substitute(a, b)); }
+        for (SMTTerm term : terms) {
+            ret.add(term.substitute(a, b));
+        }
         return new SMTTerms(ret);
     }
 
     @Override
     public SMTTerm replace(SMTTermCall a, SMTTerm b) {
         List<SMTTerm> ret = new LinkedList<>();
-        for (SMTTerm term : terms) { ret.add(term.replace(a, b)); }
+        for (SMTTerm term : terms) {
+            ret.add(term.replace(a, b));
+        }
         return new SMTTerms(ret);
     }
 
     @Override
     public SMTTerm instantiate(SMTTermVariable a, SMTTerm b) {
         List<SMTTerm> ret = new LinkedList<>();
-        for (SMTTerm term : terms) { ret.add(term.instantiate(a, b)); }
+        for (SMTTerm term : terms) {
+            ret.add(term.instantiate(a, b));
+        }
         return new SMTTerms(ret);
     }
 
@@ -126,11 +140,18 @@ public class SMTTerms extends SMTTerm {
 
     public String toString(int nestPos) {
         StringBuilder ret = new StringBuilder();
-        for (int i = 0; i < nestPos; i++) { ret.append(" "); }
+        for (int i = 0; i < nestPos; i++) {
+            ret.append(" ");
+        }
 
-        if (terms.size() == 0) { throw new RuntimeException("Unexpected: Empty args for TermLogicalOp "); }
+        if (terms.size() == 0) {
+            throw new RuntimeException("Unexpected: Empty args for TermLogicalOp ");
+        }
 
-        for (SMTTerm term : terms) { ret.append(term.toString(nestPos)); ret.append(", "); }
+        for (SMTTerm term : terms) {
+            ret.append(term.toString(nestPos));
+            ret.append(", ");
+        }
         return ret.toString();
     }
 

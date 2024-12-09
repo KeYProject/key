@@ -237,7 +237,9 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
     }
 
     protected void processTacletSelected(ActionEvent e) {
-        for (final ActionListener al : listenerList) { al.actionPerformed(e); }
+        for (final ActionListener al : listenerList) {
+            al.actionPerformed(e);
+        }
     }
 
     @Override

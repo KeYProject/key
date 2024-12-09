@@ -72,7 +72,11 @@ public class VariableReference extends JavaNonTerminalProgramElement
      *         of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (variable != null) { if (index == 0) { return variable; } }
+        if (variable != null) {
+            if (index == 0) {
+                return variable;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

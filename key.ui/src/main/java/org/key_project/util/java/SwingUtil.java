@@ -83,7 +83,9 @@ public final class SwingUtil {
                 return (T) c;
             } else if (c instanceof Container) {
                 var f = findComponent((Container) c, classToFind);
-                if (f != null) { return f; }
+                if (f != null) {
+                    return f;
+                }
             }
         }
         return null;
@@ -107,7 +109,9 @@ public final class SwingUtil {
         for (int i = 0; i < container.getComponentCount(); i++) {
             var c = container.getComponent(i);
             // if the docking container is visible, we consider all tabs in the search
-            if (!c.isVisible() && !(c instanceof BasicDockableDisplayer)) { continue; }
+            if (!c.isVisible() && !(c instanceof BasicDockableDisplayer)) {
+                continue;
+            }
 
             if (classToFind.isAssignableFrom(c.getClass())) {
                 l.add((T) c);
@@ -123,9 +127,15 @@ public final class SwingUtil {
                     for (var menu : queue) {
                         for (int j = 0; j < menu.getItemCount(); j++) {
                             var item = menu.getItem(j);
-                            if (item == null) { continue; }
-                            if (item instanceof JMenu) { newQ.add((JMenu) item); }
-                            if (classToFind.isAssignableFrom(item.getClass())) { l.add((T) item); }
+                            if (item == null) {
+                                continue;
+                            }
+                            if (item instanceof JMenu) {
+                                newQ.add((JMenu) item);
+                            }
+                            if (classToFind.isAssignableFrom(item.getClass())) {
+                                l.add((T) item);
+                            }
                         }
                     }
                     queue = newQ;
@@ -145,7 +155,9 @@ public final class SwingUtil {
             var newQ = new HashSet<Window>();
 
             for (var window : q) {
-                if (l.contains(window)) { continue; }
+                if (l.contains(window)) {
+                    continue;
+                }
                 l.add(window);
                 newQ.addAll(Arrays.asList(window.getOwnedWindows()));
             }
@@ -160,7 +172,11 @@ public final class SwingUtil {
         MenuElement[] p = msm.getSelectedPath();
 
         List<JPopupMenu> list = new ArrayList<>();
-        for (MenuElement element : p) { if (element instanceof JPopupMenu) { list.add((JPopupMenu) element); } }
+        for (MenuElement element : p) {
+            if (element instanceof JPopupMenu) {
+                list.add((JPopupMenu) element);
+            }
+        }
         return list;
     }
 
@@ -193,13 +209,19 @@ public final class SwingUtil {
      *        the font
      */
     public static void setFont(JComponent component, Font font) {
-        if (component == null) { return; }
+        if (component == null) {
+            return;
+        }
         component.setFont(font);
         for (int i = 0; i < component.getComponentCount(); i++) {
             Component c = component.getComponent(i);
-            if (c == null) { continue; }
+            if (c == null) {
+                continue;
+            }
             c.setFont(font);
-            if (c instanceof JComponent) { setFont((JComponent) c, font); }
+            if (c instanceof JComponent) {
+                setFont((JComponent) c, font);
+            }
         }
         // JMenu hides its entries in the popup menu
         if (component instanceof JMenu && ((JMenu) component).getPopupMenu() != null) {
@@ -255,7 +277,9 @@ public final class SwingUtil {
             } catch (AWTException e) {
                 LOGGER.warn(NOTIFICATION_ERROR, e);
             } finally {
-                if (tray != null && trayIcon != null) { tray.remove(trayIcon); }
+                if (tray != null && trayIcon != null) {
+                    tray.remove(trayIcon);
+                }
             }
         }
     }

@@ -207,13 +207,17 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             final Instantiation instantiation =
                 instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
 
-            if (instantiation == null) { return false; }
+            if (instantiation == null) {
+                return false;
+            }
 
             final ImmutableSet<LoopContract> contracts =
                 getApplicableContracts(instantiation, goal, goal.proof().getServices());
 
             for (LoopContract contract : contracts) {
-                if (contract.getHead() == null && !contract.isInternalOnly()) { return true; }
+                if (contract.getHead() == null && !contract.isInternalOnly()) {
+                    return true;
+                }
             }
             return false;
         }
@@ -273,7 +277,9 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
                 .getInitConfig().getJustifInfo().getJustification(this);
 
-        for (Contract c : contract.getFunctionalContracts()) { cjust.add(application, new RuleJustificationBySpec(c)); }
+        for (Contract c : contract.getFunctionalContracts()) {
+            cjust.add(application, new RuleJustificationBySpec(c));
+        }
 
         return result;
     }

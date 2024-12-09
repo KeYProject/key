@@ -493,13 +493,18 @@ public class SymbolicExecutionTreeBuilder {
         if (firstFather != null && firstFather != startNode) {
             pruneOnExNode = true;
         } else {
-            while (firstFather == null) { node = node.parent(); firstFather = getExecutionNode(node); }
+            while (firstFather == null) {
+                node = node.parent();
+                firstFather = getExecutionNode(node);
+            }
         }
         // determine which nodes should be pruned
         ExecutionNodePreorderIterator subtreeToBePruned =
             new ExecutionNodePreorderIterator(firstFather);
         // include the first execution node in the hierarchy only if it was pruned on
-        if (!pruneOnExNode) { subtreeToBePruned.next(); }
+        if (!pruneOnExNode) {
+            subtreeToBePruned.next();
+        }
         Set<AbstractExecutionNode<?>> exNodesToDelete = new HashSet<>();
         while (subtreeToBePruned.hasNext()) {
             AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) subtreeToBePruned.next();
@@ -548,10 +553,14 @@ public class SymbolicExecutionTreeBuilder {
                 new LinkedList<>();
             // remove pruned completed blocks
             for (IExecutionBlockStartNode<?> block : exNode.getCompletedBlocks()) {
-                if (exNodesToDelete.contains(block)) { deletedBlocks.add(block); }
+                if (exNodesToDelete.contains(block)) {
+                    deletedBlocks.add(block);
+                }
             }
             if (exNode instanceof AbstractExecutionNode<?> exNodeCast) {
-                for (IExecutionBlockStartNode<?> block : deletedBlocks) { exNodeCast.removeCompletedBlock(block); }
+                for (IExecutionBlockStartNode<?> block : deletedBlocks) {
+                    exNodeCast.removeCompletedBlock(block);
+                }
             }
             // remove all pruned method returns
             if (exNode instanceof ExecutionMethodCall) {
@@ -561,7 +570,9 @@ public class SymbolicExecutionTreeBuilder {
                     new LinkedList<>();
                 while (iter.hasNext()) {
                     IExecutionBaseMethodReturn<?> methodReturn = iter.next();
-                    if (exNodesToDelete.contains(methodReturn)) { removed.add(methodReturn); }
+                    if (exNodesToDelete.contains(methodReturn)) {
+                        removed.add(methodReturn);
+                    }
                 }
                 for (IExecutionBaseMethodReturn<?> deleted : removed) {
                     ((ExecutionMethodCall) exNode).removeMethodReturn(deleted);
@@ -574,7 +585,9 @@ public class SymbolicExecutionTreeBuilder {
                 LinkedList<IExecutionNode<?>> removed = new LinkedList<>();
                 while (iter.hasNext()) {
                     IExecutionNode<?> completion = iter.next();
-                    if (exNodesToDelete.contains(completion)) { removed.add(completion); }
+                    if (exNodesToDelete.contains(completion)) {
+                        removed.add(completion);
+                    }
                 }
                 for (IExecutionNode<?> deleted : removed) {
                     ((AbstractExecutionBlockStartNode<?>) exNode).removeBlockCompletion(deleted);
@@ -587,9 +600,13 @@ public class SymbolicExecutionTreeBuilder {
                 LinkedList<IExecutionTermination> removed = new LinkedList<>();
                 while (iter.hasNext()) {
                     IExecutionTermination termination = iter.next();
-                    if (exNodesToDelete.contains(termination)) { removed.add(termination); }
+                    if (exNodesToDelete.contains(termination)) {
+                        removed.add(termination);
+                    }
                 }
-                for (IExecutionTermination deleted : removed) { ((ExecutionStart) exNode).removeTermination(deleted); }
+                for (IExecutionTermination deleted : removed) {
+                    ((ExecutionStart) exNode).removeTermination(deleted);
+                }
             }
         }
         return exNodesToDelete;
@@ -630,7 +647,9 @@ public class SymbolicExecutionTreeBuilder {
          *        The new block completion.
          */
         private void addBlockCompletion(IExecutionNode<?> blockCompletion) {
-            if (blockCompletion != null) { blockCompletions.add(blockCompletion); }
+            if (blockCompletion != null) {
+                blockCompletions.add(blockCompletion);
+            }
         }
 
         /**
@@ -649,7 +668,9 @@ public class SymbolicExecutionTreeBuilder {
          *        The method return.
          */
         private void addMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
-            if (methodReturn != null) { methodReturns.add(methodReturn); }
+            if (methodReturn != null) {
+                methodReturns.add(methodReturn);
+            }
         }
     }
 
@@ -837,7 +858,9 @@ public class SymbolicExecutionTreeBuilder {
                         bcIter.remove();
                     }
                 }
-                if (entry.getValue().isEmpty()) { stackIter.remove(); }
+                if (entry.getValue().isEmpty()) {
+                    stackIter.remove();
+                }
             }
         }
 
@@ -894,7 +917,9 @@ public class SymbolicExecutionTreeBuilder {
                                                                                   // unknown
                                                                                   // reasons.
                 Goal goal = proof.getOpenGoal(node);
-                if (goal != null) { currentOrFutureRuleApplication = goal.getRuleAppManager().peekNext(); }
+                if (goal != null) {
+                    currentOrFutureRuleApplication = goal.getRuleAppManager().peekNext();
+                }
             }
             if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node,
                 currentOrFutureRuleApplication)) {
@@ -1004,7 +1029,9 @@ public class SymbolicExecutionTreeBuilder {
                         parentFound = true;
                     }
                 }
-                if (!parentFound) { current = null; }
+                if (!parentFound) {
+                    current = null;
+                }
             }
         }
         return null;
@@ -1074,7 +1101,9 @@ public class SymbolicExecutionTreeBuilder {
             Map<Node, ImmutableList<Node>> methodCallStack = getMethodCallStack(label);
             ImmutableList<Node> stack = findMethodCallStack(methodCallStack, node);
             if (stack != null) {
-                while (stack.size() > currentLevel) { stack = stack.take(1); }
+                while (stack.size() > currentLevel) {
+                    stack = stack.take(1);
+                }
             } else {
                 stack = ImmutableSLList.nil();
             }
@@ -1087,7 +1116,10 @@ public class SymbolicExecutionTreeBuilder {
     protected ImmutableList<Node> findMethodCallStack(
             Map<Node, ImmutableList<Node>> methodCallStack, Node node) {
         ImmutableList<Node> result = null;
-        while (result == null && node != null) { result = methodCallStack.get(node); node = node.parent(); }
+        while (result == null && node != null) {
+            result = methodCallStack.get(node);
+            node = node.parent();
+        }
         return result;
     }
 
@@ -1147,10 +1179,14 @@ public class SymbolicExecutionTreeBuilder {
                     }
                 } else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(),
                     statement, posInfo)) {
-                    if (isNotInImplicitMethod(node)) { result = new ExecutionStatement(settings, node); }
+                    if (isNotInImplicitMethod(node)) {
+                        result = new ExecutionStatement(settings, node);
+                    }
                 }
             } else if (SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp())) {
-                if (isNotInImplicitMethod(node)) { result = new ExecutionOperationContract(settings, node); }
+                if (isNotInImplicitMethod(node)) {
+                    result = new ExecutionOperationContract(settings, node);
+                }
             } else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp())) {
                 if (isNotInImplicitMethod(node)) {
                     result = new ExecutionLoopInvariant(settings, node);
@@ -1223,7 +1259,9 @@ public class SymbolicExecutionTreeBuilder {
                 JavaPair secondPair = new JavaPair(stackSize,
                     ImmutableSLList.<SourceElement>nil().append(sourceElements));
                 ImmutableList<IExecutionNode<?>> blockStartList = afterBlockMap.get(secondPair);
-                if (blockStartList == null) { blockStartList = ImmutableSLList.nil(); }
+                if (blockStartList == null) {
+                    blockStartList = ImmutableSLList.nil();
+                }
                 blockStartList = blockStartList.append(blockStartNode);
                 afterBlockMap.put(secondPair, blockStartList);
             }
@@ -1316,7 +1354,10 @@ public class SymbolicExecutionTreeBuilder {
             Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> afterBlockMaps, Node node) {
         if (afterBlockMaps != null) {
             Map<JavaPair, ImmutableList<IExecutionNode<?>>> result = null;
-            while (result == null && node != null) { result = afterBlockMaps.get(node); node = node.parent(); }
+            while (result == null && node != null) {
+                result = afterBlockMaps.get(node);
+                node = node.parent();
+            }
             return result;
         } else {
             return null;
@@ -1420,7 +1461,9 @@ public class SymbolicExecutionTreeBuilder {
         Iterator<IExecutionNode<?>> iter = list.iterator();
         while (!contained && iter.hasNext()) {
             IExecutionNode<?> next = iter.next();
-            if (next.getProofNode() == node) { contained = true; }
+            if (next.getProofNode() == node) {
+                contained = true;
+            }
         }
         return contained;
     }
@@ -1769,7 +1812,9 @@ public class SymbolicExecutionTreeBuilder {
                 if (!shouldPrune(child)) {
                     // Check if the current method on stack is not an implicit method
                     Node previousSymbolicExecutionNode = searchPreviousSymbolicExecutionNode(child);
-                    if (!isInImplicitMethod(previousSymbolicExecutionNode)) { openChildrenCount++; }
+                    if (!isInImplicitMethod(previousSymbolicExecutionNode)) {
+                        openChildrenCount++;
+                    }
                 }
             }
             return openChildrenCount >= 2;
@@ -1788,7 +1833,9 @@ public class SymbolicExecutionTreeBuilder {
      *         found.
      */
     protected Node searchPreviousSymbolicExecutionNode(Node node) {
-        while (node != null && node.getNodeInfo().getActiveStatement() == null) { node = node.parent(); }
+        while (node != null && node.getNodeInfo().getActiveStatement() == null) {
+            node = node.parent();
+        }
         return node;
     }
 
@@ -1837,8 +1884,12 @@ public class SymbolicExecutionTreeBuilder {
      */
     public IExecutionNode<?> getExecutionNode(Node proofNode) {
         IExecutionNode<?> result = keyNodeMapping.get(proofNode);
-        if (result == null) { result = keyNodeBranchConditionMapping.get(proofNode); }
-        if (result == null) { result = keyNodeLoopConditionMapping.get(proofNode); }
+        if (result == null) {
+            result = keyNodeBranchConditionMapping.get(proofNode);
+        }
+        if (result == null) {
+            result = keyNodeLoopConditionMapping.get(proofNode);
+        }
         return result;
     }
 
@@ -1889,7 +1940,9 @@ public class SymbolicExecutionTreeBuilder {
                             SourceElement next = iter.next();
                             SourceElement otherNext = otherIter.next();
                             // Comparison by == is not possible since loops are recreated
-                            if (!SymbolicExecutionUtil.equalsWithPosition(next, otherNext)) { equals = false; }
+                            if (!SymbolicExecutionUtil.equalsWithPosition(next, otherNext)) {
+                                equals = false;
+                            }
                         }
                         assert !otherIter.hasNext();
                         return equals;

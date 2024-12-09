@@ -75,9 +75,15 @@ public class SExprs {
      * @return a boolean expression equivalent to the implication {@code (=> ante concl)}
      */
     public static SExpr imp(SExpr ante, SExpr cons) {
-        if (ante.equals(TRUE)) { return cons; }
-        if (cons.equals(FALSE)) { return not(ante); }
-        if (ante.equals(FALSE) || cons.equals(TRUE)) { return TRUE; }
+        if (ante.equals(TRUE)) {
+            return cons;
+        }
+        if (cons.equals(FALSE)) {
+            return not(ante);
+        }
+        if (ante.equals(FALSE) || cons.equals(TRUE)) {
+            return TRUE;
+        }
         return new SExpr("=>", Type.BOOL, ante, cons);
     }
 
@@ -106,7 +112,9 @@ public class SExprs {
      */
     public static SExpr forall(List<SExpr> vars, SExpr matrix) throws SMTTranslationException {
         if (vars.isEmpty()) {
-            if (matrix.getName().equals("!")) { return matrix.getChildren().get(0); }
+            if (matrix.getName().equals("!")) {
+                return matrix.getChildren().get(0);
+            }
             return matrix;
         } else {
             return new SExpr("forall", Type.BOOL, new SExpr(vars), coerce(matrix, Type.BOOL));
@@ -169,7 +177,9 @@ public class SExprs {
      */
     public static List<SExpr> coerce(List<SExpr> exprs, Type type) throws SMTTranslationException {
         List<SExpr> result = new ArrayList<>();
-        for (SExpr expr : exprs) { result.add(coerce(expr, type)); }
+        for (SExpr expr : exprs) {
+            result.add(coerce(expr, type));
+        }
         return result;
     }
 
@@ -218,7 +228,9 @@ public class SExprs {
      * @return the expanded pattern with the same type as e
      */
     public static SExpr patternSExpr(SExpr e, List<SExpr> patterns) {
-        if (patterns.isEmpty()) { return e; }
+        if (patterns.isEmpty()) {
+            return e;
+        }
 
         ArrayList<SExpr> children = new ArrayList<>();
         children.add(e);
@@ -307,11 +319,15 @@ public class SExprs {
         for (int i = 0; i < orgChildren.size(); i++) {
             SExpr repl = filterAndCollectPatterns(orgChildren.get(i), collected);
             if (repl != orgChildren.get(i)) {
-                if (children == null) { children = new ArrayList<>(orgChildren); }
+                if (children == null) {
+                    children = new ArrayList<>(orgChildren);
+                }
                 children.set(i, repl);
             }
         }
-        if (children == null) { return matrix; }
+        if (children == null) {
+            return matrix;
+        }
         return new SExpr(matrix.getName(), matrix.getType(), children);
     }
 

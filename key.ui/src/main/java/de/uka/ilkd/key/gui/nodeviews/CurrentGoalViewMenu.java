@@ -190,7 +190,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         createDelayedCutJoinMenu(control);
         createMergeRuleMenu();
 
-        if (getPos() != null && getPos().isSequent()) { createSMTMenu(control); }
+        if (getPos() != null && getPos().isSequent()) {
+            createSMTMenu(control);
+        }
         createFocussedAutoModeMenu(control);
         addMacroMenu();
 
@@ -220,19 +222,25 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         if (!builtInList.isEmpty()) {
             addSeparator();
-            for (BuiltInRule builtInRule : builtInList) { addBuiltInRuleItem(builtInRule, control); }
+            for (BuiltInRule builtInRule : builtInList) {
+                addBuiltInRuleItem(builtInRule, control);
+            }
         }
     }
 
     private void addMacroMenu() {
         ProofMacroMenu menu = new ProofMacroMenu(mediator, getPos().getPosInOccurrence());
-        if (!menu.isEmpty()) { add(menu); }
+        if (!menu.isEmpty()) {
+            add(menu);
+        }
     }
 
     private void createSMTMenu(MenuControl control) {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE
                 .getSMTSettings().getSolverUnions();
-        if (!solverUnions.isEmpty()) { addSeparator(); }
+        if (!solverUnions.isEmpty()) {
+            addSeparator();
+        }
         for (SolverTypeCollection union : solverUnions) {
             if (union.isUsable()) {
                 JMenuItem item = new SMTMenuItem(union);
@@ -337,11 +345,15 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         List<TacletApp> list = new ArrayList<>(finds.size());
 
-        for (final TacletApp app : finds) { list.add(app); }
+        for (final TacletApp app : finds) {
+            list.add(app);
+        }
 
         list.sort(comp);
 
-        for (final TacletApp app : list) { result = result.prepend(app); }
+        for (final TacletApp app : list) {
+            result = result.prepend(app);
+        }
 
         return result;
     }
@@ -398,7 +410,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 insSystemInvItem.add(app);
                 continue;
             }
-            if (!mediator.getFilterForInteractiveProving().filter(taclet)) { continue; }
+            if (!mediator.getFilterForInteractiveProving().filter(taclet)) {
+                continue;
+            }
 
             if (isRareRule(taclet)) {
                 rareTaclets.add(app);
@@ -455,7 +469,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     private boolean isRareRule(Taclet taclet) {
-        if (clutterRules.contains(taclet.name().toString())) { return true; }
+        if (clutterRules.contains(taclet.name().toString())) {
+            return true;
+        }
         return taclet.getRuleSets().stream()
                 .anyMatch(it -> clutterRuleSets.contains(it.name().toString()));
     }
@@ -484,7 +500,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     class MenuControl extends SequentViewMenu<CurrentGoalView>.MenuControl {
 
         private boolean validAbbreviation(String s) {
-            if (s == null || s.length() == 0) { return false; }
+            if (s == null || s.length() == 0) {
+                return false;
+            }
             for (int i = 0; i < s.length(); i++) {
                 if (!((s.charAt(i) <= '9' && s.charAt(i) >= '0')
                         || (s.charAt(i) <= 'z' && s.charAt(i) >= 'a')
@@ -585,7 +603,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                                 if (!validAbbreviation(abbreviation)) {
                                     JOptionPane.showMessageDialog(new JFrame(),
                                         "Only letters, numbers and '_'"
-                                                + "are allowed for Abbreviations",
+                                            + "are allowed for Abbreviations",
                                         "Sorry", JOptionPane.INFORMATION_MESSAGE);
                                 } else {
                                     mediator.getNotationInfo().getAbbrevMap()
@@ -615,9 +633,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         public FocussedRuleApplicationMenuItem() {
             super(APPLY_RULES_AUTOMATICALLY_HERE);
             setToolTipText("<html>Initiates and restricts automatic rule applications on the "
-                    + "highlighted formula, term or sequent.<br> "
-                    + "'Shift + left mouse click' on the highlighted "
-                    + "entity does the same.</html>");
+                + "highlighted formula, term or sequent.<br> "
+                + "'Shift + left mouse click' on the highlighted "
+                + "entity does the same.</html>");
         }
 
     }
@@ -627,7 +645,12 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         private int countFormulaSV(TacletSchemaVariableCollector c) {
             int formulaSV = 0;
             Iterator<SchemaVariable> it = c.varIterator();
-            while (it.hasNext()) { SchemaVariable sv = it.next(); if (sv instanceof FormulaSV) { formulaSV++; } }
+            while (it.hasNext()) {
+                SchemaVariable sv = it.next();
+                if (sv instanceof FormulaSV) {
+                    formulaSV++;
+                }
+            }
 
             return formulaSV;
         }
@@ -645,7 +668,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                         result += ((RewriteTacletGoalTemplate) gt).replaceWith().depth();
                     }
                 }
-                if (!gt.sequent().isEmpty()) { result += 10; }
+                if (!gt.sequent().isEmpty()) {
+                    result += 10;
+                }
             }
             return result;
         }
@@ -654,7 +679,9 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
          * rough approximation of the program complexity
          */
         public int programComplexity(JavaBlock b) {
-            if (b.isEmpty()) { return 0; }
+            if (b.isEmpty()) {
+                return 0;
+            }
             return new de.uka.ilkd.key.java.visitor.JavaASTWalker(b.program()) {
                 private int counter = 0;
 
@@ -683,13 +710,17 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 if (!s1.equals(s2)) {
                     throw new IllegalStateException(
                         "A decision should have been made on a higher level ( " + s1 + "<->" + s2
-                                + ")");
+                            + ")");
                 }
                 int v1 = map1.get(s1);
                 int v2 = map2.get(s2);
                 // the order will be reversed when the list is sorted
-                if (v1 < v2) { return 1; }
-                if (v1 > v2) { return -1; }
+                if (v1 < v2) {
+                    return 1;
+                }
+                if (v1 > v2) {
+                    return -1;
+                }
             }
             return 0;
         }

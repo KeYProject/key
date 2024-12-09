@@ -34,12 +34,20 @@ public class InstantiationCostScalerFeature implements Feature {
 
         final RuleAppCost cost = costFeature.computeCost(app, pos, goal, mState);
 
-        if (cost.equals(NumberRuleAppCost.getZeroCost())) { return MINUS_3000_COST; }
-        if (cost.equals(ONE_COST)) { return NumberRuleAppCost.getZeroCost(); }
+        if (cost.equals(NumberRuleAppCost.getZeroCost())) {
+            return MINUS_3000_COST;
+        }
+        if (cost.equals(ONE_COST)) {
+            return NumberRuleAppCost.getZeroCost();
+        }
 
         final RuleAppCost as = allowSplitting.computeCost(app, pos, goal, mState);
-        if (!as.equals(NumberRuleAppCost.getZeroCost())) { return TopRuleAppCost.INSTANCE; }
-        if (cost.equals(TopRuleAppCost.INSTANCE)) { return TopRuleAppCost.INSTANCE; }
+        if (!as.equals(NumberRuleAppCost.getZeroCost())) {
+            return TopRuleAppCost.INSTANCE;
+        }
+        if (cost.equals(TopRuleAppCost.INSTANCE)) {
+            return TopRuleAppCost.INSTANCE;
+        }
 
         assert cost instanceof NumberRuleAppCost : "Can only handle LongRuleAppCost";
 

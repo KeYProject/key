@@ -297,8 +297,12 @@ public class Configuration {
     @SuppressWarnings("unchecked")
     public <T> @Nullable List<T> getList(String name, Class<T> clazz) {
         List<?> result = get(name, List.class);
-        if (result == null) { return null; }
-        if (!result.stream().allMatch(clazz::isInstance)) { throw new ClassCastException(); }
+        if (result == null) {
+            return null;
+        }
+        if (!result.stream().allMatch(clazz::isInstance)) {
+            throw new ClassCastException();
+        }
         return (List<T>) result;
     }
 
@@ -317,8 +321,12 @@ public class Configuration {
     @SuppressWarnings("unchecked")
     public @NonNull List<String> getStringList(String name) {
         List<?> result = get(name, List.class);
-        if (result == null) { return Collections.emptyList(); }
-        if (!result.stream().allMatch(String.class::isInstance)) { throw new ClassCastException(); }
+        if (result == null) {
+            return Collections.emptyList();
+        }
+        if (!result.stream().allMatch(String.class::isInstance)) {
+            throw new ClassCastException();
+        }
         return (List<String>) result;
     }
 
@@ -369,7 +377,9 @@ public class Configuration {
     }
 
     public Configuration getSection(String name, boolean createIfNotExists) {
-        if (!exists(name) && createIfNotExists) { set(name, new Configuration()); }
+        if (!exists(name) && createIfNotExists) {
+            set(name, new Configuration());
+        }
         return getSection(name);
     }
 
@@ -488,7 +498,9 @@ public class Configuration {
         }
 
         public ConfigurationWriter printIndent() {
-            for (int i = 0; i < indent; i++) { out.format(" "); }
+            for (int i = 0; i < indent; i++) {
+                out.format(" ");
+            }
             return this;
         }
 

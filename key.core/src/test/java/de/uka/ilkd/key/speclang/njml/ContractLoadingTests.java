@@ -29,7 +29,9 @@ public class ContractLoadingTests {
         ProofManagementApi file = KeYApi.loadProof(javaFile.toPath());
         Services services = file.getServices();
         Logger LOGGER = LoggerFactory.getLogger(ContractLoadingTests.class);
-        for (Contract proofContract : file.getProofContracts()) { LOGGER.info(proofContract.getPlainText(services)); }
+        for (Contract proofContract : file.getProofContracts()) {
+            LOGGER.info(proofContract.getPlainText(services));
+        }
     }
 
     @Test

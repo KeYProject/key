@@ -89,7 +89,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         cut = (NoFindTaclet) parseTaclet("cut{\\add(b==>); \\add(==>b)}");
         imprightadd = (SuccTaclet) parseTaclet(
             "imp_right_add{\\find(==> b->b0) \\replacewith(b==>b0) \\addrules("
-                    + "cut{\\add(b==>); \\add(==>b)})}");
+                + "cut{\\add(b==>); \\add(==>b)})}");
         close = (SuccTaclet) parseTaclet("close_goal{\\assumes (b==>) \\find(==>b) \\closegoal}");
         contradiction =
             (RewriteTaclet) parseTaclet("contracdiction{\\find(b->b0) \\replacewith(!b0 -> !b)}");

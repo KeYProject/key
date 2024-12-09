@@ -51,16 +51,22 @@ public final class ArrayComponentTypeCondition extends VariableConditionAdapter 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement candidate, SVInstantiations svInst,
             Services services) {
-        if (var != this.var) { return true; }
+        if (var != this.var) {
+            return true;
+        }
         Sort s = null;
         if (candidate instanceof Term) {
             s = ((Term) candidate).sort();
         } else if (candidate instanceof Expression) {
             s = ((Expression) candidate).getKeYJavaType(services, svInst.getExecutionContext())
                     .getSort();
-        } else if (candidate instanceof TypeReference) { s = ((TypeReference) candidate).getKeYJavaType().getSort(); }
+        } else if (candidate instanceof TypeReference) {
+            s = ((TypeReference) candidate).getKeYJavaType().getSort();
+        }
 
-        if (!(s instanceof ArraySort)) { return false; }
+        if (!(s instanceof ArraySort)) {
+            return false;
+        }
         return !(((ArraySort) s).elementSort().extendsTrans(services.getJavaInfo().objectSort()))
                 ^ checkReferenceType;
     }

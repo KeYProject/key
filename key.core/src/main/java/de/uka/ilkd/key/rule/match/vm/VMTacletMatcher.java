@@ -128,12 +128,16 @@ public class VMTacletMatcher implements TacletMatcher {
         ImmutableList<UpdateLabelPair> context =
             ImmutableSLList.nil();
 
-        if (updateContextPresent) { context = p_matchCond.getInstantiations().getUpdateContext(); }
+        if (updateContextPresent) {
+            context = p_matchCond.getInstantiations().getUpdateContext();
+        }
 
         for (var cf : p_toMatch) {
             Term formula = cf.getConstrainedFormula().formula();
 
-            if (updateContextPresent) { formula = matchUpdateContext(context, formula); }
+            if (updateContextPresent) {
+                formula = matchUpdateContext(context, formula);
+            }
             if (formula != null) {// update context not present or update context match succeeded
                 final MatchConditions newMC =
                     checkConditions(prg.match(formula, p_matchCond, p_services), p_services);
@@ -206,16 +210,20 @@ public class VMTacletMatcher implements TacletMatcher {
             Iterator<SequentFormula> itIfSequent = candidateInAntec ? anteIterator : succIterator;
             // Fix end
 
-            assert itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
+            assert itIfSequent.hasNext()
+                    : "p_toMatch and assumes sequent must have same number of elements";
             newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
                 itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
 
-            if (newMC.isEmpty()) { return null; }
+            if (newMC.isEmpty()) {
+                return null;
+            }
 
             p_matchCond = newMC.head();
         }
         assert !anteIterator.hasNext()
-                && !succIterator.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
+                && !succIterator.hasNext()
+                : "p_toMatch and assumes sequent must have same number of elements";
 
         return p_matchCond;
     }
@@ -252,7 +260,11 @@ public class VMTacletMatcher implements TacletMatcher {
      * @return true iff declared not free
      */
     private boolean varDeclaredNotFree(SchemaVariable var) {
-        for (final NotFreeIn nfi : varsNotFreeIn) { if (nfi.first() == var) { return true; } }
+        for (final NotFreeIn nfi : varsNotFreeIn) {
+            if (nfi.first() == var) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -358,7 +370,9 @@ public class VMTacletMatcher implements TacletMatcher {
 
         matchCond = instr.match(term, matchCond, services);
 
-        if (matchCond != null) { matchCond = checkVariableConditions(sv, term, matchCond, services); }
+        if (matchCond != null) {
+            matchCond = checkVariableConditions(sv, term, matchCond, services);
+        }
 
         return matchCond;
     }
@@ -373,7 +387,9 @@ public class VMTacletMatcher implements TacletMatcher {
             TacletMatchProgram.getMatchInstructionForSV(sv);
         matchCond = instr.match(pe, matchCond, services);
 
-        if (matchCond != null) { matchCond = checkConditions(matchCond, services); }
+        if (matchCond != null) {
+            matchCond = checkConditions(matchCond, services);
+        }
 
         return matchCond;
     }

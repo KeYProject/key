@@ -47,14 +47,18 @@ public class ThrownExceptionFeature extends BinaryFeature {
 
         for (String p_filteredException : p_filteredExceptions) {
             final KeYJavaType nullPointer = javaInfo.getKeYJavaType(p_filteredException);
-            if (nullPointer != null) { filtered.add(nullPointer.getSort()); }
+            if (nullPointer != null) {
+                filtered.add(nullPointer.getSort());
+            }
         }
         filteredExceptions = filtered.toArray(new Sort[0]);
     }
 
     private boolean blockedExceptions(Sort excType) {
         for (Sort filteredException : filteredExceptions) {
-            if (excType.extendsTrans(filteredException)) { return true; }
+            if (excType.extendsTrans(filteredException)) {
+                return true;
+            }
         }
         return false;
     }
@@ -81,7 +85,9 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @return the first executable statement
      */
     private ProgramElement getFirstExecutableStatement(Term term) {
-        if (term.javaBlock().isEmpty()) { return null; }
+        if (term.javaBlock().isEmpty()) {
+            return null;
+        }
 
         final ProgramElement jb = term.javaBlock().program();
         final ProgramElement fstActive;

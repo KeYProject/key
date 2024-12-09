@@ -272,7 +272,9 @@ public class TermTacletAppIndex {
         final boolean completeRebuild = !pathToModification.hasNext();
         final PosInOccurrence pos = pathToModification.getPosInOccurrence();
 
-        if (completeRebuild) { return updateCompleteRebuild(pos, services, tacletIndex, listener, indexCache); }
+        if (completeRebuild) {
+            return updateCompleteRebuild(pos, services, tacletIndex, listener, indexCache);
+        }
 
         final Term newTerm = pathToModification.getSubTerm();
 
@@ -434,14 +436,18 @@ public class TermTacletAppIndex {
      * @return the sub-index for the given position
      */
     private TermTacletAppIndex descend(PosInOccurrence pos) {
-        if (pos.isTopLevel()) { return this; }
+        if (pos.isTopLevel()) {
+            return this;
+        }
 
         final PIOPathIterator it = pos.iterator();
         TermTacletAppIndex res = this;
 
         while (true) {
             final int child = it.next();
-            if (child == -1) { return res; }
+            if (child == -1) {
+                return res;
+            }
 
             res = res.getSubIndex(child);
         }
@@ -473,7 +479,9 @@ public class TermTacletAppIndex {
             if (filter.filter(app.rule())) {
                 final TacletApp tacletApp =
                     TacletAppIndex.createTacletApp((NoPosTacletApp) app, pos, services);
-                if (tacletApp != null) { convertedApps = convertedApps.prepend(tacletApp); }
+                if (tacletApp != null) {
+                    convertedApps = convertedApps.prepend(tacletApp);
+                }
             }
         }
 
@@ -629,7 +637,9 @@ public class TermTacletAppIndex {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
 
         for (final NoPosTacletApp app : taclets) {
-            if (p_filter.filter(app.taclet())) { result = result.prepend(app); }
+            if (p_filter.filter(app.taclet())) {
+                result = result.prepend(app);
+            }
         }
 
         return result;

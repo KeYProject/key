@@ -74,7 +74,11 @@ public class ProgramSVInstantiation {
     public ProgramSVInstantiation replace(SchemaVariable sv, JavaProgramElement prgElement) {
         ImmutableList<ProgramSVEntry> result =
             ImmutableSLList.<ProgramSVEntry>nil().prepend(new ProgramSVEntry(sv, prgElement));
-        for (final ProgramSVEntry entry : list) { if (entry.key() != sv) { result = result.prepend(entry); } }
+        for (final ProgramSVEntry entry : list) {
+            if (entry.key() != sv) {
+                result = result.prepend(entry);
+            }
+        }
         return new ProgramSVInstantiation(result);
     }
 
@@ -84,7 +88,11 @@ public class ProgramSVInstantiation {
      * @return true iff the sv has been instantiated already
      */
     public boolean isInstantiated(SchemaVariable sv) {
-        for (ProgramSVEntry entry : list) { if (entry.key() == sv) { return true; } }
+        for (ProgramSVEntry entry : list) {
+            if (entry.key() == sv) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -95,7 +103,11 @@ public class ProgramSVInstantiation {
      *         instantiation is stored
      */
     public JavaProgramElement getInstantiation(SchemaVariable sv) {
-        for (ProgramSVEntry entry : list) { if (entry.key() == sv) { return entry.value(); } }
+        for (ProgramSVEntry entry : list) {
+            if (entry.key() == sv) {
+                return entry.value();
+            }
+        }
         return null;
     }
 
@@ -136,7 +148,9 @@ public class ProgramSVInstantiation {
             final Iterator<ProgramSVEntry> it = iterator();
             while (it.hasNext()) {
                 final ProgramSVEntry psv = it.next();
-                if (!psv.value().equals(cmp.getInstantiation(psv.key()))) { return false; }
+                if (!psv.value().equals(cmp.getInstantiation(psv.key()))) {
+                    return false;
+                }
             }
             return true;
         }

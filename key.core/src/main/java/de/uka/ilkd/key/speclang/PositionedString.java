@@ -27,7 +27,9 @@ public class PositionedString {
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST = new ImmutableArray<>();
 
     public PositionedString(@NonNull String text, @NonNull Location location) {
-        if (text == null || location == null) { throw new IllegalArgumentException(); }
+        if (text == null || location == null) {
+            throw new IllegalArgumentException();
+        }
 
         this.text = text;
         this.location = location;
@@ -56,8 +58,8 @@ public class PositionedString {
 
     public String toString() {
         return text + " ("
-                + (location.getFileURI().isPresent() ? location.getFileURI().get() + ", " : "")
-                + location.getPosition() + ")";
+            + (location.getFileURI().isPresent() ? location.getFileURI().get() + ", " : "")
+            + location.getPosition() + ")";
     }
 
     public @NonNull String getText() {
@@ -70,8 +72,12 @@ public class PositionedString {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (!(o instanceof PositionedString that)) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PositionedString that)) {
+            return false;
+        }
         return text.equals(that.text) && Objects.equals(location, that.location);
     }
 

@@ -37,7 +37,9 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLInitially ci)) { return false; }
+        if (!(o instanceof TextualJMLInitially ci)) {
+            return false;
+        }
         return modifiers.equals(ci.modifiers) && inv.equals(ci.inv);
     }
 

@@ -42,7 +42,9 @@ public final class MainFrame extends JPanel {
             scrollPane.setViewportView(component);
         }
 
-        if (oldSequentView != null) { oldSequentView.removeUserSelectionHighlight(); }
+        if (oldSequentView != null) {
+            oldSequentView.removeUserSelectionHighlight();
+        }
 
     }
 

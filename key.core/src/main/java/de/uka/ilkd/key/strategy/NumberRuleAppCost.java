@@ -23,13 +23,17 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     }
 
     public static RuleAppCost create(int p_cost) {
-        if (p_cost == 0) { return NumberRuleAppCost.getZeroCost(); }
+        if (p_cost == 0) {
+            return NumberRuleAppCost.getZeroCost();
+        }
 
         NumberRuleAppCost ac;
         synchronized (cache) { // Ensure thread save access which is required for parallel proofs
                                // (e.g. in Eclipse)
             ac = cache.get(p_cost);
-            if (ac != null) { return ac; }
+            if (ac != null) {
+                return ac;
+            }
 
             ac = new IntRuleAppCost(p_cost);
             cache.put(p_cost, ac);
@@ -40,7 +44,9 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
     public static RuleAppCost create(long p_cost) {
 
-        if (p_cost <= Integer.MAX_VALUE && p_cost >= Integer.MIN_VALUE) { return create((int) p_cost); }
+        if (p_cost <= Integer.MAX_VALUE && p_cost >= Integer.MIN_VALUE) {
+            return create((int) p_cost);
+        }
 
         return new LongRuleAppCost(p_cost);
     }
@@ -52,7 +58,9 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
     @Override
     public @NonNull RuleAppCost mul(@NonNull RuleAppCost cost) {
-        if (cost instanceof TopRuleAppCost) { return cost.mul(this); }
+        if (cost instanceof TopRuleAppCost) {
+            return cost.mul(this);
+        }
         if (cost instanceof NumberRuleAppCost numberRuleAppCost) {
             return create(getValue() * numberRuleAppCost.getValue());
         }
@@ -61,7 +69,9 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
     @Override
     public int compareTo(RuleAppCost o) {
-        if (o instanceof TopRuleAppCost) { return -1; }
+        if (o instanceof TopRuleAppCost) {
+            return -1;
+        }
         return compareTo((NumberRuleAppCost) o);
     }
 
@@ -75,7 +85,9 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
 
     public boolean equals(Object o) {
-        if (o instanceof RuleAppCost) { return compareTo((RuleAppCost) o) == 0; }
+        if (o instanceof RuleAppCost) {
+            return compareTo((RuleAppCost) o) == 0;
+        }
         return false;
     }
 

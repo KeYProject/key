@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
@@ -120,12 +119,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public TextualJMLSpecCase(ImmutableList<JMLModifier> modifiers, @NonNull Behavior behavior) {
         super(modifiers);
-        if (behavior == null) { throw new IllegalArgumentException(); }
+        if (behavior == null) {
+            throw new IllegalArgumentException();
+        }
         this.behavior = behavior;
     }
 
     public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
-        if (clauses.isEmpty()) { setPosition(ctx); }
+        if (clauses.isEmpty()) {
+            setPosition(ctx);
+        }
         clauses.add(new Entry(clause, ctx));
         return this;
     }
@@ -136,7 +139,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
             LabeledParserRuleContext ctx) {
-        if (heapName == null) { heapName = HeapLDT.BASE_HEAP_NAME; }
+        if (heapName == null) {
+            heapName = HeapLDT.BASE_HEAP_NAME;
+        }
         clauses.add(new Entry(clause, ctx, heapName));
         return this;
     }
@@ -190,7 +195,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     @Override
     public String toString() {
         return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses
-                + ", modifiers=" + modifiers + ", name='" + name + '\'' + '}';
+            + ", modifiers=" + modifiers + ", name='" + name + '\'' + '}';
     }
 
 
@@ -199,9 +204,21 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         addClause(REQUIRES, label);
     }
 
-    public Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext>[] getAbbreviations() {
+    /**
+     * An abbreviation is a short-name for a term. Currently unused during the JML translation.
+     * A relict from older days ({@link #getAbbreviations()}.
+     *
+     * @param typeName name of the type
+     * @param abbrevName the short-representation of the term
+     * @param abbreviatedTerm the term to be abbreviated.
+     */
+    public record Abbreviation(LabeledParserRuleContext typeName,
+            LabeledParserRuleContext abbrevName,
+            LabeledParserRuleContext abbreviatedTerm) {}
+
+    public Abbreviation[] getAbbreviations() {
         /* weigl: prepare for future use of generated abbreviations from JML specifications */
-        return new Triple[0];
+        return new Abbreviation[0];
     }
 
     public ImmutableList<LabeledParserRuleContext> getInfFlowSpecs() {
@@ -262,8 +279,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (!(o instanceof TextualJMLSpecCase that)) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof TextualJMLSpecCase that)) {
+            return false;
+        }
         return getBehavior() == that.getBehavior() && clauses.equals(that.clauses);
     }
 

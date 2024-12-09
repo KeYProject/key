@@ -66,7 +66,9 @@ public class UnwindLoop extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        if (!(pe instanceof LoopStatement originalLoop)) { return new ProgramElement[] { pe }; }
+        if (!(pe instanceof LoopStatement originalLoop)) {
+            return new ProgramElement[] { pe };
+        }
 
         final WhileLoopTransformation w = new WhileLoopTransformation(originalLoop,
             (ProgramElementName) svInst.getInstantiation(outerLabel),
@@ -96,9 +98,13 @@ public class UnwindLoop extends ProgramTransformer {
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
         ImmutableList<SchemaVariable> ret = ImmutableSLList.nil();
 
-        if (innerLabel != null) { ret = ret.prepend(innerLabel); }
+        if (innerLabel != null) {
+            ret = ret.prepend(innerLabel);
+        }
 
-        if (outerLabel != null) { ret = ret.prepend(outerLabel); }
+        if (outerLabel != null) {
+            ret = ret.prepend(outerLabel);
+        }
 
         return ret;
     }

@@ -99,7 +99,9 @@ public class StdDialog extends JDialog {
     }
 
     public JButton getHelpButton() {
-        if (helpButton == null) { helpButton = new JButton("Help"); }
+        if (helpButton == null) {
+            helpButton = new JButton("Help");
+        }
         return helpButton;
     }
 

@@ -178,7 +178,9 @@ public final class SourceView extends JComponent {
             }
 
             // Mark tabs that contain highlights.
-            for (Tab tab : tabs.values()) { tab.markTabComponent(); }
+            for (Tab tab : tabs.values()) {
+                tab.markTabComponent();
+            }
         });
 
         // set the same style as the main status line:
@@ -196,7 +198,9 @@ public final class SourceView extends JComponent {
 
         // react to font changes
         Config.DEFAULT.addConfigChangeListener(e -> {
-            for (Tab tab : tabs.values()) { tab.textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW)); }
+            for (Tab tab : tabs.values()) {
+                tab.textPane.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
+            }
         });
 
         if (mainWindow.getMediator().getSelectedProof() != null) {
@@ -207,7 +211,9 @@ public final class SourceView extends JComponent {
         mainWindow.getMediator().addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
-                if (!mainWindow.getMediator().isInAutoMode()) { updateGUI(); }
+                if (!mainWindow.getMediator().isInAutoMode()) {
+                    updateGUI();
+                }
             }
 
             @Override
@@ -256,7 +262,9 @@ public final class SourceView extends JComponent {
      * @return the component responsible for showing source code and symbolic execution information
      */
     public static SourceView getSourceView(MainWindow mainWindow) {
-        if (instance == null) { instance = new SourceView(mainWindow); }
+        if (instance == null) {
+            instance = new SourceView(mainWindow);
+        }
         return instance;
     }
 
@@ -301,7 +309,9 @@ public final class SourceView extends JComponent {
             throw new BadLocationException("Not a valid line number for " + fileURI, line);
         }
 
-        if (!tab.highlights.containsKey(line)) { tab.highlights.put(line, new TreeSet<>(Collections.reverseOrder())); }
+        if (!tab.highlights.containsKey(line)) {
+            tab.highlights.put(line, new TreeSet<>(Collections.reverseOrder()));
+        }
 
         SortedSet<Highlight> highlights = tab.highlights.get(line);
 
@@ -404,12 +414,16 @@ public final class SourceView extends JComponent {
         tab.highlights.get(oldLine).remove(highlight);
         tab.applyHighlights(oldLine);
 
-        if (tab.highlights.get(oldLine).isEmpty()) { tab.highlights.remove(oldLine); }
+        if (tab.highlights.get(oldLine).isEmpty()) {
+            tab.highlights.remove(oldLine);
+        }
 
         highlight.line = newLine;
         highlight.setTag(null);
 
-        if (!tab.highlights.containsKey(newLine)) { tab.highlights.put(newLine, new TreeSet<>()); }
+        if (!tab.highlights.containsKey(newLine)) {
+            tab.highlights.put(newLine, new TreeSet<>());
+        }
 
         tab.highlights.get(newLine).add(highlight);
         tab.removeHighlights(newLine);
@@ -427,7 +441,9 @@ public final class SourceView extends JComponent {
     public boolean removeHighlight(Highlight highlight) {
         Tab tab = tabs.get(highlight.getFileURI());
 
-        if (tab == null) { return false; }
+        if (tab == null) {
+            return false;
+        }
 
         tab.removeHighlights(highlight.getLine());
 
@@ -484,11 +500,15 @@ public final class SourceView extends JComponent {
         for (URI fileURI : fileURIs) {
             if (addFile(fileURI)) {
                 updateNecessary = true;
-                if (sources != null) { sources.addRelevantFile(fileURI); }
+                if (sources != null) {
+                    sources.addRelevantFile(fileURI);
+                }
             }
         }
 
-        if (updateNecessary) { updateGUI(); }
+        if (updateNecessary) {
+            updateGUI();
+        }
     }
 
     /**
@@ -519,7 +539,9 @@ public final class SourceView extends JComponent {
         start = start == -1 ? 0 : start; // first line?
 
         // ignore whitespace at the beginning of the line
-        while (start < text.length() && start < end && Character.isWhitespace(text.charAt(start))) { start++; }
+        while (start < text.length() && start < end && Character.isWhitespace(text.charAt(start))) {
+            start++;
+        }
 
         return new Range(start, end);
     }
@@ -564,7 +586,9 @@ public final class SourceView extends JComponent {
                     calculateLineRange(tab.textPane, tab.lineInformation[line - 1].getOffset());
                 // we need < here, since viewToModel can not return a position after the last
                 // char in a line
-                if (range.start() <= pos && pos < range.end()) { return true; }
+                if (range.start() <= pos && pos < range.end()) {
+                    return true;
+                }
             }
         }
         return false;
@@ -578,7 +602,9 @@ public final class SourceView extends JComponent {
         final ProofJavaSourceCollection sources =
             selectedProof == null ? null : selectedProof.lookup(ProofJavaSourceCollection.class);
 
-        if (sources == null) { return; }
+        if (sources == null) {
+            return;
+        }
 
         final ImmutableSet<URI> fileURIs = sources.getRelevantFiles();
 
@@ -717,13 +743,17 @@ public final class SourceView extends JComponent {
     private LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node node) {
         LinkedList<Pair<Node, PositionInfo>> list = new LinkedList<>();
 
-        if (node == null) { return null; }
+        if (node == null) {
+            return null;
+        }
 
         Node cur = node;
 
         do {
             SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
-            if (activeStatement != null) { addPosToList(joinPositionsRec(activeStatement), list, cur); }
+            if (activeStatement != null) {
+                addPosToList(joinPositionsRec(activeStatement), list, cur);
+            }
             cur = cur.parent();
 
         } while (cur != null);
@@ -768,7 +798,9 @@ public final class SourceView extends JComponent {
                                                 // the method is declared without a body
                                                 // -> we try to show the file either way
                                                 IProgramMethod pm = mb.getProgramMethod(services);
-                                                if (pm != null) { posInf = pm.getPositionInfo(); }
+                                                if (pm != null) {
+                                                    posInf = pm.getPositionInfo();
+                                                }
                                             }
                                             if (posInf != null && posInf.getURI().isPresent()) {
                                                 // sometimes the useful file info is only stored in
@@ -807,7 +839,9 @@ public final class SourceView extends JComponent {
     private static PositionInfo joinPositionsRec(SourceElement se) {
         if (se instanceof NonTerminalProgramElement ntpe) {
             // TODO: additional elements, e.g. code inside if
-            if (se instanceof If || se instanceof Then || se instanceof Else) { return PositionInfo.UNDEFINED; }
+            if (se instanceof If || se instanceof Then || se instanceof Else) {
+                return PositionInfo.UNDEFINED;
+            }
 
             PositionInfo pos = se.getPositionInfo();
 
@@ -903,7 +937,9 @@ public final class SourceView extends JComponent {
                     return null;
                 }
 
-                if (isHighlighted(mouseEvent.getPoint())) { return TEXTPANE_HIGHLIGHTED_TOOLTIP; }
+                if (isHighlighted(mouseEvent.getPoint())) {
+                    return TEXTPANE_HIGHLIGHTED_TOOLTIP;
+                }
                 return null;
             }
         };
@@ -1019,7 +1055,9 @@ public final class SourceView extends JComponent {
                 @Override
                 public void mouseMoved(MouseEvent e) {
                     synchronized (SourceView.this) {
-                        if (selectionHL != null) { paintSelectionHighlight(e.getPoint(), selectionHL); }
+                        if (selectionHL != null) {
+                            paintSelectionHighlight(e.getPoint(), selectionHL);
+                        }
                     }
                 }
 
@@ -1042,7 +1080,9 @@ public final class SourceView extends JComponent {
                 @Override
                 public void mouseEntered(MouseEvent e) {
                     synchronized (SourceView.this) {
-                        if (selectionHL == null) { initSelectionHL(); }
+                        if (selectionHL == null) {
+                            initSelectionHL();
+                        }
                     }
                 }
             });
@@ -1084,7 +1124,9 @@ public final class SourceView extends JComponent {
         private void removeHighlights(int line) {
             SortedSet<Highlight> set = highlights.get(line);
 
-            if (set == null) { return; }
+            if (set == null) {
+                return;
+            }
 
             for (Highlight highlight : set) {
                 if (highlight.getTag() != null) {
@@ -1120,11 +1162,15 @@ public final class SourceView extends JComponent {
          * highlighted with a different color.
          */
         private void paintSymbExHighlights() {
-            for (Highlight hl : symbExHighlights) { removeHighlight(hl); }
+            for (Highlight hl : symbExHighlights) {
+                removeHighlight(hl);
+            }
 
             symbExHighlights.clear();
 
-            if (lines == null) { return; }
+            if (lines == null) {
+                return;
+            }
 
             try {
                 int mostRecentLine = -1;
@@ -1178,7 +1224,9 @@ public final class SourceView extends JComponent {
         }
 
         private void dispose() {
-            if (doc != null) { doc.dispose(); }
+            if (doc != null) {
+                doc.dispose();
+            }
         }
     }
 
@@ -1242,17 +1290,33 @@ public final class SourceView extends JComponent {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) { return true; }
-            if (obj == null) { return false; }
-            if (getClass() != obj.getClass()) { return false; }
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
             Highlight other = (Highlight) obj;
             if (color == null) {
-                if (other.color != null) { return false; }
-            } else if (!color.equals(other.color)) { return false; }
+                if (other.color != null) {
+                    return false;
+                }
+            } else if (!color.equals(other.color)) {
+                return false;
+            }
             if (fileURI == null) {
-                if (other.fileURI != null) { return false; }
-            } else if (!fileURI.equals(other.fileURI)) { return false; }
-            if (level != other.level) { return false; }
+                if (other.fileURI != null) {
+                    return false;
+                }
+            } else if (!fileURI.equals(other.fileURI)) {
+                return false;
+            }
+            if (level != other.level) {
+                return false;
+            }
             return line == other.line;
         }
 
@@ -1260,11 +1324,17 @@ public final class SourceView extends JComponent {
         public int compareTo(Highlight other) {
             int result = fileURI.compareTo(other.fileURI);
 
-            if (result == 0) { result = Integer.compare(line, other.line); }
+            if (result == 0) {
+                result = Integer.compare(line, other.line);
+            }
 
-            if (result == 0) { result = Integer.compare(level, other.level); }
+            if (result == 0) {
+                result = Integer.compare(level, other.level);
+            }
 
-            if (result == 0) { result = Integer.compare(color.getRGB(), other.color.getRGB()); }
+            if (result == 0) {
+                result = Integer.compare(color.getRGB(), other.color.getRGB());
+            }
 
             return result;
         }
@@ -1369,7 +1439,9 @@ public final class SourceView extends JComponent {
                 int line = 0;
                 // calculate the line number
                 while (line < li.length - 1) {
-                    if (li[line].getOffset() <= pos && pos < li[line + 1].getOffset()) { break; }
+                    if (li[line].getOffset() <= pos && pos < li[line + 1].getOffset()) {
+                        break;
+                    }
                     line++;
                 }
                 // jump in proof tree (get corresponding node from list)
@@ -1382,7 +1454,9 @@ public final class SourceView extends JComponent {
                     }
                 }
 
-                if (n != null) { mainWindow.getMediator().getSelectionModel().setSelectedNode(n); }
+                if (n != null) {
+                    mainWindow.getMediator().getSelectionModel().setSelectedNode(n);
+                }
             }
         }
     }

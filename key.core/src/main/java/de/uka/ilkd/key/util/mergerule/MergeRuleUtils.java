@@ -36,7 +36,6 @@ import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -180,7 +179,9 @@ public class MergeRuleUtils {
         } else if (u.op() instanceof UpdateJunctor) {
 
             ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
-            for (Term sub : u.subs()) { result = result.union(getUpdateLeftSideLocations(sub)); }
+            for (Term sub : u.subs()) {
+                result = result.union(getUpdateLeftSideLocations(sub));
+            }
             return result;
 
         } else {
@@ -203,7 +204,9 @@ public class MergeRuleUtils {
         if (u.op() instanceof ElementaryUpdate) {
             result.add(u);
         } else if (u.op() instanceof UpdateJunctor) {
-            for (Term sub : u.subs()) { result.addAll(getElementaryUpdates(sub)); }
+            for (Term sub : u.subs()) {
+                result.addAll(getElementaryUpdates(sub));
+            }
         } else {
             throw new IllegalArgumentException("Expected an update!");
         }
@@ -225,9 +228,13 @@ public class MergeRuleUtils {
         if (term.op() instanceof LocationVariable) {
             result = result.add((LocationVariable) term.op());
         } else {
-            if (!term.javaBlock().isEmpty()) { result = result.union(getProgramLocations(term, services)); }
+            if (!term.javaBlock().isEmpty()) {
+                result = result.union(getProgramLocations(term, services));
+            }
 
-            for (Term sub : term.subs()) { result = result.union(getLocationVariables(sub, services)); }
+            for (Term sub : term.subs()) {
+                result = result.union(getLocationVariables(sub, services));
+            }
         }
 
         return result;
@@ -244,7 +251,9 @@ public class MergeRuleUtils {
             Services services) {
         HashSet<LocationVariable> result = new HashSet<>();
 
-        for (SequentFormula f : sequent) { result.addAll(getLocationVariablesHashSet(f.formula(), services)); }
+        for (SequentFormula f : sequent) {
+            result.addAll(getLocationVariablesHashSet(f.formula(), services));
+        }
 
         return result;
     }
@@ -263,9 +272,13 @@ public class MergeRuleUtils {
         if (term.op() instanceof LocationVariable) {
             result.add((LocationVariable) term.op());
         } else {
-            if (!term.javaBlock().isEmpty()) { result.addAll(getProgramLocationsHashSet(term, services)); }
+            if (!term.javaBlock().isEmpty()) {
+                result.addAll(getProgramLocationsHashSet(term, services));
+            }
 
-            for (Term sub : term.subs()) { result.addAll(getLocationVariablesHashSet(sub, services)); }
+            for (Term sub : term.subs()) {
+                result.addAll(getLocationVariablesHashSet(sub, services));
+            }
         }
 
         return result;
@@ -284,7 +297,9 @@ public class MergeRuleUtils {
         if (term.op() instanceof JFunction && ((Function) term.op()).isSkolemConstant()) {
             result.add((Function) term.op());
         } else {
-            for (Term sub : term.subs()) { result.addAll(getSkolemConstants(sub)); }
+            for (Term sub : term.subs()) {
+                result.addAll(getSkolemConstants(sub));
+            }
         }
 
         return result;
@@ -325,7 +340,9 @@ public class MergeRuleUtils {
 
             for (Term sub : update.subs()) {
                 Term rightSide = getUpdateRightSideFor(sub, leftSide);
-                if (rightSide != null) { return rightSide; }
+                if (rightSide != null) {
+                    return rightSide;
+                }
             }
 
             return null;
@@ -348,7 +365,9 @@ public class MergeRuleUtils {
         if (term.sort().equals(JavaDLTheory.FORMULA)) {
             if (term.op() instanceof Junctor) {
                 int result = 0;
-                for (Term sub : term.subs()) { result += countAtoms(sub); }
+                for (Term sub : term.subs()) {
+                    result += countAtoms(sub);
+                }
                 return result;
             } else {
                 return 1;
@@ -382,9 +401,13 @@ public class MergeRuleUtils {
                     result++;
                 }
 
-                if (term.op().equals(Junctor.NOT)) { negated = !negated; }
+                if (term.op().equals(Junctor.NOT)) {
+                    negated = !negated;
+                }
 
-                for (Term sub : term.subs()) { result += countDisjunctions(sub, negated); }
+                for (Term sub : term.subs()) {
+                    result += countDisjunctions(sub, negated);
+                }
 
                 return result;
             } else {
@@ -580,7 +603,9 @@ public class MergeRuleUtils {
             return true;
         } else if (u.op() instanceof UpdateJunctor) {
             boolean result = true;
-            for (Term sub : u.subs()) { result = result && isUpdateNormalForm(sub); }
+            for (Term sub : u.subs()) {
+                result = result && isUpdateNormalForm(sub);
+            }
             return result;
         } else {
             return false;
@@ -656,7 +681,9 @@ public class MergeRuleUtils {
      */
     public static Node getIntroducingNodeforLocVar(LocationVariable var, Node node) {
 
-        while (!node.root() && node.getLocalProgVars().contains(var)) { node = node.parent(); }
+        while (!node.root() && node.getLocalProgVars().contains(var)) {
+            node = node.parent();
+        }
 
         return node;
 
@@ -672,14 +699,18 @@ public class MergeRuleUtils {
      *         Java block.
      */
     public static JavaBlock getJavaBlockRecursive(Term term) {
-        if (!term.containsJavaBlockRecursive()) { return JavaBlock.EMPTY_JAVABLOCK; }
+        if (!term.containsJavaBlockRecursive()) {
+            return JavaBlock.EMPTY_JAVABLOCK;
+        }
 
-        if (term.subs().size() == 0 || !term.javaBlock().isEmpty()) {
+        if (term.subs().isEmpty() || !term.javaBlock().isEmpty()) {
             return term.javaBlock();
         } else {
             for (Term sub : term.subs()) {
                 JavaBlock subJavaBlock = getJavaBlockRecursive(sub);
-                if (!subJavaBlock.isEmpty()) { return subJavaBlock; }
+                if (!subJavaBlock.isEmpty()) {
+                    return subJavaBlock;
+                }
             }
             return JavaBlock.EMPTY_JAVABLOCK;
         }
@@ -869,7 +900,9 @@ public class MergeRuleUtils {
         // Quick short cut for the special case where no program variables
         // have to be renamed.
         if (se1.equalsModProperty(se2, RENAMING_SOURCE_ELEMENT_PROPERTY,
-            new NameAbstractionTable())) { return true; }
+            new NameAbstractionTable())) {
+            return true;
+        }
 
         LocVarReplBranchUniqueMap replMap =
             new LocVarReplBranchUniqueMap(node, DefaultImmutableSet.nil());
@@ -924,7 +957,9 @@ public class MergeRuleUtils {
     public static Term createSimplifiedDisjunctivePathCondition(final Term cond1, final Term cond2,
             Services services, int simplificationTimeout) {
 
-        if (cond1.equals(cond2)) { return cond1; }
+        if (cond1.equals(cond2)) {
+            return cond1;
+        }
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -936,7 +971,8 @@ public class MergeRuleUtils {
         final LinkedHashSet<Term> equalElements = commonAndSpecific.common;
 
         assert !cond1ConjElems.isEmpty() && !cond2ConjElems
-                .isEmpty() : "Possibly, this merge is not sound: Cannot find distinguishing formulas!";
+                .isEmpty()
+                : "Possibly, this merge is not sound: Cannot find distinguishing formulas!";
 
         final Term commonElemsTerm = joinConjuctiveElements(equalElements, services);
 
@@ -994,7 +1030,9 @@ public class MergeRuleUtils {
         final LinkedHashSet<Term> cond2SpecificElems = commonAndSpecific.specific2;
         final LinkedHashSet<Term> equalElements = commonAndSpecific.common;
 
-        if (cond1SpecificElems.isEmpty() || cond2SpecificElems.isEmpty()) { return Optional.empty(); }
+        if (cond1SpecificElems.isEmpty() || cond2SpecificElems.isEmpty()) {
+            return Optional.empty();
+        }
 
         Term theOneDistinguishingTerm = null;
         for (final Term t : cond1SpecificElems) {
@@ -1088,7 +1126,7 @@ public class MergeRuleUtils {
 
         SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(node, pio, services);
 
-        return new SymbolicExecutionState(triple.first, triple.second, node);
+        return new SymbolicExecutionState(triple.symbolicState(), triple.pathCondition(), node);
     }
 
     /**
@@ -1159,11 +1197,12 @@ public class MergeRuleUtils {
             final Node node = sequentInfo.getGoal().node();
             final Services services = sequentInfo.getGoal().proof().getServices();
 
-            Triple<Term, Term, Term> partnerSEState =
+            SymbolicExecutionStateWithProgCnt partnerSEState =
                 sequentToSETriple(node, sequentInfo.getPio(), services);
 
             result = result.prepend(
-                new SymbolicExecutionState(partnerSEState.first, partnerSEState.second, node));
+                new SymbolicExecutionState(partnerSEState.symbolicState(),
+                    partnerSEState.pathCondition(), node));
         }
 
         return result;
@@ -1250,7 +1289,7 @@ public class MergeRuleUtils {
                 } else {
                     throw new RuntimeException(
                         "MergeRule: Unexpected type of Operator involved in name clash: "
-                                + partnerStateOp.getClass().getSimpleName());
+                            + partnerStateOp.getClass().getSimpleName());
                 }
 
                 mergeState = new SymbolicExecutionState(
@@ -1314,18 +1353,22 @@ public class MergeRuleUtils {
     public static Pair<Sort, Name> parsePlaceholder(String input, boolean registerInNamespaces,
             Services services) {
         String[] chunks = input.split(" ");
-        if (chunks.length != 2) { throw new RuntimeException("Expecting an input of type &lt;SORT&gt; &lt;NAME&gt;"); }
+        if (chunks.length != 2) {
+            throw new RuntimeException("Expecting an input of type &lt;SORT&gt; &lt;NAME&gt;");
+        }
 
         Sort sort = services.getNamespaces().sorts().lookup(chunks[0]);
 
-        if (sort == null) { throw new SortNotKnownException("Sort \"" + chunks[0] + "\" is not known"); }
+        if (sort == null) {
+            throw new SortNotKnownException("Sort \"" + chunks[0] + "\" is not known");
+        }
 
         String strName = chunks[1];
         Name name = new Name(strName);
 
         if (registerInNamespaces && services.getNamespaces().lookup(name) != null) {
             throw new NameAlreadyBoundException("The name \"" + strName
-                    + "\" is already known to the system.<br/>\n" + "Plase choose a fresh one.");
+                + "\" is already known to the system.<br/>\n" + "Plase choose a fresh one.");
         }
 
         return new Pair<>(sort, name);
@@ -1457,7 +1500,7 @@ public class MergeRuleUtils {
      */
     private static Term joinListToAndTerm(ImmutableList<SequentFormula> formulae,
             Services services) {
-        if (formulae.size() == 0) {
+        if (formulae.isEmpty()) {
             return services.getTermBuilder().tt();
         } else if (formulae.size() == 1) {
             return formulae.head().formula();
@@ -1531,12 +1574,16 @@ public class MergeRuleUtils {
     private static Term joinConjuctiveElements(final Collection<Term> elems, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        if (elems.isEmpty()) { return tb.tt(); }
+        if (elems.isEmpty()) {
+            return tb.tt();
+        }
 
         Iterator<Term> it = elems.iterator();
 
         Term result = it.next();
-        while (it.hasNext()) { result = tb.and(result, it.next()); }
+        while (it.hasNext()) {
+            result = tb.and(result, it.next());
+        }
 
         return result;
     }
@@ -1752,7 +1799,11 @@ public class MergeRuleUtils {
      *
      */
     private static boolean isUniqueInGlobals(String name, Iterable<IProgramVariable> globals) {
-        for (final IProgramVariable n : globals) { if (n.toString().equals(name)) { return false; } }
+        for (final IProgramVariable n : globals) {
+            if (n.toString().equals(name)) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -2001,9 +2052,13 @@ public class MergeRuleUtils {
         public LocationVariable get(Object key) {
             if (key instanceof LocationVariable var) {
 
-                if (doNotRename.contains(var)) { return var; }
+                if (doNotRename.contains(var)) {
+                    return var;
+                }
 
-                if (cache.containsKey(var)) { return cache.get(var); }
+                if (cache.containsKey(var)) {
+                    return cache.get(var);
+                }
 
                 final LocationVariable result = getBranchUniqueLocVar(var, node);
                 cache.put(var, result);

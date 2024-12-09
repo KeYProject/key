@@ -66,9 +66,13 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
 
         Term result = tb.label(tb.wellFormed(anonHeapTerm), ParameterlessTermLabel.ANON_HEAP_LABEL);
 
-        if (isTransaction) { result = tb.and(result, tb.wellFormed(anonSavedHeapTerm)); }
+        if (isTransaction) {
+            result = tb.and(result, tb.wellFormed(anonSavedHeapTerm));
+        }
 
-        if (isPermissions) { result = tb.and(result, tb.wellFormed(anonPermissionsHeapTerm)); }
+        if (isPermissions) {
+            result = tb.and(result, tb.wellFormed(anonPermissionsHeapTerm));
+        }
 
         return result;
     }

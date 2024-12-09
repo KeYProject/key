@@ -84,7 +84,9 @@ public abstract class TextualJMLConstruct {
      *        set position of the construct
      */
     protected void setPosition(PositionedString ps) {
-        if (location == null) { location = ps.location; }
+        if (location == null) {
+            location = ps.location;
+        }
     }
 
     protected void setPosition(ParserRuleContext ps) {

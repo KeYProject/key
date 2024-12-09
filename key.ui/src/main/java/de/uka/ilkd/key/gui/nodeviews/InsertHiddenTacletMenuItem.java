@@ -50,10 +50,14 @@ public class InsertHiddenTacletMenuItem extends InsertionTacletBrowserMenuItem {
      * @return the sequent with the formulas to be added or null
      */
     protected Sequent checkTaclet(Taclet t) {
-        if (!(t instanceof NoFindTaclet) || !t.displayName().startsWith("insert_hidden")) { return null; }
+        if (!(t instanceof NoFindTaclet) || !t.displayName().startsWith("insert_hidden")) {
+            return null;
+        }
 
         final ImmutableList<TacletGoalTemplate> goalTemplates = t.goalTemplates();
-        if (goalTemplates.size() != 1) { return null; }
+        if (goalTemplates.size() != 1) {
+            return null;
+        }
         return goalTemplates.head().sequent();
     }
 }

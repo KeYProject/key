@@ -65,7 +65,9 @@ public class SwitchToIf extends ProgramTransformer {
         sw = changeBreaks(sw, newBreak);
         Statement currentBlock = null;
         for (int i = sw.getBranchCount() - 1; 0 <= i; i--) {
-            if (sw.getBranchAt(i) instanceof Default) { currentBlock = collectStatements(sw, i); }
+            if (sw.getBranchAt(i) instanceof Default) {
+                currentBlock = collectStatements(sw, i);
+            }
         }
         for (int i = sw.getBranchCount() - 1; 0 <= i; i--) {
             if (sw.getBranchAt(i) instanceof Case) {
@@ -131,12 +133,16 @@ public class SwitchToIf extends ProgramTransformer {
     private Switch changeBreaks(Switch sw, Break b) {
         int n = sw.getBranchCount();
         Branch[] branches = new Branch[n];
-        for (int i = 0; i < n; i++) { branches[i] = (Branch) recChangeBreaks(sw.getBranchAt(i), b); }
+        for (int i = 0; i < n; i++) {
+            branches[i] = (Branch) recChangeBreaks(sw.getBranchAt(i), b);
+        }
         return KeYJavaASTFactory.switchBlock(sw.getExpression(), branches);
     }
 
     private ProgramElement recChangeBreaks(ProgramElement p, Break b) {
-        if (p == null) { return null; }
+        if (p == null) {
+            return null;
+        }
         if (p instanceof Break && ((Break) p).getLabel() == null) {
             noNewBreak = false;
             return b;
@@ -146,12 +152,24 @@ public class SwitchToIf extends ProgramTransformer {
             for (int i = 0; i < ((Branch) p).getStatementCount(); i++) {
                 s[i] = (Statement) recChangeBreaks(((Branch) p).getStatementAt(i), b);
             }
-            if (p instanceof Case) { return KeYJavaASTFactory.caseBlock(((Case) p).getExpression(), s); }
-            if (p instanceof Default) { return KeYJavaASTFactory.defaultBlock(s); }
-            if (p instanceof Catch) { return KeYJavaASTFactory.catchClause(((Catch) p).getParameterDeclaration(), s); }
-            if (p instanceof Finally) { return KeYJavaASTFactory.finallyBlock(s); }
-            if (p instanceof Then) { return KeYJavaASTFactory.thenBlock(s); }
-            if (p instanceof Else) { return KeYJavaASTFactory.elseBlock(s); }
+            if (p instanceof Case) {
+                return KeYJavaASTFactory.caseBlock(((Case) p).getExpression(), s);
+            }
+            if (p instanceof Default) {
+                return KeYJavaASTFactory.defaultBlock(s);
+            }
+            if (p instanceof Catch) {
+                return KeYJavaASTFactory.catchClause(((Catch) p).getParameterDeclaration(), s);
+            }
+            if (p instanceof Finally) {
+                return KeYJavaASTFactory.finallyBlock(s);
+            }
+            if (p instanceof Then) {
+                return KeYJavaASTFactory.thenBlock(s);
+            }
+            if (p instanceof Else) {
+                return KeYJavaASTFactory.elseBlock(s);
+            }
         }
         if (p instanceof If) {
             return KeYJavaASTFactory.ifElse(((If) p).getExpression(),
@@ -168,7 +186,9 @@ public class SwitchToIf extends ProgramTransformer {
         if (p instanceof Try) {
             int n = ((Try) p).getBranchCount();
             Branch[] branches = new Branch[n];
-            for (int i = 0; i < n; i++) { branches[i] = (Branch) recChangeBreaks(((Try) p).getBranchAt(i), b); }
+            for (int i = 0; i < n; i++) {
+                branches[i] = (Branch) recChangeBreaks(((Try) p).getBranchAt(i), b);
+            }
             return KeYJavaASTFactory
                     .tryBlock((StatementBlock) recChangeBreaks(((Try) p).getBody(), b), branches);
         }

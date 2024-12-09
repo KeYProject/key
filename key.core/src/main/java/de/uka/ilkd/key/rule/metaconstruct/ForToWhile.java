@@ -104,9 +104,13 @@ public class ForToWhile extends ProgramTransformer {
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
         ImmutableList<SchemaVariable> ret = ImmutableSLList.nil();
 
-        if (innerLabel != null) { ret = ret.prepend(innerLabel); }
+        if (innerLabel != null) {
+            ret = ret.prepend(innerLabel);
+        }
 
-        if (outerLabel != null) { ret = ret.prepend(outerLabel); }
+        if (outerLabel != null) {
+            ret = ret.prepend(outerLabel);
+        }
 
         return ret;
     }

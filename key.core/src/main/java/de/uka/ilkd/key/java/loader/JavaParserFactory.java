@@ -161,9 +161,15 @@ public class JavaParserFactory {
             // resolve logical datatypes as \\map or \\seq, or \\dl_Free
             ct.add(new LogicalTypeSolver());
 
-            if (!bootClasses.isEmpty()) { ct.add(new ListTypeSolver(bootClasses)); }
-            if (!libraryClasses.isEmpty()) { ct.add(new ListTypeSolver(libraryClasses)); }
-            if (!userClasses.isEmpty()) { ct.add(new ListTypeSolver(userClasses)); }
+            if (!bootClasses.isEmpty()) {
+                ct.add(new ListTypeSolver(bootClasses));
+            }
+            if (!libraryClasses.isEmpty()) {
+                ct.add(new ListTypeSolver(libraryClasses));
+            }
+            if (!userClasses.isEmpty()) {
+                ct.add(new ListTypeSolver(userClasses));
+            }
             delegate = ct;
         }
 
@@ -216,7 +222,9 @@ public class JavaParserFactory {
         public SymbolReference<ResolvedReferenceTypeDeclaration> tryToSolveType(String name) {
             SymbolReference<ResolvedReferenceTypeDeclaration> cachedValue =
                 foundTypes.getIfPresent(name);
-            if (cachedValue != null) { return cachedValue; }
+            if (cachedValue != null) {
+                return cachedValue;
+            }
 
             // Otherwise load it
             SymbolReference<ResolvedReferenceTypeDeclaration> result = tryToSolveTypeUncached(name);
@@ -239,7 +247,9 @@ public class JavaParserFactory {
 
                 var packageName =
                     unit.getPackageDeclaration().map(p -> p.getName().asString()).orElse("");
-                if (!name.startsWith(packageName)) { continue; }
+                if (!name.startsWith(packageName)) {
+                    continue;
+                }
                 String localName =
                     name.substring(Math.min(name.length(), packageName.length() + 1));
                 var astTypeDeclaration = Navigator.findType(unit, localName);
@@ -272,7 +282,9 @@ public class JavaParserFactory {
             if (name.contains("\\")) { // e.g., java.math.\bigint.
                 name = "\\" + name.replaceFirst(".*\\\\", "");
                 var kjt = services.getJavaInfo().getPrimitiveKeYJavaType(name);
-                if (kjt != null) { return SymbolReference.solved(new ResolvedLogicalType(kjt)); }
+                if (kjt != null) {
+                    return SymbolReference.solved(new ResolvedLogicalType(kjt));
+                }
             }
             return SymbolReference.unsolved();
         }

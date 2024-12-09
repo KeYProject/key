@@ -58,15 +58,23 @@ public class TestTacletEquality {
             new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String tmp;
             while ((tmp = r.readLine()) != null) {
-                if (tmp.trim().isEmpty()) { continue; }
-                if (tmp.startsWith("#")) { continue; }
+                if (tmp.trim().isEmpty()) {
+                    continue;
+                }
+                if (tmp.startsWith("#")) {
+                    continue;
+                }
                 if (tmp.startsWith("== ")) {
                     StringBuilder expected = new StringBuilder();
                     int nameEnd = tmp.indexOf(' ', 4);
                     String name = tmp.substring(3, nameEnd + 1).trim();
                     while ((tmp = r.readLine()) != null) {
-                        if (tmp.trim().isEmpty()) { continue; }
-                        if (tmp.startsWith("#")) { continue; }
+                        if (tmp.trim().isEmpty()) {
+                            continue;
+                        }
+                        if (tmp.startsWith("#")) {
+                            continue;
+                        }
                         if (tmp.startsWith("---")) {
                             seq.add(Arguments.of(name, expected.toString()));
                             break;
@@ -144,7 +152,9 @@ public class TestTacletEquality {
 
     private Taclet findTaclet(String name) {
         if (cache.isEmpty()) {
-            for (Taclet taclet : initConfig.activatedTaclets()) { cache.put(taclet.name().toString(), taclet); }
+            for (Taclet taclet : initConfig.activatedTaclets()) {
+                cache.put(taclet.name().toString(), taclet);
+            }
         }
         return cache.get(name);
     }

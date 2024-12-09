@@ -52,7 +52,9 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
      */
     @Override
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
-        if (term2 == term1) { return true; }
+        if (term2 == term1) {
+            return true;
+        }
 
         if (!(term1.op().equals(term2.op()) && term1.boundVars().equals(term2.boundVars())
                 && term1.javaBlock().equals(term2.javaBlock()))) {
@@ -62,10 +64,14 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
         final ImmutableArray<TermLabel> term1Labels = term1.getLabels();
         final ImmutableArray<TermLabel> term2Labels = term2.getLabels();
         for (TermLabel label : term1Labels) {
-            if (label.isProofRelevant() && !term2Labels.contains(label)) { return false; }
+            if (label.isProofRelevant() && !term2Labels.contains(label)) {
+                return false;
+            }
         }
         for (TermLabel label : term2Labels) {
-            if (label.isProofRelevant() && !term1Labels.contains(label)) { return false; }
+            if (label.isProofRelevant() && !term1Labels.contains(label)) {
+                return false;
+            }
         }
 
         final ImmutableArray<Term> termSubs = term1.subs();
@@ -73,7 +79,9 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
         final int numOfSubs = termSubs.size();
         for (int i = 0; i < numOfSubs; ++i) {
             if (!termSubs.get(i).equalsModProperty(term2Subs.get(i),
-                IRRELEVANT_TERM_LABELS_PROPERTY)) { return false; }
+                IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                return false;
+            }
         }
 
         return true;
@@ -98,7 +106,9 @@ public class IrrelevantTermLabelsProperty implements Property<Term> {
         final ImmutableArray<TermLabel> labels = term.getLabels();
         for (int i = 0, sz = labels.size(); i < sz; i++) {
             final TermLabel currentLabel = labels.get(i);
-            if (currentLabel.isProofRelevant()) { hashcode += 7 * currentLabel.hashCode(); }
+            if (currentLabel.isProofRelevant()) {
+                hashcode += 7 * currentLabel.hashCode();
+            }
         }
 
         return hashcode;

@@ -87,7 +87,9 @@ public final class JavaTools {
                 if (!done && node == statement) {
                     done = true;
                     stack.pop();
-                    if (with != null) { addToTopOfStack(with); }
+                    if (with != null) {
+                        addToTopOfStack(with);
+                    }
                     changed();
                 } else {
                     super.doAction(node);
@@ -108,7 +110,9 @@ public final class JavaTools {
             private MethodFrame res;
 
             protected void doDefaultAction(SourceElement node) {
-                if (node instanceof MethodFrame && res == null) { res = (MethodFrame) node; }
+                if (node instanceof MethodFrame && res == null) {
+                    res = (MethodFrame) node;
+                }
             }
 
             public MethodFrame run() {

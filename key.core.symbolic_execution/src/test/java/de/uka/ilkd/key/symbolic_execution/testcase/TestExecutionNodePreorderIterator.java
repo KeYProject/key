@@ -217,7 +217,9 @@ public class TestExecutionNodePreorderIterator {
                 IExecutionNode<?> next = iter.next();
                 assertNotNull(next);
                 assertEquals(node.getExpectedName(), next.getName());
-                if (iterateOverSubtree) { assertRoot(next, new ExpectedNode[] { node }); }
+                if (iterateOverSubtree) {
+                    assertRoot(next, new ExpectedNode[] { node });
+                }
                 assertExpectedNodes(iter, node.getExpectedChildren(), true);
             }
         }
@@ -294,7 +296,9 @@ public class TestExecutionNodePreorderIterator {
             ExpectedNode[]... children) {
         assertEquals(expectedNames.length, children.length);
         List<ExpectedNode> result = new LinkedList<>();
-        for (int i = 0; i < expectedNames.length; i++) { result.add(new ExpectedNode(expectedNames[i], children[i])); }
+        for (int i = 0; i < expectedNames.length; i++) {
+            result.add(new ExpectedNode(expectedNames[i], children[i]));
+        }
         return result.toArray(new ExpectedNode[0]);
     }
 
@@ -307,7 +311,9 @@ public class TestExecutionNodePreorderIterator {
      */
     protected ExpectedNode[] createExpectedNodes(String... expectedNames) {
         List<ExpectedNode> result = new LinkedList<>();
-        for (String name : expectedNames) { result.add(new ExpectedNode(name)); }
+        for (String name : expectedNames) {
+            result.add(new ExpectedNode(name));
+        }
         return result.toArray(new ExpectedNode[0]);
     }
 

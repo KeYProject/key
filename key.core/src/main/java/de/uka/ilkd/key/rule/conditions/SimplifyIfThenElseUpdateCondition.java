@@ -55,7 +55,9 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         }
 
         public Term createIfElseTerm(Term phi, TermServices services) {
-            if (rhs1.equals(rhs2)) { return services.getTermBuilder().elementary(op, rhs1); }
+            if (rhs1.equals(rhs2)) {
+                return services.getTermBuilder().elementary(op, rhs1);
+            }
             Term ifThenElse = services.getTermBuilder().ife(phi, rhs1, rhs2);
             return services.getTermBuilder().elementary(op, ifThenElse);
 
@@ -114,7 +116,9 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
             } else if (next.op() == UpdateJunctor.SKIP) {
                 return true;
             } else if (next.op() instanceof ElementaryUpdate eu) {
-                if (collected.contains(eu.lhs())) { return false; }
+                if (collected.contains(eu.lhs())) {
+                    return false;
+                }
                 collected.add(eu.lhs());
                 collectSingleTerm(map, next, firstTerm, services);
             } else {
@@ -133,7 +137,9 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
             return null;
         }
-        if (!collect(map, u2, false, services)) { return null; }
+        if (!collect(map, u2, false, services)) {
+            return null;
+        }
         Term result = services.getTermBuilder().skip();
         for (ElementaryUpdateWrapper euw : map.values()) {
             result =
@@ -157,7 +163,9 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         Term phiInst = (Term) svInst.getInstantiation(phi);
         Term resultInst = (Term) svInst.getInstantiation(result);
 
-        if (tInst == null || phiInst == null) { return mc; }
+        if (tInst == null || phiInst == null) {
+            return mc;
+        }
 
         u1Inst = u1Inst == null ? services.getTermBuilder().skip() : u1Inst;
         u2Inst = u2Inst == null ? services.getTermBuilder().skip() : u2Inst;

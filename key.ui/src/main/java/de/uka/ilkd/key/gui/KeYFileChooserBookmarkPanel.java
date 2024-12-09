@@ -77,13 +77,17 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
         listBookmarks.setCellRenderer(new BookmarkRenderer());
         listBookmarks.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) { setBookmark(); }
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    setBookmark();
+                }
             }
         });
 
         listBookmarks.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) { setBookmark(); }
+                if (e.getClickCount() == 2) {
+                    setBookmark();
+                }
             }
         });
 
@@ -95,7 +99,9 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private void setBookmark() {
-        if (listBookmarks.getSelectedValue() != null) { chooser.setCurrentDirectory(listBookmarks.getSelectedValue()); }
+        if (listBookmarks.getSelectedValue() != null) {
+            chooser.setCurrentDirectory(listBookmarks.getSelectedValue());
+        }
     }
 
     private void loadBookmarks() {
@@ -105,7 +111,9 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     private void saveBookmarks() {
         List<String> newMarks = new ArrayList<>();
         Enumeration<File> iter = bookmarks.elements();
-        while (iter.hasMoreElements()) { newMarks.add(iter.nextElement().getAbsolutePath()); }
+        while (iter.hasMoreElements()) {
+            newMarks.add(iter.nextElement().getAbsolutePath());
+        }
         viewSettings.setFolderBookmarks(newMarks);
     }
 
@@ -122,9 +130,13 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
             do {
                 sb.insert(0, file.getName());
                 file = file.getParentFile();
-                if (file != null) { sb.insert(0, '/'); }
+                if (file != null) {
+                    sb.insert(0, '/');
+                }
             } while (file != null && sb.length() < LIMIT);
-            if (file != null) { sb.insert(0, '…'); }
+            if (file != null) {
+                sb.insert(0, '…');
+            }
             return sb.toString();
         }
 

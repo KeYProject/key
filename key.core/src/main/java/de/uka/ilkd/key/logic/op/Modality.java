@@ -93,27 +93,39 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     protected <T extends org.key_project.logic.Term> void additionalValidTopLevel(T p_term) {
         final Term term = (Term) p_term;
         for (int i = 0, n = arity(); i < n; i++) {
-            if (!possibleSub(i, term.sub(i))) { throw new TermCreationException(this, term); }
+            if (!possibleSub(i, term.sub(i))) {
+                throw new TermCreationException(this, term);
+            }
         }
     }
 
     @Override
     public void validTopLevelException(org.key_project.logic.Term term)
             throws TermCreationException {
-        if (1 != term.arity()) { throw new TermCreationException(this, term); }
+        if (1 != term.arity()) {
+            throw new TermCreationException(this, term);
+        }
 
-        if (1 != term.subs().size()) { throw new TermCreationException(this, term); }
+        if (1 != term.subs().size()) {
+            throw new TermCreationException(this, term);
+        }
 
-        if (!term.boundVars().isEmpty()) { throw new TermCreationException(this, term); }
+        if (!term.boundVars().isEmpty()) {
+            throw new TermCreationException(this, term);
+        }
 
-        if (term.sub(0) == null) { throw new TermCreationException(this, term); }
+        if (term.sub(0) == null) {
+            throw new TermCreationException(this, term);
+        }
 
         additionalValidTopLevel(term);
     }
 
     @Override
     public String toString() {
-        if (kind() instanceof ModalOperatorSV) { return kind().toString(); }
+        if (kind() instanceof ModalOperatorSV) {
+            return kind().toString();
+        }
         return super.toString();
     }
 

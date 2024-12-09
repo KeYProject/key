@@ -96,8 +96,8 @@ public class FeatureSettings extends AbstractSettings {
      */
     private boolean isTrue(Object value) {
         return switch (value.toString().toLowerCase()) {
-            case "true", "yes", "on" -> true;
-            default -> false;
+        case "true", "yes", "on" -> true;
+        default -> false;
         };
     }
 
@@ -118,13 +118,17 @@ public class FeatureSettings extends AbstractSettings {
     @Override
     public void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
-        for (String activatedFeature : activatedFeatures) { props.put(prefix + activatedFeature, "true"); }
+        for (String activatedFeature : activatedFeatures) {
+            props.put(prefix + activatedFeature, "true");
+        }
     }
 
     @Override
     public void readSettings(@NonNull Configuration props) {
         activatedFeatures.clear();
-        for (String s : props.getStringList(CATEGORY)) { activate(s); }
+        for (String s : props.getStringList(CATEGORY)) {
+            activate(s);
+        }
     }
 
     @Override

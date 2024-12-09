@@ -48,8 +48,12 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
                 .op() instanceof LocationVariable : "Something is wrong with the catch variable";
 
         ImmutableList<Term> posts = ImmutableSLList.nil();
-        if (poVars.post.self != null) { posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self)); }
-        if (poVars.post.result != null) { posts = posts.append(d.tb.equals(poVars.post.result, poVars.pre.result)); }
+        if (poVars.post.self != null) {
+            posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
+        }
+        if (poVars.post.result != null) {
+            posts = posts.append(d.tb.equals(poVars.post.result, poVars.pre.result));
+        }
         posts = posts.append(d.tb.equals(poVars.post.exception, poVars.pre.exception));
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
         final Term prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
@@ -154,7 +158,9 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             throws IllegalArgumentException {
         ProgramVariable[] formalParVars = new ProgramVariable[formalPars.size()];
         int i = 0;
-        for (Term formalPar : formalPars) { formalParVars[i++] = formalPar.op(ProgramVariable.class); }
+        for (Term formalPar : formalPars) {
+            formalParVars[i++] = formalPar.op(ProgramVariable.class);
+        }
         return formalParVars;
     }
 }

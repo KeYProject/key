@@ -162,8 +162,12 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     public int getChildCount() {
         int result = 0;
-        if (body != null) { result++; }
-        if (branches != null) { result += branches.size(); }
+        if (body != null) {
+            result++;
+        }
+        if (branches != null) {
+            result += branches.size();
+        }
         return result;
     }
 
@@ -185,7 +189,9 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
                 return body;
             index--;
         }
-        if (branches != null) { return branches.get(index); }
+        if (branches != null) {
+            return branches.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -220,7 +226,9 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) { return body; }
+        if (body != null && index == 0) {
+            return body;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -245,7 +253,9 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
      */
 
     public Branch getBranchAt(int index) {
-        if (branches != null) { return branches.get(index); }
+        if (branches != null) {
+            return branches.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

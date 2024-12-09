@@ -77,7 +77,9 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
             }
         } else if (pe instanceof FieldReference fr) {
             ReferencePrefix ref = fr.getReferencePrefix();
-            if (ref != null) { listReferences(node, ref, arrayLength, toFill, includeExpressionContainer); }
+            if (ref != null) {
+                listReferences(node, ref, arrayLength, toFill, includeExpressionContainer);
+            }
             ProgramVariable pv = fr.getProgramVariable();
             if (pv != arrayLength) {
                 DefaultProofReference<ProgramVariable> reference =

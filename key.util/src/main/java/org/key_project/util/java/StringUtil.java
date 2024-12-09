@@ -235,7 +235,9 @@ public final class StringUtil {
             char[] signs = text.toCharArray();
             for (int i = 0; i < signs.length; i++) {
                 int index = Arrays.binarySearch(toSearch, signs[i]);
-                if (index >= 0) { signs[i] = toReplace; }
+                if (index >= 0) {
+                    signs[i] = toReplace;
+                }
             }
             return new String(signs);
         } else {
@@ -274,7 +276,9 @@ public final class StringUtil {
                         && secondIndex < secondContent.length) {
                     // Compare content
                     if (firstIndex < firstContent.length && secondIndex < secondContent.length) {
-                        if (firstContent[firstIndex] != secondContent[secondIndex]) { equal = false; }
+                        if (firstContent[firstIndex] != secondContent[secondIndex]) {
+                            equal = false;
+                        }
                     } else {
                         if (firstIndex < firstContent.length - 1
                                 || secondIndex < secondContent.length - 1) {
@@ -346,7 +350,9 @@ public final class StringUtil {
         if (text != null) {
             char[] content = text.toCharArray();
             int newLength = content.length;
-            while (newLength >= 1 && Character.isWhitespace(content[newLength - 1])) { newLength--; }
+            while (newLength >= 1 && Character.isWhitespace(content[newLength - 1])) {
+                newLength--;
+            }
             return newLength == text.length() ? text : text.substring(0, newLength);
         } else {
             return null;
@@ -417,8 +423,12 @@ public final class StringUtil {
         int last = text.length() - 1;
         char[] value = text.toCharArray();
 
-        while (first < last && predicate.test(value[first])) { ++first; }
-        while (first <= last && predicate.test(value[last])) { --last; }
+        while (first < last && predicate.test(value[first])) {
+            ++first;
+        }
+        while (first <= last && predicate.test(value[last])) {
+            --last;
+        }
         return (first < last + 1) ? text.substring(first, last + 1) : "";
     }
 
@@ -527,6 +537,8 @@ public final class StringUtil {
      */
     public static void appendRepeated(StringBuilder b, char value, int count) {
         b.ensureCapacity(b.length() + count);
-        for (int i = 0; i < count; i++) { b.append(value); }
+        for (int i = 0; i < count; i++) {
+            b.append(value);
+        }
     }
 }

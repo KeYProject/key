@@ -22,19 +22,19 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private static final String CLUTTER_RULES = "clutterRules";
 
     private static final String CLUTTER_RULES_DEFAULT = "cut_direct_r,cut_direct_l,"
-            + "case_distinction_r,case_distinction_l,local_cut,commute_and_2,commute_or_2,"
-            + "boxToDiamond,pullOut,typeStatic,less_is_total,less_zero_is_total,apply_eq_monomials"
-            + "eqTermCut,instAll,instEx,divIncreasingPos,divIncreasingNeg,jmodUnique1,jmodeUnique2,"
-            + "jmodjmod,jmodDivisble,jdivAddMultDenom,jmodAltZero,add_non_neq_square,divide_geq,"
-            + "add_greatereq,geq_add_one,leq_add_one,polySimp_addOrder,polySimp_expand,add_lesseq,"
-            + "divide_equation,equal_add_one,add_eq";
+        + "case_distinction_r,case_distinction_l,local_cut,commute_and_2,commute_or_2,"
+        + "boxToDiamond,pullOut,typeStatic,less_is_total,less_zero_is_total,apply_eq_monomials"
+        + "eqTermCut,instAll,instEx,divIncreasingPos,divIncreasingNeg,jmodUnique1,jmodeUnique2,"
+        + "jmodjmod,jmodDivisble,jdivAddMultDenom,jmodAltZero,add_non_neq_square,divide_geq,"
+        + "add_greatereq,geq_add_one,leq_add_one,polySimp_addOrder,polySimp_expand,add_lesseq,"
+        + "divide_equation,equal_add_one,add_eq";
 
     private static final String CLUTTER_RULESSETS = "clutterRuleSets";
 
     private static final String CLUTTER_RULESETS_DEFAULT = "notHumanReadable,obsolete,"
-            + "pullOutQuantifierAll,inEqSimp_commute,inEqSimp_expand,pullOutQuantifierEx,"
-            + "inEqSimp_nonLin_divide,inEqSimp_special_nonLin,inEqSimp_nonLin,polySimp_normalise,"
-            + "polySimp_directEquations";
+        + "pullOutQuantifierAll,inEqSimp_commute,inEqSimp_expand,pullOutQuantifierEx,"
+        + "inEqSimp_nonLin_divide,inEqSimp_special_nonLin,inEqSimp_nonLin,polySimp_normalise,"
+        + "polySimp_directEquations";
 
     /**
      * default max number of displayed tooltip lines is 40
@@ -418,7 +418,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
     }
 
     public void setUsePretty(boolean usePretty) {
-        if (!usePretty) { setUseUnicode(false); }
+        if (!usePretty) {
+            setUseUnicode(false);
+        }
         this.usePretty.set(usePretty);
     }
 

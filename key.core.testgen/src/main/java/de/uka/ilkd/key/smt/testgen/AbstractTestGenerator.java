@@ -85,11 +85,11 @@ public abstract class AbstractTestGenerator {
         }
         if (!SolverTypes.Z3_CE_SOLVER.isSupportedVersion()) {
             log.writeln("Warning: z3 supported minimum supported version is: "
-                    + SolverTypes.Z3_CE_SOLVER.getMinimumSupportedVersion());
+                + SolverTypes.Z3_CE_SOLVER.getMinimumSupportedVersion());
         }
         if (originalProof.closed() && settings.includePostCondition()) {
             log.writeln("Cannot generate test cases from closed proof with "
-                    + "\nInclude Postcondition option activated. Aborting.");
+                + "\nInclude Postcondition option activated. Aborting.");
             return;
         }
 
@@ -107,7 +107,9 @@ public abstract class AbstractTestGenerator {
         log.writeln("Extracting test data constraints (path conditions).");
         proofs =
             createProofsForTesting(settings.removeDuplicates(), !settings.includePostCondition());
-        if (stopRequest != null && stopRequest.shouldStop()) { return; }
+        if (stopRequest != null && stopRequest.shouldStop()) {
+            return;
+        }
         if (!proofs.isEmpty()) {
             log.writeln("Extracted " + proofs.size() + " test data constraints.");
         } else {
@@ -117,13 +119,17 @@ public abstract class AbstractTestGenerator {
         log.writeln("Test data generation: appling semantic blasting macro on proofs");
         try {
             for (final Proof proof : proofs) {
-                if (stopRequest != null && stopRequest.shouldStop()) { return; }
+                if (stopRequest != null && stopRequest.shouldStop()) {
+                    return;
+                }
                 log.write(".");
                 final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
                 TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
                 final ProverTaskListener ptl = ui.getProofControl().getDefaultProverTaskListener();
                 try {
-                    if (stopRequest != null && stopRequest.shouldStop()) { return; }
+                    if (stopRequest != null && stopRequest.shouldStop()) {
+                        return;
+                    }
 
                     selectProof(ui, proof);
 
@@ -133,7 +139,7 @@ public abstract class AbstractTestGenerator {
                 } catch (final InterruptedException e) {
                     LOGGER.debug("Semantics blasting interrupted");
                     log.writeln("\n Warning: semantics blasting was interrupted. "
-                            + "A test case will not be generated.");
+                        + "A test case will not be generated.");
                 } catch (final Exception e) {
                     log.writeln(e.getLocalizedMessage());
                     LOGGER.warn("", e);
@@ -176,8 +182,12 @@ public abstract class AbstractTestGenerator {
         final List<SolverType> solvers = new LinkedList<>();
         solvers.add(SolverTypes.Z3_CE_SOLVER);
         SolverTypes.Z3_CE_SOLVER.checkForSupport();
-        if (stopRequest != null && stopRequest.shouldStop()) { return; }
-        if (Thread.interrupted()) { return; }
+        if (stopRequest != null && stopRequest.shouldStop()) {
+            return;
+        }
+        if (Thread.interrupted()) {
+            return;
+        }
         launcher.launch(solvers, problems, proof.getServices());
     }
 
@@ -189,7 +199,11 @@ public abstract class AbstractTestGenerator {
      * Removes all generated proofs.
      */
     public void dispose() {
-        if (proofs != null) { for (final Proof p : proofs) { p.dispose(); } }
+        if (proofs != null) {
+            for (final Proof p : proofs) {
+                p.dispose();
+            }
+        }
     }
 
     protected void selectProof(UserInterfaceControl ui, Proof proof) {
@@ -214,7 +228,9 @@ public abstract class AbstractTestGenerator {
         if (originalProof.closed()) {
             getNodesWithEmptyModalities(originalProof.root(), nodes);
         } else {
-            for (final Goal goal : oldGoals) { nodes.add(goal.node()); }
+            for (final Goal goal : oldGoals) {
+                nodes.add(goal.node());
+            }
         }
         final Iterator<Node> oldGoalIter = nodes.iterator();
         while (oldGoalIter.hasNext()) {
@@ -227,7 +243,9 @@ public abstract class AbstractTestGenerator {
                     p = createProofForTestingNoDuplicate(oldGoalIter.next(), null,
                         removePostCondition);
                 }
-                if (p != null) { res.add(p); }
+                if (p != null) {
+                    res.add(p);
+                }
             } catch (final Exception e) {
                 LOGGER.error("Could not create a proof for testing", e);
             }
@@ -246,9 +264,13 @@ public abstract class AbstractTestGenerator {
     private void getNodesWithEmptyModalities(Node root, List<Node> nodes) {
         if (root.getAppliedRuleApp() != null) {
             final RuleApp app = root.getAppliedRuleApp();
-            if (app.rule().name().toString().equals("emptyModality")) { nodes.add(root); }
+            if (app.rule().name().toString().equals("emptyModality")) {
+                nodes.add(root);
+            }
         }
-        for (int i = 0; i < root.childrenCount(); ++i) { getNodesWithEmptyModalities(root.child(i), nodes); }
+        for (int i = 0; i < root.childrenCount(); ++i) {
+            getNodesWithEmptyModalities(root.child(i), nodes);
+        }
     }
 
     /**
@@ -275,13 +297,17 @@ public abstract class AbstractTestGenerator {
         while (it.hasNext()) {
             final SequentFormula sf = it.next();
             // Allow updates modailities in the antecedent
-            if (hasModalities(sf.formula(), false)) { continue; }
+            if (hasModalities(sf.formula(), false)) {
+                continue;
+            }
             newSequent = newSequent.addFormula(sf, true, false).sequent();
         }
         it = oldSequent.succedent().iterator();
         while (it.hasNext()) {
             final SequentFormula sf = it.next();
-            if (hasModalities(sf.formula(), removePostCondition)) { continue; }
+            if (hasModalities(sf.formula(), removePostCondition)) {
+                continue;
+            }
             newSequent = newSequent.addFormula(sf, false, false).sequent();
         }
         // Check if a proof with the same sequent already exists.
@@ -310,10 +336,16 @@ public abstract class AbstractTestGenerator {
 
     private boolean hasModalities(Term t, boolean checkUpdates) {
         final JavaBlock jb = t.javaBlock();
-        if (jb != null && !jb.isEmpty()) { return true; }
-        if (t.op() == UpdateApplication.UPDATE_APPLICATION && checkUpdates) { return true; }
+        if (jb != null && !jb.isEmpty()) {
+            return true;
+        }
+        if (t.op() == UpdateApplication.UPDATE_APPLICATION && checkUpdates) {
+            return true;
+        }
         boolean res = false;
-        for (int i = 0; i < t.arity() && !res; i++) { res |= hasModalities(t.sub(i), checkUpdates); }
+        for (int i = 0; i < t.arity() && !res; i++) {
+            res |= hasModalities(t.sub(i), checkUpdates);
+        }
         return res;
     }
 
@@ -321,7 +353,7 @@ public abstract class AbstractTestGenerator {
     protected void handleLauncherStarted(Collection<SMTProblem> problems,
             Collection<SolverType> solverTypes, SolverLauncher launcher, TestGenerationLog log) {
         log.writeln("Test data generation: solving " + problems.size()
-                + " SMT problems... \n please wait...");
+            + " SMT problems... \n please wait...");
     }
 
     protected void handleLauncherStopped(SolverLauncher launcher,
@@ -387,14 +419,18 @@ public abstract class AbstractTestGenerator {
                     } else {
                         problem++;
                     }
-                } else if (res == SMTSolverResult.ThreeValuedTruth.VALID) { infeasiblePaths++; }
+                } else if (res == SMTSolverResult.ThreeValuedTruth.VALID) {
+                    infeasiblePaths++;
+                }
             } catch (final Exception ex) {
                 log.writeln(ex.getMessage());
             }
         }
         log.writeln("--- SMT Solver Results ---\n" + " solved pathconditions:" + solvedPaths + "\n"
-                + " invalid pre-/pathconditions:" + infeasiblePaths + "\n" + " unknown:" + unknown);
-        if (problem > 0) { log.writeln(" problems             :" + problem); }
+            + " invalid pre-/pathconditions:" + infeasiblePaths + "\n" + " unknown:" + unknown);
+        if (problem > 0) {
+            log.writeln(" problems             :" + problem);
+        }
         if (unknown > 0) {
             log.writeln(
                 " Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers and restart key.\n Make sure you use Z3 version 4.3.1.");
@@ -404,7 +440,9 @@ public abstract class AbstractTestGenerator {
     }
 
     public void stopSMTLauncher() {
-        if (launcher != null) { launcher.stop(); }
+        if (launcher != null) {
+            launcher.stop();
+        }
     }
 
     protected Proof getOriginalProof() {

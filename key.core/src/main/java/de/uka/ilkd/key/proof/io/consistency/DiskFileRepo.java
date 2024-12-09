@@ -102,7 +102,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
             return entryURL.openStream();
         } else {
             LOGGER.debug("This type of URL is not supported by the FileRepo!"
-                    + " Resource will not be copied to FileRepo!");
+                + " Resource will not be copied to FileRepo!");
             return url.openStream(); // fallback without a copy
         }
     }
@@ -114,7 +114,9 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
         // map lookup if the current path was already requested
         final Path p = map.get(norm);
-        if (p != null) { return new FileInputStream(p.toFile()); }
+        if (p != null) {
+            return new FileInputStream(p.toFile());
+        }
 
         // internal files are not copied to repo (but added to map for faster lookup)
         if (isInternalFile(norm)) {
@@ -169,7 +171,9 @@ public final class DiskFileRepo extends AbstractFileRepo {
             }
         }
 
-        if (newFile != null) { return new FileInputStream(newFile.toFile()); }
+        if (newFile != null) {
+            return new FileInputStream(newFile.toFile());
+        }
 
         return null;
     }
@@ -299,7 +303,9 @@ public final class DiskFileRepo extends AbstractFileRepo {
             concrete = tmpDir.resolve(p.normalize());
         }
 
-        if (concrete == null) { return null; }
+        if (concrete == null) {
+            return null;
+        }
 
         // open new FileInputStream of the converted path
         return new FileInputStream(concrete.toFile());
@@ -311,7 +317,9 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
     @Override
     protected void dispose() {
-        if (isDisposed()) { return; }
+        if (isDisposed()) {
+            return;
+        }
 
         try {
             // delete the temporary directory with all contained files

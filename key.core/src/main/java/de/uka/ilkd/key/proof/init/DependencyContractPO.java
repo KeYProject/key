@@ -81,7 +81,9 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = tb.tt();
-        for (var paramVar : paramVars) { paramsOK = tb.and(paramsOK, tb.reachableValue(paramVar)); }
+        for (var paramVar : paramVars) {
+            paramsOK = tb.and(paramsOK, tb.reachableValue(paramVar));
+        }
 
         // initial value of measured_by clause
         final Term mbyAtPreDef;
@@ -117,7 +119,9 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             target = javaInfo.getToplevelPM(contract.getKJT(), (IProgramMethod) target);
             // FIXME: for some reason the above method call returns null now and then, the following
             // line (hopefully) is a work-around
-            if (target == null) { target = contract.getTarget(); }
+            if (target == null) {
+                target = contract.getTarget();
+            }
         }
         if (target.getType() == KeYJavaType.VOID_TYPE) {
             throw new ProofInputException(
@@ -141,7 +145,9 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         List<LocationVariable> heaps = new LinkedList<>();
         int hc = 0;
         for (LocationVariable h : HeapContext.getModifiableHeaps(proofServices, false)) {
-            if (hc >= heapCount) { break; }
+            if (hc >= heapCount) {
+                break;
+            }
             heaps.add(h);
             LocationVariable preVar =
                 twoState ? tb.atPreVar(h.name().toString(), h.sort(), true) : null;
@@ -150,7 +156,9 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
                 heaps.add(preVar);
             }
             preHeapVars.put(h, preVar);
-            if (preVar != null) { preHeapVarsReverse.put(preVar, h); }
+            if (preVar != null) {
+                preHeapVarsReverse.put(preVar, h);
+            }
         }
 
         Term permsFor = tb.tt();
@@ -216,9 +224,15 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         // prepare target term
         final Term[] subs = new Term[paramVars.size() + heaps.size() + (target.isStatic() ? 0 : 1)];
         int offset = 0;
-        for (LocationVariable heap : heaps) { subs[offset++] = tb.var(heap); }
-        if (!target.isStatic()) { subs[offset++] = tb.var(selfVar); }
-        for (ProgramVariable paramVar : paramVars) { subs[offset++] = tb.var(paramVar); }
+        for (LocationVariable heap : heaps) {
+            subs[offset++] = tb.var(heap);
+        }
+        if (!target.isStatic()) {
+            subs[offset++] = tb.var(selfVar);
+        }
+        for (ProgramVariable paramVar : paramVars) {
+            subs[offset++] = tb.var(paramVar);
+        }
         final Term targetTerm = tb.func(target, subs);
 
         // build po
@@ -243,7 +257,9 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof DependencyContractPO cPO)) { return false; }
+        if (!(po instanceof DependencyContractPO cPO)) {
+            return false;
+        }
         return contract.equals(cPO.contract);
     }
 

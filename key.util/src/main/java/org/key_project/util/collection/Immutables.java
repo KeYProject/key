@@ -38,7 +38,12 @@ public final class Immutables {
      */
     public static <T extends @Nullable Object> boolean isDuplicateFree(ImmutableList<T> list) {
         HashSet<T> set = new HashSet<>();
-        for (T element : list) { if (set.contains(element)) { return false; } set.add(element); }
+        for (T element : list) {
+            if (set.contains(element)) {
+                return false;
+            }
+            set.add(element);
+        }
 
         return true;
     }
@@ -72,11 +77,16 @@ public final class Immutables {
     public static <T extends @Nullable Object> ImmutableList<T> removeDuplicates(
             ImmutableList<T> list) {
 
-        if (list.isEmpty()) { return list; }
+        if (list.isEmpty()) {
+            return list;
+        }
 
         ImmutableList<ImmutableList<T>> stack = ImmutableSLList.nil();
 
-        while (!list.isEmpty()) { stack = stack.prepend(list); list = list.tail(); }
+        while (!list.isEmpty()) {
+            stack = stack.prepend(list);
+            list = list.tail();
+        }
 
         HashSet<T> alreadySeen = new HashSet<>();
         ImmutableList<T> result = ImmutableSLList.nil();
@@ -114,10 +124,16 @@ public final class Immutables {
             ImmutableList<? extends T> l2) {
 
         HashSet<T> lookup = new HashSet<>();
-        for (T element : l1) { lookup.add(element); }
+        for (T element : l1) {
+            lookup.add(element);
+        }
 
         ImmutableList<T> result = l1;
-        for (T element : l2) { if (!lookup.contains(element)) { result = result.prepend(element); } }
+        for (T element : l2) {
+            if (!lookup.contains(element)) {
+                result = result.prepend(element);
+            }
+        }
 
         return result;
     }
@@ -153,7 +169,9 @@ public final class Immutables {
      */
     public static <T> ImmutableList<T> createListFrom(Iterable<? extends T> iterable) {
         ImmutableList<T> result = ImmutableSLList.nil();
-        for (T t : iterable) { result = result.prepend(t); }
+        for (T t : iterable) {
+            result = result.prepend(t);
+        }
         return result.reverse();
     }
 
@@ -176,7 +194,13 @@ public final class Immutables {
         // This must be a loop. A tail recursive implementation is not optimised
         // by the compiler and quickly leads to a stack overlow.
         ImmutableList<T> acc = ImmutableSLList.nil();
-        while (!ts.isEmpty()) { T hd = ts.head(); if (predicate.test(hd)) { acc = acc.prepend(hd); } ts = ts.tail(); }
+        while (!ts.isEmpty()) {
+            T hd = ts.head();
+            if (predicate.test(hd)) {
+                acc = acc.prepend(hd);
+            }
+            ts = ts.tail();
+        }
         return acc.reverse();
     }
 
@@ -197,7 +221,11 @@ public final class Immutables {
         // This must be a loop. A tail recursive implementation is not optimised
         // by the compiler and quickly leads to a stack overflow.
         ImmutableList<R> acc = ImmutableSLList.nil();
-        while (!ts.isEmpty()) { T hd = ts.head(); acc = acc.prepend(function.apply(hd)); ts = ts.tail(); }
+        while (!ts.isEmpty()) {
+            T hd = ts.head();
+            acc = acc.prepend(function.apply(hd));
+            ts = ts.tail();
+        }
         return acc.reverse();
     }
 }

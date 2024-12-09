@@ -49,12 +49,16 @@ public class LoopFreeInvariantCondition implements VariableCondition {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final TermBuilder tb = services.getTermBuilder();
 
-        if (svInst.getInstantiation(invSV) != null) { return matchCond; }
+        if (svInst.getInstantiation(invSV) != null) {
+            return matchCond;
+        }
 
         final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
         final LoopSpecification loopSpec = services.getSpecificationRepository().getLoopSpec(loop);
 
-        if (loopSpec == null) { return null; }
+        if (loopSpec == null) {
+            return null;
+        }
 
         final JavaBlock javaBlock = JavaBlock.createJavaBlock(
             (StatementBlock) svInst.getContextInstantiation().contextProgram());

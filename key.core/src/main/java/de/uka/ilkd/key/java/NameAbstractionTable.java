@@ -63,7 +63,9 @@ public class NameAbstractionTable {
 
                 if (pe0.equals(o0)) {
                     return pe1.equals(o1);
-                } else if (pe1.equals(o1)) { return false; }
+                } else if (pe1.equals(o1)) {
+                    return false;
+                }
             }
         }
 

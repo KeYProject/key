@@ -74,7 +74,9 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
         // characters and contract several whitespaces into a
         // single one so that line breaks are treated correctly.
 
-        if (!regex) { search = search.replaceAll("[^\\s\\u00a0\\w]", "\\\\$0"); }
+        if (!regex) {
+            search = search.replaceAll("[^\\s\\u00a0\\w]", "\\\\$0");
+        }
 
         Pattern p = null;
         try {

@@ -72,7 +72,11 @@ public final class ParsingFacade {
             KeyAst.File ctx = parseFile(url);
             ctxs.add(ctx);
             Collection<RuleSource> includes = ctx.getIncludes(url).getRuleSets();
-            for (RuleSource u : includes) { if (!reached.contains(u.url())) { queue.push(u.url()); } }
+            for (RuleSource u : includes) {
+                if (!reached.contains(u.url())) {
+                    queue.push(u.url());
+                }
+            }
         }
         return ctxs;
     }
@@ -141,7 +145,9 @@ public final class ParsingFacade {
             p = createParser(stream);
             p.setErrorHandler(new BailErrorStrategy());
             ctx = p.file();
-            if (p.getErrorReporter().hasErrors()) { throw ex; }
+            if (p.getErrorReporter().hasErrors()) {
+                throw ex;
+            }
         }
 
         p.getErrorReporter().throwException();
@@ -190,7 +196,9 @@ public final class ParsingFacade {
     }
 
     public static @Nullable String getValueDocumentation(@Nullable TerminalNode docComment) {
-        if (docComment == null) { return null; }
+        if (docComment == null) {
+            return null;
+        }
         String value = docComment.getText();
         return value.substring(3, value.length() - 2);// remove leading "/*!" and trailing "*/"
     }

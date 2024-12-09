@@ -76,7 +76,9 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
 
     public SourceElement getLastElement() {
-        if (supertypes == null) { return this; }
+        if (supertypes == null) {
+            return this;
+        }
         return supertypes.get(supertypes.size() - 1);
     }
 
@@ -89,7 +91,9 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     public int getChildCount() {
         int result = 0;
-        if (supertypes != null) { result += supertypes.size(); }
+        if (supertypes != null) {
+            result += supertypes.size();
+        }
         return result;
     }
 
@@ -104,7 +108,9 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
 
     public ProgramElement getChildAt(int index) {
-        if (supertypes != null) { return supertypes.get(index); }
+        if (supertypes != null) {
+            return supertypes.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -140,7 +146,9 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (supertypes != null) { return supertypes.get(index); }
+        if (supertypes != null) {
+            return supertypes.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 }

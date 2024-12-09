@@ -91,7 +91,9 @@ public abstract class TacletIndex {
         if (!indexTerm.javaBlock().isEmpty()) {
             final JavaProgramElement prg = indexTerm.javaBlock().program();
             indexObj = ((StatementBlock) prg).getStatementAt(0);
-            if (!(indexObj instanceof SchemaVariable)) { indexObj = indexObj.getClass(); }
+            if (!(indexObj instanceof SchemaVariable)) {
+                indexObj = indexObj.getClass();
+            }
         } else {
             indexObj = indexTerm.op();
             if (indexObj instanceof SortDependingFunction) {
@@ -99,7 +101,9 @@ public abstract class TacletIndex {
                 indexObj = ((SortDependingFunction) indexObj).getKind();
             } else if (indexObj instanceof ElementaryUpdate) {
                 indexObj = ElementaryUpdate.class;
-            } else if (indexObj instanceof Modality) { indexObj = Modality.class; }
+            } else if (indexObj instanceof Modality) {
+                indexObj = Modality.class;
+            }
         }
 
         if (indexObj instanceof SchemaVariable) {
@@ -108,7 +112,9 @@ public abstract class TacletIndex {
 
                 indexObj = ((OperatorSV) indexObj).sort();
 
-                if (indexObj instanceof GenericSort) { indexObj = GenericSort.class; }
+                if (indexObj instanceof GenericSort) {
+                    indexObj = GenericSort.class;
+                }
             } else if (indexObj instanceof ProgramSV) {
                 indexObj = DEFAULT_PROGSV_KEY;
             } else {
@@ -153,12 +159,16 @@ public abstract class TacletIndex {
      *        the NoPosTacletApps to be added
      */
     public void addTaclets(Iterable<NoPosTacletApp> tacletAppList) {
-        for (NoPosTacletApp taclet : tacletAppList) { add(taclet); }
+        for (NoPosTacletApp taclet : tacletAppList) {
+            add(taclet);
+        }
     }
 
     public static ImmutableSet<NoPosTacletApp> toNoPosTacletApp(Iterable<Taclet> rule) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
-        for (Taclet t : rule) { result = result.prepend(NoPosTacletApp.createNoPosTacletApp(t)); }
+        for (Taclet t : rule) {
+            result = result.prepend(NoPosTacletApp.createNoPosTacletApp(t));
+        }
         return DefaultImmutableSet.fromImmutableList(result);
     }
 
@@ -207,7 +217,9 @@ public abstract class TacletIndex {
      *        the NoPosTacletApps to be removed
      */
     public void removeTaclets(Iterable<NoPosTacletApp> tacletAppList) {
-        for (final NoPosTacletApp tacletApp : tacletAppList) { remove(tacletApp); }
+        for (final NoPosTacletApp tacletApp : tacletAppList) {
+            remove(tacletApp);
+        }
     }
 
 
@@ -248,18 +260,26 @@ public abstract class TacletIndex {
     }
 
     private void addToSet(ImmutableList<NoPosTacletApp> list, Set<NoPosTacletApp> result) {
-        for (NoPosTacletApp tacletApp : list) { result.add(tacletApp); }
+        for (NoPosTacletApp tacletApp : list) {
+            result.add(tacletApp);
+        }
     }
 
 
 
     public Set<NoPosTacletApp> allNoPosTacletApps() {
         Set<NoPosTacletApp> result = new LinkedHashSet<>();
-        for (ImmutableList<NoPosTacletApp> tacletApps : rwList.values()) { addToSet(tacletApps, result); }
+        for (ImmutableList<NoPosTacletApp> tacletApps : rwList.values()) {
+            addToSet(tacletApps, result);
+        }
 
-        for (ImmutableList<NoPosTacletApp> tacletApps : antecList.values()) { addToSet(tacletApps, result); }
+        for (ImmutableList<NoPosTacletApp> tacletApps : antecList.values()) {
+            addToSet(tacletApps, result);
+        }
 
-        for (ImmutableList<NoPosTacletApp> tacletApps : succList.values()) { addToSet(tacletApps, result); }
+        for (ImmutableList<NoPosTacletApp> tacletApps : succList.values()) {
+            addToSet(tacletApps, result);
+        }
 
         addToSet(noFindList, result);
 
@@ -306,10 +326,14 @@ public abstract class TacletIndex {
         if (pe instanceof ProgramPrefix) {
             int next = prefixOccurrences.occurred(pe);
             NonTerminalProgramElement nt = (NonTerminalProgramElement) pe;
-            if (next < nt.getChildCount()) { return getJavaTacletList(map, nt.getChildAt(next), prefixOccurrences); }
+            if (next < nt.getChildCount()) {
+                return getJavaTacletList(map, nt.getChildAt(next), prefixOccurrences);
+            }
         } else {
             final ImmutableList<NoPosTacletApp> apps = map.get(pe.getClass());
-            if (apps != null) { res = apps; }
+            if (apps != null) {
+                res = apps;
+            }
         }
         return merge(res, prefixOccurrences.getList(map));
     }
@@ -322,7 +346,8 @@ public abstract class TacletIndex {
         ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
         final Operator op = term.op();
 
-        assert !(op instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "metavariables are disabled";
+        assert !(op instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable)
+                : "metavariables are disabled";
 
         if (!term.javaBlock().isEmpty()) {
             prefixOccurrences.reset();
@@ -506,7 +531,9 @@ public abstract class TacletIndex {
      */
     public NoPosTacletApp lookup(Name name) {
         for (NoPosTacletApp tacletApp : allNoPosTacletApps()) {
-            if (tacletApp.taclet().name().equals(name)) { return tacletApp; }
+            if (tacletApp.taclet().name().equals(name)) {
+                return tacletApp;
+            }
         }
         return null;
     }
@@ -541,10 +568,10 @@ public abstract class TacletIndex {
     @Override
     public String toString() {
         String sb = "TacletIndex with applicable rules: " +
-                "ANTEC\n " + antecList +
-                "\nSUCC\n " + succList +
-                "\nREWRITE\n " + rwList +
-                "\nNOFIND\n " + noFindList;
+            "ANTEC\n " + antecList +
+            "\nSUCC\n " + succList +
+            "\nREWRITE\n " + rwList +
+            "\nNOFIND\n " + noFindList;
         return sb;
     }
 
@@ -623,7 +650,9 @@ public abstract class TacletIndex {
             for (int i = 0; i < PREFIXTYPES; i++) {
                 if (occurred[i]) {
                     ImmutableList<NoPosTacletApp> inMap = map.get(prefixClasses[i]);
-                    if (inMap != null) { result = result.prepend(inMap); }
+                    if (inMap != null) {
+                        result = result.prepend(inMap);
+                    }
                 }
             }
             return result;

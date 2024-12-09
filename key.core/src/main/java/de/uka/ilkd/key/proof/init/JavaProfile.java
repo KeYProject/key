@@ -181,7 +181,9 @@ public class JavaProfile extends AbstractProfile {
      */
     public OneStepSimplifier getOneStepSimpilifier() {
         synchronized (this) {
-            if (oneStepSimpilifier == null) { oneStepSimpilifier = new OneStepSimplifier(); }
+            if (oneStepSimpilifier == null) {
+                oneStepSimpilifier = new OneStepSimplifier();
+            }
             return oneStepSimpilifier;
         }
     }
@@ -240,10 +242,14 @@ public class JavaProfile extends AbstractProfile {
      */
     public static synchronized JavaProfile getDefaultInstance(boolean perms) {
         if (!perms) {
-            if (defaultInstance == null) { defaultInstance = new JavaProfile(); }
+            if (defaultInstance == null) {
+                defaultInstance = new JavaProfile();
+            }
             return defaultInstance;
         } else {
-            if (defaultInstancePermissions == null) { defaultInstancePermissions = new JavaProfile(true); }
+            if (defaultInstancePermissions == null) {
+                defaultInstancePermissions = new JavaProfile(true);
+            }
             return defaultInstancePermissions;
         }
     }

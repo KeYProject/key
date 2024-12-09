@@ -141,7 +141,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         if (goal != null) {
             Node node = goal.node();
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-            if (getVarsForCondition() != null && ruleApp != null && node != null) { refreshVarMaps(ruleApp, node); }
+            if (getVarsForCondition() != null && ruleApp != null && node != null) {
+                refreshVarMaps(ruleApp, node);
+            }
         }
     }
 
@@ -301,7 +303,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @return the {@link Term} that represents the condition
      */
     private Term computeTermForCondition(String condition) {
-        if (condition == null) { return getProof().getServices().getTermBuilder().tt(); }
+        if (condition == null) {
+            return getProof().getServices().getTermBuilder().tt();
+        }
         // collect all variables needed to parse the condition
         setSelfVar(new LocationVariable(
             new ProgramElementName(getProof().getServices().getTermBuilder().newName("self")),
@@ -322,7 +326,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                 new ProgramVariableCollector(result, getProof().getServices());
             variableCollector.start();
             Set<LocationVariable> undeclaredVariables = variableCollector.result();
-            for (LocationVariable x : undeclaredVariables) { varsForCondition = saveAddVariable(x, varsForCondition); }
+            for (LocationVariable x : undeclaredVariables) {
+                varsForCondition = saveAddVariable(x, varsForCondition);
+            }
         }
         JavaInfo info = getProof().getServices().getJavaInfo();
         ImmutableList<LocationVariable> globalVars = ImmutableSLList.nil();
@@ -374,7 +380,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             IExecutionContext ec =
                 JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
             // put values into map which have to be replaced
-            if (ec != null) { getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance()); }
+            if (ec != null) {
+                getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
+            }
             // replace renamings etc.
             OpReplacer replacer =
                 new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
@@ -448,7 +456,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                 break;
             }
         }
-        if (!contains && !x.isMember()) { varsForCondition = varsForCondition.append(x); }
+        if (!contains && !x.isMember()) {
+            varsForCondition = varsForCondition.append(x);
+        }
         return varsForCondition;
     }
 

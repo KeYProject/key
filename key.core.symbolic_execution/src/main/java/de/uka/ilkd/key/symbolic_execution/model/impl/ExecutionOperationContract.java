@@ -120,8 +120,8 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
                     KeYJavaType selfType = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
                     if (inst.staticType != selfType) {
                         throw new ProofInputException("Type \"" + inst.staticType
-                                + "\" expected but found \"" + selfType
-                                + "\", implementation of UseOperationContractRule might has changed!");
+                            + "\" expected but found \"" + selfType
+                            + "\", implementation of UseOperationContractRule might has changed!");
                     }
                 } else {
                     selfTerm = UseOperationContractRule.computeSelf(baseHeapTerm, atPres, baseHeap,
@@ -314,9 +314,13 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
         postModality = TermBuilder.goBelowUpdates(postModality);
         MethodFrame mf = JavaTools.getInnermostMethodFrame(postModality.javaBlock(), services);
         SourceElement firstElement = NodeInfo.computeActiveStatement(mf.getFirstElement());
-        if (!(firstElement instanceof CopyAssignment assignment)) { return null; }
+        if (!(firstElement instanceof CopyAssignment assignment)) {
+            return null;
+        }
         ProgramElement rightChild = assignment.getChildAt(1);
-        if (!(rightChild instanceof LocationVariable)) { return null; }
+        if (!(rightChild instanceof LocationVariable)) {
+            return null;
+        }
         return (LocationVariable) rightChild;
     }
 
@@ -363,7 +367,9 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     @Override
     public boolean isPreconditionComplied() {
         boolean complied = false;
-        if (getProofNode().childrenCount() >= 3) { complied = getProofNode().child(2).isClosed(); }
+        if (getProofNode().childrenCount() >= 3) {
+            complied = getProofNode().child(2).isClosed();
+        }
         return complied;
     }
 

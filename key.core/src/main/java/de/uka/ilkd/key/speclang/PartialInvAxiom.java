@@ -80,10 +80,14 @@ public final class PartialInvAxiom extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || this.getClass() != o.getClass()) { return false; }
+        if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        }
         final PartialInvAxiom other = (PartialInvAxiom) o;
 
-        if (!target.equals(other.target)) { return false; }
+        if (!target.equals(other.target)) {
+            return false;
+        }
         return inv.equals(other.inv);
     }
 
@@ -125,7 +129,7 @@ public final class PartialInvAxiom extends ClassAxiom {
             // i==0 normal and i==1 EQ version
             TacletGenerator TG = TacletGenerator.getInstance();
             final Name name = MiscTools.toValidTacletName("Partial inv axiom for "
-                    + (target.isStatic() ? "static " : "") + inv.getName() + (i == 0 ? "" : " EQ"));
+                + (target.isStatic() ? "static " : "") + inv.getName() + (i == 0 ? "" : " EQ"));
 
             // create schema variables
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -146,7 +150,9 @@ public final class PartialInvAxiom extends ClassAxiom {
             result = result.union(taclets);
 
             // EQ taclet (with i==1) only for non-static invariants
-            if (target.isStatic()) { break; }
+            if (target.isStatic()) {
+                break;
+            }
         }
 
         // return

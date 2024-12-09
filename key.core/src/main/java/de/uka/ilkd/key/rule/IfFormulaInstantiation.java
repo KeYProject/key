@@ -24,7 +24,9 @@ public interface IfFormulaInstantiation extends EqualsModProofIrrelevancy {
 
     @Override
     default boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof IfFormulaInstantiation that)) { return false; }
+        if (!(obj instanceof IfFormulaInstantiation that)) {
+            return false;
+        }
         return getConstrainedFormula().equalsModProofIrrelevancy(that.getConstrainedFormula());
     }
 

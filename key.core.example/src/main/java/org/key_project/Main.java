@@ -94,7 +94,9 @@ public class Main {
         try {
             final List<Contract> proofContracts = getContracts(env);
 
-            for (Contract contract : proofContracts) { proveContract(env, contract); }
+            for (Contract contract : proofContracts) {
+                proveContract(env, contract);
+            }
         } finally {
             env.dispose(); // Ensure always that all instances of KeYEnvironment are disposed
         }
@@ -119,7 +121,9 @@ public class Main {
                 for (IObserverFunction target : targets) {
                     ImmutableSet<Contract> contracts =
                         env.getSpecificationRepository().getContracts(type, target);
-                    for (Contract contract : contracts) { proofContracts.add(contract); }
+                    for (Contract contract : contracts) {
+                        proofContracts.add(contract);
+                    }
                 }
             }
         }
@@ -167,8 +171,8 @@ public class Main {
             // Show proof result
             boolean closed = proof.openGoals().isEmpty();
             LOGGER.info("Contract '" + contract.getDisplayName() + "' of "
-                    + contract.getTarget() + " is " + (closed ? "verified" : "still open")
-                    + ".");
+                + contract.getTarget() + " is " + (closed ? "verified" : "still open")
+                + ".");
         } catch (ProofInputException e) {
             LOGGER.error("Exception at {} of {}", contract.getDisplayName(),
                 contract.getTarget());

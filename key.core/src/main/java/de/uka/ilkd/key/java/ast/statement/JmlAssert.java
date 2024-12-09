@@ -134,8 +134,12 @@ public class JmlAssert extends JavaStatement {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) { return true; }
-        if (!super.equals(o)) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         // super.equals() check classes
         final JmlAssert jmlAssert = (JmlAssert) o;
         return kind == jmlAssert.kind && Objects.equals(condition, jmlAssert.condition);

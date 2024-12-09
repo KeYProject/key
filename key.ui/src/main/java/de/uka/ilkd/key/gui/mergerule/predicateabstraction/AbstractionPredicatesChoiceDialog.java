@@ -453,7 +453,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 "Could not find css/html resources for the abstraction predicates choice dialog.";
 
         String sb = "<html><head>" + "<style type=\"text/css\">" + infoCSS + "</style>"
-                + "</head><body>" + infoHTML + "</body></html>";
+            + "</head><body>" + infoHTML + "</body></html>";
 
         final JTextPane infoLabel = new JTextPane();
         infoLabel.setContentType("text/html");
@@ -511,13 +511,19 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      */
     private String abstrPredToStringRepr(
             Optional<AbstractPredicateAbstractionDomainElement> domElem) {
-        if (domElem == null) { return ""; }
+        if (domElem == null) {
+            return "";
+        }
 
-        if (!domElem.isPresent()) { return "None."; }
+        if (!domElem.isPresent()) {
+            return "None.";
+        }
 
         final AbstractPredicateAbstractionDomainElement predElem = domElem.get();
 
-        if (predElem.getPredicates().size() < 1) { return predElem.toString(); }
+        if (predElem.getPredicates().size() < 1) {
+            return predElem.toString();
+        }
 
         final StringBuilder sb = new StringBuilder();
 
@@ -527,7 +533,9 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         while (it.hasNext()) {
             sb.append(abstrPredToString(it.next()));
 
-            if (it.hasNext()) { sb.append(predElem.getPredicateNameCombinationString()); }
+            if (it.hasNext()) {
+                sb.append(predElem.getPredicateNameCombinationString());
+            }
         }
 
         return sb.toString();
@@ -545,7 +553,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         final Pair<LocationVariable, Term> predFormWithPh = pred.getPredicateFormWithPlaceholder();
 
         return "(" + predFormWithPh.first.toString() + ","
-                + OutputStreamProofSaver.printAnything(predFormWithPh.second, services) + ")";
+            + OutputStreamProofSaver.printAnything(predFormWithPh.second, services) + ")";
     }
 
     // ///////////////////////////// //
@@ -638,7 +646,9 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         @Override
         public TableCellEditor getCellEditor(int row, int column) {
-            if (column != 1) { return super.getCellEditor(row, column); }
+            if (column != 1) {
+                return super.getCellEditor(row, column);
+            }
 
             final Sort s = abstrPredicateChoices.get(row).getProgVar().sort();
 
@@ -682,7 +692,9 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         @Override
         public TableCellRenderer getCellRenderer(int row, int column) {
-            if (column != 1) { return super.getCellRenderer(row, column); }
+            if (column != 1) {
+                return super.getCellRenderer(row, column);
+            }
 
             return new DefaultTableCellRenderer() {
                 private static final long serialVersionUID = 1L;

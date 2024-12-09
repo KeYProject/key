@@ -32,7 +32,7 @@ public class IntegerSimplificationMacro extends AbstractPropositionalExpansionMa
     @Override
     public String getDescription() {
         return "This macro performs simplification of integers and terms with integers.\n"
-                + "It applies only non-splitting simplification rules.";
+            + "It applies only non-splitting simplification rules.";
     }
 
     private static final Set<String> ADMITTED_RULES_SET = asSet("add_eq_back",

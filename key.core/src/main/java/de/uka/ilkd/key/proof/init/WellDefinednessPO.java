@@ -118,7 +118,11 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
             ImmutableList<LocationVariable> paramVars, ImmutableList<LocationVariable> origParams) {
         // make sure ghost parameters are present
         ImmutableList<LocationVariable> ghostParams = ImmutableSLList.nil();
-        for (LocationVariable param : origParams) { if (param.isGhost()) { ghostParams = ghostParams.append(param); } }
+        for (LocationVariable param : origParams) {
+            if (param.isGhost()) {
+                ghostParams = ghostParams.append(param);
+            }
+        }
         paramVars = paramVars.append(ghostParams);
         return paramVars;
     }
@@ -267,7 +271,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof WellDefinednessPO wPO)) { return false; }
+        if (!(po instanceof WellDefinednessPO wPO)) {
+            return false;
+        }
         WellDefinednessCheck check = getContract();
         return check.equals(wPO.getContract());
     }

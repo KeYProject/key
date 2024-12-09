@@ -282,7 +282,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
     public Configuration createLoaderConfig() {
         var c = super.createLoaderConfig();
         c.set("method", getProgramMethodSignature(getProgramMethod(), true));
-        if (getPrecondition() != null && !getPrecondition().isEmpty()) { c.set("precondition", getPrecondition()); }
+        if (getPrecondition() != null && !getPrecondition().isEmpty()) {
+            c.set("precondition", getPrecondition());
+        }
         return c;
     }
 
@@ -325,7 +327,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
             throws IOException {
         // Get container class and method signature
         String value = properties.getString("method");
-        if (value == null) { throw new IOException("Property \"method\" is not defined."); }
+        if (value == null) {
+            throw new IOException("Property \"method\" is not defined.");
+        }
         int classMethodSeparator = value.indexOf("#");
         if (classMethodSeparator < 0) {
             throw new IOException(
@@ -338,12 +342,12 @@ public class ProgramMethodPO extends AbstractOperationPO {
         int breaketsStart = signature.indexOf("(");
         if (breaketsStart < 0) {
             throw new IOException("Method signature \"" + signature
-                    + "\" does not contain required character \"(\".");
+                + "\" does not contain required character \"(\".");
         }
         int breaketsEnd = signature.lastIndexOf(")");
         if (breaketsEnd < 0) {
             throw new IOException("Method signature \"" + signature
-                    + "\" does not contain required character \")\".");
+                + "\" does not contain required character \")\".");
         }
         if (breaketsEnd < breaketsStart) {
             throw new IOException(
@@ -354,17 +358,23 @@ public class ProgramMethodPO extends AbstractOperationPO {
         String[] types = parameters.isEmpty() ? new String[0] : parameters.split(",");
         // Find container and parameter types
         KeYJavaType type = javaInfo.getKeYJavaType(className.trim());
-        if (type == null) { throw new IOException("Can't find type \"" + className + "\"."); }
+        if (type == null) {
+            throw new IOException("Can't find type \"" + className + "\".");
+        }
         ImmutableList<KeYJavaType> parameterTypes = ImmutableSLList.nil();
         for (String s : types) {
             KeYJavaType paramType = javaInfo.getKeYJavaType(s.trim());
-            if (paramType == null) { throw new IOException("Can't find type \"" + s + "\"."); }
+            if (paramType == null) {
+                throw new IOException("Can't find type \"" + s + "\".");
+            }
             parameterTypes = parameterTypes.append(paramType);
         }
         IProgramMethod pm = javaInfo.getProgramMethod(type, name.trim(), parameterTypes);
         if (pm == null) {
             pm = javaInfo.getConstructor(type, parameterTypes);
-            if (pm == null) { throw new IOException("Can't find program method \"" + value + "\"."); }
+            if (pm == null) {
+                throw new IOException("Can't find program method \"" + value + "\".");
+            }
         }
         return pm;
     }

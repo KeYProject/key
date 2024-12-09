@@ -29,7 +29,7 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
     @Override
     public String getDescription() {
         return "<html><ol><li>Start auxiliary computation" + "<li>Finish symbolic execution"
-                + "<li>Try to close as many goals as possible</ol>";
+            + "<li>Try to close as many goals as possible</ol>";
     }
 
 

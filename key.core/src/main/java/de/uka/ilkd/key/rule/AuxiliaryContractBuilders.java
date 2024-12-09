@@ -269,7 +269,9 @@ public final class AuxiliaryContractBuilders {
          */
         private Statement label(final StatementBlock block, Iterable<Label> labels) {
             Statement result = block;
-            for (Label label : labels) { result = new LabeledStatement(label, result, PositionInfo.UNDEFINED); }
+            for (Label label : labels) {
+                result = new LabeledStatement(label, result, PositionInfo.UNDEFINED);
+            }
             return result;
         }
 
@@ -861,7 +863,9 @@ public final class AuxiliaryContractBuilders {
          */
         public Term buildWellFormedHeapsCondition() {
             Term result = tt();
-            for (LocationVariable heap : heaps) { result = and(result, wellFormed(heap)); }
+            for (LocationVariable heap : heaps) {
+                result = and(result, wellFormed(heap));
+            }
             return result;
         }
 
@@ -899,7 +903,9 @@ public final class AuxiliaryContractBuilders {
          */
         public Term buildReachableCondition(final ImmutableSet<LocationVariable> variables) {
             Term result = tt();
-            for (LocationVariable variable : variables) { result = and(result, reachableValue(variable)); }
+            for (LocationVariable variable : variables) {
+                result = and(result, reachableValue(variable));
+            }
             return result;
         }
 
@@ -934,11 +940,15 @@ public final class AuxiliaryContractBuilders {
          * @return the loop contract's decreases clause.
          */
         public Term buildDecreasesCheck() {
-            if (!(contract instanceof LoopContract lc)) { throw new IllegalStateException(); }
+            if (!(contract instanceof LoopContract lc)) {
+                throw new IllegalStateException();
+            }
 
             Term decreases = lc.getDecreases(getBaseHeap(), terms.self, services);
 
-            if (decreases == null) { return tt(); }
+            if (decreases == null) {
+                return tt();
+            }
 
             Term oldDecreases = new OpReplacer(variables.combineRemembranceVariables(),
                 services.getTermFactory(), services.getProof()).replace(decreases);
@@ -1069,15 +1079,21 @@ public final class AuxiliaryContractBuilders {
             final List<Term> notSetConditions = new LinkedList<>();
             notSetConditions.addAll(buildFlagsNotSetConditions(variables.breakFlags.values()));
             notSetConditions.addAll(buildFlagsNotSetConditions(variables.continueFlags.values()));
-            if (variables.returnFlag != null) { notSetConditions.add(buildFlagNotSetCondition(variables.returnFlag)); }
+            if (variables.returnFlag != null) {
+                notSetConditions.add(buildFlagNotSetCondition(variables.returnFlag));
+            }
             notSetConditions.add(equals(var(variables.exception), NULL()));
 
             Term result = tt();
-            for (Term notSetCondition : notSetConditions) { result = and(result, notSetCondition); }
+            for (Term notSetCondition : notSetConditions) {
+                result = and(result, notSetCondition);
+            }
             for (Term onlySetNotSetCondition : notSetConditions) {
                 Term condition = not(onlySetNotSetCondition);
                 for (Term notSetCondition : notSetConditions) {
-                    if (notSetCondition != onlySetNotSetCondition) { condition = and(condition, notSetCondition); }
+                    if (notSetCondition != onlySetNotSetCondition) {
+                        condition = and(condition, notSetCondition);
+                    }
                 }
                 result = or(result, condition);
             }
@@ -1107,7 +1123,9 @@ public final class AuxiliaryContractBuilders {
 
                 Term created = null;
                 for (LocationVariable heap : heaps) {
-                    if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) { continue; }
+                    if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
+                        continue;
+                    }
                     final Term cr = created(var(heap), self);
                     if (created == null) {
                         created = cr;
@@ -1132,7 +1150,9 @@ public final class AuxiliaryContractBuilders {
          */
         private List<Term> buildFlagsNotSetConditions(final Collection<LocationVariable> flags) {
             final List<Term> result = new LinkedList<>();
-            for (LocationVariable flag : flags) { result.add(buildFlagNotSetCondition(flag)); }
+            for (LocationVariable flag : flags) {
+                result.add(buildFlagNotSetCondition(flag));
+            }
             return result;
         }
 
@@ -1412,9 +1432,15 @@ public final class AuxiliaryContractBuilders {
                 Term exceptionNeqNull, final TermBuilder tb) {
             Set<Term> abruptTerms = new LinkedHashSet<>();
             abruptTerms.add(exceptionNeqNull);
-            if (terms.returnFlag != null) { abruptTerms.add(tb.equals(terms.returnFlag, tb.TRUE())); }
-            for (Term term : terms.continueFlags.values()) { abruptTerms.add(tb.equals(term, tb.TRUE())); }
-            for (Term term : terms.breakFlags.values()) { abruptTerms.add(tb.equals(term, tb.TRUE())); }
+            if (terms.returnFlag != null) {
+                abruptTerms.add(tb.equals(terms.returnFlag, tb.TRUE()));
+            }
+            for (Term term : terms.continueFlags.values()) {
+                abruptTerms.add(tb.equals(term, tb.TRUE()));
+            }
+            for (Term term : terms.breakFlags.values()) {
+                abruptTerms.add(tb.equals(term, tb.TRUE()));
+            }
             return tb.or(abruptTerms);
         }
 
@@ -1483,7 +1509,9 @@ public final class AuxiliaryContractBuilders {
                 newPost, ImmutableSLList.<LocationVariable>nil()
                         .prependReverse(terms.remembranceLocalVariables.keySet()),
                 terms.exception);
-            if (goal != null) { goal.setBranchLabel("Validity"); }
+            if (goal != null) {
+                goal.setBranchLabel("Validity");
+            }
             newPost = TermLabelManager.refactorTerm(termLabelState, services, null, newPost, rule,
                 goal, AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT, null);
 
@@ -1680,7 +1708,9 @@ public final class AuxiliaryContractBuilders {
          *         itself.
          */
         private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block) {
-            if (instantiation.context() == null) { return block; }
+            if (instantiation.context() == null) {
+                return block;
+            }
             return new MethodFrame(null, instantiation.context(), block);
         }
 

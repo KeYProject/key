@@ -93,8 +93,12 @@ public class Case extends BranchImp implements ExpressionContainer {
      */
     public int getChildCount() {
         int result = 0;
-        if (expression != null) { result++; }
-        if (body != null) { result += body.size(); }
+        if (expression != null) {
+            result++;
+        }
+        if (body != null) {
+            result += body.size();
+        }
         return result;
     }
 
@@ -110,12 +114,16 @@ public class Case extends BranchImp implements ExpressionContainer {
     public ProgramElement getChildAt(int index) {
         int len;
         if (expression != null) {
-            if (index == 0) { return expression; }
+            if (index == 0) {
+                return expression;
+            }
             index--;
         }
         if (body != null) {
             len = body.size();
-            if (len > index) { return body.get(index); }
+            if (len > index) {
+                return body.get(index);
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -140,7 +148,9 @@ public class Case extends BranchImp implements ExpressionContainer {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
-        if (expression != null && index == 0) { return expression; }
+        if (expression != null && index == 0) {
+            return expression;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -163,7 +173,9 @@ public class Case extends BranchImp implements ExpressionContainer {
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
-        if (body != null) { return body.get(index); }
+        if (body != null) {
+            return body.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

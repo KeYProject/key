@@ -85,7 +85,9 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         if (u.freeVars().isEmpty()) {
             final TermBuilder tb = services.getTermBuilder();
             final Term[] updatedSubs = new Term[phi.arity()];
-            for (int i = 0; i < updatedSubs.length; i++) { updatedSubs[i] = tb.apply(u, phi.sub(i)); }
+            for (int i = 0; i < updatedSubs.length; i++) {
+                updatedSubs[i] = tb.apply(u, phi.sub(i));
+            }
 
             return services.getTermFactory().createTerm(phi.op(), updatedSubs, phi.boundVars(),
                 null);
@@ -117,7 +119,9 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         final TermBuilder tb = services.getTermBuilder();
 
         final Set<Name> freeVarNamesInU = new HashSet<>();
-        for (QuantifiableVariable freeVar : u.freeVars()) { freeVarNamesInU.add(freeVar.name()); }
+        for (QuantifiableVariable freeVar : u.freeVars()) {
+            freeVarNamesInU.add(freeVar.name());
+        }
 
         final QuantifiableVariable[] boundVarsInPhi =
             phi.boundVars().toArray(new QuantifiableVariable[0]);
@@ -133,14 +137,18 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
                 final Term substTerm = tb.var(renamedVar);
 
                 final ClashFreeSubst subst = new ClashFreeSubst(currentBoundVar, substTerm, tb);
-                for (int j = 0; j < updatedSubs.length; j++) { updatedSubs[j] = subst.apply(updatedSubs[j]); }
+                for (int j = 0; j < updatedSubs.length; j++) {
+                    updatedSubs[j] = subst.apply(updatedSubs[j]);
+                }
 
                 // Rename quantifiable variable in list for later term construction
                 boundVarsInPhi[i] = renamedVar;
             }
         }
 
-        for (int i = 0; i < updatedSubs.length; i++) { updatedSubs[i] = tb.apply(u, updatedSubs[i]); }
+        for (int i = 0; i < updatedSubs.length; i++) {
+            updatedSubs[i] = tb.apply(u, updatedSubs[i]);
+        }
 
         return services.getTermFactory().createTerm(phi.op(), updatedSubs,
             new ImmutableArray<>(boundVarsInPhi), null);
@@ -175,7 +183,10 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         String stem = var.name().toString();
         int i = 1;
         Name newName;
-        do { newName = new Name(stem + i); i++; } while (nameIsAlreadyUsed(newName, usedVars, services));
+        do {
+            newName = new Name(stem + i);
+            i++;
+        } while (nameIsAlreadyUsed(newName, usedVars, services));
         return newName;
     }
 
@@ -195,7 +206,11 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      */
     private static boolean nameIsAlreadyUsed(Name name, ImmutableSet<QuantifiableVariable> qvars,
             TermServices services) {
-        for (QuantifiableVariable qvar : qvars) { if (qvar.name().equals(name)) { return true; } }
+        for (QuantifiableVariable qvar : qvars) {
+            if (qvar.name().equals(name)) {
+                return true;
+            }
+        }
         return services.getNamespaces().lookupLogicSymbol(name) != null;
     }
 
@@ -207,9 +222,13 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         Term uInst = (Term) svInst.getInstantiation(u);
         Term phiInst = (Term) svInst.getInstantiation(phi);
         Term resultInst = (Term) svInst.getInstantiation(result);
-        if (uInst == null || phiInst == null) { return mc; }
+        if (uInst == null || phiInst == null) {
+            return mc;
+        }
 
-        if (!phiInst.op().isRigid() || phiInst.op().arity() == 0) { return null; }
+        if (!phiInst.op().isRigid() || phiInst.op().arity() == 0) {
+            return null;
+        }
         Term properResultInst = applyUpdateOnRigid(uInst, phiInst, services);
         if (resultInst == null) {
             svInst = svInst.add(result, properResultInst, services);

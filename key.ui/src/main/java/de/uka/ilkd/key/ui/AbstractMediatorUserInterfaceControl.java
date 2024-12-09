@@ -218,7 +218,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         final ProofSaver ps =
             new ProofSaver(proof, toSave.toAbsolutePath().toString(), krm.getSHA1());
         final String errorMsg = ps.save();
-        if (errorMsg != null) { reportException(this, null, new IOException(errorMsg)); }
+        if (errorMsg != null) {
+            reportException(this, null, new IOException(errorMsg));
+        }
     }
 
     /**
@@ -235,7 +237,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
 
     @Override
     public void proofUnregistered(ProofEnvironmentEvent event) {
-        if (event.getSource().getProofs().isEmpty()) { event.getSource().removeProofEnvironmentListener(this); }
+        if (event.getSource().getProofs().isEmpty()) {
+            event.getSource().removeProofEnvironmentListener(this);
+        }
     }
 
     /**
@@ -293,6 +297,8 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      */
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
-        for (Proof proof : pa.getProofs()) { proof.addProofDisposedListener(this); }
+        for (Proof proof : pa.getProofs()) {
+            proof.addProofDisposedListener(this);
+        }
     }
 }

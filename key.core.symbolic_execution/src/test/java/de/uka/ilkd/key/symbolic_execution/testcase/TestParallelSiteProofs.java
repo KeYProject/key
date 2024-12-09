@@ -96,7 +96,9 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
             new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
         while (iter.hasNext() && threads.size() < NUMBER_OF_THREADS) {
             IExecutionNode<?> next = iter.next();
-            if (next != null) { threads.add(new ExecutionVariableSiteProofThread(next)); }
+            if (next != null) {
+                threads.add(new ExecutionVariableSiteProofThread(next));
+            }
             if (next instanceof IExecutionMethodReturn) {
                 threads.add(new ExecutionReturnValueSiteProofThread((IExecutionMethodReturn) next));
             }
@@ -104,13 +106,17 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
         // Make sure that the correct number of threads are available
         assertEquals(NUMBER_OF_THREADS, threads.size());
         // Start threads
-        for (SiteProofThread<?> thread : threads) { thread.start(); }
+        for (SiteProofThread<?> thread : threads) {
+            thread.start();
+        }
         // Wait for threads
         waitForThreads(threads, 20 * 1000);
         // Check result
         for (SiteProofThread<?> thread : threads) {
             // Make sure that no exception is thrown.
-            if (thread.getException() != null) { Assertions.fail(thread.getException()); }
+            if (thread.getException() != null) {
+                Assertions.fail(thread.getException());
+            }
             // Make sure that something was computed in site proofs.
             Assertions.assertNotNull(thread.getResult());
         }

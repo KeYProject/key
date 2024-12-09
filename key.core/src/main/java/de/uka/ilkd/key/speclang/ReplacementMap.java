@@ -113,7 +113,9 @@ public abstract class ReplacementMap<S extends Sorted & SyntaxElement>
             final Map<LocationVariable, ? extends S> newRemembranceHeaps, final Services services) {
         if (newRemembranceHeaps != null) {
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) { continue; }
+                if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
+                    continue;
+                }
 
                 if (oldRemembranceHeaps.get(heap) != null) {
                     final LocationVariable oldRemembranceHeap = oldRemembranceHeaps.get(heap);

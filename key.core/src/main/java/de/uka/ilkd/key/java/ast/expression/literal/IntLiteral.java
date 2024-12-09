@@ -181,7 +181,9 @@ public class IntLiteral extends AbstractIntegerLiteral {
         }
 
         // add minus sign again
-        if (neg) { valStr = "-" + valStr; }
+        if (neg) {
+            valStr = "-" + valStr;
+        }
 
         ///////////////////////////////////////////////////////////////////////////
         /* range check and actual conversion: */

@@ -72,7 +72,9 @@ class BufferedMessageReader {
                 if (endsWith(sb, delim)) {
                     String result = sb.substring(0, sb.length() - delim.length());
 
-                    if (!result.isEmpty()) { return result; }
+                    if (!result.isEmpty()) {
+                        return result;
+                    }
 
                     // if empty then continue with an empty buffer
                     sb.setLength(0);
@@ -105,9 +107,15 @@ class BufferedMessageReader {
         int len = sb.length();
         int dlen = s.length();
 
-        if (len < dlen) { return false; }
+        if (len < dlen) {
+            return false;
+        }
 
-        for (int i = len - dlen, j = 0; i < len; i++, j++) { if (sb.charAt(i) != s.charAt(j)) { return false; } }
+        for (int i = len - dlen, j = 0; i < len; i++, j++) {
+            if (sb.charAt(i) != s.charAt(j)) {
+                return false;
+            }
+        }
 
         return true;
     }

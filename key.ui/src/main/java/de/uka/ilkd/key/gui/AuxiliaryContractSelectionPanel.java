@@ -52,7 +52,9 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
                 .setSelectionMode(multipleSelection ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
                         : ListSelectionModel.SINGLE_SELECTION);
         contractList.addListSelectionListener(e -> {
-            if (contractList.isSelectionEmpty()) { contractList.setSelectedIndex(e.getFirstIndex()); }
+            if (contractList.isSelectionEmpty()) {
+                contractList.setSelectedIndex(e.getFirstIndex());
+            }
         });
         final Services serv = services;
         contractList.setCellRenderer(new DefaultListCellRenderer() {
@@ -86,7 +88,9 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
                 Font borderFont = border.getTitleFont();
                 if (borderFont == null) { // MS Windows issues
                     borderFont = result.getFont();
-                    if (borderFont == null) { borderFont = PLAINFONT; }
+                    if (borderFont == null) {
+                        borderFont = PLAINFONT;
+                    }
                 }
                 border.setTitleFont(borderFont.deriveFont(Font.BOLD));
                 result.setBorder(border);
@@ -104,7 +108,9 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
     public void setContracts(final T[] contracts, final String title) {
         contractList.setListData(contracts);
         contractList.setSelectedIndex(0);
-        if (title != null) { border.setTitle(title); }
+        if (title != null) {
+            border.setTitle(title);
+        }
         updateUI();
     }
 

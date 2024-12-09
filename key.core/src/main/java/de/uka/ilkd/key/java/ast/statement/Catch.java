@@ -84,8 +84,12 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      */
     public int getChildCount() {
         int result = 0;
-        if (parameter != null) { result++; }
-        if (body != null) { result++; }
+        if (parameter != null) {
+            result++;
+        }
+        if (body != null) {
+            result++;
+        }
         return result;
     }
 
@@ -100,11 +104,15 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      */
     public ProgramElement getChildAt(int index) {
         if (parameter != null) {
-            if (index == 0) { return parameter; }
+            if (index == 0) {
+                return parameter;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0) { return body; }
+            if (index == 0) {
+                return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -129,7 +137,9 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) { return body; }
+        if (body != null && index == 0) {
+            return body;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -153,7 +163,9 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public ParameterDeclaration getParameterDeclarationAt(int index) {
-        if (parameter != null && index == 0) { return parameter; }
+        if (parameter != null && index == 0) {
+            return parameter;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

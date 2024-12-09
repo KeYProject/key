@@ -178,7 +178,9 @@ public class LongLiteral extends AbstractIntegerLiteral {
         valStr = valStr.replace("_", "");
 
         // remove long suffix
-        if (valStr.endsWith("L") || valStr.endsWith("l")) { valStr = valStr.substring(0, valStr.length() - 1); }
+        if (valStr.endsWith("L") || valStr.endsWith("l")) {
+            valStr = valStr.substring(0, valStr.length() - 1);
+        }
 
         if (valStr.startsWith("0x") || valStr.startsWith("0X")) { // hex
             radix = 16;
@@ -192,7 +194,9 @@ public class LongLiteral extends AbstractIntegerLiteral {
         }
 
         // add minus sign again
-        if (neg) { valStr = "-" + valStr; }
+        if (neg) {
+            valStr = "-" + valStr;
+        }
 
         ///////////////////////////////////////////////////////////////////////////
         /* range check and actual conversion: */

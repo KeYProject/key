@@ -104,7 +104,9 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     @Override
     public Path getBootclasspath() throws IOException {
         Path bootclasspath = rootPath.resolve(Paths.get("bootclasspath"));
-        if (Files.isDirectory(bootclasspath)) { return bootclasspath; }
+        if (Files.isDirectory(bootclasspath)) {
+            return bootclasspath;
+        }
         return null;
     }
 

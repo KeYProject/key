@@ -41,7 +41,9 @@ public abstract class MetaShift extends AbstractTermTransformer {
             if (rightActual.compareTo(INT_MIN_VALUE) <= 0) {
                 rightActual = INT_MIN_VALUE;
             } else {
-                if (rightActual.compareTo(INT_MAX_VALUE) >= 0) { rightActual = INT_MAX_VALUE; }
+                if (rightActual.compareTo(INT_MAX_VALUE) >= 0) {
+                    rightActual = INT_MAX_VALUE;
+                }
             }
 
             result = shiftOp(result, rightActual);

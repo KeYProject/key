@@ -90,7 +90,9 @@ public interface SourceElement extends SyntaxElement, EqualsModProperty<SourceEl
      */
     @Override
     default <V> boolean equalsModProperty(Object o, Property<SourceElement> property, V... v) {
-        if (!(o instanceof SourceElement)) { return false; }
+        if (!(o instanceof SourceElement)) {
+            return false;
+        }
         return property.equalsModThisProperty(this, (SourceElement) o, v);
     }
 

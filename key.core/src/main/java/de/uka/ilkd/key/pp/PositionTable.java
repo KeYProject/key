@@ -56,7 +56,11 @@ public class PositionTable {
         startPos = new int[rows];
         endPos = new int[rows];
         children = new PositionTable[rows];
-        for (int i = 0; i < rows; i++) { startPos[i] = -1; endPos[i] = -1; children[i] = null; }
+        for (int i = 0; i < rows; i++) {
+            startPos[i] = -1;
+            endPos[i] = -1;
+            children[i] = null;
+        }
     }
 
     /**
@@ -65,7 +69,11 @@ public class PositionTable {
     private int searchEntry(int index) {
 
         // linear search:
-        for (int m = 0; m < rows; m++) { if ((startPos[m] <= index) && (index < endPos[m])) { return m; } }
+        for (int m = 0; m < rows; m++) {
+            if ((startPos[m] <= index) && (index < endPos[m])) {
+                return m;
+            }
+        }
 
         // binary search (ordered arrays are precondition!), NOT CHECKED SO FAR:
         /*
@@ -216,7 +224,9 @@ public class PositionTable {
         for (int i = 0; i < rows; i++) {
             result.append("<").append(startPos[i]).append(",").append(endPos[i]).append(",")
                     .append(children[i]).append(">");
-            if (rows - 1 != i) { result.append(","); }
+            if (rows - 1 != i) {
+                result.append(",");
+            }
         }
         return result + "]";
     }
@@ -282,7 +292,9 @@ public class PositionTable {
         int i = cfmaNo;
         ImmutableList<SequentPrintFilterEntry> list =
             filter.getFilteredAntec().append(filter.getFilteredSucc());
-        while (i-- != 0) { list = list.tail(); }
+        while (i-- != 0) {
+            list = list.tail();
+        }
         return list.head();
     }
 }

@@ -60,7 +60,9 @@ public class SolverTypeCollection implements Iterable<SolverType> {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof SolverTypeCollection stc)) { return false; }
+        if (!(o instanceof SolverTypeCollection stc)) {
+            return false;
+        }
         return name.equals(stc.name) && minUsableSolver == stc.minUsableSolver
                 && types.equals(stc.types);
     }
@@ -68,8 +70,12 @@ public class SolverTypeCollection implements Iterable<SolverType> {
     public int hashCode() {
         if (hashCode == -1) {
             hashCode = (minUsableSolver + 1) * name.hashCode();
-            for (SolverType type : types) { hashCode = hashCode + 7 * type.hashCode(); }
-            if (hashCode == -1) { hashCode = 0; }
+            for (SolverType type : types) {
+                hashCode = hashCode + 7 * type.hashCode();
+            }
+            if (hashCode == -1) {
+                hashCode = 0;
+            }
         }
         return hashCode;
     }
@@ -80,7 +86,11 @@ public class SolverTypeCollection implements Iterable<SolverType> {
 
     public boolean isUsable() {
         int usableCount = 0;
-        for (SolverType type : types) { if (type.isInstalled(false)) { usableCount++; } }
+        for (SolverType type : types) {
+            if (type.isInstalled(false)) {
+                usableCount++;
+            }
+        }
         return usableCount >= minUsableSolver;
     }
 
@@ -94,12 +104,16 @@ public class SolverTypeCollection implements Iterable<SolverType> {
         int i = 0;
         for (SolverType type : types) {
             if (type.isInstalled(false)) {
-                if (i > 0) { s.append(", "); }
+                if (i > 0) {
+                    s.append(", ");
+                }
                 s.append(type.getName());
                 i++;
             }
         }
-        if (s.length() == 0) { return "No solver available."; }
+        if (s.length() == 0) {
+            return "No solver available.";
+        }
         return s.toString();
     }
 

@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -19,7 +18,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
-import org.key_project.util.collection.Pair;
 import org.key_project.util.helper.FindResources;
 
 import org.junit.jupiter.api.DynamicTest;
@@ -59,18 +57,18 @@ public class ProveRulesTest {
         assertNotNull(proofFile,
             "Taclet " + tacletName + " was annoted with \\lemma but no taclet proof was found.");
         assertNotNull(taclet, "Proof file " + proofFile
-                + " claims that it contains a proof for taclet " + tacletName
-                + " but corresponding taclet seems to be unavailable (maybe it is not annotated with \\lemma?).");
+            + " claims that it contains a proof for taclet " + tacletName
+            + " but corresponding taclet seems to be unavailable (maybe it is not annotated with \\lemma?).");
         assertInstanceOf(LemmaJustification.class, taclet.getRuleJustification(),
             "Found a taclet proof for taclet " + tacletName
-                    + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
-                    + "adding annotation \\lemma to the declaration of the taclet.");
+                + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
+                + "adding annotation \\lemma to the declaration of the taclet.");
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(proofFile.toPath());
         Proof proof = env.getLoadedProof();
 
-        Pair<String, Location> script = env.getProofScript();
+        var script = env.getProofScript();
         if (script != null) {
-            ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+            ProofScriptEngine pse = new ProofScriptEngine(script.script(), script.location());
             pse.execute(env.getUi(), proof);
         }
 
@@ -80,12 +78,15 @@ public class ProveRulesTest {
     }
 
     private static List<File> getFilesRecursive(File directory) {
-        assert directory.isDirectory() : "Expecting a directory as input parameter but found: " + directory;
+        assert directory.isDirectory()
+                : "Expecting a directory as input parameter but found: " + directory;
         List<File> list = new LinkedList<>();
         for (File file : Objects.requireNonNull(directory.listFiles())) {
             if (file.isFile()) {
                 String fileName = file.getName();
-                if (fileName.startsWith("Taclet_") && fileName.endsWith(".proof")) { list.add(file); }
+                if (fileName.startsWith("Taclet_") && fileName.endsWith(".proof")) {
+                    list.add(file);
+                }
             } else {
                 list.addAll(getFilesRecursive(file));
             }

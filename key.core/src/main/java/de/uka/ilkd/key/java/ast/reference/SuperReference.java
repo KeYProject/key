@@ -86,7 +86,9 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      */
     public int getChildCount() {
         int count = 0;
-        if (prefix != null) { count++; }
+        if (prefix != null) {
+            count++;
+        }
         return count;
     }
 
@@ -100,7 +102,11 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      *            if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (prefix != null) { if (index == 0) { return prefix; } }
+        if (prefix != null) {
+            if (index == 0) {
+                return prefix;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -125,7 +131,9 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      */
 
     public Expression getExpressionAt(int index) {
-        if (prefix instanceof Expression && index == 0) { return (Expression) prefix; }
+        if (prefix instanceof Expression && index == 0) {
+            return (Expression) prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -151,7 +159,9 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if ((prefix instanceof TypeReference) && index == 0) { return (TypeReference) prefix; }
+        if ((prefix instanceof TypeReference) && index == 0) {
+            return (TypeReference) prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

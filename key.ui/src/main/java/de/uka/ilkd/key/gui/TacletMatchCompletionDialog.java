@@ -77,7 +77,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         this.current = 0;
         dataTable = new DataTable[model.length];
 
-        for (TacletInstantiationModel aModel : model) { aModel.prepareUnmatchedInstantiation(); }
+        for (TacletInstantiationModel aModel : model) {
+            aModel.prepareUnmatchedInstantiation();
+        }
 
         setStatus();
 
@@ -202,8 +204,12 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     }
 
     private void pushAllInputToModel(int i) {
-        if (dataTable[i].hasIfSelectionPanel()) { dataTable[i].getIfSelectionPanel().pushAllInputToModel(); }
-        if (dataTable[i].isEditing()) { dataTable[i].getCellEditor().stopCellEditing(); }
+        if (dataTable[i].hasIfSelectionPanel()) {
+            dataTable[i].getIfSelectionPanel().pushAllInputToModel();
+        }
+        if (dataTable[i].isEditing()) {
+            dataTable[i].getCellEditor().stopCellEditing();
+        }
     }
 
     private JPanel createInstantiationDisplay(int i) {
@@ -252,7 +258,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
      */
     @Override
     protected void closeDlg() {
-        if (mainWindow != null) { mainWindow.savePreferences(this); }
+        if (mainWindow != null) {
+            mainWindow.savePreferences(this);
+        }
         super.closeDlg();
     }
 
@@ -285,7 +293,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
                 } catch (IllegalArgumentException iae) {
                     LOGGER.debug("tacletmatchcompletiondialog:: something is "
-                            + "wrong with the caret position calculation.");
+                        + "wrong with the caret position calculation.");
 
                 }
                 ed.setVisible(true);
@@ -457,7 +465,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         public Object getValueAt(int x, int y) {
             Object value = super.getValueAt(x, y);
-            if (value == null) { return ""; }
+            if (value == null) {
+                return "";
+            }
             return value;
         }
 
@@ -510,7 +520,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             if (modelNr == owner.current()) {
                 super.editingStopped(e);
                 owner.pushAllInputToModel(modelNr);
-                if (owner.checkAfterEachInput()) { owner.setStatus(owner.model[modelNr].getStatusString()); }
+                if (owner.checkAfterEachInput()) {
+                    owner.setStatus(owner.model[modelNr].getStatusString());
+                }
             }
         }
 
@@ -651,7 +663,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
             public Component getTableCellEditorComponent(JTable table, Object value,
                     boolean isSelected, int row, int column) {
-                if (value == null) { value = ""; }
+                if (value == null) {
+                    value = "";
+                }
                 textarea.setText(value.toString());
                 textarea.setRows(getRowHeight(row) / 16);
                 return editorComponent;
@@ -669,7 +683,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
             public Component getTableCellRendererComponent(JTable table, Object obj,
                     boolean isSelected, boolean hasFocus, int row, int column) {
-                if (obj == null) { obj = ""; }
+                if (obj == null) {
+                    obj = "";
+                }
                 ta.setRows(getRowHeight(row) / 16);
                 ta.setText(obj.toString());
                 if (table.isCellEditable(row, column)) {

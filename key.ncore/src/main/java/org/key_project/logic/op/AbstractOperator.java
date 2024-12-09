@@ -87,13 +87,23 @@ public abstract class AbstractOperator implements Operator {
      */
     @Override
     public <T extends Term> void validTopLevelException(T term) throws TermCreationException {
-        if (arity != term.arity()) { throw new TermCreationException(this, term); }
+        if (arity != term.arity()) {
+            throw new TermCreationException(this, term);
+        }
 
-        if (arity != term.subs().size()) { throw new TermCreationException(this, term); }
+        if (arity != term.subs().size()) {
+            throw new TermCreationException(this, term);
+        }
 
-        if ((whereToBind == null) != term.boundVars().isEmpty()) { throw new TermCreationException(this, term); }
+        if ((whereToBind == null) != term.boundVars().isEmpty()) {
+            throw new TermCreationException(this, term);
+        }
 
-        for (int i = 0; i < arity; i++) { if (term.sub(i) == null) { throw new TermCreationException(this, term); } }
+        for (int i = 0; i < arity; i++) {
+            if (term.sub(i) == null) {
+                throw new TermCreationException(this, term);
+            }
+        }
     }
 
 }

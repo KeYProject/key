@@ -74,7 +74,9 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
     @Override
     public IExecutionConstraint[] getConstraints() throws ProofInputException {
         synchronized (this) {
-            if (constraints == null) { constraints = lazyComputeConstraints(); }
+            if (constraints == null) {
+                constraints = lazyComputeConstraints();
+            }
             return constraints;
         }
     }
@@ -93,7 +95,9 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
             IExecutionConstraint[] allConstraints = getNodeConstraints();
             Set<Term> relevantTerms = collectRelevantTerms(getServices(), getValue());
             for (IExecutionConstraint constraint : allConstraints) {
-                if (containsTerm(constraint.getTerm(), relevantTerms)) { constraints.add(constraint); }
+                if (containsTerm(constraint.getTerm(), relevantTerms)) {
+                    constraints.add(constraint);
+                }
             }
             return constraints.toArray(new IExecutionConstraint[0]);
         } else {
@@ -140,7 +144,9 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
                     || SymbolicExecutionUtil.isSelect(services, term)) {
                 toFill.add(OriginTermLabel.removeOriginLabels(term, services));
             } else {
-                for (int i = 0; i < term.arity(); i++) { fillRelevantTerms(services, term.sub(i), toFill); }
+                for (int i = 0; i < term.arity(); i++) {
+                    fillRelevantTerms(services, term.sub(i), toFill);
+                }
             }
         }
     }
@@ -161,7 +167,10 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
         } else {
             boolean contained = false;
             int i = 0;
-            while (!contained && i < term.arity()) { contained = containsTerm(term.sub(i), toSearch); i++; }
+            while (!contained && i < term.arity()) {
+                contained = containsTerm(term.sub(i), toSearch);
+                i++;
+            }
             return contained;
         }
     }

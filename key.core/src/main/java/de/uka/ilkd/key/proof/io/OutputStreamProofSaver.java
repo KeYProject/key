@@ -91,7 +91,9 @@ public class OutputStreamProofSaver {
             final int begin = header.indexOf('\"', i);
             final int end = header.indexOf('\"', begin + 1);
             final String sourceLocation = header.substring(begin + 1, end);
-            if (sourceLocation.length() > 0) { return new File(sourceLocation); }
+            if (sourceLocation.length() > 0) {
+                return new File(sourceLocation);
+            }
         }
         return null;
     }
@@ -130,8 +132,12 @@ public class OutputStreamProofSaver {
     public StringBuffer writeLog() {
         final StringBuffer logstr = new StringBuffer();
         // Advance the Log entries
-        if (proof.userLog == null) { proof.userLog = new ArrayList<>(); }
-        if (proof.keyVersionLog == null) { proof.keyVersionLog = new ArrayList<>(); }
+        if (proof.userLog == null) {
+            proof.userLog = new ArrayList<>();
+        }
+        if (proof.keyVersionLog == null) {
+            proof.keyVersionLog = new ArrayList<>();
+        }
         proof.userLog.add(System.getProperty("user.name"));
         proof.keyVersionLog.add(internalVersion);
         final int s = proof.userLog.size();
@@ -270,7 +276,9 @@ public class OutputStreamProofSaver {
 
                 // there may be more than one path
                 while (0 <= tmp.indexOf('"', i) && tmp.indexOf('"', i) < l) {
-                    if (relPathString.length() > 0) { relPathString.append(", "); }
+                    if (relPathString.length() > 0) {
+                        relPathString.append(", ");
+                    }
 
                     // path is always put in quotation marks
                     final int k = tmp.indexOf('"', i) + 1;
@@ -310,10 +318,16 @@ public class OutputStreamProofSaver {
     private String newNames2Proof(Node n) {
         StringBuilder s = new StringBuilder();
         final NameRecorder rec = n.getNameRecorder();
-        if (rec == null) { return s.toString(); }
+        if (rec == null) {
+            return s.toString();
+        }
         final ImmutableList<Name> proposals = rec.getProposals();
-        if (proposals.isEmpty()) { return s.toString(); }
-        for (final Name proposal : proposals) { s.append(",").append(proposal); }
+        if (proposals.isEmpty()) {
+            return s.toString();
+        }
+        for (final Name proposal : proposals) {
+            s.append(",").append(proposal);
+        }
         return " (newnames \"" + s.substring(1) + "\")";
     }
 
@@ -341,7 +355,9 @@ public class OutputStreamProofSaver {
         output.append(newNames2Proof(node));
         output.append(getInteresting(appliedRuleApp.instantiations()));
         final ImmutableList<IfFormulaInstantiation> l = appliedRuleApp.ifFormulaInstantiations();
-        if (l != null) { output.append(ifFormulaInsts(node, l)); }
+        if (l != null) {
+            output.append(ifFormulaInsts(node, l));
+        }
         output.append("");
         userInteraction2Proof(node, output);
         notes2Proof(node, output);
@@ -519,7 +535,8 @@ public class OutputStreamProofSaver {
         final RuleJustification ruleJusti = proof.getInitConfig().getJustifInfo()
                 .getJustification(appliedRuleApp, proof.getServices());
 
-        assert ruleJusti instanceof RuleJustificationBySpec : "Please consult bug #1111 if this fails.";
+        assert ruleJusti instanceof RuleJustificationBySpec
+                : "Please consult bug #1111 if this fails.";
 
         final RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
         output.append(" (contract \"");
@@ -638,7 +655,9 @@ public class OutputStreamProofSaver {
             printSingleNode(node, prefix, output);
         }
 
-        if (node.childrenCount() == 0) { return; }
+        if (node.childrenCount() == 0) {
+            return;
+        }
 
         childrenIt = node.childrenIterator();
 
@@ -672,8 +691,12 @@ public class OutputStreamProofSaver {
      *         an exception thrown in case printing fails
      */
     private void userInteraction2Proof(Node node, Appendable output) throws IOException {
-        if (node.getNodeInfo().getInteractiveRuleApplication()) { output.append(" (userinteraction)"); }
-        if (node.getNodeInfo().getScriptRuleApplication()) { output.append(" (proofscript)"); }
+        if (node.getNodeInfo().getInteractiveRuleApplication()) {
+            output.append(" (userinteraction)");
+        }
+        if (node.getNodeInfo().getScriptRuleApplication()) {
+            output.append(" (proofscript)");
+        }
     }
 
     /**
@@ -716,13 +739,17 @@ public class OutputStreamProofSaver {
     }
 
     public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
-        if (pos == null) { return ""; }
+        if (pos == null) {
+            return "";
+        }
         return " (formula \"" + seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
-                + "\")" + posInTerm2Proof(pos.posInTerm());
+            + "\")" + posInTerm2Proof(pos.posInTerm());
     }
 
     public static String posInTerm2Proof(PosInTerm pos) {
-        if (pos == PosInTerm.getTopLevel()) { return ""; }
+        if (pos == PosInTerm.getTopLevel()) {
+            return "";
+        }
         String s = " (term \"";
         final String list = pos.integerList(pos.reverseIterator()); // cheaper to read
         // in
@@ -751,7 +778,7 @@ public class OutputStreamProofSaver {
             if (!(value instanceof Term || value instanceof ProgramElement
                     || value instanceof Name)) {
                 throw new IllegalStateException("Saving failed.\n"
-                        + "FIXME: Unhandled instantiation type: " + value.getClass());
+                    + "FIXME: Unhandled instantiation type: " + value.getClass());
             }
 
             String singleInstantiation =

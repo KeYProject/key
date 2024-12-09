@@ -109,7 +109,9 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     @Override
     public String getName() throws ProofInputException {
         synchronized (this) {
-            if (name == null) { name = lazyComputeName(); }
+            if (name == null) {
+                name = lazyComputeName();
+            }
             return name;
         }
     }

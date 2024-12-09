@@ -14,12 +14,16 @@ public class TopRuleAppCost implements RuleAppCost {
     private TopRuleAppCost() {}
 
     public int compareTo(@NonNull RuleAppCost o) {
-        if (o instanceof TopRuleAppCost) { return 0; }
+        if (o instanceof TopRuleAppCost) {
+            return 0;
+        }
         return 1;
     }
 
     public boolean equals(Object o) {
-        if (o instanceof RuleAppCost) { return compareTo((RuleAppCost) o) == 0; }
+        if (o instanceof RuleAppCost) {
+            return compareTo((RuleAppCost) o) == 0;
+        }
         return false;
     }
 

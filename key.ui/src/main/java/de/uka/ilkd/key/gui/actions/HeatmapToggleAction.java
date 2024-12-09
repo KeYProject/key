@@ -32,7 +32,9 @@ public class HeatmapToggleAction extends MainWindowAction {
 
         setIcon();
         addPropertyChangeListener(evt -> {
-            if (evt.getPropertyName().equals(SELECTED_KEY)) { setIcon(); }
+            if (evt.getPropertyName().equals(SELECTED_KEY)) {
+                setIcon();
+            }
         });
 
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();

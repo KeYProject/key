@@ -87,7 +87,9 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
     @Override
     protected String lazyComputeName() throws ProofInputException {
         // Ensure that constant is defined
-        if (constant == null) { getValues(); }
+        if (constant == null) {
+            getValues();
+        }
         // Compute name
         String arrayName = super.lazyComputeName();
         return arrayName + "[" + constant + "]";

@@ -140,7 +140,9 @@ public abstract class ProofTreeViewFilter {
             int count = 0;
             for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
                 child = ((TreeNode) parent).getChildAt(i);
-                if (countChild(child, (TreeNode) parent, i)) { count++; }
+                if (countChild(child, (TreeNode) parent, i)) {
+                    count++;
+                }
             }
             return count;
         }
@@ -162,7 +164,9 @@ public abstract class ProofTreeViewFilter {
                 child = ((TreeNode) parent).getChildAt(i);
                 if (countChild(child, (TreeNode) parent, i)) {
                     count++;
-                    if (index == count) { return child; }
+                    if (index == count) {
+                        return child;
+                    }
                 }
             }
             return null;
@@ -183,7 +187,9 @@ public abstract class ProofTreeViewFilter {
             for (int i = 0; i < guiParent.getChildCount(); i++) {
                 if (countChild(guiParent.getChildAt(i), guiParent, i)) {
                     count++;
-                    if (guiParent.getChildAt(i) == child) { return count; }
+                    if (guiParent.getChildAt(i) == child) {
+                        return count;
+                    }
                 }
             }
             return -1;
@@ -205,7 +211,9 @@ public abstract class ProofTreeViewFilter {
         protected boolean countChild(TreeNode child, TreeNode parent, int pos) {
             if (child instanceof GUIProofTreeNode) {
                 return countChild((GUIProofTreeNode) child, parent, pos);
-            } else if (child instanceof GUIBranchNode) { return true; }
+            } else if (child instanceof GUIBranchNode) {
+                return true;
+            }
             return true;
         }
     }
@@ -214,7 +222,9 @@ public abstract class ProofTreeViewFilter {
 
         @Override
         protected boolean countChild(GUIProofTreeNode node, TreeNode parent, int pos) {
-            if (pos == parent.getChildCount() - 1) { return true; }
+            if (pos == parent.getChildCount() - 1) {
+                return true;
+            }
 
             // count if child is inlined because of a hidden subtree
             for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL_GLOBAL_FILTERS) {
@@ -255,9 +265,13 @@ public abstract class ProofTreeViewFilter {
 
         @Override
         protected boolean countChild(GUIProofTreeNode node, TreeNode parent, int pos) {
-            if (node.getNode().getNodeInfo().getInteractiveRuleApplication()) { return true; }
+            if (node.getNode().getNodeInfo().getInteractiveRuleApplication()) {
+                return true;
+            }
 
-            if (pos == parent.getChildCount() - 1) { return true; }
+            if (pos == parent.getChildCount() - 1) {
+                return true;
+            }
 
             // count if child is inlined because of a hidden subtree
             for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL_GLOBAL_FILTERS) {
@@ -357,7 +371,11 @@ public abstract class ProofTreeViewFilter {
             Proof proof = node.proof();
 
             // Show subtrees with at least one automatic goal.
-            for (Goal goal : proof.getSubtreeGoals(node)) { if (goal.isAutomatic()) { return true; } }
+            for (Goal goal : proof.getSubtreeGoals(node)) {
+                if (goal.isAutomatic()) {
+                    return true;
+                }
+            }
 
             // Also show closed subtrees.
             return proof.getSubtreeGoals(node).isEmpty();

@@ -99,7 +99,9 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      */
     @Override
     public String getReturnValueString() throws ProofInputException {
-        if (returnValueString == null) { returnValueString = lazyComputeReturnValueString(); }
+        if (returnValueString == null) {
+            returnValueString = lazyComputeReturnValueString();
+        }
         return returnValueString;
     }
 
@@ -134,7 +136,9 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      */
     @Override
     public String getConditionString() throws ProofInputException {
-        if (conditionString == null) { conditionString = lazyComputeConditionString(); }
+        if (conditionString == null) {
+            conditionString = lazyComputeConditionString();
+        }
         return conditionString;
     }
 

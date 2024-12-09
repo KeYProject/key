@@ -76,20 +76,28 @@ public class FocussedBreakpointRuleApplicationManager
 
     @Override
     public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
-        if (mayAddRule(rule, pos)) { delegate.ruleAdded(rule, pos); }
+        if (mayAddRule(rule, pos)) {
+            delegate.ruleAdded(rule, pos);
+        }
     }
 
     @Override
     public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = //
             ImmutableSLList.nil();
-        for (RuleApp r : rules) { if (mayAddRule(r, pos)) { applicableRules = applicableRules.prepend(r); } }
+        for (RuleApp r : rules) {
+            if (mayAddRule(r, pos)) {
+                applicableRules = applicableRules.prepend(r);
+            }
+        }
 
         delegate.rulesAdded(applicableRules, pos);
     }
 
     private boolean mayAddRule(RuleApp rule, PosInOccurrence pos) {
-        if (!breakpoint.isPresent()) { return true; }
+        if (!breakpoint.isPresent()) {
+            return true;
+        }
 
         if ((!(rule instanceof Taclet) || NodeInfo.isSymbolicExecution((Taclet) rule.rule()))
                 && isJavaPIO(pos)) {

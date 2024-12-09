@@ -107,7 +107,7 @@ public class ExecutionNodeReader {
                         IExecutionNode<?> stackEntry = findNode(root, path);
                         if (stackEntry == null) {
                             throw new SAXException("Can't find call stack entry \"" + path
-                                    + "\" in parsed symbolic execution tree.");
+                                + "\" in parsed symbolic execution tree.");
                         }
                         entry.getKey().addCallStackEntry(stackEntry);
                     }
@@ -120,11 +120,11 @@ public class ExecutionNodeReader {
                         IExecutionNode<?> returnEntry = findNode(root, path);
                         if (returnEntry == null) {
                             throw new SAXException("Can't find method return entry \"" + path
-                                    + "\" in parsed symbolic execution tree.");
+                                + "\" in parsed symbolic execution tree.");
                         }
                         if (!(returnEntry instanceof IExecutionBaseMethodReturn<?>)) {
                             throw new SAXException("Expected basemethod return on \"" + path
-                                    + "\" but is " + returnEntry.getElementType() + ".");
+                                + "\" but is " + returnEntry.getElementType() + ".");
                         }
                         entry.getKey().addMethodReturn((IExecutionBaseMethodReturn<?>) returnEntry);
                     }
@@ -137,7 +137,7 @@ public class ExecutionNodeReader {
                         IExecutionNode<?> returnEntry = findNode(root, pair.first);
                         if (returnEntry == null) {
                             throw new SAXException("Can't find completed block entry \""
-                                    + pair.first + "\" in parsed symbolic execution tree.");
+                                + pair.first + "\" in parsed symbolic execution tree.");
                         } else if (!(returnEntry instanceof IExecutionBlockStartNode<?>)) {
                             throw new SAXException(
                                 "Found completed block entry is not an instance of IExecutionBlockStartNode.");
@@ -154,7 +154,7 @@ public class ExecutionNodeReader {
                         IExecutionNode<?> returnEntry = findNode(root, path);
                         if (returnEntry == null) {
                             throw new SAXException("Can't find block completion entry \"" + path
-                                    + "\" in parsed symbolic execution tree.");
+                                + "\" in parsed symbolic execution tree.");
                         }
                         entry.getKey().addBlockCompletion(returnEntry);
                     }
@@ -167,7 +167,7 @@ public class ExecutionNodeReader {
                         IExecutionNode<?> target = findNode(root, path);
                         if (target == null) {
                             throw new SAXException("Can't find link targets \"" + path
-                                    + "\" in parsed symbolic execution tree.");
+                                + "\" in parsed symbolic execution tree.");
                         }
                         KeYLessLink link = new KeYLessLink();
                         link.setSource(entry.getKey());
@@ -184,11 +184,11 @@ public class ExecutionNodeReader {
                         IExecutionNode<?> terminationEntry = findNode(root, path);
                         if (terminationEntry == null) {
                             throw new SAXException("Can't find termination entry \"" + path
-                                    + "\" in parsed symbolic execution tree.");
+                                + "\" in parsed symbolic execution tree.");
                         }
                         if (!(terminationEntry instanceof IExecutionTermination)) {
                             throw new SAXException("Expected termination on \"" + path
-                                    + "\" but is " + terminationEntry.getElementType() + ".");
+                                + "\" but is " + terminationEntry.getElementType() + ".");
                         }
                         entry.getKey().addTermination((IExecutionTermination) terminationEntry);
                     }
@@ -222,17 +222,17 @@ public class ExecutionNodeReader {
                     int childIndex = Integer.parseInt(next);
                     if (childIndex < 0) {
                         throw new SAXException("Path segment \"" + next + "\" of path \"" + path
-                                + "\" is a negative integer.");
+                            + "\" is a negative integer.");
                     }
                     IExecutionNode<?>[] children = root.getChildren();
                     if (childIndex >= children.length) {
                         throw new SAXException("Path segment \"" + next + "\" of path \"" + path
-                                + "\" is outside of the child array range.");
+                            + "\" is outside of the child array range.");
                     }
                     root = children[childIndex];
                 } catch (NumberFormatException e) {
                     throw new SAXException("Path segment \"" + next + "\" of path \"" + path
-                            + "\" is no valid integer.",
+                        + "\" is no valid integer.",
                         e);
                 }
             }
@@ -410,8 +410,12 @@ public class ExecutionNodeReader {
             } else {
                 AbstractKeYlessExecutionNode<?> child =
                     createExecutionNode(parent, uri, localName, qName, attributes);
-                if (root == null) { root = child; }
-                if (parent != null) { parent.addChild(child); }
+                if (root == null) {
+                    root = child;
+                }
+                if (parent != null) {
+                    parent.addChild(child);
+                }
                 parentNodeStack.addFirst(child);
             }
         }
@@ -1733,7 +1737,9 @@ public class ExecutionNodeReader {
          *        The block completion to add.
          */
         public void addBlockCompletion(IExecutionNode<?> blockCompletion) {
-            if (blockCompletion != null) { blockCompletions = blockCompletions.append(blockCompletion); }
+            if (blockCompletion != null) {
+                blockCompletions = blockCompletions.append(blockCompletion);
+            }
         }
 
         /**
@@ -1912,7 +1918,9 @@ public class ExecutionNodeReader {
          *        The {@link IExecutionTermination} to add.
          */
         public void addTermination(IExecutionTermination termination) {
-            if (termination != null) { terminations = terminations.prepend(termination); }
+            if (termination != null) {
+                terminations = terminations.prepend(termination);
+            }
         }
 
         /**
@@ -2241,7 +2249,9 @@ public class ExecutionNodeReader {
          *        The {@link IExecutionBaseMethodReturn<?>} to add.
          */
         public void addMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
-            if (methodReturn != null) { methodReturns = methodReturns.prepend(methodReturn); }
+            if (methodReturn != null) {
+                methodReturns = methodReturns.prepend(methodReturn);
+            }
         }
     }
 

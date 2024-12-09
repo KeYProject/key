@@ -50,7 +50,9 @@ public class Pair<T1, T2> {
 
     @Override
     public boolean equals(@Nullable Object o) {
-        if (!(o instanceof Pair<?, ?> p)) { return false; }
+        if (!(o instanceof Pair<?, ?> p)) {
+            return false;
+        }
         return Objects.equals(first, p.first) && Objects.equals(second, p.second);
     }
 
@@ -86,7 +88,9 @@ public class Pair<T1, T2> {
      */
     public static <S, T> Set<S> getFirstSet(Collection<Pair<S, T>> pairs) {
         Set<S> res = new java.util.HashSet<>();
-        for (Pair<S, T> p : pairs) { res.add(p.first); }
+        for (Pair<S, T> p : pairs) {
+            res.add(p.first);
+        }
         return res;
     }
 
@@ -95,7 +99,9 @@ public class Pair<T1, T2> {
      */
     public static <S, T> Set<T> getSecondSet(Collection<Pair<S, T>> pairs) {
         Set<T> res = new java.util.HashSet<>();
-        for (Pair<S, T> p : pairs) { res.add(p.second); }
+        for (Pair<S, T> p : pairs) {
+            res.add(p.second);
+        }
         return res;
     }
 }

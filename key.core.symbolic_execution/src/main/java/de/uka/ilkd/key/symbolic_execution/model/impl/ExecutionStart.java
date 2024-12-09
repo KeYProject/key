@@ -82,7 +82,9 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement>
      *        The {@link IExecutionTermination} to register.
      */
     public void addTermination(IExecutionTermination termination) {
-        if (termination != null) { terminations = terminations.append(termination); }
+        if (termination != null) {
+            terminations = terminations.append(termination);
+        }
     }
 
     /**

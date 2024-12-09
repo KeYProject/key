@@ -60,7 +60,9 @@ public abstract class AbstractLoopContractBuiltInRuleApp
      */
     public AbstractLoopContractBuiltInRuleApp tryToInstantiate(final Goal goal,
             final AbstractLoopContractRule rule) {
-        if (complete() || cannotComplete(goal)) { return this; }
+        if (complete() || cannotComplete(goal)) {
+            return this;
+        }
         final Services services = goal.proof().getServices();
         final AbstractLoopContractRule.Instantiation instantiation =
             rule.instantiate(posInOccurrence().subTerm(), goal, services);

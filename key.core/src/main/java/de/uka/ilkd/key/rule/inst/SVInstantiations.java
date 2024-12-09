@@ -151,7 +151,8 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
      */
     public SVInstantiations add(SchemaVariable sv, Modality.JavaModalityKind kind,
             Services services) throws SortException {
-        return add(sv, new InstantiationEntry<>(kind) {}, services);
+        return add(sv, new InstantiationEntry<>(kind) {
+        }, services);
     }
 
     public SVInstantiations addList(SchemaVariable sv, Object[] list, Services services) {
@@ -213,11 +214,11 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     // the following two exceptions are created statically for performance
     private static final SortException INCOMPATIBLE_INSTANTIATION_EXCEPTION =
         new SortException("Sort of SV " + "is not compatible with its " + "instantiation's sort\n"
-                + "(This exception object is static)");
+            + "(This exception object is static)");
 
     private static final IllegalInstantiationException CONVERT_INSTANTIATION_EXCEPTION =
         new SortException("Instantiation of SV " + "cannot be converted to logic\n"
-                + "(This exception object is static)");
+            + "(This exception object is static)");
 
     private static final SortException UNSOLVABLE_SORT_CONDITIONS_EXCEPTION = new SortException(
         "Conditions for sorts" + " cannot be satisfied\n" + "(This exception object is static)");
@@ -229,8 +230,12 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
             if (b == null) {
                 return rebuildSorts(services);
-            } else if (!b) { throw INCOMPATIBLE_INSTANTIATION_EXCEPTION; }
-            if (p_forceRebuild) { return rebuildSorts(services); }
+            } else if (!b) {
+                throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
+            }
+            if (p_forceRebuild) {
+                return rebuildSorts(services);
+            }
         }
         return this;
     }
@@ -241,8 +246,12 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
         if (b == null) {
             return rebuildSorts(services);
-        } else if (!b) { throw UNSOLVABLE_SORT_CONDITIONS_EXCEPTION; }
-        if (p_forceRebuild) { return rebuildSorts(services); }
+        } else if (!b) {
+            throw UNSOLVABLE_SORT_CONDITIONS_EXCEPTION;
+        }
+        if (p_forceRebuild) {
+            return rebuildSorts(services);
+        }
         return this;
     }
 
@@ -272,7 +281,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             Services services) {
         return new SVInstantiations(map.put(sv, entry), interesting().put(sv, entry),
             getUpdateContext(), getGenericSortInstantiations(), getGenericSortConditions())
-                    .checkSorts(sv, entry, false, services);
+                .checkSorts(sv, entry, false, services);
     }
 
 
@@ -554,7 +563,9 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         } else {
             cmp = (SVInstantiations) obj;
         }
-        if (size() != cmp.size() || !getUpdateContext().equals(cmp.getUpdateContext())) { return false; }
+        if (size() != cmp.size() || !getUpdateContext().equals(cmp.getUpdateContext())) {
+            return false;
+        }
 
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
             pairIterator();
@@ -567,7 +578,9 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
                     IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     return false;
                 }
-            } else if (!inst.equals(cmp.getInstantiation(e.key()))) { return false; }
+            } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
+                return false;
+            }
         }
         return true;
 
@@ -581,7 +594,9 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         } else {
             cmp = (SVInstantiations) obj;
         }
-        if (size() != cmp.size() || !getUpdateContext().equals(cmp.getUpdateContext())) { return false; }
+        if (size() != cmp.size() || !getUpdateContext().equals(cmp.getUpdateContext())) {
+            return false;
+        }
 
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
             pairIterator();
@@ -594,7 +609,9 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
                     cmp.getInstantiation(e.key()), PROOF_IRRELEVANCY_PROPERTY)) {
                     return false;
                 }
-            } else if (!inst.equals(cmp.getInstantiation(e.key()))) { return false; }
+            } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
+                return false;
+            }
         }
         return true;
 
@@ -607,7 +624,9 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
             if (e.value().getInstantiation() instanceof TermLabel termLabel) {
-                if (!termLabel.isProofRelevant()) { continue; }
+                if (!termLabel.isProofRelevant()) {
+                    continue;
+                }
             }
             result = 37 * result + e.value().getInstantiation().hashCode() + e.key().hashCode();
         }
@@ -659,7 +678,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     public SVInstantiations add(GenericSortCondition p_c, Services services) throws SortException {
         return new SVInstantiations(map, interesting(), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions().prepend(p_c))
-                    .checkCondition(p_c, false, services);
+                .checkCondition(p_c, false, services);
     }
 
     public ExecutionContext getExecutionContext() {
@@ -673,7 +692,9 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     public ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> lookupEntryForSV(Name name) {
         for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e : map) {
-            if (e.key().name().equals(name)) { return e; }
+            if (e.key().name().equals(name)) {
+                return e;
+            }
         }
         return null; // handle this better!
     }

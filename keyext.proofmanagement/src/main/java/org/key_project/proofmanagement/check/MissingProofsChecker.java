@@ -64,7 +64,7 @@ public class MissingProofsChecker implements Checker {
             reportContractsWithoutProof(contracts, data);
         } catch (ProofInputException e) {
             throw new ProofManagementException("EnvInput could not be loaded!"
-                    + System.lineSeparator() + e.getMessage());
+                + System.lineSeparator() + e.getMessage());
         }
     }
 

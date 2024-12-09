@@ -60,7 +60,9 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
         MethodReference explicitConstructorMR = getExplicitConstructorMethodReference();
         String call = explicitConstructorMR != null ? explicitConstructorMR.toString()
                 : getMethodReference().toString();
-        if (call.endsWith(";")) { call = call.substring(0, call.length() - 1); }
+        if (call.endsWith(";")) {
+            call = call.substring(0, call.length() - 1);
+        }
         return call;
     }
 

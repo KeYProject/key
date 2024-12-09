@@ -55,20 +55,32 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
      * @return the index of the element (-1 if not found)
      */
     protected int getArrayPos(ImmutableArray<ProgramElement> arr, ProgramElement el) {
-        for (int i = 0, sz = arr.size(); i < sz; i++) { if (arr.get(i) == el) { return i; } }
+        for (int i = 0, sz = arr.size(); i < sz; i++) {
+            if (arr.get(i) == el) {
+                return i;
+            }
+        }
         return -1;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true; }
-        if (o == null || o.getClass() != this.getClass()) { return false; }
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
 
         final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) o;
-        if (jnte.getChildCount() != getChildCount()) { return false; }
+        if (jnte.getChildCount() != getChildCount()) {
+            return false;
+        }
 
         for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equals(jnte.getChildAt(i))) { return false; }
+            if (!getChildAt(i).equals(jnte.getChildAt(i))) {
+                return false;
+            }
         }
         return true;
     }
@@ -87,16 +99,22 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
 
-        if (src == null) { return null; }
+        if (src == null) {
+            return null;
+        }
 
-        if (src.getClass() != this.getClass()) { return null; }
+        if (src.getClass() != this.getClass()) {
+            return null;
+        }
 
         final NonTerminalProgramElement ntSrc = (NonTerminalProgramElement) src;
         final SourceData newSource = new SourceData(ntSrc, 0, source.getServices());
 
         matchCond = matchChildren(newSource, matchCond, 0);
 
-        if (matchCond == null) { return null; }
+        if (matchCond == null) {
+            return null;
+        }
 
         source.next();
         return matchCond;
@@ -134,12 +152,16 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 
         for (int i = offset, sz = getChildCount(); i < sz; i++) {
             matchCond = getChildAt(i).match(source, matchCond);
-            if (matchCond == null) { return null; }
+            if (matchCond == null) {
+                return null;
+            }
         }
 
         final NonTerminalProgramElement ntSrc = (NonTerminalProgramElement) source.getElement();
 
-        if (!compatibleBlockSize(source.getChildPos(), ntSrc.getChildCount())) { return null; }
+        if (!compatibleBlockSize(source.getChildPos(), ntSrc.getChildCount())) {
+            return null;
+        }
 
         return matchCond;
     }

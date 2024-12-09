@@ -29,7 +29,9 @@ abstract class PrefixTermTacletAppIndexCache implements ITermTacletAppIndexCache
     protected ImmutableList<QuantifiableVariable> getExtendedPrefix(
             ImmutableArray<QuantifiableVariable> extension) {
         ImmutableList<QuantifiableVariable> res = prefix;
-        for (int i = 0; i != extension.size(); ++i) { res = res.prepend(extension.get(i)); }
+        for (int i = 0; i != extension.size(); ++i) {
+            res = res.prepend(extension.get(i));
+        }
         return res;
     }
 

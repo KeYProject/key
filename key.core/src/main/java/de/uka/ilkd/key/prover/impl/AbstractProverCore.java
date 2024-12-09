@@ -49,7 +49,9 @@ public abstract class AbstractProverCore implements ProverCore {
     protected void fireTaskProgress() {
         // no need to synchronize here as we use immutable list and hence
         // the add/remove task observer methods won't interfere
-        for (final ProverTaskListener ptl : proverTaskObservers) { ptl.taskProgress(countApplied); }
+        for (final ProverTaskListener ptl : proverTaskObservers) {
+            ptl.taskProgress(countApplied);
+        }
     }
 
     /**
@@ -62,7 +64,9 @@ public abstract class AbstractProverCore implements ProverCore {
     protected void fireTaskFinished(TaskFinishedInfo info) {
         // no need to synchronize here as we use immutable list and hence
         // the add/remove task observer methods won't interfere
-        for (final ProverTaskListener ptl : proverTaskObservers) { ptl.taskFinished(info); }
+        for (final ProverTaskListener ptl : proverTaskObservers) {
+            ptl.taskFinished(info);
+        }
     }
 
     /**

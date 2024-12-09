@@ -23,7 +23,7 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
     @Override
     public String getDescription() {
         return "Apply rules to decompose propositional toplevel formulas; "
-                + "splits the goal if necessary";
+            + "splits the goal if necessary";
     }
 
     @Override

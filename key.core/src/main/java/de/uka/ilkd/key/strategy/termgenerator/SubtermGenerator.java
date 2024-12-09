@@ -95,7 +95,9 @@ public abstract class SubtermGenerator implements TermGenerator {
             termStack = termStack.tail();
 
             if (descendFurther(res, mState, services)) {
-                for (int i = res.arity() - 1; i >= 0; --i) { termStack = termStack.prepend(res.sub(i)); }
+                for (int i = res.arity() - 1; i >= 0; --i) {
+                    termStack = termStack.prepend(res.sub(i));
+                }
             }
 
             return res;
@@ -120,7 +122,9 @@ public abstract class SubtermGenerator implements TermGenerator {
             termStack = termStack.tail();
 
             if (descendFurther(res, mState, services)) {
-                for (int i = 0; i != res.arity(); ++i) { termStack = termStack.prepend(res.sub(i)); }
+                for (int i = 0; i != res.arity(); ++i) {
+                    termStack = termStack.prepend(res.sub(i));
+                }
             }
 
             return res;

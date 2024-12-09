@@ -164,7 +164,9 @@ public class KeYMediator {
                 @Override
                 protected boolean filter(Taclet taclet) {
                     for (String name : JoinProcessor.SIMPLIFY_UPDATE) {
-                        if (name.equals(taclet.name().toString())) { return false; }
+                        if (name.equals(taclet.name().toString())) {
+                            return false;
+                        }
                     }
                     return true;
                 }
@@ -196,8 +198,8 @@ public class KeYMediator {
                 @Override
                 public String toString() {
                     return "Proof has been pruned: "
-                            + (proof.openGoals().size() == 1 ? "one open goal remains."
-                                    : (proof.openGoals().size() + " open goals remain."));
+                        + (proof.openGoals().size() == 1 ? "one open goal remains."
+                                : (proof.openGoals().size() + " open goals remain."));
                 }
             };
         this.ui.taskFinished(info);
@@ -224,18 +226,24 @@ public class KeYMediator {
      *        the previously selected proof
      */
     void setProof(Proof newProof, Proof previousProof) {
-        if (previousProof == newProof) { return; }
+        if (previousProof == newProof) {
+            return;
+        }
 
         if (previousProof != null) {
             previousProof.removeProofTreeListener(proofTreeListener);
             previousProof.removeRuleAppListener(proofListener);
         }
-        if (newProof != null) { notationInfo.setAbbrevMap(newProof.abbreviations()); }
+        if (newProof != null) {
+            notationInfo.setAbbrevMap(newProof.abbreviations());
+        }
         if (newProof != null) {
             newProof.addProofTreeListener(proofTreeListener);
             newProof.addRuleAppListener(proofListener);
         }
-        if (getAutoSaver() != null) { getAutoSaver().setProof(newProof); }
+        if (getAutoSaver() != null) {
+            getAutoSaver().setProof(newProof);
+        }
 
         OneStepSimplifier.refreshOSS(newProof);
     }
@@ -247,7 +255,9 @@ public class KeYMediator {
      *        an int setting the limit
      */
     public void setMaxAutomaticSteps(int steps) {
-        if (getSelectedProof() != null) { getSelectedProof().getSettings().getStrategySettings().setMaxSteps(steps); }
+        if (getSelectedProof() != null) {
+            getSelectedProof().getSettings().getStrategySettings().setMaxSteps(steps);
+        }
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
 
@@ -382,7 +392,9 @@ public class KeYMediator {
     public synchronized void fireModalDialogOpened(EventObject e) {
         Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == GUIListener.class) { ((GUIListener) listeners[i + 1]).modalDialogOpened(e); }
+            if (listeners[i] == GUIListener.class) {
+                ((GUIListener) listeners[i + 1]).modalDialogOpened(e);
+            }
         }
     }
 
@@ -393,7 +405,9 @@ public class KeYMediator {
     public synchronized void fireModalDialogClosed(EventObject e) {
         Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == GUIListener.class) { ((GUIListener) listeners[i + 1]).modalDialogClosed(e); }
+            if (listeners[i] == GUIListener.class) {
+                ((GUIListener) listeners[i + 1]).modalDialogClosed(e);
+            }
         }
     }
 
@@ -403,7 +417,9 @@ public class KeYMediator {
     public synchronized void fireShutDown(EventObject e) {
         Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == GUIListener.class) { ((GUIListener) listeners[i + 1]).shutDown(e); }
+            if (listeners[i] == GUIListener.class) {
+                ((GUIListener) listeners[i + 1]).shutDown(e);
+            }
         }
     }
 
@@ -414,8 +430,12 @@ public class KeYMediator {
      *        the proof that was just loaded and is about to be replayed
      */
     public synchronized void fireProofLoaded(Proof p) {
-        if (p == null) { return; }
-        for (Consumer<Proof> listener : proofLoadListeners) { listener.accept(p); }
+        if (p == null) {
+            return;
+        }
+        for (Consumer<Proof> listener : proofLoadListeners) {
+            listener.accept(p);
+        }
     }
 
     /**
@@ -497,7 +517,9 @@ public class KeYMediator {
         final boolean b = fullStop;
         Runnable interfaceSignaller = () -> {
             ui.notifyAutoModeBeingStarted();
-            if (b) { inAutoMode = true; }
+            if (b) {
+                inAutoMode = true;
+            }
         };
         ThreadUtilities.invokeAndWait(interfaceSignaller);
     }
@@ -505,7 +527,9 @@ public class KeYMediator {
     public synchronized void startInterface(boolean fullStop) {
         final boolean b = fullStop;
         Runnable interfaceSignaller = () -> {
-            if (b) { inAutoMode = false; }
+            if (b) {
+                inAutoMode = false;
+            }
             ui.notifyAutomodeStopped();
         };
         ThreadUtilities.invokeOnEventQueue(interfaceSignaller);
@@ -590,7 +614,9 @@ public class KeYMediator {
      */
     public <T> T lookup(Class<T> service) {
         try {
-            if (userData == null) { return null; }
+            if (userData == null) {
+                return null;
+            }
             return userData.get(service);
         } catch (IllegalStateException ignored) {
             return null;
@@ -621,7 +647,9 @@ public class KeYMediator {
      *        arbitray object
      */
     public <T> void deregister(T obj, Class<T> service) {
-        if (userData != null) { userData.deregister(obj, service); }
+        if (userData != null) {
+            userData.deregister(obj, service);
+        }
     }
 
     /**
@@ -630,7 +658,9 @@ public class KeYMediator {
      * @return
      */
     public @NonNull Lookup getUserData() {
-        if (userData == null) { userData = new Lookup(); }
+        if (userData == null) {
+            userData = new Lookup();
+        }
         return userData;
     }
 
@@ -652,7 +682,9 @@ public class KeYMediator {
         @Override
         public void proofPruned(final ProofTreeEvent e) {
             SwingUtilities.invokeLater(() -> {
-                if (!e.getSource().find(getSelectedNode())) { keySelectionModel.setSelectedNode(e.getNode()); }
+                if (!e.getSource().find(getSelectedNode())) {
+                    keySelectionModel.setSelectedNode(e.getNode());
+                }
             });
             OneStepSimplifier.refreshOSS(e.getSource());
             pruningInProcess = false;
@@ -677,8 +709,12 @@ public class KeYMediator {
         /** invoked when a rule has been applied */
         @Override
         public void ruleApplied(ProofEvent e) {
-            if (isInAutoMode()) { return; }
-            if (e.getSource() == getSelectedProof()) { keySelectionModel.defaultSelection(); }
+            if (isInAutoMode()) {
+                return;
+            }
+            if (e.getSource() == getSelectedProof()) {
+                keySelectionModel.defaultSelection();
+            }
         }
 
         /**
@@ -767,7 +803,9 @@ public class KeYMediator {
      *        a long specifying the timeout time in ms
      */
     public void setAutomaticApplicationTimeout(long timeout) {
-        if (getSelectedProof() != null) { getSelectedProof().getSettings().getStrategySettings().setTimeout(timeout); }
+        if (getSelectedProof() != null) {
+            getSelectedProof().getSettings().getStrategySettings().setTimeout(timeout);
+        }
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
 
@@ -817,6 +855,8 @@ public class KeYMediator {
      *        the user action
      */
     public void fireActionPerformed(UserAction action) {
-        for (UserActionListener listener : userActionListeners) { listener.actionPerformed(action); }
+        for (UserActionListener listener : userActionListeners) {
+            listener.actionPerformed(action);
+        }
     }
 }

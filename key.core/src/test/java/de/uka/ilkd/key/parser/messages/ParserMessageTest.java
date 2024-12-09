@@ -52,7 +52,11 @@ public class ParserMessageTest {
         final var files = testDataDir.listFiles();
         Assertions.assertNotNull(files);
         for (File file : files) {
-            if (file.isDirectory()) { if (!new File(file, "IGNORE").exists()) { data.add(Arguments.of(file)); } }
+            if (file.isDirectory()) {
+                if (!new File(file, "IGNORE").exists()) {
+                    data.add(Arguments.of(file));
+                }
+            }
         }
         return data;
     }
@@ -62,7 +66,7 @@ public class ParserMessageTest {
         for (File file : sourceDir.listFiles()) {
             if (file.getName().endsWith(".java")) {
                 assertNull(javaFile, "Found multiple Java files in directory " + sourceDir
-                        + "\nCannot unambiguously determine Java source file.");
+                    + "\nCannot unambiguously determine Java source file.");
                 javaFile = file;
             }
         }
@@ -74,15 +78,15 @@ public class ParserMessageTest {
         lines = Files.readAllLines(javaFile.toPath(), Charset.defaultCharset());
         assertTrue(lines.size() >= 3,
             "Number of lines in file " + javaFile
-                    + " is less than required minimal number of lines."
-                    + "\nFirst three lines of tested Java source file must contain "
-                    + "information about expected parser message. " + "See file " + DOC_FILE
-                    + " for more information.");
+                + " is less than required minimal number of lines."
+                + "\nFirst three lines of tested Java source file must contain "
+                + "information about expected parser message. " + "See file " + DOC_FILE
+                + " for more information.");
 
         try {
             KeYEnvironment.load(javaFile.toPath());
             fail("Parsing unexpectedly did not throw a " + "ProblemLoaderException for file "
-                    + javaFile);
+                + javaFile);
             throw new Error(); // to make the rest of the method unreachable
         } catch (ProblemLoaderException e) {
             exception = e;
@@ -97,7 +101,7 @@ public class ParserMessageTest {
 
         assertEquals(javaFile.getAbsoluteFile(), Paths.get(location.getFileURI().get()),
             "Filename retrieved from parser message "
-                    + "doesn't match filename of originally parsed file.");
+                + "doesn't match filename of originally parsed file.");
     }
 
     @Test
@@ -105,13 +109,13 @@ public class ParserMessageTest {
         String firstLine = lines.get(0);
         assertTrue(firstLine.startsWith("//MSG "),
             "First line of file " + javaFile + " must start with \"//MSG *regexp*\", "
-                    + "to specify a regular expression for the " + "expected parser message.");
+                + "to specify a regular expression for the " + "expected parser message.");
         String parserMessageRegExp = firstLine.substring(6);
 
         assertTrue(exception.getMessage().matches(parserMessageRegExp),
             "Message of ProblemLoaderException doesn't match regular expression, "
-                    + "that was specified in file " + javaFile + "\nRequested regular expression: "
-                    + parserMessageRegExp + "\nRetrieved exception message: " + exception.getMessage());
+                + "that was specified in file " + javaFile + "\nRequested regular expression: "
+                + parserMessageRegExp + "\nRetrieved exception message: " + exception.getMessage());
     }
 
     @Test
@@ -119,12 +123,12 @@ public class ParserMessageTest {
         String secondLine = lines.get(1);
         assertTrue(secondLine.startsWith("//LINE "),
             "Second line of file " + javaFile + " must start with \"//LINE *number*\", "
-                    + "to specify the line number in which a parser error is " + "expected to occur.");
+                + "to specify the line number in which a parser error is " + "expected to occur.");
         int expectedLineNumber = Integer.parseInt(secondLine.substring(7));
 
         assertEquals(expectedLineNumber, location.getPosition().line(),
             "Line number " + location.getPosition().line() + " of retrieved parser message "
-                    + "doesn't match expected line number " + expectedLineNumber + ".");
+                + "doesn't match expected line number " + expectedLineNumber + ".");
     }
 
     @Test
@@ -132,8 +136,8 @@ public class ParserMessageTest {
         String thirdLine = lines.get(2);
         assertTrue(thirdLine.startsWith("//COL "),
             "Third line of file " + javaFile + " must start with \"//COL *number*\", "
-                    + "to specify the column number in which a parser error is "
-                    + "expected to occur.");
+                + "to specify the column number in which a parser error is "
+                + "expected to occur.");
         int expectedColumnNumber = Integer.parseInt(thirdLine.substring(6));
 
         assertEquals(expectedColumnNumber, location.getPosition().column(),

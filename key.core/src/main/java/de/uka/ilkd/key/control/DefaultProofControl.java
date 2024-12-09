@@ -79,7 +79,9 @@ public class DefaultProofControl extends AbstractProofControl {
 
     @Override
     public synchronized void stopAutoMode() {
-        if (isInAutoMode()) { autoModeThread.interrupt(); }
+        if (isInAutoMode()) {
+            autoModeThread.interrupt();
+        }
     }
 
     @Override
@@ -163,14 +165,18 @@ public class DefaultProofControl extends AbstractProofControl {
             try {
                 fireAutoModeStarted(new ProofEvent(proof));
                 info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
-                if (ptl != null) { ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0)); }
+                if (ptl != null) {
+                    ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
+                }
                 synchronized (macro) {
                     info = macro.applyTo(ui, node, posInOcc, ptl);
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Macro caused an exception: " + e.getMessage(), e);
             } finally {
-                if (ptl != null) { ptl.taskFinished(info); }
+                if (ptl != null) {
+                    ptl.taskFinished(info);
+                }
                 autoModeThread = null;
                 fireAutoModeStopped(new ProofEvent(proof));
             }

@@ -51,7 +51,9 @@ public class ProofScriptFromFileAction extends AbstractAction {
             Proof currentProof = mediator.getSelectedProof();
             if (currentProof != null) {
                 var currentFile = currentProof.getProofFile();
-                if (currentFile != null) { dir = currentFile.getParent().toFile(); }
+                if (currentFile != null) {
+                    dir = currentFile.getParent().toFile();
+                }
             } else {
                 dir = new File(".");
             }

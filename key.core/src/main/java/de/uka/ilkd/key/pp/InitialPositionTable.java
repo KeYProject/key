@@ -47,7 +47,9 @@ public class InitialPositionTable extends PositionTable {
      *
      */
     public PosInSequent getPosInSequent(int index, SequentPrintFilter filter) {
-        if (index < startPos[0] || index >= endPos[0]) { return null; }
+        if (index < startPos[0] || index >= endPos[0]) {
+            return null;
+        }
 
         ImmutableList<Integer> posList = pathForIndex(index);
 
@@ -56,7 +58,9 @@ public class InitialPositionTable extends PositionTable {
         Range r = rangeForIndex(index);
         pis.setBounds(r);
         Range firstStatement = firstStatementRangeForIndex(index);
-        if (firstStatement != null) { pis.setFirstJavaStatementRange(firstStatement); }
+        if (firstStatement != null) {
+            pis.setFirstJavaStatementRange(firstStatement);
+        }
         return pis;
     }
 
@@ -93,7 +97,9 @@ public class InitialPositionTable extends PositionTable {
         ImmutableList<Integer> p = ImmutableSLList.nil();
         p = prependPathInFormula(p, pio);
         int index = indexOfCfma(pio.sequentFormula(), filter);
-        if (index == -1) { return null; }
+        if (index == -1) {
+            return null;
+        }
         p = p.prepend(index);
         p = p.prepend(0);
         return p;
@@ -102,7 +108,9 @@ public class InitialPositionTable extends PositionTable {
     private ImmutableList<Integer> prependPathInFormula(ImmutableList<Integer> p,
             PosInOccurrence pio) {
         IntIterator pit = pio.posInTerm().reverseIterator();
-        while (pit.hasNext()) { p = p.prepend(pit.next()); }
+        while (pit.hasNext()) {
+            p = p.prepend(pit.next());
+        }
         return p;
     }
 
@@ -121,7 +129,9 @@ public class InitialPositionTable extends PositionTable {
             filter.getFilteredAntec().append(filter.getFilteredSucc());
         int k;
         for (k = 0; !list.isEmpty(); k++, list = list.tail()) {
-            if (list.head().getOriginalFormula() == cfma) { return k; }
+            if (list.head().getOriginalFormula() == cfma) {
+                return k;
+            }
         }
         return -1;
     }

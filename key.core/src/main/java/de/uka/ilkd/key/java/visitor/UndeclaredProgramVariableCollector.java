@@ -80,7 +80,9 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
         ImmutableArray<VariableSpecification> varSpecs = x.getVariableSpecifications();
         for (VariableSpecification spec : varSpecs) {
             IProgramVariable var = spec.getProgramVariable();
-            if (var != null) { declaredVariables.add(var); }
+            if (var != null) {
+                declaredVariables.add(var);
+            }
         }
     }
 
@@ -90,7 +92,9 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     @Override
     public void performActionOnMethodFrame(MethodFrame x) {
         IProgramVariable resultVar = x.getProgramVariable();
-        if (resultVar != null) { declaredVariables.add(resultVar); }
+        if (resultVar != null) {
+            declaredVariables.add(resultVar);
+        }
     }
 
     /**
@@ -118,7 +122,9 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
      * @return All used variables.
      */
     public LinkedHashSet<LocationVariable> getAllVariables() {
-        if (allVariables == null) { allVariables = super.result(); }
+        if (allVariables == null) {
+            allVariables = super.result();
+        }
         return allVariables;
     }
 

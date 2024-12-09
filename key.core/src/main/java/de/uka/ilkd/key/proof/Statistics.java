@@ -75,7 +75,9 @@ public class Statistics {
     }
 
     public Statistics(List<Node> startNodes) {
-        if (startNodes.isEmpty()) { throw new IllegalArgumentException("can't generate statistics on zero nodes"); }
+        if (startNodes.isEmpty()) {
+            throw new IllegalArgumentException("can't generate statistics on zero nodes");
+        }
 
         int nodes = 0;
         int branches = 0;
@@ -100,7 +102,10 @@ public class Statistics {
             TemporaryStatistics tmp = new TemporaryStatistics();
 
             Node node;
-            while (it.hasNext()) { node = it.next(); tmp.changeOnNode(node, interactiveAppsDetails); }
+            while (it.hasNext()) {
+                node = it.next();
+                tmp.changeOnNode(node, interactiveAppsDetails);
+            }
 
             nodes += tmp.nodes;
             branches = tmp.branches;
@@ -147,7 +152,10 @@ public class Statistics {
         TemporaryStatistics tmp = new TemporaryStatistics();
 
         Node node;
-        while (it.hasNext()) { node = it.next(); tmp.changeOnNode(node, interactiveAppsDetails); }
+        while (it.hasNext()) {
+            node = it.next();
+            tmp.changeOnNode(node, interactiveAppsDetails);
+        }
 
         this.nodes = tmp.nodes;
         this.branches = tmp.branches;
@@ -215,12 +223,16 @@ public class Statistics {
 
         summaryList.add(new Pair<>("Automode time",
             EnhancedStringBuffer.formatTime(time).toString()));
-        if (time >= 10000L) { summaryList.add(new Pair<>("Automode time", time + "ms")); }
+        if (time >= 10000L) {
+            summaryList.add(new Pair<>("Automode time", time + "ms"));
+        }
         if (stat.nodes > 0) {
             String avgTime = String.valueOf(stat.timePerStepInMillis);
             // round to 3 digits after point
             int i = avgTime.indexOf('.') + 4;
-            if (i > avgTime.length()) { i = avgTime.length(); }
+            if (i > avgTime.length()) {
+                i = avgTime.length();
+            }
             avgTime = avgTime.substring(0, i);
             summaryList.add(new Pair<>("Avg. time per step", avgTime + "ms"));
         }
@@ -258,7 +270,9 @@ public class Statistics {
             final String c = p.first;
             final String s = p.second;
             sb = sb.append(c);
-            if (!"".equals(s)) { sb = sb.append(": ").append(s); }
+            if (!"".equals(s)) {
+                sb = sb.append(": ").append(s);
+            }
             sb = sb.append('\n');
         }
         sb.deleteCharAt(sb.length() - 1);
@@ -337,7 +351,9 @@ public class Statistics {
          */
         private int childBranches(final Node node) {
             final int c = node.childrenCount();
-            if (c > 1) { return c - 1; }
+            if (c > 1) {
+                return c - 1;
+            }
             return 0;
         }
 
@@ -390,7 +406,9 @@ public class Statistics {
             int tmpOssCaptured = 0;
             final Protocol protocol =
                 ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
-            if (protocol != null) { tmpOssCaptured = protocol.size() - 1; }
+            if (protocol != null) {
+                tmpOssCaptured = protocol.size() - 1;
+            }
             return tmpOssCaptured;
         }
 

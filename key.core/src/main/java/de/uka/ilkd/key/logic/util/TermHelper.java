@@ -34,9 +34,13 @@ public class TermHelper {
      * @return the maximal sort allowed at the i-th position
      */
     public static Sort getMaxSort(Term term, int i) {
-        if (term.sub(i).sort() == JavaDLTheory.FORMULA) { return JavaDLTheory.FORMULA; }
+        if (term.sub(i).sort() == JavaDLTheory.FORMULA) {
+            return JavaDLTheory.FORMULA;
+        }
 
-        if (term.op() instanceof IfThenElse && i > 0) { return term.sort(); }
+        if (term.op() instanceof IfThenElse && i > 0) {
+            return term.sort();
+        }
         return getMaxSortHelper(term.op(), i, term.sub(i).sort());
     }
 

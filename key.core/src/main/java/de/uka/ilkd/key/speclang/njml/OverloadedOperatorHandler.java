@@ -50,7 +50,11 @@ public class OverloadedOperatorHandler {
         }
 
         public static JMLOperator get(String image) {
-            for (JMLOperator value : JMLOperator.values()) { if (value.image.equals(image)) { return value; } }
+            for (JMLOperator value : JMLOperator.values()) {
+                if (value.image.equals(image)) {
+                    return value;
+                }
+            }
             throw new NoSuchElementException("There is no JML operator for " + image);
         }
 
@@ -131,7 +135,9 @@ public class OverloadedOperatorHandler {
             throws SLTranslationException {
         for (JMLOperatorHandler handler : handlers) {
             var term = handler.build(op, left, right);
-            if (term != null) { return term; }
+            if (term != null) {
+                return term;
+            }
         }
         return null;
     }
@@ -149,10 +155,14 @@ public class OverloadedOperatorHandler {
         @Override
         public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
-            if (right == null) { return null; }
+            if (right == null) {
+                return null;
+            }
             if (left.getTerm().sort() == ldtSequence.targetSort()
                     && right.getTerm().sort() == ldtSequence.targetSort()) {
-                if (op == JMLOperator.ADD) { return new SLExpression(tb.seqConcat(left.getTerm(), right.getTerm())); }
+                if (op == JMLOperator.ADD) {
+                    return new SLExpression(tb.seqConcat(left.getTerm(), right.getTerm()));
+                }
             }
             return null;
         }
@@ -170,7 +180,9 @@ public class OverloadedOperatorHandler {
         @Override
         public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
-            if (right == null) { return null; }
+            if (right == null) {
+                return null;
+            }
             final var l = left.getTerm();
             final var r = right.getTerm();
             if (l.sort() == ldt.targetSort() && r.sort() == ldt.targetSort()) {

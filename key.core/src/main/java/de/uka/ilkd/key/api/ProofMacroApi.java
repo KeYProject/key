@@ -26,7 +26,9 @@ public class ProofMacroApi {
     private void initialize() {
         ServiceLoader<ProofMacro> loader = ServiceLoader.load(ProofMacro.class);
         loader.forEach(psc -> {
-            if (psc.getScriptCommandName() != null) { commandMap.put(psc.getScriptCommandName(), psc); }
+            if (psc.getScriptCommandName() != null) {
+                commandMap.put(psc.getScriptCommandName(), psc);
+            }
         });
     }
 

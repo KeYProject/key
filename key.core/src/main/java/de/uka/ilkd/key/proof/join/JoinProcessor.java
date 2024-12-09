@@ -74,7 +74,9 @@ public class JoinProcessor implements Runnable {
     }
 
     public void join() {
-        if (used) { throw new IllegalStateException("Every instance can only be used once."); }
+        if (used) {
+            throw new IllegalStateException("Every instance can only be used once.");
+        }
         used = true;
         processJoin();
 
@@ -102,10 +104,14 @@ public class JoinProcessor implements Runnable {
         ImmutableList<Goal> list = ImmutableSLList.nil();
 
         for (NodeGoalPair pair : cut.getGoalsAfterUncovering()) {
-            if (pair.node == partner.getNode(0) || pair.node == partner.getNode(1)) { list = list.append(pair.goal); }
+            if (pair.node == partner.getNode(0) || pair.node == partner.getNode(1)) {
+                list = list.append(pair.goal);
+            }
         }
 
-        for (Listener listener : listeners) { listener.endOfJoining(list); }
+        for (Listener listener : listeners) {
+            listener.endOfJoining(list);
+        }
     }
 
     private void orRight(Goal goal) {
@@ -117,7 +123,9 @@ public class JoinProcessor implements Runnable {
 
     private SequentFormula findFormula(Sequent sequent, Term content, boolean antecedent) {
         for (SequentFormula sf : (antecedent ? sequent.antecedent() : sequent.succedent())) {
-            if (sf.formula().equals(content)) { return sf; }
+            if (sf.formula().equals(content)) {
+                return sf;
+            }
         }
         return null;
     }
@@ -142,7 +150,9 @@ public class JoinProcessor implements Runnable {
             @Override
             protected boolean filter(Taclet taclet) {
                 for (String tacletName : tacletNames) {
-                    if (taclet.name().toString().equals(tacletName)) { return true; }
+                    if (taclet.name().toString().equals(tacletName)) {
+                        return true;
+                    }
                 }
                 return false;
             }
@@ -162,7 +172,9 @@ public class JoinProcessor implements Runnable {
     }
 
     private Goal hide(Goal goal) {
-        if (partner.getFormulaForHiding() == null) { return goal; }
+        if (partner.getFormulaForHiding() == null) {
+            return goal;
+        }
         int index = goal.sequent().formulaNumberInSequent(false, partner.getFormulaForHiding());
         PosInOccurrence pio =
             PosInOccurrence.findInSequent(goal.sequent(), index, PosInTerm.getTopLevel());
@@ -250,7 +262,11 @@ public class JoinProcessor implements Runnable {
     private Collection<Term> computeCommonFormulas(Semisequent s1, Semisequent s2, Term exclude) {
         TreeSet<Term> formulas1 = createTree(s1, exclude);
         TreeSet<Term> result = createTree();
-        for (SequentFormula sf : s2) { if (formulas1.contains(sf.formula())) { result.add(sf.formula()); } }
+        for (SequentFormula sf : s2) {
+            if (formulas1.contains(sf.formula())) {
+                result.add(sf.formula());
+            }
+        }
         return result;
     }
 
@@ -258,14 +274,20 @@ public class JoinProcessor implements Runnable {
             Term exclude) {
         LinkedList<Term> result = new LinkedList<>();
         for (SequentFormula sf : s) {
-            if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) { result.add(sf.formula()); }
+            if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {
+                result.add(sf.formula());
+            }
         }
         return result;
     }
 
     private TreeSet<Term> createTree(Semisequent semisequent, Term exclude) {
         TreeSet<Term> set = createTree();
-        for (SequentFormula sf : semisequent) { if (sf.formula() != exclude) { set.add(sf.formula()); } }
+        for (SequentFormula sf : semisequent) {
+            if (sf.formula() != exclude) {
+                set.add(sf.formula());
+            }
+        }
         return set;
     }
 
@@ -278,7 +300,9 @@ public class JoinProcessor implements Runnable {
         try {
             join();
         } catch (Throwable e) {
-            for (Listener listener : listeners) { listener.exceptionWhileJoining(e); }
+            for (Listener listener : listeners) {
+                listener.exceptionWhileJoining(e);
+            }
         }
     }
 

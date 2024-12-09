@@ -116,7 +116,9 @@ public class CheckedUserInput extends JPanel {
 
 
     private TrafficLight getTrafficLight() {
-        if (trafficLight == null) { trafficLight = new TrafficLight(10); }
+        if (trafficLight == null) {
+            trafficLight = new TrafficLight(10);
+        }
         return trafficLight;
     }
 
@@ -169,7 +171,9 @@ public class CheckedUserInput extends JPanel {
         String text = inputFieldForFormula.getText();
         String result = inspector.check(text);
         setValid(result);
-        for (CheckedUserInputListener listener : listeners) { listener.userInputChanged(text, result == null, result); }
+        for (CheckedUserInputListener listener : listeners) {
+            listener.userInputChanged(text, result == null, result);
+        }
     }
 
     public void addListener(CheckedUserInputListener listener) {
@@ -228,7 +232,9 @@ public class CheckedUserInput extends JPanel {
         dialog.setSize(Math.max(dim.width, dialog.getOkButton().getWidth() * 4), dim.height);
         dialog.setVisible(true);
 
-        if (dialog.okButtonHasBeenPressed()) { return userInput.getInput(); }
+        if (dialog.okButtonHasBeenPressed()) {
+            return userInput.getInput();
+        }
         return null;
     }
 

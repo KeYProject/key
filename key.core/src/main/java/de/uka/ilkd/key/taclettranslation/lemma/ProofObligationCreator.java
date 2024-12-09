@@ -57,7 +57,9 @@ public class ProofObligationCreator {
 
         ProofAggregate[] singleProofs = new ProofAggregate[taclets.size()];
 
-        for (LoaderListener listener : listeners) { listener.progressStarted(this); }
+        for (LoaderListener listener : listeners) {
+            listener.progressStarted(this);
+        }
 
         int i = 0;
 
@@ -79,7 +81,9 @@ public class ProofObligationCreator {
         ProofAggregate proofAggregate = singleProofs.length == 1 ? singleProofs[0]
                 : ProofAggregate.createProofAggregate(singleProofs, createName(singleProofs));
         // listener.progressStopped(this);
-        for (LoaderListener listener : listeners) { listener.resetStatus(this); }
+        for (LoaderListener listener : listeners) {
+            listener.resetStatus(this);
+        }
         return proofAggregate;
     }
 
@@ -97,14 +101,18 @@ public class ProofObligationCreator {
 
             }
         };
-        for (Taclet taclet : taclets) { visitor.visit(taclet); }
+        for (Taclet taclet : taclets) {
+            visitor.visit(taclet);
+        }
         return userDefinedSymbols;
     }
 
 
 
     private void collectUserDefinedSymbols(Term term, UserDefinedSymbols userDefinedSymbols) {
-        for (Term sub : term.subs()) { collectUserDefinedSymbols(sub, userDefinedSymbols); }
+        for (Term sub : term.subs()) {
+            collectUserDefinedSymbols(sub, userDefinedSymbols);
+        }
         if (term.op() instanceof final SortedOperator op) {
             final Sort sort = op.sort();
             userDefinedSymbols.addSort(sort);
@@ -116,7 +124,9 @@ public class ProofObligationCreator {
                     userDefinedSymbols.addFunction((JFunction) term.op());
                 }
             }
-            if (term.op() instanceof LogicVariable) { userDefinedSymbols.addVariable((LogicVariable) term.op()); }
+            if (term.op() instanceof LogicVariable) {
+                userDefinedSymbols.addVariable((LogicVariable) term.op());
+            }
             if (term.op() instanceof SchemaVariable) {
                 userDefinedSymbols.addSchemaVariable((SchemaVariable) term.op());
             }

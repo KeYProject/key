@@ -21,7 +21,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -45,7 +45,6 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,7 +115,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          * assigned to keyProblemFile in method loadProblem(File).
          */
         assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
-                + " save a proof but no corresponding key problem file is " + "available.";
+            + " save a proof but no corresponding key problem file is " + "available.";
         allProofsSuccessful &= saveProof(result2, info.getProof(), keyProblemFile);
         /*
          * We "delete" the value of keyProblemFile at this point by assigning null to it. That way
@@ -146,7 +145,9 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         final int openGoals = proof.openGoals().size();
         final Object result2 = info.getResult();
         if (info.getSource() instanceof ProverCore || info.getSource() instanceof ProofMacro) {
-            if (!isAtLeastOneMacroRunning()) { printResults(openGoals, info, result2); }
+            if (!isAtLeastOneMacroRunning()) {
+                printResults(openGoals, info, result2);
+            }
         } else if (info.getSource() instanceof ProblemLoader) {
             LOGGER.debug("{}", result2);
             System.exit(-1);
@@ -158,13 +159,17 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         ProblemLoader problemLoader = (ProblemLoader) info.getSource();
         if (problemLoader.hasProofScript()) {
             try {
-                Pair<String, Location> script = problemLoader.readProofScript();
-                ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-                this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
-                pse.execute(this, proof);
-                // The start and end messages are fake to persuade the system ...
-                // All this here should refactored anyway ...
-                this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+                ProofScriptEntry script = problemLoader.getProofScript();
+                if (script != null) {
+                    ProofScriptEngine pse =
+                        new ProofScriptEngine(script.script(), script.location());
+                    this.taskStarted(
+                        new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
+                    pse.execute(this, proof);
+                    // The start and end messages are fake to persuade the system ...
+                    // All this here should refactored anyway ...
+                    this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+                }
             } catch (Exception e) {
                 LOGGER.debug("", e);
                 System.exit(-1);
@@ -275,7 +280,9 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     public final void taskProgress(int position) {
         super.taskProgress(position);
         if (progressMax > 0) {
-            if ((position * PROGRESS_BAR_STEPS) % progressMax == 0) { System.out.print(PROGRESS_MARK); }
+            if ((position * PROGRESS_BAR_STEPS) % progressMax == 0) {
+                System.out.print(PROGRESS_MARK);
+            }
         }
     }
 
@@ -366,17 +373,24 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * @return true, if successful
      */
     public static boolean saveProof(Object result, Proof proof, Path keyProblemFile) {
-        if (result instanceof Throwable) { throw new RuntimeException("Error in batchmode.", (Throwable) result); }
+        if (result instanceof Throwable) {
+            throw new RuntimeException("Error in batchmode.", (Throwable) result);
+        }
 
         // Save the proof before exit.
         String baseName = keyProblemFile.toAbsolutePath().toString();
         int idx = baseName.indexOf(".key");
-        if (idx == -1) { idx = baseName.indexOf(".proof"); }
+        if (idx == -1) {
+            idx = baseName.indexOf(".proof");
+        }
         baseName = baseName.substring(0, idx == -1 ? baseName.length() : idx);
 
         File f;
         int counter = 0;
-        do { f = new File(baseName + ".auto." + counter + ".proof"); counter++; } while (f.exists());
+        do {
+            f = new File(baseName + ".auto." + counter + ".proof");
+            counter++;
+        } while (f.exists());
 
         try {
             // a copy with running number to compare different runs

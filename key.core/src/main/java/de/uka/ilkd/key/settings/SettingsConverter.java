@@ -231,7 +231,9 @@ public final class SettingsConverter {
      */
     public static String readRawString(Properties props, String key, String defaultValue) {
         String value = props.getProperty(key);
-        if (value == null) { value = defaultValue; }
+        if (value == null) {
+            value = defaultValue;
+        }
         return value;
     }
 
@@ -251,7 +253,9 @@ public final class SettingsConverter {
     public static String[] readRawStringList(Properties props, String key, String split,
             String[] defaultValue) {
         String value = props.getProperty(key);
-        if (value == null) { return defaultValue; }
+        if (value == null) {
+            return defaultValue;
+        }
         return value.split(split);
     }
 
@@ -278,9 +282,13 @@ public final class SettingsConverter {
     public static String readFile(Properties props, String key, String defaultVal,
             ClassLoader loader) {
         String filePath = props.getProperty(key);
-        if (filePath == null) { return defaultVal; }
+        if (filePath == null) {
+            return defaultVal;
+        }
         InputStream fileContent = loader.getResourceAsStream(filePath);
-        if (fileContent == null) { return defaultVal; }
+        if (fileContent == null) {
+            return defaultVal;
+        }
         try {
             return Streams.toString(fileContent);
         } catch (IOException e) {
@@ -303,7 +311,9 @@ public final class SettingsConverter {
      */
     public static int read(Properties props, String key, int defaultVal) {
         String eth = props.getProperty(key);
-        if (eth == null) { return defaultVal; }
+        if (eth == null) {
+            return defaultVal;
+        }
         try {
             return Integer.parseInt(eth);
         } catch (NumberFormatException e) {
@@ -327,7 +337,9 @@ public final class SettingsConverter {
      */
     public static long read(Properties props, String key, long defaultVal) {
         String eth = props.getProperty(key);
-        if (eth == null) { return defaultVal; }
+        if (eth == null) {
+            return defaultVal;
+        }
         try {
             return Long.parseLong(eth);
         } catch (NumberFormatException e) {
@@ -353,9 +365,15 @@ public final class SettingsConverter {
      */
     public static boolean read(Properties props, String key, boolean defaultVal) {
         String eth = props.getProperty(key);
-        if (eth == null) { return defaultVal; }
-        if (eth.equals("true")) { return true; }
-        if (eth.equals("false")) { return false; }
+        if (eth == null) {
+            return defaultVal;
+        }
+        if (eth.equals("true")) {
+            return true;
+        }
+        if (eth.equals("false")) {
+            return false;
+        }
         return defaultVal;
     }
 
@@ -373,7 +391,9 @@ public final class SettingsConverter {
      */
     public static String[] read(Properties props, String key, String[] defaultVal) {
         String val = props.getProperty(key);
-        if (val == null) { return defaultVal; }
+        if (val == null) {
+            return defaultVal;
+        }
         String[] result = val.split(LIST_SEPARATOR);
         for (int i = 0; i < result.length; i++) {
             try {
@@ -416,7 +436,9 @@ public final class SettingsConverter {
      *        the String value to store for key
      */
     public static void store(Properties props, String key, String value) {
-        if (key != null && value != null) { props.setProperty(key, encode(value)); }
+        if (key != null && value != null) {
+            props.setProperty(key, encode(value));
+        }
     }
 
     /**
@@ -430,7 +452,9 @@ public final class SettingsConverter {
      *        the boolean value to store for key
      */
     public static void store(Properties props, String key, boolean value) {
-        if (key != null) { props.setProperty(key, value ? "true" : "false"); }
+        if (key != null) {
+            props.setProperty(key, value ? "true" : "false");
+        }
     }
 
     /**
@@ -444,7 +468,9 @@ public final class SettingsConverter {
      *        the long value to store for key
      */
     public static void store(Properties props, String key, long value) {
-        if (key != null) { props.setProperty(key, Long.toString(value)); }
+        if (key != null) {
+            props.setProperty(key, Long.toString(value));
+        }
     }
 
     /**
@@ -465,7 +491,11 @@ public final class SettingsConverter {
     public static <T extends Enum<?>> T read(Properties props, String key, T defaultValue,
             T[] values) {
         int ord = read(props, key, defaultValue.ordinal());
-        for (T value : values) { if (ord == value.ordinal()) { return value; } }
+        for (T value : values) {
+            if (ord == value.ordinal()) {
+                return value;
+            }
+        }
         return defaultValue;
     }
 

@@ -74,9 +74,13 @@ public final class PosInOccurrence {
      * the same occurrence
      */
     public boolean eqEquals(Object obj) {
-        if (!(obj instanceof PosInOccurrence cmp)) { return false; }
+        if (!(obj instanceof PosInOccurrence cmp)) {
+            return false;
+        }
 
-        if (!sequentFormula.equals(cmp.sequentFormula)) { return false; }
+        if (!sequentFormula.equals(cmp.sequentFormula)) {
+            return false;
+        }
 
         return equalsHelp(cmp);
     }
@@ -91,17 +95,23 @@ public final class PosInOccurrence {
      */
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof PosInOccurrence cmp)) { return false; }
+        if (!(obj instanceof PosInOccurrence cmp)) {
+            return false;
+        }
 
         // NB: the class <code>NonDuplicateAppFeature</code> depends on the usage
         // of <code>!=</code> in this condition
-        if (sequentFormula() != cmp.sequentFormula()) { return false; }
+        if (sequentFormula() != cmp.sequentFormula()) {
+            return false;
+        }
 
         return equalsHelp(cmp);
     }
 
     private boolean equalsHelp(final PosInOccurrence cmp) {
-        if (inAntec == cmp.inAntec) { return posInTerm.equals(cmp.posInTerm); }
+        if (inAntec == cmp.inAntec) {
+            return posInTerm.equals(cmp.posInTerm);
+        }
         return false;
     }
 
@@ -163,7 +173,9 @@ public final class PosInOccurrence {
      */
     public PosInOccurrence replaceConstrainedFormula(SequentFormula p_newFormula) {
         assert p_newFormula != null;
-        if (p_newFormula == sequentFormula) { return this; }
+        if (p_newFormula == sequentFormula) {
+            return this;
+        }
         return new PosInOccurrence(p_newFormula, posInTerm, inAntec);
     }
 
@@ -171,7 +183,9 @@ public final class PosInOccurrence {
      * returns the subterm this object points to
      */
     public Term subTerm() {
-        if (subTermCache == null) { subTermCache = posInTerm.getSubTerm(sequentFormula.formula()); }
+        if (subTermCache == null) {
+            subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
+        }
         return subTermCache;
     }
 
@@ -179,7 +193,9 @@ public final class PosInOccurrence {
      * Ascend to the top node of the formula this object points to
      */
     public PosInOccurrence topLevel() {
-        if (isTopLevel()) { return this; }
+        if (isTopLevel()) {
+            return this;
+        }
         return new PosInOccurrence(sequentFormula, PosInTerm.getTopLevel(), inAntec);
     }
 

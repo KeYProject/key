@@ -88,7 +88,9 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
             }
             // Replace label with a new one with increased sub ID.
             if (newLabelIdRequired) {
-                if (originalLabel != null) { originalLabelIds.add(originalLabel.getId()); }
+                if (originalLabel != null) {
+                    originalLabelIds.add(originalLabel.getId());
+                }
                 int labelSubID = FormulaTermLabel.newLabelSubID(services, mostImportantLabel);
                 if (!originalLabelIds.isEmpty()) {
                     return new FormulaTermLabel(mostImportantLabel.getMajorId(), labelSubID,

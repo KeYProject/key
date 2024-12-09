@@ -70,7 +70,9 @@ public final class DotExporter {
             node.childrenIterator().forEachRemaining(queue::add);
             var edges = graph.edgesOf(node);
             var data = node.lookup(DependencyNodeData.class);
-            if (edges == null || edges.isEmpty() || data == null) { continue; }
+            if (edges == null || edges.isEmpty() || data == null) {
+                continue;
+            }
             outputEdge(buf, analysisResults, abbreviateFormulas, false, node, data, edges);
         }
         // colorize useless nodes
@@ -118,16 +120,22 @@ public final class DotExporter {
         Set<Node> drawn = new HashSet<>();
         while (!queue.isEmpty()) {
             Pair<GraphNode, Integer> nodePair = queue.remove(queue.size() - 1);
-            if (visited.contains(nodePair.first)) { continue; }
+            if (visited.contains(nodePair.first)) {
+                continue;
+            }
             GraphNode nodeB = nodePair.first;
             visited.add(nodeB);
             Stream<Node> incoming = graph.incomingEdgesOf(nodeB);
             Stream<Node> outgoing = graph.outgoingEdgesOf(nodeB);
             Stream.concat(incoming, outgoing).forEach(node -> {
-                if (drawn.contains(node)) { return; }
+                if (drawn.contains(node)) {
+                    return;
+                }
                 drawn.add(node);
                 DependencyNodeData data = node.lookup(DependencyNodeData.class);
-                if (data == null) { return; }
+                if (data == null) {
+                    return;
+                }
                 outputEdge(buf, analysisResults, abbreviateFormulas, omitBranch, node, data);
             });
             if (nodePair.second < 1) {
@@ -216,7 +224,9 @@ public final class DotExporter {
             String outString = out.toString(abbreviateFormulas, omitBranch);
             // label for edge itself
             String label = data.label;
-            if (edge instanceof AnnotatedShortenedEdge ase) { label = ase.getEdgeLabel(); }
+            if (edge instanceof AnnotatedShortenedEdge ase) {
+                label = ase.getEdgeLabel();
+            }
             buf
                     .append('"')
                     .append(inString)

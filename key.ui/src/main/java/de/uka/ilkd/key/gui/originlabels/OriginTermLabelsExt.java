@@ -41,7 +41,9 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     private ToggleOriginHighlightAction toggleSourceViewHighlightAction;
 
     private ToggleTermOriginTrackingAction getToggleTrackingAction(MainWindow mainWindow) {
-        if (toggleTrackingAction == null) { toggleTrackingAction = new ToggleTermOriginTrackingAction(mainWindow); }
+        if (toggleTrackingAction == null) {
+            toggleTrackingAction = new ToggleTermOriginTrackingAction(mainWindow);
+        }
 
         return toggleTrackingAction;
     }
@@ -82,20 +84,26 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
 
         List<String> result = new LinkedList<>();
 
-        if (origin != null) { result.add("Origin: " + origin); }
+        if (origin != null) {
+            result.add("Origin: " + origin);
+        }
 
         return result;
     }
 
     @Override
     public List<String> getTooltipStrings(MainWindow mainWindow, PosInSequent pos) {
-        if (pos == null || pos.isSequent()) { return Collections.emptyList(); }
+        if (pos == null || pos.isSequent()) {
+            return Collections.emptyList();
+        }
 
         Origin origin = OriginTermLabel.getOrigin(pos);
 
         String result = "";
 
-        if (origin != null) { result += "<b>Origin:</b> " + origin + "<br>"; }
+        if (origin != null) {
+            result += "<b>Origin:</b> " + origin + "<br>";
+        }
 
         PosInOccurrence pio = pos.getPosInOccurrence();
 

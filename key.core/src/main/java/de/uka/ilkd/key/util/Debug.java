@@ -32,7 +32,11 @@ public final class Debug {
      *        boolean the assertion that is checked
      */
     public static void assertTrue(boolean isOK) {
-        if (ENABLE_ASSERTION) { if (!isOK) { fail(); } }
+        if (ENABLE_ASSERTION) {
+            if (!isOK) {
+                fail();
+            }
+        }
     }
 
     public static void assertFalse(boolean isNotOK) {
@@ -49,7 +53,11 @@ public final class Debug {
      *        String describes the failed assertion
      */
     public static void assertTrue(boolean isOK, String message) {
-        if (ENABLE_ASSERTION) { if (!isOK) { fail(message); } }
+        if (ENABLE_ASSERTION) {
+            if (!isOK) {
+                fail(message);
+            }
+        }
     }
 
     /**
@@ -62,7 +70,11 @@ public final class Debug {
      *        String describes the failed assertion
      */
     public static void assertTrue(boolean isOK, String message, Object parameter) {
-        if (ENABLE_ASSERTION) { if (!isOK) { fail(message + ":" + parameter); } }
+        if (ENABLE_ASSERTION) {
+            if (!isOK) {
+                fail(message + ":" + parameter);
+            }
+        }
     }
 
     /**
@@ -76,8 +88,14 @@ public final class Debug {
      */
     public static void assertDeepNonNull(Iterable<?> iterable, String message) {
         if (ENABLE_ASSERTION) {
-            if (iterable == null) { fail("Null pointer: " + message); }
-            for (Object object : iterable) { if (object == null) { fail("Null element in collection:" + message); } }
+            if (iterable == null) {
+                fail("Null pointer: " + message);
+            }
+            for (Object object : iterable) {
+                if (object == null) {
+                    fail("Null element in collection:" + message);
+                }
+            }
         }
     }
 
@@ -90,10 +108,14 @@ public final class Debug {
     }
 
     public static void fail(String message) {
-        if (ENABLE_ASSERTION) { throw new AssertionFailure("\nAssertion failure: " + message); }
+        if (ENABLE_ASSERTION) {
+            throw new AssertionFailure("\nAssertion failure: " + message);
+        }
     }
 
     public static void fail(String message, Object o) {
-        if (ENABLE_ASSERTION) { throw new AssertionFailure("\nAssertion failure: " + message + ":" + o); }
+        if (ENABLE_ASSERTION) {
+            throw new AssertionFailure("\nAssertion failure: " + message + ":" + o);
+        }
     }
 }

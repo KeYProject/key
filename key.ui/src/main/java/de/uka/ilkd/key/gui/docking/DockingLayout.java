@@ -85,7 +85,9 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
 
     private static void loadLayouts(CControl globalPort) {
         try {
-            if (LAYOUT_FILE.exists()) { globalPort.readXML(LAYOUT_FILE); }
+            if (LAYOUT_FILE.exists()) {
+                globalPort.readXML(LAYOUT_FILE);
+            }
         } catch (IOException e) {
             LOGGER.warn("Failed to load layouts", e);
         }
@@ -122,7 +124,9 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
     private void setLayout(String layout) {
         CControl globalPort = window.getDockControl();
         boolean defaultLayoutDefined = Arrays.asList(globalPort.layouts()).contains(layout);
-        if (defaultLayoutDefined) { globalPort.load(layout); }
+        if (defaultLayoutDefined) {
+            globalPort.load(layout);
+        }
         DockingHelper.restoreMissingPanels(window);
     }
 
@@ -181,7 +185,9 @@ final class LoadLayoutAction extends MainWindowAction {
         this.layoutName = name;
         setName("Load " + name);
         setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
-        if (key != null) { setAcceleratorKey(KeyStroke.getKeyStroke(key, InputEvent.CTRL_DOWN_MASK)); }
+        if (key != null) {
+            setAcceleratorKey(KeyStroke.getKeyStroke(key, InputEvent.CTRL_DOWN_MASK));
+        }
         KeyStrokeManager.lookupAndOverride(this, getClass().getName() + "$" + layoutName);
         setMenuPath("View.Layout");
     }

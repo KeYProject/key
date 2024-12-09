@@ -91,7 +91,9 @@ public class MaxRuleAppSlider extends JSlider {
     }
 
     private void updateAllSliders() {
-        for (MaxRuleAppSlider allInstance : allInstances) { allInstance.refresh(); }
+        for (MaxRuleAppSlider allInstance : allInstances) {
+            allInstance.refresh();
+        }
     }
 
     public void setMediator(KeYMediator mediator) {

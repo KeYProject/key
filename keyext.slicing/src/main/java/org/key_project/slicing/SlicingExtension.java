@@ -90,7 +90,9 @@ public class SlicingExtension implements KeYGuiExtension,
 
             PosInOccurrence topLevel = pos.getPosInOccurrence().topLevel();
             Node node = tracker.getNodeThatProduced(currentNode, topLevel);
-            if (node == null) { return List.of(); }
+            if (node == null) {
+                return List.of();
+            }
             List<Action> list = new ArrayList<>();
             list.add(new ShowCreatedByAction(MainWindow.getInstance(), node));
             GraphNode graphNode = tracker.getDependencyGraph()
@@ -124,7 +126,9 @@ public class SlicingExtension implements KeYGuiExtension,
 
     private void createTrackerForProof(Proof newProof) {
         trackers.computeIfAbsent(newProof, proof -> {
-            if (proof == null) { return null; }
+            if (proof == null) {
+                return null;
+            }
             proof.addProofDisposedListener(this);
             DependencyTracker tracker = new DependencyTracker(proof);
             if (leftPanel != null) {
@@ -154,7 +158,9 @@ public class SlicingExtension implements KeYGuiExtension,
     public void proofDisposing(ProofDisposedEvent e) {
         trackers.put(e.getSource(), null);
         trackers.remove(e.getSource());
-        if (leftPanel != null) { leftPanel.proofDisposed(e.getSource()); }
+        if (leftPanel != null) {
+            leftPanel.proofDisposed(e.getSource());
+        }
     }
 
     @Override

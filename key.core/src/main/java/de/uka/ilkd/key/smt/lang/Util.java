@@ -10,7 +10,9 @@ public final class Util {
 
     public static String processName(String id) {
         // is symbol already quoted?
-        if (id.startsWith("|") && id.endsWith("|")) { return id; }
+        if (id.startsWith("|") && id.endsWith("|")) {
+            return id;
+        }
 
 
         // id = id.replace("store", "store_");

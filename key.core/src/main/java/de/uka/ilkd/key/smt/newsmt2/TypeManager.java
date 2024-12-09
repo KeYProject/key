@@ -93,7 +93,11 @@ class TypeManager {
      */
     private Set<Sort> directChildSorts(Sort s, Set<Sort> sorts, Services services) {
         Set<Sort> res = new HashSet<>();
-        for (Sort child : sorts) { if (isDirectParentOf(s, child, services)) { res.add(child); } }
+        for (Sort child : sorts) {
+            if (isDirectParentOf(s, child, services)) {
+                res.add(child);
+            }
+        }
         return res;
     }
 
@@ -145,6 +149,8 @@ class TypeManager {
         }
 
         // and have a type hierarchy.
-        if (!HandlerUtil.PROPERTY_NO_TYPE_HIERARCHY.get(services)) { createSortTypeHierarchy(master, services); }
+        if (!HandlerUtil.PROPERTY_NO_TYPE_HIERARCHY.get(services)) {
+            createSortTypeHierarchy(master, services);
+        }
     }
 }

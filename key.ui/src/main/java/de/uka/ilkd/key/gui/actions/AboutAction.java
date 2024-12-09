@@ -35,7 +35,7 @@ public class AboutAction extends MainWindowAction {
         JOptionPane.showMessageDialog(mainWindow,
             new Object[] { IconFactory.keyVersionLogo(),
                 KeYConstants.COPYRIGHT.replace("and", "\n" + UnicodeHelper.emSpaces(8) + "and")
-                        + "\n\nWWW: http://key-project.org/" + "\n\nVersion " + KeYConstants.VERSION },
+                    + "\n\nWWW: http://key-project.org/" + "\n\nVersion " + KeYConstants.VERSION },
             "The KeY Project", JOptionPane.INFORMATION_MESSAGE);
 
         // JOptionPane pane = new JOptionPane(

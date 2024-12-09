@@ -147,7 +147,9 @@ public class SemisequentChangeInfo {
         lastFormulaIndex = (lastFormulaIndex == idx) ? -1
                 : lastFormulaIndex > idx ? lastFormulaIndex - 1 : lastFormulaIndex;
 
-        if (lastFormulaIndex < -1) { lastFormulaIndex = -1; }
+        if (lastFormulaIndex < -1) {
+            lastFormulaIndex = -1;
+        }
 
     }
 
@@ -161,7 +163,9 @@ public class SemisequentChangeInfo {
      */
     public void combine(SemisequentChangeInfo succ) {
         final SemisequentChangeInfo predecessor = this;
-        if (succ == predecessor) { return; }
+        if (succ == predecessor) {
+            return;
+        }
 
         for (SequentFormula sf : succ.removed) {
             predecessor.added = predecessor.added.removeAll(sf);
@@ -177,7 +181,9 @@ public class SemisequentChangeInfo {
                     break;
                 }
             }
-            if (!skip) { predecessor.removedFormula(succ.lastFormulaIndex, sf); }
+            if (!skip) {
+                predecessor.removedFormula(succ.lastFormulaIndex, sf);
+            }
         }
 
         for (FormulaChangeInfo fci : succ.modified) {
@@ -191,11 +197,15 @@ public class SemisequentChangeInfo {
 
         for (SequentFormula sf : succ.added) {
             predecessor.removed = predecessor.removed.removeAll(sf);
-            if (!predecessor.added.contains(sf)) { predecessor.addedFormula(succ.lastFormulaIndex, sf); }
+            if (!predecessor.added.contains(sf)) {
+                predecessor.addedFormula(succ.lastFormulaIndex, sf);
+            }
         }
 
         for (SequentFormula sf : succ.rejected) {
-            if (!predecessor.rejected.contains(sf)) { predecessor.rejectedFormula(sf); }
+            if (!predecessor.rejected.contains(sf)) {
+                predecessor.rejectedFormula(sf);
+            }
         }
 
         predecessor.lastFormulaIndex = succ.lastFormulaIndex;
@@ -228,7 +238,7 @@ public class SemisequentChangeInfo {
      */
     public String toString() {
         return "changed:" + hasChanged() + "\n  added (pos):" + added + "(" + lastFormulaIndex + ")"
-                + "\n  removed:" + removed + "\n  modified:" + modified + "\n  rejected:" + rejected
-                + "\n  new semisequent:" + modifiedSemisequent;
+            + "\n  removed:" + removed + "\n  modified:" + modified + "\n  rejected:" + rejected
+            + "\n  new semisequent:" + modifiedSemisequent;
     }
 }

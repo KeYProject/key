@@ -334,7 +334,9 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = y;
-        if (y == 0) { c.anchor = GridBagConstraints.PAGE_START; }
+        if (y == 0) {
+            c.anchor = GridBagConstraints.PAGE_START;
+        }
         c.weightx = 1.0;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(0, 0, 10, 0);
@@ -347,7 +349,9 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     }
 
     private void exportDot(ActionEvent event) {
-        if (currentProof == null) { return; }
+        if (currentProof == null) {
+            return;
+        }
         KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
             "Choose filename to save dot file");
         fileChooser.setFileFilter(KeYFileChooser.DOT_FILTER);
@@ -368,22 +372,30 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     }
 
     private void showRuleStatistics(ActionEvent e) {
-        if (currentProof == null) { return; }
+        if (currentProof == null) {
+            return;
+        }
         AnalysisResults results = this.analyzeProof();
-        if (results != null) { new RuleStatisticsDialog(
-            MainWindow.getInstance(),
-            results); }
+        if (results != null) {
+            new RuleStatisticsDialog(
+                MainWindow.getInstance(),
+                results);
+        }
     }
 
     private void previewGraph(ActionEvent e) {
-        if (currentProof == null) { return; }
+        if (currentProof == null) {
+            return;
+        }
         String text = extension.trackers.get(currentProof)
                 .exportDot(abbreviateFormulas.isSelected(), abbreviateChains.isSelected());
         new PreviewDialog(MainWindow.getInstance(), text);
     }
 
     private AnalysisResults analyzeProof() {
-        if (currentProof == null) { return null; }
+        if (currentProof == null) {
+            return null;
+        }
         try {
             AnalysisResults results = extension.trackers.get(currentProof).analyze(
                 doDependencyAnalysis.isSelected(), doDeduplicateRuleApps.isSelected());
@@ -398,9 +410,13 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     }
 
     private void sliceProof() {
-        if (currentProof == null) { return; }
+        if (currentProof == null) {
+            return;
+        }
         final AnalysisResults results = analyzeProof();
-        if (results == null) { return; }
+        if (results == null) {
+            return;
+        }
         if (!results.indicateSlicingPotential()) {
             updateUIState();
             return;
@@ -521,8 +537,12 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         resetGraphLabels();
         updateUIState();
         var tracker = extension.trackers.get(currentProof);
-        if (tracker == null) { return; }
-        if (tracker.getAnalysisResults() != null) { displayResults(tracker.getAnalysisResults()); }
+        if (tracker == null) {
+            return;
+        }
+        if (tracker.getAnalysisResults() != null) {
+            displayResults(tracker.getAnalysisResults());
+        }
         if (tracker.getDependencyGraph() != null) {
             graphNodesNr = tracker.getDependencyGraph().countNodes();
             graphEdgesNr = tracker.getDependencyGraph().countEdges();
@@ -583,10 +603,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             sliceProofFixedPoint.setEnabled(true);
             sliceProofFixedPoint.setToolTipText(
                 "<html>Slices the proof. "
-                        + "The resulting proof is analyzed: "
-                        + "if more steps may be sliced away, the process repeats."
-                        + "<br>Warning: the original proof and intermediate slicing "
-                        + "iterations are automatically removed!</html>");
+                    + "The resulting proof is analyzed: "
+                    + "if more steps may be sliced away, the process repeats."
+                    + "<br>Warning: the original proof and intermediate slicing "
+                    + "iterations are automatically removed!</html>");
         }
         if (currentProof != null) {
             DependencyTracker tracker = extension.trackers.get(currentProof);

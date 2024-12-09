@@ -130,7 +130,9 @@ public class DockingHelper {
      */
     public static void focus(MainWindow mainWindow, Class<?> panel) {
         SingleCDockable dockable = mainWindow.getDockControl().getSingleDockable(panel.getName());
-        if (dockable == null) { return; }
+        if (dockable == null) {
+            return;
+        }
         dockable.setVisible(true);
         FocusRequest request =
             new DefaultFocusRequest(dockable.intern(), null, false, true, false, true);
@@ -148,7 +150,9 @@ public class DockingHelper {
     public static void restoreMissingPanels(MainWindow mainWindow) {
         for (int c = mainWindow.getDockControl().getCDockableCount(), i = 0; i < c; i++) {
             final CDockable cur = mainWindow.getDockControl().getCDockable(i);
-            if (cur.isVisible()) { continue; }
+            if (cur.isVisible()) {
+                continue;
+            }
             cur.setLocationsAside(
                 mainWindow.getDockControl().getSingleDockable(GoalList.class.getName()));
             cur.setVisible(true);

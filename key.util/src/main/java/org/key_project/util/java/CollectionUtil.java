@@ -77,7 +77,9 @@ public class CollectionUtil {
         boolean afterFirst = false;
         for (Object object : collection) {
             if (afterFirst) {
-                if (separator != null) { sb.append(separator); }
+                if (separator != null) {
+                    sb.append(separator);
+                }
             } else {
                 afterFirst = true;
             }
@@ -97,7 +99,9 @@ public class CollectionUtil {
      *        The elements to add.
      */
     public static <T> void addAll(Collection<T> collection, Iterable<T> iterable) {
-        for (T toAdd : iterable) { collection.add(toAdd); }
+        for (T toAdd : iterable) {
+            collection.add(toAdd);
+        }
     }
 
     /**
@@ -135,7 +139,11 @@ public class CollectionUtil {
     public static <T extends @Nullable Object> List<T> searchAll(Iterable<T> iterable,
             Predicate<T> filter) {
         List<T> result = new ArrayList<>();
-        for (T element : iterable) { if (filter.test(element)) { result.add(element); } }
+        for (T element : iterable) {
+            if (filter.test(element)) {
+                result.add(element);
+            }
+        }
         return result;
     }
 
@@ -152,7 +160,12 @@ public class CollectionUtil {
             Predicate<T> filter) {
         T result = null;
         Iterator<T> iter = iterable.iterator();
-        while (result == null && iter.hasNext()) { T next = iter.next(); if (filter.test(next)) { result = next; } }
+        while (result == null && iter.hasNext()) {
+            T next = iter.next();
+            if (filter.test(next)) {
+                result = next;
+            }
+        }
         return result;
     }
 
@@ -217,7 +230,9 @@ public class CollectionUtil {
     public static <T extends @Nullable Object> boolean contains(Iterable<T> iterable, T element) {
         boolean found = false;
         Iterator<T> iter = iterable.iterator();
-        while (!found && iter.hasNext()) { found = Objects.equals(iter.next(), element); }
+        while (!found && iter.hasNext()) {
+            found = Objects.equals(iter.next(), element);
+        }
         return found;
     }
 
@@ -234,7 +249,11 @@ public class CollectionUtil {
     public static <T extends @Nullable Object> int count(Iterable<T> iterable,
             Predicate<T> filter) {
         int count = 0;
-        for (T element : iterable) { if (filter.test(element)) { count++; } }
+        for (T element : iterable) {
+            if (filter.test(element)) {
+                count++;
+            }
+        }
         return count;
     }
 
@@ -307,7 +326,9 @@ public class CollectionUtil {
             list.add(toInsert);
         } else {
             int index = Collections.binarySearch(list, toInsert, comparator);
-            if (index < 0) { index = (index * -1) - 1; }
+            if (index < 0) {
+                index = (index * -1) - 1;
+            }
             list.add(index, toInsert);
         }
     }

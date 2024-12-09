@@ -79,14 +79,18 @@ public class ImplicitFieldAdder extends JavaTransformer {
     public static FieldDeclaration createImplicitField(
             Type type, String fieldName, boolean isStatic, boolean isPrivate, boolean isFinal) {
         NodeList<Modifier> modifiers = new NodeList<>();
-        if (isStatic) { modifiers.add(new Modifier(Modifier.Keyword.STATIC)); }
+        if (isStatic) {
+            modifiers.add(new Modifier(Modifier.Keyword.STATIC));
+        }
         if (isPrivate) {
             modifiers.add(new Modifier(Modifier.Keyword.PRIVATE));
         } else {
             modifiers.add(new Modifier(Modifier.Keyword.PUBLIC));
         }
 
-        if (isFinal) { modifiers.add(new Modifier(Modifier.Keyword.FINAL)); }
+        if (isFinal) {
+            modifiers.add(new Modifier(Modifier.Keyword.FINAL));
+        }
 
         VariableDeclarator variable = new VariableDeclarator(type, fieldName);
         FieldDeclaration fd = new FieldDeclaration(modifiers, variable);

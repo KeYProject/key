@@ -240,7 +240,9 @@ public class ObjectVal {
         } else {
             for (var pair : fieldvalues.entrySet()) {
                 String field = pair.getKey();
-                if (field.endsWith(name) || field.endsWith(name + "|")) { return pair.getValue(); }
+                if (field.endsWith(name) || field.endsWith(name + "|")) {
+                    return pair.getValue();
+                }
             }
         }
         return null;
@@ -255,7 +257,9 @@ public class ObjectVal {
         String tab = "   ";
 
         // for null we don't care about length, type, etc.
-        if (name.startsWith("#o0")) { return tab + "Object " + name + "\n"; }
+        if (name.startsWith("#o0")) {
+            return tab + "Object " + name + "\n";
+        }
 
         String type = sort == null ? "java.lang.Object" : sort.name().toString();
 
@@ -312,7 +316,9 @@ public class ObjectVal {
      */
     public boolean equals(Object o) {
         if (o instanceof ObjectVal ov) {
-            if (ov.name == null) { return name == null; }
+            if (ov.name == null) {
+                return name == null;
+            }
             return ov.name.equals(name);
         }
         return false;

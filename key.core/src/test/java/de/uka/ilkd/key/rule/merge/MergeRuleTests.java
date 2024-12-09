@@ -96,7 +96,9 @@ public class MergeRuleTests {
         Iterator<Node> it = proof.root().subtreeIterator();
         int mergeAppsCnt = 0;
         while (it.hasNext()) {
-            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) { mergeAppsCnt++; }
+            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
+                mergeAppsCnt++;
+            }
         }
 
         Assertions.assertEquals(2, mergeAppsCnt, "There should be two merge apps.");
@@ -116,7 +118,9 @@ public class MergeRuleTests {
         Iterator<Node> it = proof.root().subtreeIterator();
         int mergeAppsCnt = 0;
         while (it.hasNext()) {
-            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) { mergeAppsCnt++; }
+            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
+                mergeAppsCnt++;
+            }
         }
 
         Assertions.assertEquals(2, mergeAppsCnt, "There should be two merge apps.");
@@ -135,7 +139,9 @@ public class MergeRuleTests {
         Iterator<Node> it = proof.root().subtreeIterator();
         int mergeAppsCnt = 0;
         while (it.hasNext()) {
-            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) { mergeAppsCnt++; }
+            if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
+                mergeAppsCnt++;
+            }
         }
 
         Assertions.assertEquals(1, mergeAppsCnt, "There should be one merge app.");
@@ -274,7 +280,9 @@ public class MergeRuleTests {
             mergeApp.setMergeNode(mergeNode);
         }
 
-        if (!mergeApp.complete()) { throw new IncompleteRuleAppException(); }
+        if (!mergeApp.complete()) {
+            throw new IncompleteRuleAppException();
+        }
 
         mergeGoal.apply(mergeApp);
     }

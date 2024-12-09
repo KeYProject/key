@@ -71,15 +71,21 @@ public class ClassInitializer extends JavaDeclaration
      */
 
     public Statement getStatementAt(int index) {
-        if (body != null && index == 0) { return body; }
+        if (body != null && index == 0) {
+            return body;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
 
     public int getChildCount() {
         int result = 0;
-        if (modArray != null) { result += modArray.size(); }
-        if (body != null) { result++; }
+        if (modArray != null) {
+            result += modArray.size();
+        }
+        if (body != null) {
+            result++;
+        }
         return result;
     }
 
@@ -97,10 +103,16 @@ public class ClassInitializer extends JavaDeclaration
         int len;
         if (modArray != null) {
             len = modArray.size();
-            if (len > index) { return modArray.get(index); }
+            if (len > index) {
+                return modArray.get(index);
+            }
             index -= len;
         }
-        if (body != null) { if (index == 0) { return body; } }
+        if (body != null) {
+            if (index == 0) {
+                return body;
+            }
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

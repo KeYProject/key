@@ -25,7 +25,6 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.*;
-import de.uka.ilkd.key.util.Triple;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -405,9 +404,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         existingPredefs[0] = "Defaults";
 
         int i = 1;
-        for (Triple<String, Integer, IDefaultStrategyPropertiesFactory> furtherDefault : DEFINITION
+        for (StrategySettingsDefinition.StrategySettingEntry furtherDefault : DEFINITION
                 .getFurtherDefaults()) {
-            existingPredefs[i] = furtherDefault.first;
+            existingPredefs[i] = furtherDefault.name();
             i++;
         }
 
@@ -425,10 +424,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 newProps =
                     DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties();
             } else {
-                Triple<String, Integer, IDefaultStrategyPropertiesFactory> chosenDefault =
-                    DEFINITION.getFurtherDefaults().get(selIndex - 1);
-                newMaxSteps = chosenDefault.second;
-                newProps = chosenDefault.third.createDefaultStrategyProperties();
+                var chosenDefault = DEFINITION.getFurtherDefaults().get(selIndex - 1);
+                newMaxSteps = chosenDefault.order();
+                newProps = chosenDefault.factory().createDefaultStrategyProperties();
             }
 
             mediator.getSelectedProof().getSettings().getStrategySettings()
@@ -450,10 +448,16 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     }
 
     public void setMediator(KeYMediator mediator) {
-        if (this.mediator != null) { this.mediator.removeKeYSelectionListener(mediatorListener); }
+        if (this.mediator != null) {
+            this.mediator.removeKeYSelectionListener(mediatorListener);
+        }
         this.mediator = mediator;
-        if (components.getMaxRuleAppSlider() != null) { components.getMaxRuleAppSlider().setMediator(this.mediator); }
-        if (this.mediator != null) { this.mediator.addKeYSelectionListener(mediatorListener); }
+        if (components.getMaxRuleAppSlider() != null) {
+            components.getMaxRuleAppSlider().setMediator(this.mediator);
+        }
+        if (this.mediator != null) {
+            this.mediator.addKeYSelectionListener(mediatorListener);
+        }
     }
 
     /**
@@ -463,7 +467,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         if (proof == null) {
             enableAll(false);
         } else {
-            if (components.getMaxRuleAppSlider() != null) { components.getMaxRuleAppSlider().refresh(); }
+            if (components.getMaxRuleAppSlider() != null) {
+                components.getMaxRuleAppSlider().refresh();
+            }
             StrategyProperties sp =
                 proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             for (Entry<String, List<JRadioButton>> entry : components.getPropertyButtons()
@@ -495,18 +501,24 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      *        boolean saying whether to activate or deactivate the components
      */
     private void enableAll(boolean enable) {
-        if (components.getMaxRuleAppSlider() != null) { components.getMaxRuleAppSlider().setEnabled(enable); }
+        if (components.getMaxRuleAppSlider() != null) {
+            components.getMaxRuleAppSlider().setEnabled(enable);
+        }
         components.getDefaultButton().setEnabled(enable);
         components.getStrategyPredefSettingsCmb().setEnabled(enable);
         for (Entry<String, List<JRadioButton>> entry : components.getPropertyButtons().entrySet()) {
-            for (JRadioButton button : entry.getValue()) { button.setEnabled(enable); }
+            for (JRadioButton button : entry.getValue()) {
+                button.setEnabled(enable);
+            }
         }
     }
 
     public Strategy getStrategy(String strategyName, Proof proof, StrategyProperties properties) {
         if (mediator != null) {
             for (StrategyFactory s : mediator.getProfile().supportedStrategies()) {
-                if (strategyName.equals(s.name().toString())) { return s.create(proof, properties); }
+                if (strategyName.equals(s.name().toString())) {
+                    return s.create(proof, properties);
+                }
             }
             LOGGER.info("Selected Strategy '{}' not found falling back to {}", strategyName,
                 mediator.getProfile().getDefaultStrategyFactory().name());

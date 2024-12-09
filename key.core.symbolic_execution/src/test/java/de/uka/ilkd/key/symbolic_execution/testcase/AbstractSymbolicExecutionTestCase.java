@@ -258,7 +258,9 @@ public abstract class AbstractSymbolicExecutionTestCase {
             while (expectedExecutionTreeNodeIterator.hasNext()) {
                 IExecutionNode<?> expectedNext = expectedExecutionTreeNodeIterator.next();
                 IExecutionNode<?> currentNext = searchExecutionNode(current, expectedNext);
-                if (!currentVisitedNodes.add(currentNext)) { fail("Node " + currentNext + " visited twice."); }
+                if (!currentVisitedNodes.add(currentNext)) {
+                    fail("Node " + currentNext + " visited twice.");
+                }
                 assertExecutionNode(expectedNext, currentNext, true, compareVariables,
                     compareCallStack, compareReturnValues, compareConstraints);
             }
@@ -294,7 +296,10 @@ public abstract class AbstractSymbolicExecutionTestCase {
         // Collect parents
         Deque<IExecutionNode<?>> parents = new LinkedList<>();
         IExecutionNode<?> parent = childToSearch;
-        while (parent != null) { parents.addFirst(parent); parent = parent.getParent(); }
+        while (parent != null) {
+            parents.addFirst(parent);
+            parent = parent.getParent();
+        }
         // Search children in parent order
         boolean afterFirst = false;
         for (IExecutionNode<?> currentParent : parents) {
@@ -305,7 +310,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             }
         }
         assertNotNull(toSearchIn, "Direct or indirect Child " + childToSearch
-                + " is not contained in " + toSearchIn + ".");
+            + " is not contained in " + toSearchIn + ".");
         return toSearchIn;
     }
 
@@ -415,8 +420,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
                     ((IExecutionBranchCondition) expected).getFormatedBranchCondition(),
                     ((IExecutionBranchCondition) current).getFormatedBranchCondition()),
                 "Expected \"" + ((IExecutionBranchCondition) expected).getFormatedBranchCondition()
-                        + "\" but is \""
-                        + ((IExecutionBranchCondition) current).getFormatedBranchCondition() + "\".");
+                    + "\" but is \""
+                    + ((IExecutionBranchCondition) current).getFormatedBranchCondition() + "\".");
             assertEquals(((IExecutionBranchCondition) expected).isMergedBranchCondition(),
                 ((IExecutionBranchCondition) current).isMergedBranchCondition());
             assertEquals(((IExecutionBranchCondition) expected).isBranchConditionComputed(),
@@ -426,20 +431,20 @@ public abstract class AbstractSymbolicExecutionTestCase {
                     ((IExecutionBranchCondition) expected).getAdditionalBranchLabel(),
                     ((IExecutionBranchCondition) current).getAdditionalBranchLabel()),
                 "Expected \"" + ((IExecutionBranchCondition) expected).getAdditionalBranchLabel()
-                        + "\" but is \""
-                        + ((IExecutionBranchCondition) current).getAdditionalBranchLabel() + "\".");
+                    + "\" but is \""
+                    + ((IExecutionBranchCondition) current).getAdditionalBranchLabel() + "\".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionStart) {
             assertTrue(current instanceof IExecutionStart, "Expected IExecutionStartNode but is "
-                    + current.getClass() + ".");
+                + current.getClass() + ".");
             assertTerminations((IExecutionStart) expected, (IExecutionStart) current);
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionTermination) {
             assertTrue(current instanceof IExecutionTermination,
                 "Expected IExecutionTermination but is "
-                        + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertEquals(((IExecutionTermination) expected).getTerminationKind(),
                 ((IExecutionTermination) current).getTerminationKind());
             assertEquals(((IExecutionTermination) expected).isBranchVerified(),
@@ -449,52 +454,52 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else if (expected instanceof IExecutionBranchStatement) {
             assertTrue(current instanceof IExecutionBranchStatement,
                 "Expected IExecutionBranchStatement but is "
-                        + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionLoopCondition) {
             assertTrue(current instanceof IExecutionLoopCondition,
                 "Expected IExecutionLoopCondition but is "
-                        + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionLoopStatement) {
             assertTrue(current instanceof IExecutionLoopStatement,
                 "Expected IExecutionLoopStatement but is "
-                        + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionMethodCall) {
             assertTrue(current instanceof IExecutionMethodCall,
                 "Expected IExecutionMethodCall but is "
-                        + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
             assertMethodReturns((IExecutionMethodCall) expected, (IExecutionMethodCall) current);
         } else if (expected instanceof IExecutionMethodReturn) {
             assertTrue(current instanceof IExecutionMethodReturn,
                 "Expected IExecutionMethodReturn but is "
-                        + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertTrue(
                 StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn) expected).getSignature(),
                     ((IExecutionMethodReturn) current).getSignature()),
                 ((IExecutionMethodReturn) expected).getSignature() + " does not match "
-                        + ((IExecutionMethodReturn) current).getSignature());
+                    + ((IExecutionMethodReturn) current).getSignature());
             if (compareReturnValues) {
                 assertTrue(
                     StringUtil.equalIgnoreWhiteSpace(
                         ((IExecutionMethodReturn) expected).getNameIncludingReturnValue(),
                         ((IExecutionMethodReturn) current).getNameIncludingReturnValue()),
                     ((IExecutionMethodReturn) expected).getNameIncludingReturnValue()
-                            + " does not match "
-                            + ((IExecutionMethodReturn) current).getNameIncludingReturnValue());
+                        + " does not match "
+                        + ((IExecutionMethodReturn) current).getNameIncludingReturnValue());
                 assertTrue(
                     StringUtil.equalIgnoreWhiteSpace(
                         ((IExecutionMethodReturn) expected).getSignatureIncludingReturnValue(),
                         ((IExecutionMethodReturn) current).getSignatureIncludingReturnValue()),
                     ((IExecutionMethodReturn) expected).getSignatureIncludingReturnValue()
-                            + " does not match "
-                            + ((IExecutionMethodReturn) current).getSignatureIncludingReturnValue());
+                        + " does not match "
+                        + ((IExecutionMethodReturn) current).getSignatureIncludingReturnValue());
                 assertEquals(((IExecutionMethodReturn) expected).isReturnValuesComputed(),
                     ((IExecutionMethodReturn) current).isReturnValuesComputed());
             }
@@ -503,8 +508,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
                     ((IExecutionMethodReturn) expected).getFormattedMethodReturnCondition(),
                     ((IExecutionMethodReturn) current).getFormattedMethodReturnCondition()),
                 ((IExecutionMethodReturn) expected).getFormattedMethodReturnCondition()
-                        + " does not match "
-                        + ((IExecutionMethodReturn) current).getFormattedMethodReturnCondition());
+                    + " does not match "
+                    + ((IExecutionMethodReturn) current).getFormattedMethodReturnCondition());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
             if (compareReturnValues) {
@@ -514,31 +519,31 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else if (expected instanceof IExecutionExceptionalMethodReturn) {
             assertTrue(current instanceof IExecutionExceptionalMethodReturn,
                 "Expected IExecutionExceptionalMethodReturn but is "
-                        + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertTrue(
                 StringUtil.equalIgnoreWhiteSpace(
                     ((IExecutionExceptionalMethodReturn) expected).getSignature(),
                     ((IExecutionExceptionalMethodReturn) current).getSignature()),
                 ((IExecutionExceptionalMethodReturn) expected).getSignature() + " does not match "
-                        + ((IExecutionExceptionalMethodReturn) current).getSignature());
+                    + ((IExecutionExceptionalMethodReturn) current).getSignature());
             assertTrue(StringUtil.equalIgnoreWhiteSpace(
                 ((IExecutionExceptionalMethodReturn) expected).getFormattedMethodReturnCondition(),
                 ((IExecutionExceptionalMethodReturn) current).getFormattedMethodReturnCondition()),
                 ((IExecutionExceptionalMethodReturn) expected).getFormattedMethodReturnCondition()
-                        + " does not match " + ((IExecutionExceptionalMethodReturn) current)
-                                .getFormattedMethodReturnCondition());
+                    + " does not match " + ((IExecutionExceptionalMethodReturn) current)
+                            .getFormattedMethodReturnCondition());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionStatement) {
             assertTrue(current instanceof IExecutionStatement,
                 "Expected IExecutionStatement but is "
-                        + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionOperationContract) {
             assertTrue(current instanceof IExecutionOperationContract,
                 "Expected IExecutionOperationContract but is "
-                        + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertEquals(((IExecutionOperationContract) expected).isPreconditionComplied(),
                 ((IExecutionOperationContract) current).isPreconditionComplied());
             assertEquals(((IExecutionOperationContract) expected).hasNotNullCheck(),
@@ -558,7 +563,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else if (expected instanceof IExecutionLoopInvariant) {
             assertTrue(current instanceof IExecutionLoopInvariant,
                 "Expected IExecutionLoopInvariant but is "
-                        + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertEquals(((IExecutionLoopInvariant) expected).isInitiallyValid(),
                 ((IExecutionLoopInvariant) current).isInitiallyValid());
             assertVariables(expected, current, compareVariables, compareConstraints);
@@ -566,14 +571,14 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else if (expected instanceof IExecutionAuxiliaryContract) {
             assertTrue(current instanceof IExecutionAuxiliaryContract,
                 "Expected IExecutionBlockContract but is "
-                        + current.getClass() + ".");
+                    + current.getClass() + ".");
             assertEquals(((IExecutionAuxiliaryContract) expected).isPreconditionComplied(),
                 ((IExecutionAuxiliaryContract) current).isPreconditionComplied());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionJoin) {
             assertTrue(current instanceof IExecutionJoin, "Expected IExecutionJoin but is "
-                    + current.getClass() + ".");
+                + current.getClass() + ".");
             assertEquals(((IExecutionJoin) expected).isWeakeningVerified(),
                 ((IExecutionJoin) current).isWeakeningVerified());
             assertVariables(expected, current, compareVariables, compareConstraints);
@@ -596,7 +601,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             } else {
                 assertTrue(currentStack == null || currentStack.length == 0,
                     "Call stack of \"" + current + "\" is \"" + Arrays.toString(currentStack)
-                            + "\" but should be null or empty.");
+                        + "\" but should be null or empty.");
             }
         }
         // Optionally compare parent
@@ -640,7 +645,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertFalse(actualExecutionTreeNodeIterator.hasNext());
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(), "Outgoing links of \""
-                    + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
+                + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
         }
     }
 
@@ -678,7 +683,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertFalse(actualExecutionTreeNodeIterator.hasNext());
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(), "Incoming links of \""
-                    + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
+                + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
         }
     }
 
@@ -722,7 +727,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(),
                 "Completed block entries of \"" + current + "\" is \"" + currentEntries
-                        + "\" but should be null or empty.");
+                    + "\" but should be null or empty.");
         }
     }
 
@@ -759,7 +764,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(),
                 "Block completion entries of \"" + current + "\" is \"" + currentEntries
-                        + "\" but should be null or empty.");
+                    + "\" but should be null or empty.");
         }
     }
 
@@ -797,7 +802,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(),
                 "Method return entries of \"" + current + "\" is \"" + currentEntries
-                        + "\" but should be null or empty.");
+                    + "\" but should be null or empty.");
         }
     }
 
@@ -834,7 +839,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(),
                 "Termination entries of \"" + current + "\" is \"" + currentEntries
-                        + "\" but should be null or empty.");
+                    + "\" but should be null or empty.");
         }
     }
 
@@ -853,7 +858,9 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertNotNull(expected);
         assertNotNull(current);
         assertEquals(expected.length, current.length);
-        for (int i = 0; i < expected.length; i++) { assertReturnValue(expected[i], current[i]); }
+        for (int i = 0; i < expected.length; i++) {
+            assertReturnValue(expected[i], current[i]);
+        }
     }
 
     /**
@@ -1686,7 +1693,9 @@ public abstract class AbstractSymbolicExecutionTestCase {
         choices = choices.add(new Choice("methodExpansion", "noRestriction"));
 
         ProofSettings settings = env.getInitConfig().getSettings();
-        if (settings == null) { settings = ProofSettings.DEFAULT_SETTINGS; }
+        if (settings == null) {
+            settings = ProofSettings.DEFAULT_SETTINGS;
+        }
         settings.getChoiceSettings().updateWith(choices);
     }
 
@@ -1931,8 +1940,12 @@ public abstract class AbstractSymbolicExecutionTestCase {
             reloadedBuilder.analyse();
             assertSetTreeAfterStep(reloadedBuilder, oraclePathInBaseDirFile, baseDir);
         } finally {
-            if (reloadedBuilder != null) { reloadedBuilder.dispose(); }
-            if (reloadedEnv != null) { reloadedEnv.dispose(); }
+            if (reloadedBuilder != null) {
+                reloadedBuilder.dispose();
+            }
+            if (reloadedEnv != null) {
+                reloadedEnv.dispose();
+            }
             tempFile.delete();
             assertFalse(tempFile.exists());
         }
@@ -2193,7 +2206,9 @@ public abstract class AbstractSymbolicExecutionTestCase {
                 useOperationContracts, useLoopInvariants, blockTreatmentContract,
                 nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting,
                 variablesAreOnlyComputedFromUpdates, false, true);
-        if (env != null) { env.dispose(); }
+        if (env != null) {
+            env.dispose();
+        }
     }
 
     /**
@@ -2724,7 +2739,9 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertEquals(expected.javaBlock(), actual.javaBlock());
             assertEquals(expected.getLabels(), actual.getLabels());
             assertEquals(expected.arity(), actual.arity());
-            for (int i = 0; i < expected.arity(); i++) { assertTerm(expected.sub(i), actual.sub(i)); }
+            for (int i = 0; i < expected.arity(); i++) {
+                assertTerm(expected.sub(i), actual.sub(i));
+            }
         } else {
             assertNull(actual);
         }
