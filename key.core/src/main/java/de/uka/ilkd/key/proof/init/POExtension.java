@@ -30,13 +30,14 @@ public interface POExtension {
      * Modifies the post condition.
      *
      * @param abstractOperationPO The proof obligation for which the mdification is done
-     * @param proofConfig         The {@link InitConfig} to use.
-     * @param services            The {@link Services} to use.
-     * @param selfTerm            The {@link ProgramVariable} representing the current receiver object.
-     * @param postTerm            The post condition to modify.
+     * @param proofConfig The {@link InitConfig} to use.
+     * @param services The {@link Services} to use.
+     * @param selfTerm The {@link ProgramVariable} representing the current receiver object.
+     * @param postTerm The post condition to modify.
      * @return The modified post condition or the original post condition if no modifications were
-     * performed.
+     *         performed.
      */
-    Term modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig, Services services, ProgramVariable selfTerm,
-                        Term postTerm);
+    Term modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig,
+            Services services, ProgramVariable selfTerm,
+            Term postTerm);
 }

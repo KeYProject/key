@@ -36,8 +36,9 @@ public class TruthValuePOExtension implements POExtension {
      * {@inheritDoc}
      */
     @Override
-    public Term modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig, Services services, ProgramVariable selfTerm,
-                               Term postTerm) {
+    public Term modifyPostTerm(AbstractOperationPO abstractOperationPO, InitConfig proofConfig,
+            Services services, ProgramVariable selfTerm,
+            Term postTerm) {
         if (SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(proofConfig)) {
             return labelPostTerm(services, postTerm);
         } else {

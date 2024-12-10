@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
@@ -28,6 +27,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 
@@ -239,16 +239,19 @@ public final class HeapLDT extends LDT {
 
     /**
      * Returns the function symbol to access final fields for the given instance sort.
+     *
      * @param instanceSort the sort of the value to be read
      * @param services the services to find/create the sort-depending function
      * @return the function symbol to access final fields for the given instance sort
      */
-    public @NonNull SortDependingFunction getFinal(@NonNull Sort instanceSort, @NonNull Services services) {
+    public @NonNull SortDependingFunction getFinal(@NonNull Sort instanceSort,
+            @NonNull Services services) {
         return finalFunction.getInstanceFor(instanceSort, services);
     }
 
     /**
      * Check if the given operator is an instance of the "final" function to access final fields.
+     *
      * @param op the operator to check
      * @return true if the operator is an instance of the "X::final" srot-depending function
      */
