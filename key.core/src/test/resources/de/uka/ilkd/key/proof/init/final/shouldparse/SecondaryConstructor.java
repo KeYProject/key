@@ -8,7 +8,8 @@ class SecondaryConstructor {
         finalField = v;
     }
 
-    SecondaryCosntructor() {
+    //@ ensures b;
+    SecondaryConstructor() {
         this(42);
         int x = finalField;
     }

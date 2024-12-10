@@ -46,12 +46,12 @@ class FinalPrinter extends FieldPrinter {
                  * This section deals with PP of frame conditions (and similar).
                  * Select-type is any.
                  */
-                if (isFieldName(fieldTerm.op().name().toString(), objectTerm)
-                        || isJavaFieldConstant(fieldTerm)) {
-                    lp.printFunctionTerm(t);
-                } else {
-                    printAnySelect(lp, objectTerm, fieldTerm);
-                }
+                // if (isFieldName(fieldTerm.op().name().toString(), objectTerm)
+                // || isJavaFieldConstant(fieldTerm)) {
+                lp.printFunctionTerm(t);
+                // } else {
+                // printAnySelect(lp, objectTerm, fieldTerm);
+                // }
             } else if (isBuiltinObjectProperty(fieldTerm)) {
                 // object properties denoted like o.<created>
                 printBuiltinObjectProperty(lp, t, objectTerm, fieldTerm);
@@ -60,8 +60,9 @@ class FinalPrinter extends FieldPrinter {
                 // static field access
                 printStaticJavaFieldConstant(lp, fieldTerm);
             } else if (isJavaFieldConstant(fieldTerm)
+                    && isFinalFieldConstant(fieldTerm)
                     && getFieldSort(fieldTerm).equals(t.sort())) {
-                // non-static field access
+                // non-static field access to a final field
                 printNonStaticJavaFieldConstant(lp, objectTerm, fieldTerm);
             } else {
                 lp.printFunctionTerm(t);

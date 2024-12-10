@@ -157,15 +157,19 @@ class FieldPrinter {
      * Determine whether a field constant is static.
      */
     protected boolean isStaticFieldConstant(Term objectTerm, Term fieldTerm) {
-        ProgramVariable pv =
-            getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
-        return pv.isStatic();
+        try {
+            ProgramVariable pv =
+                getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
+            return pv.isStatic();
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
     /*
      * Determine whether a field constant is declared final.
      */
-    protected boolean isFinalFieldConstant(Term objectTerm, Term fieldTerm) {
+    protected boolean isFinalFieldConstant(Term fieldTerm) {
         ProgramVariable pv =
             getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
         return pv.isFinal();

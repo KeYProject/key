@@ -100,7 +100,7 @@ public class LogicPrinter {
         }
         storePrinter = new StorePrinter(this.services);
         finalPrinter = new FinalPrinter(this.services);
-        selectPrinter = new SelectPrinter(this.services);
+        selectPrinter = new SelectPrinter(notationInfo, this.services);
         this.layouter = layouter;
     }
 
