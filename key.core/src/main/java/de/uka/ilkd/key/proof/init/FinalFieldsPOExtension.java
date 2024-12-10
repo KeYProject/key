@@ -19,15 +19,19 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.logic.Name;
 
 /**
- * This class is responsible for making the immutable treatment of final fields possible also for constructors.
- * It is an extension of the ProofOblInput interface (originally targeted for the symbolic execution engine)
+ * This class is responsible for making the immutable treatment of final fields possible also for
+ * constructors.
+ * It is an extension of the ProofOblInput interface (originally targeted for the symbolic execution
+ * engine)
  *
  * It has two purposes:
- * 1. It checks if the final fields are not read before they are written (via {@link FinalFieldCodeValidator}).
- * 2. It modifies the postcondition of the constructor to make the final field values available in the postconditions.
+ * 1. It checks if the final fields are not read before they are written (via
+ * {@link FinalFieldCodeValidator}).
+ * 2. It modifies the postcondition of the constructor to make the final field values available in
+ * the postconditions.
  *
  * To make 2 possible, an additional premiss is added in the post-state formulating that
- *    \forall Fields f; any::final(self, f) = any::select(heap, self, f)
+ * \forall Fields f; any::final(self, f) = any::select(heap, self, f)
  * essentially activating the final field assignments.
  *
  * @author Mattias Ulbrich
@@ -45,10 +49,11 @@ public class FinalFieldsPOExtension implements POExtension {
     }
 
     @Override
-    public Term modifyPostTerm(AbstractOperationPO abstractPO, InitConfig proofConfig, Services services, ProgramVariable selfVar,
-                               Term postTerm) {
+    public Term modifyPostTerm(AbstractOperationPO abstractPO, InitConfig proofConfig,
+            Services services, ProgramVariable selfVar,
+            Term postTerm) {
 
-        if(!FinalHeapResolution.isFinalEnabled(proofConfig)) {
+        if (!FinalHeapResolution.isFinalEnabled(proofConfig)) {
             return postTerm;
         }
 

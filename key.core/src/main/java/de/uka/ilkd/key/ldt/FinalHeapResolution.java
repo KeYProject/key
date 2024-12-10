@@ -5,6 +5,7 @@ package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.ProofSettings;
+
 import org.jspecify.annotations.NonNull;
 
 

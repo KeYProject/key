@@ -1678,6 +1678,7 @@ public class TermBuilder {
     /**
      * Final fields can be treated differently outside the heap.
      * This methods creates a heap-independent read access to final field.
+     *
      * @param asSort the sort of the result.
      * @param o the object to access
      * @param f the field to access
@@ -1685,7 +1686,7 @@ public class TermBuilder {
      */
     public Term finalDot(Sort asSort, Term o, Term f) {
         return func(services.getTypeConverter().getHeapLDT().getFinal(asSort, services),
-                o, f);
+            o, f);
     }
 
     public Term arr(Term idx) {

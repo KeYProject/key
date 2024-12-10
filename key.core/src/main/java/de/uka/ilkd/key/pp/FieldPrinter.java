@@ -3,20 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
+import java.util.NoSuchElementException;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.UnknownJavaTypeException;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
-import java.util.NoSuchElementException;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Common superclass of {@link StorePrinter} and {@link SelectPrinter}.
@@ -109,7 +109,7 @@ class FieldPrinter {
      * @param fieldTerm The field term to analyse.
      */
     protected static @NonNull ProgramVariable getJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT,
-                                                                   Services services) {
+            Services services) {
         String name = fieldTerm.op().name().toString();
         if (name.contains("::$") && isFieldConstant(fieldTerm, heapLDT)) {
             String pvName = name.replace("::$", "::");
@@ -129,7 +129,7 @@ class FieldPrinter {
      * @param fieldTerm The target field.
      */
     protected static boolean isJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT,
-                                                Services services) {
+            Services services) {
         try {
             getJavaFieldConstant(fieldTerm, heapLDT, services);
             return true;
@@ -157,7 +157,8 @@ class FieldPrinter {
      * Determine whether a field constant is static.
      */
     protected boolean isStaticFieldConstant(Term objectTerm, Term fieldTerm) {
-        ProgramVariable pv = getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
+        ProgramVariable pv =
+            getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
         return pv.isStatic();
     }
 
@@ -165,7 +166,8 @@ class FieldPrinter {
      * Determine whether a field constant is declared final.
      */
     protected boolean isFinalFieldConstant(Term objectTerm, Term fieldTerm) {
-        ProgramVariable pv = getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
+        ProgramVariable pv =
+            getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
         return pv.isFinal();
     }
 
