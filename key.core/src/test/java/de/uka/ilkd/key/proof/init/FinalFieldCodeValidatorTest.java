@@ -25,7 +25,7 @@ class FinalFieldCodeValidatorTest {
        return testContracts(false, "final/shouldparse");
     }
 
-    //@TestFactory
+    @TestFactory
     public Stream<DynamicTest> testCodeValidatorFail() throws ProblemLoaderException {
         return testContracts(true, "final/shouldfail");
     }
@@ -66,7 +66,7 @@ class FinalFieldCodeValidatorTest {
             ContractPO po = c.createProofObl(env.getInitConfig());
             env.createProof(po);
         } catch(FinalFieldCodeValidator.FinalViolationException fex) {
-            System.err.println("Position: " + fex.getPosition());
+            System.err.println("Position: " + fex.getPositionInfo());
             fex.printStackTrace();
             throw fex;
         }

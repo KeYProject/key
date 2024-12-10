@@ -19,7 +19,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.ldt.FinalHeapResolver;
+import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -75,7 +75,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     // -------------------------------------------------------------------------
 
     public JMLSpecExtractor(InitConfig initConfig) {
-        FinalHeapResolver.rememberIfFinalEnabled(initConfig);
+        FinalHeapResolution.rememberIfFinalEnabled(initConfig);
         this.services = initConfig.getServices();
         this.jsf = new JMLSpecFactory(services);
     }
