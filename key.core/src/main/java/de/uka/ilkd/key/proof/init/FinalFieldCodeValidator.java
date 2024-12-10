@@ -16,37 +16,70 @@ import java.util.Deque;
 import java.util.Set;
 
 /**
- * Validates the code of a constructor to ensure that final fields are not read before they are initialized.
+ * Validates a constructor to ensure that the executed code does not read final fields before they
+ * have been initialized. This is implemented by a rather straightforward static analysis of the
+ * code.
+ * <p>
+ * Currently, the rather rules to be obeyed here are rather strict, but safe:
+ * <ul>
+ *   <li>Called methods must not receive 'this' as an explicit parameter.</li>
+ *   <li>'this' must not be assigned to any field or variable.</li>
+ *   <li>'final' fields must not be read.</li>
+ *   <li>Methods called on 'this' must be effectively final (not overridable).</li>
+ *   <li>The body of methods called on 'this' must not read any final fields as well.
+ *       (This applies transitively.)</li>
+ * </ul>
+ * <p>
+ * There is some potential for relaxations should the above rules turn out to be too strict
+ * in practice:
+ * <ul>
+ *   <li>Final fields may be read after their initialization (locally and also in called methods).
+ *       This requires a lot more bookkeeping, though.</li>
+ *   <li>Effective 'final'-ness can be relaxed: If every constructor of every subclass is subject
+ *       to this treatment, violations would still be observable by expanding methods, and any
+ *       illegal reads would be revealed. That would require 'super(...)' calls to be expanded
+ *       for analysis.</li>
+ * </ul>
+ * <p>
+ * There are no restrictions for secondary constructors (referring to another constructor
+ * via 'this(...)').
+ * </p>
  *
- * Currently rather strict:
- * - Called methods must not receive 'this' as an explicit parameter
- * - 'this' must not be assigned to any field or variable
- * - final fields must not be read.
- * - Methods called on 'this' must be effectively final (not overridable)
- * - Methods called on 'this' must not read any final fields as well.
- *
- * Potential for relaxaions:
- * - Final fields may be read after initialization (locally and in called methods)
- * This requires a lot more bookkeeping, though.
- * - Effective finalness can be relaxed: If every constructor is subject to this treatment,
- * corresponding expansion of the methods would reveal any illegal reads. ... if the super(...)
- * calls are expanded for analysis.
- *
- * If this is a secondary constructor (referring to another constructor via this()), there are no restrictions.
+ * @author Mattias Ulbrich
+ * @since 2024-12-10
  */
+
 class FinalFieldCodeValidator {
     private final InitConfig initConfig;
-    private final Set<IProgramMethod> validatedMethods = new IdentityHashSet<>();
-    private final Deque<IProgramMethod> methodStack = new ArrayDeque<>();
-    private KeYJavaType enclosingClass;
+    private final KeYJavaType enclosingClass;
 
-    public FinalFieldCodeValidator(InitConfig initConfig) {
+    /**
+     * Methods that have already been validated so far.
+     */
+    private final Set<IProgramMethod> validatedMethods = new IdentityHashSet<>();
+
+    /**
+     * Stack of methods currently being validated. Needed to resolve method references.
+     */
+    private final Deque<IProgramMethod> methodStack = new ArrayDeque<>();
+
+    private FinalFieldCodeValidator(InitConfig initConfig, KeYJavaType containerType) {
         this.initConfig = initConfig;
+        this.enclosingClass = containerType;
     }
 
+    /**
+     * Validates the given constructor.
+     *
+     * The method does not do anything if the constructor is not problematic.
+     * If the code is deemed problematic a {@link FinalViolationException} is thrown.
+     *
+     * @param constructor the constructor to validate
+     * @param initConfig  the init config to be used during validation
+     * @throws FinalViolationException if the code is considered problematic wrt. final fields
+     */
     public static void validateFinalFields(ProgramMethod constructor, InitConfig initConfig) {
-        var validator = new FinalFieldCodeValidator(initConfig);
-        validator.enclosingClass = constructor.getContainerType();
+        var validator = new FinalFieldCodeValidator(initConfig, constructor.getContainerType());
         if(isSecondaryConstructor(constructor)) {
             // secondary constructors are fine!
             return;
@@ -54,6 +87,9 @@ class FinalFieldCodeValidator {
         validator.validate(constructor);
     }
 
+    /*
+     * Secondary constructors have a 'this(...)' (ThisConstructorReference) as their first statement.
+     */
     private static boolean isSecondaryConstructor(IProgramMethod constructor) {
         StatementBlock body = constructor.getBody();
         if(body == null) {
@@ -68,6 +104,10 @@ class FinalFieldCodeValidator {
         return firstStatement instanceof ThisConstructorReference;
     }
 
+    /*
+     * Recursively validate code and all called methods.
+     *
+     */
     private void validate(IProgramMethod method) {
         if(validatedMethods.contains(method)) {
             return;
@@ -87,6 +127,10 @@ class FinalFieldCodeValidator {
         validatedMethods.add(method);
     }
 
+    /*
+     * Recursively validate code and all called methods. Makes case distinctions for different
+     * program elements.
+     */
     private void validateProgramElement(SyntaxElement element) {
         if(element instanceof MethodReference methodReference) {
             validateMethodReference(methodReference);
@@ -96,15 +140,26 @@ class FinalFieldCodeValidator {
             validateFieldReference(fieldReference);
         } else if(element instanceof Assignment assignment) {
             validateAssignment(assignment);
+        } else {
+            validateChildren(element);
         }
         // Case: "string" + this .... not allowed!
         // Case: Model method calls are as problematic as the rest ...
 
+    }
+
+    /*
+     * Recursively validate all children of the given element.
+     */
+    private void validateChildren(SyntaxElement element) {
         for(int i = 0; i < element.getChildCount(); i++) {
             validateProgramElement(element.getChild(i));
         }
     }
 
+    /*
+     * Constructor calls must not leak 'this' to the called constructor.
+     */
     private void validateConstructorReference(ConstructorReference methodReference) {
         // TODO We have to make sure that on non-static subclass is instantiated here
         var hasThisArgument = methodReference.getArguments().stream().anyMatch(ThisReference.class::isInstance);
@@ -112,8 +167,14 @@ class FinalFieldCodeValidator {
         if(hasThisArgument) {
             throw new FinalViolationException("Method call " + methodReference + " leaks 'this' to called method.", methodReference);
         }
+
+        validateChildren(methodReference);
     }
 
+    /*
+     * Method calls must not leak 'this' to the called method (other than as receiver)
+     * Method calls on 'this' must be effectively final and are recursively validated.
+     */
     private void validateMethodReference(MethodReference methodReference) {
         ReferencePrefix referencePrefix = methodReference.getReferencePrefix();
         var calledOnThis = referencePrefix == null || referencePrefix instanceof ThisReference;
@@ -128,7 +189,7 @@ class FinalFieldCodeValidator {
             if(method.isStatic() || method.isConstructor()) {
                 // local static methods are acutally fine ...
                 // constructor calls are also fine
-                //    TODO (well ... what about inner classes?)
+                //    TODO (well ... what about inner classes? Aren't they evil?)
                 return;
             }
             if(!method.isFinal() && !method.isPrivate() && !((ClassType)enclosingClass.getJavaType()).isFinal()) {
@@ -136,35 +197,49 @@ class FinalFieldCodeValidator {
             }
             validate(method);
         }
+
+        validateChildren(methodReference);
     }
 
     private IProgramMethod findMethod(MethodReference methodReference) {
-        // return the program method for the method reference
-        // YOu can use enclosingClass to get the class in which the method is defined
-        // The method is guaranteed to be defined in the enclosing class not in a superclass.
-        // One can also peek the method stack if needed ...
         ExecutionContext ec = new ExecutionContext(new TypeRef(enclosingClass), methodStack.peek(), methodReference.getReferencePrefix());
-        return         methodReference.method(initConfig.getServices(), methodReference.determineStaticPrefixType(initConfig.getServices(), ec), ec);
+        return methodReference.method(initConfig.getServices(), methodReference.determineStaticPrefixType(initConfig.getServices(), ec), ec);
     }
 
+    /*
+     * Validate assignments. 'this' must not be assigned to any field or variable.
+     * References to final fields are ok on the left hand side.
+     */
     private void validateAssignment(Assignment assignment) {
+        SyntaxElement assignee = assignment.getChild(0);
         SyntaxElement value = assignment.getChild(1);
         if (value instanceof ThisReference) {
             throw new FinalViolationException("'this' is leaked to a field or variable.", assignment);
         }
+        if (assignee instanceof FieldReference fr) {
+            // it is ok to assign to this.finalfield!
+            validateProgramElement(fr.getReferencePrefix());
+        } else {
+            validateProgramElement(assignee);
+        }
+        validateProgramElement(value);
     }
 
+    /*
+     * Validate field references. Final fields must not be read. (Exception see assignment.)
+     */
     private void validateFieldReference(FieldReference fieldReference) {
         ReferencePrefix prefix = fieldReference.getReferencePrefix();
         ProgramVariable field = fieldReference.getProgramVariable();
         if(field.isFinal() && prefix instanceof ThisReference) {
             throw new FinalViolationException("Final field " + field + " is read.", fieldReference);
         }
+        validateChildren(fieldReference);
     }
 
     static class FinalViolationException extends RuntimeException {
 
-        private final Position position;
+        private final PositionInfo position;
 
         public FinalViolationException(String message) {
             this(message, null);
@@ -173,16 +248,14 @@ class FinalFieldCodeValidator {
         public FinalViolationException(String message, SyntaxElement syntaxElement) {
             super(message);
             if (syntaxElement instanceof SourceElement sourceElement) {
-                this.position = sourceElement.getStartPosition();
+                this.position = sourceElement.getPositionInfo();
             } else {
                 this.position = null;
             }
         }
 
-        public Position getPosition() {
+        public PositionInfo getPositionInfo() {
             return position;
         }
     }
 }
-
-

@@ -6,7 +6,7 @@ package de.uka.ilkd.key.proof.init;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.FinalHeapResolver;
+import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Term;
@@ -35,7 +35,7 @@ public class FinalFieldsPOExtension implements POExtension {
     public Term modifyPostTerm(AbstractOperationPO abstractPO, InitConfig proofConfig, Services services, ProgramVariable selfVar,
                                Term postTerm) {
 
-        if(!FinalHeapResolver.isFinalEnabled(proofConfig)) {
+        if(!FinalHeapResolution.isFinalEnabled(proofConfig)) {
             return postTerm;
         }
 
