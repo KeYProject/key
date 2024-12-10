@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
@@ -99,7 +100,7 @@ public final class HeapLDT extends LDT {
         fieldSort = sorts.lookup(new Name("Field"));
         select = addSortDependingFunction(services, SELECT_NAME.toString());
         finalFunction = addSortDependingFunction(services, FINAL_NAME.toString());
-        store = addFunction(services, "store");
+        store = addFunction(services, STORE_NAME.toString());
         create = addFunction(services, "create");
         anon = addFunction(services, "anon");
         memset = addFunction(services, "memset");
@@ -236,10 +237,21 @@ public final class HeapLDT extends LDT {
         return select.getInstanceFor(instanceSort, services);
     }
 
-    public SortDependingFunction getFinal(Sort instanceSort, Services services) {
+    /**
+     * Returns the function symbol to access final fields for the given instance sort.
+     * @param instanceSort the sort of the value to be read
+     * @param services the services to find/create the sort-depending function
+     * @return the function symbol to access final fields for the given instance sort
+     */
+    public @NonNull SortDependingFunction getFinal(@NonNull Sort instanceSort, @NonNull Services services) {
         return finalFunction.getInstanceFor(instanceSort, services);
     }
 
+    /**
+     * Check if the given operator is an instance of the "final" function to access final fields.
+     * @param op the operator to check
+     * @return true if the operator is an instance of the "X::final" srot-depending function
+     */
     public boolean isFinalOp(Operator op) {
         return op instanceof SortDependingFunction
                 && ((SortDependingFunction) op).isSimilar(finalFunction);
