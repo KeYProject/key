@@ -78,14 +78,12 @@ public class ChoiceSettings extends AbstractSettings {
         return Collections.unmodifiableMap(category2Default);
     }
 
-
     /**
      * returns the current selected choices as an immutable set
      */
     public @NonNull ImmutableSet<Choice> getDefaultChoicesAsSet() {
         return choiceMap2choiceSet(category2Default);
     }
-
 
     private static ImmutableSet<Choice> choiceMap2choiceSet(Map<String, String> ccc) {
         ImmutableList<Choice> choices = ImmutableSLList.nil();

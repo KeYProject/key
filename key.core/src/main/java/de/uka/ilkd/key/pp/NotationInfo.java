@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
 
@@ -108,6 +109,14 @@ public final class NotationInfo {
     public static boolean DEFAULT_HIDE_PACKAGE_PREFIX = false;
 
     /**
+     * Whether the final field special treatment is on. If on, then select(heap, o, f) is not
+     * pretty-printed as o.f.
+     * To be on the safe side, it is on by default.
+     */
+    public static boolean DEFAULT_FINAL_IMMUTABLE = true;
+
+
+    /**
      * This maps operators and classes of operators to {@link Notation}s. The idea is that we first
      * look whether the operator has a Notation registered. Otherwise, we see if there is one for
      * the <em>class</em> of the operator.
@@ -125,6 +134,8 @@ public final class NotationInfo {
     private boolean unicodeEnabled = DEFAULT_UNICODE_ENABLED;
 
     private boolean hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
+
+    private boolean finalImmutable = DEFAULT_FINAL_IMMUTABLE;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -282,6 +293,7 @@ public final class NotationInfo {
         // heap operators
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+        tbl.put(HeapLDT.FINAL_NAME, new Notation.FinalNotation());
         tbl.put(heapLDT.getStore(), new Notation.StoreNotation());
         tbl.put(heapLDT.getAnon(), new Notation.HeapConstructorNotation());
         tbl.put(heapLDT.getCreate(), new Notation.HeapConstructorNotation());
@@ -408,6 +420,11 @@ public final class NotationInfo {
             this.notationTable = createDefaultNotation();
         }
         hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
+
+        if (services != null && services.getProof() != null) {
+            ProofSettings settings = services.getProof().getSettings();
+            finalImmutable = FinalHeapResolution.isFinalEnabled(settings);
+        }
     }
 
     public AbbrevMap getAbbrevMap() {
@@ -495,6 +512,10 @@ public final class NotationInfo {
 
     public void setHidePackagePrefix(boolean b) {
         hidePackagePrefix = b;
+    }
+
+    public boolean isFinalImmutable() {
+        return finalImmutable;
     }
 
     public Map<Object, Notation> getNotationTable() {
