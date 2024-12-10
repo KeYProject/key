@@ -24,8 +24,11 @@ import org.key_project.logic.sort.Sort;
  */
 class SelectPrinter extends FieldPrinter {
 
-    SelectPrinter(Services services) {
+    private final NotationInfo ni;
+
+    SelectPrinter(NotationInfo ni, Services services) {
         super(services);
+        this.ni = ni;
     }
 
     /*
@@ -72,9 +75,10 @@ class SelectPrinter extends FieldPrinter {
                 // object properties denoted like o.<created>
                 printBuiltinObjectProperty(lp, t, heapTerm, objectTerm, fieldTerm, tacitHeap);
 
-            }
-            // TODO Check if final-treatment is immutable and act accordingly ...
-            else if (isStaticFieldConstant(objectTerm, fieldTerm)
+            } else if (ni.isFinalImmutable() && isFinalFieldConstant(fieldTerm)) {
+                // final field access: do not pretty print the sect term but only the final term.
+                lp.printFunctionTerm(t);
+            } else if (isStaticFieldConstant(objectTerm, fieldTerm)
                     && getFieldSort(fieldTerm).equals(t.sort())) {
                 // static field access
                 printStaticJavaFieldConstant(lp, fieldTerm, heapTerm, tacitHeap);

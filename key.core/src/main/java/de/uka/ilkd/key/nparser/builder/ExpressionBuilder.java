@@ -14,10 +14,7 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
@@ -680,9 +677,18 @@ public class ExpressionBuilder extends DefaultBuilder {
                 ProgramVariable pv = (ProgramVariable) attribute;
                 JFunction fieldSymbol = getServices().getTypeConverter().getHeapLDT()
                         .getFieldSymbolForPV((LocationVariable) pv, getServices());
-                if (pv.isStatic()) {
+                if (pv.isFinal() && FinalHeapResolution.isFinalEnabled(getServices().getProof().getSettings())) {
+                    if(pv.isStatic()) {
+                        // TODO! Make a staticFinalDot method
+                        throw new UnsupportedOperationException("Static final fields are not supported yet. (easy to be added)");
+                    } else {
+                        result = getServices().getTermBuilder().finalDot(pv.sort(), result, fieldSymbol);
+                    }
+                } else if (pv.isStatic()) {
                     result = getServices().getTermBuilder().staticDot(pv.sort(), fieldSymbol);
-                } else {
+                }
+
+                else {
                     result = getServices().getTermBuilder().dot(pv.sort(), result, fieldSymbol);
                 }
             }
