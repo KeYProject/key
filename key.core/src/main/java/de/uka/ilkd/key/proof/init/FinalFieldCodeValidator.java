@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.IdentityHashSet;
@@ -27,6 +28,9 @@ import java.util.Set;
  * Potential for relaxaions:
  * - Final fields may be read after initialization (locally and in called methods)
  * This requires a lot more bookkeeping, though.
+ * - Effective finalness can be relaxed: If every constructor is subject to this treatment,
+ * corresponding expansion of the methods would reveal any illegal reads. ... if the super(...)
+ * calls are expanded for analysis.
  *
  * If this is a secondary constructor (referring to another constructor via this()), there are no restrictions.
  */
@@ -40,9 +44,9 @@ class FinalFieldCodeValidator {
         this.initConfig = initConfig;
     }
 
-    public static void validateFinalFields(IProgramMethod constructor, InitConfig initConfig) {
+    public static void validateFinalFields(ProgramMethod constructor, InitConfig initConfig) {
         var validator = new FinalFieldCodeValidator(initConfig);
-        validator.enclosingClass = null; // constructor.getEnclosingClass(); // TODO!
+        validator.enclosingClass = constructor.getContainerType();
         if(isSecondaryConstructor(constructor)) {
             // secondary constructors are fine!
             return;
@@ -61,12 +65,7 @@ class FinalFieldCodeValidator {
         }
 
         var firstStatement = body.getStatementAt(0);
-        if (firstStatement instanceof MethodOrConstructorReference methodReference) {
-            // check that this is a reference of the form this(...)
-            return true;
-        }
-
-        return false;
+        return firstStatement instanceof ThisConstructorReference;
     }
 
     private void validate(IProgramMethod method) {
@@ -81,10 +80,7 @@ class FinalFieldCodeValidator {
             throw new FinalViolationException("Method " + method.getFullName() + " has no body.");
         }
 
-        for(int i = 0; i < body.getStatementCount(); i++) {
-            var statement = body.getStatementAt(i);
-            validateProgramElement(statement);
-        }
+       validateProgramElement(body);
 
         var popped = methodStack.pop();
         assert popped == method;
@@ -92,8 +88,10 @@ class FinalFieldCodeValidator {
     }
 
     private void validateProgramElement(SyntaxElement element) {
-        if(element instanceof MethodOrConstructorReference methodReference) {
+        if(element instanceof MethodReference methodReference) {
             validateMethodReference(methodReference);
+        } else if (element instanceof ConstructorReference constructorReference) {
+            validateConstructorReference(constructorReference);
         } else if(element instanceof FieldReference fieldReference) {
             validateFieldReference(fieldReference);
         } else if(element instanceof Assignment assignment) {
@@ -107,7 +105,16 @@ class FinalFieldCodeValidator {
         }
     }
 
-    private void validateMethodReference(MethodOrConstructorReference methodReference) {
+    private void validateConstructorReference(ConstructorReference methodReference) {
+        // TODO We have to make sure that on non-static subclass is instantiated here
+        var hasThisArgument = methodReference.getArguments().stream().anyMatch(ThisReference.class::isInstance);
+
+        if(hasThisArgument) {
+            throw new FinalViolationException("Method call " + methodReference + " leaks 'this' to called method.", methodReference);
+        }
+    }
+
+    private void validateMethodReference(MethodReference methodReference) {
         ReferencePrefix referencePrefix = methodReference.getReferencePrefix();
         var calledOnThis = referencePrefix == null || referencePrefix instanceof ThisReference;
         var hasThisArgument = methodReference.getArguments().stream().anyMatch(ThisReference.class::isInstance);
@@ -131,12 +138,13 @@ class FinalFieldCodeValidator {
         }
     }
 
-    private IProgramMethod findMethod(MethodOrConstructorReference methodReference) {
+    private IProgramMethod findMethod(MethodReference methodReference) {
         // return the program method for the method reference
         // YOu can use enclosingClass to get the class in which the method is defined
         // The method is guaranteed to be defined in the enclosing class not in a superclass.
         // One can also peek the method stack if needed ...
-        throw new UnsupportedOperationException("Not implemented yet.");
+        ExecutionContext ec = new ExecutionContext(new TypeRef(enclosingClass), methodStack.peek(), methodReference.getReferencePrefix());
+        return         methodReference.method(initConfig.getServices(), methodReference.determineStaticPrefixType(initConfig.getServices(), ec), ec);
     }
 
     private void validateAssignment(Assignment assignment) {

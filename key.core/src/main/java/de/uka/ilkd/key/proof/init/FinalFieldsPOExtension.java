@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.Name;
@@ -40,13 +41,14 @@ public class FinalFieldsPOExtension implements POExtension {
 
         // We know this holds because of isPOSupported:
         FunctionalOperationContractPO fpo = (FunctionalOperationContractPO) abstractPO;
-        IProgramMethod constructor = fpo.getProgramMethod();
-        assert constructor.isConstructor();
+        IProgramMethod iconstructor = fpo.getProgramMethod();
+        assert iconstructor instanceof ProgramMethod : "Contracts cannot have schema ";
+        ProgramMethod constructor = (ProgramMethod) iconstructor;
 
         FinalFieldCodeValidator.validateFinalFields(constructor, proofConfig);
 
         TermBuilder tb = services.getTermBuilder();
-        LogicVariable fv = new LogicVariable(new Name("o"),
+        LogicVariable fv = new LogicVariable(new Name("fld"),
             services.getTypeConverter().getHeapLDT().getFieldSort());
         Term self = tb.var(selfVar);
         Term sel = tb.dot(JavaDLTheory.ANY, self, tb.var(fv));
