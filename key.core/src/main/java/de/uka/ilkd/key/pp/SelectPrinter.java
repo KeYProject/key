@@ -71,7 +71,10 @@ class SelectPrinter extends FieldPrinter {
             } else if (isBuiltinObjectProperty(fieldTerm)) {
                 // object properties denoted like o.<created>
                 printBuiltinObjectProperty(lp, t, heapTerm, objectTerm, fieldTerm, tacitHeap);
-            } else if (isStaticFieldConstant(objectTerm, fieldTerm)
+
+            }
+            // TODO Check if final-treatment is immutable and act accordingly ...
+            else if (isStaticFieldConstant(objectTerm, fieldTerm)
                     && getFieldSort(fieldTerm).equals(t.sort())) {
                 // static field access
                 printStaticJavaFieldConstant(lp, fieldTerm, heapTerm, tacitHeap);

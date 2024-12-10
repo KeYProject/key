@@ -18,14 +18,27 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.Name;
 
+/**
+ * This class is responsible for making the immutable treatment of final fields possible also for constructors.
+ * It is an extension of the ProofOblInput interface (originally targeted for the symbolic execution engine)
+ *
+ * It has two purposes:
+ * 1. It checks if the final fields are not read before they are written (via {@link FinalFieldCodeValidator}).
+ * 2. It modifies the postcondition of the constructor to make the final field values available in the postconditions.
+ *
+ * To make 2 possible, an additional premiss is added in the post-state formulating that
+ *    \forall Fields f; any::final(self, f) = any::select(heap, self, f)
+ * essentially activating the final field assignments.
+ *
+ * @author Mattias Ulbrich
+ */
 public class FinalFieldsPOExtension implements POExtension {
 
     private static final Choice FINAL_IMMUTABLE_CHOICE = new Choice("finalFields", "immutable");
 
     @Override
     public boolean isPOSupported(ProofOblInput po) {
-        if (po instanceof FunctionalOperationContractPO) {
-            FunctionalOperationContractPO fpo = (FunctionalOperationContractPO) po;
+        if (po instanceof FunctionalOperationContractPO fpo) {
             return fpo.getProgramMethod().isConstructor();
         }
         return false;
