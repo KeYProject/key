@@ -41,13 +41,15 @@ public class InfFlowContractAppTacletExecutor
 
     @Override
     protected void addToAntec(Semisequent semi, TermLabelState termLabelState,
-            TacletLabelHint labelHint, SequentChangeInfo<SequentFormula> currentSequent,
+            TacletLabelHint labelHint,
+            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
             PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence,
             MatchConditions matchCond, Goal goal,
             RuleApp tacletApp) {
-        final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi,
-            termLabelState, labelHint, pos, matchCond, goal, tacletApp);
+        final ImmutableList<org.key_project.prover.sequent.SequentFormula> replacements =
+            instantiateSemisequent(semi,
+                termLabelState, labelHint, pos, matchCond, goal, tacletApp);
         assert replacements.size() == 1
                 : "information flow taclets must have " + "exactly one add!";
         updateStrategyInfo(goal.proof().openEnabledGoals().head(),

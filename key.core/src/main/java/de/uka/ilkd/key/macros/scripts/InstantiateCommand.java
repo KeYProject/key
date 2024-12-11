@@ -111,7 +111,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         index.autoModeStopped();
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
-        for (SequentFormula sf : g.node().sequent().antecedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : g.node().sequent().antecedent()) {
             if (p.formula != null
                     && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
@@ -120,7 +120,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
 
-        for (SequentFormula sf : g.node().sequent().succedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : g.node().sequent().succedent()) {
             if (p.formula != null
                     && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
@@ -152,7 +152,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         Node n = goal.node();
         Sequent seq = n.sequent();
         int occ = params.occ;
-        for (SequentFormula form : seq.antecedent().asList()) {
+        for (org.key_project.prover.sequent.SequentFormula form : seq.antecedent().asList()) {
             Term term = form.formula();
             Term stripped = stripUpdates(term);
             if (stripped.op() == Quantifier.ALL) {
@@ -167,7 +167,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
             }
         }
 
-        for (SequentFormula form : seq.succedent().asList()) {
+        for (org.key_project.prover.sequent.SequentFormula form : seq.succedent().asList()) {
             Term term = form.formula();
             Term stripped = stripUpdates(term);
             if (stripped.op() == Quantifier.EX) {

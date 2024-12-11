@@ -152,7 +152,7 @@ public class TestTacletIndex {
 
         Term term_p1 = TacletForTests.parseTerm("p(one, zero)");
 
-        SequentFormula cfma = new SequentFormula(term_p1);
+        org.key_project.prover.sequent.SequentFormula cfma = new SequentFormula(term_p1);
 
         PosInOccurrence posSucc =
             new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);

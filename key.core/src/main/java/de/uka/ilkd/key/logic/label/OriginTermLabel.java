@@ -250,17 +250,19 @@ public class OriginTermLabel implements TermLabel {
      * @param services services.
      * @return the resulting sequent change info.
      */
-    public static SequentChangeInfo<SequentFormula> removeOriginLabels(Sequent seq,
+    public static SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> removeOriginLabels(
+            Sequent seq,
             Services services) {
-        SequentChangeInfo<SequentFormula> changes = null;
+        SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> changes = null;
 
         for (int i = 1; i <= seq.size(); ++i) {
-            SequentFormula oldFormula = seq.getFormulabyNr(i);
-            SequentFormula newFormula = new SequentFormula(
+            org.key_project.prover.sequent.SequentFormula oldFormula = seq.getFormulabyNr(i);
+            org.key_project.prover.sequent.SequentFormula newFormula = new SequentFormula(
                 OriginTermLabel.removeOriginLabels(oldFormula.formula(), services));
-            SequentChangeInfo<SequentFormula> change = seq.changeFormula(newFormula,
-                PosInOccurrence.findInSequent(seq, i,
-                    PosInTerm.getTopLevel()));
+            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> change =
+                seq.changeFormula(newFormula,
+                    PosInOccurrence.findInSequent(seq, i,
+                        PosInTerm.getTopLevel()));
 
             if (changes == null) {
                 changes = change;

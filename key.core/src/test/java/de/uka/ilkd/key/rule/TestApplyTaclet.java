@@ -531,7 +531,8 @@ public class TestApplyTaclet {
 
 
         assertEquals(1, goals.size(), "Expected one goal");
-        Iterator<SequentFormula> it = goals.head().sequent().antecedent().iterator();
+        Iterator<org.key_project.prover.sequent.SequentFormula> it =
+            goals.head().sequent().antecedent().iterator();
         assertTrue(
             goals.head().sequent().antecedent().size() == 2
                     && it.next().formula().equals(TacletForTests.parseTerm("A"))
@@ -572,7 +573,8 @@ public class TestApplyTaclet {
 
         assertEquals(1, goals.size(), "Expected one goal");
 
-        Iterator<SequentFormula> it = goals.head().sequent().antecedent().iterator();
+        Iterator<org.key_project.prover.sequent.SequentFormula> it =
+            goals.head().sequent().antecedent().iterator();
 
         assertTrue(
             goals.head().sequent().antecedent().size() == 2
@@ -640,7 +642,7 @@ public class TestApplyTaclet {
         assertEquals(0, appList.size(), "Did not expect a match.");
 
         Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
-        SequentFormula ifformula = new SequentFormula(ifterm);
+        org.key_project.prover.sequent.SequentFormula ifformula = new SequentFormula(ifterm);
         ImmutableList<IfFormulaInstantiation> ifInsts = ImmutableSLList
                 .<IfFormulaInstantiation>nil().prepend(new IfFormulaInstDirect(ifformula));
         appIt = rApplist.iterator();

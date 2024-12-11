@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
@@ -32,7 +31,7 @@ public class FormulaAddedByRuleFeature extends BinaryFeature {
     public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final SequentFormula cfma = (SequentFormula) pos.sequentFormula();
+        final org.key_project.prover.sequent.SequentFormula cfma = pos.sequentFormula();
         final boolean antec = pos.isInAntec();
 
         Node node = goal.node();

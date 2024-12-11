@@ -334,7 +334,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * @param initGoal The goal containing the "initially valid" PO.
      * @return The {@link SequentFormula} for the "initially valid" goal.
      */
-    private SequentFormula initFormula(TermLabelState termLabelState, Instantiation inst,
+    private org.key_project.prover.sequent.SequentFormula initFormula(TermLabelState termLabelState,
+            Instantiation inst,
             final Term invTerm, Term reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
 

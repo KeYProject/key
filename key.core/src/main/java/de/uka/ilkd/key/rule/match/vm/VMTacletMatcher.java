@@ -9,7 +9,6 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -101,7 +101,7 @@ public class VMTacletMatcher implements TacletMatcher {
             findMatchProgram = TacletMatchProgram.EMPTY_PROGRAM;
         }
 
-        for (SequentFormula sf : assumesSequent) {
+        for (org.key_project.prover.sequent.SequentFormula sf : assumesSequent) {
             assumesMatchPrograms.put(sf.formula(), TacletMatchProgram.createProgram(sf.formula()));
         }
     }
@@ -189,8 +189,10 @@ public class VMTacletMatcher implements TacletMatcher {
     public final MatchConditions matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
             MatchConditions p_matchCond, Services p_services) {
 
-        final Iterator<SequentFormula> anteIterator = assumesSequent.antecedent().iterator();
-        final Iterator<SequentFormula> succIterator = assumesSequent.succedent().iterator();
+        final Iterator<org.key_project.prover.sequent.SequentFormula> anteIterator =
+            assumesSequent.antecedent().iterator();
+        final Iterator<org.key_project.prover.sequent.SequentFormula> succIterator =
+            assumesSequent.succedent().iterator();
 
         ImmutableList<MatchConditions> newMC;
 

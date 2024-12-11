@@ -6,11 +6,11 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -25,9 +25,10 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
      */
     private final Sequent seq;
     private final boolean antec; // formula is in antecedent?
-    private final SequentFormula cf;
+    private final org.key_project.prover.sequent.SequentFormula cf;
 
-    public IfFormulaInstSeq(Sequent p_seq, boolean antec, SequentFormula p_cf) {
+    public IfFormulaInstSeq(Sequent p_seq, boolean antec,
+            org.key_project.prover.sequent.SequentFormula p_cf) {
         seq = p_seq;
         this.antec = antec;
         cf = p_cf;

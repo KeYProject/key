@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSLList;
 
 /**
@@ -33,7 +33,7 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
     @Override
     protected void filterSequent() {
 
-        Iterator<SequentFormula> it;
+        Iterator<org.key_project.prover.sequent.SequentFormula> it;
 
         if (searchString == null || searchString.length() < 3) {
             filterIdentity();
@@ -48,7 +48,7 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
         antec = ImmutableSLList.nil();
         it = originalSequent.antecedent().iterator();
         while (it.hasNext()) {
-            SequentFormula sf = it.next();
+            org.key_project.prover.sequent.SequentFormula sf = it.next();
             lp.reset();
             lp.printConstrainedFormula(sf);
             String formString = lp.result();

@@ -12,7 +12,6 @@ import java.util.WeakHashMap;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -149,7 +148,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             boolean added = false;
             for (int i = 0; i <= size; i++) {
                 TrackedFormula formula =
-                    new TrackedFormula((SequentFormula) in.sequentFormula(), loc, in.isInAntec(),
+                    new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(),
                         proof.getServices());
                 if (graph.containsNode(formula)) {
                     input.add(new Pair<>(formula, removed.contains(in)));
@@ -162,12 +161,12 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             }
             if (!added) {
                 // should only happen if the formula is the initial proof obligation
-                if (!proof.root().sequent().contains((SequentFormula) in.sequentFormula())) {
+                if (!proof.root().sequent().contains(in.sequentFormula())) {
                     throw new IllegalStateException(
                         "found formula that was not produced by any rule! " + in.sequentFormula());
                 }
                 TrackedFormula formula =
-                    new TrackedFormula((SequentFormula) in.sequentFormula(), loc, in.isInAntec(),
+                    new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(),
                         proof.getServices());
                 input.add(new Pair<>(formula, removed.contains(in)));
             }
@@ -311,7 +310,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 loc = loc.append(new Pair<>(n, out.second));
             }
             TrackedFormula formula = new TrackedFormula(
-                (SequentFormula) out.first.sequentFormula(),
+                out.first.sequentFormula(),
                 loc,
                 out.first.isInAntec(),
                 proof.getServices());
@@ -396,7 +395,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 loc = loc.append(new Pair<>(n, out.second));
             }
             TrackedFormula formula = new TrackedFormula(
-                (SequentFormula) out.first.sequentFormula(),
+                out.first.sequentFormula(),
                 loc,
                 out.first.isInAntec(),
                 proof.getServices());

@@ -228,7 +228,8 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      * creation the necessary information is passed to the listener as parameters and not through an
      * event object.
      */
-    private void fireSequentChanged(SequentChangeInfo<SequentFormula> sci) {
+    private void fireSequentChanged(
+            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci) {
         var time = System.nanoTime();
         getFormulaTagManager().sequentChanged(this, sci);
         var time1 = System.nanoTime();
@@ -367,7 +368,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      * @param sci SequentChangeInfo containing the sequent to be set and describing the applied
      *        changes to the sequent of the node currently pointed to by this goal
      */
-    public void setSequent(SequentChangeInfo<SequentFormula> sci) {
+    public void setSequent(SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci) {
         assert sci.getOriginalSequent() == node().sequent();
         if (!sci.hasChanged()) {
             assert sci.sequent().equals(sci.getOriginalSequent());
@@ -401,7 +402,8 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      *        (succedent)
      * @param first boolean true if at the front, if false then cf is added at the back
      */
-    public void addFormula(SequentFormula cf, boolean inAntec, boolean first) {
+    public void addFormula(org.key_project.prover.sequent.SequentFormula cf, boolean inAntec,
+            boolean first) {
         setSequent(sequent().addFormula(cf, inAntec, first));
     }
 
@@ -412,7 +414,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      * @param cf the SequentFormula replacing the old one
      * @param p the PosInOccurrence encoding the position
      */
-    public void changeFormula(SequentFormula cf, PosInOccurrence p) {
+    public void changeFormula(org.key_project.prover.sequent.SequentFormula cf, PosInOccurrence p) {
         setSequent(sequent().changeFormula(cf, p));
     }
 
@@ -712,12 +714,12 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
     public List<RuleApp> getAllBuiltInRuleApps() {
         final BuiltInRuleAppIndex index = ruleAppIndex().builtInRuleAppIndex();
         LinkedList<RuleApp> ruleApps = new LinkedList<>();
-        for (SequentFormula sf : node().sequent().antecedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : node().sequent().antecedent()) {
             ImmutableList<IBuiltInRuleApp> t =
                 index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
             t.forEach(ruleApps::add);
         }
-        for (SequentFormula sf : node().sequent().succedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : node().sequent().succedent()) {
             ImmutableList<IBuiltInRuleApp> t =
                 index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false));
             t.forEach(ruleApps::add);
@@ -735,13 +737,13 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
                 return true;
             }
         };
-        for (SequentFormula sf : node().sequent().antecedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : node().sequent().antecedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services);
             tacletAppAtAndBelow.forEach(allApps::add);
         }
 
-        for (SequentFormula sf : node().sequent().succedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : node().sequent().succedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
             tacletAppAtAndBelow.forEach(allApps::add);

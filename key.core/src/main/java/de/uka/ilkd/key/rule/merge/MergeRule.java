@@ -234,7 +234,8 @@ public class MergeRule implements BuiltInRule {
 
         // Add new antecedent (path condition)
         for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
-            final SequentFormula newAntecedent = new SequentFormula(antecedentFormula);
+            final org.key_project.prover.sequent.SequentFormula newAntecedent =
+                new SequentFormula(antecedentFormula);
             newGoal.addFormula(newAntecedent, true, false);
         }
 
@@ -687,7 +688,7 @@ public class MergeRule implements BuiltInRule {
             if (!g.equals(goal) && !g.isLinked()) {
                 Semisequent succedent = g.sequent().succedent();
                 for (int i = 0; i < succedent.size(); i++) {
-                    final SequentFormula f = succedent.get(i);
+                    final org.key_project.prover.sequent.SequentFormula f = succedent.get(i);
 
                     final PosInTerm pit = PosInTerm.getTopLevel();
 

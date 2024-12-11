@@ -9,7 +9,6 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -76,7 +76,7 @@ class Instantiation {
 
     private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
         ImmutableList<Term> res = ImmutableSLList.nil();
-        for (final SequentFormula cf : seq) {
+        for (final org.key_project.prover.sequent.SequentFormula cf : seq) {
             res = res.prepend(cf.formula());
         }
         return DefaultImmutableSet.fromImmutableList(res);
@@ -148,7 +148,7 @@ class Instantiation {
      */
     private ImmutableSet<Term> initAssertLiterals(Sequent seq, TermServices services) {
         ImmutableList<Term> assertLits = ImmutableSLList.nil();
-        for (final SequentFormula cf : seq.antecedent()) {
+        for (final org.key_project.prover.sequent.SequentFormula cf : seq.antecedent()) {
             final Term atom = cf.formula();
             final Operator op = atom.op();
             if (!(op == Quantifier.ALL || op == Quantifier.EX)) {

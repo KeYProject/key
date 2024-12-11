@@ -6,7 +6,6 @@ package de.uka.ilkd.key.proof.join;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -90,7 +89,7 @@ public class JoinIsApplicable {
             referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(1)
                     : referenceFormula;
 
-        for (SequentFormula sf : g2.sequent().succedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : g2.sequent().succedent()) {
             Term formula = sf.formula();
             Term update2 = tb.skip();
             if (formula.op() instanceof UpdateApplication
@@ -102,7 +101,7 @@ public class JoinIsApplicable {
             }
             if (formula.equalsModProperty(referenceFormula, RENAMING_TERM_PROPERTY)) {
                 return new ProspectivePartner(referenceFormula, g1.node(),
-                    (SequentFormula) pio.sequentFormula(),
+                    pio.sequentFormula(),
                     update1, g2.node(), sf, update2);
             }
         }

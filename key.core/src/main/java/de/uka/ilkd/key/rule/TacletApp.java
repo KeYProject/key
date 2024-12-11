@@ -241,7 +241,7 @@ public abstract class TacletApp implements RuleApp {
      * @return the term below the given quantifier in the find and if-parts of the Taclet
      */
     private static Term getTermBelowQuantifier(Taclet taclet, SchemaVariable varSV) {
-        for (SequentFormula sequentFormula : taclet.ifSequent()) {
+        for (org.key_project.prover.sequent.SequentFormula sequentFormula : taclet.ifSequent()) {
             Term result = getTermBelowQuantifier(varSV, sequentFormula.formula());
             if (result != null) {
                 return result;
@@ -882,7 +882,8 @@ public abstract class TacletApp implements RuleApp {
      * @return a list of tacletapps with the found if formula instantiations
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
-            ImmutableList<SequentFormula> ruleSuccTail, ImmutableList<SequentFormula> ruleAntecTail,
+            ImmutableList<org.key_project.prover.sequent.SequentFormula> ruleSuccTail,
+            ImmutableList<org.key_project.prover.sequent.SequentFormula> ruleAntecTail,
             ImmutableArray<IfFormulaInstantiation> instSucc,
             ImmutableArray<IfFormulaInstantiation> instAntec,
             ImmutableList<IfFormulaInstantiation> instAlreadyMatched, MatchConditions matchCond,
@@ -922,10 +923,11 @@ public abstract class TacletApp implements RuleApp {
         return res;
     }
 
-    private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
-        ImmutableList<SequentFormula> res = ImmutableSLList.nil();
+    private ImmutableList<org.key_project.prover.sequent.SequentFormula> createSemisequentList(
+            Semisequent p_ss) {
+        ImmutableList<org.key_project.prover.sequent.SequentFormula> res = ImmutableSLList.nil();
 
-        for (SequentFormula p_s : p_ss) {
+        for (org.key_project.prover.sequent.SequentFormula p_s : p_ss) {
             res = res.prepend(p_s);
         }
 

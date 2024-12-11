@@ -77,7 +77,7 @@ public class TestVariableNamer {
     }
 
 
-    private PosInOccurrence constructPIO(SequentFormula formula) {
+    private PosInOccurrence constructPIO(org.key_project.prover.sequent.SequentFormula formula) {
         return new PosInOccurrence(formula, PosInTerm.getTopLevel(), true);
     }
 

@@ -174,7 +174,8 @@ public class OutputStreamProofSaver {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                     StrategyProperties.INF_FLOW_CHECK_TRUE);
                 strategySettings.setActiveStrategyProperties(strategyProperties);
-                for (final SequentFormula s : proof.root().sequent().succedent().asList()) {
+                for (final org.key_project.prover.sequent.SequentFormula s : proof.root().sequent()
+                        .succedent().asList()) {
                     ((InfFlowProof) proof).addLabeledTotalTerm(s.formula());
                 }
             } else {
@@ -704,7 +705,7 @@ public class OutputStreamProofSaver {
             return "";
         }
         return " (formula \""
-            + seq.formulaNumberInSequent(pos.isInAntec(), (SequentFormula) pos.sequentFormula())
+            + seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
             + "\")" + posInTerm2Proof(pos.posInTerm());
     }
 
@@ -764,7 +765,7 @@ public class OutputStreamProofSaver {
         StringBuilder s = new StringBuilder();
         for (final IfFormulaInstantiation aL : l) {
             if (aL instanceof IfFormulaInstSeq) {
-                final SequentFormula f = aL.getConstrainedFormula();
+                final org.key_project.prover.sequent.SequentFormula f = aL.getConstrainedFormula();
                 s.append(" (ifseqformula \"")
                         .append(node.sequent()
                                 .formulaNumberInSequent(((IfFormulaInstSeq) aL).inAntec(), f))

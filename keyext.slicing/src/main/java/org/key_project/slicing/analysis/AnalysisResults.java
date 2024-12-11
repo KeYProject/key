@@ -11,13 +11,13 @@ import java.util.Set;
 
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.SlicingProofReplayer;
@@ -164,7 +164,7 @@ public final class AnalysisResults {
     }
 
     private Semisequent reduce(Semisequent semi, Node node, boolean antec) {
-        var semiList = new ArrayList<SequentFormula>();
+        var semiList = new ArrayList<org.key_project.prover.sequent.SequentFormula>();
         for (SequentFormula sf : semi) {
             var graphNode = dependencyGraph.getGraphNode(node.proof(), node.getBranchLocation(),
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), antec));

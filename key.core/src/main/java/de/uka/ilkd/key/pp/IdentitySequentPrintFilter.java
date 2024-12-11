@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.SequentFormula;
-
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -27,7 +26,8 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
      * @param sequentFormula the formula to filter
      * @return the FilterEntry from the formula
      */
-    protected SequentPrintFilterEntry filterFormula(SequentFormula sequentFormula) {
+    protected SequentPrintFilterEntry filterFormula(
+            org.key_project.prover.sequent.SequentFormula sequentFormula) {
         return new IdentityFilterEntry(sequentFormula);
     }
 
@@ -60,14 +60,14 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
         /**
          * the original Formula being filtered
          */
-        final SequentFormula originalFormula;
+        final org.key_project.prover.sequent.SequentFormula originalFormula;
 
         /**
          * constructor
          *
          * @param originalFormula the original formula to be filtered
          */
-        IdentityFilterEntry(SequentFormula originalFormula) {
+        IdentityFilterEntry(org.key_project.prover.sequent.SequentFormula originalFormula) {
             this.originalFormula = originalFormula;
         }
 
@@ -76,7 +76,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
          *
          * @return the original formula
          */
-        public SequentFormula getFilteredFormula() {
+        public org.key_project.prover.sequent.SequentFormula getFilteredFormula() {
             return originalFormula;
         }
 

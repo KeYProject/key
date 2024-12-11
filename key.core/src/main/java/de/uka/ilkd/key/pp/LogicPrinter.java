@@ -751,7 +751,7 @@ public class LogicPrinter {
      *
      * @param cfma the constrained formula to be printed
      */
-    public void printConstrainedFormula(SequentFormula cfma) {
+    public void printConstrainedFormula(org.key_project.prover.sequent.SequentFormula cfma) {
         printTerm(cfma.formula());
     }
 
