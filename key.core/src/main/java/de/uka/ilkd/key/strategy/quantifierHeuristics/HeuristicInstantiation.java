@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -15,6 +14,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
 
@@ -30,10 +30,10 @@ public class HeuristicInstantiation implements TermGenerator {
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final Term qf = (Term) pos.sequentFormula().formula();
+        final Term qf = pos.sequentFormula().formula();
         final Instantiation ia =
             Instantiation.create(qf, goal.sequent(), goal.proof().getServices());
-        final QuantifiableVariable var = qf.varsBoundHere(0).last();
+        final QuantifiableVariable var = (QuantifiableVariable) qf.varsBoundHere(0).last();
         return new HIIterator(ia.getSubstitution().iterator(), var, goal.proof().getServices());
     }
 
@@ -67,7 +67,8 @@ public class HeuristicInstantiation implements TermGenerator {
                         nextInst = null;
                         continue;
                     }
-                    nextInst = services.getTermBuilder().func(quantifiedVarSortCast, nextInst);
+                    nextInst = services.getTermBuilder().func(quantifiedVarSortCast,
+                        (de.uka.ilkd.key.logic.Term) nextInst);
                 }
             }
         }

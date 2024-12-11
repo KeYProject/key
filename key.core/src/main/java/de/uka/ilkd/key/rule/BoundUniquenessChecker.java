@@ -53,7 +53,7 @@ public class BoundUniquenessChecker {
      */
     public void addAll(Sequent seq) {
         for (final SequentFormula cf : seq) {
-            terms = terms.prepend(cf.formula());
+            terms = terms.prepend((Term) cf.formula());
         }
     }
 

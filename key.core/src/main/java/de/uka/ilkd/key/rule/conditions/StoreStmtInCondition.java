@@ -56,7 +56,7 @@ public class StoreStmtInCondition implements VariableCondition {
 
         assert !instantiatedTerm.javaBlock().isEmpty();
         assert instantiatedTerm.javaBlock().program() instanceof StatementBlock;
-        assert ((StatementBlock) instantiatedTerm.javaBlock().program()).getChildCount() == 1;
+        assert instantiatedTerm.javaBlock().program().getChildCount() == 1;
 
         return matchCond.setInstantiations(//
             svInst.add(storeInSV,

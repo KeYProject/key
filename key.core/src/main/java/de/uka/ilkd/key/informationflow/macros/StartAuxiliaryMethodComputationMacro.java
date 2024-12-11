@@ -71,7 +71,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
         final Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
 
-        return term.equalsModProperty(selfComposedExec, RENAMING_TERM_PROPERTY);
+        return RENAMING_TERM_PROPERTY.equalsModThisProperty(term, selfComposedExec);
     }
 
     @Override

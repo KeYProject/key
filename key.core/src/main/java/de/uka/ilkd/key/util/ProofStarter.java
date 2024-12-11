@@ -6,7 +6,6 @@ package de.uka.ilkd.key.util;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -62,7 +62,7 @@ public class ProofStarter {
         }
 
         public UserProvidedInput(Term formula, ProofEnvironment env) {
-            this(Sequent.createSuccSequent((Semisequent) Semisequent.EMPTY_SEMISEQUENT
+            this(Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
                     .insertFirst(new SequentFormula(formula)).semisequent()),
                 env);
         }

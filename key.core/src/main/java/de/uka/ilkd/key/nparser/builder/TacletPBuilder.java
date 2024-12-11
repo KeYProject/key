@@ -28,6 +28,7 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 
 import antlr.RecognitionException;
@@ -768,14 +769,14 @@ public class TacletPBuilder extends ExpressionBuilder {
             if (findSeq.isEmpty()) {
                 return new NoFindTacletBuilder();
             } else if (findSeq.antecedent().size() == 1 && findSeq.succedent().isEmpty()) {
-                Term findFma = findSeq.antecedent().get(0).formula();
+                Term findFma = (Term) findSeq.antecedent().get(0).formula();
                 AntecTacletBuilder b = new AntecTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates(
                     (applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) == 0);
                 return b;
             } else if (findSeq.antecedent().isEmpty() && findSeq.succedent().size() == 1) {
-                Term findFma = findSeq.succedent().get(0).formula();
+                Term findFma = (Term) findSeq.succedent().get(0).formula();
                 SuccTacletBuilder b = new SuccTacletBuilder();
                 b.setFind(findFma);
                 b.setIgnoreTopLevelUpdates(

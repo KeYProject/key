@@ -146,9 +146,9 @@ public final class ReferenceSearcher {
      * @return whether all formulas are present
      */
     private static boolean containedIn(Semisequent superset, Semisequent subset) {
-        for (org.key_project.prover.sequent.SequentFormula sf : subset) {
+        for (SequentFormula sf : subset) {
             boolean found = false;
-            for (org.key_project.prover.sequent.SequentFormula sf2 : superset) {
+            for (SequentFormula sf2 : superset) {
                 if ((Object) sf instanceof SequentFormula that
                         ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(sf2, that)
                         : false) {

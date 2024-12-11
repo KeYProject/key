@@ -22,7 +22,7 @@ public class ProspectivePartner {
     private final Node[] nodes = new Node[2];
     private Term commonPredicate = null;
     private Node commonParent = null;
-    private org.key_project.prover.sequent.SequentFormula formulaForHiding = null;
+    private SequentFormula formulaForHiding = null;
 
     /**
      * Constructs a new prospective partner object, i.e. a structure comprising the information
@@ -38,8 +38,8 @@ public class ProspectivePartner {
      * @param update2 The second symbolic state.
      */
     public ProspectivePartner(Term commonFormula, Node node1,
-            org.key_project.prover.sequent.SequentFormula formula1, Term update1,
-            Node node2, org.key_project.prover.sequent.SequentFormula formula2, Term update2) {
+            SequentFormula formula1, Term update1,
+            Node node2, SequentFormula formula2, Term update2) {
         super();
         this.commonFormula = commonFormula;
         formula[0] = formula1;
@@ -81,11 +81,11 @@ public class ProspectivePartner {
     }
 
     private void setFormulaForHiding(
-            org.key_project.prover.sequent.SequentFormula formulaForHiding) {
+            SequentFormula formulaForHiding) {
         this.formulaForHiding = formulaForHiding;
     }
 
-    public org.key_project.prover.sequent.SequentFormula getFormulaForHiding() {
+    public SequentFormula getFormulaForHiding() {
         return formulaForHiding;
     }
 

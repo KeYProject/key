@@ -60,7 +60,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
                     TacletApp ta = (TacletApp) app;
                     if (ta.ifFormulaInstantiations() != null) {
                         for (IfFormulaInstantiation ifi : ta.ifFormulaInstantiations()) {
-                            if (ifi.getConstrainedFormula().formula()
+                            if (ifi.getSequentFormula().formula()
                                     .containsLabel(SymbolicExecutionUtil.RESULT_LABEL)) {
                                 hasLabel = true;
                             }

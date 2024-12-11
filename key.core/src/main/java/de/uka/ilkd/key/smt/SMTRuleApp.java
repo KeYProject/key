@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -145,10 +146,10 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
         SMTRuleApp app = RULE.createApp(pio, goal.proof().getServices());
         Sequent seq = goal.sequent();
         List<PosInOccurrence> ifInsts = new ArrayList<>();
-        for (org.key_project.prover.sequent.SequentFormula ante : seq.antecedent()) {
+        for (SequentFormula ante : seq.antecedent()) {
             ifInsts.add(new PosInOccurrence(ante, PosInTerm.getTopLevel(), true));
         }
-        for (org.key_project.prover.sequent.SequentFormula succ : seq.succedent()) {
+        for (SequentFormula succ : seq.succedent()) {
             ifInsts.add(new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
         }
         return app.setIfInsts(ImmutableList.fromList(ifInsts));

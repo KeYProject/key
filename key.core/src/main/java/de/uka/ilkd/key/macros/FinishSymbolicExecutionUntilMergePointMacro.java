@@ -24,6 +24,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -153,9 +154,10 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
      * @return true iff the given succedent has one formula with a break point statement.
      */
     private boolean hasBreakPoint(Semisequent succedent) {
-        for (org.key_project.prover.sequent.SequentFormula formula : succedent.asList()) {
+        for (SequentFormula formula : succedent.asList()) {
             if (blockElems.contains(JavaTools
-                    .getActiveStatement(MergeRuleUtils.getJavaBlockRecursive(formula.formula())))) {
+                    .getActiveStatement(
+                        MergeRuleUtils.getJavaBlockRecursive((Term) formula.formula())))) {
                 return true;
             }
         }

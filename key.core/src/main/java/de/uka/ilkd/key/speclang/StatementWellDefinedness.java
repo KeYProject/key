@@ -54,7 +54,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return
      */
-    abstract org.key_project.prover.sequent.SequentFormula generateSequent(SequentTerms seqTerms,
+    abstract SequentFormula generateSequent(SequentTerms seqTerms,
             TermServices services);
 
     public abstract SpecificationElement getStatement();
@@ -122,7 +122,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services The current services reference
      * @return The proof sequent for the well-definedness check
      */
-    public org.key_project.prover.sequent.SequentFormula generateSequent(LocationVariable self,
+    public SequentFormula generateSequent(LocationVariable self,
             LocationVariable exception,
             LocationVariable result, LocationVariable heap, LocationVariable heapAtPre,
             Term anonHeap,

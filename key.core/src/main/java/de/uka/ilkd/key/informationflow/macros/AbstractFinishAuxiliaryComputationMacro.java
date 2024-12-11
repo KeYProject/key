@@ -120,12 +120,12 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         final TermBuilder tb = symbExecGoal.proof().getServices().getTermBuilder();
         final TermFactory tf = symbExecGoal.proof().getServices().getTermFactory();
         Term result = tb.tt();
-        for (final org.key_project.prover.sequent.SequentFormula f : symbExecGoal.sequent()
+        for (final SequentFormula f : symbExecGoal.sequent()
                 .antecedent()) {
-            result = tb.and(result, f.formula());
+            result = tb.and(result, (Term) f.formula());
         }
         for (final SequentFormula f : symbExecGoal.sequent().succedent()) {
-            result = tb.and(result, tb.not(f.formula()));
+            result = tb.and(result, tb.not((Term) f.formula()));
         }
         result = TermLabelManager.removeIrrelevantLabels(result, tf);
         return result;

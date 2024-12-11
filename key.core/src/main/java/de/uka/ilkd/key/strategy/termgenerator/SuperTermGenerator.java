@@ -8,7 +8,6 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.op.Modifier;
@@ -97,8 +97,9 @@ public abstract class SuperTermGenerator implements TermGenerator {
         }
 
         protected Term generateOneTerm(Term superterm, int child) {
-            final Term index = services.getTermBuilder().zTerm(String.valueOf(child));
-            return services.getTermBuilder().tf().createTerm(binFunc, superterm, index);
+            final var index = services.getTermBuilder().zTerm(String.valueOf(child));
+            return services.getTermBuilder().tf().createTerm(binFunc,
+                (de.uka.ilkd.key.logic.Term) superterm, index);
         }
 
         private static class SuperTermGeneratedOp
@@ -179,7 +180,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
         public Term next() {
             final int child = currentPos.getIndex();
             currentPos = currentPos.up();
-            final Term res = generateOneTerm((Term) currentPos.subTerm(), child);
+            final Term res = generateOneTerm(currentPos.subTerm(), child);
             if (!generateFurther(res, mState, services)) {
                 currentPos = null;
             }

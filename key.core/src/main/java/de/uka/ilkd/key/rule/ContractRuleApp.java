@@ -103,7 +103,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 
     public Term programTerm() {
         if (posInOccurrence() != null) {
-            return TermBuilder.goBelowUpdates((Term) posInOccurrence().subTerm());
+            return TermBuilder.goBelowUpdates(posInOccurrence().subTerm());
         }
         return null;
     }

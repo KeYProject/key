@@ -7,8 +7,9 @@ import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.LexPathOrdering;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+
+import org.key_project.logic.Term;
 
 public class MonomialColumnOp extends AbstractDividePolynomialsProjection {
 

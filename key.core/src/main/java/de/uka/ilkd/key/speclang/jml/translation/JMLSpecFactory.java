@@ -1047,14 +1047,17 @@ public class JMLSpecFactory {
 
         boolean createContract = true;
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
-            if (clauses.accessibles.get(heap).equalsModProperty(tb.allLocs(),
-                RENAMING_TERM_PROPERTY)) {
+            org.key_project.logic.Term term1 = clauses.accessibles.get(heap);
+            org.key_project.logic.Term formula1 = tb.allLocs();
+            if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term1, formula1)) {
                 createContract = false;
                 break;
             }
             if (pm.isModel() && pm.getStateCount() > 1) {
-                if (clauses.accessibles.get(progVars.atPreVars.get(heap))
-                        .equalsModProperty(tb.allLocs(), RENAMING_TERM_PROPERTY)) {
+                org.key_project.logic.Term term =
+                    clauses.accessibles.get(progVars.atPreVars.get(heap));
+                org.key_project.logic.Term formula = tb.allLocs();
+                if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term, formula)) {
                     createContract = false;
                     break;
                 }

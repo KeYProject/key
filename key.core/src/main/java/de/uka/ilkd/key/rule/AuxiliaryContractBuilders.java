@@ -43,6 +43,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -645,7 +646,7 @@ public final class AuxiliaryContractBuilders {
             return buildAnonOutUpdate(
                 MiscTools.getLocalOuts(el, services).stream()
                         .filter(LocationVariable.class::isInstance)
-                        .map(LocationVariable.class::cast).collect(Collectors.toSet()),
+                        .map(locationVariable -> locationVariable).collect(Collectors.toSet()),
                 anonymisationHeaps, modifiableClauses, prefix);
         }
 
@@ -1369,7 +1370,7 @@ public final class AuxiliaryContractBuilders {
             services.getSpecificationRepository().addWdStatement(bwd);
             final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
             final Term anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
-            final org.key_project.prover.sequent.SequentFormula wdBlock = bwd.generateSequent(
+            final SequentFormula wdBlock = bwd.generateSequent(
                 variables.self, variables.exception,
                 variables.result, heap, heapAtPre, anon, localIns, update, anonUpdate, services);
 
@@ -1378,7 +1379,7 @@ public final class AuxiliaryContractBuilders {
                 goal.changeFormula(wdBlock, occurrence);
             }
 
-            return wdBlock.formula();
+            return (Term) wdBlock.formula();
         }
 
         /**

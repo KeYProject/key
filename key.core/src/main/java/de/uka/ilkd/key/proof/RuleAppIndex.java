@@ -14,7 +14,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -299,7 +298,7 @@ public final class RuleAppIndex {
      *
      * @param sci SequentChangeInfo describing the change of the sequent
      */
-    public void sequentChanged(SequentChangeInfo<SequentFormula> sci) {
+    public void sequentChanged(SequentChangeInfo sci) {
         if (!autoMode) {
             interactiveTacletAppIndex.sequentChanged(sci);
         }

@@ -87,7 +87,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
         Set<SchemaVariable> result = new LinkedHashSet<>();
 
         for (final SequentFormula cf : s) {
-            result.addAll(collectSchemaVariables(cf.formula()));
+            result.addAll(collectSchemaVariables((Term) cf.formula()));
         }
 
         return result;

@@ -6,11 +6,11 @@ package de.uka.ilkd.key.logic;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.logic.equality.Property;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Property;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.Strings;
@@ -355,7 +355,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public int hashCodeModProperty(Property<Term> property) {
+    public int hashCodeModProperty(Property<? super Term> property) {
         return property.hashCodeModThisProperty(this);
     }
 

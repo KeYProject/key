@@ -210,7 +210,7 @@ public class TestTriggersSet {
         TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
         int triggerNum = ts.getAllTriggers().size();
         assertEquals(1, triggerNum);
-        Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
+        var trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
         assertEquals(trigger1, trigger2);
     }
 
@@ -223,7 +223,7 @@ public class TestTriggersSet {
         TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
         int triggerNum = ts.getAllTriggers().size();
         assertEquals(1, triggerNum);
-        Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
+        var trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
         assertEquals(trigger1, trigger2);
     }
 }

@@ -101,8 +101,9 @@ public class VMTacletMatcher implements TacletMatcher {
             findMatchProgram = TacletMatchProgram.EMPTY_PROGRAM;
         }
 
-        for (org.key_project.prover.sequent.SequentFormula sf : assumesSequent) {
-            assumesMatchPrograms.put(sf.formula(), TacletMatchProgram.createProgram(sf.formula()));
+        for (SequentFormula sf : assumesSequent) {
+            assumesMatchPrograms.put((Term) sf.formula(),
+                TacletMatchProgram.createProgram((Term) sf.formula()));
         }
     }
 
@@ -132,7 +133,7 @@ public class VMTacletMatcher implements TacletMatcher {
         }
 
         for (var cf : p_toMatch) {
-            Term formula = cf.getConstrainedFormula().formula();
+            Term formula = (Term) cf.getSequentFormula().formula();
 
             if (updateContextPresent) {
                 formula = matchUpdateContext(context, formula);
@@ -167,7 +168,7 @@ public class VMTacletMatcher implements TacletMatcher {
             if (formula.op() instanceof UpdateApplication) {
                 final Term update = UpdateApplication.getUpdate(formula);
                 final UpdateLabelPair ulp = curContext.head();
-                if (ulp.update().equalsModProperty(update, RENAMING_TERM_PROPERTY)
+                if (RENAMING_TERM_PROPERTY.equalsModThisProperty(ulp.update(), update)
                         && ulp.updateApplicationlabels().equals(update.getLabels())) {
                     curContext = curContext.tail();
                     formula = UpdateApplication.getTarget(formula);
@@ -212,7 +213,7 @@ public class VMTacletMatcher implements TacletMatcher {
             assert itIfSequent.hasNext()
                     : "p_toMatch and assumes sequent must have same number of elements";
             newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
-                itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
+                (Term) itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
 
             if (newMC.isEmpty()) {
                 return null;

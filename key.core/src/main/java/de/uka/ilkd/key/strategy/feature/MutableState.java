@@ -5,11 +5,12 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.instantiator.BackTrackingManager;
 import de.uka.ilkd.key.strategy.feature.instantiator.ChoicePoint;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
+
+import org.key_project.logic.Term;
 
 /**
  * <p>

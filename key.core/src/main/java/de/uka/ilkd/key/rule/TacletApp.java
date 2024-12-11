@@ -25,6 +25,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;
@@ -225,7 +226,7 @@ public abstract class TacletApp implements RuleApp {
                     return term.sub(i);
                 }
             }
-            Term rec = getTermBelowQuantifier(varSV, term.sub(i));
+            var rec = getTermBelowQuantifier(varSV, term.sub(i));
             if (rec != null) {
                 return rec;
             }
@@ -241,8 +242,8 @@ public abstract class TacletApp implements RuleApp {
      * @return the term below the given quantifier in the find and if-parts of the Taclet
      */
     private static Term getTermBelowQuantifier(Taclet taclet, SchemaVariable varSV) {
-        for (org.key_project.prover.sequent.SequentFormula sequentFormula : taclet.ifSequent()) {
-            Term result = getTermBelowQuantifier(varSV, sequentFormula.formula());
+        for (SequentFormula sequentFormula : taclet.ifSequent()) {
+            Term result = getTermBelowQuantifier(varSV, (Term) sequentFormula.formula());
             if (result != null) {
                 return result;
             }
@@ -906,8 +907,9 @@ public abstract class TacletApp implements RuleApp {
         }
 
         // Match the current formula
-        IfMatchResult mr = taclet().getMatcher().matchIf(instSucc, ruleSuccTail.head().formula(),
-            matchCond, services);
+        IfMatchResult mr =
+            taclet().getMatcher().matchIf(instSucc, (Term) ruleSuccTail.head().formula(),
+                matchCond, services);
 
         // For each matching formula call the method again to match
         // the remaining terms
@@ -927,7 +929,7 @@ public abstract class TacletApp implements RuleApp {
             Semisequent p_ss) {
         ImmutableList<org.key_project.prover.sequent.SequentFormula> res = ImmutableSLList.nil();
 
-        for (org.key_project.prover.sequent.SequentFormula p_s : p_ss) {
+        for (SequentFormula p_s : p_ss) {
             res = res.prepend(p_s);
         }
 

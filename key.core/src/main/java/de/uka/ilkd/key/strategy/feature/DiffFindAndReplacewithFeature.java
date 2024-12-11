@@ -5,7 +5,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
@@ -30,7 +29,7 @@ public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
         assert pos != null && app.rule() instanceof RewriteTaclet
                 : "Feature is only applicable to rewrite taclets";
 
-        for (TacletGoalTemplate temp : ((Taclet) app.rule()).goalTemplates()) {
+        for (TacletGoalTemplate temp : app.rule().goalTemplates()) {
             RewriteTacletGoalTemplate rwtemp = (RewriteTacletGoalTemplate) temp;
             if (rwtemp.replaceWith().equalsModProperty(pos.subTerm(),
                 IRRELEVANT_TERM_LABELS_PROPERTY)) {

@@ -13,7 +13,6 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -92,10 +91,6 @@ public class HelperClassForTests {
         KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
         ProblemInitializer pi = new ProblemInitializer(profile);
         return pi.startProver(po, po);
-    }
-
-    public Term extractProblemTerm(Proof p) {
-        return p.root().sequent().succedent().iterator().next().formula();
     }
 
     /**

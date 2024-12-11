@@ -6,7 +6,7 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Iterator;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
@@ -18,7 +18,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -76,14 +78,17 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
 
         // The formulas to keep in the antecedent
         ImmutableList<Term> keepAnte = toKeep.antecedent().asList()
-                .map(org.key_project.prover.sequent.SequentFormula::formula);
-        ImmutableList<org.key_project.prover.sequent.SequentFormula> ante =
+                .map(SequentFormula::formula);
+        ImmutableList<SequentFormula> ante =
             goal.sequent().antecedent().asList();
 
-        for (org.key_project.prover.sequent.SequentFormula seqFormula : ante) {
+        for (SequentFormula seqFormula : ante) {
             // This means "!keepAnte.contains(seqFormula.formula)" but with equality mod renaming!
             if (!keepAnte.exists(
-                it -> it.equalsModProperty(seqFormula.formula(), RENAMING_TERM_PROPERTY))) {
+                it -> {
+                    org.key_project.logic.Term formula = seqFormula.formula();
+                    return RENAMING_TERM_PROPERTY.equalsModThisProperty(it, formula);
+                })) {
                 Taclet tac = getHideTaclet("left");
                 makeTacletApp(goal, seqFormula, tac, true);
             }
@@ -93,9 +98,12 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
             toKeep.succedent().asList().map(org.key_project.prover.sequent.SequentFormula::formula);
         ImmutableList<org.key_project.prover.sequent.SequentFormula> succ =
             goal.sequent().succedent().asList();
-        for (org.key_project.prover.sequent.SequentFormula seqFormula : succ) {
+        for (SequentFormula seqFormula : succ) {
             if (!keepSucc.exists(
-                it -> it.equalsModProperty(seqFormula.formula(), RENAMING_TERM_PROPERTY))) {
+                it -> {
+                    org.key_project.logic.Term formula = seqFormula.formula();
+                    return RENAMING_TERM_PROPERTY.equalsModThisProperty(it, formula);
+                })) {
                 Taclet tac = getHideTaclet("right");
                 makeTacletApp(goal, seqFormula, tac, false);
             }
@@ -116,7 +124,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
      * @param tac the taclet top apply (either hide_left or hide_right)
      * @param antec whether the formula is in the antecedent
      */
-    private void makeTacletApp(Goal g, org.key_project.prover.sequent.SequentFormula toHide,
+    private void makeTacletApp(Goal g, SequentFormula toHide,
             Taclet tac, boolean antec) {
         // hide rules only applicable to top-level terms/sequent formulas
         PosInTerm pit = PosInTerm.getTopLevel();
@@ -132,7 +140,8 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
 
         TacletApp app =
             PosTacletApp.createPosTacletApp((FindTaclet) tac, inst, pio, proof.getServices());
-        app = app.addCheckedInstantiation(sv, toHide.formula(), proof.getServices(), true);
+        app = app.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) toHide.formula(),
+            proof.getServices(), true);
         g.apply(app);
 
     }

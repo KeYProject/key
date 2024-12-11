@@ -275,7 +275,7 @@ public final class TypeConverter {
                 return tb.dot(var.sort(), findThisForSort(var.getContainerType().getSort(), ec),
                     fieldSymbol);
             } else {
-                return tb.var((LocationVariable) var);
+                return tb.var(var);
             }
         } else if (!(prefix instanceof PackageReference)) {
             final JFunction fieldSymbol =

@@ -133,7 +133,7 @@ public class TacletInstantiationModel {
             ifChoiceModel = new TacletAssumesModel[size];
 
             for (int i = 0; i < size; i++) {
-                ifFma = it.next().formula();
+                ifFma = (Term) it.next().formula();
                 ifChoiceModel[i] =
                     new TacletAssumesModel(
                         ifFma, taclet().getMatcher().matchIf((i < asize ? antecCand : succCand),

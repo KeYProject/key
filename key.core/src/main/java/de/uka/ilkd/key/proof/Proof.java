@@ -33,6 +33,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.prover.proof.ProofObject;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
@@ -243,7 +244,7 @@ public class Proof implements ProofObject<Goal>, Named {
     public Proof(String name, Term problem, String header, InitConfig initConfig) {
         this(name,
             Sequent.createSuccSequent(
-                (Semisequent) Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(problem))
+                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(problem))
                         .semisequent()),
             initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
         problemHeader = header;

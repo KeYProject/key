@@ -32,7 +32,6 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -55,6 +54,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -537,7 +537,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    private org.key_project.prover.sequent.SequentFormula initFormula(TermLabelState termLabelState,
+    private SequentFormula initFormula(TermLabelState termLabelState,
             Instantiation inst,
             final Term invTerm, Term reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
@@ -697,7 +697,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             self = null;
         }
         services.getSpecificationRepository().addWdStatement(lwd);
-        final org.key_project.prover.sequent.SequentFormula wdInv =
+        final SequentFormula wdInv =
             lwd.generateSequent(self, heap, anonHeap, localIns, update, localAnonUpdate, services);
         goal.changeFormula(wdInv, pio);
     }

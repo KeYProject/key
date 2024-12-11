@@ -49,7 +49,7 @@ public class EditFormulaAction extends ExplorationAction {
         TermBuilder tb = getMediator().getServices().getTermBuilder();
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
         Term term = (Term) pio.subTerm();
-        org.key_project.prover.sequent.SequentFormula sf = pio.sequentFormula();
+        SequentFormula sf = pio.sequentFormula();
         Goal g = getMediator().getSelectedGoal();
         Term newTerm = promptForTerm(mainWindow, term);
 

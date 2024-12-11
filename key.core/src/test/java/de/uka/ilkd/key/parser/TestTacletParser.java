@@ -24,6 +24,7 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -101,7 +102,7 @@ public class TestTacletParser {
     }
 
     public Semisequent sseq(String s) {
-        return (Semisequent) Semisequent.EMPTY_SEMISEQUENT.insertFirst(cf(s)).semisequent();
+        return Semisequent.EMPTY_SEMISEQUENT.insertFirst(cf(s)).semisequent();
     }
 
     public Sequent sequent(String a, String s) {

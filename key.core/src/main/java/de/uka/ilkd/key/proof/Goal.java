@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -36,6 +35,7 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -229,7 +229,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      * event object.
      */
     private void fireSequentChanged(
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci) {
+            SequentChangeInfo sci) {
         var time = System.nanoTime();
         getFormulaTagManager().sequentChanged(this, sci);
         var time1 = System.nanoTime();
@@ -368,7 +368,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      * @param sci SequentChangeInfo containing the sequent to be set and describing the applied
      *        changes to the sequent of the node currently pointed to by this goal
      */
-    public void setSequent(SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci) {
+    public void setSequent(SequentChangeInfo sci) {
         assert sci.getOriginalSequent() == node().sequent();
         if (!sci.hasChanged()) {
             assert sci.sequent().equals(sci.getOriginalSequent());
@@ -402,7 +402,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      *        (succedent)
      * @param first boolean true if at the front, if false then cf is added at the back
      */
-    public void addFormula(org.key_project.prover.sequent.SequentFormula cf, boolean inAntec,
+    public void addFormula(SequentFormula cf, boolean inAntec,
             boolean first) {
         setSequent(sequent().addFormula(cf, inAntec, first));
     }
@@ -414,7 +414,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      * @param cf the SequentFormula replacing the old one
      * @param p the PosInOccurrence encoding the position
      */
-    public void changeFormula(org.key_project.prover.sequent.SequentFormula cf, PosInOccurrence p) {
+    public void changeFormula(SequentFormula cf, PosInOccurrence p) {
         setSequent(sequent().changeFormula(cf, p));
     }
 
@@ -714,12 +714,12 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
     public List<RuleApp> getAllBuiltInRuleApps() {
         final BuiltInRuleAppIndex index = ruleAppIndex().builtInRuleAppIndex();
         LinkedList<RuleApp> ruleApps = new LinkedList<>();
-        for (org.key_project.prover.sequent.SequentFormula sf : node().sequent().antecedent()) {
+        for (SequentFormula sf : node().sequent().antecedent()) {
             ImmutableList<IBuiltInRuleApp> t =
                 index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
             t.forEach(ruleApps::add);
         }
-        for (org.key_project.prover.sequent.SequentFormula sf : node().sequent().succedent()) {
+        for (SequentFormula sf : node().sequent().succedent()) {
             ImmutableList<IBuiltInRuleApp> t =
                 index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false));
             t.forEach(ruleApps::add);
@@ -737,13 +737,13 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
                 return true;
             }
         };
-        for (org.key_project.prover.sequent.SequentFormula sf : node().sequent().antecedent()) {
+        for (SequentFormula sf : node().sequent().antecedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services);
             tacletAppAtAndBelow.forEach(allApps::add);
         }
 
-        for (org.key_project.prover.sequent.SequentFormula sf : node().sequent().succedent()) {
+        for (SequentFormula sf : node().sequent().succedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
             tacletAppAtAndBelow.forEach(allApps::add);

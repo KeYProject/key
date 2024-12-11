@@ -235,7 +235,7 @@ public class OpReplacer {
         }
 
         for (SyntaxElement svs : map.keySet()) {
-            if (term.equalsModProperty(svs, TERM_LABELS_PROPERTY)) {
+            if (svs instanceof Term t && TERM_LABELS_PROPERTY.equalsModThisProperty(term, t)) {
                 return (Term) map.get(svs);
             }
         }

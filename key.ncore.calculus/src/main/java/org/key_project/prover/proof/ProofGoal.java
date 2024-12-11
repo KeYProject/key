@@ -4,10 +4,9 @@
 package org.key_project.prover.proof;
 
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.prover.sequent.SequentFormula;
 
 public interface ProofGoal<G extends ProofGoal<G>> {
     ProofObject<G> proof();
 
-    Sequent<? extends SequentFormula> sequent();
+    Sequent sequent();
 }

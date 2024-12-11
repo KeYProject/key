@@ -43,7 +43,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
 
         final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
         if (t != null) {
-            if (!t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
+            if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(t, term)) {
                 return null;
             } else {
                 return matchCond;

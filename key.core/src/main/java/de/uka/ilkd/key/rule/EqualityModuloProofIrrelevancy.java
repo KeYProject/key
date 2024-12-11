@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.Objects;
 
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
@@ -174,13 +174,15 @@ public class EqualityModuloProofIrrelevancy {
      * @return true if both arguments are equal modulo proof irrelevancy
      */
     public static boolean equalsModProofIrrelevancy(
-            org.key_project.prover.sequent.SequentFormula _this,
-            org.key_project.prover.sequent.SequentFormula that) {
+            SequentFormula _this,
+            SequentFormula that) {
         if (_this == that) {
             return true;
         }
         if (_this != null && that != null) {
-            return _this.formula().equalsModProperty(that.formula(), PROOF_IRRELEVANCY_PROPERTY);
+            Term term = (Term) _this.formula();
+            Term formula = (Term) that.formula();
+            return (PROOF_IRRELEVANCY_PROPERTY).equalsModThisProperty(term, formula);
         }
         return false;
     }
@@ -192,8 +194,8 @@ public class EqualityModuloProofIrrelevancy {
      * @return the hash code modulo proof irrelevancy for the given argument
      */
     public static int hashCodeModProofIrrelevancy(
-            org.key_project.prover.sequent.SequentFormula sf) {
-        return sf.formula().hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY);
+            SequentFormula sf) {
+        return PROOF_IRRELEVANCY_PROPERTY.hashCodeModThisProperty((Term) sf.formula());
     }
 
     // RuleApp
@@ -492,7 +494,7 @@ public class EqualityModuloProofIrrelevancy {
             return false;
         }
         return EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(
-            _this.getConstrainedFormula(), that.getConstrainedFormula());
+            _this.getSequentFormula(), that.getSequentFormula());
     }
 
     /**
@@ -503,6 +505,6 @@ public class EqualityModuloProofIrrelevancy {
      */
     public static int hashCodeModProofIrrelevancy(IfFormulaInstantiation ifInst) {
         return EqualityModuloProofIrrelevancy
-                .hashCodeModProofIrrelevancy(ifInst.getConstrainedFormula());
+                .hashCodeModProofIrrelevancy(ifInst.getSequentFormula());
     }
 }

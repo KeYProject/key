@@ -77,7 +77,7 @@ public class SeqDefHandler implements SMTHandler {
             (Map<Term, SExpr>) state.computeIfAbsent("SEQDEF_MAP", x -> new LinkedHashMap<>());
 
         for (Entry<Term, SExpr> entry : seqDefMap.entrySet()) {
-            if (entry.getKey().equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
+            if (RENAMING_TERM_PROPERTY.equalsModThisProperty(entry.getKey(), term)) {
                 return entry.getValue();
             }
         }

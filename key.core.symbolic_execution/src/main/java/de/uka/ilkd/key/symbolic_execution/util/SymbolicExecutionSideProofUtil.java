@@ -66,16 +66,16 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The general initial {@link Sequent}.
      */
     public static Sequent computeGeneralSequentToProve(Sequent goalSequent,
-            org.key_project.prover.sequent.SequentFormula currentSF) {
+            SequentFormula currentSF) {
         Sequent sequentToProve = Sequent.EMPTY_SEQUENT;
-        for (org.key_project.prover.sequent.SequentFormula sf : goalSequent.antecedent()) {
+        for (SequentFormula sf : goalSequent.antecedent()) {
             if (sf != currentSF) {
                 if (!containsModalityOrQuery(sf)) {
                     sequentToProve = (Sequent) sequentToProve.addFormula(sf, true, false).sequent();
                 }
             }
         }
-        for (org.key_project.prover.sequent.SequentFormula sf : goalSequent.succedent()) {
+        for (SequentFormula sf : goalSequent.succedent()) {
             if (sf != currentSF) {
                 if (!containsModalityOrQuery(sf)) {
                     sequentToProve =
@@ -123,14 +123,14 @@ public final class SymbolicExecutionSideProofUtil {
                 }
                 Sequent sequent = resultGoal.sequent();
                 List<Term> results = new LinkedList<>();
-                for (org.key_project.prover.sequent.SequentFormula sf : sequent.antecedent()) {
+                for (SequentFormula sf : sequent.antecedent()) {
                     if (sf.formula().containsLabel(label)) {
                         Term result = sf.formula();
                         result = services.getTermBuilder().not(result);
                         results.add(result);
                     }
                 }
-                for (org.key_project.prover.sequent.SequentFormula sf : sequent.succedent()) {
+                for (SequentFormula sf : sequent.succedent()) {
                     if (sf.formula().containsLabel(label)) {
                         Term result = sf.formula();
                         results.add(result);
@@ -194,7 +194,7 @@ public final class SymbolicExecutionSideProofUtil {
                 boolean newPredicateIsSequentFormula = isOperatorASequentFormula(sequent, operator);
                 Set<Term> resultConditions = new LinkedHashSet<>();
                 Term result = null;
-                for (org.key_project.prover.sequent.SequentFormula sf : sequent.antecedent()) {
+                for (SequentFormula sf : sequent.antecedent()) {
                     if (newPredicateIsSequentFormula) {
                         if (Operator.opEquals(sf.formula().op(), operator)) {
                             throw new IllegalStateException(
@@ -215,7 +215,7 @@ public final class SymbolicExecutionSideProofUtil {
                         }
                     }
                 }
-                for (org.key_project.prover.sequent.SequentFormula sf : sequent.succedent()) {
+                for (SequentFormula sf : sequent.succedent()) {
                     if (newPredicateIsSequentFormula) {
                         if (Operator.opEquals(sf.formula().op(), operator)) {
                             if (result != null) {
@@ -257,7 +257,7 @@ public final class SymbolicExecutionSideProofUtil {
     }
 
     private static Term constructResultIfContained(Services services,
-            org.key_project.prover.sequent.SequentFormula sf,
+            SequentFormula sf,
             Operator operator) {
         return constructResultIfContained(services, sf.formula(), operator);
     }
@@ -323,7 +323,7 @@ public final class SymbolicExecutionSideProofUtil {
      *         modalities and no queries.
      */
     public static boolean containsModalityOrQuery(
-            org.key_project.prover.sequent.SequentFormula sf) {
+            SequentFormula sf) {
         return containsModalityOrQuery(sf.formula());
     }
 
@@ -385,7 +385,7 @@ public final class SymbolicExecutionSideProofUtil {
     public static Set<Operator> extractRelevantThings(final Services services,
             Sequent sequentToProve) {
         final Set<Operator> result = new HashSet<>();
-        for (org.key_project.prover.sequent.SequentFormula sf : sequentToProve) {
+        for (SequentFormula sf : sequentToProve) {
             sf.formula().execPreOrder(new DefaultVisitor() {
                 @Override
                 public void visit(Term visited) {
@@ -439,7 +439,7 @@ public final class SymbolicExecutionSideProofUtil {
      */
     public static boolean isIrrelevantCondition(Services services, Sequent initialSequent,
             Set<Operator> relevantThingsInSequentToProve,
-            org.key_project.prover.sequent.SequentFormula sf) {
+            SequentFormula sf) {
         return initialSequent.antecedent().contains(sf) || initialSequent.succedent().contains(sf)
                 || containsModalityOrQuery(sf) // isInOrOfAntecedent(initialSequent, sf) ||
                 || containsIrrelevantThings(services, sf, relevantThingsInSequentToProve);
@@ -483,7 +483,7 @@ public final class SymbolicExecutionSideProofUtil {
      *         {@link SequentFormula} contains no irrelevant things.
      */
     public static boolean containsIrrelevantThings(Services services,
-            org.key_project.prover.sequent.SequentFormula sf,
+            SequentFormula sf,
             Set<Operator> relevantThings) {
         ContainsIrrelevantThingsVisitor visitor =
             new ContainsIrrelevantThingsVisitor(services, relevantThings);
@@ -702,7 +702,7 @@ public final class SymbolicExecutionSideProofUtil {
     public static Term extractOperatorTerm(Node node, final Operator operator) {
         assert node != null;
         // Search formula with the given operator in sequent (or in some cases below the updates)
-        org.key_project.prover.sequent.SequentFormula sf =
+        SequentFormula sf =
             CollectionUtil.search(node.sequent(), element -> {
                 Term term = element.formula();
                 term = TermBuilder.goBelowUpdates(term);

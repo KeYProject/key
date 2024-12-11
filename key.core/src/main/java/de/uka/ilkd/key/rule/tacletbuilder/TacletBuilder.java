@@ -11,12 +11,12 @@ import java.util.Set;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -57,9 +57,9 @@ public abstract class TacletBuilder<T extends Taclet> {
         this.tacletAnnotations = tacletAnnotations;
     }
 
-    private static boolean containsFreeVarSV(Term t) {
-        for (final QuantifiableVariable var : t.freeVars()) {
-            if (var instanceof VariableSV) {
+    private static boolean containsFreeVarSV(org.key_project.logic.Term t) {
+        for (final var freeVar : t.freeVars()) {
+            if (freeVar instanceof VariableSV) {
                 return true;
             }
         }
@@ -67,7 +67,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
     private static boolean containsFreeVarSV(Sequent sequent) {
-        for (final org.key_project.prover.sequent.SequentFormula cf : sequent) {
+        for (final SequentFormula cf : sequent) {
             if (containsFreeVarSV(cf.formula())) {
                 return true;
             }

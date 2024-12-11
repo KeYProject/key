@@ -217,7 +217,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         if (resultInst == null) {
             svInst = svInst.add(result, properResultInst, services);
             return mc.setInstantiations(svInst);
-        } else if (resultInst.equalsModProperty(properResultInst, RENAMING_TERM_PROPERTY)) {
+        } else if (RENAMING_TERM_PROPERTY.equalsModThisProperty(resultInst, properResultInst)) {
             return mc;
         } else {
             return null;

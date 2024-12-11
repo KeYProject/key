@@ -15,6 +15,8 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.key_project.prover.sequent.SequentFormula;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 

@@ -27,6 +27,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -1708,10 +1709,10 @@ public class TermLabelManager {
             Object hint, Term tacletTerm, Semisequent semisequent, boolean inAntec,
             Set<TermLabelRefactoring> activeRefactorings) {
         if (!activeRefactorings.isEmpty()) {
-            for (org.key_project.prover.sequent.SequentFormula sfa : semisequent) {
+            for (SequentFormula sfa : semisequent) {
                 Term updatedTerm =
                     refactorLabelsRecursive(state, services, applicationPosInOccurrence,
-                        applicationTerm, rule, goal, hint, tacletTerm, sfa.formula(),
+                        applicationTerm, rule, goal, hint, tacletTerm, (Term) sfa.formula(),
                         activeRefactorings);
                 if (!sfa.formula().equals(updatedTerm)) {
                     goal.changeFormula(new SequentFormula(updatedTerm),
@@ -2012,7 +2013,7 @@ public class TermLabelManager {
      * @param services The {@link Services} to use.
      */
     public static void mergeLabels(
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             Services services) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
@@ -2029,7 +2030,7 @@ public class TermLabelManager {
      *        {@link SequentFormula}s.
      */
     public void mergeLabels(Services services,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent) {
+            SequentChangeInfo currentSequent) {
         for (var rejectedSF : currentSequent.getSemisequentChangeInfo(true)
                 .rejectedFormulas()) {
             mergeLabels(currentSequent, services, rejectedSF, true);
@@ -2052,19 +2053,19 @@ public class TermLabelManager {
      *        {@code false} it is in succedent.
      */
     protected void mergeLabels(
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             Services services,
-            org.key_project.prover.sequent.SequentFormula rejectedSF, boolean inAntecedent) {
-        final Term rejectedTerm = rejectedSF.formula();
+            SequentFormula rejectedSF, boolean inAntecedent) {
+        final Term rejectedTerm = (Term) rejectedSF.formula();
         if (rejectedTerm.hasLabels()) {
             // Search existing SequentFormula
             var s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
-            org.key_project.prover.sequent.SequentFormula existingSF = CollectionUtil.search(s,
-                element -> element.formula().equalsModProperty(rejectedTerm,
-                    RENAMING_TERM_PROPERTY));
+            SequentFormula existingSF = CollectionUtil.search(s,
+                element -> RENAMING_TERM_PROPERTY.equalsModThisProperty(element.formula(),
+                    rejectedTerm));
             if (existingSF != null) {
                 // Create list of new labels
-                Term existingTerm = existingSF.formula();
+                Term existingTerm = (Term) existingSF.formula();
                 List<TermLabel> mergedLabels = new LinkedList<>();
                 CollectionUtil.addAll(mergedLabels, existingTerm.getLabels());
                 boolean labelsChanged = false;
@@ -2085,7 +2086,7 @@ public class TermLabelManager {
                     Term newTerm = services.getTermFactory().createTerm(existingTerm.op(),
                         existingTerm.subs(), existingTerm.boundVars(),
                         new ImmutableArray<>(mergedLabels));
-                    SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci =
+                    SequentChangeInfo sci =
                         currentSequent.sequent().changeFormula(new SequentFormula(newTerm),
                             new PosInOccurrence(existingSF, PosInTerm.getTopLevel(), inAntecedent));
                     currentSequent.combine(sci);

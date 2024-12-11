@@ -9,7 +9,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -117,21 +117,25 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
 
         // filter taclets that are applicable on the given formula
         // filter taclets that are applicable on the given formula in the antecedent
-        for (org.key_project.prover.sequent.SequentFormula sf : g.node().sequent().antecedent()) {
+        for (SequentFormula sf : g.node().sequent().antecedent()) {
 
-            if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
-                continue;
+            if (p.formula != null) {
+                org.key_project.logic.Term term = sf.formula();
+                if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula)) {
+                    continue;
+                }
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
 
         // filter taclets that are applicable on the given formula in the succedent
-        for (org.key_project.prover.sequent.SequentFormula sf : g.node().sequent().succedent()) {
-            if (p.formula != null
-                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
-                continue;
+        for (SequentFormula sf : g.node().sequent().succedent()) {
+            if (p.formula != null) {
+                org.key_project.logic.Term term = sf.formula();
+                if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula)) {
+                    continue;
+                }
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
@@ -165,7 +169,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
 
                             RewriteTaclet rw = (RewriteTaclet) pta.taclet();
                             if (pta.complete()) {
-                                org.key_project.prover.sequent.SequentFormula rewriteResult =
+                                SequentFormula rewriteResult =
                                     rw.getExecutor().getRewriteResult(
                                         goalold, null, goalold.proof().getServices(), pta);
 
@@ -194,7 +198,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param rewriteResult
      */
     private void executeRewriteTaclet(Parameters p, PosTacletApp pta, Goal goalold,
-            org.key_project.prover.sequent.SequentFormula rewriteResult) {
+            SequentFormula rewriteResult) {
         if (rewriteResult.formula().equals(p.replace)
                 || getTermAtPos(rewriteResult, pta.posInOccurrence()).equals(p.replace)) {
             failposInOccs.remove(pta.posInOccurrence());

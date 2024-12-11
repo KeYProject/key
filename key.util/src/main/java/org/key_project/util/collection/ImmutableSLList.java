@@ -98,7 +98,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
             // @ assert !rest.isEmpty();
             T head = rest.head();
             // Somehow the nullness checker needs this cast to be explicit.
-            result[i] = (S) type.cast(head);
+            result[i] = type.cast(head);
             rest = rest.tail();
         }
         return result;
@@ -370,7 +370,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
 
         /** @return boolean true iff. obj in list */
         @Override
-        public boolean contains(S obj) {
+        public boolean contains(Object obj) {
             ImmutableList<S> list = this;
             S t;
             while (!list.isEmpty()) {
@@ -585,7 +585,7 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
         }
 
         @Override
-        public boolean contains(S obj) {
+        public boolean contains(Object obj) {
             return false;
         }
 

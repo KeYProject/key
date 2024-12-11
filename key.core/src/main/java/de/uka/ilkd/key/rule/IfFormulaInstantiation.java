@@ -17,7 +17,7 @@ public interface IfFormulaInstantiation {
     /**
      * @return the cf this is pointing to
      */
-    SequentFormula getConstrainedFormula();
+    SequentFormula getSequentFormula();
 
     String toString(Services services);
 }

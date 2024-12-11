@@ -38,6 +38,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -560,13 +561,13 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (head != null && ss != null) {
             // A sequent with only head in the antecedent.
             Semisequent ant = Semisequent.EMPTY_SEMISEQUENT;
-            ant = (Semisequent) ant.insertFirst(new SequentFormula(head)).semisequent();
+            ant = ant.insertFirst(new SequentFormula(head)).semisequent();
             return Sequent.createSequent(ant, ss);
         }
         if (head != null && s != null) {
             // A sequent. Prepend head to the antecedent.
             Semisequent newAnt = s.antecedent();
-            newAnt = (Semisequent) newAnt.insertFirst(new SequentFormula(head)).semisequent();
+            newAnt = newAnt.insertFirst(new SequentFormula(head)).semisequent();
             return Sequent.createSequent(newAnt, s.succedent());
         }
         if (ss != null) {
@@ -584,7 +585,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         Term head = accept(ctx.term());
         if (head != null) {
-            ss = (Semisequent) ss.insertFirst(new SequentFormula(head)).semisequent();
+            ss = ss.insertFirst(new SequentFormula(head)).semisequent();
         }
         return ss;
     }

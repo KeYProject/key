@@ -29,6 +29,7 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -751,8 +752,8 @@ public class LogicPrinter {
      *
      * @param cfma the constrained formula to be printed
      */
-    public void printConstrainedFormula(org.key_project.prover.sequent.SequentFormula cfma) {
-        printTerm(cfma.formula());
+    public void printConstrainedFormula(SequentFormula cfma) {
+        printTerm((Term) cfma.formula());
     }
 
     /**

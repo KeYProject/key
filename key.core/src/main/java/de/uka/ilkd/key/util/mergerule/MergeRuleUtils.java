@@ -40,6 +40,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 import org.key_project.util.collection.Pair;
 
@@ -48,7 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
-import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * This class encapsulates static methods used in the MergeRule implementation. The methods are
@@ -239,7 +239,7 @@ public class MergeRuleUtils {
             Services services) {
         HashSet<LocationVariable> result = new HashSet<>();
 
-        for (org.key_project.prover.sequent.SequentFormula f : sequent) {
+        for (SequentFormula f : sequent) {
             result.addAll(getLocationVariablesHashSet(f.formula(), services));
         }
 
@@ -252,18 +252,19 @@ public class MergeRuleUtils {
      * @param term The term to extract program variables from.
      * @return All program variables of the given term.
      */
-    public static HashSet<LocationVariable> getLocationVariablesHashSet(Term term,
+    public static HashSet<LocationVariable> getLocationVariablesHashSet(
+            org.key_project.logic.Term term,
             Services services) {
         HashSet<LocationVariable> result = new HashSet<>();
 
         if (term.op() instanceof LocationVariable) {
             result.add((LocationVariable) term.op());
         } else {
-            if (!term.javaBlock().isEmpty()) {
+            if (term.op() instanceof Modality) {
                 result.addAll(getProgramLocationsHashSet(term, services));
             }
 
-            for (Term sub : term.subs()) {
+            for (var sub : term.subs()) {
                 result.addAll(getLocationVariablesHashSet(sub, services));
             }
         }
@@ -803,7 +804,7 @@ public class MergeRuleUtils {
     public static void clearSemisequent(Goal goal, boolean antec) {
         final Semisequent semiseq =
             antec ? goal.sequent().antecedent() : goal.sequent().succedent();
-        for (final org.key_project.prover.sequent.SequentFormula f : semiseq) {
+        for (final SequentFormula f : semiseq) {
             final PosInOccurrence gPio =
                 new PosInOccurrence(f, PosInTerm.getTopLevel(), antec);
             goal.removeFormula(gPio);
@@ -1062,16 +1063,17 @@ public class MergeRuleUtils {
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(Node node,
             PosInOccurrence pio, Services services) {
 
-        ImmutableList<org.key_project.prover.sequent.SequentFormula> pathConditionSet =
+        ImmutableList<SequentFormula> pathConditionSet =
             ImmutableSLList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent().asList());
 
         var selected = pio.subTerm();
 
-        for (org.key_project.prover.sequent.SequentFormula sf : node.sequent().succedent()) {
+        for (SequentFormula sf : node.sequent().succedent()) {
             if (!sf.formula().equals(selected)) {
                 pathConditionSet = pathConditionSet
-                        .prepend(new SequentFormula(services.getTermBuilder().not(sf.formula())));
+                        .prepend(
+                            new SequentFormula(services.getTermBuilder().not((Term) sf.formula())));
             }
         }
 
@@ -1384,14 +1386,14 @@ public class MergeRuleUtils {
      * @return And-formula connecting the given terms.
      */
     private static Term joinListToAndTerm(
-            ImmutableList<org.key_project.prover.sequent.SequentFormula> formulae,
+            ImmutableList<SequentFormula> formulae,
             Services services) {
         if (formulae.isEmpty()) {
             return services.getTermBuilder().tt();
         } else if (formulae.size() == 1) {
-            return formulae.head().formula();
+            return (Term) formulae.head().formula();
         } else {
-            return services.getTermBuilder().and(formulae.head().formula(),
+            return services.getTermBuilder().and((Term) formulae.head().formula(),
                 joinListToAndTerm(formulae.tail(), services));
         }
     }
@@ -1426,9 +1428,11 @@ public class MergeRuleUtils {
      * @param services The Services object.
      * @return The set of contained program locations.
      */
-    private static HashSet<LocationVariable> getProgramLocationsHashSet(Term programCounterTerm,
+    private static HashSet<LocationVariable> getProgramLocationsHashSet(
+            org.key_project.logic.Term programCounterTerm,
             Services services) {
-        final JavaProgramElement program = programCounterTerm.javaBlock().program();
+        final var mod = (Modality) programCounterTerm.op();
+        final JavaProgramElement program = mod.program().program();
         if (program instanceof StatementBlock && (((StatementBlock) program).isEmpty()
                 || (((StatementBlock) program).getInnerMostMethodFrame() != null
                         && ((StatementBlock) program).getInnerMostMethodFrame().getBody()
@@ -1631,12 +1635,12 @@ public class MergeRuleUtils {
         ImmutableList<Term> succedentForms = ImmutableSLList.nil();
 
         // Shift antecedent formulae to the succedent by negation
-        for (org.key_project.prover.sequent.SequentFormula sf : sequent.antecedent().asList()) {
-            negAntecedentForms = negAntecedentForms.prepend(tb.not(sf.formula()));
+        for (SequentFormula sf : sequent.antecedent().asList()) {
+            negAntecedentForms = negAntecedentForms.prepend(tb.not((Term) sf.formula()));
         }
 
-        for (org.key_project.prover.sequent.SequentFormula sf : sequent.succedent().asList()) {
-            succedentForms = succedentForms.prepend(sf.formula());
+        for (SequentFormula sf : sequent.succedent().asList()) {
+            succedentForms = succedentForms.prepend((Term) sf.formula());
         }
 
         return tb.or(negAntecedentForms.prepend(succedentForms));
@@ -1722,27 +1726,6 @@ public class MergeRuleUtils {
     // /////////////////////////////////////////////////
 
     /**
-     * Creates {@link TermWrapper} objects, thereby ensuring that equal term wrappers also have
-     * equal hash codes.
-     *
-     * @author Dominic Scheurer
-     */
-    static class TermWrapperFactory {
-        private final ArrayList<Term> wrappedTerms = new ArrayList<>();
-
-        public TermWrapper wrapTerm(Term term) {
-            for (Term existingTerm : wrappedTerms) {
-                if (existingTerm.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
-                    return new TermWrapper(term, existingTerm.hashCode());
-                }
-            }
-
-            wrappedTerms.add(term);
-            return new TermWrapper(term, term.hashCode());
-        }
-    }
-
-    /**
      * TODO
      *
      * @author Dominic Scheurer
@@ -1751,48 +1734,6 @@ public class MergeRuleUtils {
             LinkedHashSet<Term> specific2,
             LinkedHashSet<Term> common) {
     }
-
-    /**
-         * Simple term wrapper for comparing terms modulo renaming.
-         *
-         * @author Dominic Scheurer
-         * @see TermWrapperFactory
-         */
-        record TermWrapper(Term term, int hashcode) {
-
-        @Override
-            public boolean equals(Object obj) {
-                return obj instanceof TermWrapper
-                        && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_TERM_PROPERTY);
-            }
-
-            @Override
-            public int hashCode() {
-                return hashcode;
-            }
-
-            @Override
-            public String toString() {
-                return term.toString();
-            }
-
-            /**
-             * Adds the wrapped content of the Iterable object into the given target collection.
-             *
-             * @param target            The collection to insert the wrapped terms into.
-             * @param wrappedCollection Iterable to transform.
-             * @return The target collection with inserted terms.
-             */
-            public static <T extends Collection<Term>> T toTermList(T target,
-                                                                    Iterable<TermWrapper> wrappedCollection) {
-
-                for (TermWrapper termWrapper : wrappedCollection) {
-                    target.add(termWrapper.term());
-                }
-
-                return target;
-            }
-        }
 
     /**
      * Visitor for collecting program locations in a Java block.

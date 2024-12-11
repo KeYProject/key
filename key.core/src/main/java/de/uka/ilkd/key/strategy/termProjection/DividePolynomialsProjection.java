@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.termProjection;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 
 public abstract class DividePolynomialsProjection extends AbstractDividePolynomialsProjection {
@@ -19,7 +18,8 @@ public abstract class DividePolynomialsProjection extends AbstractDividePolynomi
     public static ProjectionToTerm createRoundingDown(ProjectionToTerm leftCoefficient,
             ProjectionToTerm polynomial) {
         return new DividePolynomialsProjection(leftCoefficient, polynomial) {
-            protected Term divide(Monomial numerator, BigInteger denominator, Services services) {
+            protected org.key_project.logic.Term divide(Monomial numerator, BigInteger denominator,
+                    Services services) {
                 final BigInteger newRightCoeff = divide(numerator.getCoefficient(), denominator);
                 return numerator.setCoefficient(newRightCoeff).toTerm(services);
             }
@@ -30,7 +30,8 @@ public abstract class DividePolynomialsProjection extends AbstractDividePolynomi
     public static ProjectionToTerm createRoundingUp(ProjectionToTerm leftCoefficient,
             ProjectionToTerm polynomial) {
         return new DividePolynomialsProjection(leftCoefficient, polynomial) {
-            protected Term divide(Monomial numerator, BigInteger denominator, Services services) {
+            protected org.key_project.logic.Term divide(Monomial numerator, BigInteger denominator,
+                    Services services) {
                 final BigInteger newRightCoeff =
                     divide(numerator.getCoefficient().negate(), denominator).negate();
                 return numerator.setCoefficient(newRightCoeff).toTerm(services);

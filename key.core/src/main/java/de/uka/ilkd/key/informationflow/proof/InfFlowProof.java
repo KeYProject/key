@@ -98,12 +98,12 @@ public class InfFlowProof extends Proof {
         ImmutableList<TacletGoalTemplate> temps = t.goalTemplates();
         assert temps != null;
         for (TacletGoalTemplate tgt : temps) {
-            for (org.key_project.prover.sequent.SequentFormula sf : tgt.sequent().antecedent()
+            for (SequentFormula sf : tgt.sequent().antecedent()
                     .asList()) {
-                addLabeledTotalTerm(sf.formula());
+                addLabeledTotalTerm((Term) sf.formula());
             }
             for (SequentFormula sf : tgt.sequent().succedent().asList()) {
-                addLabeledTotalTerm(sf.formula());
+                addLabeledTotalTerm((Term) sf.formula());
             }
         }
     }

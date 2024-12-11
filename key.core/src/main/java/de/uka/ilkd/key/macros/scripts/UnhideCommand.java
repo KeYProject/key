@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
@@ -58,10 +57,10 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
 
         Goal goal = state.getFirstOpenAutomaticGoal();
 
-        Set<Term> antes = new HashSet<>();
+        Set<org.key_project.logic.Term> antes = new HashSet<>();
         args.sequent.antecedent().forEach(sf -> antes.add(sf.formula()));
 
-        Set<Term> succs = new HashSet<>();
+        Set<org.key_project.logic.Term> succs = new HashSet<>();
         args.sequent.succedent().forEach(sf -> succs.add(sf.formula()));
 
         RuleAppIndex index = goal.ruleAppIndex();

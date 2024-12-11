@@ -3,10 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.SequentFormula;
-
 import org.key_project.logic.IntIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -117,7 +116,7 @@ public class InitialPositionTable extends PositionTable {
      * @param filter the current filter
      * @return the index of the given formula in the sequent as printed
      */
-    private int indexOfCfma(org.key_project.prover.sequent.SequentFormula cfma,
+    private int indexOfCfma(SequentFormula cfma,
             SequentPrintFilter filter) {
         ImmutableList<SequentPrintFilterEntry> list =
             filter.getFilteredAntec().append(filter.getFilteredSucc());

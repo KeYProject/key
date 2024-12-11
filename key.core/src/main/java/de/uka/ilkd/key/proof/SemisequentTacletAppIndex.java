@@ -18,6 +18,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 
 /**
@@ -46,7 +47,7 @@ public class SemisequentTacletAppIndex {
             Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
         while (!cfmas.isEmpty()) {
-            final org.key_project.prover.sequent.SequentFormula cfma = cfmas.head();
+            final SequentFormula cfma = cfmas.head();
             cfmas = cfmas.tail();
             addTermIndex(cfma, services, tacletIndex, listener);
         }
@@ -56,7 +57,8 @@ public class SemisequentTacletAppIndex {
      * Add an index for the given formula to the map <code>termIndices</code>. An existing entry is
      * replaced with the new one. Note: destructive, use only when constructing new index
      */
-    private void addTermIndex(org.key_project.prover.sequent.SequentFormula cfma, Services services,
+    private void addTermIndex(
+            SequentFormula cfma, Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
         final PosInOccurrence pos =
             new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
@@ -69,7 +71,7 @@ public class SemisequentTacletAppIndex {
      * <code>termIndices</code>, by adding the taclets that are selected by <code>filter</code>
      * Note: destructive, use only when constructing new index
      */
-    private void addTaclets(RuleFilter filter, org.key_project.prover.sequent.SequentFormula cfma,
+    private void addTaclets(RuleFilter filter, SequentFormula cfma,
             Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
         final TermTacletAppIndex oldIndex = termIndices.get(cfma);
@@ -88,7 +90,7 @@ public class SemisequentTacletAppIndex {
      */
     private void removeTermIndices(
             ImmutableList<org.key_project.prover.sequent.SequentFormula> cfmas) {
-        for (org.key_project.prover.sequent.SequentFormula cfma : cfmas) {
+        for (SequentFormula cfma : cfmas) {
             removeTermIndex(cfma);
         }
     }
@@ -97,7 +99,7 @@ public class SemisequentTacletAppIndex {
      * Remove the index for the given formula from the map <code>termIndices</code>. Note:
      * destructive, use only when constructing new index
      */
-    private void removeTermIndex(org.key_project.prover.sequent.SequentFormula cfma) {
+    private void removeTermIndex(SequentFormula cfma) {
         termIndices = termIndices.remove(cfma);
     }
 
@@ -108,11 +110,11 @@ public class SemisequentTacletAppIndex {
      *         use only when constructing new index
      */
     private List<TermTacletAppIndex> removeFormulas(
-            ImmutableList<FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula>> infos) {
+            ImmutableList<FormulaChangeInfo> infos) {
         var oldIndices = new ArrayList<TermTacletAppIndex>(infos.size());
 
-        for (FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula> info : infos) {
-            final org.key_project.prover.sequent.SequentFormula oldFor = info.getOriginalFormula();
+        for (FormulaChangeInfo info : infos) {
+            final SequentFormula oldFor = info.getOriginalFormula();
 
             oldIndices.add(termIndices.get(oldFor));
             removeTermIndex(oldFor);
@@ -128,18 +130,18 @@ public class SemisequentTacletAppIndex {
      * when constructing new index
      */
     private void updateTermIndices(List<TermTacletAppIndex> oldIndices,
-            ImmutableList<FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula>> infos,
+            ImmutableList<FormulaChangeInfo> infos,
             Services services,
             TacletIndex tacletIndex,
             NewRuleListener listener) {
-        final Iterator<FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula>> infoIt =
+        final Iterator<FormulaChangeInfo> infoIt =
             infos.iterator();
         final Iterator<TermTacletAppIndex> oldIndexIt = oldIndices.iterator();
 
         while (infoIt.hasNext()) {
-            final FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula> info =
+            final FormulaChangeInfo info =
                 infoIt.next();
-            final org.key_project.prover.sequent.SequentFormula newFor = info.newFormula();
+            final SequentFormula newFor = info.newFormula();
             final TermTacletAppIndex oldIndex = oldIndexIt.next();
 
             if (oldIndex == null)
@@ -158,7 +160,7 @@ public class SemisequentTacletAppIndex {
     }
 
     private void updateTermIndices(
-            ImmutableList<FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula>> infos,
+            ImmutableList<FormulaChangeInfo> infos,
             Services services, TacletIndex tacletIndex, NewRuleListener listener) {
 
         // remove original indices
@@ -228,7 +230,7 @@ public class SemisequentTacletAppIndex {
      * @param sci SequentChangeInfo describing the change of the sequent
      */
     public SemisequentTacletAppIndex sequentChanged(
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci,
+            SequentChangeInfo sci,
             Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
         if (sci.hasChanged(antec)) {
@@ -277,7 +279,7 @@ public class SemisequentTacletAppIndex {
      */
     void reportRuleApps(NewRuleListener l) {
         for (final ImmutableMapEntry<org.key_project.prover.sequent.SequentFormula, TermTacletAppIndex> entry : termIndices) {
-            final org.key_project.prover.sequent.SequentFormula cfma = entry.key();
+            final SequentFormula cfma = entry.key();
             final TermTacletAppIndex index = entry.value();
             final PosInOccurrence pio =
                 new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);

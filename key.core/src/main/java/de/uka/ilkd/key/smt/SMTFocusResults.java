@@ -20,6 +20,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -74,7 +75,7 @@ public final class SMTFocusResults {
         Semisequent succedent = goalNode.sequent().succedent();
 
         int i = 1;
-        for (org.key_project.prover.sequent.SequentFormula sf : antecedent) {
+        for (SequentFormula sf : antecedent) {
             PosInOccurrence pio =
                 PosInOccurrence.findInSequent(goalNode.sequent(), i,
                     PosInTerm.getTopLevel());
@@ -84,13 +85,13 @@ public final class SMTFocusResults {
                 TacletApp app = PosTacletApp.createPosTacletApp(hideLeft, new MatchConditions(),
                     new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
                     services);
-                app = app.addCheckedInstantiation(schema, sf.formula(), services, true);
+                app = app.addCheckedInstantiation(schema, (Term) sf.formula(), services, true);
                 goal = goal.apply(app).iterator().next();
             }
             i++;
         }
 
-        for (org.key_project.prover.sequent.SequentFormula sf : succedent) {
+        for (SequentFormula sf : succedent) {
             PosInOccurrence pio =
                 PosInOccurrence.findInSequent(goalNode.sequent(), i,
                     PosInTerm.getTopLevel());
@@ -101,7 +102,7 @@ public final class SMTFocusResults {
                     PosTacletApp.createPosTacletApp(hideRight, new MatchConditions(),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
                         services);
-                app = app.addCheckedInstantiation(schema, sf.formula(), services, true);
+                app = app.addCheckedInstantiation(schema, (Term) sf.formula(), services, true);
                 goal = goal.apply(app).iterator().next();
             }
             i++;
@@ -153,7 +154,7 @@ public final class SMTFocusResults {
 
         Semisequent antecedent = goalNode.sequent().antecedent();
         int i = 1;
-        for (org.key_project.prover.sequent.SequentFormula sf : antecedent) {
+        for (SequentFormula sf : antecedent) {
             if (unsatCore.contains(i)) {
                 unsatCoreFormulas =
                     unsatCoreFormulas.prepend(PosInOccurrence
@@ -163,7 +164,7 @@ public final class SMTFocusResults {
         }
 
         Semisequent succedent = goalNode.sequent().succedent();
-        for (org.key_project.prover.sequent.SequentFormula sf : succedent) {
+        for (SequentFormula sf : succedent) {
             if (unsatCore.contains(i)) {
                 unsatCoreFormulas =
                     unsatCoreFormulas.prepend(PosInOccurrence

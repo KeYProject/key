@@ -7,8 +7,8 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
-import de.uka.ilkd.key.logic.equality.Property;
 
+import org.key_project.logic.Property;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.Nullable;
@@ -33,9 +33,9 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
     private final LinkedHashMap<ElementWrapper<K>, @Nullable V> map;
 
     /**
-     * The {@link Property<K>} that is used for equality checks and hash codes.
+     * The {@link Property} that is used for equality checks and hash codes.
      */
-    private final Property<K> property;
+    private final Property<? super K> property;
 
     /**
      * Constructs a new empty {@link LinkedHashMapWrapper}.
@@ -43,7 +43,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * @param property the {@link Property<Term>} that is used internally for equality checks and
      *        hash codes
      */
-    public LinkedHashMapWrapper(Property<K> property) {
+    public LinkedHashMapWrapper(Property<? super K> property) {
         this.property = property;
         map = new LinkedHashMap<>();
     }
@@ -56,7 +56,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * @param property the {@link Property<Term>} that is used internally for equality checks and
      *        hash codes
      */
-    public LinkedHashMapWrapper(K key, V value, Property<K> property) {
+    public LinkedHashMapWrapper(K key, V value, Property<? super K> property) {
         this(property);
         put(key, value);
     }
@@ -73,7 +73,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * @param property the {@link Property<Term>} that is used internally for equality checks and
      *        hash codes
      */
-    public LinkedHashMapWrapper(K[] keys, V[] values, Property<K> property) {
+    public LinkedHashMapWrapper(K[] keys, V[] values, Property<? super K> property) {
         this(property);
         putAll(keys, values);
     }
@@ -90,7 +90,8 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * @param property the {@link Property<Term>} that is used internally for equality checks and
      *        hash codes
      */
-    public LinkedHashMapWrapper(Iterable<K> keys, Iterable<V> values, Property<K> property) {
+    public LinkedHashMapWrapper(Iterable<K> keys, Iterable<V> values,
+            Property<? super K> property) {
         this(property);
         putAll(keys, values);
     }
@@ -258,17 +259,17 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
         K key;
 
         /**
-         * The {@link Property<K>} that is used for equality checks and hash codes.
+         * The {@link Property} that is used for equality checks and hash codes.
          */
-        Property<K> property;
+        Property<? super K> property;
 
         /**
          * Creates a new wrapper for the given element.
          *
          * @param key the element to be wrapped
-         * @param property the {@link Property<K>} that is used for equality checks and hash codes
+         * @param property the {@link Property} that is used for equality checks and hash codes
          */
-        public ElementWrapper(K key, Property<K> property) {
+        public ElementWrapper(K key, Property<? super K> property) {
             this.key = key;
             this.property = property;
         }
@@ -276,7 +277,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof ElementWrapper<?> other) {
-                return key.equalsModProperty(other.key, property);
+                return property.equalsModThisProperty(key, (K) other.key);
             }
             return false;
         }

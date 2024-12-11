@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
-import java.util.Objects;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -298,30 +297,6 @@ public class PosTacletApp extends TacletApp {
     @Override
     public int hashCode() {
         return super.hashCode() + 13 * posInOccurrence().hashCode();
-    }
-
-    public boolean equalsModProofIrrelevancy(Object o) {
-        if (!(o instanceof TacletApp cmp
-                ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(this, cmp)
-                : false) || !(o instanceof PosTacletApp)) {
-            return false;
-        }
-        PosInOccurrence posA = ((PosTacletApp) o).pos;
-        PosInOccurrence posB = pos;
-        if (posA == null && posB == null) {
-            return true;
-        } else if (posA == null || posB == null) {
-            return false;
-        } else {
-            return posA.eqEquals(posB);
-        }
-    }
-
-    public int hashCodeModProofIrrelevancy() {
-        org.key_project.prover.sequent.SequentFormula sf = pos.sequentFormula();
-        return Objects.hash(EqualityModuloProofIrrelevancy.hashCodeModProofIrrelevancy(this),
-            EqualityModuloProofIrrelevancy.hashCodeModProofIrrelevancy(sf),
-            pos.posInTerm());
     }
 
     @Override

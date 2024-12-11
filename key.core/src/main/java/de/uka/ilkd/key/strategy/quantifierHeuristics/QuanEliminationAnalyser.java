@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 public class QuanEliminationAnalyser {
@@ -23,14 +22,14 @@ public class QuanEliminationAnalyser {
     public int eliminableDefinition(Term definition,
             PosInOccurrence envPIO) {
         final PosInOccurrence matrixPIO = walkUpMatrix(envPIO);
-        final Term matrix = (Term) matrixPIO.subTerm();
+        final Term matrix = matrixPIO.subTerm();
 
         if (matrixPIO.isTopLevel()) {
             return Integer.MAX_VALUE;
         }
 
         PosInOccurrence quantPIO = matrixPIO.up();
-        Term quantTerm = (Term) quantPIO.subTerm();
+        Term quantTerm = quantPIO.subTerm();
         final boolean ex;
         if (quantTerm.op() == Quantifier.EX) {
             ex = true;
@@ -40,7 +39,7 @@ public class QuanEliminationAnalyser {
             return Integer.MAX_VALUE;
         }
 
-        if (!isDefinitionCandidate(definition, (Term) envPIO.subTerm(), ex)) {
+        if (!isDefinitionCandidate(definition, envPIO.subTerm(), ex)) {
             return Integer.MAX_VALUE;
         }
 
@@ -57,7 +56,7 @@ public class QuanEliminationAnalyser {
                 return Integer.MAX_VALUE;
             }
             quantPIO = quantPIO.up();
-            quantTerm = (Term) quantPIO.subTerm();
+            quantTerm = quantPIO.subTerm();
 
             if (quantTerm.op() != (ex ? Quantifier.EX : Quantifier.ALL)) {
                 return Integer.MAX_VALUE;
@@ -75,7 +74,7 @@ public class QuanEliminationAnalyser {
     }
 
     private boolean isBelowOr(Term t, Term env) {
-        final Operator envOp = env.op();
+        final var envOp = env.op();
         if (envOp == Junctor.OR && (env.sub(0) == t || env.sub(1) == t)) {
             return true;
         }
@@ -114,11 +113,12 @@ public class QuanEliminationAnalyser {
      */
     public boolean isEliminableVariableSomePaths(QuantifiableVariable var, Term matrix,
             boolean ex) {
-        if (!matrix.freeVars().contains(var)) {
+        if (!((de.uka.ilkd.key.logic.Term) matrix).freeVars()
+                .contains((de.uka.ilkd.key.logic.op.QuantifiableVariable) var)) {
             return true;
         }
 
-        final Operator op = matrix.op();
+        final var op = matrix.op();
 
         if (op == (ex ? Junctor.OR : Junctor.AND)) {
             return isEliminableVariableSomePaths(var, matrix.sub(0), ex)
@@ -142,7 +142,7 @@ public class QuanEliminationAnalyser {
      * <code>matrix</code> (depending on whether <code>ex</code> is true/false)
      */
     public boolean isEliminableVariableAllPaths(QuantifiableVariable var, Term matrix, boolean ex) {
-        final Operator op = matrix.op();
+        final var op = matrix.op();
 
         if (op == (ex ? Junctor.OR : Junctor.AND)) {
             return isEliminableVariableAllPaths(var, matrix.sub(0), ex)
@@ -189,12 +189,14 @@ public class QuanEliminationAnalyser {
         if (t.op() != Equality.EQUALS) {
             return false;
         }
-        final Term left = t.sub(0);
-        final Term right = t.sub(1);
-        final Operator leftOp = left.op();
-        final Operator rightOp = right.op();
-        return leftOp == var && !right.freeVars().contains(var)
-                || rightOp == var && !left.freeVars().contains(var);
+        final var left = (de.uka.ilkd.key.logic.Term) t.sub(0);
+        final var right = (de.uka.ilkd.key.logic.Term) t.sub(1);
+        final var leftOp = left.op();
+        final var rightOp = right.op();
+        return leftOp == var
+                && !right.freeVars().contains((de.uka.ilkd.key.logic.op.QuantifiableVariable) var)
+                || rightOp == var && !left.freeVars()
+                        .contains((de.uka.ilkd.key.logic.op.QuantifiableVariable) var);
     }
 
 }

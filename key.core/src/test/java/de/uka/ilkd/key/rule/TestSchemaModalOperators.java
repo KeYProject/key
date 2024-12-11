@@ -20,6 +20,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -157,7 +158,7 @@ public class TestSchemaModalOperators {
             new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
         PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
         Term instReplace =
-            t.getRewriteResult(TacletForTests.createGoal(), new TermLabelState(), services,
+            (Term) t.getRewriteResult(TacletForTests.createGoal(), new TermLabelState(), services,
                 tacletApp).formula();
         assertNotNull(instReplace);
         assertSame(Modality.JavaModalityKind.DIA, ((Modality) instReplace.op()).kind());

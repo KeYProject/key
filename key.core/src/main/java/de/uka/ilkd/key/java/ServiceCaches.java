@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
@@ -92,23 +91,26 @@ public class ServiceCaches {
     private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
         new LRUCache<>(1000);
 
-    private final LRUCache<Operator, Integer> introductionTimeCache =
+    private final LRUCache<org.key_project.logic.op.Operator, Integer> introductionTimeCache =
         new LRUCache<>(10000);
 
-    private final LRUCache<Term, Monomial> monomialCache = new LRUCache<>(2000);
+    private final LRUCache<org.key_project.logic.Term, Monomial> monomialCache =
+        new LRUCache<>(2000);
 
-    private final LRUCache<Term, Polynomial> polynomialCache = new LRUCache<>(2000);
+    private final LRUCache<org.key_project.logic.Term, Polynomial> polynomialCache =
+        new LRUCache<>(2000);
 
     /**
      * a <code>HashMap</code> from <code>Term</code> to <code>TriggersSet</code> uses to cache all
      * created TriggersSets
      */
-    private final Map<Term, TriggersSet> triggerSetCache = new LRUCache<>(1000);
+    private final Map<org.key_project.logic.Term, TriggersSet> triggerSetCache =
+        new LRUCache<>(1000);
 
     /**
      * Map from <code>Term</code>(allTerm) to <code>ClausesGraph</code>
      */
-    private final Map<Term, ClausesGraph> graphCache = new LRUCache<>(1000);
+    private final Map<org.key_project.logic.Term, ClausesGraph> graphCache = new LRUCache<>(1000);
 
     /**
      * Cache used by the TermFactory to avoid unnecessary creation of terms
@@ -170,23 +172,23 @@ public class ServiceCaches {
         return ifThenElseMalusCache;
     }
 
-    public final LRUCache<Operator, Integer> getIntroductionTimeCache() {
+    public final LRUCache<org.key_project.logic.op.Operator, Integer> getIntroductionTimeCache() {
         return introductionTimeCache;
     }
 
-    public final LRUCache<Term, Monomial> getMonomialCache() {
+    public final LRUCache<org.key_project.logic.Term, Monomial> getMonomialCache() {
         return monomialCache;
     }
 
-    public final LRUCache<Term, Polynomial> getPolynomialCache() {
+    public final LRUCache<org.key_project.logic.Term, Polynomial> getPolynomialCache() {
         return polynomialCache;
     }
 
-    public final Map<Term, TriggersSet> getTriggerSetCache() {
+    public final Map<org.key_project.logic.Term, TriggersSet> getTriggerSetCache() {
         return triggerSetCache;
     }
 
-    public final Map<Term, ClausesGraph> getGraphCache() {
+    public final Map<org.key_project.logic.Term, ClausesGraph> getGraphCache() {
         return graphCache;
     }
 

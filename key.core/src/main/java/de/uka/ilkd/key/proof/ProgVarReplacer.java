@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -162,7 +163,7 @@ public final class ProgVarReplacer {
     /**
      * replaces in a sequent
      */
-    public SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> replace(Sequent s) {
+    public SequentChangeInfo replace(Sequent s) {
         SemisequentChangeInfo anteCI = replace(s.antecedent());
         SemisequentChangeInfo succCI = replace(s.succedent());
 
@@ -171,7 +172,7 @@ public final class ProgVarReplacer {
 
         Sequent newSequent = Sequent.createSequent(newAntecedent, newSuccedent);
 
-        SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> result =
+        SequentChangeInfo result =
             SequentChangeInfo.createSequentChangeInfo(anteCI, succCI, newSequent, s);
         return result;
     }
@@ -205,7 +206,7 @@ public final class ProgVarReplacer {
     public SequentFormula replace(SequentFormula cf) {
         SequentFormula result = cf;
 
-        final Term newFormula = replace(cf.formula());
+        final Term newFormula = replace((Term) cf.formula());
 
         if (newFormula != cf.formula()) {
             result = new SequentFormula(newFormula);
@@ -285,7 +286,7 @@ public final class ProgVarReplacer {
      */
     private Term replaceProgramVariableInLHSOfElementaryUpdate(Term t) {
         final Term newTerm = services.getTermBuilder().elementary(
-            (UpdateableOperator) map.get(((ElementaryUpdate) t.op()).lhs()),
+            map.get(((ElementaryUpdate) t.op()).lhs()),
             standardReplace(t.sub(0)));
         return newTerm;
     }

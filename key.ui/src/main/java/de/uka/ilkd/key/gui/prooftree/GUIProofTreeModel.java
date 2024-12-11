@@ -15,7 +15,6 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter.NodeFilter;
 import de.uka.ilkd.key.proof.*;
 
 import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -70,7 +69,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         GoalListener goalListener = new GoalListener() {
 
             @Override
-            public void sequentChanged(Goal source, SequentChangeInfo<SequentFormula> sci) {}
+            public void sequentChanged(Goal source, SequentChangeInfo sci) {}
 
             @Override
             public void goalReplaced(Goal source, Node parent, ImmutableList<Goal> newGoals) {}

@@ -18,16 +18,16 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
     /**
      * Simply the formula
      */
-    private final org.key_project.prover.sequent.SequentFormula cf;
+    private final SequentFormula cf;
 
-    public IfFormulaInstDirect(org.key_project.prover.sequent.SequentFormula p_cf) {
+    public IfFormulaInstDirect(SequentFormula p_cf) {
         cf = p_cf;
     }
 
     /**
      * @return the cf this is pointing to
      */
-    public SequentFormula getConstrainedFormula() {
+    public SequentFormula getSequentFormula() {
         return cf;
     }
 

@@ -14,11 +14,12 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -100,8 +101,11 @@ public class LexPathOrdering implements TermOrdering {
             return LESS;
         }
 
+        var p__a = (de.uka.ilkd.key.logic.Term) p_a;
+        var p__b = (de.uka.ilkd.key.logic.Term) p_b;
+
         final int opComp =
-            compare(p_a.op(), p_a.sort(), p_a.getLabels(), p_b.op(), p_b.sort(), p_b.getLabels());
+            compare(p_a.op(), p_a.sort(), p__a.getLabels(), p_b.op(), p_b.sort(), p__b.getLabels());
         if (opComp == 0) {
             final CompRes lexComp = compareSubsLex(p_a, p_b);
             if (lexComp.eq()) {
@@ -179,7 +183,8 @@ public class LexPathOrdering implements TermOrdering {
      * @return a number negative, zero or a number positive if <code>p_a</code> is less than, equal,
      *         or greater than <code>p_b</code>
      */
-    private int compare(Operator aOp, Sort aSort, ImmutableArray<TermLabel> aLabels, Operator bOp,
+    private int compare(org.key_project.logic.op.Operator aOp, Sort aSort,
+            ImmutableArray<TermLabel> aLabels, org.key_project.logic.op.Operator bOp,
             Sort bSort, ImmutableArray<TermLabel> bLabels) {
         if (aOp == bOp) {
             return 0;

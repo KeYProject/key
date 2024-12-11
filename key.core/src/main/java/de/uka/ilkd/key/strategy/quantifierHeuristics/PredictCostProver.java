@@ -54,7 +54,7 @@ public class PredictCostProver {
             return -1;
         } else {
             final PredictCostProver prover = new PredictCostProver(
-                sub.applyWithoutCasts(matrix, services), assertList, services);
+                (Term) sub.applyWithoutCasts(matrix, services), assertList, services);
             return prover.cost();
         }
     }
@@ -62,29 +62,24 @@ public class PredictCostProver {
     // init context
     private void initClauses(Term instance) {
 
-        for (Term t : TriggerUtils.setByOperator(instance, Junctor.AND)) {
+        for (var t : TriggerUtils.setByOperator(instance, Junctor.AND)) {
             for (ImmutableSet<Term> lit : createClause(TriggerUtils.setByOperator(t, Junctor.OR))) {
                 clauses.add(new Clause(lit));
             }
         }
     }
 
-    private ImmutableSet<ImmutableSet<Term>> createClause(ImmutableSet<Term> set) {
+    private ImmutableSet<ImmutableSet<Term>> createClause(
+            ImmutableSet<org.key_project.logic.Term> set) {
         final ImmutableSet<ImmutableSet<Term>> nil = DefaultImmutableSet.nil();
         ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
-        for (Term t : set) {
+        for (var t : set) {
             ImmutableSet<ImmutableSet<Term>> tmp = nil;
             for (ImmutableSet<Term> cl : res) {
-                tmp = createClauseHelper(tmp, t, cl);
+                tmp = tmp.add(cl.add((Term) t));
             }
             res = tmp;
         }
-        return res;
-    }
-
-    private ImmutableSet<ImmutableSet<Term>> createClauseHelper(
-            ImmutableSet<ImmutableSet<Term>> res, Term self, ImmutableSet<Term> ts) {
-        res = res.add(ts.add(self));
         return res;
     }
 
@@ -104,9 +99,12 @@ public class PredictCostProver {
             pro = pro.sub(0);
             op = pro.op();
         }
-        if ((op == Equality.EQUALS || op == Equality.EQV)
-                && pro.sub(0).equalsModProperty(pro.sub(1), RENAMING_TERM_PROPERTY)) {
-            return negated ? falseT : trueT;
+        if ((op == Equality.EQUALS || op == Equality.EQV)) {
+            org.key_project.logic.Term term = pro.sub(0);
+            org.key_project.logic.Term formula = pro.sub(1);
+            if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term, formula)) {
+                return negated ? falseT : trueT;
+            }
         }
         Term arithRes = HandleArith.provedByArith(pro, services);
         if (TriggerUtils.isTrueOrFalse(arithRes)) {
@@ -133,7 +131,7 @@ public class PredictCostProver {
             ax = ax.sub(0);
             negated = !negated;
         }
-        if (pro.equalsModProperty(ax, RENAMING_TERM_PROPERTY)) {
+        if (RENAMING_TERM_PROPERTY.equalsModThisProperty(pro, ax)) {
             return negated ? falseT : trueT;
         }
         return problem;

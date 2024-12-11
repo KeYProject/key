@@ -18,7 +18,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
 
-public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends @NonNull RuleApp, T extends Taclet, SF extends SequentFormula>
+public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends @NonNull RuleApp, T extends Taclet>
         implements RuleExecutor {
     protected static final String AUTO_NAME = "_taclet";
 
@@ -44,12 +44,12 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *         two entries: one for the original sequent and one with the sequent encoding the proof
      *         obligation for the to be proven formulas of the assumes goal
      */
-    protected ImmutableList<SequentChangeInfo<SF>> checkAssumesGoals(Goal p_goal,
+    protected ImmutableList<SequentChangeInfo> checkAssumesGoals(Goal p_goal,
             ImmutableList<? extends AssumesFormulaInstantiation> p_list,
             MatchConditions p_matchCond,
             int p_numberOfNewGoals) {
-        ImmutableList<SequentChangeInfo<SF>> res = null;
-        Iterator<SequentChangeInfo<SF>> itNewGoalSequents;
+        ImmutableList<SequentChangeInfo> res = null;
+        Iterator<SequentChangeInfo> itNewGoalSequents;
 
         // proof obligation for the assumes-formulas
         Term assumesObl = null;
@@ -79,7 +79,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
                             // noinspection unchecked
                             res = res.prepend(SequentChangeInfo.createSequentChangeInfo(
                                 null, null,
-                                (Sequent<SF>) p_goal.sequent(), (Sequent<SF>) p_goal.sequent()));
+                                p_goal.sequent(), p_goal.sequent()));
                         }
                         assumesObl = assumesPart;
                     } else {
@@ -90,10 +90,10 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
                     // goals, thus the `assumes` formulas have to be added to
                     // every new goal
                     itNewGoalSequents = res.iterator();
-                    SequentChangeInfo<SF> seq = itNewGoalSequents.next();
+                    SequentChangeInfo seq = itNewGoalSequents.next();
                     while (itNewGoalSequents.hasNext()) {
                         // (i > 0) iff inst is formula of the antecedent
-                        addToPosWithoutInst((SF) inst.getSequentFormula(), seq, null, (i > 0));
+                        addToPosWithoutInst(inst.getSequentFormula(), seq, null, (i > 0));
                         seq = itNewGoalSequents.next();
                     }
                 }
@@ -108,12 +108,12 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
                 // noinspection unchecked
                 res = res.prepend(
                     SequentChangeInfo.createSequentChangeInfo(null,
-                        null, (Sequent<SF>) p_goal.sequent(), (Sequent<SF>) p_goal.sequent()));
+                        null, p_goal.sequent(), p_goal.sequent()));
             }
         } else {
             // find the sequent the `assumes` obligation has to be added to
             itNewGoalSequents = res.iterator();
-            SequentChangeInfo<SF> seq = itNewGoalSequents.next();
+            SequentChangeInfo seq = itNewGoalSequents.next();
             while (itNewGoalSequents.hasNext()) {
                 seq = itNewGoalSequents.next();
             }
@@ -124,7 +124,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
         return res;
     }
 
-    protected abstract SF createSequentFormula(Term form);
+    protected abstract SequentFormula createSequentFormula(Term form);
 
     protected abstract Term not(Term t, Goal goal);
 
@@ -141,7 +141,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param antec boolean true(false) if elements have to be added to the antecedent(succedent)
      *        (only looked at if pos == null)
      */
-    private void addToPosWithoutInst(SF frm, SequentChangeInfo<SF> currentSequent,
+    private void addToPosWithoutInst(SequentFormula frm, SequentChangeInfo currentSequent,
             PosInOccurrence pos, boolean antec) {
         if (pos != null) {
             currentSequent.combine(currentSequent.sequent().addFormula(frm, pos));
@@ -167,7 +167,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
             MatchConditions matchCond);
 
     protected void applyAddProgVars(ImmutableSet<? extends SchemaVariable> pvs,
-            SequentChangeInfo<SF> currentSequent, Goal goal, PosInOccurrence posOfFind,
+            SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,
             LogicServices services, MatchConditions matchCond) {
         // TODO @ DD
     }
@@ -188,7 +188,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *        schemavariables
      * @param services the Services encapsulating all Rust information
      */
-    protected void addToAntec(Semisequent<SF> semi, SequentChangeInfo<SF> currentSequent,
+    protected void addToAntec(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
             App tacletApp, LogicServices services) {
@@ -211,7 +211,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param goal the Goal that knows the node the formulae have to be added
      * @param services the Services encapsulating all Rust information
      */
-    protected void addToSucc(Semisequent<SF> semi, SequentChangeInfo<SF> currentSequent,
+    protected void addToSucc(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
             App ruleApp, LogicServices services) {
@@ -230,10 +230,10 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param matchCond the MatchConditions containing in particular
      * @param services the Services encapsulating all Rust information
      */
-    protected void replaceAtPos(Semisequent<SF> semi,
-            SequentChangeInfo<SF> currentSequent, PosInOccurrence pos, MatchConditions matchCond,
+    protected void replaceAtPos(Semisequent semi,
+            SequentChangeInfo currentSequent, PosInOccurrence pos, MatchConditions matchCond,
             Goal goal, App ruleApp, LogicServices services) {
-        final ImmutableList<SF> replacements = instantiateSemisequent(semi,
+        final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi,
             pos, matchCond, goal, ruleApp, services);
         currentSequent.combine(currentSequent.sequent().changeFormula(replacements, pos));
     }
@@ -253,11 +253,11 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param matchCond the MatchConditions containing in particular
      * @param services the Services encapsulating all Rust information
      */
-    private void addToPos(Semisequent<SF> semi, SequentChangeInfo<SF> currentSequent,
+    private void addToPos(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence, boolean antec,
             MatchConditions matchCond, Goal goal, LogicServices services, App tacletApp) {
-        final ImmutableList<SF> replacements =
+        final ImmutableList<SequentFormula> replacements =
             instantiateSemisequent(semi, applicationPosInOccurrence,
                 matchCond, goal, tacletApp, services);
         if (pos != null) {
@@ -279,8 +279,8 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *        rewritten
      * @return the as far as possible instantiated SequentFormula
      */
-    private SF instantiateReplacement(
-            SF schemaFormula, LogicServices services, MatchConditions matchCond,
+    private SequentFormula instantiateReplacement(
+            SequentFormula schemaFormula, LogicServices services, MatchConditions matchCond,
             PosInOccurrence applicationPosInOccurrence, Goal goal,
             App tacletApp) {
         final SVInstantiations svInst = matchCond.getInstantiations();
@@ -324,12 +324,12 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param services the Services
      * @return the instantiated formulas of the semisequent as list
      */
-    protected ImmutableList<SF> instantiateSemisequent(Semisequent<SF> semi,
+    protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi,
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
             App tacletApp, LogicServices services) {
-        ImmutableList<SF> replacements = ImmutableSLList.nil();
+        ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
 
-        for (SF sf : semi) {
+        for (SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(sf, services,
                 matchCond, applicationPosInOccurrence, goal, tacletApp));
         }

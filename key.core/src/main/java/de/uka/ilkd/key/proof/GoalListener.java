@@ -5,7 +5,6 @@ package de.uka.ilkd.key.proof;
 
 
 import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 /** interface to be implemented by a goal listener */
@@ -14,7 +13,7 @@ public interface GoalListener {
     /**
      * informs the listener about a change that occured to the sequent of goal
      */
-    void sequentChanged(Goal source, SequentChangeInfo<SequentFormula> sci);
+    void sequentChanged(Goal source, SequentChangeInfo sci);
 
     /**
      * Informs the listener that the given goal <code>source</code> has been replaced by the goals

@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.SortCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -43,6 +42,7 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
@@ -69,7 +69,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         SortCollector sortCollector = new SortCollector();
 
-        for (org.key_project.prover.sequent.SequentFormula sf : goal.sequent()) {
+        for (SequentFormula sf : goal.sequent()) {
             sf.formula().execPreOrder(sortCollector);
         }
 
@@ -77,7 +77,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         sorts.remove(nullSort);
         List<org.key_project.prover.sequent.SequentFormula> formulae =
             createFormulae(goal.proof().getServices(), sorts);
-        for (org.key_project.prover.sequent.SequentFormula sf : formulae) {
+        for (SequentFormula sf : formulae) {
             Sequent s = goal.sequent();
             Semisequent antecedent = s.antecedent();
             if (!antecedent.containsEqual(sf)) {

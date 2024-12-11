@@ -9,7 +9,6 @@ import javax.swing.*;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.RecognitionException;
 
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiation> {
@@ -41,7 +41,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
         }
 
         @Override
-        public org.key_project.prover.sequent.SequentFormula getConstrainedFormula() {
+        public SequentFormula getSequentFormula() {
             return null;
         }
     };

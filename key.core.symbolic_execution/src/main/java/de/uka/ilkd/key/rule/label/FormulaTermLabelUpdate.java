@@ -79,9 +79,9 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                     new LinkedHashMap<>();
                 for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(
-                        ifInst.getConstrainedFormula().formula().getLabels());
+                        ifInst.getSequentFormula().formula().getLabels());
                     if (ifLabel != null) {
-                        ifLabels.put(ifInst.getConstrainedFormula(), ifLabel);
+                        ifLabels.put(ifInst.getSequentFormula(), ifLabel);
                     }
                 }
                 if (!ifLabels.isEmpty()) {

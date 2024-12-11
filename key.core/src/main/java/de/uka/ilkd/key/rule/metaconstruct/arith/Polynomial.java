@@ -9,11 +9,11 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 
+import org.key_project.logic.Term;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -49,7 +49,8 @@ public class Polynomial {
 
     public static Polynomial create(Term polyTerm, Services services) {
         final LRUCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
-        polyTerm = TermLabelManager.removeIrrelevantLabels(polyTerm, services);
+        polyTerm = TermLabelManager.removeIrrelevantLabels((de.uka.ilkd.key.logic.Term) polyTerm,
+            services);
 
         Polynomial res;
         synchronized (cache) {
@@ -235,7 +236,8 @@ public class Polynomial {
         if (it.hasNext()) {
             res = it.next().toTerm(services);
             while (it.hasNext()) {
-                res = services.getTermFactory().createTerm(add, res, it.next().toTerm(services));
+                res = services.getTermFactory().createTerm(add, (de.uka.ilkd.key.logic.Term) res,
+                    (de.uka.ilkd.key.logic.Term) it.next().toTerm(services));
             }
         }
 
@@ -244,7 +246,8 @@ public class Polynomial {
         if (res == null) {
             res = cTerm;
         } else if (!BigInteger.ZERO.equals(constantPart)) {
-            res = services.getTermFactory().createTerm(add, cTerm, res);
+            res = services.getTermFactory().createTerm(add, (de.uka.ilkd.key.logic.Term) cTerm,
+                (de.uka.ilkd.key.logic.Term) res);
         }
 
         return res;
@@ -278,7 +281,7 @@ public class Polynomial {
         }
 
         public void analyse(Term polynomial) {
-            final Operator op = polynomial.op();
+            final var op = polynomial.op();
             if (op == add) {
                 analyse(polynomial.sub(0));
                 analyse(polynomial.sub(1));

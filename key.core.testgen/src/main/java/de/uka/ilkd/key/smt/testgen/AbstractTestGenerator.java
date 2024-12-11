@@ -286,7 +286,7 @@ public abstract class AbstractTestGenerator {
         Iterator<org.key_project.prover.sequent.SequentFormula> it =
             oldSequent.antecedent().iterator();
         while (it.hasNext()) {
-            final org.key_project.prover.sequent.SequentFormula sf = it.next();
+            final SequentFormula sf = it.next();
             // Allow updates modailities in the antecedent
             if (hasModalities(sf.formula(), false)) {
                 continue;

@@ -23,7 +23,7 @@ public class FormulaTermLabelMerger implements TermLabelMerger {
      * {@inheritDoc}
      */
     @Override
-    public boolean mergeLabels(org.key_project.prover.sequent.SequentFormula existingSF,
+    public boolean mergeLabels(SequentFormula existingSF,
             Term existingTerm,
             TermLabel existingLabel, SequentFormula rejectedSF, Term rejectedTerm,
             TermLabel rejectedLabel, List<TermLabel> mergedLabels) {

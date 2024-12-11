@@ -277,7 +277,7 @@ public abstract class AbstractProofReplayer {
             if (posTacletApp.ifFormulaInstantiations() != null) {
                 for (IfFormulaInstantiation x : posTacletApp.ifFormulaInstantiations()) {
                     if (x instanceof IfFormulaInstDirect) {
-                        oldFormulas.add(new Pair<>(new PosInOccurrence(x.getConstrainedFormula(),
+                        oldFormulas.add(new Pair<>(new PosInOccurrence(x.getSequentFormula(),
                             PosInTerm.getTopLevel(), true), false));
                     }
                 }
@@ -326,10 +326,10 @@ public abstract class AbstractProofReplayer {
      */
     private PosInOccurrence findInNewSequent(PosInOccurrence oldPos,
             Sequent newSequent) {
-        org.key_project.prover.sequent.SequentFormula oldFormula = oldPos.sequentFormula();
+        SequentFormula oldFormula = oldPos.sequentFormula();
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()
                 : newSequent.succedent();
-        for (org.key_project.prover.sequent.SequentFormula newFormula : semiSeq.asList()) {
+        for (SequentFormula newFormula : semiSeq.asList()) {
             if ((Object) oldFormula instanceof SequentFormula that
                     ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(newFormula, that)
                     : false) {

@@ -26,6 +26,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -58,8 +59,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     private static List<Term> getEqualityDefs(Term term, Sequent seq) {
         final List<Term> result = new LinkedList<>();
-        for (org.key_project.prover.sequent.SequentFormula cf : seq.antecedent()) {
-            final Term formula = cf.formula();
+        for (SequentFormula cf : seq.antecedent()) {
+            final Term formula = (Term) cf.formula();
             if (formula.op() instanceof Equality && formula.sub(1).equals(term)) {
                 result.add(formula.sub(0));
             }
@@ -72,8 +73,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
             org.key_project.logic.Term term, Sequent seq) {
         final List<Pair<Term, PosInOccurrence>> result =
             new LinkedList<>();
-        for (org.key_project.prover.sequent.SequentFormula cf : seq.antecedent()) {
-            final Term formula = cf.formula();
+        for (SequentFormula cf : seq.antecedent()) {
+            final Term formula = (Term) cf.formula();
             if (formula.op() instanceof Equality && formula.sub(1).equals(term)) {
                 final PosInOccurrence pos =
                     new PosInOccurrence(cf, PosInTerm.getTopLevel(), true);
@@ -87,8 +88,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
     private ImmutableSet<Term> addEqualDefs(ImmutableSet<Term> terms, Goal g) {
         ImmutableList<Term> result = ImmutableSLList.nil();
 
-        for (org.key_project.prover.sequent.SequentFormula cf : g.sequent().antecedent()) {
-            final Term formula = cf.formula();
+        for (SequentFormula cf : g.sequent().antecedent()) {
+            final Term formula = (Term) cf.formula();
             if (formula.op() instanceof Equality && terms.contains(formula.sub(1))) {
                 result = result.prepend(formula.sub(0));
             }
@@ -246,12 +247,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
         assert focus.op() instanceof IObserverFunction;
         final Map<Term, PosInOccurrence> result =
             new LinkedHashMap<>();
-        for (org.key_project.prover.sequent.SequentFormula cf : seq.antecedent()) {
+        for (SequentFormula cf : seq.antecedent()) {
             final PosInOccurrence pos =
                 new PosInOccurrence(cf, PosInTerm.getTopLevel(), true);
             collectBaseOccsHelper(focus, pos, result);
         }
-        for (org.key_project.prover.sequent.SequentFormula cf : seq.succedent()) {
+        for (SequentFormula cf : seq.succedent()) {
             final PosInOccurrence pos =
                 new PosInOccurrence(cf, PosInTerm.getTopLevel(), false);
             collectBaseOccsHelper(focus, pos, result);
