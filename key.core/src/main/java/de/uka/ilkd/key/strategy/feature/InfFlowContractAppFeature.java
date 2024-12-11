@@ -61,7 +61,7 @@ public class InfFlowContractAppFeature implements Feature {
      * an equal formula
      */
     protected boolean semiSequentContains(Semisequent semisequent,
-            org.key_project.prover.sequent.SequentFormula cfma) {
+            SequentFormula cfma) {
         return semisequent.containsEqual(cfma);
     }
 
@@ -104,7 +104,7 @@ public class InfFlowContractAppFeature implements Feature {
 
             while (it0.hasNext()) {
                 // this test should be improved
-                if (it0.next().getConstrainedFormula() != it1.next().getConstrainedFormula()) {
+                if (it0.next().getSequentFormula() != it1.next().getSequentFormula()) {
                     return false;
                 }
             }
@@ -159,10 +159,10 @@ public class InfFlowContractAppFeature implements Feature {
         assert app.ifFormulaInstantiations().size() >= 1
                 : "Featureis only applicable to rules with at least one assumes.";
 
-        final org.key_project.prover.sequent.SequentFormula focusFor = pos.sequentFormula();
+        final SequentFormula focusFor = pos.sequentFormula();
         final boolean antec = pos.isInAntec();
-        final org.key_project.prover.sequent.SequentFormula assumesFor =
-            app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
+        final SequentFormula assumesFor =
+            app.ifFormulaInstantiations().iterator().next().getSequentFormula();
 
         // assumtion has to occour before the find-term in the sequent in order
         // to avoid duplicated applications
@@ -224,9 +224,9 @@ public class InfFlowContractAppFeature implements Feature {
 
         // only relate the n-th called method in execution A with the n-th
         // called method in execution B automatically
-        final org.key_project.prover.sequent.SequentFormula focusFor = pos.sequentFormula();
-        final org.key_project.prover.sequent.SequentFormula assumesFor =
-            app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
+        final SequentFormula focusFor = pos.sequentFormula();
+        final SequentFormula assumesFor =
+            app.ifFormulaInstantiations().iterator().next().getSequentFormula();
 
         ArrayList<org.key_project.prover.sequent.SequentFormula> relatesTerms =
             getRelatesTerms(goal);

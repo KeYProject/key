@@ -26,8 +26,7 @@ public final class DependencyContractFeature extends BinaryFeature {
         for (RuleApp app : goal.appliedRuleApps()) {
             Term term = (Term) app.posInOccurrence().subTerm();
             if (app.rule() instanceof UseDependencyContractRule
-                    && term.equalsModProperty(focus,
-                        RENAMING_TERM_PROPERTY)) {
+                    && RENAMING_TERM_PROPERTY.equalsModThisProperty(term, focus)) {
                 final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
                 for (PosInOccurrence ifInst : bapp.ifInsts()) {
                     steps.remove(ifInst);

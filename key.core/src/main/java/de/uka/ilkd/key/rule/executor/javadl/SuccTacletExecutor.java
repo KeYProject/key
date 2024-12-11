@@ -17,7 +17,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
 
 public class SuccTacletExecutor<TacletKind extends SuccTaclet>
         extends FindTacletExecutor<TacletKind> {
@@ -31,7 +30,7 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet>
      */
     @Override
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             PosInOccurrence posOfFind, MatchConditions matchCond,
             Goal goal, RuleApp ruleApp, Services services) {
         if (gt instanceof AntecSuccTacletGoalTemplate) {
@@ -53,7 +52,7 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet>
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
-            SequentChangeInfo<SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
             MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
         addToAntec(add.antecedent(), termLabelState,

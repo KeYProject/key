@@ -30,7 +30,7 @@ public class TrackedFormula extends GraphNode {
     /**
      * The formula.
      */
-    public final org.key_project.prover.sequent.SequentFormula formula;
+    public final SequentFormula formula;
     /**
      * Whether the formula is in the antecedent.
      */
@@ -49,7 +49,7 @@ public class TrackedFormula extends GraphNode {
      * @param services services
      */
     public TrackedFormula(
-            org.key_project.prover.sequent.SequentFormula formula,
+            SequentFormula formula,
             BranchLocation branchLocation,
             boolean inAntec,
             Services services) {

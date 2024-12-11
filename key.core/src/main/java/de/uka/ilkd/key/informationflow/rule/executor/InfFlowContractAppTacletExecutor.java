@@ -42,7 +42,7 @@ public class InfFlowContractAppTacletExecutor
     @Override
     protected void addToAntec(Semisequent semi, TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence,
             MatchConditions matchCond, Goal goal,
@@ -53,7 +53,7 @@ public class InfFlowContractAppTacletExecutor
         assert replacements.size() == 1
                 : "information flow taclets must have " + "exactly one add!";
         updateStrategyInfo(goal.proof().openEnabledGoals().head(),
-            replacements.iterator().next().formula());
+            (Term) replacements.iterator().next().formula());
         super.addToAntec(semi, termLabelState, labelHint, currentSequent, pos,
             applicationPosInOccurrence, matchCond, goal, tacletApp);
     }

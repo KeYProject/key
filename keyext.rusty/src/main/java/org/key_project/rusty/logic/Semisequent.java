@@ -8,7 +8,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import static org.key_project.rusty.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
-public class Semisequent extends org.key_project.prover.sequent.Semisequent<SequentFormula> {
+public class Semisequent extends org.key_project.prover.sequent.Semisequent {
     /** the empty semisequent (using singleton pattern) */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
 

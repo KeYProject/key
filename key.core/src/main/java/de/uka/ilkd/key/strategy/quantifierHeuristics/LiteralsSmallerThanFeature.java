@@ -7,10 +7,8 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
@@ -19,6 +17,7 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 public class LiteralsSmallerThanFeature extends SmallerThanFeature {
@@ -172,7 +171,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     private int formulaKind(Term t) {
-        final Operator op = t.op();
+        final var op = t.op();
         if (op == numbers.getLessOrEquals()) {
             return 1;
         }
@@ -232,7 +231,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
     private static class LiteralCollector extends Collector {
         protected void collect(Term te) {
-            final Operator op = te.op();
+            final var op = te.op();
             if (op == Junctor.OR) {
                 collect(te.sub(0));
                 collect(te.sub(1));

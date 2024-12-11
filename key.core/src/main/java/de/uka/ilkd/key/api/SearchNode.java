@@ -39,7 +39,7 @@ public final class SearchNode {
     }
 
     public Term getPatternTerm() {
-        return pattern[pos].formula();
+        return (Term) pattern[pos].formula();
     }
 
     public boolean isFinished() {

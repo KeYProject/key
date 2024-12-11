@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 
@@ -29,7 +30,7 @@ public enum LateApplicationCheck {
     private List<String> check(ApplicationCheck check, Sequent sequent, Node cutNode) {
         List<String> conflicts = new LinkedList<>();
         for (SequentFormula sf : sequent) {
-            String result = check.check(cutNode, sf.formula());
+            String result = check.check(cutNode, (Term) sf.formula());
             if (result != null) {
                 conflicts.add(result);
             }

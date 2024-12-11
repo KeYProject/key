@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public abstract class TacletExecutor<T extends Taclet> extends
-        org.key_project.prover.rules.TacletExecutor<@NonNull Goal, @NonNull RuleApp, @NonNull T, SequentFormula> {
+        org.key_project.prover.rules.TacletExecutor<@NonNull Goal, @NonNull RuleApp, @NonNull T> {
     public TacletExecutor(T taclet) {
         super(taclet);
     }

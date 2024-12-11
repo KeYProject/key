@@ -42,7 +42,7 @@ public class BoundVarsVisitor implements DefaultVisitor {
      */
     public void visit(Sequent visited) {
         for (SequentFormula cf : visited) {
-            visit(cf.formula());
+            visit((Term) cf.formula());
         }
     }
 

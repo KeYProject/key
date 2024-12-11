@@ -23,7 +23,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
 import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -196,7 +195,7 @@ public class Node implements Iterable<Node> {
      */
     void clearNodeInfo() {
         if (this.nodeInfo != null) {
-            SequentChangeInfo<SequentFormula> oldSeqChangeInfo =
+            SequentChangeInfo oldSeqChangeInfo =
                 this.nodeInfo.getSequentChangeInfo();
             this.nodeInfo = new NodeInfo(this);
             this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);

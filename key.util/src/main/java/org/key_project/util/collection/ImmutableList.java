@@ -219,7 +219,7 @@ public interface ImmutableList<T extends @Nullable Object>
     /**
      * @return boolean is true iff. obj is in List
      */
-    boolean contains(T obj);
+    boolean contains(Object obj);
 
     /**
      * @return int representing number of elements in list

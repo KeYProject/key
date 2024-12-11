@@ -19,7 +19,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
@@ -41,7 +40,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * @param matchCond the MatchConditions with all required instantiations
      */
     protected void applyAdd(TermLabelState termLabelState, Sequent add,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             MatchConditions matchCond,
             Goal goal, RuleApp ruleApp) {
         addToAntec(add.antecedent(), termLabelState,
@@ -67,14 +66,14 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
         TacletApp tacletApp = (TacletApp) ruleApp;
         MatchConditions mc = tacletApp.matchConditions();
 
-        ImmutableList<SequentChangeInfo<org.key_project.prover.sequent.SequentFormula>> newSequentsForGoals =
+        ImmutableList<SequentChangeInfo> newSequentsForGoals =
             checkIfGoals(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
 
         ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
         Iterator<TacletGoalTemplate> it = taclet.goalTemplates().iterator();
         Iterator<Goal> goalIt = newGoals.iterator();
-        Iterator<SequentChangeInfo<org.key_project.prover.sequent.SequentFormula>> newSequentsIt =
+        Iterator<SequentChangeInfo> newSequentsIt =
             newSequentsForGoals.iterator();
 
         final var services = goal.getOverlayServices();
@@ -84,7 +83,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
             // add first because we want to use pos information that
             // is lost applying replacewith
 
-            SequentChangeInfo<SequentFormula> currentSequent = newSequentsIt.next();
+            SequentChangeInfo currentSequent = newSequentsIt.next();
 
             var timeApply = System.nanoTime();
             applyAdd(termLabelState, gt.sequent(), currentSequent, mc, goal, ruleApp);

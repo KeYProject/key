@@ -433,10 +433,10 @@ public class MergePartnerSelectionDialog extends JDialog {
 
         Semisequent antecedent = seq.antecedent();
 
-        for (org.key_project.prover.sequent.SequentFormula succedentFormula : seq.succedent()) {
+        for (SequentFormula succedentFormula : seq.succedent()) {
             if (!succedentFormula.formula().containsJavaBlockRecursive()) {
                 antecedent =
-                    (Semisequent) antecedent
+                    antecedent
                             .insertFirst(new SequentFormula(tb.not(succedentFormula.formula())))
                             .semisequent();
             }

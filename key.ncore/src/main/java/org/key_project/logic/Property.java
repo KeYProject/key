@@ -1,14 +1,14 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.logic.equality;
+package org.key_project.logic;
 
 /**
  * <p>
  * This interface is used for equality checks and hashing modulo a certain property.
  * </p>
  * Objects of classes implementing this interface are given to the methods in
- * {@link EqualsModProperty} as parameters to unify equality checks and hashing modulo different
+ * {@link Property} as parameters to unify equality checks and hashing modulo different
  * properties.
  *
  * @param <T> the type of the objects that are checked for equality or hashed

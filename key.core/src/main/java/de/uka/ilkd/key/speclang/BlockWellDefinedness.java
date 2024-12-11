@@ -8,13 +8,13 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -68,7 +68,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    org.key_project.prover.sequent.SequentFormula generateSequent(SequentTerms seq,
+    SequentFormula generateSequent(SequentTerms seq,
             TermServices services) {
         // wd(pre) & (pre & wf(anon) -> wd(modifiable) & {anon^modifiable}(wd(post)))
         final Term imp =

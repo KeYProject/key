@@ -3,15 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
-import de.uka.ilkd.key.logic.label.TermLabel;
-
-import org.key_project.logic.Name;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -26,7 +22,7 @@ import org.jspecify.annotations.NonNull;
  * {@link Sequent#createSuccSequent} or by inserting formulas directly into
  * {@link Sequent#EMPTY_SEQUENT}.
  */
-public class Sequent extends org.key_project.prover.sequent.Sequent<SequentFormula> {
+public class Sequent extends org.key_project.prover.sequent.Sequent {
     public static final Sequent EMPTY_SEQUENT = NILSequent.INSTANCE;
 
     /**
@@ -96,13 +92,13 @@ public class Sequent extends org.key_project.prover.sequent.Sequent<SequentFormu
     }
 
     @Override
-    public SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> addFormula(
+    public SequentChangeInfo addFormula(
             SequentFormula cf, PosInOccurrence p) {
         return super.addFormula(cf, p);
     }
 
     @Override
-    public SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> removeFormula(
+    public SequentChangeInfo removeFormula(
             PosInOccurrence p) {
         return super.removeFormula(p);
     }
@@ -116,7 +112,7 @@ public class Sequent extends org.key_project.prover.sequent.Sequent<SequentFormu
      * @return the resulting sequent
      */
     protected Sequent composeSequent(boolean antec,
-            org.key_project.prover.sequent.Semisequent<org.key_project.prover.sequent.SequentFormula> p_semiSeq) {
+            org.key_project.prover.sequent.Semisequent p_semiSeq) {
         final var semiSeq = (Semisequent) p_semiSeq;
         if (semiSeq.isEmpty()) {
             if (!antec && antecedent().isEmpty()) {
@@ -150,43 +146,13 @@ public class Sequent extends org.key_project.prover.sequent.Sequent<SequentFormu
         }
     }
 
-    /*
-     * Returns names of TermLabels, that occur in term or one of its subterms.
-     */
-    private static Set<Name> getLabelsForTermRecursively(Term term) {
-        Set<Name> result = new HashSet<>();
-
-        if (term.hasLabels()) {
-            for (TermLabel label : term.getLabels()) {
-                result.add(label.name());
-            }
-        }
-
-        for (final Term subTerm : term.subs()) {
-            result.addAll(getLabelsForTermRecursively(subTerm));
-        }
-
-        return result;
-    }
-
-    /*
-     * Returns names of TermLabels, that occur in this sequent.
-     */
-    public Set<Name> getOccuringTermLabels() {
-        final Set<Name> result = new HashSet<>();
-        for (final org.key_project.prover.sequent.SequentFormula sf : this) {
-            result.addAll(getLabelsForTermRecursively(sf.formula()));
-        }
-        return result;
-    }
-
     /**
      * used to check whether this sequent contains a given sequent formula.
      *
      * @param form the given formula
      * @return true if this sequent contains the given formula
      */
-    public boolean contains(org.key_project.prover.sequent.SequentFormula form) {
+    public boolean contains(SequentFormula form) {
         return antecedent().contains(form) || succedent().contains(form);
     }
 

@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
@@ -44,6 +43,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.ArrayUtil;
 
@@ -66,7 +66,7 @@ public final class TruthValueTracingUtil {
      * @return {@code true} is predicate, {@code false} is something else.
      */
     public static boolean isPredicate(
-            org.key_project.prover.sequent.SequentFormula sequentFormula) {
+            SequentFormula sequentFormula) {
         return sequentFormula != null && isPredicate(sequentFormula.formula());
     }
 
@@ -344,7 +344,7 @@ public final class TruthValueTracingUtil {
             if (tacletApp.ifInstsComplete() && tacletApp.ifFormulaInstantiations() != null) {
                 for (IfFormulaInstantiation ifInst : tacletApp.ifFormulaInstantiations()) {
                     assert ifInst instanceof IfFormulaInstSeq;
-                    Term term = ifInst.getConstrainedFormula().formula();
+                    Term term = ifInst.getSequentFormula().formula();
                     TermLabel label = term.getLabel(termLabelName);
                     if (label instanceof FormulaTermLabel) {
                         result.add(new LabelOccurrence((FormulaTermLabel) label,
@@ -481,7 +481,7 @@ public final class TruthValueTracingUtil {
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void checkForNewMinorIdsOSS(
-            org.key_project.prover.sequent.SequentFormula onlyChangedChildSF, Term term,
+            SequentFormula onlyChangedChildSF, Term term,
             Name termLabelName, PosInOccurrence parentPio,
             TermBuilder tb,
             Map<String, MultiEvaluationResult> results) {
@@ -506,7 +506,7 @@ public final class TruthValueTracingUtil {
      * @return The computed instruction {@link Term} or {@code null} if not available.
      */
     private static Term checkForNewMinorIdsOSS(
-            org.key_project.prover.sequent.SequentFormula onlyChangedChildSF,
+            SequentFormula onlyChangedChildSF,
             FormulaTermLabel label, boolean antecedentRuleApplication, TermBuilder tb) {
         // Search replacements
         List<Term> antecedentReplacements = new LinkedList<>();
@@ -561,7 +561,7 @@ public final class TruthValueTracingUtil {
                 if (parentRuleApp instanceof TacletApp ta) {
                     if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
                         for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
-                            checkForNewMinorIds(childNode, ifInst.getConstrainedFormula().formula(),
+                            checkForNewMinorIds(childNode, ifInst.getSequentFormula().formula(),
                                 termLabelName, parentPio, tb, results);
                         }
                     }
@@ -610,10 +610,10 @@ public final class TruthValueTracingUtil {
         // Search replacements
         List<Term> antecedentReplacements = new LinkedList<>();
         List<Term> succedentReplacements = new LinkedList<>();
-        for (org.key_project.prover.sequent.SequentFormula sf : childNode.sequent().antecedent()) {
+        for (SequentFormula sf : childNode.sequent().antecedent()) {
             listLabelReplacements(sf, label.name(), label.getId(), antecedentReplacements);
         }
-        for (org.key_project.prover.sequent.SequentFormula sf : childNode.sequent().succedent()) {
+        for (SequentFormula sf : childNode.sequent().succedent()) {
             listLabelReplacements(sf, label.name(), label.getId(), succedentReplacements);
         }
         // Compute term
@@ -630,7 +630,7 @@ public final class TruthValueTracingUtil {
      * @param resultToFill The result {@link List} to fill.
      */
     private static void listLabelReplacements(
-            final org.key_project.prover.sequent.SequentFormula sf, final Name labelName,
+            final SequentFormula sf, final Name labelName,
             final String labelId, final List<Term> resultToFill) {
         sf.formula().execPreOrder(new DefaultVisitor() {
             @Override

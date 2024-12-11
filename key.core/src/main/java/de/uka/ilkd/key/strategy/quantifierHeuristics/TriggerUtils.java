@@ -5,12 +5,12 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -49,7 +49,8 @@ class TriggerUtils {
      * @return a set of quantifiableVariable which are belonged to both set0 and set1 have
      */
     public static ImmutableSet<QuantifiableVariable> intersect(
-            ImmutableSet<QuantifiableVariable> set0, ImmutableSet<QuantifiableVariable> set1) {
+            ImmutableSet<? extends QuantifiableVariable> set0,
+            ImmutableSet<? extends QuantifiableVariable> set1) {
         ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.nil();
         for (QuantifiableVariable aSet0 : set0) {
             final QuantifiableVariable el = aSet0;
@@ -61,7 +62,7 @@ class TriggerUtils {
     }
 
     public static boolean isTrueOrFalse(Term res) {
-        final Operator op = res.op();
+        final var op = res.op();
         return op == Junctor.TRUE || op == Junctor.FALSE;
     }
 }

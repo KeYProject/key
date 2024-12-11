@@ -73,7 +73,7 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
     private ImmutableList<Term> getFormulaeOfSemisequent(Semisequent s) {
         ImmutableList<Term> terms = ImmutableSLList.nil();
         for (SequentFormula cf : s) {
-            terms = terms.append(cf.formula());
+            terms = terms.append((Term) cf.formula());
         }
         return terms;
 

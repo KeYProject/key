@@ -5,11 +5,11 @@ package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 
@@ -22,7 +22,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
 
     public static SequentFormulasGenerator antecedent() {
         return new SequentFormulasGenerator() {
-            protected Iterator<org.key_project.prover.sequent.SequentFormula> generateForIt(
+            protected Iterator<SequentFormula> generateForIt(
                     Goal goal) {
                 return goal.sequent().antecedent().iterator();
             }
@@ -31,7 +31,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
 
     public static SequentFormulasGenerator succedent() {
         return new SequentFormulasGenerator() {
-            protected Iterator<org.key_project.prover.sequent.SequentFormula> generateForIt(
+            protected Iterator<SequentFormula> generateForIt(
                     Goal goal) {
                 return goal.sequent().succedent().iterator();
             }
@@ -40,14 +40,14 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
 
     public static SequentFormulasGenerator sequent() {
         return new SequentFormulasGenerator() {
-            protected Iterator<org.key_project.prover.sequent.SequentFormula> generateForIt(
+            protected Iterator<SequentFormula> generateForIt(
                     Goal goal) {
                 return goal.sequent().iterator();
             }
         };
     }
 
-    protected abstract Iterator<org.key_project.prover.sequent.SequentFormula> generateForIt(
+    protected abstract Iterator<SequentFormula> generateForIt(
             Goal goal);
 
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
@@ -56,7 +56,7 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
     }
 
     private static class SFIterator implements Iterator<Term> {
-        private final Iterator<org.key_project.prover.sequent.SequentFormula> forIt;
+        private final Iterator<SequentFormula> forIt;
 
         public boolean hasNext() {
             return forIt.hasNext();

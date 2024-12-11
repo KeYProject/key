@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.slf4j.Logger;
@@ -246,8 +247,9 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         String test1 = "\\predicates {A; B; } (A -> B) -> (!(!(A -> B)))";
         Term t_test1 = null;
         try {
-            t_test1 = io.load(test1).loadDeclarations().loadProblem().getProblem().succedent()
-                    .get(0).formula();
+            t_test1 =
+                (Term) io.load(test1).loadDeclarations().loadProblem().getProblem().succedent()
+                        .get(0).formula();
         } catch (Exception e) {
             LOGGER.error("Parser Error or Input Error", e);
             fail("Parser Error");

@@ -27,7 +27,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
      * @return the FilterEntry from the formula
      */
     protected SequentPrintFilterEntry filterFormula(
-            org.key_project.prover.sequent.SequentFormula sequentFormula) {
+            SequentFormula sequentFormula) {
         return new IdentityFilterEntry(sequentFormula);
     }
 
@@ -60,14 +60,14 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
         /**
          * the original Formula being filtered
          */
-        final org.key_project.prover.sequent.SequentFormula originalFormula;
+        final SequentFormula originalFormula;
 
         /**
          * constructor
          *
          * @param originalFormula the original formula to be filtered
          */
-        IdentityFilterEntry(org.key_project.prover.sequent.SequentFormula originalFormula) {
+        IdentityFilterEntry(SequentFormula originalFormula) {
             this.originalFormula = originalFormula;
         }
 
@@ -76,7 +76,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
          *
          * @return the original formula
          */
-        public org.key_project.prover.sequent.SequentFormula getFilteredFormula() {
+        public SequentFormula getFilteredFormula() {
             return originalFormula;
         }
 

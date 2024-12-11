@@ -7,13 +7,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
-import de.uka.ilkd.key.logic.equality.Property;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Property;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 

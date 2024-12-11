@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Collection;
 
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -17,7 +18,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * future versions it can be enhanced to do other simplifications. A sequent and so a semisequent
  * has to be immutable.
  */
-public class Semisequent extends org.key_project.prover.sequent.Semisequent<SequentFormula> {
+public class Semisequent extends org.key_project.prover.sequent.Semisequent {
     /** the empty semisequent (using singleton pattern) */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
 
@@ -227,7 +228,7 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
          * @return index of sequentFormula
          */
         @Override
-        public int indexOf(org.key_project.prover.sequent.SequentFormula sequentFormula) {
+        public int indexOf(SequentFormula sequentFormula) {
             return -1;
         }
 
@@ -238,7 +239,7 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
          * @return {@link SequentFormula} found at index idx
          */
         @Override
-        public org.key_project.prover.sequent.SequentFormula get(int idx) {
+        public SequentFormula get(int idx) {
             return null;
         }
 
@@ -246,7 +247,7 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
          * @return the first SequentFormula of this Semisequent
          */
         @Override
-        public org.key_project.prover.sequent.SequentFormula getFirst() {
+        public SequentFormula getFirst() {
             return null;
         }
 
@@ -257,7 +258,7 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
          * @return true iff. sequentFormula has been found in this Semisequent
          */
         @Override
-        public boolean contains(org.key_project.prover.sequent.SequentFormula sequentFormula) {
+        public boolean contains(SequentFormula sequentFormula) {
             return false;
         }
 

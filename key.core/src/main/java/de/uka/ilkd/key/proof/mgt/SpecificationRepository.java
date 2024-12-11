@@ -38,6 +38,7 @@ import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -192,7 +193,7 @@ public final class SpecificationRepository {
         final SequentFormula cf = new SequentFormula(tb.equals(limitedTerm, unlimitedTerm));
         final Sequent addedSeq =
             Sequent.createAnteSequent(
-                (Semisequent) Semisequent.EMPTY_SEMISEQUENT.insertFirst(cf).semisequent());
+                Semisequent.EMPTY_SEMISEQUENT.insertFirst(cf).semisequent());
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(addedSeq,
             ImmutableSLList.nil(), tb.func(unlimited, subs)));
         tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);

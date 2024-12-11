@@ -27,7 +27,7 @@ public class NodeReplacement {
 
     final Node node;
     final Node parent;
-    ImmutableList<SequentChangeInfo<org.key_project.prover.sequent.SequentFormula>> rawChanges;
+    ImmutableList<SequentChangeInfo> rawChanges;
     ImmutableList<NodeChange> changes = null;
 
     /**
@@ -37,7 +37,7 @@ public class NodeReplacement {
      *        change being the first element of the list
      */
     public NodeReplacement(Node p_node, Node p_parent,
-            ImmutableList<SequentChangeInfo<org.key_project.prover.sequent.SequentFormula>> p_changes) {
+            ImmutableList<SequentChangeInfo> p_changes) {
         node = p_node;
         parent = p_parent;
         rawChanges = p_changes;
@@ -45,7 +45,7 @@ public class NodeReplacement {
 
     private void addNodeChanges() {
         if (!rawChanges.isEmpty()) {
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci =
+            SequentChangeInfo sci =
                 rawChanges.head();
             rawChanges = rawChanges.tail();
 
@@ -57,9 +57,9 @@ public class NodeReplacement {
     }
 
     private void addNodeChange(
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> p_sci) {
+            SequentChangeInfo p_sci) {
         Iterator<org.key_project.prover.sequent.SequentFormula> it;
-        Iterator<FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula>> it2;
+        Iterator<FormulaChangeInfo> it2;
 
         // ---
         it = p_sci.removedFormulas(true).iterator();
@@ -124,7 +124,7 @@ public class NodeReplacement {
 
     }
 
-    private void addAddedChange(org.key_project.prover.sequent.SequentFormula p_cf,
+    private void addAddedChange(SequentFormula p_cf,
             boolean p_inAntec) {
         Sequent oldS = parent.sequent();
         Semisequent oldSS = (p_inAntec ? oldS.antecedent() : oldS.succedent());
@@ -147,7 +147,7 @@ public class NodeReplacement {
      * @param p_cf
      * @param p_inAntec
      */
-    private void addAddedRedundantChange(org.key_project.prover.sequent.SequentFormula p_cf,
+    private void addAddedRedundantChange(SequentFormula p_cf,
             boolean p_inAntec) {
 
         final PosInOccurrence pio =
@@ -158,7 +158,7 @@ public class NodeReplacement {
 
 
 
-    private void addRemovedChange(org.key_project.prover.sequent.SequentFormula p_cf,
+    private void addRemovedChange(SequentFormula p_cf,
             boolean p_inAntec) {
         Sequent oldS = parent.sequent();
         Semisequent oldSS = (p_inAntec ? oldS.antecedent() : oldS.succedent());

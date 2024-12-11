@@ -57,7 +57,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.modelField = false;
         final OriginalVariables origVars = contract.getOrigVars();
         final LocationVariable h = getHeap();
-        final LocationVariable hPre = (LocationVariable) origVars.atPres.get(h);
+        final LocationVariable hPre = origVars.atPres.get(h);
 
         setRequires(contract.getRequires(h));
         setModifiable(
@@ -83,7 +83,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.contract = contract;
         this.modelField = true;
         final LocationVariable h = getHeap();
-        final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
+        final LocationVariable hPre = contract.getOrigVars().atPres.get(h);
 
         setRequires(contract.getRequires(h));
         setModifiable(TB.strictlyNothing(), services);
@@ -115,7 +115,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.modelField = true;
         final OriginalVariables origVars = contract.getOrigVars();
         final LocationVariable h = getHeap();
-        final LocationVariable hPre = (LocationVariable) origVars.atPres.get(h);
+        final LocationVariable hPre = origVars.atPres.get(h);
 
         setRequires(contract.getRequires(h));
         setModifiable(TB.strictlyNothing(), services);
@@ -275,7 +275,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final LocationVariable heap = getHeap();
         final LocationVariable heapAtPre;
         if (getOrigVars().atPres != null && getOrigVars().atPres.get(heap) != null) {
-            heapAtPre = (LocationVariable) getOrigVars().atPres.get(heap);
+            heapAtPre = getOrigVars().atPres.get(heap);
         } else {
             heapAtPre = heap;
         }

@@ -53,7 +53,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
         antec = ImmutableSLList.nil();
         it = originalSequent.antecedent().iterator();
         while (it.hasNext()) {
-            org.key_project.prover.sequent.SequentFormula sf = it.next();
+            SequentFormula sf = it.next();
             lp.reset();
             lp.printConstrainedFormula(sf);
             String formString = lp.result();

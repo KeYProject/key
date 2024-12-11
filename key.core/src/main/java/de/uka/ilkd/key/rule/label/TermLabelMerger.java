@@ -7,10 +7,11 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * <p>
@@ -43,8 +44,8 @@ public interface TermLabelMerger {
      * @return {@code true} if the {@link List} of {@link TermLabel} was modified and {@code false}
      *         otherwise.
      */
-    boolean mergeLabels(org.key_project.prover.sequent.SequentFormula existingSF, Term existingTerm,
-            TermLabel existingLabel, org.key_project.prover.sequent.SequentFormula rejectedSF,
+    boolean mergeLabels(SequentFormula existingSF, Term existingTerm,
+            TermLabel existingLabel, SequentFormula rejectedSF,
             Term rejectedTerm,
             TermLabel rejectedLabel, List<TermLabel> mergedLabels);
 }

@@ -11,7 +11,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 
 
 /**
@@ -39,13 +39,13 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
         // Compute collect terms of sequent formulas
         Sequent sequent = goal.sequent();
         Set<Term> topTerms = new LinkedHashSet<>();
-        for (org.key_project.prover.sequent.SequentFormula sf : sequent) {
+        for (SequentFormula sf : sequent) {
             topTerms.add(sf.formula());
         }
         // Compute equality terms
         HeapLDT heapLDT = goal.node().proof().getServices().getTypeConverter().getHeapLDT();
         Set<Term> equalityTerms = new LinkedHashSet<>();
-        for (org.key_project.prover.sequent.SequentFormula sf : sequent) {
+        for (SequentFormula sf : sequent) {
             collectEqualityTerms(sf, equalityTerms, topTerms, heapLDT,
                 goal.node().proof().getServices());
         }
@@ -61,7 +61,7 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
      * @param heapLDT The {@link HeapLDT} to use.
      * @param services TODO
      */
-    protected void collectEqualityTerms(org.key_project.prover.sequent.SequentFormula sf,
+    protected void collectEqualityTerms(SequentFormula sf,
             Set<Term> equalityTerms,
             Set<Term> topTerms, HeapLDT heapLDT, Services services) {
         // Collect objects (target of store operations on heap)

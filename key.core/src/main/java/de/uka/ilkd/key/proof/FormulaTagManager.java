@@ -13,6 +13,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -82,14 +83,14 @@ public class FormulaTagManager {
      * @return All modifications that were applied to the formula with the given tag since the
      *         creation of the tag, starting with the most recent one
      */
-    public ImmutableList<FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula>> getModifications(
+    public ImmutableList<FormulaChangeInfo> getModifications(
             FormulaTag p_tag) {
         return getFormulaInfo(p_tag).modifications;
     }
 
 
     public void sequentChanged(Goal source,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci) {
+            SequentChangeInfo sci) {
         assert source != null;
         removeTags(sci, true, source);
         removeTags(sci, false, source);
@@ -101,16 +102,16 @@ public class FormulaTagManager {
         addTags(sci, false, source);
     }
 
-    private void updateTags(SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci,
+    private void updateTags(SequentChangeInfo sci,
             boolean p_antec, Goal p_goal) {
         for (var formulaChangeInfo : sci.modifiedFormulas(p_antec)) {
             updateTag(formulaChangeInfo, (Sequent) sci.sequent(), p_goal);
         }
     }
 
-    private void addTags(SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci,
+    private void addTags(SequentChangeInfo sci,
             boolean p_antec, Goal p_goal) {
-        for (org.key_project.prover.sequent.SequentFormula constrainedFormula : sci
+        for (SequentFormula constrainedFormula : sci
                 .addedFormulas(p_antec)) {
             final PosInOccurrence pio =
                 new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
@@ -118,9 +119,9 @@ public class FormulaTagManager {
         }
     }
 
-    private void removeTags(SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci,
+    private void removeTags(SequentChangeInfo sci,
             boolean p_antec, Goal p_goal) {
-        for (org.key_project.prover.sequent.SequentFormula constrainedFormula : sci
+        for (SequentFormula constrainedFormula : sci
                 .removedFormulas(p_antec)) {
             final PosInOccurrence pio =
                 new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
@@ -159,7 +160,7 @@ public class FormulaTagManager {
         final Sequent seq = p_goal.sequent();
         final Semisequent ss = p_antec ? seq.antecedent() : seq.succedent();
 
-        for (org.key_project.prover.sequent.SequentFormula s : ss) {
+        for (SequentFormula s : ss) {
             final PosInOccurrence pio =
                 new PosInOccurrence(s, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
@@ -190,7 +191,7 @@ public class FormulaTagManager {
         pioToTag.remove(p_pio);
     }
 
-    private void updateTag(FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula> p_info,
+    private void updateTag(FormulaChangeInfo p_info,
             Sequent p_newSeq,
             Goal p_goal) {
         final PosInOccurrence oldPIO =
@@ -248,7 +249,7 @@ public class FormulaTagManager {
          * All modifications that have been applied to the formula since the creation of the tag.
          * The most recent modification is the first element of the list
          */
-        public final ImmutableList<FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula>> modifications;
+        public final ImmutableList<FormulaChangeInfo> modifications;
 
         /**
          * The age (as obtained by <code>Goal.getTime()</code>) of the formula, i.e. the time when
@@ -261,7 +262,7 @@ public class FormulaTagManager {
         }
 
         private FormulaInfo(PosInOccurrence p_pio,
-                ImmutableList<FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula>> p_modifications,
+                ImmutableList<FormulaChangeInfo> p_modifications,
                 long p_age) {
             pio = p_pio;
             modifications = p_modifications;
@@ -269,7 +270,7 @@ public class FormulaTagManager {
         }
 
         public FormulaInfo addModification(
-                FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula> p_info,
+                FormulaChangeInfo p_info,
                 Sequent p_newSeq, long p_age) {
             final PosInOccurrence newPIO =
                 new PosInOccurrence(p_info.newFormula(),

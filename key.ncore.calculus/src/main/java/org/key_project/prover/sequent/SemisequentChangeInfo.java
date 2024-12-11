@@ -6,20 +6,20 @@ package org.key_project.prover.sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
+public abstract class SemisequentChangeInfo {
     /** contains the added formulas to the semisequent */
-    private ImmutableList<SF> added = ImmutableSLList.nil();
+    private ImmutableList<SequentFormula> added = ImmutableSLList.nil();
     /** contains the removed formulas from the semisequent */
-    private ImmutableList<SF> removed = ImmutableSLList.nil();
+    private ImmutableList<SequentFormula> removed = ImmutableSLList.nil();
     /** contains the modified formulas from the semisequent */
-    private ImmutableList<FormulaChangeInfo<SF>> modified = ImmutableSLList.nil();
+    private ImmutableList<FormulaChangeInfo> modified = ImmutableSLList.nil();
     /** stores the redundance free formula list of the semisequent */
-    private ImmutableList<SF> modifiedSemisequent = ImmutableSLList.nil();
+    private ImmutableList<SequentFormula> modifiedSemisequent = ImmutableSLList.nil();
     /**
      * contains formulas that have been tried to add, but which have been rejected due to already
      * existing formulas in the sequent subsuming these formulas
      */
-    private ImmutableList<SF> rejected = ImmutableSLList.nil();
+    private ImmutableList<SequentFormula> rejected = ImmutableSLList.nil();
 
     /** */
     private int lastFormulaIndex = -1;
@@ -27,11 +27,11 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
     public SemisequentChangeInfo() {
     }
 
-    public SemisequentChangeInfo(ImmutableList<SF> formulas) {
+    public SemisequentChangeInfo(ImmutableList<SequentFormula> formulas) {
         this.modifiedSemisequent = formulas;
     }
 
-    protected SemisequentChangeInfo(SemisequentChangeInfo<SF> o) {
+    protected SemisequentChangeInfo(SemisequentChangeInfo o) {
         this.added = o.added;
         this.removed = o.removed;
         this.modified = o.modified;
@@ -40,9 +40,9 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
         this.lastFormulaIndex = o.lastFormulaIndex;
     }
 
-    public abstract SemisequentChangeInfo<SF> copy();
+    public abstract SemisequentChangeInfo copy();
 
-    protected ImmutableList<SF> modifiedSemisequent() {
+    protected ImmutableList<SequentFormula> modifiedSemisequent() {
         return modifiedSemisequent;
     }
 
@@ -57,21 +57,21 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
      * sets the list of constrained formula containing all formulas of the semisequent after the
      * operation
      */
-    public void setFormulaList(ImmutableList<SF> list) {
+    public void setFormulaList(ImmutableList<SequentFormula> list) {
         modifiedSemisequent = list;
     }
 
     /**
      * returns the list of constrained formula of the new semisequent
      */
-    public ImmutableList<SF> getFormulaList() {
+    public ImmutableList<SequentFormula> getFormulaList() {
         return modifiedSemisequent;
     }
 
     /**
      * logs an added formula at position idx
      */
-    public void addedFormula(int idx, SF cf) {
+    public void addedFormula(int idx, SequentFormula cf) {
         added = added.prepend(cf);
         lastFormulaIndex = idx;
     }
@@ -79,10 +79,10 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
     /**
      * logs a modified formula at position idx
      */
-    public void modifiedFormula(int idx, FormulaChangeInfo<SF> fci) {
+    public void modifiedFormula(int idx, FormulaChangeInfo fci) {
         // This information can overwrite older records about removed
         // formulas
-        removed = removed.removeAll((SF) fci.positionOfModification().sequentFormula());
+        removed = removed.removeAll(fci.positionOfModification().sequentFormula());
         modified = modified.prepend(fci);
         lastFormulaIndex = idx;
     }
@@ -92,7 +92,7 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
      *
      * @return IList<SequentFormula> added to the semisequent
      */
-    public ImmutableList<SF> addedFormulas() {
+    public ImmutableList<SequentFormula> addedFormulas() {
         return added;
     }
 
@@ -101,7 +101,7 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
      *
      * @return IList<SequentFormula> removed from the semisequent
      */
-    public ImmutableList<SF> removedFormulas() {
+    public ImmutableList<SequentFormula> removedFormulas() {
         return removed;
     }
 
@@ -111,7 +111,7 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
      *
      * @return list of formulas rejected due to redundancy
      */
-    public ImmutableList<SF> rejectedFormulas() {
+    public ImmutableList<SequentFormula> rejectedFormulas() {
         return this.rejected;
     }
 
@@ -122,7 +122,7 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
      *
      * @param f the SequentFormula
      */
-    public void rejectedFormula(SF f) {
+    public void rejectedFormula(SequentFormula f) {
         this.rejected = this.rejected.append(f);
     }
 
@@ -131,14 +131,14 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
      *
      * @return IList<SequentFormula> modified within the semisequent
      */
-    public ImmutableList<FormulaChangeInfo<SF>> modifiedFormulas() {
+    public ImmutableList<FormulaChangeInfo> modifiedFormulas() {
         return modified;
     }
 
     /**
      * logs an added formula at position idx
      */
-    public void removedFormula(int idx, SF cf) {
+    public void removedFormula(int idx, SequentFormula cf) {
         removed = removed.prepend(cf);
 
         lastFormulaIndex = (lastFormulaIndex == idx) ? -1
@@ -157,8 +157,8 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
      *
      * @param succ the SemisequentChangeInfo to combine with
      */
-    public void combine(SemisequentChangeInfo<SF> succ) {
-        final SemisequentChangeInfo<SF> predecessor = this;
+    public void combine(SemisequentChangeInfo succ) {
+        final SemisequentChangeInfo predecessor = this;
         if (succ == predecessor) {
             return;
         }
@@ -170,9 +170,9 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
             for (var fci : predecessor.modified) {
                 if (fci.newFormula() == sf) {
                     predecessor.modified = predecessor.modified.removeAll(fci);
-                    if (!predecessor.removed.contains((SF) fci.getOriginalFormula())) {
+                    if (!predecessor.removed.contains(fci.getOriginalFormula())) {
                         predecessor.removed =
-                            predecessor.removed.append((SF) fci.getOriginalFormula());
+                            predecessor.removed.append(fci.getOriginalFormula());
                     }
                     skip = true;
                     break;
@@ -192,14 +192,14 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
             }
         }
 
-        for (SF sf : succ.added) {
+        for (SequentFormula sf : succ.added) {
             predecessor.removed = predecessor.removed.removeAll(sf);
             if (!predecessor.added.contains(sf)) {
                 predecessor.addedFormula(succ.lastFormulaIndex, sf);
             }
         }
 
-        for (SF sf : succ.rejected) {
+        for (SequentFormula sf : succ.rejected) {
             if (!predecessor.rejected.contains(sf)) {
                 predecessor.rejectedFormula(sf);
             }
@@ -219,7 +219,7 @@ public abstract class SemisequentChangeInfo<SF extends SequentFormula> {
     /**
      * returns the semisequent that is the result of the change operation
      */
-    public abstract Semisequent<SF> semisequent();
+    public abstract Semisequent semisequent();
 
     /**
      * toString

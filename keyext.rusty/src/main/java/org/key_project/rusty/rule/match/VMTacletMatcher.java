@@ -206,7 +206,7 @@ public class VMTacletMatcher implements TacletMatcher {
     @Override
     public final AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
             Term template, MatchConditions matchCond, Services lservices) {
-        var services = (Services) lservices;
+        var services = lservices;
         TacletMatchProgram prg = assumesMatchPrograms.get(template);
 
         ImmutableList<AssumesFormulaInstantiation> resFormulas =

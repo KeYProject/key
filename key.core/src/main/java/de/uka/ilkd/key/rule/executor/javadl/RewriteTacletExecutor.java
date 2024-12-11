@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule.executor.javadl;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -24,6 +23,7 @@ import org.key_project.logic.IntIterator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 
 public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
         extends FindTacletExecutor<TacletKind> {
@@ -64,7 +64,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
     }
 
 
-    private org.key_project.prover.sequent.SequentFormula applyReplacewithHelper(Goal goal,
+    private SequentFormula applyReplacewithHelper(Goal goal,
             TermLabelState termLabelState,
             RewriteTacletGoalTemplate gt, PosInOccurrence posOfFind,
             Services services,
@@ -85,7 +85,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
     }
 
 
-    public org.key_project.prover.sequent.SequentFormula getRewriteResult(Goal goal,
+    public SequentFormula getRewriteResult(Goal goal,
             TermLabelState termLabelState,
             Services services, TacletApp app) {
         assert taclet.goalTemplates().size() == 1;
@@ -104,11 +104,11 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
      */
     @Override
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             PosInOccurrence posOfFind, MatchConditions matchCond,
             Goal goal, RuleApp ruleApp, Services services) {
         if (gt instanceof RewriteTacletGoalTemplate) {
-            final org.key_project.prover.sequent.SequentFormula cf =
+            final SequentFormula cf =
                 applyReplacewithHelper(goal, termLabelState,
                     (RewriteTacletGoalTemplate) gt, posOfFind, services, matchCond, ruleApp);
             currentSequent.combine(currentSequent.sequent().changeFormula(cf, posOfFind));
@@ -143,7 +143,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
             MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
         if (posOfFind.isInAntec()) {

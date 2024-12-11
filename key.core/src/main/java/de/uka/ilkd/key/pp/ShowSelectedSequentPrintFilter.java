@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -66,25 +64,25 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
         /**
          * The filtered formula, i.e., the formula at {@code pos}.
          */
-        private final org.key_project.prover.sequent.SequentFormula filtered;
+        private final SequentFormula filtered;
 
         /**
          * The origin formula, i.e., the formula at {@code pos.getTopLevel()}.
          */
-        private final org.key_project.prover.sequent.SequentFormula original;
+        private final SequentFormula original;
 
         private Entry(PosInOccurrence pos) {
-            filtered = new SequentFormula((Term) pos.subTerm());
+            filtered = new SequentFormula(pos.subTerm());
             original = pos.sequentFormula();
         }
 
         @Override
-        public org.key_project.prover.sequent.SequentFormula getFilteredFormula() {
+        public SequentFormula getFilteredFormula() {
             return filtered;
         }
 
         @Override
-        public org.key_project.prover.sequent.SequentFormula getOriginalFormula() {
+        public SequentFormula getOriginalFormula() {
             return original;
         }
 

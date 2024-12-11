@@ -32,13 +32,13 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         final var tacletApp = (TacletApp) ruleApp;
         final MatchConditions mc = tacletApp.matchConditions();
 
-        final ImmutableList<SequentChangeInfo<org.key_project.rusty.logic.SequentFormula>> newSequentsForGoals =
+        final ImmutableList<SequentChangeInfo> newSequentsForGoals =
             checkAssumesGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
 
         final ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
         final Iterator<Goal> goalIt = newGoals.iterator();
-        final Iterator<SequentChangeInfo<org.key_project.rusty.logic.SequentFormula>> newSequentsIt =
+        final Iterator<SequentChangeInfo> newSequentsIt =
             newSequentsForGoals.iterator();
 
         for (var nextGT : taclet.goalTemplates()) {

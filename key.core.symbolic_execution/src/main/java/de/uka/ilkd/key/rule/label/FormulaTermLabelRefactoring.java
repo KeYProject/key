@@ -416,7 +416,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param sf The {@link SequentFormula} to add.
      */
     public static void addSequentFormulaToRefactor(TermLabelState state,
-            org.key_project.prover.sequent.SequentFormula sf) {
+            SequentFormula sf) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         @SuppressWarnings("unchecked")
         Set<org.key_project.prover.sequent.SequentFormula> sfSet =

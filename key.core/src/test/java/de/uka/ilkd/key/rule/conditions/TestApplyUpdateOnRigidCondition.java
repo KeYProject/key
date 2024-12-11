@@ -26,7 +26,7 @@ public class TestApplyUpdateOnRigidCondition {
         Term term = TacletForTests.parseTerm("{i:=0}\\forall int a; a = i");
         Term result = applyUpdateOnFormula(term);
         Term expected = TacletForTests.parseTerm("\\forall int a; {i:=0}(a = i)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Update without free variables was not properly applied on formula!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -41,7 +41,7 @@ public class TestApplyUpdateOnRigidCondition {
         term = TacletForTests.parseTerm("{i:=0} f(const)");
         result = applyUpdateOnTerm(term);
         expected = TacletForTests.parseTerm("f({i:=0} const)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Update without free variables was not properly applied on term!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -58,7 +58,7 @@ public class TestApplyUpdateOnRigidCondition {
         Term result = tb.all(b, applyUpdateOnFormula(term.sub(0)));
         Term expected =
             TacletForTests.parseTerm("\\forall int b; \\forall java.lang.Object a; {i:=b} (a = i)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Update is not simply pulled over quantification!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -68,7 +68,7 @@ public class TestApplyUpdateOnRigidCondition {
         b = term.boundVars().get(0);
         result = tb.all(b, applyUpdateOnFormula(term.sub(0)));
         expected = TacletForTests.parseTerm("\\forall int b; {i:=b} 0 = {i:=b} i");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Update is not simply pulled over equality!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -78,7 +78,7 @@ public class TestApplyUpdateOnRigidCondition {
         b = term.boundVars().get(0);
         result = tb.all(b, tb.equals(applyUpdateOnTerm(term.sub(0).sub(0)), term.sub(0).sub(1)));
         expected = TacletForTests.parseTerm("\\forall int b; f({i:=b} const) = 0");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Update is not simply pulled over function symbol!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -95,7 +95,7 @@ public class TestApplyUpdateOnRigidCondition {
         Term result = tb.all(a, applyUpdateOnFormula(term.sub(0)));
         Term expected = TacletForTests
                 .parseTerm("\\forall int a; \\forall java.lang.Object a1; {i:=a} (a1 = i)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Renaming or applying update afterwards !");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -108,7 +108,7 @@ public class TestApplyUpdateOnRigidCondition {
         result = tb.all(a, tb.all(a1, applyUpdateOnFormula(term.sub(0).sub(0))));
         expected = TacletForTests.parseTerm(
             "\\forall int a1; \\forall int a; \\forall java.lang.Object a2; {i:=a} (i = a1)");
-        assertTrue(expected.equalsModProperty(result, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(expected, result),
             "Counter appended to stem was not increased high enough!");
         assertEquals(expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             result.hashCodeModProperty(RENAMING_TERM_PROPERTY),

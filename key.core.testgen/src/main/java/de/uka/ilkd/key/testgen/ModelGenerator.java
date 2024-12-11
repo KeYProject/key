@@ -9,7 +9,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 import org.key_project.logic.Namespace;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -149,7 +149,7 @@ public class ModelGenerator implements SolverLauncherListener {
 
         if (!tmodel.equals(tb.tt())) {
             Term notTerm = tb.not(tmodel);
-            org.key_project.prover.sequent.SequentFormula sf = new SequentFormula(notTerm);
+            SequentFormula sf = new SequentFormula(notTerm);
             goal.addFormula(sf, true, true);
             return true;
         }
@@ -175,13 +175,13 @@ public class ModelGenerator implements SolverLauncherListener {
 
         final TermBuilder tb = services.getTermBuilder();
         ante = ante.append(tb.tt());
-        for (org.key_project.prover.sequent.SequentFormula f : s.antecedent()) {
+        for (SequentFormula f : s.antecedent()) {
             ante = ante.append(f.formula());
         }
 
         ImmutableList<Term> succ = ImmutableSLList.nil();
         succ = succ.append(tb.ff());
-        for (org.key_project.prover.sequent.SequentFormula f : s.succedent()) {
+        for (SequentFormula f : s.succedent()) {
             succ = succ.append(f.formula());
         }
 

@@ -771,7 +771,7 @@ public abstract class SequentView extends JEditorPane {
             }
         } else { // all formulas below MAX_AGE_FOR_HEATMAP are highlighted.
             for (SequentPrintFilterEntry entry : entryList) {
-                org.key_project.prover.sequent.SequentFormula form = entry.getFilteredFormula();
+                SequentFormula form = entry.getFilteredFormula();
                 int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
                     form, max_age + 2);
                 if (age < max_age) {
@@ -820,17 +820,17 @@ public abstract class SequentView extends JEditorPane {
                     node.getNodeInfo().getSequentChangeInfo().addedFormulas(true);
                 ImmutableList<org.key_project.prover.sequent.SequentFormula> added_succ =
                     node.getNodeInfo().getSequentChangeInfo().addedFormulas(false);
-                for (org.key_project.prover.sequent.SequentFormula sf : added_ante) {
+                for (SequentFormula sf : added_ante) {
                     pio_age_list.add(
                         new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), age));
                 }
-                for (org.key_project.prover.sequent.SequentFormula sf : added_succ) {
+                for (SequentFormula sf : added_succ) {
                     pio_age_list.add(
                         new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), age));
                 }
-                ImmutableList<FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula>> modified =
+                ImmutableList<FormulaChangeInfo> modified =
                     node.getNodeInfo().getSequentChangeInfo().modifiedFormulas();
-                for (FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula> fci : modified) {
+                for (FormulaChangeInfo fci : modified) {
                     PosInOccurrence positionOfMod =
                         fci.positionOfModification();
                     pio_age_list.add(new PIO_age(positionOfMod, age));
@@ -845,7 +845,7 @@ public abstract class SequentView extends JEditorPane {
                         }
                     }
                 }
-                for (org.key_project.prover.sequent.SequentFormula sf : node.getNodeInfo()
+                for (SequentFormula sf : node.getNodeInfo()
                         .getSequentChangeInfo()
                         .removedFormulas(true)) {
                     for (PIO_age pair : pio_age_list) {
@@ -855,7 +855,7 @@ public abstract class SequentView extends JEditorPane {
                         }
                     }
                 }
-                for (org.key_project.prover.sequent.SequentFormula sf : node.getNodeInfo()
+                for (SequentFormula sf : node.getNodeInfo()
                         .getSequentChangeInfo()
                         .removedFormulas(false)) {
                     for (PIO_age pair : pio_age_list) {
@@ -943,7 +943,7 @@ public abstract class SequentView extends JEditorPane {
      * @param max_age the maximum age, specified in viewSettings
      * @return the sf's age
      */
-    private int computeSeqFormulaAge(Node node, org.key_project.prover.sequent.SequentFormula form,
+    private int computeSeqFormulaAge(Node node, SequentFormula form,
             int max_age) {
         int age = -1;
         while (age < max_age && node != null && node.sequent().contains(form)) {

@@ -20,7 +20,6 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
@@ -334,7 +334,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * @param initGoal The goal containing the "initially valid" PO.
      * @return The {@link SequentFormula} for the "initially valid" goal.
      */
-    private org.key_project.prover.sequent.SequentFormula initFormula(TermLabelState termLabelState,
+    private SequentFormula initFormula(TermLabelState termLabelState,
             Instantiation inst,
             final Term invTerm, Term reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
