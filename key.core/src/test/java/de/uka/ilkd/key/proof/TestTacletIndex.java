@@ -17,6 +17,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -152,7 +153,7 @@ public class TestTacletIndex {
 
         Term term_p1 = TacletForTests.parseTerm("p(one, zero)");
 
-        org.key_project.prover.sequent.SequentFormula cfma = new SequentFormula(term_p1);
+        SequentFormula cfma = new SequentFormula(term_p1);
 
         PosInOccurrence posSucc =
             new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);
@@ -236,7 +237,7 @@ public class TestTacletIndex {
         Term term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
         SequentFormula cfma_p5 = new SequentFormula(term_p5);
         Sequent seq_p5 = Sequent.createAnteSequent(
-            (Semisequent) Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p5).semisequent());
+            Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p5).semisequent());
         PosInOccurrence pio_p5 =
             new PosInOccurrence(cfma_p5, PosInTerm.getTopLevel(), true);
         RuleAppIndex appIdx = createGoalFor(seq_p5, ruleIdx);
@@ -249,7 +250,7 @@ public class TestTacletIndex {
 
         SequentFormula cfma_p6 = new SequentFormula(term_p6);
         Sequent seq_p6 = Sequent.createAnteSequent(
-            (Semisequent) Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p6).semisequent());
+            Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p6).semisequent());
         PosInOccurrence pio_p6 =
             new PosInOccurrence(cfma_p6, PosInTerm.getTopLevel(), true);
         appIdx = createGoalFor(seq_p6, ruleIdx);

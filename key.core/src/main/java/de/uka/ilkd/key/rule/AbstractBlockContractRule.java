@@ -23,7 +23,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -43,6 +42,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -294,7 +294,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         return afterAssumptions;
     }
 
-    static org.key_project.prover.sequent.SequentFormula buildBodyPreservesSequent(
+    static SequentFormula buildBodyPreservesSequent(
             InfFlowPOSnippetFactory f, InfFlowProof proof) {
         Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
@@ -348,7 +348,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         InfFlowPOSnippetFactory infFlowFactory =
             POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, ec, services);
 
-        final org.key_project.prover.sequent.SequentFormula poFormula =
+        final SequentFormula poFormula =
             buildBodyPreservesSequent(infFlowFactory, proof);
 
         // add proof obligation to goal

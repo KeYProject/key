@@ -27,6 +27,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
@@ -77,7 +78,7 @@ public class TestVariableNamer {
     }
 
 
-    private PosInOccurrence constructPIO(org.key_project.prover.sequent.SequentFormula formula) {
+    private PosInOccurrence constructPIO(SequentFormula formula) {
         return new PosInOccurrence(formula, PosInTerm.getTopLevel(), true);
     }
 

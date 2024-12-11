@@ -250,7 +250,7 @@ public class SymbolicExecutionTreeBuilder {
     protected void initMethodCallStack(final Node root, Services services) {
         // Find all modalities in the succedent
         final List<Term> modalityTerms = new LinkedList<>();
-        for (org.key_project.prover.sequent.SequentFormula sequentFormula : root.sequent()
+        for (SequentFormula sequentFormula : root.sequent()
                 .succedent()) {
             sequentFormula.formula().execPreOrder(new DefaultVisitor() {
                 @Override

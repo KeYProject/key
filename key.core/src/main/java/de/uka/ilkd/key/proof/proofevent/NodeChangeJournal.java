@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 
 import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -81,7 +80,7 @@ public class NodeChangeJournal implements GoalListener {
     /**
      * informs the listener about a change that occured to the sequent of goal
      */
-    public void sequentChanged(Goal source, SequentChangeInfo<SequentFormula> sci) {
+    public void sequentChanged(Goal source, SequentChangeInfo sci) {
         NodeChangesHolder nc = getChangeObj(source.node());
 
         if (nc != null) {

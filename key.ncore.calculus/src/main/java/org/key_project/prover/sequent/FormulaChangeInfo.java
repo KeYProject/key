@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.sequent;
 
-public record FormulaChangeInfo<SF extends SequentFormula>(PosInOccurrence positionOfModification, SF newFormula) {
+public record FormulaChangeInfo(PosInOccurrence positionOfModification, SequentFormula newFormula) {
 
-    public SF getOriginalFormula() {
-        return (SF) positionOfModification().sequentFormula();
+    public SequentFormula getOriginalFormula() {
+        return positionOfModification().sequentFormula();
     }
 
     /**

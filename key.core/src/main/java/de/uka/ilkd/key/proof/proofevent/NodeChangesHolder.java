@@ -4,24 +4,23 @@
 package de.uka.ilkd.key.proof.proofevent;
 
 import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 
 public class NodeChangesHolder {
-    public ImmutableList<SequentChangeInfo<org.key_project.prover.sequent.SequentFormula>> scis;
+    public ImmutableList<SequentChangeInfo> scis;
 
     NodeChangesHolder() {
         this(ImmutableSLList.nil());
     }
 
     NodeChangesHolder(
-            ImmutableList<SequentChangeInfo<org.key_project.prover.sequent.SequentFormula>> p_scis) {
+            ImmutableList<SequentChangeInfo> p_scis) {
         scis = p_scis;
     }
 
-    public void addSCI(SequentChangeInfo<SequentFormula> p_sci) {
+    public void addSCI(SequentChangeInfo p_sci) {
         scis = scis.prepend(p_sci);
     }
 

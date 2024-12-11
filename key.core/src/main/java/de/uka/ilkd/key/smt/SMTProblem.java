@@ -157,19 +157,18 @@ public class SMTProblem {
     }
 
     public static Term sequentToTerm(Sequent s, Services services) {
-
         ImmutableList<Term> ante = ImmutableSLList.nil();
 
         final TermBuilder tb = services.getTermBuilder();
         ante = ante.append(tb.tt());
-        for (org.key_project.prover.sequent.SequentFormula f : s.antecedent()) {
-            ante = ante.append(f.formula());
+        for (SequentFormula f : s.antecedent()) {
+            ante = ante.append((Term) f.formula());
         }
 
         ImmutableList<Term> succ = ImmutableSLList.nil();
         succ = succ.append(tb.ff());
-        for (org.key_project.prover.sequent.SequentFormula f : s.succedent()) {
-            succ = succ.append(f.formula());
+        for (SequentFormula f : s.succedent()) {
+            succ = succ.append((Term) f.formula());
         }
 
         return tb.imp(tb.and(ante), tb.or(succ));
@@ -183,14 +182,14 @@ public class SMTProblem {
 
         final TermBuilder tb = goal.proof().getServices().getTermBuilder();
         ante = ante.append(tb.tt());
-        for (org.key_project.prover.sequent.SequentFormula f : s.antecedent()) {
-            ante = ante.append(f.formula());
+        for (SequentFormula f : s.antecedent()) {
+            ante = ante.append((Term) f.formula());
         }
 
         ImmutableList<Term> succ = ImmutableSLList.nil();
         succ = succ.append(tb.ff());
         for (SequentFormula f : s.succedent()) {
-            succ = succ.append(f.formula());
+            succ = succ.append((Term) f.formula());
         }
 
         return tb.imp(tb.and(ante), tb.or(succ));

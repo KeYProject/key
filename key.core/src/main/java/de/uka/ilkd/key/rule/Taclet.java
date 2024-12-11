@@ -23,6 +23,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -688,7 +689,7 @@ public abstract class Taclet implements Rule, Named {
 
 
     private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
-        for (org.key_project.prover.sequent.SequentFormula cf : s) {
+        for (SequentFormula cf : s) {
             cf.formula().execPostOrder(oc);
         }
     }
@@ -712,7 +713,7 @@ public abstract class Taclet implements Rule, Named {
         /**
          * The optional {@link SequentFormula} contained in {@link #getSequent()}.
          */
-        private final org.key_project.prover.sequent.SequentFormula sequentFormula;
+        private final SequentFormula sequentFormula;
 
         /**
          * The optional replace {@link Term} of the taclet.
@@ -762,7 +763,7 @@ public abstract class Taclet implements Rule, Named {
          *        {@link #getSequent()}.
          */
         public TacletLabelHint(TacletLabelHint labelHint,
-                org.key_project.prover.sequent.SequentFormula sequentFormula) {
+                SequentFormula sequentFormula) {
             assert labelHint != null;
             assert !TacletOperation.REPLACE_TERM.equals(labelHint.getTacletOperation());
             assert sequentFormula != null;
@@ -795,7 +796,7 @@ public abstract class Taclet implements Rule, Named {
          *
          * @return The optional {@link SequentFormula} contained in {@link #getSequent()}.
          */
-        public org.key_project.prover.sequent.SequentFormula getSequentFormula() {
+        public SequentFormula getSequentFormula() {
             return sequentFormula;
         }
 
@@ -893,7 +894,7 @@ public abstract class Taclet implements Rule, Named {
     }
 
     public TacletExecutor<?> getExecutor() {
-        return (TacletExecutor<? extends Taclet>) executor;
+        return executor;
     }
 
     public abstract Taclet setName(String s);

@@ -227,11 +227,11 @@ public class ModularSMTLib2Translator implements SMTTranslator {
     private List<Term> getTermsFromSequent(Sequent seq, Services serv) {
         TermBuilder tb = serv.getTermBuilder();
         List<Term> res = new LinkedList<>();
-        for (org.key_project.prover.sequent.SequentFormula sf : seq.antecedent()) {
-            res.add(sf.formula());
+        for (SequentFormula sf : seq.antecedent()) {
+            res.add((Term) sf.formula());
         }
         for (SequentFormula sf : seq.succedent()) {
-            res.add(tb.not(sf.formula()));
+            res.add(tb.not((Term) sf.formula()));
         }
         return res;
     }

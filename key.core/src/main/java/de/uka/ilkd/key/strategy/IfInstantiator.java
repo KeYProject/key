@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.FormulaTagManager;
 import de.uka.ilkd.key.proof.Goal;
@@ -159,8 +160,8 @@ public class IfInstantiator {
     private boolean isNewFormulaDirect(IfFormulaInstSeq p_ifInstantiation) {
         final boolean antec = p_ifInstantiation.inAntec();
 
-        final org.key_project.prover.sequent.SequentFormula cfma =
-            p_ifInstantiation.getConstrainedFormula();
+        final SequentFormula cfma =
+            p_ifInstantiation.getSequentFormula();
         final PosInOccurrence pio =
             new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
 
@@ -224,7 +225,7 @@ public class IfInstantiator {
         final ImmutableArray<IfFormulaInstantiation> formulas =
             getSequentFormulas(antec, !lastIfFormula || p_alreadyMatchedNewFor);
         final IfMatchResult mr = getTaclet().getMatcher().matchIf(formulas,
-            p_ifSeqTail.head().formula(), p_matchCond, getServices());
+            (Term) p_ifSeqTail.head().formula(), p_matchCond, getServices());
 
         // For each matching formula call the method again to match
         // the remaining terms

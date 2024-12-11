@@ -252,7 +252,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                 Debug.fail("Don't know what to do with the " + "assumes-instantiation ", ifInst2);
                 throw new IllegalStateException("Unexpected assume-instantiation" + ifInst2);
             } else if (!(ifInst.inAntec() ? seq.antecedent() : seq.succedent())
-                    .contains(ifInst.getConstrainedFormula())) {
+                    .contains(ifInst.getSequentFormula())) {
                 return false;
             }
         }

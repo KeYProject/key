@@ -25,6 +25,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
@@ -250,16 +251,16 @@ public class OriginTermLabel implements TermLabel {
      * @param services services.
      * @return the resulting sequent change info.
      */
-    public static SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> removeOriginLabels(
+    public static SequentChangeInfo removeOriginLabels(
             Sequent seq,
             Services services) {
-        SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> changes = null;
+        SequentChangeInfo changes = null;
 
         for (int i = 1; i <= seq.size(); ++i) {
-            org.key_project.prover.sequent.SequentFormula oldFormula = seq.getFormulabyNr(i);
-            org.key_project.prover.sequent.SequentFormula newFormula = new SequentFormula(
-                OriginTermLabel.removeOriginLabels(oldFormula.formula(), services));
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> change =
+            SequentFormula oldFormula = seq.getFormulabyNr(i);
+            SequentFormula newFormula = new SequentFormula(
+                OriginTermLabel.removeOriginLabels((Term) oldFormula.formula(), services));
+            SequentChangeInfo change =
                 seq.changeFormula(newFormula,
                     PosInOccurrence.findInSequent(seq, i,
                         PosInTerm.getTopLevel()));

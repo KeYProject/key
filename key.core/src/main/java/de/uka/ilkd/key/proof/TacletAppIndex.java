@@ -19,7 +19,6 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -305,7 +304,7 @@ public class TacletAppIndex {
      * @param sci SequentChangeInfo describing the change of the sequent
      */
     public void sequentChanged(
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci) {
+            SequentChangeInfo sci) {
         if (sci.getOriginalSequent() != getSequent()) {
             // we are not up-to-date and have to rebuild everything (lazy)
             clearIndexes();
@@ -316,7 +315,7 @@ public class TacletAppIndex {
         }
     }
 
-    private void updateIndices(SequentChangeInfo<SequentFormula> sci) {
+    private void updateIndices(SequentChangeInfo sci) {
         seq = (Sequent) sci.sequent();
 
         antecIndex =

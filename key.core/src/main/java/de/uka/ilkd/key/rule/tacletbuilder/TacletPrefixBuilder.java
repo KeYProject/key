@@ -104,7 +104,7 @@ public class TacletPrefixBuilder {
 
     private void visit(Sequent s) {
         for (final SequentFormula cf : s) {
-            visit(cf.formula());
+            visit((Term) cf.formula());
         }
     }
 

@@ -182,14 +182,14 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
 
     /** @return true iff obj in set */
     @Override
-    public boolean contains(T obj) {
+    public boolean contains(Object obj) {
         complainAboutSize();
         return elementList.contains(obj);
     }
 
     /** @return true iff this set is subset of set s */
     @Override
-    public boolean subset(ImmutableSet<T> s) {
+    public boolean subset(ImmutableSet<? extends Object> s) {
         if (size() > s.size()) {
             return false;
         } else {
@@ -346,7 +346,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
 
         /** @return true iff obj in set */
         @Override
-        public boolean contains(T obj) {
+        public boolean contains(Object obj) {
             return false;
         }
 
@@ -358,7 +358,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
 
         /** @return true iff this set is subset of set s */
         @Override
-        public boolean subset(ImmutableSet<T> s) {
+        public boolean subset(ImmutableSet<? extends Object> s) {
             return true;
         }
 

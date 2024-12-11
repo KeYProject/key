@@ -84,7 +84,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
         @Override
         public void visit(Term visited) {
-            isSubFormula |= visited.equalsModProperty(potentialSub, RENAMING_TERM_PROPERTY);
+            isSubFormula |= RENAMING_TERM_PROPERTY.equalsModThisProperty(visited, potentialSub);
         }
 
 

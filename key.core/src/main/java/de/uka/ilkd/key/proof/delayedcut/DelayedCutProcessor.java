@@ -190,7 +190,7 @@ public class DelayedCutProcessor implements Runnable {
      */
     private ImmutableList<Goal> hide(DelayedCut cut, Goal goal) {
 
-        org.key_project.prover.sequent.SequentFormula sf =
+        SequentFormula sf =
             getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
 
         PosInOccurrence pio =
@@ -213,7 +213,7 @@ public class DelayedCutProcessor implements Runnable {
             String side = cut.isDecisionPredicateInAntecendet() ? "TRUE" : "FALSE";
 
             if (goal[i].node().getNodeInfo().getBranchLabel().endsWith(side)) {
-                org.key_project.prover.sequent.SequentFormula formula =
+                SequentFormula formula =
                     getSequentFormula(goal[i], cut.isDecisionPredicateInAntecendet());
                 if (formula.formula() == cut.getFormula()) {
                     return i;

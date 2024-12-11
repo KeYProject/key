@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -75,7 +76,7 @@ public class TestSemisequent {
         Semisequent seq = Semisequent.EMPTY_SEMISEQUENT;
         seq = extract(seq.insert(0, con[0]));
         seq = extract(seq.insert(1, con[1]));
-        org.key_project.prover.sequent.SequentFormula eq2con0 =
+        SequentFormula eq2con0 =
             new SequentFormula(con[0].formula());
         assertFalse(seq.contains(eq2con0), "Contains should test of identity and not equality.");
     }
@@ -85,7 +86,7 @@ public class TestSemisequent {
         Semisequent seq = Semisequent.EMPTY_SEMISEQUENT;
         seq = extract(seq.insert(0, con[0]));
         seq = extract(seq.insert(1, con[1]));
-        org.key_project.prover.sequent.SequentFormula eq2con0 =
+        SequentFormula eq2con0 =
             new SequentFormula(con[0].formula());
         assertTrue(seq.containsEqual(eq2con0),
             "Contains tests of equality and should find the formula.");

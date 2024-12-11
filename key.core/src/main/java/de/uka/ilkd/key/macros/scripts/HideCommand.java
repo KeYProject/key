@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 
@@ -56,11 +57,12 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
 
         Taclet hideLeft =
             state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_LEFT);
-        for (org.key_project.prover.sequent.SequentFormula s : args.sequent.antecedent()) {
+        for (SequentFormula s : args.sequent.antecedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideLeft);
-            org.key_project.prover.sequent.SequentFormula s2 = find(s, goal.sequent().antecedent());
+            SequentFormula s2 = find(s, goal.sequent().antecedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, s2.formula(), service, true);
+            app = app.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) s2.formula(),
+                service, true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), true),
                 service);
             goal.apply(app);
@@ -68,22 +70,25 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
 
         Taclet hideRight =
             state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_RIGHT);
-        for (org.key_project.prover.sequent.SequentFormula s : args.sequent.succedent()) {
+        for (SequentFormula s : args.sequent.succedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideRight);
-            org.key_project.prover.sequent.SequentFormula s2 = find(s, goal.sequent().succedent());
+            SequentFormula s2 = find(s, goal.sequent().succedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, s2.formula(), service, true);
+            app = app.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) s2.formula(),
+                service, true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), false),
                 service);
             goal.apply(app);
         }
     }
 
-    private org.key_project.prover.sequent.SequentFormula find(
-            org.key_project.prover.sequent.SequentFormula sf, Semisequent semiseq)
+    private SequentFormula find(
+            SequentFormula sf, Semisequent semiseq)
             throws ScriptException {
         for (SequentFormula s : semiseq) {
-            if (s.formula().equalsModProperty(sf.formula(), TERM_LABELS_PROPERTY)) {
+            Term term = s.formula();
+            Term formula = sf.formula();
+            if ((TERM_LABELS_PROPERTY).equalsModThisProperty(term, formula)) {
                 return s;
             }
         }

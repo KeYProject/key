@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -11,6 +10,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.prover.sequent.PosInOccurrence;
 
@@ -84,7 +84,7 @@ public class ContainsTermFeature implements Feature {
 
         @Override
         public void visit(Term visited) {
-            found = found || visited.equalsModProperty(term, RENAMING_TERM_PROPERTY);
+            found = found || RENAMING_TERM_PROPERTY.equalsModThisProperty(visited, term);
         }
 
         @Override

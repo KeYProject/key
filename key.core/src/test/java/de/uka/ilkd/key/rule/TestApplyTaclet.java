@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -114,7 +115,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testSuccTacletWithoutIf() {
-        Term fma = proof[0].root().sequent().succedent().getFirst().formula();
+        Term fma = (Term) proof[0].root().sequent().succedent().getFirst().formula();
         NoPosTacletApp impright = TacletForTests.getRules().lookup("imp_right");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(impright);
@@ -139,7 +140,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testAddingRule() {
-        Term fma = proof[0].root().sequent().succedent().getFirst().formula();
+        Term fma = (Term) proof[0].root().sequent().succedent().getFirst().formula();
         NoPosTacletApp imprightadd =
             TacletForTests.getRules().lookup("TestApplyTaclet_imp_right_add");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
@@ -248,7 +249,7 @@ public class TestApplyTaclet {
 
     @Test
     public void testAntecTacletWithoutIf() {
-        Term fma = proof[3].root().sequent().antecedent().getFirst().formula();
+        Term fma = (Term) proof[3].root().sequent().antecedent().getFirst().formula();
         NoPosTacletApp impleft = TacletForTests.getRules().lookup("imp_left");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(impleft);
@@ -302,7 +303,7 @@ public class TestApplyTaclet {
         ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
         assertEquals(1, goals.size(), "Too many or zero goals for contradiction.");
         Sequent seq = goals.head().sequent();
-        Term term = seq.succedent().getFirst().formula().sub(1).sub(0).sub(0);
+        var term = seq.succedent().getFirst().formula().sub(1).sub(0).sub(0);
         assertEquals(term, TacletForTests.parseTerm("!B -> !A"));
     }
 
@@ -642,7 +643,7 @@ public class TestApplyTaclet {
         assertEquals(0, appList.size(), "Did not expect a match.");
 
         Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
-        org.key_project.prover.sequent.SequentFormula ifformula = new SequentFormula(ifterm);
+        SequentFormula ifformula = new SequentFormula(ifterm);
         ImmutableList<IfFormulaInstantiation> ifInsts = ImmutableSLList
                 .<IfFormulaInstantiation>nil().prepend(new IfFormulaInstDirect(ifformula));
         appIt = rApplist.iterator();
@@ -773,10 +774,10 @@ public class TestApplyTaclet {
 
         Sequent correctSeq = proof[p_proof + 1].root().sequent();
 
-        Term resultFormula = goals.head().sequent().getFormulabyNr(1).formula();
-        Term correctFormula = correctSeq.getFormulabyNr(1).formula();
+        Term resultFormula = (Term) goals.head().sequent().getFormulabyNr(1).formula();
+        Term correctFormula = (Term) correctSeq.getFormulabyNr(1).formula();
 
-        assertTrue(resultFormula.equalsModProperty(correctFormula, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(resultFormula, correctFormula),
             "Wrong result. Expected:"
                 + ProofSaver.printAnything(correctFormula, TacletForTests.services()) + " But was:"
                 + ProofSaver.printAnything(resultFormula, TacletForTests.services()));
@@ -850,9 +851,10 @@ public class TestApplyTaclet {
 
         // the content of the diamond must not have changed
         ProgramElement expected =
-            proof[22].root().sequent().getFormulabyNr(1).formula().javaBlock().program();
+            ((Term) proof[22].root().sequent().getFormulabyNr(1).formula()).javaBlock().program();
         ProgramElement is =
-            goals.head().sequent().getFormulabyNr(1).formula().sub(0).javaBlock().program();
+            ((Term) goals.head().sequent().getFormulabyNr(1).formula().sub(0)).javaBlock()
+                    .program();
         assertEquals(expected, is, "Context has been thrown away.");
 
     }
@@ -888,7 +890,7 @@ public class TestApplyTaclet {
                 + "int i=17; } catch (Exception e) { return null;}}");
 
         ProgramElement is =
-            goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
+            ((Term) goals.head().sequent().getFormulabyNr(1).formula()).javaBlock().program();
         // FIXME weigl: This test case is spurious:
         // actual.toString() == expected.toString() but internally there is a difference.
         assertTrue(
@@ -931,7 +933,7 @@ public class TestApplyTaclet {
                 + "int i=17; } catch (Exception e) { return null;}}");
 
         ProgramElement is =
-            goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
+            ((Term) goals.head().sequent().getFormulabyNr(1).formula()).javaBlock().program();
         assertTrue(
             expected.equalsModProperty(is, RENAMING_SOURCE_ELEMENT_PROPERTY,
                 new NameAbstractionTable()),

@@ -74,15 +74,15 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *         altered since the creation of this object or if a preceding update has changed
      */
     private boolean subformulaOrPreceedingUpdateHasChanged(Goal goal) {
-        ImmutableList<FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula>> infoList =
+        ImmutableList<FormulaChangeInfo> infoList =
             goal.getFormulaTagManager().getModifications(positionTag);
 
         while (!infoList.isEmpty()) {
-            final FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula> info =
+            final FormulaChangeInfo info =
                 infoList.head();
             infoList = infoList.tail();
 
-            final org.key_project.prover.sequent.SequentFormula newFormula = info.newFormula();
+            final SequentFormula newFormula = info.newFormula();
             if (newFormula == applicationPosition.sequentFormula()) {
                 // then there were no relevant modifications since the creation
                 // of the rule app object

@@ -15,7 +15,7 @@ public interface SequentPrintFilterEntry {
     /**
      * Formula to display
      */
-    org.key_project.prover.sequent.SequentFormula getFilteredFormula();
+    SequentFormula getFilteredFormula();
 
     /**
      * Original formula from sequent

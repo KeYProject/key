@@ -17,6 +17,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.BeforeEach;

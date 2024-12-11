@@ -32,6 +32,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleExecutor;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -156,9 +157,9 @@ public class TestTermLabelManager {
         Iterator<org.key_project.prover.sequent.SequentFormula> expectedIter = expected.iterator();
         Iterator<org.key_project.prover.sequent.SequentFormula> currentIter = current.iterator();
         while (expectedIter.hasNext() && currentIter.hasNext()) {
-            org.key_project.prover.sequent.SequentFormula expectedSF = expectedIter.next();
-            org.key_project.prover.sequent.SequentFormula currentSF = currentIter.next();
-            compareTerms(expectedSF.formula(), currentSF.formula(), changed, scope);
+            SequentFormula expectedSF = expectedIter.next();
+            SequentFormula currentSF = currentIter.next();
+            compareTerms((Term) expectedSF.formula(), (Term) currentSF.formula(), changed, scope);
         }
         assertFalse(expectedIter.hasNext());
         assertFalse(currentIter.hasNext());

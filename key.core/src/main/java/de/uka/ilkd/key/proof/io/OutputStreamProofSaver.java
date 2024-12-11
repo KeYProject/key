@@ -51,6 +51,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
@@ -174,9 +175,9 @@ public class OutputStreamProofSaver {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                     StrategyProperties.INF_FLOW_CHECK_TRUE);
                 strategySettings.setActiveStrategyProperties(strategyProperties);
-                for (final org.key_project.prover.sequent.SequentFormula s : proof.root().sequent()
+                for (final SequentFormula s : proof.root().sequent()
                         .succedent().asList()) {
-                    ((InfFlowProof) proof).addLabeledTotalTerm(s.formula());
+                    ((InfFlowProof) proof).addLabeledTotalTerm((Term) s.formula());
                 }
             } else {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
@@ -765,7 +766,7 @@ public class OutputStreamProofSaver {
         StringBuilder s = new StringBuilder();
         for (final IfFormulaInstantiation aL : l) {
             if (aL instanceof IfFormulaInstSeq) {
-                final org.key_project.prover.sequent.SequentFormula f = aL.getConstrainedFormula();
+                final SequentFormula f = aL.getSequentFormula();
                 s.append(" (ifseqformula \"")
                         .append(node.sequent()
                                 .formulaNumberInSequent(((IfFormulaInstSeq) aL).inAntec(), f))
@@ -773,7 +774,7 @@ public class OutputStreamProofSaver {
             } else if (aL instanceof IfFormulaInstDirect) {
 
                 final String directInstantiation =
-                    printTerm(aL.getConstrainedFormula().formula(), node.proof().getServices());
+                    printTerm((Term) aL.getSequentFormula().formula(), node.proof().getServices());
 
                 s.append(" (ifdirectformula \"").append(escapeCharacters(directInstantiation))
                         .append("\")");

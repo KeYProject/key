@@ -77,7 +77,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
             while (it0.hasNext()) {
                 // this test should be improved
-                if (it0.next().getConstrainedFormula() != it1.next().getConstrainedFormula()) {
+                if (it0.next().getSequentFormula() != it1.next().getSequentFormula()) {
                     return false;
                 }
             }

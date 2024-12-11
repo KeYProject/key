@@ -11,7 +11,6 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -38,6 +37,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -234,7 +234,7 @@ public class MergeRule implements BuiltInRule {
 
         // Add new antecedent (path condition)
         for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
-            final org.key_project.prover.sequent.SequentFormula newAntecedent =
+            final SequentFormula newAntecedent =
                 new SequentFormula(antecedentFormula);
             newGoal.addFormula(newAntecedent, true, false);
         }
@@ -356,7 +356,8 @@ public class MergeRule implements BuiltInRule {
             // Check if location v is set to different value in both states.
 
             // Easy check: Term equality
-            boolean proofClosed = rightSide1.equalsModProperty(rightSide2, RENAMING_TERM_PROPERTY);
+            boolean proofClosed =
+                RENAMING_TERM_PROPERTY.equalsModThisProperty(rightSide1, rightSide2);
 
             // We skip the check for equal valuation of this variable if
             // the depth threshold is exceeded by one of the right sides.
@@ -688,7 +689,7 @@ public class MergeRule implements BuiltInRule {
             if (!g.equals(goal) && !g.isLinked()) {
                 Semisequent succedent = g.sequent().succedent();
                 for (int i = 0; i < succedent.size(); i++) {
-                    final org.key_project.prover.sequent.SequentFormula f = succedent.get(i);
+                    final SequentFormula f = succedent.get(i);
 
                     final PosInTerm pit = PosInTerm.getTopLevel();
 

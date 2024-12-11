@@ -43,7 +43,7 @@ public final class RuleAppUtil {
 
                     if (x instanceof IfFormulaInstSeq) {
                         boolean antec = ((IfFormulaInstSeq) x).inAntec();
-                        inputs.add(new PosInOccurrence(x.getConstrainedFormula(),
+                        inputs.add(new PosInOccurrence(x.getSequentFormula(),
                             PosInTerm.getTopLevel(), antec));
                     }
                 }

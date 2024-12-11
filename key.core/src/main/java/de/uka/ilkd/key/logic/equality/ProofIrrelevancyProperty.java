@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.util.EqualityUtils;
 import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 
+import org.key_project.logic.Property;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -108,7 +109,7 @@ public class ProofIrrelevancyProperty implements Property<Term> {
     @Override
     public int hashCodeModThisProperty(Term term) {
         int hashcode = Objects.hash(term.op(),
-            EqualityUtils.hashCodeModPropertyOfIterable(PROOF_IRRELEVANCY_PROPERTY, term.subs()),
+            EqualityUtils.hashCodeModPropertyOfIterable(term.subs(), this::hashCodeModThisProperty),
             EqualsModProofIrrelevancyUtil.hashCodeIterable(term.boundVars(),
                 EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
             term.javaBlock());

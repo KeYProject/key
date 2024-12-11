@@ -32,7 +32,6 @@ import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import org.key_project.logic.Name;
 import org.key_project.proof.LocationVariableTracker;
 import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -79,7 +78,7 @@ public class NodeInfo {
     private String notes;
 
     /** Information about changes respective to the parent of this node. */
-    private SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sequentChangeInfo;
+    private SequentChangeInfo sequentChangeInfo;
 
     public NodeInfo(Node node) {
         this.node = node;
@@ -166,7 +165,7 @@ public class NodeInfo {
             if (!isSymbolicExecution(pta.taclet())) {
                 return null;
             }
-            Term t = TermBuilder.goBelowUpdates((Term) pta.posInOccurrence().subTerm());
+            Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
             final ProgramElement pe = t.javaBlock().program();
             if (pe != null) {
                 firstStatement = pe.getFirstElement();
@@ -424,11 +423,11 @@ public class NodeInfo {
         return notes;
     }
 
-    public SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> getSequentChangeInfo() {
+    public SequentChangeInfo getSequentChangeInfo() {
         return sequentChangeInfo;
     }
 
-    public void setSequentChangeInfo(SequentChangeInfo<SequentFormula> sequentChangeInfo) {
+    public void setSequentChangeInfo(SequentChangeInfo sequentChangeInfo) {
         this.sequentChangeInfo = sequentChangeInfo;
     }
 

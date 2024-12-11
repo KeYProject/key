@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -117,16 +118,16 @@ public class JoinProcessor implements Runnable {
     }
 
     private void orRight(Goal goal) {
-        org.key_project.prover.sequent.SequentFormula sf = goal.sequent().succedent().get(0);
+        SequentFormula sf = goal.sequent().succedent().get(0);
         PosInOccurrence pio =
             new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
         apply(new String[] { OR_RIGHT_TACLET }, goal, pio);
 
     }
 
-    private org.key_project.prover.sequent.SequentFormula findFormula(Sequent sequent, Term content,
+    private SequentFormula findFormula(Sequent sequent, Term content,
             boolean antecedent) {
-        for (org.key_project.prover.sequent.SequentFormula sf : (antecedent ? sequent.antecedent()
+        for (SequentFormula sf : (antecedent ? sequent.antecedent()
                 : sequent.succedent())) {
             if (sf.formula().equals(content)) {
                 return sf;
@@ -137,7 +138,7 @@ public class JoinProcessor implements Runnable {
 
     private Goal simplifyUpdate(Goal goal, DelayedCut cut) {
 
-        org.key_project.prover.sequent.SequentFormula sf =
+        SequentFormula sf =
             findFormula(goal.sequent(), cut.getFormula(), false);
 
         PosInOccurrence pio =
@@ -213,9 +214,9 @@ public class JoinProcessor implements Runnable {
         Collection<Term> commonGamma = computeCommonFormulas(partner.getSequent(0).antecedent(),
             partner.getSequent(1).antecedent(), partner.getCommonFormula());
         Collection<Term> delta1 = computeDifference(partner.getSequent(0).succedent(), commonDelta,
-            partner.getFormula(0).formula());
+            (Term) partner.getFormula(0).formula());
         Collection<Term> delta2 = computeDifference(partner.getSequent(1).succedent(), commonDelta,
-            partner.getFormula(1).formula());
+            (Term) partner.getFormula(1).formula());
 
         Collection<Term> gamma1 =
             computeDifference(partner.getSequent(0).antecedent(), commonGamma, null);
@@ -271,9 +272,9 @@ public class JoinProcessor implements Runnable {
     private Collection<Term> computeCommonFormulas(Semisequent s1, Semisequent s2, Term exclude) {
         TreeSet<Term> formulas1 = createTree(s1, exclude);
         TreeSet<Term> result = createTree();
-        for (org.key_project.prover.sequent.SequentFormula sf : s2) {
+        for (SequentFormula sf : s2) {
             if (formulas1.contains(sf.formula())) {
-                result.add(sf.formula());
+                result.add((Term) sf.formula());
             }
         }
         return result;
@@ -282,9 +283,9 @@ public class JoinProcessor implements Runnable {
     private Collection<Term> computeDifference(Semisequent s, Collection<Term> excludeSet,
             Term exclude) {
         LinkedList<Term> result = new LinkedList<>();
-        for (org.key_project.prover.sequent.SequentFormula sf : s) {
+        for (SequentFormula sf : s) {
             if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {
-                result.add(sf.formula());
+                result.add((Term) sf.formula());
             }
         }
         return result;
@@ -292,9 +293,9 @@ public class JoinProcessor implements Runnable {
 
     private TreeSet<Term> createTree(Semisequent semisequent, Term exclude) {
         TreeSet<Term> set = createTree();
-        for (org.key_project.prover.sequent.SequentFormula sf : semisequent) {
+        for (SequentFormula sf : semisequent) {
             if (sf.formula() != exclude) {
-                set.add(sf.formula());
+                set.add((Term) sf.formula());
             }
         }
         return set;

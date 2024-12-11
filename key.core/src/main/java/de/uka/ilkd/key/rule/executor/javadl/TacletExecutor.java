@@ -31,6 +31,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -103,8 +104,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param antec boolean true(false) if elements have to be added to the antecedent(succedent)
      *        (only looked at if pos == null)
      */
-    private void addToPosWithoutInst(org.key_project.prover.sequent.SequentFormula frm,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+    private void addToPosWithoutInst(SequentFormula frm,
+            SequentChangeInfo currentSequent,
             PosInOccurrence pos, boolean antec) {
         if (pos != null) {
             currentSequent.combine(currentSequent.sequent().addFormula(frm, pos));
@@ -129,16 +130,17 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param labelHint The hint used to maintain {@link TermLabel}s.
      * @return the as far as possible instantiated SequentFormula
      */
-    private org.key_project.prover.sequent.SequentFormula instantiateReplacement(
+    private SequentFormula instantiateReplacement(
             TermLabelState termLabelState,
-            org.key_project.prover.sequent.SequentFormula schemaFormula, MatchConditions matchCond,
+            SequentFormula schemaFormula, MatchConditions matchCond,
             PosInOccurrence applicationPosInOccurrence,
             TacletLabelHint labelHint, Goal goal,
             RuleApp tacletApp) {
 
         final SVInstantiations svInst = matchCond.getInstantiations();
 
-        Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(), termLabelState,
+        Term instantiatedFormula = syntacticalReplace((Term) schemaFormula.formula(),
+            termLabelState,
             new TacletLabelHint(labelHint, schemaFormula), applicationPosInOccurrence, matchCond,
             goal, tacletApp);
 
@@ -173,7 +175,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         ImmutableList<org.key_project.prover.sequent.SequentFormula> replacements =
             ImmutableSLList.nil();
 
-        for (org.key_project.prover.sequent.SequentFormula sf : semi) {
+        for (SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(termLabelState, sf,
                 matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp));
         }
@@ -198,7 +200,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param services the Services encapsulating all java information
      */
     protected void replaceAtPos(Semisequent semi, TermLabelState termLabelState,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             PosInOccurrence pos,
             MatchConditions matchCond,
             TacletLabelHint labelHint, Goal goal, RuleApp ruleApp, Services services) {
@@ -226,7 +228,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      * @param matchCond the MatchConditions containing in particular
      */
     private void addToPos(Semisequent semi, TermLabelState termLabelState,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence, boolean antec,
             TacletLabelHint labelHint,
@@ -261,7 +263,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      */
     protected void addToAntec(Semisequent semi, TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence,
             MatchConditions matchCond, Goal goal,
@@ -288,7 +290,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      */
     protected void addToSucc(Semisequent semi, TermLabelState termLabelState,
             TacletLabelHint labelHint,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence,
             MatchConditions matchCond, Goal goal,
@@ -353,7 +355,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
 
     protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            SequentChangeInfo currentSequent,
             Goal goal,
             PosInOccurrence posOfFind,
             Services services, MatchConditions matchCond) {
@@ -417,12 +419,12 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
      *         two entries: one for the original sequent and one with the sequent encoding the proof
      *         obligation for the to be proven formulas of the assumes goal
      */
-    protected ImmutableList<SequentChangeInfo<org.key_project.prover.sequent.SequentFormula>> checkIfGoals(
+    protected ImmutableList<SequentChangeInfo> checkIfGoals(
             Goal p_goal,
             ImmutableList<IfFormulaInstantiation> p_list, MatchConditions p_matchCond,
             int p_numberOfNewGoals) {
-        ImmutableList<SequentChangeInfo<org.key_project.prover.sequent.SequentFormula>> res = null;
-        Iterator<SequentChangeInfo<org.key_project.prover.sequent.SequentFormula>> itNewGoalSequents;
+        ImmutableList<SequentChangeInfo> res = null;
+        Iterator<SequentChangeInfo> itNewGoalSequents;
 
         // proof obligation for the if-formulas
         Term ifObl = null;
@@ -439,7 +441,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             for (final IfFormulaInstantiation inst : p_list) {
                 if (!(inst instanceof IfFormulaInstSeq)) {
                     // build the if obligation formula
-                    ifPart = inst.getConstrainedFormula().formula();
+                    ifPart = (Term) inst.getSequentFormula().formula();
 
                     // negate formulas of the if-succedent
                     final TermServices services = p_goal.proof().getServices();
@@ -463,11 +465,11 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                     // goals, thus the if formulas have to be added to
                     // every new goal
                     itNewGoalSequents = res.iterator();
-                    SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> seq =
+                    SequentChangeInfo seq =
                         itNewGoalSequents.next();
                     while (itNewGoalSequents.hasNext()) {
                         // (i > 0) iff inst is formula of the antecedent
-                        addToPosWithoutInst(inst.getConstrainedFormula(), seq, null, (i > 0));
+                        addToPosWithoutInst(inst.getSequentFormula(), seq, null, (i > 0));
                         seq = itNewGoalSequents.next();
                     }
                 }
@@ -480,13 +482,13 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             res = ImmutableSLList.nil();
             for (int j = 0; j < p_numberOfNewGoals; j++) {
                 res = res.prepend(
-                    SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo) null,
+                    SequentChangeInfo.createSequentChangeInfo(null,
                         null, p_goal.sequent(), p_goal.sequent()));
             }
         } else {
             // find the sequent the if obligation has to be added to
             itNewGoalSequents = res.iterator();
-            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> seq =
+            SequentChangeInfo seq =
                 itNewGoalSequents.next();
             while (itNewGoalSequents.hasNext()) {
                 seq = itNewGoalSequents.next();

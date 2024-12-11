@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic.label;
 
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -22,6 +21,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.TerminalSyntaxElement;
+import org.key_project.prover.sequent.SequentFormula;
 
 // spotless:off     // this protects the JavaDoc from automatic reformatting
 /**

@@ -25,10 +25,10 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
      */
     private final Sequent seq;
     private final boolean antec; // formula is in antecedent?
-    private final org.key_project.prover.sequent.SequentFormula cf;
+    private final SequentFormula cf;
 
     public IfFormulaInstSeq(Sequent p_seq, boolean antec,
-            org.key_project.prover.sequent.SequentFormula p_cf) {
+            SequentFormula p_cf) {
         seq = p_seq;
         this.antec = antec;
         cf = p_cf;
@@ -44,7 +44,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
      * @return the cf this is pointing to
      */
     @Override
-    public SequentFormula getConstrainedFormula() {
+    public SequentFormula getSequentFormula() {
         return cf;
     }
 

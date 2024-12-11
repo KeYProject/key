@@ -4,9 +4,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.Feature;
@@ -14,6 +12,7 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
@@ -88,7 +87,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
 
     private static class ClauseCollector extends Collector {
         protected void collect(Term te) {
-            final Operator op = te.op();
+            final var op = te.op();
             if (op == Junctor.AND) {
                 collect(te.sub(0));
                 collect(te.sub(1));

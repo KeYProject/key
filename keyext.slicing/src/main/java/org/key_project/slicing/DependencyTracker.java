@@ -286,7 +286,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                         justAddRule.node() == n) {
                     AddedRule ruleNode = new AddedRule(newRule.rule().name().toString());
                     output.add(ruleNode);
-                    dynamicRules.put((Taclet) newRule.rule(), ruleNode);
+                    dynamicRules.put(newRule.rule(), ruleNode);
                 }
             }
         }
