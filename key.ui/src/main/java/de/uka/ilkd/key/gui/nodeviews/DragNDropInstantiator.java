@@ -21,7 +21,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -354,7 +353,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         } else {
             final IfFormulaInstSeq ifInst =
                 new IfFormulaInstSeq(seq, ifPIO.isInAntec(),
-                    (SequentFormula) ifPIO.sequentFormula());
+                    ifPIO.sequentFormula());
             ifFmlInst = ImmutableSLList.<IfFormulaInstantiation>nil().prepend(ifInst);
         }
 

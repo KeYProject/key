@@ -65,7 +65,8 @@ public final class TruthValueTracingUtil {
      * @param sequentFormula The {@link SequentFormula} to check.
      * @return {@code true} is predicate, {@code false} is something else.
      */
-    public static boolean isPredicate(SequentFormula sequentFormula) {
+    public static boolean isPredicate(
+            org.key_project.prover.sequent.SequentFormula sequentFormula) {
         return sequentFormula != null && isPredicate(sequentFormula.formula());
     }
 
@@ -453,7 +454,7 @@ public final class TruthValueTracingUtil {
             parentPio.subTerm().execPreOrder(new DefaultVisitor() {
                 @Override
                 public void visit(Term visited) {
-                    checkForNewMinorIdsOSS((SequentFormula) childPio.sequentFormula(), visited,
+                    checkForNewMinorIdsOSS(childPio.sequentFormula(), visited,
                         termLabelName,
                         parentPio, tb, results);
                 }
@@ -462,7 +463,7 @@ public final class TruthValueTracingUtil {
             PosInOccurrence currentPio = parentPio;
             while (!currentPio.isTopLevel()) {
                 currentPio = currentPio.up();
-                checkForNewMinorIdsOSS((SequentFormula) childPio.sequentFormula(),
+                checkForNewMinorIdsOSS(childPio.sequentFormula(),
                     (Term) currentPio.subTerm(),
                     termLabelName, parentPio, tb, results);
             }
@@ -480,7 +481,7 @@ public final class TruthValueTracingUtil {
      * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
      */
     private static void checkForNewMinorIdsOSS(
-            SequentFormula onlyChangedChildSF, Term term,
+            org.key_project.prover.sequent.SequentFormula onlyChangedChildSF, Term term,
             Name termLabelName, PosInOccurrence parentPio,
             TermBuilder tb,
             Map<String, MultiEvaluationResult> results) {
@@ -505,7 +506,7 @@ public final class TruthValueTracingUtil {
      * @return The computed instruction {@link Term} or {@code null} if not available.
      */
     private static Term checkForNewMinorIdsOSS(
-            SequentFormula onlyChangedChildSF,
+            org.key_project.prover.sequent.SequentFormula onlyChangedChildSF,
             FormulaTermLabel label, boolean antecedentRuleApplication, TermBuilder tb) {
         // Search replacements
         List<Term> antecedentReplacements = new LinkedList<>();
@@ -609,10 +610,10 @@ public final class TruthValueTracingUtil {
         // Search replacements
         List<Term> antecedentReplacements = new LinkedList<>();
         List<Term> succedentReplacements = new LinkedList<>();
-        for (SequentFormula sf : childNode.sequent().antecedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : childNode.sequent().antecedent()) {
             listLabelReplacements(sf, label.name(), label.getId(), antecedentReplacements);
         }
-        for (SequentFormula sf : childNode.sequent().succedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : childNode.sequent().succedent()) {
             listLabelReplacements(sf, label.name(), label.getId(), succedentReplacements);
         }
         // Compute term
@@ -629,7 +630,7 @@ public final class TruthValueTracingUtil {
      * @param resultToFill The result {@link List} to fill.
      */
     private static void listLabelReplacements(
-            final SequentFormula sf, final Name labelName,
+            final org.key_project.prover.sequent.SequentFormula sf, final Name labelName,
             final String labelId, final List<Term> resultToFill) {
         sf.formula().execPreOrder(new DefaultVisitor() {
             @Override

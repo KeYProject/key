@@ -287,13 +287,13 @@ public abstract class AbstractSlicer {
      */
     protected void analyzeSequent(Services services, Sequent sequent,
             Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
-        for (SequentFormula sf : sequent.antecedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : sequent.antecedent()) {
             Term term = sf.formula();
             if (Equality.EQUALS == term.op()) {
                 analyzeEquality(services, term, aliases, thisReference);
             }
         }
-        for (SequentFormula sf : sequent.succedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : sequent.succedent()) {
             Term term = sf.formula();
             if (Junctor.NOT == term.op()) {
                 Term negatedTerm = term.sub(0);

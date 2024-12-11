@@ -6,10 +6,11 @@ package org.key_project.slicing.graph;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
+
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * A sequent formula tracked by the dependency graph.
@@ -29,7 +30,7 @@ public class TrackedFormula extends GraphNode {
     /**
      * The formula.
      */
-    public final SequentFormula formula;
+    public final org.key_project.prover.sequent.SequentFormula formula;
     /**
      * Whether the formula is in the antecedent.
      */
@@ -48,7 +49,7 @@ public class TrackedFormula extends GraphNode {
      * @param services services
      */
     public TrackedFormula(
-            SequentFormula formula,
+            org.key_project.prover.sequent.SequentFormula formula,
             BranchLocation branchLocation,
             boolean inAntec,
             Services services) {

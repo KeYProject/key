@@ -8,7 +8,6 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
@@ -16,6 +15,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -162,13 +162,13 @@ public class SMTProblem {
 
         final TermBuilder tb = services.getTermBuilder();
         ante = ante.append(tb.tt());
-        for (SequentFormula f : s.antecedent()) {
+        for (org.key_project.prover.sequent.SequentFormula f : s.antecedent()) {
             ante = ante.append(f.formula());
         }
 
         ImmutableList<Term> succ = ImmutableSLList.nil();
         succ = succ.append(tb.ff());
-        for (SequentFormula f : s.succedent()) {
+        for (org.key_project.prover.sequent.SequentFormula f : s.succedent()) {
             succ = succ.append(f.formula());
         }
 
@@ -183,7 +183,7 @@ public class SMTProblem {
 
         final TermBuilder tb = goal.proof().getServices().getTermBuilder();
         ante = ante.append(tb.tt());
-        for (SequentFormula f : s.antecedent()) {
+        for (org.key_project.prover.sequent.SequentFormula f : s.antecedent()) {
             ante = ante.append(f.formula());
         }
 

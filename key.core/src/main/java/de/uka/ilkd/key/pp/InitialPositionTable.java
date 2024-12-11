@@ -91,7 +91,7 @@ public class InitialPositionTable extends PositionTable {
             SequentPrintFilter filter) {
         ImmutableList<Integer> p = ImmutableSLList.nil();
         p = prependPathInFormula(p, pio);
-        int index = indexOfCfma((SequentFormula) pio.sequentFormula(), filter);
+        int index = indexOfCfma(pio.sequentFormula(), filter);
         if (index == -1) {
             return null;
         }
@@ -117,7 +117,8 @@ public class InitialPositionTable extends PositionTable {
      * @param filter the current filter
      * @return the index of the given formula in the sequent as printed
      */
-    private int indexOfCfma(SequentFormula cfma, SequentPrintFilter filter) {
+    private int indexOfCfma(org.key_project.prover.sequent.SequentFormula cfma,
+            SequentPrintFilter filter) {
         ImmutableList<SequentPrintFilterEntry> list =
             filter.getFilteredAntec().append(filter.getFilteredSucc());
         int k;

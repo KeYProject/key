@@ -240,7 +240,7 @@ public class MergeRuleUtils {
             Services services) {
         HashSet<LocationVariable> result = new HashSet<>();
 
-        for (SequentFormula f : sequent) {
+        for (org.key_project.prover.sequent.SequentFormula f : sequent) {
             result.addAll(getLocationVariablesHashSet(f.formula(), services));
         }
 
@@ -804,7 +804,7 @@ public class MergeRuleUtils {
     public static void clearSemisequent(Goal goal, boolean antec) {
         final Semisequent semiseq =
             antec ? goal.sequent().antecedent() : goal.sequent().succedent();
-        for (final SequentFormula f : semiseq) {
+        for (final org.key_project.prover.sequent.SequentFormula f : semiseq) {
             final PosInOccurrence gPio =
                 new PosInOccurrence(f, PosInTerm.getTopLevel(), antec);
             goal.removeFormula(gPio);
@@ -1063,12 +1063,13 @@ public class MergeRuleUtils {
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(Node node,
             PosInOccurrence pio, Services services) {
 
-        ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
+        ImmutableList<org.key_project.prover.sequent.SequentFormula> pathConditionSet =
+            ImmutableSLList.nil();
         pathConditionSet = pathConditionSet.prepend(node.sequent().antecedent().asList());
 
         var selected = pio.subTerm();
 
-        for (SequentFormula sf : node.sequent().succedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : node.sequent().succedent()) {
             if (!sf.formula().equals(selected)) {
                 pathConditionSet = pathConditionSet
                         .prepend(new SequentFormula(services.getTermBuilder().not(sf.formula())));
@@ -1382,7 +1383,8 @@ public class MergeRuleUtils {
      * @param services The services object.
      * @return And-formula connecting the given terms.
      */
-    private static Term joinListToAndTerm(ImmutableList<SequentFormula> formulae,
+    private static Term joinListToAndTerm(
+            ImmutableList<org.key_project.prover.sequent.SequentFormula> formulae,
             Services services) {
         if (formulae.size() == 0) {
             return services.getTermBuilder().tt();
@@ -1629,11 +1631,11 @@ public class MergeRuleUtils {
         ImmutableList<Term> succedentForms = ImmutableSLList.nil();
 
         // Shift antecedent formulae to the succedent by negation
-        for (SequentFormula sf : sequent.antecedent().asList()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : sequent.antecedent().asList()) {
             negAntecedentForms = negAntecedentForms.prepend(tb.not(sf.formula()));
         }
 
-        for (SequentFormula sf : sequent.succedent().asList()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : sequent.succedent().asList()) {
             succedentForms = succedentForms.prepend(sf.formula());
         }
 

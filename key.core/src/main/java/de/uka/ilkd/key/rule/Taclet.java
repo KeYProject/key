@@ -688,7 +688,7 @@ public abstract class Taclet implements Rule, Named {
 
 
     private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
-        for (SequentFormula cf : s) {
+        for (org.key_project.prover.sequent.SequentFormula cf : s) {
             cf.formula().execPostOrder(oc);
         }
     }
@@ -712,7 +712,7 @@ public abstract class Taclet implements Rule, Named {
         /**
          * The optional {@link SequentFormula} contained in {@link #getSequent()}.
          */
-        private final SequentFormula sequentFormula;
+        private final org.key_project.prover.sequent.SequentFormula sequentFormula;
 
         /**
          * The optional replace {@link Term} of the taclet.
@@ -761,7 +761,8 @@ public abstract class Taclet implements Rule, Named {
          * @param sequentFormula The optional {@link SequentFormula} contained in
          *        {@link #getSequent()}.
          */
-        public TacletLabelHint(TacletLabelHint labelHint, SequentFormula sequentFormula) {
+        public TacletLabelHint(TacletLabelHint labelHint,
+                org.key_project.prover.sequent.SequentFormula sequentFormula) {
             assert labelHint != null;
             assert !TacletOperation.REPLACE_TERM.equals(labelHint.getTacletOperation());
             assert sequentFormula != null;
@@ -794,7 +795,7 @@ public abstract class Taclet implements Rule, Named {
          *
          * @return The optional {@link SequentFormula} contained in {@link #getSequent()}.
          */
-        public SequentFormula getSequentFormula() {
+        public org.key_project.prover.sequent.SequentFormula getSequentFormula() {
             return sequentFormula;
         }
 

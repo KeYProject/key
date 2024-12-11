@@ -1369,7 +1369,8 @@ public final class AuxiliaryContractBuilders {
             services.getSpecificationRepository().addWdStatement(bwd);
             final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
             final Term anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
-            final SequentFormula wdBlock = bwd.generateSequent(variables.self, variables.exception,
+            final org.key_project.prover.sequent.SequentFormula wdBlock = bwd.generateSequent(
+                variables.self, variables.exception,
                 variables.result, heap, heapAtPre, anon, localIns, update, anonUpdate, services);
 
             if (goal != null) {

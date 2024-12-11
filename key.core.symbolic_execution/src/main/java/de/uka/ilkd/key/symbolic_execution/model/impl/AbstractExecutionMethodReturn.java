@@ -8,7 +8,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * The default implementation of {@link IExecutionBaseMethodReturn}.
@@ -182,9 +182,9 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
         PosInOccurrence originalPIO = methodCall.getModalityPIO();
         int index = originalPIO.isInAntec()
                 ? proofNode.sequent().antecedent()
-                        .indexOf((SequentFormula) originalPIO.sequentFormula())
+                        .indexOf(originalPIO.sequentFormula())
                 : proofNode.sequent().succedent()
-                        .indexOf((SequentFormula) originalPIO.sequentFormula());
+                        .indexOf(originalPIO.sequentFormula());
         // Search relevant position in child node
         Node childNode = proofNode.child(0);
         SequentFormula nodeSF =

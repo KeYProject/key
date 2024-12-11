@@ -48,7 +48,8 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    SequentFormula generateSequent(SequentTerms seq, TermServices services) {
+    org.key_project.prover.sequent.SequentFormula generateSequent(SequentTerms seq,
+            TermServices services) {
         // wd(phi) & (phi & wf(anon) -> wd(modifiable) & wd(variant) & {anon^modifiable}(wd(phi) &
         // wd(variant)))
         final Term imp =

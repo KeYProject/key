@@ -75,10 +75,12 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         assert goal != null : "not null by contract of the method";
 
         // The formulas to keep in the antecedent
-        ImmutableList<Term> keepAnte = toKeep.antecedent().asList().map(SequentFormula::formula);
-        ImmutableList<SequentFormula> ante = goal.sequent().antecedent().asList();
+        ImmutableList<Term> keepAnte = toKeep.antecedent().asList()
+                .map(org.key_project.prover.sequent.SequentFormula::formula);
+        ImmutableList<org.key_project.prover.sequent.SequentFormula> ante =
+            goal.sequent().antecedent().asList();
 
-        for (SequentFormula seqFormula : ante) {
+        for (org.key_project.prover.sequent.SequentFormula seqFormula : ante) {
             // This means "!keepAnte.contains(seqFormula.formula)" but with equality mod renaming!
             if (!keepAnte.exists(
                 it -> it.equalsModProperty(seqFormula.formula(), RENAMING_TERM_PROPERTY))) {
@@ -87,9 +89,11 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
             }
         }
 
-        ImmutableList<Term> keepSucc = toKeep.succedent().asList().map(SequentFormula::formula);
-        ImmutableList<SequentFormula> succ = goal.sequent().succedent().asList();
-        for (SequentFormula seqFormula : succ) {
+        ImmutableList<Term> keepSucc =
+            toKeep.succedent().asList().map(org.key_project.prover.sequent.SequentFormula::formula);
+        ImmutableList<org.key_project.prover.sequent.SequentFormula> succ =
+            goal.sequent().succedent().asList();
+        for (org.key_project.prover.sequent.SequentFormula seqFormula : succ) {
             if (!keepSucc.exists(
                 it -> it.equalsModProperty(seqFormula.formula(), RENAMING_TERM_PROPERTY))) {
                 Taclet tac = getHideTaclet("right");
@@ -112,7 +116,8 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
      * @param tac the taclet top apply (either hide_left or hide_right)
      * @param antec whether the formula is in the antecedent
      */
-    private void makeTacletApp(Goal g, SequentFormula toHide, Taclet tac, boolean antec) {
+    private void makeTacletApp(Goal g, org.key_project.prover.sequent.SequentFormula toHide,
+            Taclet tac, boolean antec) {
         // hide rules only applicable to top-level terms/sequent formulas
         PosInTerm pit = PosInTerm.getTopLevel();
 

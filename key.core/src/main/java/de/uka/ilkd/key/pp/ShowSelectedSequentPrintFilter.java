@@ -66,25 +66,25 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
         /**
          * The filtered formula, i.e., the formula at {@code pos}.
          */
-        private final SequentFormula filtered;
+        private final org.key_project.prover.sequent.SequentFormula filtered;
 
         /**
          * The origin formula, i.e., the formula at {@code pos.getTopLevel()}.
          */
-        private final SequentFormula original;
+        private final org.key_project.prover.sequent.SequentFormula original;
 
         private Entry(PosInOccurrence pos) {
             filtered = new SequentFormula((Term) pos.subTerm());
-            original = (SequentFormula) pos.sequentFormula();
+            original = pos.sequentFormula();
         }
 
         @Override
-        public SequentFormula getFilteredFormula() {
+        public org.key_project.prover.sequent.SequentFormula getFilteredFormula() {
             return filtered;
         }
 
         @Override
-        public SequentFormula getOriginalFormula() {
+        public org.key_project.prover.sequent.SequentFormula getOriginalFormula() {
             return original;
         }
 

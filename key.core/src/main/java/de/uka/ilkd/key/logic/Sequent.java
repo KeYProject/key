@@ -96,12 +96,14 @@ public class Sequent extends org.key_project.prover.sequent.Sequent<SequentFormu
     }
 
     @Override
-    public SequentChangeInfo<SequentFormula> addFormula(SequentFormula cf, PosInOccurrence p) {
+    public SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> addFormula(
+            SequentFormula cf, PosInOccurrence p) {
         return super.addFormula(cf, p);
     }
 
     @Override
-    public SequentChangeInfo<SequentFormula> removeFormula(PosInOccurrence p) {
+    public SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> removeFormula(
+            PosInOccurrence p) {
         return super.removeFormula(p);
     }
 
@@ -114,7 +116,7 @@ public class Sequent extends org.key_project.prover.sequent.Sequent<SequentFormu
      * @return the resulting sequent
      */
     protected Sequent composeSequent(boolean antec,
-            org.key_project.prover.sequent.Semisequent<SequentFormula> p_semiSeq) {
+            org.key_project.prover.sequent.Semisequent<org.key_project.prover.sequent.SequentFormula> p_semiSeq) {
         final var semiSeq = (Semisequent) p_semiSeq;
         if (semiSeq.isEmpty()) {
             if (!antec && antecedent().isEmpty()) {
@@ -143,7 +145,7 @@ public class Sequent extends org.key_project.prover.sequent.Sequent<SequentFormu
         }
 
         @Override
-        public @NonNull Iterator<SequentFormula> iterator() {
+        public @NonNull Iterator<org.key_project.prover.sequent.SequentFormula> iterator() {
             return ImmutableSLList.<SequentFormula>nil().iterator();
         }
     }
@@ -172,7 +174,7 @@ public class Sequent extends org.key_project.prover.sequent.Sequent<SequentFormu
      */
     public Set<Name> getOccuringTermLabels() {
         final Set<Name> result = new HashSet<>();
-        for (final SequentFormula sf : this) {
+        for (final org.key_project.prover.sequent.SequentFormula sf : this) {
             result.addAll(getLabelsForTermRecursively(sf.formula()));
         }
         return result;
@@ -184,7 +186,7 @@ public class Sequent extends org.key_project.prover.sequent.Sequent<SequentFormu
      * @param form the given formula
      * @return true if this sequent contains the given formula
      */
-    public boolean contains(SequentFormula form) {
+    public boolean contains(org.key_project.prover.sequent.SequentFormula form) {
         return antecedent().contains(form) || succedent().contains(form);
     }
 
@@ -193,7 +195,7 @@ public class Sequent extends org.key_project.prover.sequent.Sequent<SequentFormu
      *
      * @return a list containing every {@link SequentFormula} in this sequent.
      */
-    public ImmutableList<SequentFormula> asList() {
+    public ImmutableList<org.key_project.prover.sequent.SequentFormula> asList() {
         return antecedent().asList().append(succedent().asList());
     }
 

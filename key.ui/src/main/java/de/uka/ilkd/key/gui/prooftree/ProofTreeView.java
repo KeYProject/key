@@ -32,7 +32,6 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
@@ -992,7 +991,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     var newSequent = ossParentNode.getNode().sequent();
                     var modifiedSequent = newSequent
                             .replaceFormula(ossNode.getFormulaNr(),
-                                (SequentFormula) pio.sequentFormula())
+                                pio.sequentFormula())
                             .sequent();
                     mediator.getSelectionModel().setSelectedSequentAndRuleApp(
                         ossParentNode.getNode(), (Sequent) modifiedSequent, ossNode.getRuleApp());

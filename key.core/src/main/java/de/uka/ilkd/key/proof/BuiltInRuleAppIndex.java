@@ -91,13 +91,14 @@ public class BuiltInRuleAppIndex {
         final Node node = goal.node();
         final Sequent seq = node.sequent();
 
-        for (final SequentFormula sf : (antec ? seq.antecedent() : seq.succedent())) {
+        for (final org.key_project.prover.sequent.SequentFormula sf : (antec ? seq.antecedent()
+                : seq.succedent())) {
             scanSimplificationRule(rules, goal, antec, sf, listener);
         }
     }
 
     private void scanSimplificationRule(ImmutableList<BuiltInRule> rules, Goal goal, boolean antec,
-            SequentFormula cfma, NewRuleListener listener) {
+            org.key_project.prover.sequent.SequentFormula cfma, NewRuleListener listener) {
         final PosInOccurrence pos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
         ImmutableList<BuiltInRule> subrules = ImmutableSLList.nil();
         while (!rules.isEmpty()) {
@@ -139,7 +140,8 @@ public class BuiltInRuleAppIndex {
      *
      * @param sci SequentChangeInfo describing the change of the sequent
      */
-    public void sequentChanged(Goal goal, SequentChangeInfo<SequentFormula> sci,
+    public void sequentChanged(Goal goal,
+            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci,
             NewRuleListener listener) {
         scanAddedFormulas(goal, true, sci, listener);
         scanAddedFormulas(goal, false, sci, listener);
@@ -148,11 +150,13 @@ public class BuiltInRuleAppIndex {
         scanModifiedFormulas(goal, false, sci, listener);
     }
 
-    private void scanAddedFormulas(Goal goal, boolean antec, SequentChangeInfo<SequentFormula> sci,
+    private void scanAddedFormulas(Goal goal, boolean antec,
+            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci,
             NewRuleListener listener) {
-        ImmutableList<SequentFormula> cfmas = sci.addedFormulas(antec);
+        ImmutableList<org.key_project.prover.sequent.SequentFormula> cfmas =
+            sci.addedFormulas(antec);
         while (!cfmas.isEmpty()) {
-            final SequentFormula cfma = cfmas.head();
+            final org.key_project.prover.sequent.SequentFormula cfma = cfmas.head();
             scanSimplificationRule(index.rules(), goal, antec, cfma, listener);
             cfmas = cfmas.tail();
         }
@@ -160,13 +164,15 @@ public class BuiltInRuleAppIndex {
 
 
     private void scanModifiedFormulas(Goal goal, boolean antec,
-            SequentChangeInfo<SequentFormula> sci,
+            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> sci,
             NewRuleListener listener) {
-        ImmutableList<FormulaChangeInfo<SequentFormula>> fcis = sci.modifiedFormulas(antec);
+        ImmutableList<FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula>> fcis =
+            sci.modifiedFormulas(antec);
 
         while (!fcis.isEmpty()) {
-            final FormulaChangeInfo<SequentFormula> fci = fcis.head();
-            final SequentFormula cfma = fci.newFormula();
+            final FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula> fci =
+                fcis.head();
+            final org.key_project.prover.sequent.SequentFormula cfma = fci.newFormula();
             scanSimplificationRule(index.rules(), goal, antec, cfma, listener);
             fcis = fcis.tail();
         }

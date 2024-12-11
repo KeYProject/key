@@ -682,7 +682,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     protected Set<Term> collectObjectsFromSequent(Sequent sequent, Set<Term> objectsToIgnore)
             throws ProofInputException {
         Set<Term> result = new LinkedHashSet<>();
-        for (SequentFormula sf : sequent) {
+        for (org.key_project.prover.sequent.SequentFormula sf : sequent) {
             if (SymbolicExecutionUtil.checkSkolemEquality(sf) == 0) {
                 result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
             }

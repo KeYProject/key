@@ -126,7 +126,7 @@ public class TacletInstantiationModel {
             ImmutableArray<IfFormulaInstantiation> succCand =
                 IfFormulaInstSeq.createList(seq, false, services);
 
-            Iterator<SequentFormula> it = ifseq.iterator();
+            Iterator<org.key_project.prover.sequent.SequentFormula> it = ifseq.iterator();
             Term ifFma;
             MatchConditions matchCond = app.matchConditions();
 

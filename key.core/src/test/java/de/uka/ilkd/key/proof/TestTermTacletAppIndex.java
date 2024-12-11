@@ -121,7 +121,7 @@ public class TestTermTacletAppIndex {
         ruleIdx.add(remove_zero);
 
         Term term = TacletForTests.parseTerm("f(f(f(zero)))=one");
-        SequentFormula cfma = new SequentFormula(term);
+        org.key_project.prover.sequent.SequentFormula cfma = new SequentFormula(term);
 
         PosInOccurrence pio =
             new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);
@@ -139,7 +139,7 @@ public class TestTermTacletAppIndex {
 
         // now a real change
         Term term2 = TacletForTests.parseTerm("f(f(zero))=one");
-        SequentFormula cfma2 = new SequentFormula(term2);
+        org.key_project.prover.sequent.SequentFormula cfma2 = new SequentFormula(term2);
         PosInOccurrence pio2 =
             new PosInOccurrence(cfma2, PosInTerm.getTopLevel(), false);
 

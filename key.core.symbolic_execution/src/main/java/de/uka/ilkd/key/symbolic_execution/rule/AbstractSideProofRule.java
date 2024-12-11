@@ -105,7 +105,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @param newTerm The new {@link Term}.
      * @return The created {@link SequentFormula} in which the {@link Term} is replaced.
      */
-    protected static SequentFormula replace(PosInOccurrence pio,
+    protected static org.key_project.prover.sequent.SequentFormula replace(PosInOccurrence pio,
             Term newTerm, Services services) {
         // Iterate along the PosInOccurrence and collect the parents and indices
         Deque<Pair<Integer, Term>> indexAndParents = new LinkedList<>();

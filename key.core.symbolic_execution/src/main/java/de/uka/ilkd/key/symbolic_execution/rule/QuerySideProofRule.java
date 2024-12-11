@@ -223,7 +223,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                     .cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true);
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
-                    .computeGeneralSequentToProve(goalSequent, (SequentFormula) equalitySF);
+                    .computeGeneralSequentToProve(goalSequent, equalitySF);
             JFunction newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
             Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
             sequentToProve =

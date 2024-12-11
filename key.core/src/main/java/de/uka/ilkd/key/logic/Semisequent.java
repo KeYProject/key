@@ -33,7 +33,7 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
      *
      * @param seqList list of sequent formulas
      */
-    public Semisequent(ImmutableList<SequentFormula> seqList) {
+    public Semisequent(ImmutableList<org.key_project.prover.sequent.SequentFormula> seqList) {
         super(seqList);
     }
 
@@ -44,7 +44,7 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
      *
      * @param seqList list of sequent formulas
      */
-    public Semisequent(Collection<SequentFormula> seqList) {
+    public Semisequent(Collection<org.key_project.prover.sequent.SequentFormula> seqList) {
         super(seqList);
     }
 
@@ -64,12 +64,13 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
 
     @Override
     protected SemisequentChangeInfo createSemisequentChangeInfo(
-            ImmutableList<SequentFormula> seqList) {
+            ImmutableList<org.key_project.prover.sequent.SequentFormula> seqList) {
         return new SemisequentChangeInfo(seqList);
     }
 
     @Override
-    public SemisequentChangeInfo insert(int idx, ImmutableList<SequentFormula> insertionList) {
+    public SemisequentChangeInfo insert(int idx,
+            ImmutableList<org.key_project.prover.sequent.SequentFormula> insertionList) {
         return (SemisequentChangeInfo) super.insert(idx, insertionList);
     }
 
@@ -79,7 +80,8 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
     }
 
     @Override
-    public SemisequentChangeInfo insertFirst(ImmutableList<SequentFormula> insertions) {
+    public SemisequentChangeInfo insertFirst(
+            ImmutableList<org.key_project.prover.sequent.SequentFormula> insertions) {
         return (SemisequentChangeInfo) super.insertFirst(insertions);
     }
 
@@ -89,7 +91,8 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
     }
 
     @Override
-    public SemisequentChangeInfo insertLast(ImmutableList<SequentFormula> insertions) {
+    public SemisequentChangeInfo insertLast(
+            ImmutableList<org.key_project.prover.sequent.SequentFormula> insertions) {
         return (SemisequentChangeInfo) super.insertLast(insertions);
     }
 
@@ -104,7 +107,8 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
     }
 
     @Override
-    public SemisequentChangeInfo replace(int idx, ImmutableList<SequentFormula> replacements) {
+    public SemisequentChangeInfo replace(int idx,
+            ImmutableList<org.key_project.prover.sequent.SequentFormula> replacements) {
         return (SemisequentChangeInfo) super.replace(idx, replacements);
     }
 
@@ -121,7 +125,8 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
      *
      * @param seqList list of sequent formulas
      */
-    public static Semisequent create(Collection<SequentFormula> seqList) {
+    public static Semisequent create(
+            Collection<org.key_project.prover.sequent.SequentFormula> seqList) {
         if (seqList.isEmpty()) {
             return EMPTY_SEMISEQUENT;
         }
@@ -222,7 +227,7 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
          * @return index of sequentFormula
          */
         @Override
-        public int indexOf(SequentFormula sequentFormula) {
+        public int indexOf(org.key_project.prover.sequent.SequentFormula sequentFormula) {
             return -1;
         }
 
@@ -233,7 +238,7 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
          * @return {@link SequentFormula} found at index idx
          */
         @Override
-        public SequentFormula get(int idx) {
+        public org.key_project.prover.sequent.SequentFormula get(int idx) {
             return null;
         }
 
@@ -241,7 +246,7 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
          * @return the first SequentFormula of this Semisequent
          */
         @Override
-        public SequentFormula getFirst() {
+        public org.key_project.prover.sequent.SequentFormula getFirst() {
             return null;
         }
 
@@ -252,7 +257,7 @@ public class Semisequent extends org.key_project.prover.sequent.Semisequent<Sequ
          * @return true iff. sequentFormula has been found in this Semisequent
          */
         @Override
-        public boolean contains(SequentFormula sequentFormula) {
+        public boolean contains(org.key_project.prover.sequent.SequentFormula sequentFormula) {
             return false;
         }
 

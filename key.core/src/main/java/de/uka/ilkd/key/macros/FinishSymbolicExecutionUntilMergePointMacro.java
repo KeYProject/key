@@ -153,7 +153,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
      * @return true iff the given succedent has one formula with a break point statement.
      */
     private boolean hasBreakPoint(Semisequent succedent) {
-        for (SequentFormula formula : succedent.asList()) {
+        for (org.key_project.prover.sequent.SequentFormula formula : succedent.asList()) {
             if (blockElems.contains(JavaTools
                     .getActiveStatement(MergeRuleUtils.getJavaBlockRecursive(formula.formula())))) {
                 return true;

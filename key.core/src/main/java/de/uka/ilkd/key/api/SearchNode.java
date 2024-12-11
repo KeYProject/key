@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.api;
 
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * Created by sarah on 5/2/17.
  */
 public final class SearchNode {
-    private final SequentFormula[] pattern;
+    private final org.key_project.prover.sequent.SequentFormula[] pattern;
     private final int pos;
     private final int succAntPos;
     private final MatchConditions mc;

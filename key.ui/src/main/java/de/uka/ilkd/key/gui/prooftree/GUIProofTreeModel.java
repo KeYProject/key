@@ -12,10 +12,10 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter.NodeFilter;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.*;
 
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;

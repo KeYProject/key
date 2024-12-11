@@ -40,7 +40,7 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
      */
     @Override
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
-            SequentChangeInfo<SequentFormula> currentSequent,
+            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
             PosInOccurrence posOfFind, MatchConditions matchCond,
             Goal goal, RuleApp ruleApp, Services services) {
         if (gt instanceof AntecSuccTacletGoalTemplate) {
@@ -79,7 +79,7 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
      */
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
-            SequentChangeInfo<SequentFormula> currentSequent,
+            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
             PosInOccurrence whereToAdd,
             PosInOccurrence posOfFind,
             MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {

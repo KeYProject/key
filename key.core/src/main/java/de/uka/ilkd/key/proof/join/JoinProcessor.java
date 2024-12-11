@@ -117,15 +117,17 @@ public class JoinProcessor implements Runnable {
     }
 
     private void orRight(Goal goal) {
-        SequentFormula sf = goal.sequent().succedent().get(0);
+        org.key_project.prover.sequent.SequentFormula sf = goal.sequent().succedent().get(0);
         PosInOccurrence pio =
             new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
         apply(new String[] { OR_RIGHT_TACLET }, goal, pio);
 
     }
 
-    private SequentFormula findFormula(Sequent sequent, Term content, boolean antecedent) {
-        for (SequentFormula sf : (antecedent ? sequent.antecedent() : sequent.succedent())) {
+    private org.key_project.prover.sequent.SequentFormula findFormula(Sequent sequent, Term content,
+            boolean antecedent) {
+        for (org.key_project.prover.sequent.SequentFormula sf : (antecedent ? sequent.antecedent()
+                : sequent.succedent())) {
             if (sf.formula().equals(content)) {
                 return sf;
             }
@@ -135,7 +137,8 @@ public class JoinProcessor implements Runnable {
 
     private Goal simplifyUpdate(Goal goal, DelayedCut cut) {
 
-        SequentFormula sf = findFormula(goal.sequent(), cut.getFormula(), false);
+        org.key_project.prover.sequent.SequentFormula sf =
+            findFormula(goal.sequent(), cut.getFormula(), false);
 
         PosInOccurrence pio =
             new PosInOccurrence(sf, PosInTerm.getTopLevel().down(0), false);
@@ -268,7 +271,7 @@ public class JoinProcessor implements Runnable {
     private Collection<Term> computeCommonFormulas(Semisequent s1, Semisequent s2, Term exclude) {
         TreeSet<Term> formulas1 = createTree(s1, exclude);
         TreeSet<Term> result = createTree();
-        for (SequentFormula sf : s2) {
+        for (org.key_project.prover.sequent.SequentFormula sf : s2) {
             if (formulas1.contains(sf.formula())) {
                 result.add(sf.formula());
             }
@@ -279,7 +282,7 @@ public class JoinProcessor implements Runnable {
     private Collection<Term> computeDifference(Semisequent s, Collection<Term> excludeSet,
             Term exclude) {
         LinkedList<Term> result = new LinkedList<>();
-        for (SequentFormula sf : s) {
+        for (org.key_project.prover.sequent.SequentFormula sf : s) {
             if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {
                 result.add(sf.formula());
             }
@@ -289,7 +292,7 @@ public class JoinProcessor implements Runnable {
 
     private TreeSet<Term> createTree(Semisequent semisequent, Term exclude) {
         TreeSet<Term> set = createTree();
-        for (SequentFormula sf : semisequent) {
+        for (org.key_project.prover.sequent.SequentFormula sf : semisequent) {
             if (sf.formula() != exclude) {
                 set.add(sf.formula());
             }
