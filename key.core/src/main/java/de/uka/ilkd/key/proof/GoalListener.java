@@ -4,9 +4,8 @@
 package de.uka.ilkd.key.proof;
 
 
-import de.uka.ilkd.key.logic.SequentFormula;
-
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 /** interface to be implemented by a goal listener */

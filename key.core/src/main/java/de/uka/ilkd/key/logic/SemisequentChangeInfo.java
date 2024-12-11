@@ -15,7 +15,8 @@ public class SemisequentChangeInfo
         super();
     }
 
-    public SemisequentChangeInfo(ImmutableList<SequentFormula> formulas) {
+    public SemisequentChangeInfo(
+            ImmutableList<org.key_project.prover.sequent.SequentFormula> formulas) {
         super(formulas);
     }
 

@@ -252,7 +252,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     private void refactorSequentFormulas(TermLabelState state, Services services, final Term term,
             LabelCollection labels) {
-        Set<SequentFormula> sequentFormulas = getSequentFormulasToRefactor(state);
+        Set<org.key_project.prover.sequent.SequentFormula> sequentFormulas =
+            getSequentFormulasToRefactor(state);
         if (CollectionUtil.search(sequentFormulas, element -> element.formula() == term) != null) {
             FormulaTermLabel termLabel = (FormulaTermLabel) term.getLabel(FormulaTermLabel.NAME);
             if (termLabel != null) {
@@ -386,8 +387,9 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     public static boolean containsSequentFormulasToRefactor(TermLabelState state) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         @SuppressWarnings("unchecked")
-        Set<SequentFormula> sfSet =
-            (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+        Set<org.key_project.prover.sequent.SequentFormula> sfSet =
+            (Set<org.key_project.prover.sequent.SequentFormula>) labelState
+                    .get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
         return sfSet != null && !sfSet.isEmpty();
     }
 
@@ -397,11 +399,13 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param state The {@link TermLabelState} to read from.
      * @return The {@link SequentFormula}s to refactor.
      */
-    public static Set<SequentFormula> getSequentFormulasToRefactor(TermLabelState state) {
+    public static Set<org.key_project.prover.sequent.SequentFormula> getSequentFormulasToRefactor(
+            TermLabelState state) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         @SuppressWarnings("unchecked")
-        Set<SequentFormula> sfSet =
-            (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+        Set<org.key_project.prover.sequent.SequentFormula> sfSet =
+            (Set<org.key_project.prover.sequent.SequentFormula>) labelState
+                    .get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
         return sfSet;
     }
 
@@ -411,11 +415,13 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * @param state The {@link TermLabelState} to modify.
      * @param sf The {@link SequentFormula} to add.
      */
-    public static void addSequentFormulaToRefactor(TermLabelState state, SequentFormula sf) {
+    public static void addSequentFormulaToRefactor(TermLabelState state,
+            org.key_project.prover.sequent.SequentFormula sf) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         @SuppressWarnings("unchecked")
-        Set<SequentFormula> sfSet =
-            (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+        Set<org.key_project.prover.sequent.SequentFormula> sfSet =
+            (Set<org.key_project.prover.sequent.SequentFormula>) labelState
+                    .get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
         if (sfSet == null) {
             sfSet = new LinkedHashSet<>();
             labelState.put(SEQUENT_FORMULA_REFACTORING_REQUIRED, sfSet);

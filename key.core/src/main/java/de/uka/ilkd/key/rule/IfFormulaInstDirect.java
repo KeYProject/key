@@ -4,8 +4,9 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+
+import org.key_project.prover.sequent.SequentFormula;
 
 
 /**
@@ -17,9 +18,9 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
     /**
      * Simply the formula
      */
-    private final SequentFormula cf;
+    private final org.key_project.prover.sequent.SequentFormula cf;
 
-    public IfFormulaInstDirect(SequentFormula p_cf) {
+    public IfFormulaInstDirect(org.key_project.prover.sequent.SequentFormula p_cf) {
         cf = p_cf;
     }
 

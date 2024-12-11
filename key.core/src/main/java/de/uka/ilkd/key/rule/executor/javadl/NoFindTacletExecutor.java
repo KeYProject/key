@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
@@ -41,7 +41,8 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * @param matchCond the MatchConditions with all required instantiations
      */
     protected void applyAdd(TermLabelState termLabelState, Sequent add,
-            SequentChangeInfo<SequentFormula> currentSequent, MatchConditions matchCond,
+            SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> currentSequent,
+            MatchConditions matchCond,
             Goal goal, RuleApp ruleApp) {
         addToAntec(add.antecedent(), termLabelState,
             new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null, null,
@@ -66,14 +67,15 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
         TacletApp tacletApp = (TacletApp) ruleApp;
         MatchConditions mc = tacletApp.matchConditions();
 
-        ImmutableList<SequentChangeInfo<SequentFormula>> newSequentsForGoals =
+        ImmutableList<SequentChangeInfo<org.key_project.prover.sequent.SequentFormula>> newSequentsForGoals =
             checkIfGoals(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
 
         ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
         Iterator<TacletGoalTemplate> it = taclet.goalTemplates().iterator();
         Iterator<Goal> goalIt = newGoals.iterator();
-        Iterator<SequentChangeInfo<SequentFormula>> newSequentsIt = newSequentsForGoals.iterator();
+        Iterator<SequentChangeInfo<org.key_project.prover.sequent.SequentFormula>> newSequentsIt =
+            newSequentsForGoals.iterator();
 
         final var services = goal.getOverlayServices();
         while (it.hasNext()) {

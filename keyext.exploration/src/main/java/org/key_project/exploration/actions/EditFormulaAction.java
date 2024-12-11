@@ -6,7 +6,6 @@ package org.key_project.exploration.actions;
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -50,7 +49,7 @@ public class EditFormulaAction extends ExplorationAction {
         TermBuilder tb = getMediator().getServices().getTermBuilder();
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
         Term term = (Term) pio.subTerm();
-        SequentFormula sf = (SequentFormula) pio.sequentFormula();
+        org.key_project.prover.sequent.SequentFormula sf = pio.sequentFormula();
         Goal g = getMediator().getSelectedGoal();
         Term newTerm = promptForTerm(mainWindow, term);
 

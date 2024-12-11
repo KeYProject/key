@@ -149,7 +149,7 @@ public class ModelGenerator implements SolverLauncherListener {
 
         if (!tmodel.equals(tb.tt())) {
             Term notTerm = tb.not(tmodel);
-            SequentFormula sf = new SequentFormula(notTerm);
+            org.key_project.prover.sequent.SequentFormula sf = new SequentFormula(notTerm);
             goal.addFormula(sf, true, true);
             return true;
         }
@@ -175,13 +175,13 @@ public class ModelGenerator implements SolverLauncherListener {
 
         final TermBuilder tb = services.getTermBuilder();
         ante = ante.append(tb.tt());
-        for (SequentFormula f : s.antecedent()) {
+        for (org.key_project.prover.sequent.SequentFormula f : s.antecedent()) {
             ante = ante.append(f.formula());
         }
 
         ImmutableList<Term> succ = ImmutableSLList.nil();
         succ = succ.append(tb.ff());
-        for (SequentFormula f : s.succedent()) {
+        for (org.key_project.prover.sequent.SequentFormula f : s.succedent()) {
             succ = succ.append(f.formula());
         }
 

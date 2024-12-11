@@ -39,13 +39,13 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
         // Compute collect terms of sequent formulas
         Sequent sequent = goal.sequent();
         Set<Term> topTerms = new LinkedHashSet<>();
-        for (SequentFormula sf : sequent) {
+        for (org.key_project.prover.sequent.SequentFormula sf : sequent) {
             topTerms.add(sf.formula());
         }
         // Compute equality terms
         HeapLDT heapLDT = goal.node().proof().getServices().getTypeConverter().getHeapLDT();
         Set<Term> equalityTerms = new LinkedHashSet<>();
-        for (SequentFormula sf : sequent) {
+        for (org.key_project.prover.sequent.SequentFormula sf : sequent) {
             collectEqualityTerms(sf, equalityTerms, topTerms, heapLDT,
                 goal.node().proof().getServices());
         }
@@ -61,7 +61,8 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
      * @param heapLDT The {@link HeapLDT} to use.
      * @param services TODO
      */
-    protected void collectEqualityTerms(SequentFormula sf, Set<Term> equalityTerms,
+    protected void collectEqualityTerms(org.key_project.prover.sequent.SequentFormula sf,
+            Set<Term> equalityTerms,
             Set<Term> topTerms, HeapLDT heapLDT, Services services) {
         // Collect objects (target of store operations on heap)
         Set<Term> storeLocations = new LinkedHashSet<>();

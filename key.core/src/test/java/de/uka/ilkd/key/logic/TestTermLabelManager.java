@@ -124,7 +124,7 @@ public class TestTermLabelManager {
         Sequent sequent = Sequent.EMPTY_SEQUENT;
         sequent =
             (Sequent) sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
-        sequent = (Sequent) sequent.addFormula((SequentFormula) pos.sequentFormula(), true, false)
+        sequent = (Sequent) sequent.addFormula(pos.sequentFormula(), true, false)
                 .sequent();
         sequent =
             (Sequent) sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
@@ -153,11 +153,11 @@ public class TestTermLabelManager {
 
     protected void compareSequents(Sequent expected, Sequent current, boolean changed,
             RefactoringScope scope) {
-        Iterator<SequentFormula> expectedIter = expected.iterator();
-        Iterator<SequentFormula> currentIter = current.iterator();
+        Iterator<org.key_project.prover.sequent.SequentFormula> expectedIter = expected.iterator();
+        Iterator<org.key_project.prover.sequent.SequentFormula> currentIter = current.iterator();
         while (expectedIter.hasNext() && currentIter.hasNext()) {
-            SequentFormula expectedSF = expectedIter.next();
-            SequentFormula currentSF = currentIter.next();
+            org.key_project.prover.sequent.SequentFormula expectedSF = expectedIter.next();
+            org.key_project.prover.sequent.SequentFormula currentSF = currentIter.next();
             compareTerms(expectedSF.formula(), currentSF.formula(), changed, scope);
         }
         assertFalse(expectedIter.hasNext());

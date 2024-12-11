@@ -173,7 +173,9 @@ public class EqualityModuloProofIrrelevancy {
      * @param that the second SequentFormula
      * @return true if both arguments are equal modulo proof irrelevancy
      */
-    public static boolean equalsModProofIrrelevancy(SequentFormula _this, SequentFormula that) {
+    public static boolean equalsModProofIrrelevancy(
+            org.key_project.prover.sequent.SequentFormula _this,
+            org.key_project.prover.sequent.SequentFormula that) {
         if (_this == that) {
             return true;
         }
@@ -189,7 +191,8 @@ public class EqualityModuloProofIrrelevancy {
      * @param sf the {@link SequentFormula} for which to compute the hash
      * @return the hash code modulo proof irrelevancy for the given argument
      */
-    public static int hashCodeModProofIrrelevancy(SequentFormula sf) {
+    public static int hashCodeModProofIrrelevancy(
+            org.key_project.prover.sequent.SequentFormula sf) {
         return sf.formula().hashCodeModProperty(PROOF_IRRELEVANCY_PROPERTY);
     }
 
@@ -278,7 +281,7 @@ public class EqualityModuloProofIrrelevancy {
      * @return the hash code modulo proof irrelevancy for the given argument
      */
     public static int hashCodeModProofIrrelevancy(IBuiltInRuleApp ruleApp) {
-        var sf = (de.uka.ilkd.key.logic.SequentFormula) ruleApp.posInOccurrence().sequentFormula();
+        var sf = ruleApp.posInOccurrence().sequentFormula();
         return Objects.hash(ruleApp.rule(), ruleApp.getHeapContext(),
             hashCodeModProofIrrelevancy(sf),
             ruleApp.posInOccurrence().posInTerm());
@@ -305,8 +308,10 @@ public class EqualityModuloProofIrrelevancy {
                 || (_this.ifSequent() != null && that.ifSequent() == null)) {
             return false;
         } else {
-            ImmutableList<SequentFormula> if1 = _this.ifSequent().asList();
-            ImmutableList<SequentFormula> if2 = that.ifSequent().asList();
+            ImmutableList<org.key_project.prover.sequent.SequentFormula> if1 =
+                _this.ifSequent().asList();
+            ImmutableList<org.key_project.prover.sequent.SequentFormula> if2 =
+                that.ifSequent().asList();
             while (!if1.isEmpty() && !if2.isEmpty()
                     && equalsModProofIrrelevancy(if1.head(), if2.head())) {
                 if1 = if1.tail();

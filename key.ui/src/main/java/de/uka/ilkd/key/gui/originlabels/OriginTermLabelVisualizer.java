@@ -438,9 +438,10 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         if (parentPos == null) {
             int index = 0;
 
-            ImmutableList<SequentFormula> children = sequent.antecedent().asList();
+            ImmutableList<org.key_project.prover.sequent.SequentFormula> children =
+                sequent.antecedent().asList();
 
-            for (SequentFormula child : children) {
+            for (org.key_project.prover.sequent.SequentFormula child : children) {
                 PosInOccurrence childPos =
                     new PosInOccurrence(child, PosInTerm.getTopLevel(), true);
                 TreeNode childNode = new TreeNode(childPos);
@@ -453,7 +454,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
             children = sequent.succedent().asList();
 
-            for (SequentFormula child : children) {
+            for (org.key_project.prover.sequent.SequentFormula child : children) {
                 PosInOccurrence childPos =
                     new PosInOccurrence(child, PosInTerm.getTopLevel(), false);
                 TreeNode childNode = new TreeNode(childPos);

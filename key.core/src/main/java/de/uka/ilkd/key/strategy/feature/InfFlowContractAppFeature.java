@@ -12,7 +12,6 @@ import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 
@@ -60,7 +60,8 @@ public class InfFlowContractAppFeature implements Feature {
      * Check whether a semisequent contains a formula. Again, one can either search for the same or
      * an equal formula
      */
-    protected boolean semiSequentContains(Semisequent semisequent, SequentFormula cfma) {
+    protected boolean semiSequentContains(Semisequent semisequent,
+            org.key_project.prover.sequent.SequentFormula cfma) {
         return semisequent.containsEqual(cfma);
     }
 
@@ -158,9 +159,9 @@ public class InfFlowContractAppFeature implements Feature {
         assert app.ifFormulaInstantiations().size() >= 1
                 : "Featureis only applicable to rules with at least one assumes.";
 
-        final SequentFormula focusFor = (SequentFormula) pos.sequentFormula();
+        final org.key_project.prover.sequent.SequentFormula focusFor = pos.sequentFormula();
         final boolean antec = pos.isInAntec();
-        final SequentFormula assumesFor =
+        final org.key_project.prover.sequent.SequentFormula assumesFor =
             app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
 
         // assumtion has to occour before the find-term in the sequent in order
@@ -223,11 +224,12 @@ public class InfFlowContractAppFeature implements Feature {
 
         // only relate the n-th called method in execution A with the n-th
         // called method in execution B automatically
-        final SequentFormula focusFor = (SequentFormula) pos.sequentFormula();
-        final SequentFormula assumesFor =
+        final org.key_project.prover.sequent.SequentFormula focusFor = pos.sequentFormula();
+        final org.key_project.prover.sequent.SequentFormula assumesFor =
             app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
 
-        ArrayList<SequentFormula> relatesTerms = getRelatesTerms(goal);
+        ArrayList<org.key_project.prover.sequent.SequentFormula> relatesTerms =
+            getRelatesTerms(goal);
         final int numOfContractAppls = relatesTerms.size() / 2;
         int assumesApplNumber = 0;
         for (int i = 0; i < numOfContractAppls; i++) {
@@ -252,8 +254,8 @@ public class InfFlowContractAppFeature implements Feature {
     }
 
 
-    private ArrayList<SequentFormula> getRelatesTerms(Goal goal) {
-        ArrayList<SequentFormula> list = new ArrayList<>();
+    private ArrayList<org.key_project.prover.sequent.SequentFormula> getRelatesTerms(Goal goal) {
+        ArrayList<org.key_project.prover.sequent.SequentFormula> list = new ArrayList<>();
         Semisequent antecedent = goal.node().sequent().antecedent();
         for (SequentFormula f : antecedent) {
             if (f.formula().op().toString().startsWith("RELATED_BY_")) {

@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -116,7 +117,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
 
         // filter taclets that are applicable on the given formula
         // filter taclets that are applicable on the given formula in the antecedent
-        for (SequentFormula sf : g.node().sequent().antecedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : g.node().sequent().antecedent()) {
 
             if (p.formula != null
                     && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
@@ -127,7 +128,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         }
 
         // filter taclets that are applicable on the given formula in the succedent
-        for (SequentFormula sf : g.node().sequent().succedent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : g.node().sequent().succedent()) {
             if (p.formula != null
                     && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
@@ -164,8 +165,9 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
 
                             RewriteTaclet rw = (RewriteTaclet) pta.taclet();
                             if (pta.complete()) {
-                                SequentFormula rewriteResult = rw.getExecutor().getRewriteResult(
-                                    goalold, null, goalold.proof().getServices(), pta);
+                                org.key_project.prover.sequent.SequentFormula rewriteResult =
+                                    rw.getExecutor().getRewriteResult(
+                                        goalold, null, goalold.proof().getServices(), pta);
 
                                 executeRewriteTaclet(p, pta, goalold, rewriteResult);
                                 break;
@@ -192,7 +194,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param rewriteResult
      */
     private void executeRewriteTaclet(Parameters p, PosTacletApp pta, Goal goalold,
-            SequentFormula rewriteResult) {
+            org.key_project.prover.sequent.SequentFormula rewriteResult) {
         if (rewriteResult.formula().equals(p.replace)
                 || getTermAtPos(rewriteResult, pta.posInOccurrence()).equals(p.replace)) {
             failposInOccs.remove(pta.posInOccurrence());

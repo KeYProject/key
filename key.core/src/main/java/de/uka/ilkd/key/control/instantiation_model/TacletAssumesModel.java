@@ -41,7 +41,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
         }
 
         @Override
-        public SequentFormula getConstrainedFormula() {
+        public org.key_project.prover.sequent.SequentFormula getConstrainedFormula() {
             return null;
         }
     };

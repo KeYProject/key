@@ -162,7 +162,7 @@ public final class ProgVarReplacer {
     /**
      * replaces in a sequent
      */
-    public SequentChangeInfo<SequentFormula> replace(Sequent s) {
+    public SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> replace(Sequent s) {
         SemisequentChangeInfo anteCI = replace(s.antecedent());
         SemisequentChangeInfo succCI = replace(s.succedent());
 
@@ -171,7 +171,7 @@ public final class ProgVarReplacer {
 
         Sequent newSequent = Sequent.createSequent(newAntecedent, newSuccedent);
 
-        SequentChangeInfo<SequentFormula> result =
+        SequentChangeInfo<org.key_project.prover.sequent.SequentFormula> result =
             SequentChangeInfo.createSequentChangeInfo(anteCI, succCI, newSequent, s);
         return result;
     }
@@ -184,7 +184,7 @@ public final class ProgVarReplacer {
         SemisequentChangeInfo result = new SemisequentChangeInfo();
         result.setFormulaList(s.asList());
 
-        final Iterator<SequentFormula> it = s.iterator();
+        final Iterator<org.key_project.prover.sequent.SequentFormula> it = s.iterator();
 
         for (int formulaNumber = 0; it.hasNext(); formulaNumber++) {
             final SequentFormula oldcf = it.next();

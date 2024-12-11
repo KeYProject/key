@@ -69,14 +69,15 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         SortCollector sortCollector = new SortCollector();
 
-        for (SequentFormula sf : goal.sequent()) {
+        for (org.key_project.prover.sequent.SequentFormula sf : goal.sequent()) {
             sf.formula().execPreOrder(sortCollector);
         }
 
         Set<Sort> sorts = sortCollector.getSorts();
         sorts.remove(nullSort);
-        List<SequentFormula> formulae = createFormulae(goal.proof().getServices(), sorts);
-        for (SequentFormula sf : formulae) {
+        List<org.key_project.prover.sequent.SequentFormula> formulae =
+            createFormulae(goal.proof().getServices(), sorts);
+        for (org.key_project.prover.sequent.SequentFormula sf : formulae) {
             Sequent s = goal.sequent();
             Semisequent antecedent = s.antecedent();
             if (!antecedent.containsEqual(sf)) {
@@ -100,8 +101,9 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return false;
     }
 
-    private List<SequentFormula> createFormulae(Services services, Set<Sort> sorts) {
-        List<SequentFormula> result = new LinkedList<>();
+    private List<org.key_project.prover.sequent.SequentFormula> createFormulae(Services services,
+            Set<Sort> sorts) {
+        List<org.key_project.prover.sequent.SequentFormula> result = new LinkedList<>();
 
         JavaInfo info = services.getJavaInfo();
         SpecificationRepository spec = services.getSpecificationRepository();
@@ -134,7 +136,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return result;
     }
 
-    private static void addFormulas(List<SequentFormula> result, KeYJavaType kjt, ClassAxiom c,
+    private static void addFormulas(List<org.key_project.prover.sequent.SequentFormula> result,
+            KeYJavaType kjt, ClassAxiom c,
             LogicVariable o, LogicVariable h, Services services) {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
         Term exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));

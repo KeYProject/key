@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.speclang.OperationContract;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
@@ -296,10 +296,10 @@ public abstract class AbstractProofReplayer {
             if (oldFormulaPioSpec.second) {
                 ifFormulaList = ifFormulaList.append(
                     new IfFormulaInstSeq(currGoal.sequent(), oldFormulaPio.isInAntec(),
-                        (SequentFormula) newPio.sequentFormula()));
+                        newPio.sequentFormula()));
             } else {
                 ifFormulaList = ifFormulaList.append(
-                    new IfFormulaInstDirect((SequentFormula) newPio.sequentFormula()));
+                    new IfFormulaInstDirect(newPio.sequentFormula()));
             }
         }
 
@@ -326,10 +326,10 @@ public abstract class AbstractProofReplayer {
      */
     private PosInOccurrence findInNewSequent(PosInOccurrence oldPos,
             Sequent newSequent) {
-        SequentFormula oldFormula = (SequentFormula) oldPos.sequentFormula();
+        org.key_project.prover.sequent.SequentFormula oldFormula = oldPos.sequentFormula();
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()
                 : newSequent.succedent();
-        for (SequentFormula newFormula : semiSeq.asList()) {
+        for (org.key_project.prover.sequent.SequentFormula newFormula : semiSeq.asList()) {
             if ((Object) oldFormula instanceof SequentFormula that
                     ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(newFormula, that)
                     : false) {

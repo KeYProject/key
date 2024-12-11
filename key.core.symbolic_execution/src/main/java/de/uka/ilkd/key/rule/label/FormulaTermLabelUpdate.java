@@ -25,6 +25,7 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
 
@@ -74,7 +75,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
         }
         if (ruleApp instanceof TacletApp ta) {
             if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
-                Map<SequentFormula, FormulaTermLabel> ifLabels =
+                Map<org.key_project.prover.sequent.SequentFormula, FormulaTermLabel> ifLabels =
                     new LinkedHashMap<>();
                 for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(

@@ -6,11 +6,11 @@ package de.uka.ilkd.key.macros;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
 
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.LRUCache;
 
 /**

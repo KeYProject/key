@@ -7,9 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
+
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * Methods for computing conflicts affecting a delayed cut application. Relies on the given

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -16,6 +15,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -74,14 +74,15 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *         altered since the creation of this object or if a preceding update has changed
      */
     private boolean subformulaOrPreceedingUpdateHasChanged(Goal goal) {
-        ImmutableList<FormulaChangeInfo<SequentFormula>> infoList =
+        ImmutableList<FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula>> infoList =
             goal.getFormulaTagManager().getModifications(positionTag);
 
         while (!infoList.isEmpty()) {
-            final FormulaChangeInfo<SequentFormula> info = infoList.head();
+            final FormulaChangeInfo<org.key_project.prover.sequent.SequentFormula> info =
+                infoList.head();
             infoList = infoList.tail();
 
-            final SequentFormula newFormula = info.newFormula();
+            final org.key_project.prover.sequent.SequentFormula newFormula = info.newFormula();
             if (newFormula == applicationPosition.sequentFormula()) {
                 // then there were no relevant modifications since the creation
                 // of the rule app object

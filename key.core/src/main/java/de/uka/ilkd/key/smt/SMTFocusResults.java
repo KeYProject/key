@@ -74,7 +74,7 @@ public final class SMTFocusResults {
         Semisequent succedent = goalNode.sequent().succedent();
 
         int i = 1;
-        for (SequentFormula sf : antecedent) {
+        for (org.key_project.prover.sequent.SequentFormula sf : antecedent) {
             PosInOccurrence pio =
                 PosInOccurrence.findInSequent(goalNode.sequent(), i,
                     PosInTerm.getTopLevel());
@@ -90,7 +90,7 @@ public final class SMTFocusResults {
             i++;
         }
 
-        for (SequentFormula sf : succedent) {
+        for (org.key_project.prover.sequent.SequentFormula sf : succedent) {
             PosInOccurrence pio =
                 PosInOccurrence.findInSequent(goalNode.sequent(), i,
                     PosInTerm.getTopLevel());
@@ -153,7 +153,7 @@ public final class SMTFocusResults {
 
         Semisequent antecedent = goalNode.sequent().antecedent();
         int i = 1;
-        for (SequentFormula sf : antecedent) {
+        for (org.key_project.prover.sequent.SequentFormula sf : antecedent) {
             if (unsatCore.contains(i)) {
                 unsatCoreFormulas =
                     unsatCoreFormulas.prepend(PosInOccurrence
@@ -163,7 +163,7 @@ public final class SMTFocusResults {
         }
 
         Semisequent succedent = goalNode.sequent().succedent();
-        for (SequentFormula sf : succedent) {
+        for (org.key_project.prover.sequent.SequentFormula sf : succedent) {
             if (unsatCore.contains(i)) {
                 unsatCoreFormulas =
                     unsatCoreFormulas.prepend(PosInOccurrence

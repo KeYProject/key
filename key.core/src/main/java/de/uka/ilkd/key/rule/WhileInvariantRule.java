@@ -537,7 +537,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    private SequentFormula initFormula(TermLabelState termLabelState, Instantiation inst,
+    private org.key_project.prover.sequent.SequentFormula initFormula(TermLabelState termLabelState,
+            Instantiation inst,
             final Term invTerm, Term reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
         Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
@@ -696,7 +697,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             self = null;
         }
         services.getSpecificationRepository().addWdStatement(lwd);
-        final SequentFormula wdInv =
+        final org.key_project.prover.sequent.SequentFormula wdInv =
             lwd.generateSequent(self, heap, anonHeap, localIns, update, localAnonUpdate, services);
         goal.changeFormula(wdInv, pio);
     }
