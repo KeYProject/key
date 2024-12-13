@@ -170,9 +170,13 @@ class FieldPrinter {
      * Determine whether a field constant is declared final.
      */
     protected boolean isFinalFieldConstant(Term fieldTerm) {
-        ProgramVariable pv =
-            getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
-        return pv.isFinal();
+        try {
+            ProgramVariable pv =
+                    getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
+            return pv.isFinal();
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
 }
