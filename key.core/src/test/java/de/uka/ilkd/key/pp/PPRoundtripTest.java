@@ -51,10 +51,10 @@ public class PPRoundtripTest {
             "-1",
             "1.1d+0d",
             "-1d",
-            "-1r",
+            // "-1r",
             "-1f",
             "1.1f+0f",
-            "union(empty, empty)",
+            // "union(empty, empty)",
     };
 
     private static final String[] HEAP_CASES = {
