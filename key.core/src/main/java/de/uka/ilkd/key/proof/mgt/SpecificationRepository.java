@@ -34,15 +34,10 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -83,10 +78,11 @@ public final class SpecificationRepository {
     private final Map<ProofOblInput, ImmutableSet<Proof>> proofs = new LinkedHashMap<>();
     private final Map<Pair<LoopStatement, Integer>, LoopSpecification> loopInvs =
         new LinkedHashMap<>();
-    private final Map<Triple<StatementBlock, URI, Integer>, ImmutableSet<BlockContract>> blockContracts =
+    private final Map<BlockContractKey, ImmutableSet<BlockContract>> blockContracts =
         new LinkedHashMap<>();
-    private final Map<Triple<StatementBlock, URI, Integer>, ImmutableSet<LoopContract>> loopContracts =
+    private final Map<LoopContractKey, ImmutableSet<LoopContract>> loopContracts =
         new LinkedHashMap<>();
+
     /**
      * A map which relates each loop statement its starting line number and set of loop contracts.
      */
@@ -1493,8 +1489,8 @@ public final class SpecificationRepository {
      * @return all block contracts for the specified block.
      */
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
-        final Triple<StatementBlock, URI, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
+        var b =
+            new BlockContractKey(block, block.getParentClass(), block.getStartPosition().line());
         final ImmutableSet<BlockContract> contracts = blockContracts.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.nil();
@@ -1510,8 +1506,7 @@ public final class SpecificationRepository {
      * @return all loop contracts for the specified block.
      */
     public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
-        final Triple<StatementBlock, URI, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
+        var b = new LoopContractKey(block, block.getParentClass(), block.getStartPosition().line());
         final ImmutableSet<LoopContract> contracts = loopContracts.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.nil();
@@ -1615,8 +1610,8 @@ public final class SpecificationRepository {
      */
     public void addBlockContract(final BlockContract contract, boolean addFunctionalContract) {
         final StatementBlock block = contract.getBlock();
-        final Triple<StatementBlock, URI, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
+        var b =
+            new BlockContractKey(block, block.getParentClass(), block.getStartPosition().line());
         blockContracts.put(b, getBlockContracts(block).add(contract));
 
         if (addFunctionalContract) {
@@ -1637,11 +1632,10 @@ public final class SpecificationRepository {
      */
     public void removeBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
-        final Triple<StatementBlock, URI, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
+        var b =
+            new BlockContractKey(block, block.getParentClass(), block.getStartPosition().line());
 
-        ImmutableSet<BlockContract> set = blockContracts.get(b);
-        blockContracts.put(b, set.remove(contract));
+        blockContracts.compute(b, (k, set) -> set.remove(contract));
     }
 
     /**
@@ -1663,8 +1657,8 @@ public final class SpecificationRepository {
     public void addLoopContract(final LoopContract contract, boolean addFunctionalContract) {
         if (contract.isOnBlock()) {
             final StatementBlock block = contract.getBlock();
-            final Triple<StatementBlock, URI, Integer> b =
-                new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
+            var b =
+                new LoopContractKey(block, block.getParentClass(), block.getStartPosition().line());
             loopContracts.put(b, getLoopContracts(block).add(contract));
         } else {
             final LoopStatement loop = contract.getLoop();
@@ -1696,18 +1690,16 @@ public final class SpecificationRepository {
     public void removeLoopContract(final LoopContract contract) {
         if (contract.isOnBlock()) {
             final StatementBlock block = contract.getBlock();
-            final Triple<StatementBlock, URI, Integer> b =
-                new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
+            var b =
+                new LoopContractKey(block, block.getParentClass(), block.getStartPosition().line());
 
-            ImmutableSet<LoopContract> set = loopContracts.get(b);
-            loopContracts.put(b, set.remove(contract));
+            loopContracts.compute(b, (k, set) -> set.remove(contract));
         } else {
             final LoopStatement loop = contract.getLoop();
             final Pair<LoopStatement, Integer> b =
                 new Pair<>(loop, loop.getStartPosition().line());
 
-            ImmutableSet<LoopContract> set = loopContractsOnLoops.get(b);
-            loopContractsOnLoops.put(b, set.remove(contract));
+            loopContractsOnLoops.compute(b, (k, set) -> set.remove(contract));
         }
     }
 
@@ -1889,7 +1881,7 @@ public final class SpecificationRepository {
     public record JmlStatementSpec(
             ProgramVariableCollection vars,
             ImmutableList<Term> terms
-    ){
+    ) {
         /**
          * Retrieve a term
          * @param index a index to the list of {@code terms}.
@@ -1942,6 +1934,12 @@ public final class SpecificationRepository {
                             vars.atPreVars, atPres, vars.atBeforeVars, vars.atBefores),
                     newTerms);
         }
+    }
+
+    private record BlockContractKey(StatementBlock block, URI file, Integer pos) {
+    }
+
+    private record LoopContractKey(StatementBlock block, URI file, Integer pos) {
     }
     // endregion
 }

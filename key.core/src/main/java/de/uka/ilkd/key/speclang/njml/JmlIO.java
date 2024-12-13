@@ -18,7 +18,6 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
 import org.key_project.util.collection.ImmutableList;
@@ -295,9 +294,8 @@ public class JmlIO {
      * @throws ClassCastException if the {@code ctx} is not suitable
      */
     @SuppressWarnings("unchecked")
-    public Triple<IObserverFunction, Term, Term> translateDependencyContract(
-            ParserRuleContext ctx) {
-        return (Triple<IObserverFunction, Term, Term>) interpret(ctx);
+    public TranslatedDependencyContract translateDependencyContract(ParserRuleContext ctx) {
+        return (TranslatedDependencyContract) interpret(ctx);
     }
 
     /**
@@ -305,10 +303,11 @@ public class JmlIO {
      * <p>
      * Note (weigl): No label is currently attached.
      *
+     * @param ctx a context
+     * @return {@link #translateDependencyContract(ParserRuleContext)}
      * @throws ClassCastException if the {@code ctx} is not suitable
      */
-    public Triple<IObserverFunction, Term, Term> translateDependencyContract(
-            LabeledParserRuleContext ctx) {
+    public TranslatedDependencyContract translateDependencyContract(LabeledParserRuleContext ctx) {
         return translateDependencyContract(ctx.first);
     }
     // endregion
