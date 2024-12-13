@@ -9,7 +9,6 @@ import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -36,8 +35,17 @@ import org.key_project.util.collection.ImmutableArray;
  * @see StrategyPropertyValueDefinition
  */
 public class StrategySettingsDefinition {
+    /**
+     * This class represents an attribute in the strategy settings.
+     *
+     * @param name name of the attribute
+     * @param order precedence for sorting
+     * @param factory factory for creating new settings
+     */
+    public record StrategySettingEntry(String name, int order,
+            IDefaultStrategyPropertiesFactory factory) {}
 
-    private static final ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> STD_FURTHER_DEFAULTS;
+    private static final ArrayList<StrategySettingEntry> STD_FURTHER_DEFAULTS;
 
     /**
      * Defines if a user interface control is shown to edit {@link StrategySettings#getMaxSteps()}.
@@ -74,14 +82,13 @@ public class StrategySettingsDefinition {
      * Further default settings, for example suitable for simplification. Consists of triples
      * (DEFAULT_NAME, MAX_RULE_APPS, PROPERTIES).
      */
-    private final ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> furtherDefaults;
+    private final ArrayList<StrategySettingEntry> furtherDefaults;
 
     static {
-        STD_FURTHER_DEFAULTS =
-            new ArrayList<>();
+        STD_FURTHER_DEFAULTS = new ArrayList<>();
 
         // Java verification standard preset (tested in TimSort case study)
-        STD_FURTHER_DEFAULTS.add(new Triple<>(
+        STD_FURTHER_DEFAULTS.add(new StrategySettingEntry(
             "Java verif. std.", 7000, () -> {
                 final StrategyProperties newProps =
                     IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
@@ -124,7 +131,7 @@ public class StrategySettingsDefinition {
             }));
 
         // Simplification preset
-        STD_FURTHER_DEFAULTS.add(new Triple<>(
+        STD_FURTHER_DEFAULTS.add(new StrategySettingEntry(
             "Simplification", 5000, () -> {
                 final StrategyProperties newProps =
                     IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
@@ -197,7 +204,7 @@ public class StrategySettingsDefinition {
     public StrategySettingsDefinition(boolean showMaxRuleApplications,
             String maxRuleApplicationsLabel, int defaultMaxRuleApplications, String propertiesTitle,
             IDefaultStrategyPropertiesFactory defaultPropertiesFactory,
-            ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> furtherDefaults,
+            ArrayList<StrategySettingEntry> furtherDefaults,
             AbstractStrategyPropertyDefinition... properties) {
         assert defaultPropertiesFactory != null;
         this.showMaxRuleApplications = showMaxRuleApplications;
@@ -272,7 +279,7 @@ public class StrategySettingsDefinition {
     /**
      * @return Further default settings, e.g. for simplification.
      */
-    public ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>> getFurtherDefaults() {
+    public ArrayList<StrategySettingEntry> getFurtherDefaults() {
         return furtherDefaults;
     }
 

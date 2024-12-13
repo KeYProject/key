@@ -48,8 +48,8 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -112,9 +112,18 @@ public class IntermediateProofReplayer {
     private final LinkedList<Pair<Node, NodeIntermediate>> queue =
         new LinkedList<>();
 
+    /**
+     * Used by the node merging during the proof replay.
+     *
+     * @param node the other node to be merged with
+     * @param pio pio of ??? (ask Dominic Steinhöfel)
+     * @param intermediate representation of the node during the replay
+     * @see MergePartnerAppIntermediate
+     */
+    private record PartnerNode(Node node, PosInOccurrence pio, NodeIntermediate intermediate) {}
+
     /** Maps join node IDs to previously seen join partners */
-    private final HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes =
-        new HashMap<>();
+    private final HashMap<Integer, HashSet<PartnerNode>> joinPartnerNodes = new HashMap<>();
 
     /** The current open goal */
     private Goal currGoal = null;
@@ -264,7 +273,7 @@ public class IntermediateProofReplayer {
                             (BuiltInAppIntermediate) currInterm.getIntermediateRuleApp();
 
                         if (appInterm instanceof MergeAppIntermediate joinAppInterm) {
-                            HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo =
+                            HashSet<PartnerNode> partnerNodesInfo =
                                 joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
 
                             if (partnerNodesInfo == null
@@ -309,11 +318,11 @@ public class IntermediateProofReplayer {
                                     }
 
                                     // Now add children of partner nodes
-                                    for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+                                    for (PartnerNode partnerNodeInfo : partnerNodesInfo) {
                                         Iterator<Node> children =
-                                            partnerNodeInfo.first.childrenIterator();
+                                            partnerNodeInfo.node.childrenIterator();
                                         LinkedList<NodeIntermediate> intermChildren =
-                                            partnerNodeInfo.third.getChildren();
+                                            partnerNodeInfo.intermediate.getChildren();
 
                                         addChildren(children, intermChildren);
                                     }
@@ -327,11 +336,11 @@ public class IntermediateProofReplayer {
                             }
                         } else if (appInterm instanceof MergePartnerAppIntermediate joinPartnerApp) {
                             // Register this partner node
-                            HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodeInfo =
+                            HashSet<PartnerNode> partnerNodeInfo =
                                 joinPartnerNodes.computeIfAbsent(joinPartnerApp.getMergeNodeId(),
                                     k -> new HashSet<>());
 
-                            partnerNodeInfo.add(new Triple<>(
+                            partnerNodeInfo.add(new PartnerNode(
                                 currNode,
                                 PosInOccurrence.findInSequent(currGoal.sequent(),
                                     appInterm.getPosInfo().first, appInterm.getPosInfo().second),
@@ -713,7 +722,7 @@ public class IntermediateProofReplayer {
      */
     private MergeRuleBuiltInRuleApp instantiateJoinApp(final MergeAppIntermediate joinAppInterm,
             final Node currNode,
-            final Set<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo,
+            final HashSet<PartnerNode> partnerNodesInfo,
             final Services services) throws SkipSMTRuleException, BuiltInConstructionException {
         final MergeRuleBuiltInRuleApp joinApp =
             (MergeRuleBuiltInRuleApp) constructBuiltinApp(joinAppInterm, currGoal);
@@ -802,18 +811,18 @@ public class IntermediateProofReplayer {
         }
 
         ImmutableList<MergePartner> joinPartners = ImmutableSLList.nil();
-        for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+        for (PartnerNode partnerNodeInfo : partnerNodesInfo) {
 
-            final Triple<Term, Term, Term> ownSEState =
+            SymbolicExecutionStateWithProgCnt ownSEState =
                 sequentToSETriple(currNode, joinApp.posInOccurrence(), services);
-            final Triple<Term, Term, Term> partnerSEState =
-                sequentToSETriple(partnerNodeInfo.first, partnerNodeInfo.second, services);
+            var partnerSEState =
+                sequentToSETriple(partnerNodeInfo.node, partnerNodeInfo.pio, services);
 
-            assert ownSEState.third.equals(partnerSEState.third)
+            assert ownSEState.programCounter().equals(partnerSEState.programCounter())
                     : "Cannot merge incompatible program counters";
 
             joinPartners = joinPartners.append(
-                new MergePartner(proof.getOpenGoal(partnerNodeInfo.first), partnerNodeInfo.second));
+                new MergePartner(proof.getOpenGoal(partnerNodeInfo.node), partnerNodeInfo.pio));
         }
 
         joinApp.setMergeNode(currNode);

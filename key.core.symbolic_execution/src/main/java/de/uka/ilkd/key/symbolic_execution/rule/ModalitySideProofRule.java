@@ -8,24 +8,13 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
@@ -181,7 +170,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                     .addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false)
                     .sequent();
             // Compute results and their conditions
-            List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
+            List<ResultsAndCondition> conditionsAndResultsMap =
                 computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
                     newPredicate);
             // Create new single goal in which the query is replaced by the possible results
@@ -190,10 +179,11 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             resultGoal.removeFormula(pio);
             // Create results
             Set<Term> resultTerms = new LinkedHashSet<>();
-            for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
-                Term conditionTerm = tb.and(conditionsAndResult.second);
-                Term resultEqualityTerm = varFirst ? tb.equals(conditionsAndResult.first, otherTerm)
-                        : tb.equals(otherTerm, conditionsAndResult.first);
+            for (ResultsAndCondition conditionsAndResult : conditionsAndResultsMap) {
+                Term conditionTerm = tb.and(conditionsAndResult.conditions());
+                Term resultEqualityTerm =
+                    varFirst ? tb.equals(conditionsAndResult.result(), otherTerm)
+                            : tb.equals(otherTerm, conditionsAndResult.result());
                 Term resultTerm = pio.isInAntec() ? tb.imp(conditionTerm, resultEqualityTerm)
                         : tb.and(conditionTerm, resultEqualityTerm);
                 resultTerms.add(resultTerm);

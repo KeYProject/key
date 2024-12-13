@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.*;
@@ -11,6 +12,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
@@ -65,7 +67,10 @@ public class HeatmapToggleAction extends MainWindowAction {
         vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(), vs.isHeatmapNewest(),
             vs.getMaxAgeForHeatmap());
         // this updates the heatmap highlights
-        mainWindow.getCurrentGoalView().getHighlighter().removeAllHighlights();
-        mainWindow.getCurrentGoalView().printSequent();
+        SequentView sequentView = mainWindow.getMainFrame().getSequentView();
+        if (sequentView != null) {
+            sequentView.getHighlighter().removeAllHighlights();
+            sequentView.printSequent();
+        }
     }
 }

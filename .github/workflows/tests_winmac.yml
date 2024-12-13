@@ -30,7 +30,7 @@ jobs:
 
       - name: Setup Gradle
         uses:
-          gradle/actions/setup-gradle@v3.5.0
+          gradle/actions/setup-gradle@v4.1.0
       - name: Test with Gradle
         run: ./gradlew --continue -x :key.core.symbolic_execution:test -x :key.core.proof_references:test test
 
@@ -76,7 +76,7 @@ jobs:
         run: .github/dlsmt.sh
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.5.0
+        uses: gradle/actions/setup-gradle@v4.1.0
       - name: "Running tests: ${{ matrix.test }}"
         run: ./gradlew --continue ${{ matrix.test }}
 
