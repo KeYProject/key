@@ -6,17 +6,15 @@ package de.uka.ilkd.key.proof.init;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.ClassType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.abstraction.Variable;
 import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-
-import org.key_project.logic.Name;
+import de.uka.ilkd.key.logic.op.*;
 
 /**
  * This class is responsible for making the immutable treatment of final fields possible also for
@@ -66,14 +64,25 @@ public class FinalFieldsPOExtension implements POExtension {
         FinalFieldCodeValidator.validateFinalFields(constructor, proofConfig);
 
         TermBuilder tb = services.getTermBuilder();
-        LogicVariable fv = new LogicVariable(new Name("fld"),
-            services.getTypeConverter().getHeapLDT().getFieldSort());
+        List<JFunction> finalFields = findFinalFields(iconstructor, services);
         Term self = tb.var(selfVar);
-        Term sel = tb.dot(JavaDLTheory.ANY, self, tb.var(fv));
-        Term fsel = tb.finalDot(JavaDLTheory.ANY, self, tb.var(fv));
-        Term eq = tb.equals(sel, fsel);
-        Term all = tb.all(List.of(fv), eq);
-        Term imp = tb.imp(all, postTerm);
-        return imp;
+        for (JFunction finalField : finalFields) {
+            Term fieldRef = tb.tf().createTerm(finalField);
+            Term sel = tb.dot(JavaDLTheory.ANY, self, fieldRef);
+            Term fsel = tb.finalDot(JavaDLTheory.ANY, self, fieldRef);
+            Term eq = tb.equals(sel, fsel);
+            postTerm = tb.imp(eq, postTerm);
+        }
+        return postTerm;
     }
+
+    private List<JFunction> findFinalFields(IProgramMethod iconstructor, Services services) {
+        Type type = iconstructor.getContainerType().getJavaType();
+        assert type instanceof ClassType : "Class type was expected here, since a constructor is present";
+        ClassType classType = (ClassType) type;
+        return classType.getAllFields(services).filter(v -> v.isFinal() && !v.isModel()).map(f ->
+                services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)f.getProgramVariable(), services)).toList();
+    }
+
+
 }
