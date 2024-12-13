@@ -148,35 +148,40 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                 printResults(openGoals, info, result2);
             }
         } else if (info.getSource() instanceof ProblemLoader) {
-            LOGGER.debug("{}", result2);
-            System.exit(-1);
-        }
-        if (loadOnly || openGoals == 0) {
-            LOGGER.info("Number of open goals after loading: {}", openGoals);
-            System.exit(0);
-        }
-        ProblemLoader problemLoader = (ProblemLoader) info.getSource();
-        if (problemLoader.hasProofScript()) {
-            try {
-                ProofScriptEntry script = problemLoader.getProofScript();
-                if (script != null) {
-                    ProofScriptEngine pse =
-                        new ProofScriptEngine(script.script(), script.location());
-                    this.taskStarted(
-                        new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
-                    pse.execute(this, proof);
-                    // The start and end messages are fake to persuade the system ...
-                    // All this here should refactored anyway ...
-                    this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+            if (result2 != null) {
+                LOGGER.debug("{}", result2);
+                if (result2 instanceof Throwable) {
+                    LOGGER.debug("Exception: ", (Throwable) result2);
                 }
-            } catch (Exception e) {
-                LOGGER.debug("", e);
                 System.exit(-1);
             }
-        } else if (macroChosen()) {
-            applyMacro();
-        } else {
-            finish(proof);
+            if (loadOnly || openGoals == 0) {
+                LOGGER.info("Number of open goals after loading: {}", openGoals);
+                System.exit(0);
+            }
+            ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+            if (problemLoader.hasProofScript()) {
+                try {
+                    ProofScriptEntry script = problemLoader.getProofScript();
+                    if (script != null) {
+                        ProofScriptEngine pse =
+                            new ProofScriptEngine(script.script(), script.location());
+                        this.taskStarted(
+                            new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
+                        pse.execute(this, proof);
+                        // The start and end messages are fake to persuade the system ...
+                        // All this here should refactored anyway ...
+                        this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+                    }
+                } catch (Exception e) {
+                    LOGGER.debug("", e);
+                    System.exit(-1);
+                }
+            } else if (macroChosen()) {
+                applyMacro();
+            } else {
+                finish(proof);
+            }
         }
     }
 
