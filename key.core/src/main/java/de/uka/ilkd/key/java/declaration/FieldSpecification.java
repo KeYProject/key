@@ -91,7 +91,7 @@ public class FieldSpecification extends VariableSpecification implements Field {
      * Test whether the declaration is static.
      */
     public boolean isStatic() {
-        return ((ProgramVariable) var).isStatic();
+        return ((ProgramVariable) programVar).isStatic();
     }
 
     /**

@@ -19,6 +19,13 @@ public interface Variable extends ProgramModelElement {
     boolean isFinal();
 
     /**
+     * Checks if this variable is a model entity.
+     *
+     * @return <CODE>true</CODE> if this variable is a model entity, <CODE>false</CODE> otherwise.
+     */
+    public boolean isModel();
+
+    /**
      * Returns the type of this variable.
      *
      * @return the type of this variable.
