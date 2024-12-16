@@ -131,27 +131,26 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         super.taskFinished(info);
         progressMax = 0; // reset progress bar marker
         final Proof proof = info.getProof();
+        final Object result = info.getResult();
         if (proof == null) {
-            final Object error = info.getResult();
             LOGGER.info("Proof loading failed");
-            if (error instanceof Throwable) {
-                LOGGER.info("Proof loading failed", (Throwable) error);
+            if (result instanceof Throwable thrown) {
+                LOGGER.info("Proof loading failed", thrown);
             } else {
                 LOGGER.info("Proof loading failed");
             }
             System.exit(1);
         }
         final int openGoals = proof.openGoals().size();
-        final Object result2 = info.getResult();
         if (info.getSource() instanceof ProverCore || info.getSource() instanceof ProofMacro) {
             if (!isAtLeastOneMacroRunning()) {
-                printResults(openGoals, info, result2);
+                printResults(openGoals, info, result);
             }
         } else if (info.getSource() instanceof ProblemLoader) {
-            if (result2 != null) {
-                LOGGER.debug("{}", result2);
-                if (result2 instanceof Throwable) {
-                    LOGGER.debug("Exception: ", (Throwable) result2);
+            if (result != null) {
+                LOGGER.debug("{}", result);
+                if (result instanceof Throwable thrown) {
+                    LOGGER.debug("Exception: ", thrown);
                 }
                 System.exit(-1);
             }
