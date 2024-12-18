@@ -22,6 +22,7 @@ classlevel_element
   | monitors_for_clause | readable_if_clause | writable_if_clause
   | datagroup_clause    | set_statement      | nowarn_pragma
   | accessible_clause   | assert_statement   | assume_statement
+  | datatype_declaration
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
@@ -41,7 +42,28 @@ modifier
   | CODE_JAVA_MATH | CODE_SAFE_MATH | CODE_BIGINT_MATH)
  ;
 
+datatype_declaration:
+    DATATYPE
+    dt_name=IDENT
+    LBRACE
+    datatype_constructor (INCLUSIVEOR datatype_constructor)*
+    SEMI_TOPLEVEL
+    (datatype_function)*
+    RBRACE
+    ;
 
+datatype_constructor:
+  con_name=IDENT
+  (
+    LPAREN
+    (argType+=type argName+=IDENT
+     (COMMA argType+=type argName+=IDENT)*
+    )?
+    RPAREN
+  )?
+;
+
+datatype_function: type IDENT param_list method_body;
 
 class_axiom: AXIOM expression SEMI_TOPLEVEL;
 initially_clause: INITIALLY expression SEMI_TOPLEVEL;
