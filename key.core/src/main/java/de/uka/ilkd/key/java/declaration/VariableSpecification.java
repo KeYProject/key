@@ -71,7 +71,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     public VariableSpecification(IProgramVariable programVar, int dim, Expression init, Type type,
-                                 PositionInfo pi) {
+            PositionInfo pi) {
         super(pi);
         this.programVar = programVar;
         this.initializer = init;
@@ -87,7 +87,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      *        (as initializer of the variable) a Comment
      * @param dim the dimension of this type
      */
-    public VariableSpecification(ExtList children, IProgramVariable programVar, int dim, Type type) {
+    public VariableSpecification(ExtList children, IProgramVariable programVar, int dim,
+            Type type) {
         super(children);
         this.programVar = programVar;
         initializer = children.get(Expression.class);
