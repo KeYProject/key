@@ -6,6 +6,7 @@ package org.key_project.slicing.graph;
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
@@ -70,7 +71,7 @@ public class TrackedFormula extends GraphNode {
             return Integer.toHexString(hashCode());
         }
         String term = LogicPrinter.quickPrintTerm(
-            formula.formula(),
+            (Term) formula.formula(),
             services,
             true, // pretty print
             true // using unicode symbols
@@ -108,11 +109,10 @@ public class TrackedFormula extends GraphNode {
             return false;
         }
         TrackedFormula that = (TrackedFormula) o;
-        boolean b = inAntec == that.inAntec
+        final boolean b = inAntec == that.inAntec
                 && (that.formula instanceof SequentFormula that1
                         && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(formula, that1))
                 && Objects.equals(branchLocation, that.branchLocation);
-        System.out.println(b);
         return b;
     }
 

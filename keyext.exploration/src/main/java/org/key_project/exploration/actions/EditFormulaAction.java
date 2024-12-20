@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.exploration.ProofExplorationService;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * Action to edit formulas in the actions mode
@@ -58,8 +59,9 @@ public class EditFormulaAction extends ExplorationAction {
         }
 
         ProofExplorationService api = ProofExplorationService.get(getMediator());
-        Node toBeSelected = api.applyChangeFormula(g, pio, sf.formula(),
-            tb.replace(sf.formula(), pio.posInTerm(), newTerm));
+        final Term formula = (Term) sf.formula();
+        Node toBeSelected = api.applyChangeFormula(g, pio, formula,
+            tb.replace(formula, pio.posInTerm(), newTerm));
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
 }

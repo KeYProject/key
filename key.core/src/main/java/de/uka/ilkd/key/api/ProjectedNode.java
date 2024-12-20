@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.api;
 
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
+
+import org.key_project.prover.sequent.Sequent;
 
 /**
  * Wrapper for a proof node with utilities methods to

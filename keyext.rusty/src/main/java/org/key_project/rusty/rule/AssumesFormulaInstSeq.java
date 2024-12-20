@@ -7,10 +7,10 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.Semisequent;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -20,18 +20,19 @@ public class AssumesFormulaInstSeq implements AssumesFormulaInstantiation {
     /**
      * Sequent and formula
      */
-    private final Sequent seq;
+    private final org.key_project.prover.sequent.Sequent seq;
     private final boolean antec; // formula is in antecedent?
     private final SequentFormula cf;
 
-    public AssumesFormulaInstSeq(Sequent p_seq, boolean antec, SequentFormula p_cf) {
+    public AssumesFormulaInstSeq(org.key_project.prover.sequent.Sequent p_seq, boolean antec,
+            SequentFormula p_cf) {
         seq = p_seq;
         this.antec = antec;
         cf = p_cf;
     }
 
 
-    public AssumesFormulaInstSeq(Sequent seq, int formulaNr) {
+    public AssumesFormulaInstSeq(org.key_project.prover.sequent.Sequent seq, int formulaNr) {
         this(seq, seq.numberInAntec(formulaNr), seq.getFormulabyNr(formulaNr));
     }
 
@@ -52,7 +53,8 @@ public class AssumesFormulaInstSeq implements AssumesFormulaInstantiation {
     /**
      * Create a list with all formulas of a given semisequent
      */
-    private static ImmutableArray<AssumesFormulaInstantiation> createListHelp(Sequent p_s,
+    private static ImmutableArray<AssumesFormulaInstantiation> createListHelp(
+            org.key_project.prover.sequent.Sequent p_s,
             boolean antec) {
         Semisequent semi;
         if (antec) {

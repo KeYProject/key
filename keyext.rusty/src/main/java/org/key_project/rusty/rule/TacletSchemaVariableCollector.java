@@ -9,10 +9,9 @@ import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.sequent.Semisequent;
 import org.key_project.rusty.ast.visitor.ProgramSVCollector;
 import org.key_project.rusty.logic.RustyBlock;
-import org.key_project.rusty.logic.Semisequent;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
@@ -154,7 +153,7 @@ public class TacletSchemaVariableCollector implements Visitor<@NonNull Term> {
      *
      * @param seq the Sequent to visit
      */
-    public void visit(Sequent seq) {
+    public void visit(org.key_project.prover.sequent.Sequent seq) {
         visit(seq.antecedent());
         visit(seq.succedent());
     }
@@ -167,7 +166,7 @@ public class TacletSchemaVariableCollector implements Visitor<@NonNull Term> {
      *        false) or if the visitor descends into them (iff true)
      */
     public void visit(Taclet taclet, boolean visitAddrules) {
-        visit((Sequent) taclet.assumesSequent());
+        visit(taclet.assumesSequent());
         visitFindPart(taclet);
         visitGoalTemplates(taclet, visitAddrules);
     }
@@ -182,7 +181,7 @@ public class TacletSchemaVariableCollector implements Visitor<@NonNull Term> {
 
     protected void visitGoalTemplates(Taclet taclet, boolean visitAddrules) {
         for (var tacletGoalTemplate : taclet.goalTemplates()) {
-            visit((Sequent) tacletGoalTemplate.sequent());
+            visit(tacletGoalTemplate.sequent());
             if (tacletGoalTemplate instanceof RewriteTacletGoalTemplate rt) {
                 rt.replaceWith().execPostOrder(this);
             } else {

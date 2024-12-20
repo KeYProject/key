@@ -9,8 +9,9 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.*;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
-import org.key_project.rusty.logic.Sequent;
+import org.key_project.rusty.logic.RustySequentKit;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.VariableSV;
@@ -28,7 +29,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected Taclet taclet;
 
     protected Name name = NONAME;
-    protected Sequent ifseq = Sequent.EMPTY_SEQUENT;
+    protected Sequent ifseq = RustySequentKit.getEmptySequent();
     protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.nil();
     protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
     protected ImmutableList<NewDependingOn> varsNewDependingOn =
@@ -58,7 +59,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         return false;
     }
 
-    private static boolean containsFreeVarSV(Sequent sequent) {
+    private static boolean containsFreeVarSV(org.key_project.prover.sequent.Sequent sequent) {
         for (final var cf : sequent) {
             if (containsFreeVarSV(cf.formula())) {
                 return true;
@@ -67,7 +68,8 @@ public abstract class TacletBuilder<T extends Taclet> {
         return false;
     }
 
-    static void checkContainsFreeVarSV(Sequent seq, Name tacletName, String str) {
+    static void checkContainsFreeVarSV(org.key_project.prover.sequent.Sequent seq, Name tacletName,
+            String str) {
         if (containsFreeVarSV(seq)) {
             throw new TacletBuilderException(tacletName,
                 "Free Variable in " + str + " in Taclet / sequent: " + seq);
@@ -112,7 +114,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     /**
      * sets the ifseq of the Taclet to be built
      */
-    public void setIfSequent(Sequent seq) {
+    public void setIfSequent(org.key_project.prover.sequent.Sequent seq) {
         checkContainsFreeVarSV(seq, getName(), "sequent");
         this.ifseq = seq;
     }
@@ -198,7 +200,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      */
     public abstract void addTacletGoalTemplate(TacletGoalTemplate goal);
 
-    public Sequent ifSequent() {
+    public org.key_project.prover.sequent.Sequent ifSequent() {
         return ifseq;
     }
 

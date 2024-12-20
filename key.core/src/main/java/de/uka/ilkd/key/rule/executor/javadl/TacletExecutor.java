@@ -29,9 +29,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.prover.proof.ProofGoal;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -204,10 +202,14 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             PosInOccurrence pos,
             MatchConditions matchCond,
             TacletLabelHint labelHint, Goal goal, RuleApp ruleApp, Services services) {
-        final ImmutableList<org.key_project.prover.sequent.SequentFormula> replacements =
-            instantiateSemisequent(semi,
-                termLabelState, labelHint, pos, matchCond, goal, ruleApp);
-        currentSequent.combine(currentSequent.sequent().changeFormula(replacements, pos));
+        if (!semi.isEmpty()) {
+            final ImmutableList<org.key_project.prover.sequent.SequentFormula> replacements =
+                instantiateSemisequent(semi, termLabelState, labelHint, pos, matchCond, goal,
+                    ruleApp);
+            currentSequent.combine(currentSequent.sequent().changeFormula(replacements, pos));
+        } else {
+            currentSequent.combine(currentSequent.sequent().removeFormula(pos));
+        }
     }
 
     /**
@@ -393,7 +395,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                 pvr.replace(goal.ruleAppIndex().tacletIndex());
 
                 // sequent
-                currentSequent.combine(pvr.replace((Sequent) currentSequent.sequent()));
+                currentSequent.combine(pvr.replace(currentSequent.sequent()));
 
                 final RenamingTable rt = RenamingTable.getRenamingTable(vn.getRenamingMap());
 
@@ -452,9 +454,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                     if (res == null) {
                         res = ImmutableSLList.nil();
                         for (int j = 0; j < p_numberOfNewGoals + 1; j++) {
-                            res = res.prepend(SequentChangeInfo.createSequentChangeInfo(
-                                null, null,
-                                p_goal.sequent(), p_goal.sequent()));
+                            res = res.prepend(
+                                SequentChangeInfo.createSequentChangeInfo(p_goal.sequent()));
                         }
                         ifObl = ifPart;
                     } else {
@@ -481,9 +482,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         if (res == null) {
             res = ImmutableSLList.nil();
             for (int j = 0; j < p_numberOfNewGoals; j++) {
-                res = res.prepend(
-                    SequentChangeInfo.createSequentChangeInfo(null,
-                        null, p_goal.sequent(), p_goal.sequent()));
+                res = res.prepend(SequentChangeInfo.createSequentChangeInfo(p_goal.sequent()));
             }
         } else {
             // find the sequent the if obligation has to be added to

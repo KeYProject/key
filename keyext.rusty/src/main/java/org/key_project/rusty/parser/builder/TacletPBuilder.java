@@ -13,6 +13,8 @@ import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.prover.rules.Trigger;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ast.abstraction.PrimitiveType;
@@ -128,7 +130,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Taclet visitTaclet(KeYRustyParser.TacletContext ctx) {
-        Sequent ifSeq = Sequent.EMPTY_SEQUENT;
+        Sequent ifSeq = RustySequentKit.getEmptySequent();
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
         if (ctx.LEMMA() != null) {
             tacletAnnotations = tacletAnnotations.add(TacletAnnotation.LEMMA);
@@ -148,9 +150,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             TacletBuilder<?> b = createTacletBuilderFor(null,
                 new ApplicationRestriction(ApplicationRestriction.NONE), ctx);
             currentTBuilder.push(b);
-            SequentFormula sform = new SequentFormula(form);
-            Semisequent semi = new Semisequent(sform);
-            Sequent addSeq = Sequent.createAnteSequent(semi);
+            Sequent addSeq = RustySequentKit
+                    .createAnteSequent(ImmutableSLList.singleton(new SequentFormula(form)));
             ImmutableList<Taclet> noTaclets = ImmutableSLList.nil();
             DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.nil();
             addGoalTemplate(null, null, addSeq, noTaclets, noSV, ctx);
@@ -405,7 +406,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         // var soc = this.goalChoice;
         String name = accept(ctx.string_value());
 
-        Sequent addSeq = Sequent.EMPTY_SEQUENT;
+        Sequent addSeq = RustySequentKit.getEmptySequent();
         ImmutableSLList<Taclet> addRList = ImmutableSLList.nil();
         DefaultImmutableSet<SchemaVariable> addpv = DefaultImmutableSet.nil();
 

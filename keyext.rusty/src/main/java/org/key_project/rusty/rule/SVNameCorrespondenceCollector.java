@@ -5,8 +5,7 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
-import org.key_project.rusty.logic.Semisequent;
-import org.key_project.rusty.logic.Sequent;
+import org.key_project.prover.sequent.Semisequent;
 import org.key_project.rusty.logic.op.SubstOp;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
@@ -75,7 +74,7 @@ public class SVNameCorrespondenceCollector implements Visitor<@NonNull Term> {
      *
      * @param seq the Sequent to visit
      */
-    public void visit(Sequent seq) {
+    public void visit(org.key_project.prover.sequent.Sequent seq) {
         visit(seq.antecedent());
         visit(seq.succedent());
     }
@@ -89,7 +88,7 @@ public class SVNameCorrespondenceCollector implements Visitor<@NonNull Term> {
      */
     public void visit(Taclet taclet, boolean visitAddrules) {
         SchemaVariable findSV = null;
-        visit((Sequent) taclet.assumesSequent());
+        visit(taclet.assumesSequent());
         if (taclet instanceof FindTaclet) {
             final Term findTerm = ((FindTaclet) taclet).find();
             findTerm.execPostOrder(this);

@@ -5,7 +5,6 @@ package org.key_project.rusty.rule.tacletbuilder;
 
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.logic.BoundVarsVisitor;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.Taclet;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -30,7 +29,8 @@ public class TacletGoalTemplate
      *        time unused (new) program variables that are introduced by an application of this
      *        template
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
+    public TacletGoalTemplate(org.key_project.prover.sequent.Sequent addedSeq,
+            ImmutableList<Taclet> addedRules,
             ImmutableSet<SchemaVariable> addedProgVars) {
         super(addedSeq, addedRules, addedProgVars);
     }
@@ -44,7 +44,8 @@ public class TacletGoalTemplate
      * @param addedSeq new Sequent to be added
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
+    public TacletGoalTemplate(org.key_project.prover.sequent.Sequent addedSeq,
+            ImmutableList<Taclet> addedRules) {
         this(addedSeq, addedRules, DefaultImmutableSet.nil());
     }
 
@@ -53,8 +54,8 @@ public class TacletGoalTemplate
      *
      * @return Sequent to be added as Goal or Sequent.EMPTY_SEQUENT if no such Sequent exists
      */
-    public Sequent sequent() {
-        return (Sequent) super.sequent();
+    public org.key_project.prover.sequent.Sequent sequent() {
+        return super.sequent();
     }
 
     /**

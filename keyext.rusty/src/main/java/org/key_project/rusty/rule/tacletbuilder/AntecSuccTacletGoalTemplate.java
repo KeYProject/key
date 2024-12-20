@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.tacletbuilder;
 
-import org.key_project.rusty.logic.Sequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.rusty.logic.RustySequentKit;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.Taclet;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -12,7 +13,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
     /** sequent that replaces another one */
-    private Sequent replaceWith = Sequent.EMPTY_SEQUENT;
+    private Sequent replaceWith = RustySequentKit.getEmptySequent();
 
     /**
      * creates new GoalDescription

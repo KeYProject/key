@@ -10,10 +10,10 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.Semisequent;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
+import org.key_project.rusty.logic.RustySequentKit;
 import org.key_project.rusty.logic.op.Quantifier;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
@@ -54,14 +54,14 @@ public class TestApplyTaclet {
     };
     Proof[] proof;
 
-
-    private static Semisequent parseTermForSemisequent(String t) {
+    private static ImmutableList<SequentFormula> parseTermForSemisequent(String t) {
         if ("".equals(t)) {
-            return Semisequent.EMPTY_SEMISEQUENT;
+            return ImmutableSLList.nil();
         }
         SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
-        return (Semisequent) Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
+        return ImmutableSLList.singleton(cf0);
     }
+
 
     private Goal createGoal(Node n, TacletIndex tacletIndex) {
         // final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
@@ -78,9 +78,9 @@ public class TestApplyTaclet {
         proof = new Proof[strings.length / 2];
 
         for (int i = 0; i < proof.length; i++) {
-            Semisequent antec = parseTermForSemisequent(strings[2 * i]);
-            Semisequent succ = parseTermForSemisequent(strings[2 * i + 1]);
-            Sequent s = Sequent.createSequent(antec, succ);
+            var antec = parseTermForSemisequent(strings[2 * i]);
+            var succ = parseTermForSemisequent(strings[2 * i + 1]);
+            final Sequent s = RustySequentKit.createSequent(antec, succ);
             proof[i] = new Proof("TestApplyTaclet", TacletForTests.initConfig());
             proof[i].setRoot(new Node(proof[i], s));
         }
@@ -172,8 +172,7 @@ public class TestApplyTaclet {
         ImmutableList<Goal> goals = goal.apply(rApp);
         assertEquals(1, goals.size(), "Too many or zero goals for all-right.");
         Sequent seq = goals.head().sequent();
-        assertEquals(Semisequent.EMPTY_SEMISEQUENT, seq.antecedent(),
-            "Wrong antecedent after all-right");
+        assertTrue(seq.antecedent().isEmpty(), "Wrong antecedent after all-right");
         assertEquals(TacletForTests.getFunctions().lookup(new Name("p")),
             seq.succedent().getFirst().formula().op(),
             "Wrong succedent after all-right (op mismatch)");
@@ -539,7 +538,7 @@ public class TestApplyTaclet {
         assertEquals(0, appList.size(), "Did not expect a match.");
 
         Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
-        SequentFormula ifformula = new SequentFormula(ifterm);
+        org.key_project.prover.sequent.SequentFormula ifformula = new SequentFormula(ifterm);
         ImmutableList<AssumesFormulaInstantiation> ifInsts = ImmutableSLList
                 .<AssumesFormulaInstantiation>nil()
                 .prepend(new AssumesFormulaInstDirect(ifformula));

@@ -9,7 +9,7 @@ import java.util.LinkedHashSet;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.rusty.logic.Sequent;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -27,11 +27,11 @@ public class BoundUniquenessChecker {
         new LinkedHashSet<>();
     private ImmutableList<Term> terms = ImmutableSLList.nil();
 
-    public BoundUniquenessChecker(Sequent seq) {
+    public BoundUniquenessChecker(org.key_project.prover.sequent.Sequent seq) {
         addAll(seq);
     }
 
-    public BoundUniquenessChecker(Term t, Sequent seq) {
+    public BoundUniquenessChecker(Term t, org.key_project.prover.sequent.Sequent seq) {
         addTerm(t);
         addAll(seq);
     }

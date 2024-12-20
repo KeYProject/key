@@ -40,8 +40,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 import org.key_project.util.collection.Pair;
 
@@ -238,10 +237,10 @@ public class MergeRuleUtils {
      */
     public static HashSet<LocationVariable> getLocationVariablesHashSet(Sequent sequent,
             Services services) {
-        HashSet<LocationVariable> result = new HashSet<>();
+        final HashSet<LocationVariable> result = new HashSet<>();
 
-        for (SequentFormula f : sequent) {
-            result.addAll(getLocationVariablesHashSet(f.formula(), services));
+        for (final SequentFormula sf : sequent) {
+            result.addAll(getLocationVariablesHashSet(sf.formula(), services));
         }
 
         return result;
@@ -282,10 +281,10 @@ public class MergeRuleUtils {
     public static HashSet<Function> getSkolemConstants(Term term) {
         HashSet<Function> result = new HashSet<>();
 
-        if (term.op() instanceof JFunction && ((Function) term.op()).isSkolemConstant()) {
-            result.add((Function) term.op());
+        if (term.op() instanceof Function func && func.isSkolemConstant()) {
+            result.add(func);
         } else {
-            for (Term sub : term.subs()) {
+            for (final Term sub : term.subs()) {
                 result.addAll(getSkolemConstants(sub));
             }
         }
@@ -314,16 +313,15 @@ public class MergeRuleUtils {
      *         not be determined.
      */
     public static Term getUpdateRightSideFor(Term update, LocationVariable leftSide) {
-        if (update.op() instanceof ElementaryUpdate
-                && ((ElementaryUpdate) update.op()).lhs().equals(leftSide)) {
+        if (update.op() instanceof ElementaryUpdate elementaryUpdate
+                && elementaryUpdate.lhs().equals(leftSide)) {
 
             return update.sub(0);
 
-        } else if (update.op() instanceof UpdateJunctor
-                && update.op().equals(UpdateJunctor.PARALLEL_UPDATE)) {
+        } else if (update.op().equals(UpdateJunctor.PARALLEL_UPDATE)) {
 
-            for (Term sub : update.subs()) {
-                Term rightSide = getUpdateRightSideFor(sub, leftSide);
+            for (final Term sub : update.subs()) {
+                final Term rightSide = getUpdateRightSideFor(sub, leftSide);
                 if (rightSide != null) {
                     return rightSide;
                 }
@@ -1484,10 +1482,10 @@ public class MergeRuleUtils {
      */
     private static ApplyStrategyInfo tryToProve(Term toProve, Services services, boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
-        return tryToProve(Sequent.createSequent(
-            // Sequent to prove
-            Semisequent.EMPTY_SEMISEQUENT, new Semisequent(new SequentFormula(toProve))), services,
-            doSplit, sideProofName, timeout);
+        return tryToProve(// Sequent to prove
+            JavaDLSequentKit.createSequent(ImmutableSLList.<SequentFormula>nil(),
+                ImmutableSLList.singleton(new SequentFormula(toProve))),
+            services, doSplit, sideProofName, timeout);
     }
 
     /**

@@ -14,10 +14,9 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.pp.LogicPrinter;
 import org.key_project.rusty.pp.NotationInfo;
 import org.key_project.rusty.pp.PrettyPrinter;
@@ -136,7 +135,7 @@ public class OutputStreamProofSaver {
              * ps.print(((InfFlowProof) proof).printIFSymbols());
              * }
              */
-            final Sequent problemSeq = proof.root().sequent();
+            final org.key_project.prover.sequent.Sequent problemSeq = proof.root().sequent();
             ps.println("\\problem {");
             if (problemSeq.antecedent().isEmpty() && problemSeq.succedent().size() == 1) {
                 // Problem statement is a single formula ...
@@ -226,7 +225,7 @@ public class OutputStreamProofSaver {
         StringBuilder s = new StringBuilder();
         for (final AssumesFormulaInstantiation aL : l) {
             if (aL instanceof AssumesFormulaInstSeq ifis) {
-                final SequentFormula f = (SequentFormula) aL.getSequentFormula();
+                final org.key_project.prover.sequent.SequentFormula f = aL.getSequentFormula();
                 s.append(" (ifseqformula \"")
                         .append(node.sequent()
                                 .formulaNumberInSequent(ifis.inAntec(), f))
@@ -320,7 +319,8 @@ public class OutputStreamProofSaver {
         }
     }
 
-    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
+    public static String posInOccurrence2Proof(org.key_project.prover.sequent.Sequent seq,
+            PosInOccurrence pos) {
         if (pos == null) {
             return "";
         }
@@ -385,7 +385,7 @@ public class OutputStreamProofSaver {
         } else if (val instanceof Term) {
             return printTerm((Term) val, services, shortAttrNotation);
         } else if (val instanceof Sequent) {
-            return printSequent((Sequent) val, services);
+            return printSequent((org.key_project.prover.sequent.Sequent) val, services);
         } else if (val instanceof Name) {
             return val.toString();
         } else if (val instanceof TermInstantiation) {
@@ -399,7 +399,8 @@ public class OutputStreamProofSaver {
         }
     }
 
-    private static String printSequent(Sequent val, Services services) {
+    private static String printSequent(org.key_project.prover.sequent.Sequent val,
+            Services services) {
         final LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
         return printer.result();

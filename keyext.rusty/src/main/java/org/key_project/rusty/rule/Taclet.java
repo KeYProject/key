@@ -9,7 +9,6 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.rusty.logic.BoundVarsVisitor;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.rule.match.VMTacletMatcher;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -93,7 +92,7 @@ public abstract class Taclet extends
             }
 
             final BoundVarsVisitor bvv = new BoundVarsVisitor();
-            bvv.visit((Sequent) assumesSequent());
+            bvv.visit(assumesSequent());
             result = result.union(bvv.getBoundVariables()).union(getBoundVariablesHelper());
 
             boundVariables = result;
@@ -118,7 +117,7 @@ public abstract class Taclet extends
         // should be synchronized
         if (assumesVariables == null) {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
-            svc.visit((Sequent) assumesSequent());
+            svc.visit(assumesSequent());
 
             assumesVariables = DefaultImmutableSet.nil();
             for (final SchemaVariable sv : svc.vars()) {

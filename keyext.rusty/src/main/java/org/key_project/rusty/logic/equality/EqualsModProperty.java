@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic.equality;
 
+import org.key_project.logic.Property;
+
 public interface EqualsModProperty<T> {
     <V> boolean equalsModProperty(Object o, Property<T> property, V... v);
 

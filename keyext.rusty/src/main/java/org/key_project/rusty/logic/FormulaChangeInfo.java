@@ -5,10 +5,10 @@ package org.key_project.rusty.logic;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
-public record FormulaChangeInfo(PosInOccurrence positionOfModification, SequentFormula newFormula) {
+public record FormulaChangeInfo(PosInOccurrence positionOfModification, org.key_project.prover.sequent.SequentFormula newFormula) {
 
-    public SequentFormula getOriginalFormula() {
-        return (SequentFormula) positionOfModification().sequentFormula();
+    public org.key_project.prover.sequent.SequentFormula getOriginalFormula() {
+        return positionOfModification().sequentFormula();
     }
 
     /**

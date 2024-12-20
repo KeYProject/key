@@ -10,6 +10,7 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
@@ -26,6 +27,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -248,9 +250,11 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
         // create sequents
         Sequent assumesSeq =
-            Sequent.createAnteSequent(new Semisequent(new SequentFormula(schemaAssumes)));
+            JavaDLSequentKit.createAnteSequent(
+                ImmutableSLList.singleton(new SequentFormula(schemaAssumes)));
         Sequent replaceWithSeq =
-            Sequent.createAnteSequent(new Semisequent(new SequentFormula(replaceWithTerm)));
+            JavaDLSequentKit.createAnteSequent(
+                ImmutableSLList.singleton(new SequentFormula(replaceWithTerm)));
 
         // create taclet
         InfFlowContractAppRewriteTacletBuilder tacletBuilder =

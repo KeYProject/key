@@ -8,7 +8,6 @@ import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.Taclet;
@@ -91,7 +90,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
         getNode().setAppliedRuleApp(app);
     }
 
-    public Sequent sequent() {
+    public org.key_project.prover.sequent.Sequent sequent() {
         return getNode().sequent();
     }
 
@@ -214,7 +213,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
             assert sci.sequent().equals(sci.getOriginalSequent());
             return;
         }
-        getNode().setSequent((Sequent) sci.sequent());
+        getNode().setSequent(sci.sequent());
         // getNode().getNodeInfo().setSequentChangeInfo(sci);
     }
 

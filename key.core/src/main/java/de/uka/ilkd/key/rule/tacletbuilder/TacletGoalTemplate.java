@@ -4,11 +4,12 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -22,7 +23,7 @@ import org.key_project.util.collection.ImmutableSet;
 public class TacletGoalTemplate {
 
     /** stores sequent that is one of the new goals */
-    private Sequent addedSeq = Sequent.EMPTY_SEQUENT;
+    private Sequent addedSeq = JavaDLSequentKit.getEmptySequent();
 
     /** stores list of Taclet which are introduced */
     private ImmutableList<Taclet> addedRules = ImmutableSLList.nil();

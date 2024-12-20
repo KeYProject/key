@@ -6,6 +6,7 @@ package org.key_project.rusty.logic;
 import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 

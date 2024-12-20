@@ -7,6 +7,7 @@ import java.io.File;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
@@ -17,6 +18,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -236,8 +238,8 @@ public class TestTacletIndex {
 
         Term term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
         SequentFormula cfma_p5 = new SequentFormula(term_p5);
-        Sequent seq_p5 = Sequent.createAnteSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p5).semisequent());
+        Sequent seq_p5 = JavaDLSequentKit.createAnteSequent(
+            ImmutableSLList.singleton(cfma_p5));
         PosInOccurrence pio_p5 =
             new PosInOccurrence(cfma_p5, PosInTerm.getTopLevel(), true);
         RuleAppIndex appIdx = createGoalFor(seq_p5, ruleIdx);
@@ -249,8 +251,8 @@ public class TestTacletIndex {
         Term term_p6 = TacletForTests.parseTerm("\\forall nat z; p(zero, z)");
 
         SequentFormula cfma_p6 = new SequentFormula(term_p6);
-        Sequent seq_p6 = Sequent.createAnteSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p6).semisequent());
+        Sequent seq_p6 = JavaDLSequentKit.createAnteSequent(
+            ImmutableSLList.singleton(cfma_p6));
         PosInOccurrence pio_p6 =
             new PosInOccurrence(cfma_p6, PosInTerm.getTopLevel(), true);
         appIdx = createGoalFor(seq_p6, ruleIdx);

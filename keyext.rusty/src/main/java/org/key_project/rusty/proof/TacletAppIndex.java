@@ -4,8 +4,8 @@
 package org.key_project.rusty.proof;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.rule.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -26,14 +26,15 @@ public class TacletAppIndex {
      * <code>seq != null</code> implies that the indices <code>antecIndex</code>,
      * <code>succIndex</code> are up-to-date for the sequent <code>seq</code>
      */
-    private Sequent seq;
+    private org.key_project.prover.sequent.Sequent seq;
 
     public TacletAppIndex(TacletIndex tacletIndex, Goal goal, Services services) {
         this(tacletIndex, null, null, goal, null);
     }
 
     private TacletAppIndex(TacletIndex tacletIndex, SemisequentTacletAppIndex antecIndex,
-            SemisequentTacletAppIndex succIndex, @NonNull Goal goal, Sequent seq) {
+            SemisequentTacletAppIndex succIndex, @NonNull Goal goal,
+            org.key_project.prover.sequent.Sequent seq) {
         this.tacletIndex = tacletIndex;
         this.antecIndex = antecIndex;
         this.succIndex = succIndex;

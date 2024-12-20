@@ -10,10 +10,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.PosInTerm;
-import org.key_project.prover.sequent.FormulaChangeInfo;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -105,26 +102,22 @@ public class FormulaTagManager {
     private void updateTags(SequentChangeInfo sci,
             boolean p_antec, Goal p_goal) {
         for (var formulaChangeInfo : sci.modifiedFormulas(p_antec)) {
-            updateTag(formulaChangeInfo, (Sequent) sci.sequent(), p_goal);
+            updateTag(formulaChangeInfo, p_goal);
         }
     }
 
     private void addTags(SequentChangeInfo sci,
             boolean p_antec, Goal p_goal) {
-        for (SequentFormula constrainedFormula : sci
-                .addedFormulas(p_antec)) {
-            final PosInOccurrence pio =
-                new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
+        for (SequentFormula sf : sci.addedFormulas(p_antec)) {
+            final PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
     }
 
     private void removeTags(SequentChangeInfo sci,
             boolean p_antec, Goal p_goal) {
-        for (SequentFormula constrainedFormula : sci
-                .removedFormulas(p_antec)) {
-            final PosInOccurrence pio =
-                new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
+        for (SequentFormula sf : sci.removedFormulas(p_antec)) {
+            final PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), p_antec);
             removeTag(pio);
         }
     }
@@ -191,14 +184,12 @@ public class FormulaTagManager {
         pioToTag.remove(p_pio);
     }
 
-    private void updateTag(FormulaChangeInfo p_info,
-            Sequent p_newSeq,
-            Goal p_goal) {
+    private void updateTag(FormulaChangeInfo p_info, Goal p_goal) {
         final PosInOccurrence oldPIO =
             p_info.positionOfModification().topLevel();
         final FormulaTag tag = getTagForPos(oldPIO);
         final FormulaInfo oldInfo = getFormulaInfo(tag);
-        final FormulaInfo newInfo = oldInfo.addModification(p_info, p_newSeq, p_goal.getTime());
+        final FormulaInfo newInfo = oldInfo.addModification(p_info, p_goal.getTime());
 
         tagToFormulaInfo.put(tag, newInfo);
         putInQueryCache(tag, newInfo);
@@ -271,12 +262,13 @@ public class FormulaTagManager {
 
         public FormulaInfo addModification(
                 FormulaChangeInfo p_info,
-                Sequent p_newSeq, long p_age) {
+                long p_age) {
             final PosInOccurrence newPIO =
-                new PosInOccurrence(p_info.newFormula(),
-                    PosInTerm.getTopLevel(), pio.isInAntec());
+                new PosInOccurrence(p_info.newFormula(), PosInTerm.getTopLevel(), pio.isInAntec());
 
-            return new FormulaInfo(newPIO, modifications.prepend(p_info), p_age);
+            return new FormulaInfo(newPIO,
+                    modifications.prepend(p_info),
+                    p_age);
         }
     }
 

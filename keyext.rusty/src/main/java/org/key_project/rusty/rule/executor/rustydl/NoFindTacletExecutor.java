@@ -5,9 +5,9 @@ package org.key_project.rusty.rule.executor.rustydl;
 
 import java.util.Iterator;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;

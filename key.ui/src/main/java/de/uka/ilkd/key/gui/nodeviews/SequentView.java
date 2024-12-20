@@ -31,6 +31,8 @@ import de.uka.ilkd.key.util.DoNothingCaret;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -816,15 +818,15 @@ public abstract class SequentView extends JEditorPane {
         while (it.hasNext()) {
             node = it.next();
             if (node.getNodeInfo().getSequentChangeInfo() != null) {
-                ImmutableList<org.key_project.prover.sequent.SequentFormula> added_ante =
+                ImmutableList<SequentFormula> added_ante =
                     node.getNodeInfo().getSequentChangeInfo().addedFormulas(true);
-                ImmutableList<org.key_project.prover.sequent.SequentFormula> added_succ =
+                ImmutableList<SequentFormula> added_succ =
                     node.getNodeInfo().getSequentChangeInfo().addedFormulas(false);
-                for (SequentFormula sf : added_ante) {
+                for (final SequentFormula sf : added_ante) {
                     pio_age_list.add(
                         new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), age));
                 }
-                for (SequentFormula sf : added_succ) {
+                for (final SequentFormula sf : added_succ) {
                     pio_age_list.add(
                         new PIO_age(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), age));
                 }

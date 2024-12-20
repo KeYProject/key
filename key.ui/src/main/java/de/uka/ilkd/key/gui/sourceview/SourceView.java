@@ -234,7 +234,7 @@ public final class SourceView extends JComponent {
             proof.register(sources, ProofJavaSourceCollection.class);
             proof.root().sequent().forEach(formula -> {
                 OriginTermLabel originLabel =
-                    (OriginTermLabel) formula.formula().getLabel(OriginTermLabel.NAME);
+                    (OriginTermLabel) ((Term) formula.formula()).getLabel(OriginTermLabel.NAME);
                 if (originLabel != null) {
                     if (originLabel.getOrigin() instanceof OriginTermLabel.FileOrigin) {
                         ((OriginTermLabel.FileOrigin) originLabel.getOrigin())

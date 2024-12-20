@@ -27,6 +27,8 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -311,7 +313,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         Sequent sequent = getRoot().sequent();
         assert sequent.antecedent().isEmpty();
         assert sequent.succedent().size() == 1;
-        Term sf = sequent.succedent().get(0).formula();
+        Term sf = (Term) sequent.succedent().get(0).formula();
         assert sf.op() == Junctor.IMP;
         Term modality = sf.sub(1);
         return TermBuilder.goBelowUpdates2(modality).first;
@@ -684,7 +686,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         Set<Term> result = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
             if (SymbolicExecutionUtil.checkSkolemEquality(sf) == 0) {
-                result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
+                result.addAll(collectSymbolicObjectsFromTerm((Term) sf.formula(), objectsToIgnore));
             }
         }
         return result;

@@ -9,11 +9,10 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofObject;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
-import org.key_project.rusty.logic.Semisequent;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
+import org.key_project.rusty.logic.RustySequentKit;
 import org.key_project.rusty.proof.init.InitConfig;
 import org.key_project.rusty.settings.ProofSettings;
 import org.key_project.util.collection.ImmutableList;
@@ -84,7 +83,8 @@ public class Proof implements ProofObject<Goal>, Named {
         this(new Name(name), initConfig);
     }
 
-    private Proof(String name, Sequent problem, TacletIndex tacletIndex,
+    private Proof(String name, org.key_project.prover.sequent.Sequent problem,
+            TacletIndex tacletIndex,
             InitConfig initConfig) {
         this(new Name(name), initConfig);
 
@@ -97,13 +97,13 @@ public class Proof implements ProofObject<Goal>, Named {
 
     public Proof(String name, Term problem, InitConfig initConfig) {
         this(name,
-            Sequent.createSuccSequent(
-                new Semisequent(new SequentFormula(problem))),
+            RustySequentKit
+                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(problem))),
             initConfig.createTacletIndex(),
             initConfig);
     }
 
-    public Proof(Name name, Sequent problem, InitConfig initConfig) {
+    public Proof(Name name, org.key_project.prover.sequent.Sequent problem, InitConfig initConfig) {
         this(name, initConfig);
         final var rootNode = new Node(this, problem);
         final var firstGoal =

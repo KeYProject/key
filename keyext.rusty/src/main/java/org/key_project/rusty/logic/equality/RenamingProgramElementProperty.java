@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Property;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.rusty.ast.RustyProgramElement;

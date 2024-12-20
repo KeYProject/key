@@ -56,7 +56,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      */
     @Override
     public ImmutableList<Name> getSupportedRuleNames() {
-        return ImmutableSLList.<Name>nil().prepend(UseOperationContractRule.INSTANCE.name())
+        return ImmutableSLList.singleton(UseOperationContractRule.INSTANCE.name())
                 .prepend(WhileInvariantRule.INSTANCE.name())
                 .prepend(BlockContractInternalRule.INSTANCE.name())
                 .prepend(BlockContractExternalRule.INSTANCE.name())

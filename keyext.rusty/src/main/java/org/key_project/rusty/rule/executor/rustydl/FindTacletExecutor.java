@@ -11,7 +11,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
@@ -103,7 +102,8 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
      * @param services the {@link Services} encapsulating all Rust model information
      */
-    protected abstract void applyAdd(Sequent add, SequentChangeInfo currentSequent,
+    protected abstract void applyAdd(org.key_project.prover.sequent.Sequent add,
+            SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
             MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services);
 

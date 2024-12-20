@@ -5,7 +5,7 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
-import org.key_project.rusty.logic.SequentFormula;
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * Instantiation of an if-formula that has to be proven by an explicit if-goal
@@ -15,9 +15,9 @@ public class AssumesFormulaInstDirect implements AssumesFormulaInstantiation {
     /**
      * Simply the formula
      */
-    private final SequentFormula cf;
+    private final org.key_project.prover.sequent.SequentFormula cf;
 
-    public AssumesFormulaInstDirect(SequentFormula p_cf) {
+    public AssumesFormulaInstDirect(org.key_project.prover.sequent.SequentFormula p_cf) {
         cf = p_cf;
     }
 

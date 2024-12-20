@@ -9,7 +9,6 @@ import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 
 public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     private static final Map<String, ProofMacro> macroMap = loadMacroMap();

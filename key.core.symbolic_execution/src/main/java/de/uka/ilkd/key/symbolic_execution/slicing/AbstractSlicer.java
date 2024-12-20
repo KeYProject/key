@@ -33,6 +33,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -288,13 +290,13 @@ public abstract class AbstractSlicer {
     protected void analyzeSequent(Services services, Sequent sequent,
             Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         for (SequentFormula sf : sequent.antecedent()) {
-            Term term = sf.formula();
+            Term term = (Term) sf.formula();
             if (Equality.EQUALS == term.op()) {
                 analyzeEquality(services, term, aliases, thisReference);
             }
         }
         for (SequentFormula sf : sequent.succedent()) {
-            Term term = sf.formula();
+            Term term = (Term) sf.formula();
             if (Junctor.NOT == term.op()) {
                 Term negatedTerm = term.sub(0);
                 if (Equality.EQUALS == negatedTerm.op()) {

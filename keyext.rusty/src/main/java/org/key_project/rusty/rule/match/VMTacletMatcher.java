@@ -15,7 +15,6 @@ import org.key_project.prover.rules.AssumesMatchResult;
 import org.key_project.prover.rules.NotFreeIn;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.UpdateApplication;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.*;
@@ -45,7 +44,7 @@ public class VMTacletMatcher implements TacletMatcher {
     private final ImmutableList<NotFreeIn> varsNotFreeIn;
 
     /** the assumes sequent of the taclet */
-    private final Sequent assumesSequent;
+    private final org.key_project.prover.sequent.Sequent assumesSequent;
     /** the bound variables */
     private final ImmutableSet<QuantifiableVariable> boundVars;
 
@@ -62,7 +61,7 @@ public class VMTacletMatcher implements TacletMatcher {
 
     public VMTacletMatcher(Taclet taclet) {
         varconditions = (ImmutableList<VariableCondition>) taclet.getVariableConditions();
-        assumesSequent = (Sequent) taclet.assumesSequent();
+        assumesSequent = taclet.assumesSequent();
         boundVars = taclet.getBoundVariables();
         varsNotFreeIn = (ImmutableList<NotFreeIn>) taclet.varsNotFreeIn();
 

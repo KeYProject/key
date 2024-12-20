@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.pp;
 
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -17,7 +16,7 @@ public abstract class SequentPrintFilter {
     /**
      * the original sequent
      */
-    Sequent originalSequent;
+    org.key_project.prover.sequent.Sequent originalSequent;
 
     /**
      * the antecedent of the filtered formula
@@ -32,7 +31,7 @@ public abstract class SequentPrintFilter {
     /**
      * @return the original sequent
      */
-    public Sequent getOriginalSequent() {
+    public org.key_project.prover.sequent.Sequent getOriginalSequent() {
         return originalSequent;
     }
 
@@ -81,13 +80,13 @@ public abstract class SequentPrintFilter {
         antec = ImmutableSLList.nil();
         for (var sf : originalSequent.antecedent()) {
             antec = antec.append(
-                new IdentitySequentPrintFilter.IdentityFilterEntry((SequentFormula) sf));
+                new IdentitySequentPrintFilter.IdentityFilterEntry(sf));
         }
 
         succ = ImmutableSLList.nil();
         for (var sf : originalSequent.succedent()) {
             succ = succ.append(
-                new IdentitySequentPrintFilter.IdentityFilterEntry((SequentFormula) sf));
+                new IdentitySequentPrintFilter.IdentityFilterEntry(sf));
         }
     }
 }

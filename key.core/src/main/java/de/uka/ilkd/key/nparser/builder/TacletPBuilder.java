@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -28,6 +29,7 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 
@@ -134,7 +136,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Taclet visitTaclet(KeYParser.TacletContext ctx) {
-        Sequent ifSeq = Sequent.EMPTY_SEQUENT;
+        Sequent ifSeq = JavaDLSequentKit.getEmptySequent();
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
         if (ctx.LEMMA() != null) {
             tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
@@ -154,8 +156,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             TacletBuilder<?> b = createTacletBuilderFor(null, RewriteTaclet.NONE, ctx);
             currentTBuilder.push(b);
             SequentFormula sform = new SequentFormula(form);
-            Semisequent semi = new Semisequent(sform);
-            Sequent addSeq = Sequent.createAnteSequent(semi);
+            Sequent addSeq = JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(sform));
             ImmutableList<Taclet> noTaclets = ImmutableSLList.nil();
             DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.nil();
             addGoalTemplate(null, null, addSeq, noTaclets, noSV, null, ctx);
@@ -192,6 +193,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
         @Nullable
         Object find = accept(ctx.find);
+
         TacletBuilder<?> b = createTacletBuilderFor(find, applicationRestriction, ctx);
         currentTBuilder.push(b);
         b.setIfSequent(ifSeq);
@@ -324,8 +326,9 @@ public class TacletPBuilder extends ExpressionBuilder {
         var res = schemaVariables[argIndex];
 
         tacletBuilder.setFind(tb.func(function, tb.var(x)));
-        tacletBuilder.setIfSequent(Sequent.createAnteSequent(
-            new Semisequent(new SequentFormula(tb.equals(tb.var(x), tb.func(consFn, args))))));
+        tacletBuilder.setIfSequent(JavaDLSequentKit.createAnteSequent(
+            ImmutableSLList
+                    .singleton(new SequentFormula(tb.equals(tb.var(x), tb.func(consFn, args))))));
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(tb.var(res)));
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
 
@@ -352,7 +355,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         var use = tb.all(qvar, tb.var(phi));
         var useCase = new TacletGoalTemplate(
-            Sequent.createAnteSequent(new Semisequent(new SequentFormula(use))),
+            JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(new SequentFormula(use))),
             ImmutableSLList.nil());
         useCase.setName("Use case of " + ctx.name.getText());
         cases.add(useCase);
@@ -366,7 +369,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             VariableSV qvar, Term var, Sort sort) {
         var constr = createQuantifiedFormula(it, qvar, var, sort);
         var goal = new TacletGoalTemplate(
-            Sequent.createSuccSequent(new Semisequent(new SequentFormula(constr))),
+            JavaDLSequentKit
+                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(constr))),
             ImmutableSLList.nil());
         goal.setName(it.getText());
         return goal;
@@ -395,7 +399,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         var axiom = tb.equals(find, tb.and(cases));
 
         var goal = new TacletGoalTemplate(
-            Sequent.createAnteSequent(new Semisequent(new SequentFormula(axiom))),
+            JavaDLSequentKit
+                    .createAnteSequent(ImmutableSLList.singleton(new SequentFormula(axiom))),
             ImmutableSLList.nil());
         tacletBuilder.addTacletGoalTemplate(goal);
 
@@ -476,9 +481,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             for (int i = 0; i < args.length; i++) {
                 args[i] = variables.get(context.argName.get(i).getText());
             }
-            Semisequent antec =
-                new Semisequent(new SequentFormula(tb.equals(tb.var(phi), tb.func(func, args))));
-            Sequent addedSeq = Sequent.createAnteSequent(antec);
+            Sequent addedSeq = JavaDLSequentKit.createAnteSequent(ImmutableSLList
+                    .singleton(new SequentFormula(tb.equals(tb.var(phi), tb.func(func, args)))));
             TacletGoalTemplate goal = new TacletGoalTemplate(addedSeq, ImmutableSLList.nil());
             goal.setName("#var = " + context.name.getText());
             b.addTacletGoalTemplate(goal);
@@ -713,7 +717,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         var soc = this.goalChoice;
         String name = accept(ctx.string_value());
 
-        Sequent addSeq = Sequent.EMPTY_SEQUENT;
+        Sequent addSeq = JavaDLSequentKit.getEmptySequent();
         ImmutableSLList<Taclet> addRList = ImmutableSLList.nil();
         DefaultImmutableSet<SchemaVariable> addpv = DefaultImmutableSet.nil();
 
@@ -808,8 +812,8 @@ public class TacletPBuilder extends ExpressionBuilder {
                 // there is a replacewith without a find.
                 throwEx(new RecognitionException(""));
             } else if (b instanceof SuccTacletBuilder || b instanceof AntecTacletBuilder) {
-                if (rwObj instanceof Sequent) {
-                    gt = new AntecSuccTacletGoalTemplate(addSeq, addRList, (Sequent) rwObj, pvs);
+                if (rwObj instanceof Sequent rwSeq) {
+                    gt = new AntecSuccTacletGoalTemplate(addSeq, addRList, rwSeq, pvs);
                 } else {
                     semanticError(ctx, // new UnfittingReplacewithException
                         "Replacewith in a Antec-or SuccTaclet has to contain a sequent (not a term)");

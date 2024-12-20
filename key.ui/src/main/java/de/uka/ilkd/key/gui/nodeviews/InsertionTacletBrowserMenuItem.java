@@ -12,11 +12,12 @@ import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.prover.sequent.Sequent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

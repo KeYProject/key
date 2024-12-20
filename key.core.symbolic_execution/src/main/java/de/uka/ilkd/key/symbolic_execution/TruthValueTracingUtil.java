@@ -14,7 +14,6 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
@@ -43,6 +42,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.ArrayUtil;
@@ -76,7 +76,7 @@ public final class TruthValueTracingUtil {
      * @param term The {@link Term} to check.
      * @return {@code true} is predicate, {@code false} is something else.
      */
-    public static boolean isPredicate(Term term) {
+    public static boolean isPredicate(org.key_project.logic.Term term) {
         return term != null && isPredicate(term.op());
     }
 
@@ -86,7 +86,7 @@ public final class TruthValueTracingUtil {
      * @param operator The {@link Operator} to check.
      * @return {@code true} is predicate, {@code false} is something else.
      */
-    public static boolean isPredicate(Operator operator) {
+    public static boolean isPredicate(org.key_project.logic.op.Operator operator) {
         if (operator == Equality.EQV) {
             return false;
         } else if (operator instanceof Junctor) {
@@ -344,7 +344,7 @@ public final class TruthValueTracingUtil {
             if (tacletApp.ifInstsComplete() && tacletApp.ifFormulaInstantiations() != null) {
                 for (IfFormulaInstantiation ifInst : tacletApp.ifFormulaInstantiations()) {
                     assert ifInst instanceof IfFormulaInstSeq;
-                    Term term = ifInst.getSequentFormula().formula();
+                    Term term = (Term) ifInst.getSequentFormula().formula();
                     TermLabel label = term.getLabel(termLabelName);
                     if (label instanceof FormulaTermLabel) {
                         result.add(new LabelOccurrence((FormulaTermLabel) label,
@@ -561,7 +561,8 @@ public final class TruthValueTracingUtil {
                 if (parentRuleApp instanceof TacletApp ta) {
                     if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
                         for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
-                            checkForNewMinorIds(childNode, ifInst.getSequentFormula().formula(),
+                            checkForNewMinorIds(childNode,
+                                (Term) ifInst.getSequentFormula().formula(),
                                 termLabelName, parentPio, tb, results);
                         }
                     }
