@@ -265,6 +265,11 @@ public final class CheckerData implements Logger {
         }
     }
 
+    /**
+     * Represents one proof in the bundle with all its associated data, such as the contract that it
+     * belongs to or the path in the proof. Note that the data will not be available from the start,
+     * instead it is accumulated while the different checkers are running.
+     */
     public class ProofEntry {
         public LoadingState loadingState = LoadingState.UNKNOWN;
         public ReplayState replayState = ReplayState.UNKNOWN;
