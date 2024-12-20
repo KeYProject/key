@@ -620,7 +620,7 @@ public abstract class AbstractProofControl implements ProofControl {
             goal.setRuleAppManager(focusManager);
         }
 
-        startAutoMode(goal.proof(), ImmutableSLList.<Goal>nil().prepend(goal),
+        startAutoMode(goal.proof(), ImmutableSLList.singleton(goal),
             new FocussedAutoModeTaskListener(goal.proof()));
     }
 

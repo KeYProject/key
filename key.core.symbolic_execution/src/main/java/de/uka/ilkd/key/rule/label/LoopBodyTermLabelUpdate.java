@@ -31,7 +31,7 @@ public class LoopBodyTermLabelUpdate implements TermLabelUpdate {
      */
     @Override
     public ImmutableList<Name> getSupportedRuleNames() {
-        return ImmutableSLList.<Name>nil().append(WhileInvariantRule.INSTANCE.name());
+        return ImmutableSLList.singleton(WhileInvariantRule.INSTANCE.name());
     }
 
     /**

@@ -6,7 +6,7 @@ package org.key_project.prover.sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-public abstract class SemisequentChangeInfo {
+public class SemisequentChangeInfo {
     /** contains the added formulas to the semisequent */
     private ImmutableList<SequentFormula> added = ImmutableSLList.nil();
     /** contains the removed formulas from the semisequent */
@@ -40,7 +40,9 @@ public abstract class SemisequentChangeInfo {
         this.lastFormulaIndex = o.lastFormulaIndex;
     }
 
-    public abstract SemisequentChangeInfo copy();
+    public SemisequentChangeInfo copy() {
+        return new SemisequentChangeInfo(this);
+    }
 
     protected ImmutableList<SequentFormula> modifiedSemisequent() {
         return modifiedSemisequent;
@@ -219,7 +221,15 @@ public abstract class SemisequentChangeInfo {
     /**
      * returns the semisequent that is the result of the change operation
      */
-    public abstract Semisequent semisequent();
+    // public Semisequent semisequent() {
+    // final Semisequent semisequent;
+    // if (modifiedSemisequent().isEmpty()) {
+    // semisequent = SequentKit.emptySemisequent();
+    // } else {
+    // semisequent = new Semisequent(modifiedSemisequent());
+    // }
+    // return semisequent;
+    // }
 
     /**
      * toString

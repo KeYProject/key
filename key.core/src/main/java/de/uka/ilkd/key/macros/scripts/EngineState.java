@@ -11,8 +11,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
@@ -22,7 +20,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -59,6 +59,7 @@ public class EngineState {
     public EngineState(Proof proof) {
         this.proof = proof;
         valueInjector.addConverter(Term.class, (String s) -> toTerm(s, null));
+        valueInjector.addConverter(de.uka.ilkd.key.logic.Term.class, (String s) -> toTerm(s, null));
         valueInjector.addConverter(Sequent.class, this::toSequent);
         valueInjector.addConverter(Sort.class, this::toSort);
     }
@@ -190,7 +191,8 @@ public class EngineState {
     }
 
 
-    public Term toTerm(String string, Sort sort) throws ParserException, ScriptException {
+    public de.uka.ilkd.key.logic.Term toTerm(String string, Sort sort)
+            throws ParserException, ScriptException {
         final var io = getKeyIO();
         var term = io.parseExpression(string);
         if (sort == null || term.sort().equals(sort))

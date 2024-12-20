@@ -8,7 +8,6 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionUntilMergePointMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
@@ -41,8 +41,8 @@ public class MergeRuleTests {
         new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");
 
     /**
-     * Simple regression test case loading an existing closed proof (standard Gcd example) including
-     * two merges with ITE antecedent merges and trying to replay it.
+     * Simple regression test case loading an existing closed proof (standard Gcd example)
+     * including two merges with ITE antecedent merges and trying to replay it.
      *
      * @throws ProblemLoaderException If the proof could not be loaded.
      */

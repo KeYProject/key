@@ -10,7 +10,6 @@ import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -37,6 +36,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -234,17 +234,13 @@ public class MergeRule implements BuiltInRule {
 
         // Add new antecedent (path condition)
         for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
-            final SequentFormula newAntecedent =
-                new SequentFormula(antecedentFormula);
-            newGoal.addFormula(newAntecedent, true, false);
+            newGoal.addFormula(new SequentFormula(antecedentFormula), true, false);
         }
 
         // Add new succedent (symbolic state & program counter)
         final Term succedentFormula = tb.apply(mergedState.first, thisSEState.programCounter());
         final SequentFormula newSuccedent = new SequentFormula(succedentFormula);
-        newGoal.addFormula(newSuccedent,
-            new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
-
+        newGoal.addFormula(newSuccedent,false,true);
         // The following line has the only effect of emptying the
         // name recorder -- the name recorder for currentNode will
         // be filled after partner node closing. The purpose of this

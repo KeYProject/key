@@ -32,6 +32,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleExecutor;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -122,7 +123,7 @@ public class TestTermLabelManager {
         Term two = integerLDT.translateLiteral(new IntLiteral(2), services);
         one = TB.label(one, new ParameterlessTermLabel(new Name("APPLICATION")));
         two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
-        Sequent sequent = Sequent.EMPTY_SEQUENT;
+        Sequent sequent = JavaDLSequentKit.getEmptySequent();
         sequent =
             (Sequent) sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
         sequent = (Sequent) sequent.addFormula(pos.sequentFormula(), true, false)

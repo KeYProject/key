@@ -26,10 +26,10 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.Test;
 
@@ -84,10 +84,10 @@ public class TestVariableNamer {
 
 
     private Goal constructGoal(SequentFormula containedFormula) {
-        Semisequent empty = Semisequent.EMPTY_SEMISEQUENT;
-        Semisequent ante = empty.insert(0, containedFormula).semisequent();
+        final var empty = ImmutableSLList.<SequentFormula>nil();
+        final var ante = ImmutableSLList.singleton(containedFormula);
 
-        Sequent seq = Sequent.createSequent(ante, empty);
+        Sequent seq = JavaDLSequentKit.createSequent(ante, empty);
         Node node = new Node(proof, seq);
 
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();

@@ -31,7 +31,9 @@ public class SequentFormula {
         this.hashCode = term.hashCode() * 13;
     }
 
-    /** @return the stored Term */
+    /**
+     * @return the stored Term
+     */
     public Term formula() {
         return term;
     }

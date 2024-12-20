@@ -87,7 +87,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
         Node usageNode = getProofNode().child(2);
         assert "Usage".equals(usageNode.getNodeInfo().getBranchLabel())
                 : "Block Contract Rule has changed.";
-        Term usagePrecondition = usageNode.sequent().antecedent()
+        Term usagePrecondition = (Term) usageNode.sequent().antecedent()
                 .get(usageNode.sequent().antecedent().size() - 1).formula();
         // Find remembrance heaps and local variables
         while (applicationTerm.op() == UpdateApplication.UPDATE_APPLICATION) {

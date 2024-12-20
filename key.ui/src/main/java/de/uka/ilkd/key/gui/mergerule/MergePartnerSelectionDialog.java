@@ -27,7 +27,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -431,20 +431,18 @@ public class MergePartnerSelectionDialog extends JDialog {
     private static boolean checkProvability(Sequent seq, Term formulaToProve, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        Semisequent antecedent = seq.antecedent();
+        Sequent toProve = JavaDLSequentKit.createSequent(seq.antecedent().asList(),
+            ImmutableSLList.singleton(new SequentFormula(formulaToProve)));
 
         for (SequentFormula succedentFormula : seq.succedent()) {
-            if (!succedentFormula.formula().containsJavaBlockRecursive()) {
-                antecedent =
-                    antecedent
-                            .insertFirst(new SequentFormula(tb.not(succedentFormula.formula())))
-                            .semisequent();
+            final Term formula = (Term) succedentFormula.formula();
+            if (!formula.containsJavaBlockRecursive()) {
+                toProve =
+                    toProve.addFormula(new SequentFormula(tb.not(formula)), true, true).sequent();
             }
         }
 
-        return MergeRuleUtils.isProvable(
-            Sequent.createSequent(antecedent, new Semisequent(new SequentFormula(formulaToProve))),
-            services, 1000);
+        return MergeRuleUtils.isProvable(toProve, services, 1000);
     }
 
     /**

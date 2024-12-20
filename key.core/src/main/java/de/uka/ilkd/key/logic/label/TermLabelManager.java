@@ -26,6 +26,8 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
@@ -2031,8 +2033,7 @@ public class TermLabelManager {
      */
     public void mergeLabels(Services services,
             SequentChangeInfo currentSequent) {
-        for (var rejectedSF : currentSequent.getSemisequentChangeInfo(true)
-                .rejectedFormulas()) {
+        for (var rejectedSF : currentSequent.getSemisequentChangeInfo(true).rejectedFormulas()) {
             mergeLabels(currentSequent, services, rejectedSF, true);
         }
         for (final var rejectedSF : currentSequent.getSemisequentChangeInfo(false)
@@ -2059,7 +2060,7 @@ public class TermLabelManager {
         final Term rejectedTerm = (Term) rejectedSF.formula();
         if (rejectedTerm.hasLabels()) {
             // Search existing SequentFormula
-            var s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
+            var s = currentSequent.getSemisequentChangeInfo(inAntecedent).getFormulaList();
             SequentFormula existingSF = CollectionUtil.search(s,
                 element -> RENAMING_TERM_PROPERTY.equalsModThisProperty(element.formula(),
                     rejectedTerm));

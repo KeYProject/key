@@ -11,8 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -36,8 +35,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -630,11 +628,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             } else {
                 succFormulas = succFormulas.prepend(pos.sequentFormula());
             }
-            Semisequent antecedent = anteFormulas.isEmpty() ? Semisequent.EMPTY_SEMISEQUENT
-                    : new Semisequent(anteFormulas);
-            Semisequent succedent = succFormulas.isEmpty() ? Semisequent.EMPTY_SEMISEQUENT
-                    : new Semisequent(succFormulas);
-            seq = Sequent.createSequent(antecedent, succedent);
+            seq = JavaDLSequentKit.createSequent(anteFormulas, succFormulas);
         }
         // get instantiation
         final Instantiation inst =

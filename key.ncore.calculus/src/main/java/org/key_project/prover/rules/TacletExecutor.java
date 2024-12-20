@@ -77,9 +77,8 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
                         res = ImmutableSLList.nil();
                         for (int j = 0; j < p_numberOfNewGoals + 1; j++) {
                             // noinspection unchecked
-                            res = res.prepend(SequentChangeInfo.createSequentChangeInfo(
-                                null, null,
-                                p_goal.sequent(), p_goal.sequent()));
+                            res = res.prepend(
+                                SequentChangeInfo.createSequentChangeInfo(p_goal.sequent()));
                         }
                         assumesObl = assumesPart;
                     } else {
@@ -106,9 +105,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
             res = ImmutableSLList.nil();
             for (int j = 0; j < p_numberOfNewGoals; j++) {
                 // noinspection unchecked
-                res = res.prepend(
-                    SequentChangeInfo.createSequentChangeInfo(null,
-                        null, p_goal.sequent(), p_goal.sequent()));
+                res = res.prepend(SequentChangeInfo.createSequentChangeInfo(p_goal.sequent()));
             }
         } else {
             // find the sequent the `assumes` obligation has to be added to

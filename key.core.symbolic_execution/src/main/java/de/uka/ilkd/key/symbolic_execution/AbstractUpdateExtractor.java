@@ -28,6 +28,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -155,7 +157,7 @@ public abstract class AbstractUpdateExtractor {
             // are not part of the source code and should be ignored.
             Sequent sequent = getRoot().sequent();
             for (SequentFormula sf : sequent.succedent()) {
-                Term term = sf.formula();
+                Term term = (Term) sf.formula();
                 if (Junctor.IMP.equals(term.op())) {
                     fillInitialObjectsToIgnoreRecursively(term.sub(1), result);
                 }
@@ -438,7 +440,8 @@ public abstract class AbstractUpdateExtractor {
         Set<ExtractLocationParameter> result = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
             result.addAll(extractLocationsFromTerm(
-                OriginTermLabel.removeOriginLabels(sf.formula(), getServices()), objectsToIgnore));
+                OriginTermLabel.removeOriginLabels((Term) sf.formula(), getServices()),
+                objectsToIgnore));
         }
         return result;
     }

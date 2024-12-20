@@ -23,8 +23,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -128,9 +127,9 @@ public class TestMatchTaclet {
         // test at the subformula p(z) -> A that has a free variable
         // therefore no match should be found
 
-        Sequent seq = Sequent.createSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(match.sub(0))).semisequent(),
-            Semisequent.EMPTY_SEMISEQUENT);
+        Sequent seq = JavaDLSequentKit.createSequent(
+            ImmutableSLList.singleton(new SequentFormula(match.sub(0))),
+            ImmutableSLList.nil());
 
         assertEquals(0,
             NoPosTacletApp.createNoPosTacletApp(if_addrule_conflict)
@@ -139,9 +138,9 @@ public class TestMatchTaclet {
                 + " variable and the matching part is in the if and addrule");
 
         // we bind the free variable now a match should be found
-        seq = Sequent.createSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(match)).semisequent(),
-            Semisequent.EMPTY_SEMISEQUENT);
+        seq = JavaDLSequentKit.createSequent(
+            ImmutableSLList.singleton(new SequentFormula(match)),
+            ImmutableSLList.nil());
 
         assertNotEquals(0,
             NoPosTacletApp.createNoPosTacletApp(if_addrule_conflict)
@@ -249,11 +248,9 @@ public class TestMatchTaclet {
     public void testCloseWithBoundRenaming() {
         Term closeable_one = TacletForTests.parseTerm("\\forall testSort z; p(z)");
         Term closeable_two = TacletForTests.parseTerm("\\forall testSort y; p(y)");
-        Sequent seq = Sequent.createSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(closeable_one))
-                    .semisequent(),
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(closeable_two))
-                    .semisequent());
+        Sequent seq = JavaDLSequentKit.createSequent(
+            ImmutableSLList.singleton(new SequentFormula(closeable_one)),
+            ImmutableSLList.singleton(new SequentFormula(closeable_two)));
         TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
         index.add(close_rule.taclet());
         PosInOccurrence pio =

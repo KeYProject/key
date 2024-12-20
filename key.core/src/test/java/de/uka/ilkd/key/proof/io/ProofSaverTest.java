@@ -7,12 +7,13 @@ import java.io.File;
 import java.io.IOException;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;
+
+import org.key_project.prover.sequent.Sequent;
 
 import org.junit.jupiter.api.Test;
 

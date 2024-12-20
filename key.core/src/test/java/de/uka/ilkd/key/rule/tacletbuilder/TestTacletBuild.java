@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import java.io.File;
 
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -17,6 +18,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -58,7 +60,8 @@ public class TestTacletBuild {
         RewriteTacletBuilder<RewriteTaclet> sb = new RewriteTacletBuilder<>();
         sb.setFind(t1);
         sb.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t2));
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getEmptySequent(), ImmutableSLList.nil(),
+                t2));
         boolean thrown = false;
         try {
             sb.getTaclet();
@@ -78,8 +81,8 @@ public class TestTacletBuild {
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
         Term A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
-        Sequent seq = Sequent.createSuccSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t1)).semisequent());
+        Sequent seq =
+            JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t1)));
         Term t2 = tb.ex((QuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setIfSequent(seq);
@@ -100,9 +103,9 @@ public class TestTacletBuild {
         Term A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
         Term t2 = tb.ex((QuantifiableVariable) u, A);
-        Sequent seq = Sequent
-                .createSuccSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t1))
-                        .semisequent().insert(1, new SequentFormula(t2)).semisequent());
+        Sequent seq = JavaDLSequentKit
+                .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t2))
+                        .prepend(new SequentFormula(t1)));
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setIfSequent(seq);
         sb.setFind(A);

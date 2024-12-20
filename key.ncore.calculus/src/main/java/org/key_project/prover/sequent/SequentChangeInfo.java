@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.sequent;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -17,12 +18,12 @@ public class SequentChangeInfo {
     /**
      * change information related to the antecedent, this means the there added and removed formulas
      */
-    private SemisequentChangeInfo antecedent;
+    private @NonNull SemisequentChangeInfo antecedent;
 
     /**
      * change information related to the antecedent, this means the there added and removed formulas
      */
-    private SemisequentChangeInfo succedent;
+    private @NonNull SemisequentChangeInfo succedent;
 
     /**
      * the sequent before the changes
@@ -52,9 +53,11 @@ public class SequentChangeInfo {
             boolean antec,
             SemisequentChangeInfo semiCI, Sequent result, Sequent original) {
         if (antec) {
-            return new SequentChangeInfo(semiCI, null, result, original);
+            return new SequentChangeInfo(semiCI,
+                    new SemisequentChangeInfo(original.succedent().asList()), result, original);
         } else {
-            return new SequentChangeInfo(null, semiCI, result, original);
+            return new SequentChangeInfo(new SemisequentChangeInfo(original.antecedent().asList()),
+                    semiCI, result, original);
         }
     }
 
@@ -75,6 +78,12 @@ public class SequentChangeInfo {
         return new SequentChangeInfo(anteCI, sucCI, result, original);
     }
 
+    public static SequentChangeInfo createSequentChangeInfo(Sequent original) {
+        return new SequentChangeInfo(new SemisequentChangeInfo(original.antecedent().asList()),
+                new SemisequentChangeInfo(original.succedent().asList()), original, original);
+    }
+
+
     /**
      * creates a new sequent change information object. Therefore, it combines the changes to the
      * semisequents of the sequent.
@@ -84,8 +93,8 @@ public class SequentChangeInfo {
      * @param resultingSequent the Sequent being the result of the changes
      * @param originalSequent the Sequent that has been transformed
      */
-    private SequentChangeInfo(SemisequentChangeInfo antecedent,
-            SemisequentChangeInfo succedent,
+    private SequentChangeInfo(@NonNull SemisequentChangeInfo antecedent,
+                              @NonNull SemisequentChangeInfo succedent,
             Sequent resultingSequent, Sequent originalSequent) {
         this.antecedent = antecedent;
         this.succedent = succedent;
@@ -94,11 +103,8 @@ public class SequentChangeInfo {
     }
 
     public SequentChangeInfo copy() {
-        return new SequentChangeInfo(
-            antecedent == null ? null : antecedent.copy(),
-            succedent == null ? null : succedent.copy(),
-            resultingSequent,
-            originalSequent);
+        return new SequentChangeInfo(antecedent.copy(), succedent.copy(),
+            resultingSequent, originalSequent);
     }
 
     /**
@@ -107,8 +113,7 @@ public class SequentChangeInfo {
      * @return true iff the sequent has been changed by the operation
      */
     public boolean hasChanged() {
-        return (antecedent != null && antecedent.hasChanged())
-                || (succedent != null && succedent.hasChanged());
+        return antecedent.hasChanged() || succedent.hasChanged();
     }
 
     /**
@@ -118,8 +123,7 @@ public class SequentChangeInfo {
      * @return true iff the sequent has been changed by the operation
      */
     public boolean hasChanged(boolean antec) {
-        return antec ? (antecedent != null && antecedent.hasChanged())
-                : (succedent != null && succedent.hasChanged());
+        return antec ? antecedent.hasChanged() : succedent.hasChanged();
     }
 
     public SemisequentChangeInfo getSemisequentChangeInfo(boolean antec) {
@@ -136,9 +140,7 @@ public class SequentChangeInfo {
      * @return list of formulas added to the selected semisequent
      */
     public ImmutableList<SequentFormula> addedFormulas(boolean antec) {
-        return antec
-                ? (antecedent != null ? antecedent.addedFormulas() : ImmutableSLList.nil())
-                : (succedent != null ? succedent.addedFormulas() : ImmutableSLList.nil());
+        return antec ? antecedent.addedFormulas() : succedent.addedFormulas();
     }
 
     /**
@@ -151,9 +153,7 @@ public class SequentChangeInfo {
      * @return list of formulas removed from the selected semisequent
      */
     public ImmutableList<SequentFormula> removedFormulas(boolean antec) {
-        return antec
-                ? (antecedent != null ? antecedent.removedFormulas() : ImmutableSLList.nil())
-                : (succedent != null ? succedent.removedFormulas() : ImmutableSLList.nil());
+        return antec ? antecedent.removedFormulas() : succedent.removedFormulas();
     }
 
     /**
@@ -166,9 +166,7 @@ public class SequentChangeInfo {
      * @return list of formulas modified within the selected semisequent
      */
     public ImmutableList<FormulaChangeInfo> modifiedFormulas(boolean antec) {
-        return antec
-                ? (antecedent != null ? antecedent.modifiedFormulas() : ImmutableSLList.nil())
-                : (succedent != null ? succedent.modifiedFormulas() : ImmutableSLList.nil());
+        return antec ? antecedent.modifiedFormulas() : succedent.modifiedFormulas();
     }
 
     /**
@@ -178,10 +176,7 @@ public class SequentChangeInfo {
      * @return list of formulas modified to sequent
      */
     public ImmutableList<FormulaChangeInfo> modifiedFormulas() {
-        final ImmutableList<FormulaChangeInfo> modifiedFormulasAntec = modifiedFormulas(true);
-        final ImmutableList<FormulaChangeInfo> modifiedFormulasSucc = modifiedFormulas(false);
-
-        return concatenateHelper(modifiedFormulasAntec, modifiedFormulasSucc);
+        return concatenateHelper(modifiedFormulas(true), modifiedFormulas(false));
     }
 
     /**
@@ -192,9 +187,7 @@ public class SequentChangeInfo {
      * @return list of formulas rejected when trying to add to the selected semisequent
      */
     public ImmutableList<SequentFormula> rejectedFormulas(boolean antec) {
-        return antec
-                ? (antecedent != null ? antecedent.rejectedFormulas() : ImmutableSLList.nil())
-                : (succedent != null ? succedent.rejectedFormulas() : ImmutableSLList.nil());
+        return antec ? antecedent.rejectedFormulas() : succedent.rejectedFormulas();
     }
 
     /**
@@ -207,7 +200,7 @@ public class SequentChangeInfo {
     private <T> ImmutableList<T> concatenateHelper(final ImmutableList<T> antecList,
             final ImmutableList<T> succList) {
         final int sizeAntec = antecList.size();
-        final int sizeSucc = succList.size();
+        final int sizeSucc  = succList.size();
 
         if (sizeAntec == 0) {
             return succList;
@@ -232,17 +225,17 @@ public class SequentChangeInfo {
         antec.resultingSequent = succ.resultingSequent;
 
         if (antec.antecedent != succ.antecedent) {
-            if (antec.antecedent == null) {
+            if (!antec.antecedent.hasChanged()) {
                 antec.antecedent = succ.antecedent;
-            } else if (succ.antecedent != null) {
+            } else if (succ.antecedent.hasChanged()) {
                 antec.antecedent.combine(succ.antecedent);
             }
         }
 
         if (antec.succedent != succ.succedent) {
-            if (antec.succedent == null) {
+            if (!antec.succedent.hasChanged()) {
                 antec.succedent = succ.succedent;
-            } else if (succ.succedent != null) {
+            } else if (succ.succedent.hasChanged()) {
                 antec.succedent.combine(succ.succedent);
             }
         }

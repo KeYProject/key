@@ -6,9 +6,10 @@ package de.uka.ilkd.key.proof.init;
 import java.io.IOException;
 import java.util.Properties;
 
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.Configuration;
+
+import org.key_project.prover.sequent.Sequent;
 
 /**
  * <p>
