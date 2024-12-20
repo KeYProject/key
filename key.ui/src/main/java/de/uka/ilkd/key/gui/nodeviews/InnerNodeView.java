@@ -15,7 +15,6 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.smt.SMTRuleApp;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;

@@ -13,8 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import de.uka.ilkd.key.logic.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.RenamingTable;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -59,7 +60,7 @@ public class Node implements Iterable<Node> {
      */
     private BranchLocation branchLocation = null;
 
-    private Sequent seq = Sequent.EMPTY_SEQUENT;
+    private Sequent seq = JavaDLSequentKit.getEmptySequent();
 
     private final ArrayList<Node> children = new ArrayList<>(1);
 

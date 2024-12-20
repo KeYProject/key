@@ -67,7 +67,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -191,7 +191,8 @@ public final class SymbolicExecutionUtil {
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true);
         // Create Sequent to prove
         Sequent sequentToProve =
-            (Sequent) Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(term), false, true)
+            (Sequent) JavaDLSequentKit.getEmptySequent()
+                    .addFormula(new SequentFormula(term), false, true)
                     .sequent();
         // Return created Sequent and the used predicate to identify the value interested in.
         ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(parentProof,
@@ -249,7 +250,7 @@ public final class SymbolicExecutionUtil {
         ImmutableList<Term> terms = ImmutableSLList.nil();
         if (semisequent != null) {
             for (SequentFormula sf : semisequent) {
-                terms = terms.append(sf.formula());
+                terms = terms.append((Term) sf.formula());
             }
         }
         return terms;
@@ -631,12 +632,12 @@ public final class SymbolicExecutionUtil {
      * @param term The {@link Term} to check.
      * @return {@code true} is heap update, {@code false} is something else.
      */
-    public static boolean isHeapUpdate(Services services, Term term) {
+    public static boolean isHeapUpdate(Services services, org.key_project.logic.Term term) {
         boolean heapUpdate = false;
         if (term != null) {
-            ImmutableArray<Term> subs = term.subs();
+            final var subs = term.subs();
             if (subs.size() == 1) {
-                Term sub = subs.get(0);
+                final var sub = subs.get(0);
                 if (sub.op() == services.getTypeConverter().getHeapLDT().getStore()
                         || sub.op() == services.getTypeConverter().getHeapLDT().getCreate()) {
                     heapUpdate = true;
@@ -675,15 +676,17 @@ public final class SymbolicExecutionUtil {
             Node proofNode = node.getProofNode();
             Sequent sequent = proofNode.sequent();
             for (SequentFormula sf : sequent.antecedent()) {
-                if (!containsSymbolicExecutionLabel(sf.formula())) {
+                final Term formula = (Term) sf.formula();
+                if (!containsSymbolicExecutionLabel(formula)) {
                     constraints.add(new ExecutionConstraint(node.getSettings(), proofNode,
-                        node.getModalityPIO(), sf.formula()));
+                        node.getModalityPIO(), formula));
                 }
             }
             for (SequentFormula sf : sequent.succedent()) {
-                if (!containsSymbolicExecutionLabel(sf.formula())) {
+                final Term formula = (Term) sf.formula();
+                if (!containsSymbolicExecutionLabel(formula)) {
                     constraints.add(new ExecutionConstraint(node.getSettings(), proofNode,
-                        node.getModalityPIO(), tb.not(sf.formula())));
+                        node.getModalityPIO(), tb.not(formula)));
                 }
             }
             return constraints.toArray(new IExecutionConstraint[0]);
@@ -849,7 +852,7 @@ public final class SymbolicExecutionUtil {
      * @param term The current term to analyze.
      */
     private static void internalCollectAllElementaryUpdateTerms(Services services,
-            List<IProgramVariable> result, Term term) {
+            List<IProgramVariable> result, org.key_project.logic.Term term) {
         if (term != null) {
             if (term.op() instanceof ElementaryUpdate) {
                 if (SymbolicExecutionUtil.isHeapUpdate(services, term)) {
@@ -865,7 +868,7 @@ public final class SymbolicExecutionUtil {
                     }
                 }
             } else {
-                for (Term sub : term.subs()) {
+                for (var sub : term.subs()) {
                     internalCollectAllElementaryUpdateTerms(services, result, sub);
                 }
             }
@@ -881,14 +884,14 @@ public final class SymbolicExecutionUtil {
      * @param term The current term to analyze.
      */
     private static void internalCollectStaticProgramVariablesOnHeap(Services services,
-            Set<IProgramVariable> result, Term term) {
+            Set<IProgramVariable> result, org.key_project.logic.Term term) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         try {
             if (term.op() == heapLDT.getStore()) {
-                ImmutableArray<Term> subs = term.subs();
+                final var subs = term.subs();
                 if (term.arity() == 4) {
-                    Term innerMostSelect = findInnerMostSelect(subs.get(1), services);
-                    Term locationTerm =
+                    var innerMostSelect = findInnerMostSelect(subs.get(1), services);
+                    var locationTerm =
                         innerMostSelect != null ? innerMostSelect.sub(2) : subs.get(2);
                     ProgramVariable attribute = getProgramVariable(services, heapLDT, locationTerm);
                     if (attribute != null && attribute.isStatic()) {
@@ -899,12 +902,13 @@ public final class SymbolicExecutionUtil {
         } catch (Exception e) {
             // Can go wrong, nothing to do
         }
-        for (Term sub : term.subs()) {
+        for (var sub : term.subs()) {
             internalCollectStaticProgramVariablesOnHeap(services, result, sub);
         }
     }
 
-    private static Term findInnerMostSelect(Term term, Services services) {
+    private static org.key_project.logic.Term findInnerMostSelect(org.key_project.logic.Term term,
+            Services services) {
         if (isSelect(services, term)) {
             while (isSelect(services, term.sub(1))) {
                 term = term.sub(1);
@@ -924,7 +928,7 @@ public final class SymbolicExecutionUtil {
      * @return The {@link Term}s {@link ProgramVariable} or {@code null} if not available.
      */
     public static ProgramVariable getProgramVariable(Services services, HeapLDT heapLDT,
-            Term locationTerm) {
+            org.key_project.logic.Term locationTerm) {
         ProgramVariable result = null;
         if (locationTerm.op() instanceof JFunction function) {
             // Make sure that the function is not an array
@@ -1376,7 +1380,8 @@ public final class SymbolicExecutionUtil {
      * @return The modality {@link PosInTerm} with the maximal ID if available or {@code null}
      *         otherwise.
      */
-    public static PosInTerm findModalityWithMaxSymbolicExecutionLabelId(Term term) {
+    public static PosInTerm findModalityWithMaxSymbolicExecutionLabelId(
+            org.key_project.logic.Term term) {
         if (term != null) {
             FindModalityWithSymbolicExecutionLabelId visitor =
                 new FindModalityWithSymbolicExecutionLabelId(true);
@@ -1438,7 +1443,8 @@ public final class SymbolicExecutionUtil {
             int maxId = Integer.MIN_VALUE;
             PosInOccurrence minPio = null;
             for (SequentFormula sf : semisequent) {
-                PosInTerm current = findModalityWithMinSymbolicExecutionLabelId(sf.formula());
+                PosInTerm current =
+                    findModalityWithMinSymbolicExecutionLabelId((Term) sf.formula());
                 if (current != null) {
                     PosInOccurrence pio =
                         new PosInOccurrence(sf, current, inAntec);
@@ -2102,7 +2108,7 @@ public final class SymbolicExecutionUtil {
             Node node, Services services) throws ProofInputException {
         Semisequent antecedent = node.sequent().antecedent();
         SequentFormula sf = antecedent.get(antecedent.size() - 1);
-        Term workingTerm = sf.formula();
+        Term workingTerm = (Term) sf.formula();
         Pair<ImmutableList<Term>, Term> updatesAndTerm = TermBuilder.goBelowUpdates2(workingTerm);
         workingTerm = updatesAndTerm.second;
         if (workingTerm.op() != Junctor.AND) {
@@ -2273,7 +2279,7 @@ public final class SymbolicExecutionUtil {
             Services services = parent.proof().getServices();
             Node useNode = parent.child(2);
             Semisequent antecedent = useNode.sequent().antecedent();
-            Term invTerm = antecedent.get(antecedent.size() - 1).formula();
+            Term invTerm = (Term) antecedent.get(antecedent.size() - 1).formula();
             // Extract loop condition from child
             Term loopConditionModalityTerm =
                 posInOccurrenceInOtherNode(parent, app.posInOccurrence(), node);
@@ -2387,7 +2393,7 @@ public final class SymbolicExecutionUtil {
             // Compute invariant (last antecedent formula of the use branch)
             Services services = parent.proof().getServices();
             Semisequent antecedent = node.sequent().antecedent();
-            Term condition = antecedent.get(antecedent.size() - 1).formula();
+            Term condition = (Term) antecedent.get(antecedent.size() - 1).formula();
             if (simplify) {
                 // New OneStepSimplifier is required because it has an internal state and the
                 // default instance can't be used parallel.
@@ -2668,13 +2674,13 @@ public final class SymbolicExecutionUtil {
     private static ImmutableList<Term> listNewSemisequentTerms(Semisequent parent,
             Semisequent child) {
         Set<org.key_project.prover.sequent.SequentFormula> parentSFs = new HashSet<>();
-        for (SequentFormula sf : parent) {
+        for (final SequentFormula sf : parent) {
             parentSFs.add(sf);
         }
         ImmutableList<Term> result = ImmutableSLList.nil();
-        for (SequentFormula sf : child) {
+        for (final SequentFormula sf : child) {
             if (!parentSFs.contains(sf)) {
-                result = result.append(sf.formula());
+                result = result.append((Term) sf.formula());
             }
         }
         return result;
@@ -2694,7 +2700,7 @@ public final class SymbolicExecutionUtil {
             final Term replaceTerm) {
         SequentFormula sf = CollectionUtil.search(semisequent,
             element -> checkReplaceTerm(element.formula(), posInOccurrence, replaceTerm));
-        return sf != null ? sf.formula() : null;
+        return sf != null ? (Term) sf.formula() : null;
     }
 
     /**
@@ -2705,10 +2711,10 @@ public final class SymbolicExecutionUtil {
      * @param replaceTerm The {@link Term} to compare with.
      * @return {@code true} equal modulo labels, {@code false} not equal at all.
      */
-    private static boolean checkReplaceTerm(Term toCheck,
+    private static boolean checkReplaceTerm(org.key_project.logic.Term toCheck,
             PosInOccurrence posInOccurrence,
-            Term replaceTerm) {
-        Term termAtPio = followPosInOccurrence(posInOccurrence, toCheck);
+            org.key_project.logic.Term replaceTerm) {
+        var termAtPio = followPosInOccurrence(posInOccurrence, toCheck);
         if (termAtPio != null) {
             return RENAMING_TERM_PROPERTY.equalsModThisProperty(termAtPio, replaceTerm);
         } else {
@@ -2725,14 +2731,14 @@ public final class SymbolicExecutionUtil {
      * @return The found sub {@link Term} or {@code null} if the {@link PosInOccurrence} is not
      *         compatible.
      */
-    public static Term followPosInOccurrence(
-            PosInOccurrence posInOccurrence, Term term) {
+    public static <T extends org.key_project.logic.Term> T followPosInOccurrence(
+            PosInOccurrence posInOccurrence, T term) {
         boolean matches = true;
         org.key_project.logic.IntIterator iter = posInOccurrence.posInTerm().iterator();
         while (matches && iter.hasNext()) {
             int index = iter.next();
             if (index < term.arity()) {
-                term = term.sub(index);
+                term = (T) term.sub(index);
             } else {
                 matches = false;
             }
@@ -2749,7 +2755,8 @@ public final class SymbolicExecutionUtil {
      * @param services The {@link Services} to use.
      * @return The instantiated {@link Term} or {@code null} if no {@link Term} was given.
      */
-    public static Term instantiateTerm(Node node, Term term, TacletApp tacletApp,
+    public static Term instantiateTerm(Node node, org.key_project.logic.Term term,
+            TacletApp tacletApp,
             Services services) {
         if (term != null) {
             SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(new TermLabelState(),
@@ -2980,7 +2987,7 @@ public final class SymbolicExecutionUtil {
         ImmutableList<Term> result = ImmutableSLList.nil();
         Sequent sequent = root.sequent();
         for (SequentFormula sf : sequent.succedent()) {
-            Term term = sf.formula();
+            Term term = (Term) sf.formula();
             if (Junctor.IMP.equals(term.op())) {
                 result = result.prepend(collectElementaryUpdates(term.sub(1)));
             }
@@ -3098,7 +3105,7 @@ public final class SymbolicExecutionUtil {
         for (SequentFormula sf : sequent.antecedent()) {
             int skolemEquality = checkSkolemEquality(sf);
             if (skolemEquality == -1) {
-                Term equality = sf.formula();
+                Term equality = (Term) sf.formula();
                 if (constantsToLabel.contains(equality.sub(0))) {
                     Term definition =
                         addLabelRecursiveToNonSkolem(factory, equality.sub(1), RESULT_LABEL);
@@ -3114,7 +3121,7 @@ public final class SymbolicExecutionUtil {
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
                 }
             } else if (skolemEquality == 1) {
-                Term equality = sf.formula();
+                Term equality = (Term) sf.formula();
                 if (constantsToLabel.contains(equality.sub(1))) {
                     Term definition =
                         addLabelRecursiveToNonSkolem(factory, equality.sub(0), RESULT_LABEL);
@@ -3286,7 +3293,7 @@ public final class SymbolicExecutionUtil {
     private static Sequent removeAllUnusedSkolemEqualities(Sequent sequent,
             SequentFormula sf,
             boolean antecedent, Collection<Term> skolemConstants) {
-        Term term = sf.formula();
+        Term term = (Term) sf.formula();
         boolean remove = false;
         if (term.op() == Equality.EQUALS) {
             if (isSkolemConstant(term.sub(0))) {
@@ -3313,7 +3320,7 @@ public final class SymbolicExecutionUtil {
      *         right side of skolem equality.
      */
     public static int checkSkolemEquality(SequentFormula sf) {
-        return checkSkolemEquality(sf.formula());
+        return checkSkolemEquality((Term) sf.formula());
     }
 
     /**
@@ -3457,7 +3464,7 @@ public final class SymbolicExecutionUtil {
             Term skolemEquality) {
         List<Term> result = new LinkedList<>();
         for (SequentFormula sf : sequent) {
-            Term term = sf.formula();
+            Term term = (Term) sf.formula();
             if (term != skolemEquality) {
                 int skolemCheck = checkSkolemEquality(term);
                 if (skolemCheck == -1) {
@@ -3840,7 +3847,7 @@ public final class SymbolicExecutionUtil {
      * @param term The {@link Term} to check.
      * @return {@code true} is select, {@code false} is something else.
      */
-    public static boolean isSelect(Services services, Term term) {
+    public static boolean isSelect(Services services, org.key_project.logic.Term term) {
         if (!isNullSort(term.sort(), services)) {
             Function select =
                 services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services);
@@ -4230,7 +4237,8 @@ public final class SymbolicExecutionUtil {
             // program terminates normally
             ImmutableArray<Term> value = null;
             for (SequentFormula f : node.sequent().succedent()) {
-                Pair<ImmutableList<Term>, Term> updates = TermBuilder.goBelowUpdates2(f.formula());
+                Pair<ImmutableList<Term>, Term> updates =
+                    TermBuilder.goBelowUpdates2((Term) f.formula());
                 Iterator<Term> iter = updates.first.iterator();
                 while (value == null && iter.hasNext()) {
                     value = extractValueFromUpdate(iter.next(), exceptionVariable);

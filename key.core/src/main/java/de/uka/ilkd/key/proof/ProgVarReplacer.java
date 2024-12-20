@@ -3,26 +3,22 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.*;
+import org.key_project.util.collection.*;
 
-import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSet;
+import java.util.Iterator;
+import java.util.Map;
 
 
 /**
@@ -84,8 +80,8 @@ public final class ProgVarReplacer {
 
             if (newInsts != insts) {
                 NoPosTacletApp newNoPosTacletApp =
-                    NoPosTacletApp.createNoPosTacletApp(noPosTacletApp.taclet(), newInsts,
-                        noPosTacletApp.ifFormulaInstantiations(), services);
+                        NoPosTacletApp.createNoPosTacletApp(noPosTacletApp.taclet(), newInsts,
+                                noPosTacletApp.ifFormulaInstantiations(), services);
                 appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
                 appsToBeAdded = appsToBeAdded.add(newNoPosTacletApp);
             }
@@ -116,7 +112,7 @@ public final class ProgVarReplacer {
                 if (newPe != pe) {
                     ContextInstantiationEntry cie = (ContextInstantiationEntry) ie;
                     result = result.replace(cie.prefix(), cie.suffix(),
-                        cie.activeStatementContext(), newPe, services);
+                            cie.activeStatementContext(), newPe, services);
                 }
             } else if (ie instanceof OperatorInstantiation) {
                 /* nothing to be done (currently) */
@@ -142,8 +138,7 @@ public final class ProgVarReplacer {
                 }
 
                 if (changedSomething) {
-                    ImmutableArray<ProgramElement> newA = new ImmutableArray<>(array);
-                    result = result.replace(sv, newA, services);
+                    result = result.replace(sv, new ImmutableArray<>(array), services);
                 }
             } else if (ie instanceof TermInstantiation) {
                 Term t = (Term) inst;
@@ -164,41 +159,25 @@ public final class ProgVarReplacer {
      * replaces in a sequent
      */
     public SequentChangeInfo replace(Sequent s) {
-        SemisequentChangeInfo anteCI = replace(s.antecedent());
-        SemisequentChangeInfo succCI = replace(s.succedent());
-
-        Semisequent newAntecedent = anteCI.semisequent();
-        Semisequent newSuccedent = succCI.semisequent();
-
-        Sequent newSequent = Sequent.createSequent(newAntecedent, newSuccedent);
-
-        SequentChangeInfo result =
-            SequentChangeInfo.createSequentChangeInfo(anteCI, succCI, newSequent, s);
-        return result;
+        return replaceInSemisequent(s.succedent(),
+                replaceInSemisequent(s.antecedent(), SequentChangeInfo.createSequentChangeInfo(s), true),
+                false);
     }
 
-
-    /**
-     * replaces in a semisequent
-     */
-    public SemisequentChangeInfo replace(Semisequent s) {
-        SemisequentChangeInfo result = new SemisequentChangeInfo();
-        result.setFormulaList(s.asList());
-
-        final Iterator<org.key_project.prover.sequent.SequentFormula> it = s.iterator();
-
-        for (int formulaNumber = 0; it.hasNext(); formulaNumber++) {
-            final SequentFormula oldcf = it.next();
-            final SequentFormula newcf = replace(oldcf);
-
-            if (newcf != oldcf) {
-                result.combine(result.semisequent().replace(formulaNumber, newcf));
+    private SequentChangeInfo replaceInSemisequent(Semisequent semi,
+                                                   SequentChangeInfo resultInfo,
+                                                   boolean inAntec) {
+        for (var sf : semi) {
+            final SequentFormula newcf = replace(sf);
+            if (newcf != sf) {
+                final PosInOccurrence pos = new PosInOccurrence(sf, PosInTerm.getTopLevel(), inAntec);
+                // radical change need to force rebuild of taclet index, hence, we do not replace but remove and add
+                resultInfo.combine(resultInfo.sequent().addFormula(newcf, pos));
+                resultInfo.combine(resultInfo.sequent().removeFormula(pos));
             }
         }
-
-        return result;
+        return resultInfo;
     }
-
 
     /**
      * replaces in a constrained formula
@@ -234,9 +213,13 @@ public final class ProgVarReplacer {
 
         for (int i = 0, ar = t.arity(); i < ar; i++) {
             final Term subTerm = t.sub(i);
-            newSubTerms[i] = replace(subTerm);
-            if (newSubTerms[i] != subTerm) {
-                changedSubTerm = true;
+            if (subTerm.isRigid()) {
+                newSubTerms[i] = subTerm;
+            } else {
+                newSubTerms[i] = replace(subTerm);
+                if (newSubTerms[i] != subTerm) {
+                    changedSubTerm = true;
+                }
             }
         }
 
@@ -256,7 +239,7 @@ public final class ProgVarReplacer {
 
         if (changedSubTerm || newJb != jb) {
             result = services.getTermFactory().createTerm(op, newSubTerms, t.boundVars(),
-                t.getLabels());
+                    t.getLabels());
         }
         return result;
     }
@@ -286,8 +269,8 @@ public final class ProgVarReplacer {
      */
     private Term replaceProgramVariableInLHSOfElementaryUpdate(Term t) {
         final Term newTerm = services.getTermBuilder().elementary(
-            map.get(((ElementaryUpdate) t.op()).lhs()),
-            standardReplace(t.sub(0)));
+                map.get(((ElementaryUpdate) t.op()).lhs()),
+                standardReplace(t.sub(0)));
         return newTerm;
     }
 

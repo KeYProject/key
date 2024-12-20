@@ -18,8 +18,7 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -79,12 +78,12 @@ public class TestApplyTaclet {
     Proof[] proof;
 
 
-    private static Semisequent parseTermForSemisequent(String t) {
+    private static ImmutableList<SequentFormula> parseTermForSemisequent(String t) {
         if ("".equals(t)) {
-            return Semisequent.EMPTY_SEMISEQUENT;
+            return ImmutableSLList.nil();
         }
         SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
-        return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
+        return ImmutableSLList.singleton(cf0);
     }
 
     @BeforeEach
@@ -99,9 +98,9 @@ public class TestApplyTaclet {
         proof = new Proof[strs.length / 2];
 
         for (int i = 0; i < proof.length; i++) {
-            Semisequent antec = parseTermForSemisequent(strs[2 * i]);
-            Semisequent succ = parseTermForSemisequent(strs[2 * i + 1]);
-            Sequent s = Sequent.createSequent(antec, succ);
+            var antec = parseTermForSemisequent(strs[2 * i]);
+            var succ = parseTermForSemisequent(strs[2 * i + 1]);
+            Sequent s = JavaDLSequentKit.createSequent(antec, succ);
             proof[i] = new Proof("TestApplyTaclet", TacletForTests.initConfig());
             proof[i].setRoot(new Node(proof[i], s));
         }
@@ -204,7 +203,7 @@ public class TestApplyTaclet {
         ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
         assertEquals(1, goals.size(), "Too many or zero goals for all-right.");
         Sequent seq = goals.head().sequent();
-        assertEquals(seq.antecedent(), Semisequent.EMPTY_SEMISEQUENT,
+        assertEquals(seq.antecedent(), JavaDLSequentKit.emptySemisequent(),
             "Wrong antecedent after all-right");
         assertEquals(seq.succedent().getFirst().formula().op(),
             TacletForTests.getFunctions().lookup(new Name("p")),
@@ -1280,9 +1279,9 @@ public class TestApplyTaclet {
         NoPosTacletApp emptyMod = TacletForTests.getRules().lookup("TesTApplyTaclet_emptyModality");
         var tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(emptyMod);
-        Semisequent antec = parseTermForSemisequent("");
-        Semisequent succ = parseTermForSemisequent("{i:=2}\\<{}\\>(i = 2)");
-        Sequent s = Sequent.createSequent(antec, succ);
+        var antec = parseTermForSemisequent("");
+        var succ = parseTermForSemisequent("{i:=2}\\<{}\\>(i = 2)");
+        Sequent s = JavaDLSequentKit.createSequent(antec, succ);
         var proof = new Proof("Simple", TacletForTests.initConfig());
         proof.setRoot(new Node(proof, s));
         var goal = createGoal(proof.root(), tacletIndex);

@@ -15,10 +15,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.PosInTerm;
-import org.key_project.prover.sequent.FormulaChangeInfo;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.SequentChangeInfo;
-import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
 /**
@@ -139,8 +136,7 @@ public class SemisequentTacletAppIndex {
         final Iterator<TermTacletAppIndex> oldIndexIt = oldIndices.iterator();
 
         while (infoIt.hasNext()) {
-            final FormulaChangeInfo info =
-                infoIt.next();
+            final FormulaChangeInfo info = infoIt.next();
             final SequentFormula newFor = info.newFormula();
             final TermTacletAppIndex oldIndex = oldIndexIt.next();
 

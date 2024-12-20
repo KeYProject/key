@@ -20,6 +20,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
@@ -109,8 +110,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         while (it.hasNext()) {
             final TacletGoalTemplate gt = it.next();
             final Goal currentGoal = goalIt.next();
-            final SequentChangeInfo currentSequent =
-                newSequentsIt.next();
+            final SequentChangeInfo currentSequent = newSequentsIt.next();
 
             var timeApply = System.nanoTime();
             applyReplacewith(gt, termLabelState, currentSequent, tacletApp.posInOccurrence(), mc,
@@ -188,8 +188,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
                 currentSequent.modifiedFormulas(inAntec);
             if (modifiedFormulas != null && !modifiedFormulas.isEmpty()) {
                 // add it close to the modified formula
-                final FormulaChangeInfo head =
-                    modifiedFormulas.head();
+                final FormulaChangeInfo head = modifiedFormulas.head();
                 result =
                     new PosInOccurrence(head.newFormula(), PosInTerm.getTopLevel(), inAntec);
             } else {

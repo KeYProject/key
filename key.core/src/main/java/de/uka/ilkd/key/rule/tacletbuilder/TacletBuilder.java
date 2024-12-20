@@ -10,12 +10,14 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -33,7 +35,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected Taclet taclet;
 
     protected Name name = NONAME;
-    protected Sequent ifseq = Sequent.EMPTY_SEQUENT;
+    protected Sequent ifseq = JavaDLSequentKit.getEmptySequent();
     protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.nil();
     protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
     protected ImmutableList<NewDependingOn> varsNewDependingOn =

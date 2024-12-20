@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -186,7 +187,7 @@ public class TestTriggersSet {
         // functions.add(pi);
 
         proof = new Proof("TestTriggersSet", TacletForTests.initConfig());
-        g = new Goal(new Node(proof, Sequent.EMPTY_SEQUENT),
+        g = new Goal(new Node(proof, JavaDLSequentKit.getEmptySequent()),
             TacletIndexKit.getKit().createTacletIndex(),
             new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices());
         proof.setRoot(g.node());

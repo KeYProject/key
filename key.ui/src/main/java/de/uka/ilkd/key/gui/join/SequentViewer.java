@@ -7,9 +7,10 @@ package de.uka.ilkd.key.gui.join;
 import javax.swing.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
+
+import org.key_project.prover.sequent.Sequent;
 
 
 public class SequentViewer extends JTextPane {

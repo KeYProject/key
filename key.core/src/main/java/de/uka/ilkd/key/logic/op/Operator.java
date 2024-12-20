@@ -20,7 +20,8 @@ public interface Operator
      * @return true iff both operators have same identity and for modalities if both are of the same
      *         kind
      */
-    static boolean opEquals(Operator fst, Operator snd) {
+    static boolean opEquals(org.key_project.logic.op.Operator fst,
+            org.key_project.logic.op.Operator snd) {
         return fst == snd ||
                 (fst instanceof Modality mod1 && snd instanceof Modality mod2
                         && mod1.kind() == mod2.kind());

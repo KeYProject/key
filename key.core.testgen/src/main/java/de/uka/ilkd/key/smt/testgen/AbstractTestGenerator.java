@@ -8,10 +8,7 @@ import java.util.*;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
@@ -41,6 +38,8 @@ import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
+import org.key_project.logic.op.Modality;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
@@ -281,8 +280,7 @@ public abstract class AbstractTestGenerator {
             boolean removePostCondition) throws ProofInputException {
         final Proof oldProof = node.proof();
         final Sequent oldSequent = node.sequent();
-        Sequent newSequent =
-            Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, Semisequent.EMPTY_SEMISEQUENT);
+        Sequent newSequent = JavaDLSequentKit.getEmptySequent();
         Iterator<org.key_project.prover.sequent.SequentFormula> it =
             oldSequent.antecedent().iterator();
         while (it.hasNext()) {
@@ -325,9 +323,8 @@ public abstract class AbstractTestGenerator {
         return proof;
     }
 
-    private boolean hasModalities(Term t, boolean checkUpdates) {
-        final JavaBlock jb = t.javaBlock();
-        if (jb != null && !jb.isEmpty()) {
+    private boolean hasModalities(org.key_project.logic.Term t, boolean checkUpdates) {
+        if (t.op() instanceof Modality) {
             return true;
         }
         if (t.op() == UpdateApplication.UPDATE_APPLICATION && checkUpdates) {

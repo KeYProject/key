@@ -602,15 +602,15 @@ public class TestCaseGenerator {
 
     protected Map<String, Sort> generateTypeInferenceMap(Node n) {
         HashMap<String, Sort> typeInfMap = new HashMap<>();
-        for (SequentFormula sequentFormula : n.sequent()) {
-            Term t = sequentFormula.formula();
-            generateTypeInferenceMapHelper(t, typeInfMap);
+        for (final SequentFormula sf : n.sequent()) {
+            generateTypeInferenceMapHelper(sf.formula(), typeInfMap);
         }
         return typeInfMap;
     }
 
-    private void generateTypeInferenceMapHelper(Term t, Map<String, Sort> map) {
-        Operator op = t.op();
+    private void generateTypeInferenceMapHelper(org.key_project.logic.Term t,
+            Map<String, Sort> map) {
+        final var op = t.op();
         if (op instanceof ProgramVariable) {
             ProgramVariable pv = (ProgramVariable) t.op();
             final String name = pv.name().toString();
@@ -656,7 +656,7 @@ public class TestCaseGenerator {
         }
     }
 
-    private ProgramVariable getProgramVariable(Term locationTerm) {
+    private ProgramVariable getProgramVariable(org.key_project.logic.Term locationTerm) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         ProgramVariable result = null;
         if (locationTerm.op() instanceof JFunction function) {

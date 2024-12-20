@@ -5,30 +5,37 @@ package org.key_project.prover.sequent;
 
 import java.util.Iterator;
 
+import org.key_project.logic.Property;
+import org.key_project.logic.Term;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
 /**
  * Subclasses must add {@code create} methods
  */
-public abstract class Sequent implements Iterable<SequentFormula> {
-    private final Semisequent antecedent;
+public class Sequent implements Iterable<SequentFormula> {
 
+    private final Semisequent antecedent;
     private final Semisequent succedent;
+    private Property<? super Term> redundancyProperty;
 
     /** creates new Sequent with antecedence and succedence */
-    protected Sequent(Semisequent antecedent, Semisequent succedent) {
+    Sequent(Semisequent antecedent, Semisequent succedent) {
         assert !antecedent.isEmpty() || !succedent.isEmpty();
+        assert antecedent.redundanceProperty == succedent.redundanceProperty;
         this.antecedent = antecedent;
         this.succedent = succedent;
+        this.redundancyProperty = antecedent.redundanceProperty;
     }
 
     /** used by NILSequent implementations */
-    protected Sequent(Semisequent emptySeq) {
+    Sequent(Semisequent emptySeq) {
         assert emptySeq.isEmpty();
         this.antecedent = emptySeq;
         this.succedent = emptySeq;
+        this.redundancyProperty = emptySeq.redundanceProperty;
     }
 
     /**
@@ -117,7 +124,8 @@ public abstract class Sequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo semiCI = first ? seq.insertFirst(cf) : seq.insertLast(cf);
 
         return SequentChangeInfo.createSequentChangeInfo(antec, semiCI,
-            composeSequent(antec, semiCI.semisequent()), this);
+            composeSequent(antec, createSemisequent(semiCI.getFormulaList(), redundancyProperty)),
+            this);
     }
 
     /**
@@ -137,13 +145,19 @@ public abstract class Sequent implements Iterable<SequentFormula> {
             boolean antec,
             boolean first) {
 
+        if (insertions.isEmpty()) {
+            return SequentChangeInfo.createSequentChangeInfo(this);
+        }
+
         final Semisequent seq = antec ? antecedent : succedent;
 
         final SemisequentChangeInfo semiCI =
             first ? seq.insertFirst(insertions) : seq.insertLast(insertions);
 
         return SequentChangeInfo.createSequentChangeInfo(antec, semiCI,
-            composeSequent(antec, semiCI.semisequent()), this);
+            composeSequent(antec,
+                    createSemisequent(semiCI.getFormulaList(), redundancyProperty)),
+            this);
     }
 
     /**
@@ -154,7 +168,21 @@ public abstract class Sequent implements Iterable<SequentFormula> {
      * @param semiSeq the {@link Semisequent} to use
      * @return the resulting sequent
      */
-    protected abstract Sequent composeSequent(boolean antec, Semisequent semiSeq);
+    protected Sequent composeSequent(boolean antec, Semisequent semiSeq) {
+
+        if ((antec && semiSeq == antecedent()) || (!antec && semiSeq == succedent())) {
+            return this;
+        }
+
+        final var newAntecedent = antec ? semiSeq : antecedent();
+        final var newSuccedent = antec ? succedent() : semiSeq;
+
+        if (newAntecedent.isEmpty() && newSuccedent.isEmpty()) {
+            return new NILSequent(new Semisequent.Empty(redundancyProperty));
+        } else {
+            return new Sequent(newAntecedent, newSuccedent);
+        }
+    }
 
     /**
      * adds a formula to the sequent at the given position. (NOTICE:Sequent determines index using
@@ -172,7 +200,9 @@ public abstract class Sequent implements Iterable<SequentFormula> {
             seq.insert(seq.indexOf(p.sequentFormula()), cf);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-            composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            composeSequent(p.isInAntec(),
+                createSemisequent(semiCI.getFormulaList(), redundancyProperty)),
+            this);
     }
 
     /**
@@ -194,7 +224,18 @@ public abstract class Sequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo semiCI = seq.replace(idx, replacement);
 
         return SequentChangeInfo.createSequentChangeInfo(inAntec, semiCI,
-            composeSequent(inAntec, semiCI.semisequent()), this);
+                composeSequent(inAntec, createSemisequent(semiCI)), this);
+    }
+
+    private Semisequent createSemisequent(SemisequentChangeInfo semiCI) {
+        return createSemisequent(semiCI.getFormulaList(), redundancyProperty);
+    }
+
+    protected Semisequent createSemisequent(final ImmutableList<SequentFormula> formulas,
+                                                final Property<? super Term> redundancyProperty) {
+        return formulas.isEmpty() ?
+                new Semisequent.Empty(redundancyProperty) :
+                new Semisequent(formulas, redundancyProperty);
     }
 
     /**
@@ -214,7 +255,7 @@ public abstract class Sequent implements Iterable<SequentFormula> {
             seq.insert(seq.indexOf(p.sequentFormula()), insertions);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-            composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            composeSequent(p.isInAntec(), createSemisequent(semiCI)), this);
     }
 
     /**
@@ -232,7 +273,7 @@ public abstract class Sequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo semiCI = seq.remove(seq.indexOf(p.sequentFormula()));
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
-            semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            semiCI, composeSequent(p.isInAntec(), createSemisequent(semiCI)), this);
     }
 
     /**
@@ -270,11 +311,9 @@ public abstract class Sequent implements Iterable<SequentFormula> {
      */
     public SequentChangeInfo changeFormula(ImmutableList<SequentFormula> replacements,
             PosInOccurrence p) {
-
         final SemisequentChangeInfo semiCI = getSemisequent(p).replace(p, replacements);
-
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
-            semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            semiCI, composeSequent(p.isInAntec(), createSemisequent(semiCI)), this);
     }
 
     /**
@@ -290,7 +329,8 @@ public abstract class Sequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo semiCI = getSemisequent(p).replace(p, newCF);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-            composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            composeSequent(p.isInAntec(), new Semisequent(semiCI.getFormulaList(), redundancyProperty)),
+            this);
     }
 
     /**
@@ -327,6 +367,23 @@ public abstract class Sequent implements Iterable<SequentFormula> {
         var inAntec = pio.isInAntec();
         var formula = pio.sequentFormula();
         return formulaNumberInSequent(inAntec, formula);
+    }
+
+    static final class NILSequent extends Sequent {
+
+        NILSequent(Semisequent emptySemisequent) {
+            super(emptySemisequent);
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+
+        @Override
+        public @NonNull Iterator<org.key_project.prover.sequent.SequentFormula> iterator() {
+            return ImmutableSLList.<SequentFormula>nil().iterator();
+        }
     }
 
     static class SequentIterator implements Iterator<SequentFormula> {
@@ -394,5 +451,24 @@ public abstract class Sequent implements Iterable<SequentFormula> {
             return false;
         }
         return antecedent.equals(o1.antecedent) && succedent.equals(o1.succedent);
+    }
+
+    /**
+     * used to check whether this sequent contains a given sequent formula.
+     *
+     * @param form the given formula
+     * @return true if this sequent contains the given formula
+     */
+    public boolean contains(SequentFormula form) {
+        return antecedent().contains(form) || succedent().contains(form);
+    }
+
+    /**
+     * Returns a list containing every {@link SequentFormula} in this sequent.
+     *
+     * @return a list containing every {@link SequentFormula} in this sequent.
+     */
+    public ImmutableList<SequentFormula> asList() {
+        return antecedent().asList().append(succedent().asList());
     }
 }

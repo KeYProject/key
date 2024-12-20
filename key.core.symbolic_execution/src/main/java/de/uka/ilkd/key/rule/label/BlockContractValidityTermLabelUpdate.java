@@ -34,7 +34,7 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
      */
     @Override
     public ImmutableList<Name> getSupportedRuleNames() {
-        return ImmutableSLList.<Name>nil().append(BlockContractInternalRule.INSTANCE.name());
+        return ImmutableSLList.singleton(BlockContractInternalRule.INSTANCE.name());
     }
 
     /**

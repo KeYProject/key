@@ -78,8 +78,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
             goal.getFormulaTagManager().getModifications(positionTag);
 
         while (!infoList.isEmpty()) {
-            final FormulaChangeInfo info =
-                infoList.head();
+            final FormulaChangeInfo info = infoList.head();
             infoList = infoList.tail();
 
             final SequentFormula newFormula = info.newFormula();

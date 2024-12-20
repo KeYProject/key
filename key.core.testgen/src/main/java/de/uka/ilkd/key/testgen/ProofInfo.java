@@ -146,7 +146,7 @@ public class ProofInfo {
     }
 
     public Term getPO() {
-        return proof.root().sequent().succedent().get(0).formula();
+        return (Term) proof.root().sequent().succedent().get(0).formula();
     }
 
 

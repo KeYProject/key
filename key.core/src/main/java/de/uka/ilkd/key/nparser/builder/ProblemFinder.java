@@ -10,12 +10,15 @@ import java.util.Properties;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaDLSequentKit;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -106,7 +109,8 @@ public class ProblemFinder extends ExpressionBuilder {
         if (obj instanceof Sequent s)
             return s;
         if (obj instanceof Term t)
-            return Sequent.createSuccSequent(new Semisequent(new SequentFormula(t)));
+            return JavaDLSequentKit
+                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t)));
         return null;
     }
 

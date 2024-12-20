@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-
 import java.io.IOException;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
@@ -19,6 +19,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -26,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.fail;
-
 
 /**
  * create Taclet for test cases.
@@ -138,7 +138,8 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         rwb1.setName(new Name("r1"));
         rwb1.setFind(t_rn);
         rwb1.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_0));
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getEmptySequent(), ImmutableSLList.nil(),
+                t_0));
 
 
 
@@ -147,9 +148,11 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         RewriteTacletBuilder<RewriteTaclet> rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(t_rnminus1plus1);
         rwbuilder.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_rn));
-        rwbuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-            ImmutableSLList.<Taclet>nil().prepend(rwb1.getTaclet()), t_0plus1));
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getEmptySequent(), ImmutableSLList.nil(),
+                t_rn));
+        rwbuilder.addTacletGoalTemplate(
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getEmptySequent(),
+                ImmutableSLList.<Taclet>nil().prepend(rwb1.getTaclet()), t_0plus1));
         rwbuilder.setName(new Name("pred-succ-elim"));
         pluszeroelim = rwbuilder.getRewriteTaclet();
 
@@ -158,7 +161,8 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(tf.createTerm(func_plus, t_rn, t_0));
         rwbuilder.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_rn));
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getEmptySequent(), ImmutableSLList.nil(),
+                t_rn));
         rwbuilder.setName(new Name("plus-zero-elim"));
         predsuccelim = rwbuilder.getRewriteTaclet();
 
@@ -167,7 +171,8 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(tf.createTerm(func_plus, t_0, t_rn));
         rwbuilder.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_rn));
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getEmptySequent(), ImmutableSLList.nil(),
+                t_rn));
         rwbuilder.setName(new Name("zero-plus-elim"));
         zeropluselim = rwbuilder.getRewriteTaclet();
 
@@ -191,8 +196,9 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(t_rnplus1plusrm);
-        rwbuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-            ImmutableSLList.nil(), t_rnplusrmplus1));
+        rwbuilder.addTacletGoalTemplate(
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getEmptySequent(),
+                ImmutableSLList.nil(), t_rnplusrmplus1));
         rwbuilder.setName(new Name("switch-first-succ"));
         switchfirstsucc = rwbuilder.getRewriteTaclet();
 
@@ -204,8 +210,9 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         Term t_rnplus_rmplus1 = tf.createTerm(func_plus, t_rn, t_rmplus1);
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(t_rnplus_rmplus1);
-        rwbuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-            ImmutableSLList.nil(), t_rnplusrmplus1));
+        rwbuilder.addTacletGoalTemplate(
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getEmptySequent(),
+                ImmutableSLList.nil(), t_rnplusrmplus1));
         rwbuilder.setName(new Name("switch-second-succ"));
         switchsecondsucc = rwbuilder.getRewriteTaclet();
 
@@ -215,7 +222,8 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(tf.createTerm(func_eq, t_rnplus1, t_rmplus1));
         rwbuilder.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_rneqrm));
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getEmptySequent(), ImmutableSLList.nil(),
+                t_rneqrm));
         rwbuilder.setName(new Name("succ-elim"));
         succelim = rwbuilder.getRewriteTaclet();
 
@@ -256,12 +264,12 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         }
         SequentFormula cf = new SequentFormula(t_test1);
         SequentFormula cf2 = new SequentFormula(t_test1);
-        seq_test1 = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, cf).semisequent());
-        seq_test2 = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0, cf).semisequent(),
-            Semisequent.EMPTY_SEMISEQUENT);
-        seq_test3 = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0, cf).semisequent(),
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, cf2).semisequent());
+        seq_test1 =
+            JavaDLSequentKit.createSequent(ImmutableSLList.nil(), ImmutableSLList.singleton(cf));
+        seq_test2 =
+            JavaDLSequentKit.createSequent(ImmutableSLList.singleton(cf), ImmutableSLList.nil());
+        seq_test3 = JavaDLSequentKit.createSequent(ImmutableSLList.singleton(cf),
+            ImmutableSLList.singleton(cf2));
 
 
         func_p = new JFunction(new Name("P"), JavaDLTheory.FORMULA, sort1);
@@ -289,16 +297,16 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         Term tnat = tf.createTerm(Junctor.IMP, t_eq1, t_eq2);
 
         // => (c+d) = ((d -1 +1) +c) -> (c +1)+d = (d+c) +1
-        seq_testNat = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(tnat)).semisequent());
+        seq_testNat = JavaDLSequentKit.createSequent(ImmutableSLList.nil(),
+            ImmutableSLList.singleton(new SequentFormula(tnat)));
 
 
         z = new LogicVariable(new Name("z"), sort1);
         Term t_z = tf.createTerm(z);
         Term t_allzpz = services.getTermBuilder().all(z, tf.createTerm(func_p, t_z));
         SequentFormula cf3 = new SequentFormula(t_allzpz);
-        seq_testAll = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
-            Semisequent.EMPTY_SEMISEQUENT.insert(0, cf3).semisequent());
+        seq_testAll = JavaDLSequentKit.createSequent(ImmutableSLList.nil(),
+            ImmutableSLList.singleton(cf3));
 
 
 

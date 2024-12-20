@@ -6,10 +6,10 @@ package de.uka.ilkd.key.proof.runallproofs.performance;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
 public class NodeData {
