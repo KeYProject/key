@@ -172,7 +172,7 @@ class FieldPrinter {
     protected boolean isFinalFieldConstant(Term fieldTerm) {
         try {
             ProgramVariable pv =
-                    getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
+                getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
             return pv.isFinal();
         } catch (RuntimeException e) {
             return false;

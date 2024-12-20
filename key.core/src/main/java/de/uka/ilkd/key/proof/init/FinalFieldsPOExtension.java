@@ -8,7 +8,6 @@ import java.util.List;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.abstraction.Variable;
 import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Choice;
@@ -78,10 +77,13 @@ public class FinalFieldsPOExtension implements POExtension {
 
     private List<JFunction> findFinalFields(IProgramMethod iconstructor, Services services) {
         Type type = iconstructor.getContainerType().getJavaType();
-        assert type instanceof ClassType : "Class type was expected here, since a constructor is present";
+        assert type instanceof ClassType
+                : "Class type was expected here, since a constructor is present";
         ClassType classType = (ClassType) type;
-        return classType.getAllFields(services).filter(v -> v.isFinal() && !v.isModel()).map(f ->
-                services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)f.getProgramVariable(), services)).toList();
+        return classType.getAllFields(services).filter(v -> v.isFinal() && !v.isModel())
+                .map(f -> services.getTypeConverter().getHeapLDT()
+                        .getFieldSymbolForPV((LocationVariable) f.getProgramVariable(), services))
+                .toList();
     }
 
 
