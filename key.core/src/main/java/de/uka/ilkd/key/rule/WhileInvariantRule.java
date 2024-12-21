@@ -30,7 +30,7 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -438,7 +438,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         infFlowGoal.setBranchLabel("Information Flow Validity");
 
         // clear goal
-        infFlowGoal.node().setSequent(JavaDLSequentKit.getEmptySequent());
+        infFlowGoal.node().setSequent(JavaDLSequentKit.getInstance().getEmptySequent());
         infFlowGoal.clearAndDetachRuleAppIndex();
 
         // prepare data

@@ -9,7 +9,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -45,7 +45,7 @@ public class TriggeredInstantiations implements TermGenerator {
         return new TriggeredInstantiations(skipConditions);
     }
 
-    private Sequent last = JavaDLSequentKit.getEmptySequent();
+    private Sequent last = JavaDLSequentKit.getInstance().getEmptySequent();
     private Set<Term> lastCandidates = new HashSet<>();
     private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.nil();
 

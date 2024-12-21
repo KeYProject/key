@@ -6,7 +6,7 @@ package org.key_project.rusty.proof;
 import java.util.*;
 
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.rusty.logic.RustySequentKit;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -23,7 +23,7 @@ public class Node implements Iterable<Node> {
     /** The parent node. **/
     private @Nullable Node parent = null;
 
-    private Sequent seq = RustySequentKit.getEmptySequent();
+    private Sequent seq = RustySequentKit.getInstance().getEmptySequent();
 
     private final ArrayList<Node> children = new ArrayList<>(1);
 

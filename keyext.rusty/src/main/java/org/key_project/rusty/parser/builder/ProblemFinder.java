@@ -12,7 +12,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
-import org.key_project.rusty.logic.RustySequentKit;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.parser.KeYRustyParser;
 import org.key_project.rusty.parser.ParsingFacade;
 import org.key_project.rusty.settings.Configuration;

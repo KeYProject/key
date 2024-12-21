@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.util.HelperClassForTests;
 

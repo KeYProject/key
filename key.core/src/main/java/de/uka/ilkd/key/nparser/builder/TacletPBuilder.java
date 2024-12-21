@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -136,7 +136,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Taclet visitTaclet(KeYParser.TacletContext ctx) {
-        Sequent ifSeq = JavaDLSequentKit.getEmptySequent();
+        Sequent ifSeq = JavaDLSequentKit.getInstance().getEmptySequent();
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
         if (ctx.LEMMA() != null) {
             tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
@@ -717,7 +717,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         var soc = this.goalChoice;
         String name = accept(ctx.string_value());
 
-        Sequent addSeq = JavaDLSequentKit.getEmptySequent();
+        Sequent addSeq = JavaDLSequentKit.getInstance().getEmptySequent();
         ImmutableSLList<Taclet> addRList = ImmutableSLList.nil();
         DefaultImmutableSet<SchemaVariable> addpv = DefaultImmutableSet.nil();
 

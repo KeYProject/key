@@ -21,8 +21,8 @@
  * de.uka.ilkd.key.logic.Term} is constructed.
  * </p>
  * <p>
- * {@link de.uka.ilkd.key.logic.Sequent}s consist of two {@link
- * de.uka.ilkd.key.logic.Semisequent}s which represent a
+ * {@link de.uka.ilkd.key.proof.calculus.Sequent}s consist of two {@link
+ * de.uka.ilkd.key.proof.calculus.Semisequent}s which represent a
  * duplicate-free list of a {@link
  * de.uka.ilkd.key.logic.SequentFormula}s. The latter consist of
  * a {@link de.uka.ilkd.key.logic.Constraint} and a {@link
@@ -30,7 +30,7 @@
  * de.uka.ilkd.key.logic.sort.Sort#FORMULA}.
  * </p>
  * <p>
- * {@link de.uka.ilkd.key.logic.Sequent}s and {@link
+ * {@link de.uka.ilkd.key.proof.calculus.Sequent}s and {@link
  * de.uka.ilkd.key.logic.Term}s are <b>immutable</b>.
  * <p>
  * <!-- Created: Fri May 12 13:04:53 MET DST 2000 -->

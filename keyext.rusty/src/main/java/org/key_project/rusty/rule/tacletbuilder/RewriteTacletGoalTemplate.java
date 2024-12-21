@@ -4,7 +4,7 @@
 package org.key_project.rusty.rule.tacletbuilder;
 
 import org.key_project.logic.Term;
-import org.key_project.rusty.logic.RustySequentKit;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.Taclet;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -40,7 +40,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
 
     public RewriteTacletGoalTemplate(Term replacewith) {
-        this(RustySequentKit.getEmptySequent(), ImmutableSLList.nil(), replacewith);
+        this(RustySequentKit.getInstance().getEmptySequent(), ImmutableSLList.nil(), replacewith);
     }
 
 

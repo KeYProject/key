@@ -12,7 +12,7 @@ import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
-import org.key_project.rusty.logic.RustySequentKit;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.proof.init.InitConfig;
 import org.key_project.rusty.settings.ProofSettings;
 import org.key_project.util.collection.ImmutableList;

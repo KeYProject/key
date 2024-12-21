@@ -30,6 +30,7 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.VariableSV;
 import org.key_project.rusty.parser.KeYRustyLexer;
 import org.key_project.rusty.parser.KeYRustyParser;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.util.parsing.BuildingException;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;

@@ -30,6 +30,7 @@ import org.key_project.rusty.parser.SchemaVariableModifierSet;
 import org.key_project.rusty.parser.varcond.ArgumentType;
 import org.key_project.rusty.parser.varcond.TacletBuilderCommand;
 import org.key_project.rusty.parser.varcond.TacletBuilderManipulators;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.RewriteTaclet.ApplicationRestriction;
 import org.key_project.rusty.rule.tacletbuilder.*;
@@ -130,7 +131,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Taclet visitTaclet(KeYRustyParser.TacletContext ctx) {
-        Sequent ifSeq = RustySequentKit.getEmptySequent();
+        Sequent ifSeq = RustySequentKit.getInstance().getEmptySequent();
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
         if (ctx.LEMMA() != null) {
             tacletAnnotations = tacletAnnotations.add(TacletAnnotation.LEMMA);
@@ -406,7 +407,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         // var soc = this.goalChoice;
         String name = accept(ctx.string_value());
 
-        Sequent addSeq = RustySequentKit.getEmptySequent();
+        Sequent addSeq = RustySequentKit.getInstance().getEmptySequent();
         ImmutableSLList<Taclet> addRList = ImmutableSLList.nil();
         DefaultImmutableSet<SchemaVariable> addpv = DefaultImmutableSet.nil();
 

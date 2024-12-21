@@ -11,7 +11,7 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.*;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
-import org.key_project.rusty.logic.RustySequentKit;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.VariableSV;
@@ -29,7 +29,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected Taclet taclet;
 
     protected Name name = NONAME;
-    protected Sequent ifseq = RustySequentKit.getEmptySequent();
+    protected Sequent ifseq = RustySequentKit.getInstance().getEmptySequent();
     protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.nil();
     protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
     protected ImmutableList<NewDependingOn> varsNewDependingOn =

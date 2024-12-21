@@ -10,7 +10,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.*;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
-import org.key_project.rusty.logic.RustySequentKit;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.Node;

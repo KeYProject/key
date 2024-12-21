@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Proof;
