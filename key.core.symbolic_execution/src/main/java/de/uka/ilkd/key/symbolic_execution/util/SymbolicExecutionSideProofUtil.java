@@ -70,7 +70,7 @@ public final class SymbolicExecutionSideProofUtil {
      */
     public static Sequent computeGeneralSequentToProve(Sequent goalSequent,
             SequentFormula currentSF) {
-        Sequent sequentToProve = JavaDLSequentKit.getEmptySequent();
+        Sequent sequentToProve = JavaDLSequentKit.getInstance().getEmptySequent();
         for (SequentFormula sf : goalSequent.antecedent()) {
             if (sf != currentSF) {
                 if (!containsModalityOrQuery(sf)) {

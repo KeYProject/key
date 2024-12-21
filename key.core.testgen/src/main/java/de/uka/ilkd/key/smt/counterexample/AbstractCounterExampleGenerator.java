@@ -123,7 +123,7 @@ public abstract class AbstractCounterExampleGenerator {
      * @return The new {@link Sequent}.
      */
     protected Sequent createNewSequent(Sequent oldSequent) {
-        return JavaDLSequentKit.createSequent(oldSequent.antecedent(), oldSequent.succedent());
+        return oldSequent;
     }
 
     /**
