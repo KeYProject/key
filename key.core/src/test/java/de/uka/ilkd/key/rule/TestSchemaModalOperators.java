@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -140,7 +141,7 @@ public class TestSchemaModalOperators {
         rtb.setName(new Name("test_schema_modal1"));
         rtb.setFind(find);
         rtb.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(JavaDLSequentKit.getEmptySequent(), ImmutableSLList.nil(),
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(), ImmutableSLList.nil(),
                 replace));
 
         RewriteTaclet t = rtb.getRewriteTaclet();

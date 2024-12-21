@@ -8,7 +8,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -344,7 +344,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             validityGoal.setBranchLabel("Information Flow Validity");
 
             // clear goal
-            validityGoal.node().setSequent(JavaDLSequentKit.getEmptySequent());
+            validityGoal.node().setSequent(JavaDLSequentKit.getInstance().getEmptySequent());
             validityGoal.clearAndDetachRuleAppIndex();
             final TermBuilder tb = services.getTermBuilder();
 

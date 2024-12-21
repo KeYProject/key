@@ -6,7 +6,7 @@ package de.uka.ilkd.key.proof;
 import java.lang.reflect.Method;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;

@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -303,7 +303,7 @@ public class TacletGenerator {
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setFind(schemaLhs);
         tacletBuilder.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(JavaDLSequentKit.getEmptySequent(),
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
                 ImmutableSLList.nil(), limitedRhs));
 
         // FIXME - there is a chance this will have to go along with all the other associated
