@@ -267,8 +267,8 @@ public class FormulaTagManager {
                 new PosInOccurrence(p_info.newFormula(), PosInTerm.getTopLevel(), pio.isInAntec());
 
             return new FormulaInfo(newPIO,
-                    modifications.prepend(p_info),
-                    p_age);
+                modifications.prepend(p_info),
+                p_age);
         }
     }
 

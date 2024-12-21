@@ -141,7 +141,8 @@ public class TestSchemaModalOperators {
         rtb.setName(new Name("test_schema_modal1"));
         rtb.setFind(find);
         rtb.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(), ImmutableSLList.nil(),
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
+                ImmutableSLList.nil(),
                 replace));
 
         RewriteTaclet t = rtb.getRewriteTaclet();

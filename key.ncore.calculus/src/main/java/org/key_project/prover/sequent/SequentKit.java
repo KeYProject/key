@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.sequent;
 
-import org.key_project.logic.Property;
-import org.key_project.logic.Term;
 import org.key_project.util.collection.ImmutableList;
 
 public abstract class SequentKit {

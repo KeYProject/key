@@ -8,7 +8,6 @@ import java.util.*;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
@@ -16,6 +15,7 @@ import de.uka.ilkd.key.macros.TestGenMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.ProverTaskListener;
@@ -280,7 +280,7 @@ public abstract class AbstractTestGenerator {
             boolean removePostCondition) throws ProofInputException {
         final Proof oldProof = node.proof();
         final Sequent oldSequent = node.sequent();
-        Sequent newSequent = JavaDLSequentKit.getEmptySequent();
+        Sequent newSequent = JavaDLSequentKit.getInstance().getEmptySequent();
         Iterator<org.key_project.prover.sequent.SequentFormula> it =
             oldSequent.antecedent().iterator();
         while (it.hasNext()) {

@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.sequent;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Records the changes made to a sequent. Keeps track of added and removed formula to one of the
@@ -54,10 +54,10 @@ public class SequentChangeInfo {
             SemisequentChangeInfo semiCI, Sequent result, Sequent original) {
         if (antec) {
             return new SequentChangeInfo(semiCI,
-                    new SemisequentChangeInfo(original.succedent().asList()), result, original);
+                new SemisequentChangeInfo(original.succedent().asList()), result, original);
         } else {
             return new SequentChangeInfo(new SemisequentChangeInfo(original.antecedent().asList()),
-                    semiCI, result, original);
+                semiCI, result, original);
         }
     }
 
@@ -80,7 +80,7 @@ public class SequentChangeInfo {
 
     public static SequentChangeInfo createSequentChangeInfo(Sequent original) {
         return new SequentChangeInfo(new SemisequentChangeInfo(original.antecedent().asList()),
-                new SemisequentChangeInfo(original.succedent().asList()), original, original);
+            new SemisequentChangeInfo(original.succedent().asList()), original, original);
     }
 
 
@@ -94,7 +94,7 @@ public class SequentChangeInfo {
      * @param originalSequent the Sequent that has been transformed
      */
     private SequentChangeInfo(@NonNull SemisequentChangeInfo antecedent,
-                              @NonNull SemisequentChangeInfo succedent,
+            @NonNull SemisequentChangeInfo succedent,
             Sequent resultingSequent, Sequent originalSequent) {
         this.antecedent = antecedent;
         this.succedent = succedent;
@@ -200,7 +200,7 @@ public class SequentChangeInfo {
     private <T> ImmutableList<T> concatenateHelper(final ImmutableList<T> antecList,
             final ImmutableList<T> succList) {
         final int sizeAntec = antecList.size();
-        final int sizeSucc  = succList.size();
+        final int sizeSucc = succList.size();
 
         if (sizeAntec == 0) {
             return succList;

@@ -56,11 +56,10 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
         if (goals == null || goals.isEmpty()) {
             return false;
         }
-        Term term = (Term) posInOcc.subTerm();
-        if (posInOcc == null || term == null) {
+        if (posInOcc == null || posInOcc.subTerm() == null) {
             return false;
         }
-        Services services = proof.getServices();
+        final Services services = proof.getServices();
         ProofOblInput poForProof = services.getSpecificationRepository().getProofOblInput(proof);
         if (!(poForProof instanceof InfFlowContractPO po)) {
             return false;
@@ -71,7 +70,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
         final Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
 
-        return RENAMING_TERM_PROPERTY.equalsModThisProperty(term, selfComposedExec);
+        return RENAMING_TERM_PROPERTY.equalsModThisProperty(posInOcc.subTerm(), selfComposedExec);
     }
 
     @Override

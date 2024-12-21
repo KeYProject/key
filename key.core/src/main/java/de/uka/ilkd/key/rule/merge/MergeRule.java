@@ -240,7 +240,7 @@ public class MergeRule implements BuiltInRule {
         // Add new succedent (symbolic state & program counter)
         final Term succedentFormula = tb.apply(mergedState.first, thisSEState.programCounter());
         final SequentFormula newSuccedent = new SequentFormula(succedentFormula);
-        newGoal.addFormula(newSuccedent,false,true);
+        newGoal.addFormula(newSuccedent, false, true);
         // The following line has the only effect of emptying the
         // name recorder -- the name recorder for currentNode will
         // be filled after partner node closing. The purpose of this

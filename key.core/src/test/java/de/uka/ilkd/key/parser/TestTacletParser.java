@@ -13,9 +13,9 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -298,8 +298,9 @@ public class TestTacletParser {
         AntecTacletBuilder builder = new AntecTacletBuilder();
 
         builder.setFind(parseFma("x=x0"));
-        builder.addTacletGoalTemplate(new TacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
-            ImmutableSLList.<Taclet>nil().prepend(inserteq)));
+        builder.addTacletGoalTemplate(
+            new TacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
+                ImmutableSLList.<Taclet>nil().prepend(inserteq)));
         builder.setName(new Name("make_insert_eq"));
         Taclet makeinserteq = builder.getAntecTaclet();
         String makeinserteqString = "make_insert_eq" + "{\\find (x = x0 ==>)"
