@@ -172,8 +172,9 @@ public final class ProgVarReplacer {
             if (newcf != sf) {
                 final PosInOccurrence pos = new PosInOccurrence(sf, PosInTerm.getTopLevel(), inAntec);
                 // radical change need to force rebuild of taclet index, hence, we do not replace but remove and add
-                resultInfo.combine(resultInfo.sequent().addFormula(newcf, pos));
-                resultInfo.combine(resultInfo.sequent().removeFormula(pos));
+                Sequent sequent = resultInfo.sequent();
+                resultInfo.combine(sequent.replaceFormula(sequent.
+                        formulaNumberInSequent(inAntec,sf), newcf));
             }
         }
         return resultInfo;
