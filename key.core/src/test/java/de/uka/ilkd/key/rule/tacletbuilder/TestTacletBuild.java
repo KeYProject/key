@@ -6,7 +6,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 import java.io.File;
 
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -60,7 +60,7 @@ public class TestTacletBuild {
         RewriteTacletBuilder<RewriteTaclet> sb = new RewriteTacletBuilder<>();
         sb.setFind(t1);
         sb.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(JavaDLSequentKit.getEmptySequent(), ImmutableSLList.nil(),
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(), ImmutableSLList.nil(),
                 t2));
         boolean thrown = false;
         try {

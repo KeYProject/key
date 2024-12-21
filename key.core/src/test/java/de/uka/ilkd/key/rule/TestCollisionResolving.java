@@ -9,6 +9,7 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -45,8 +46,7 @@ public class TestCollisionResolving {
 
         // build a goal (needed for creating TacletInstantiationsTableModel)
         Proof proof = new Proof("TestCollisionResolving", TacletForTests.initConfig());
-        Semisequent empty = JavaDLSequentKit.emptySemisequent();
-        Sequent seq = JavaDLSequentKit.createSequent(empty, empty);
+        Sequent seq = JavaDLSequentKit.getInstance().getEmptySequent();
 
         Node node = new Node(proof, seq);
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();

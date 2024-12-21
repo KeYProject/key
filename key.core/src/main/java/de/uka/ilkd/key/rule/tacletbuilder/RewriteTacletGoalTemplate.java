@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -47,7 +47,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
 
     public RewriteTacletGoalTemplate(Term replacewith) {
-        this(JavaDLSequentKit.getEmptySequent(), ImmutableSLList.nil(), replacewith);
+        this(JavaDLSequentKit.getInstance().getEmptySequent(), ImmutableSLList.nil(), replacewith);
     }
 
 

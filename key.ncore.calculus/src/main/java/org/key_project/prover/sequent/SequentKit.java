@@ -9,9 +9,6 @@ import org.key_project.util.collection.ImmutableList;
 
 public abstract class SequentKit {
 
-    private final Sequent emptySequent;
-    private final Semisequent emptySemisequent;
-
     /**
      * Create a new Semisequent from an ordered collection of formulas (possibly empty).
      * The provided collection must be redundancy free, i.e., the created sequent must be exactly
@@ -29,20 +26,12 @@ public abstract class SequentKit {
 
     // INSTANCE FIELDS and METHODS
 
-    protected SequentKit(Semisequent emptySemisequent) {
-        this.emptySemisequent = emptySemisequent;
-        this.emptySequent = new Sequent.NILSequent(emptySemisequent);
+    protected SequentKit() {
     }
 
-    protected abstract Property<Term> getRedundancyProperty();
+    public abstract Semisequent getEmptySemisequent();
 
-    public Semisequent getEmptySemisequent() {
-        return emptySemisequent;
-    }
-
-    public Sequent emptySequent() {
-        return emptySequent;
-    }
+    public abstract Sequent getEmptySequent();
 
     /**
      * creates a new Sequent with empty succedent
@@ -53,9 +42,9 @@ public abstract class SequentKit {
      */
     protected Sequent newAntecedent(Semisequent ante) {
         if (ante.isEmpty()) {
-            return emptySequent;
+            return getEmptySequent();
         }
-        return new Sequent(ante, getEmptySemisequent());
+        return createSequent(ante, getEmptySemisequent());
     }
 
     /**
@@ -67,8 +56,10 @@ public abstract class SequentKit {
      */
     public Sequent newAntecedent(ImmutableList<SequentFormula> ante) {
         return newAntecedent(
-            ante.isEmpty() ? emptySemisequent : new Semisequent(ante, getRedundancyProperty()));
+            ante.isEmpty() ? getEmptySemisequent() : createSemisequent(ante));
     }
+
+    abstract protected Semisequent createSemisequent(ImmutableList<SequentFormula> ante);
 
     /**
      * creates a new Sequent
@@ -80,10 +71,20 @@ public abstract class SequentKit {
      */
     protected Sequent newSequent(Semisequent ante, Semisequent succ) {
         if (ante.isEmpty() && succ.isEmpty()) {
-            return emptySequent;
+            return getEmptySequent();
         }
-        return new Sequent(ante, succ);
+        return createSequent(ante, succ);
     }
+
+    /**
+     * creates a new Sequent
+     *
+     * @param ante the Semisequent that plays the antecedent part
+     * @param succ the Semisequent that plays the succedent part
+     * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
+     *         EMPTY_SEMISEQUENT
+     */
+    abstract protected Sequent createSequent(Semisequent ante, Semisequent succ);
 
     /**
      * creates a new Sequent
@@ -96,8 +97,8 @@ public abstract class SequentKit {
     public Sequent newSequent(ImmutableList<SequentFormula> ante,
             ImmutableList<SequentFormula> succ) {
         return newSequent(
-            ante.isEmpty() ? emptySemisequent : new Semisequent(ante, getRedundancyProperty()),
-            succ.isEmpty() ? emptySemisequent : new Semisequent(succ, getRedundancyProperty()));
+            ante.isEmpty() ? getEmptySemisequent() : createSemisequent(ante),
+            succ.isEmpty() ? getEmptySemisequent() : createSemisequent(succ));
     }
 
     /**
@@ -109,13 +110,13 @@ public abstract class SequentKit {
      */
     protected Sequent newSuccedent(Semisequent succ) {
         if (succ.isEmpty()) {
-            return emptySequent;
+            return getEmptySequent();
         }
-        return new Sequent(getEmptySemisequent(), succ);
+        return createSequent(getEmptySemisequent(), succ);
     }
 
     public Sequent newSuccedent(ImmutableList<SequentFormula> succ) {
         return newSuccedent(
-            succ.isEmpty() ? emptySemisequent : new Semisequent(succ, getRedundancyProperty()));
+            succ.isEmpty() ? getEmptySemisequent() : createSemisequent(succ));
     }
 }

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -123,7 +124,7 @@ public class TestTermLabelManager {
         Term two = integerLDT.translateLiteral(new IntLiteral(2), services);
         one = TB.label(one, new ParameterlessTermLabel(new Name("APPLICATION")));
         two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
-        Sequent sequent = JavaDLSequentKit.getEmptySequent();
+        Sequent sequent = JavaDLSequentKit.getInstance().getEmptySequent();
         sequent =
             (Sequent) sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
         sequent = (Sequent) sequent.addFormula(pos.sequentFormula(), true, false)

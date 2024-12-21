@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
     /** sequent that replaces another one */
-    private Sequent replacewith = JavaDLSequentKit.getEmptySequent();
+    private Sequent replacewith = JavaDLSequentKit.getInstance().getEmptySequent();
 
     /**
      * creates new Goaldescription
