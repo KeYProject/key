@@ -5,8 +5,6 @@ package org.key_project.prover.sequent;
 
 import java.util.Iterator;
 
-import org.key_project.logic.Property;
-import org.key_project.logic.Term;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -182,7 +180,7 @@ public abstract class Sequent implements Iterable<SequentFormula> {
     abstract protected Sequent getEmptySequent();
 
     abstract protected Sequent createSequent(Semisequent newAntecedent,
-                                             Semisequent newSuccedent);
+            Semisequent newSuccedent);
 
     /**
      * adds a formula to the sequent at the given position. (NOTICE:Sequent determines index using
@@ -224,7 +222,7 @@ public abstract class Sequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo semiCI = seq.replace(idx, replacement);
 
         return SequentChangeInfo.createSequentChangeInfo(inAntec, semiCI,
-                composeSequent(inAntec, createSemisequent(semiCI)), this);
+            composeSequent(inAntec, createSemisequent(semiCI)), this);
     }
 
     private Semisequent createSemisequent(SemisequentChangeInfo semiCI) {

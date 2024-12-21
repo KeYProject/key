@@ -192,7 +192,7 @@ public final class SymbolicExecutionUtil {
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true);
         // Create Sequent to prove
         Sequent sequentToProve =
-            (Sequent) JavaDLSequentKit.getEmptySequent()
+            (Sequent) JavaDLSequentKit.getInstance().getEmptySequent()
                     .addFormula(new SequentFormula(term), false, true)
                     .sequent();
         // Return created Sequent and the used predicate to identify the value interested in.

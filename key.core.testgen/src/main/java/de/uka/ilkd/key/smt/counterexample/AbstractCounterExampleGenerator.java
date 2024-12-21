@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Proof;
@@ -123,7 +122,7 @@ public abstract class AbstractCounterExampleGenerator {
      * @return The new {@link Sequent}.
      */
     protected Sequent createNewSequent(Sequent oldSequent) {
-        return JavaDLSequentKit.createSequent(oldSequent.antecedent(), oldSequent.succedent());
+        return oldSequent;
     }
 
     /**
