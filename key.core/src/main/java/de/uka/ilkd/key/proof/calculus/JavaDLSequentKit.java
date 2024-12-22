@@ -40,30 +40,8 @@ public class JavaDLSequentKit extends SequentKit {
      * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
      *         EMPTY_SEMISEQUENT
      */
-    public static org.key_project.prover.sequent.Sequent createAnteSequent(Semisequent ante) {
-        return getInstance().newAntecedent(ante);
-    }
-
-    /**
-     * creates a new Sequent with empty succedent
-     *
-     * @param ante the Semisequent that plays the antecedent part
-     * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
-     *         EMPTY_SEMISEQUENT
-     */
     public static org.key_project.prover.sequent.Sequent createAnteSequent(ImmutableList<SequentFormula> ante) {
         return getInstance().newAntecedent(ante);
-    }
-
-    /**
-     * creates a new Sequent with empty antecedent
-     *
-     * @param succ the Semisequent that plays the succedent part
-     * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
-     *         EMPTY_SEMISEQUENT
-     */
-    public static org.key_project.prover.sequent.Sequent createSuccSequent(Semisequent succ) {
-        return getInstance().newSuccedent(succ);
     }
 
     /**

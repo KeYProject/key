@@ -86,6 +86,4 @@ public class RustySequentKit extends SequentKit {
                 new org.key_project.rusty.proof.calculus.Semisequent(sequentFormulas);
     }
 
-
-
 }
