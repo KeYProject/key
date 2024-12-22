@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -13,12 +16,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
+
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
-
-import java.util.Iterator;
-import java.util.Map;
 
 
 /**
@@ -80,8 +81,8 @@ public final class ProgVarReplacer {
 
             if (newInsts != insts) {
                 NoPosTacletApp newNoPosTacletApp =
-                        NoPosTacletApp.createNoPosTacletApp(noPosTacletApp.taclet(), newInsts,
-                                noPosTacletApp.ifFormulaInstantiations(), services);
+                    NoPosTacletApp.createNoPosTacletApp(noPosTacletApp.taclet(), newInsts,
+                        noPosTacletApp.ifFormulaInstantiations(), services);
                 appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
                 appsToBeAdded = appsToBeAdded.add(newNoPosTacletApp);
             }
@@ -112,7 +113,7 @@ public final class ProgVarReplacer {
                 if (newPe != pe) {
                     ContextInstantiationEntry cie = (ContextInstantiationEntry) ie;
                     result = result.replace(cie.prefix(), cie.suffix(),
-                            cie.activeStatementContext(), newPe, services);
+                        cie.activeStatementContext(), newPe, services);
                 }
             } else if (ie instanceof OperatorInstantiation) {
                 /* nothing to be done (currently) */
@@ -160,21 +161,24 @@ public final class ProgVarReplacer {
      */
     public SequentChangeInfo replace(Sequent s) {
         return replaceInSemisequent(s.succedent(),
-                replaceInSemisequent(s.antecedent(), SequentChangeInfo.createSequentChangeInfo(s), true),
-                false);
+            replaceInSemisequent(s.antecedent(), SequentChangeInfo.createSequentChangeInfo(s),
+                true),
+            false);
     }
 
     private SequentChangeInfo replaceInSemisequent(Semisequent semi,
-                                                   SequentChangeInfo resultInfo,
-                                                   boolean inAntec) {
+            SequentChangeInfo resultInfo,
+            boolean inAntec) {
         for (var sf : semi) {
             final SequentFormula newcf = replace(sf);
             if (newcf != sf) {
-                final PosInOccurrence pos = new PosInOccurrence(sf, PosInTerm.getTopLevel(), inAntec);
-                // radical change need to force rebuild of taclet index, hence, we do not replace but remove and add
+                final PosInOccurrence pos =
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), inAntec);
+                // radical change need to force rebuild of taclet index, hence, we do not replace
+                // but remove and add
                 Sequent sequent = resultInfo.sequent();
-                resultInfo.combine(sequent.replaceFormula(sequent.
-                        formulaNumberInSequent(inAntec,sf), newcf));
+                resultInfo.combine(
+                    sequent.replaceFormula(sequent.formulaNumberInSequent(inAntec, sf), newcf));
             }
         }
         return resultInfo;
@@ -240,7 +244,7 @@ public final class ProgVarReplacer {
 
         if (changedSubTerm || newJb != jb) {
             result = services.getTermFactory().createTerm(op, newSubTerms, t.boundVars(),
-                    t.getLabels());
+                t.getLabels());
         }
         return result;
     }
@@ -270,8 +274,8 @@ public final class ProgVarReplacer {
      */
     private Term replaceProgramVariableInLHSOfElementaryUpdate(Term t) {
         final Term newTerm = services.getTermBuilder().elementary(
-                map.get(((ElementaryUpdate) t.op()).lhs()),
-                standardReplace(t.sub(0)));
+            map.get(((ElementaryUpdate) t.op()).lhs()),
+            standardReplace(t.sub(0)));
         return newTerm;
     }
 

@@ -4,8 +4,8 @@
 package org.key_project.rusty.rule.tacletbuilder;
 
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.rule.Taclet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;

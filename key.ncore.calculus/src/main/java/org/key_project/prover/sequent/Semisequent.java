@@ -76,7 +76,8 @@ public abstract class Semisequent implements Iterable<SequentFormula> {
         return seqList.isEmpty();
     }
 
-    protected abstract boolean isRedundant(SequentFormula existingFormula, SequentFormula checkedFormula);
+    protected abstract boolean isRedundant(SequentFormula existingFormula,
+            SequentFormula checkedFormula);
 
     /**
      * inserts new SequentFormula at index idx and removes duplicates, perform simplifications etc.
@@ -142,7 +143,8 @@ public abstract class Semisequent implements Iterable<SequentFormula> {
      * @return new Semisequent with sequentFormula at index idx and removed redundancies
      */
     private SemisequentChangeInfo removeRedundance(int idx, SequentFormula sequentFormula) {
-        return insertAndRemoveRedundancyHelper(idx, sequentFormula, createSemisequentChangeInfo(seqList), null);
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula,
+            createSemisequentChangeInfo(seqList), null);
     }
 
     private SemisequentChangeInfo createSemisequentChangeInfo(

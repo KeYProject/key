@@ -40,7 +40,8 @@ public class JavaDLSequentKit extends SequentKit {
      * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
      *         EMPTY_SEMISEQUENT
      */
-    public static org.key_project.prover.sequent.Sequent createAnteSequent(ImmutableList<SequentFormula> ante) {
+    public static org.key_project.prover.sequent.Sequent createAnteSequent(
+            ImmutableList<SequentFormula> ante) {
         return getInstance().newAntecedent(ante);
     }
 
@@ -51,7 +52,8 @@ public class JavaDLSequentKit extends SequentKit {
      * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
      *         EMPTY_SEMISEQUENT
      */
-    public static org.key_project.prover.sequent.Sequent createSuccSequent(ImmutableList<SequentFormula> succ) {
+    public static org.key_project.prover.sequent.Sequent createSuccSequent(
+            ImmutableList<SequentFormula> succ) {
         return getInstance().newSuccedent(succ);
     }
 
@@ -63,15 +65,16 @@ public class JavaDLSequentKit extends SequentKit {
      * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
      *         EMPTY_SEMISEQUENT
      */
-    public static org.key_project.prover.sequent.Sequent createSequent(ImmutableList<SequentFormula> ante,
+    public static org.key_project.prover.sequent.Sequent createSequent(
+            ImmutableList<SequentFormula> ante,
             ImmutableList<SequentFormula> succ) {
         return getInstance().newSequent(ante, succ);
     }
 
     @Override
     protected Semisequent createSemisequent(ImmutableList<SequentFormula> ante) {
-        return ante.isEmpty() ? de.uka.ilkd.key.proof.calculus.Semisequent.EMPTY_SEMISEQUENT :
-                new de.uka.ilkd.key.proof.calculus.Semisequent(ante);
+        return ante.isEmpty() ? de.uka.ilkd.key.proof.calculus.Semisequent.EMPTY_SEMISEQUENT
+                : new de.uka.ilkd.key.proof.calculus.Semisequent(ante);
     }
 
     /**
