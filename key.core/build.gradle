@@ -9,9 +9,7 @@ configurations { antlr4 }
 dependencies {
     api project(':key.util')
     api project(':key.ncore')
-    api project(':key.java')
-    //api group: group, name: 'recoderkey', version: '1.0'
-//    api project(':recoder')
+
     implementation group: 'org.antlr', name: 'antlr-runtime', version: '3.5.3'
     implementation group: 'antlr', name: 'antlr', version: '2.7.7'
 
@@ -19,8 +17,16 @@ dependencies {
 
     antlr4 "org.antlr:antlr4:4.13.2"
     api "org.antlr:antlr4-runtime:4.13.2"
-    //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 
+    api project(':key.util')
+
+    def JP_VERSION = "3.26.3-K7-SNAPSHOT"
+    api "org.key-project.proofjava:javaparser-core:$JP_VERSION"
+    api "org.key-project.proofjava:javaparser-core-serialization:$JP_VERSION"
+    api "org.key-project.proofjava:javaparser-symbol-solver-core:$JP_VERSION"
+
+    testImplementation("com.google.truth:truth:1.4.4")
+    testImplementation(project(":key.core"))
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
     testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2'

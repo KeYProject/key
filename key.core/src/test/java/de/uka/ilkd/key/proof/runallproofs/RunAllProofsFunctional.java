@@ -30,6 +30,7 @@ public final class RunAllProofsFunctional {
         var proofCollection = ProofCollections.automaticJavaDL();
         var statisticsFile = proofCollection.getSettings().getStatisticsFile();
         statisticsFile.setUp();
+
         return RunAllProofsTest.data(proofCollection);
     }
 }

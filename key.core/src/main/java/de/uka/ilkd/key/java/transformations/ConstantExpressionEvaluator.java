@@ -383,9 +383,13 @@ public class ConstantExpressionEvaluator {
         }
 
         @Override
-        public Object visit(PatternExpr n, Void arg) {
+        public Object visit(RecordPatternExpr n, Void arg) {
             throw new RuntimeException("unsupported expression");
+        }
 
+        @Override
+        public Object visit(TypePatternExpr n, Void arg) {
+            throw new RuntimeException("unsupported expression");
         }
 
         @Override

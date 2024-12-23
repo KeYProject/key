@@ -16,7 +16,6 @@ include 'keyext.proofmanagement'
 include 'keyext.exploration'
 include 'keyext.slicing'
 include 'keyext.caching'
-include 'key.java'
 
 
 // ENABLE NULLNESS here or on the CLI
