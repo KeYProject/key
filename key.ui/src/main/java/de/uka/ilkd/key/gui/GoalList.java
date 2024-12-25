@@ -805,7 +805,10 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 // (DS) Also add the serial of the corresponding node to the
                 // printed String for better transparency and quicker
                 // access to features like visual node diff.
-                valueStr = "(#" + ((Goal) value).node().serialNr() + ") " + seqToString(seq);
+
+                //FIXME weigl: disable for UnbalancedParenIssue
+                // valueStr = "(#" + ((Goal) value).node().serialNr() + ") " + seqToString(seq);
+                valueStr="";
 
                 statusIcon = ((Goal) value).isLinked() ? linkedGoalIcon
                         : ((Goal) value).isAutomatic() ? keyIcon : disabledGoalIcon;

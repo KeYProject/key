@@ -28,7 +28,7 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     public FieldSpecification() {}
 
-    public FieldSpecification(ProgramVariable var) {
+    public FieldSpecification(IProgramVariable var) {
         this(var, var.getKeYJavaType());
     }
 
@@ -41,7 +41,7 @@ public class FieldSpecification extends VariableSpecification implements Field {
      *        the Type of this field
      */
 
-    public FieldSpecification(ProgramVariable var, Type type) {
+    public FieldSpecification(IProgramVariable var, Type type) {
         super(var, type);
     }
 

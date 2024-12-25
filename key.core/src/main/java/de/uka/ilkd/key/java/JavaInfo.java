@@ -816,16 +816,7 @@ public final class JavaInfo {
      * reads a Java block given as a String
      */
     public JavaBlock readJavaBlock(String java) {
-        NamespaceSet nss = services.getNamespaces().copy();
-        // TODO
-        // final JavaBlock block = kpmi.readJavaBlock(java, nss);
-        final JavaBlock block = null;
-        // if we are here everything is fine and we can add the
-        // changes (may be new array types)
-        // Until end 2016, a protocol mode for namespaces was used here
-        // but was removed since unncessary. (mu 2016)
-        services.getNamespaces().add(nss);
-        return block;
+        return services.getJavaService().readBlockWithProgramVariables(java);
     }
 
     /**
@@ -1177,10 +1168,8 @@ public final class JavaInfo {
      */
     public ExecutionContext getDefaultExecutionContext() {
         if (defaultExecutionContext == null) {
-            // ensure that default classes are available
-            if (!kpmi.rec2key().setParsedSpecial()) {
-                readJavaBlock("{ {} }");
-            }
+            var cu = services.getJavaService().readCompilationUnit("public class %s { void %s() {} }"
+                    .formatted(DEFAULT_EXECUTION_CONTEXT_CLASS, DEFAULT_EXECUTION_CONTEXT_METHOD));
             final KeYJavaType kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
             defaultExecutionContext = new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt,
                 DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.nil()), null);

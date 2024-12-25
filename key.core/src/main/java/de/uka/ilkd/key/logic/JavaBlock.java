@@ -14,6 +14,8 @@ import org.key_project.util.EqualsModProofIrrelevancy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
 
@@ -21,10 +23,9 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
      * Attention using the JavaBlock below means no program not the empty program. It is used as a
      * realization of the sentinel design pattern to mark terms with operators that are incapable of
      * containing a program like predicate symbols.
-     *
+     * <p>
      * If you want to have an empty program, create a new JavaBlock instance with an empty statement
      * block.
-     *
      */
     public static final JavaBlock EMPTY_JAVABLOCK = new JavaBlock(new StatementBlock());
 
@@ -35,8 +36,7 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     /**
      * create a new JavaBlock
      *
-     * @param prg
-     *        the root JavaProgramElement for this JavaBlock
+     * @param prg the root JavaProgramElement for this JavaBlock
      */
     private JavaBlock(JavaProgramElement prg) {
         this.prg = prg;
@@ -45,16 +45,11 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     /**
      * create a new JavaBlock
      *
-     * @param prg
-     *        the root StatementBlock for this JavaBlock. TacletIndex relies on <code>prg</code>
-     *        being indeed a StatementBlock.
+     * @param prg the root StatementBlock for this JavaBlock. TacletIndex relies on <code>prg</code>
+     *            being indeed a StatementBlock.
      */
     public static JavaBlock createJavaBlock(StatementBlock prg) {
-        assert prg != null;
-        /*
-         * if (prg.isEmpty() && ! ) { return EMPTY_JAVABLOCK; }
-         */
-        return new JavaBlock(prg);
+        return new JavaBlock(Objects.requireNonNull(prg));
     }
 
 
@@ -72,12 +67,16 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
         return 0;
     }
 
-    /** returns the hashCode */
+    /**
+     * returns the hashCode
+     */
     public int hashCode() {
         return 17 + ((program() == null) ? 0 : program().hashCode());
     }
 
-    /** returns true iff the program elements are equal */
+    /**
+     * returns true iff the program elements are equal
+     */
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -102,7 +101,9 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
         return prg;
     }
 
-    /** toString */
+    /**
+     * toString
+     */
     public String toString() {
         PrettyPrinter printer = PrettyPrinter.purePrinter();
         printer.print(prg);

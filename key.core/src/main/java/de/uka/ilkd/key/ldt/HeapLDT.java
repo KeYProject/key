@@ -131,9 +131,10 @@ public final class HeapLDT extends LDT {
         if (fieldPV.isImplicit()) {
             return fieldPV.name().toString();
         } else {
+            //FIXME weigl: error substring range check breaks
             String fieldPVName = fieldPV.name().toString();
             int index = fieldPV.toString().indexOf("::");
-            assert index > 0;
+            if (index <= 0) return fieldPVName;
             return fieldPVName.substring(0, index) + "::$" + fieldPVName.substring(index + 2);
         }
     }
