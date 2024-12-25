@@ -16,20 +16,17 @@
 
 package de.uka.ilkd.key.java.ast.expression.literal;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
-
-import org.key_project.logic.Name;
-import org.key_project.util.ExtList;
-
 import org.jspecify.annotations.Nullable;
+import org.key_project.logic.Name;
+
+import java.util.List;
 
 
 /**
@@ -67,38 +64,8 @@ public final class BooleanLiteral extends Literal {
      * @param value
      *        a boolean value.
      */
-
     private BooleanLiteral(boolean value) {
         this((PositionInfo) null, null, value);
-    }
-
-    /**
-     * Boolean literal.
-     *
-     * @param children
-     *        list with all children
-     *        May contain: Comments
-     * @param value
-     *        a boolean value.
-     */
-    public BooleanLiteral(ExtList children, boolean value) {
-        super(children);
-        this.value = value;
-    }
-
-    /**
-     * Boolean literal.
-     *
-     * @param children
-     *        list with all children
-     * @param pos
-     *        The source code position.
-     * @param value
-     *        a boolean value.
-     */
-    public BooleanLiteral(ExtList children, PositionInfo pos, boolean value) {
-        super(children, pos);
-        this.value = value;
     }
 
     /**
@@ -110,7 +77,7 @@ public final class BooleanLiteral extends Literal {
      *        a boolean value.
      */
     public BooleanLiteral(PositionInfo pos, boolean value) {
-        super(pos);
+        super(pos, comments);
         this.value = value;
     }
 

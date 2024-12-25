@@ -86,20 +86,6 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
     }
 
-    public MethodBodyStatement(ExtList list) {
-        this.bodySource = list.get(TypeReference.class);
-        this.resultVar = list.get(IProgramVariable.class);
-
-        this.methodReference = list.get(MethodReference.class);
-
-        assert methodReference != null : "Missing methodreference";
-        assert methodReference.getReferencePrefix() != null
-                : "Method reference of a method body statement needs an "
-                    + "explicit reference prefix.";
-        checkOnlyProgramVarsAsArguments(methodReference.getArguments());
-        this.useSpecification = false;
-    }
-
     public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
             IProgramVariable res, ImmutableArray<Expression> args, boolean useSpecification) {
         this(method, newContext, res, args, useSpecification, null);

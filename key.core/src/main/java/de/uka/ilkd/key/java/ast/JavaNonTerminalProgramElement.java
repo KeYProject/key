@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast;
 
-import java.util.List;
-
 import de.uka.ilkd.key.rule.MatchConditions;
-
-import org.key_project.util.ExtList;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Top level implementation of a Java {@link NonTerminalProgramElement}. taken from COMPOST and
@@ -19,28 +18,11 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 
     public JavaNonTerminalProgramElement() {}
 
-
-    /**
-     * Java program element.
-     *
-     * @param list
-     *        as ExtList with children of the node
-     */
-    public JavaNonTerminalProgramElement(ExtList list) {
-        super(list);
-    }
-
-
     public JavaNonTerminalProgramElement(PositionInfo pos) {
         super(pos);
     }
 
-
-    public JavaNonTerminalProgramElement(ExtList children, PositionInfo pos) {
-        super(children, pos);
-    }
-
-    public JavaNonTerminalProgramElement(PositionInfo pi, List<Comment> comments) {
+    public JavaNonTerminalProgramElement(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi, comments);
     }
 

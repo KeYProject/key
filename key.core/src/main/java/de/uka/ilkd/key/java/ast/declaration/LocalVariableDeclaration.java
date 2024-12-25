@@ -3,17 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.LoopInitializer;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Local variable declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -105,23 +103,6 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
             ImmutableArray<VariableSpecification> vars) {
         super(pi, comments, mods, type, parentIsInterface);
         this.varSpecs = vars;
-    }
-
-    /**
-     * Local variable declaration.
-     *
-     * @param children
-     *        an ExtList containing the children. May include: several
-     *        VariableSpecification (specifying the declared local variable), a TypeReference (as
-     *        reference to the type of the declared variable), several Modifier (taken as modifiers
-     *        of the declaration), a Comment
-     */
-
-    public LocalVariableDeclaration(ExtList children) {
-        super(children, false);
-
-        this.varSpecs = new ImmutableArray<>(
-            children.collect(VariableSpecification.class));
     }
 
     /**

@@ -4,73 +4,70 @@
 package de.uka.ilkd.key.java.ast.expression.literal;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.RealLDT;
-
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
-import org.key_project.util.ExtList;
+
+import java.util.List;
 
 /**
  * JML \real literal.
  *
  * @author bruns
  */
-
-public non-sealed class RealLiteral extends Literal {
+public final class RealLiteral extends Literal {
 
     /**
      * Textual representation of the value.
      */
-
-    protected final String value;
+    private final String value;
 
     /**
      * Double literal.
      */
-
     public RealLiteral() {
-        this.value = "0.0";
+        this(null, null, "0.0");
     }
 
     public RealLiteral(int value) {
-        this(value + ".0");
+        this(null, null, value + ".0");
     }
 
     public RealLiteral(double value) {
-        this.value = String.valueOf(value);
+        this(null, null, String.valueOf(value));
     }
 
     public RealLiteral(java.math.BigDecimal value) {
-        this.value = String.valueOf(value);
+        this(null, null, String.valueOf(value));
     }
 
-    public RealLiteral(ExtList children, String value) {
-        super(children);
+    public RealLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> c, String value) {
+        super(pi, c);
         this.value = value;
-    }
-
-    public RealLiteral(ExtList children) {
-        super(children);
-        value = "0.0";
     }
 
     /**
      * Double literal.
      *
-     * @param value
-     *        a string.
+     * @param value a string.
      */
-
     public RealLiteral(String value) {
-        this.value = value;
+        this(null, null, value);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true; }
-        if (o == null || o.getClass() != this.getClass()) { return false; }
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
         return ((RealLiteral) o).getValue().equals(getValue());
     }
 
@@ -93,8 +90,7 @@ public non-sealed class RealLiteral extends Literal {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         // v.performActionOnDoubleLiteral(this);

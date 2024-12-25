@@ -1,34 +1,32 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.java.expression.operator;
+package de.uka.ilkd.key.java.ast.expression.operator;
 
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Subtype
  */
 public class Subtype extends BinaryOperator {
-
-    public Subtype(ExtList children) {
-        super(children);
+    public Subtype(PositionInfo pi, List<Comment> comments, Expression lhs, Expression rhs) {
+        super(pi, comments, lhs, rhs);
     }
 
     public Subtype(Expression lhs, Expression rhs) {
         super(lhs, rhs);
     }
 
-
     /**
      * Get precedence.
      *
      * @return the int value.
      */
-
     public int getPrecedence() {
         return 3;
     }
@@ -38,7 +36,6 @@ public class Subtype extends BinaryOperator {
      *
      * @return the int value.
      */
-
     public int getNotation() {
         return INFIX;
     }
@@ -47,8 +44,7 @@ public class Subtype extends BinaryOperator {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnSubtype(this);

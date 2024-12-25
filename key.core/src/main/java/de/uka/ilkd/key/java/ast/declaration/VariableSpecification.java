@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.abstraction.Variable;
@@ -14,12 +11,12 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
-
-import org.key_project.util.ExtList;
-
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 
 /**
@@ -75,7 +72,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     public VariableSpecification(IProgramVariable var, int dim, Expression init, Type type,
-            PositionInfo pi) {
+                                 PositionInfo pi) {
         super(pi);
         this.var = var;
         this.initializer = init;
@@ -83,26 +80,8 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         this.type = type;
     }
 
-
-    /**
-     * Constructor for the transformation of RECODER ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: an Expression
-     *        (as initializer of the variable) a Comment
-     * @param dim
-     *        the dimension of this type
-     */
-    public VariableSpecification(ExtList children, IProgramVariable var, int dim, Type type) {
-        super(children);
-        this.var = var;
-        initializer = children.get(Expression.class);
-        dimensions = dim;
-        this.type = type;
-    }
-
-    public VariableSpecification(PositionInfo pi, List<Comment> comments, Expression init,
-            IProgramVariable var, int dim, Type type) {
+    public VariableSpecification(@Nullable PositionInfo pi, @Nullable List<Comment> comments,
+                                 Expression init, IProgramVariable var, int dim, Type type) {
         super(pi, comments);
         this.var = var;
         initializer = init;
@@ -129,11 +108,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *        an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException
-     *         if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (var != null) {
@@ -270,8 +247,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnVariableSpecification(this);

@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -13,22 +12,14 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.jspecify.annotations.Nullable;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Shift left.
- *
  */
-
 public class ShiftLeft extends Operator {
-
-    /**
-     * Shift left.
-     */
-
-    public ShiftLeft() {}
-
     /**
      * Shift left.
      *
@@ -41,19 +32,7 @@ public class ShiftLeft extends Operator {
         super(lhs, rhs);
     }
 
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY. The first occurrence of an
-     * Expression in the given list is taken as the left hand side of the expression, the second
-     * occurrence is taken as the right hand side of the expression.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes.
-     */
-    public ShiftLeft(ExtList children) {
-        super(children);
-    }
-
-    public ShiftLeft(PositionInfo pi, List<Comment> c, Expression lhs, Expression rhs) {
+    public ShiftLeft(@Nullable PositionInfo pi, @Nullable List<Comment> c, Expression lhs, Expression rhs) {
         super(pi, c, lhs, rhs);
     }
 

@@ -3,14 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.reference;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Reference;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 
 /**
  * Array length reference. As a length reference is int-valued, and hence it is no valid prefix. Do
@@ -26,26 +28,6 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
      * Reference prefix. It must evaluate to an ArrayType.
      */
     protected final ReferencePrefix prefix;
-
-    /**
-     * Array length reference.
-     */
-    public ArrayLengthReference() {
-        prefix = null;
-    }
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: a
-     *        ReferencePrefix (for the array length), Comments
-     */
-    public ArrayLengthReference(ExtList children) {
-        super(children);
-        prefix = children.get(ReferencePrefix.class);
-    }
-
     /**
      * Returns the number of children of this node.
      *

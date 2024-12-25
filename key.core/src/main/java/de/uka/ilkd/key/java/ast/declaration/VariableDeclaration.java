@@ -3,17 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Variable declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -80,25 +79,8 @@ public abstract class VariableDeclaration extends JavaDeclaration
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
     }
 
-    /**
-     * Variable declaration.
-     *
-     * @param children
-     *        an ExtList of children. May include: a TypeReference (as reference to the
-     *        type of the declared variable) several Modifier (taken as modifiers of the
-     *        declaration), Comments
-     * @param parentIsInterfaceDeclaration
-     *        a boolean set true iff the parent is an
-     *        InterfaceDeclaration
-     */
-    public VariableDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
-        super(children);
-        typeReference = children.get(TypeReference.class);
-        this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
-    }
-
-    public VariableDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
-            TypeReference type, boolean parentIsInferface) {
+    public VariableDeclaration(@Nullable PositionInfo pi, @Nullable List<Comment> c, ImmutableArray<Modifier> modArray,
+                               TypeReference type, boolean parentIsInferface) {
         super(pi, c, modArray);
         this.typeReference = type;
         this.parentIsInterfaceDeclaration = parentIsInferface;

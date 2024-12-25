@@ -16,14 +16,11 @@
 
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
-
 import org.jspecify.annotations.NonNull;
+
+import java.util.List;
 
 /**
  * Then.
@@ -37,17 +34,6 @@ public final class Then extends BranchImp {
     public Then(PositionInfo pi, List<Comment> comments, Statement body) {
         super(pi, comments);
         this.body = body;
-    }
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes.
-     */
-    public Then(ExtList children) {
-        super(children);
-        body = children.get(Statement.class);
     }
 
     /**

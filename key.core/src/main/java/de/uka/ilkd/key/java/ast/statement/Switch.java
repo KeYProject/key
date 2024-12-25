@@ -3,14 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Switch.
@@ -32,7 +30,6 @@ public class Switch extends BranchStatement
     protected final Expression expression;
 
 
-
     /**
      * Switch.
      */
@@ -45,8 +42,7 @@ public class Switch extends BranchStatement
     /**
      * Switch.
      *
-     * @param e
-     *        an expression.
+     * @param e an expression.
      */
 
     public Switch(Expression e) {
@@ -57,10 +53,8 @@ public class Switch extends BranchStatement
     /**
      * Switch.
      *
-     * @param e
-     *        an expression.
-     * @param branches
-     *        a branch array
+     * @param e        an expression.
+     * @param branches a branch array
      */
 
     public Switch(Expression e, Branch[] branches) {
@@ -68,21 +62,9 @@ public class Switch extends BranchStatement
         this.expression = e;
     }
 
-    /**
-     * Switch.
-     *
-     * @param children
-     *        a list with all children
-     */
-
-    public Switch(ExtList children) {
-        super(children);
-        this.expression = children.get(Expression.class);
-        this.branches = new ImmutableArray<>(children.collect(Branch.class));
-    }
 
     public Switch(PositionInfo pi, List<Comment> c, Expression expr,
-            ImmutableArray<Branch> branches) {
+                  ImmutableArray<Branch> branches) {
         super(pi, c);
         this.expression = expr;
         this.branches = branches;
@@ -109,11 +91,9 @@ public class Switch extends BranchStatement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *        an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *            if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -208,8 +188,7 @@ public class Switch extends BranchStatement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnSwitch(this);

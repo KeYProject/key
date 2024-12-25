@@ -3,15 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.Label;
-import de.uka.ilkd.key.java.ast.NamedProgramElement;
-import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
@@ -23,35 +16,25 @@ import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.ast.expression.operator.DLEmbeddedExpression;
-import de.uka.ilkd.key.java.ast.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.ast.expression.operator.Intersect;
-import de.uka.ilkd.key.java.ast.expression.operator.Negative;
-import de.uka.ilkd.key.java.ast.expression.operator.New;
-import de.uka.ilkd.key.java.ast.expression.operator.NewArray;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
 import de.uka.ilkd.key.java.ast.reference.*;
-import de.uka.ilkd.key.java.ast.statement.Catch;
-import de.uka.ilkd.key.java.ast.statement.Ccatch;
-import de.uka.ilkd.key.java.ast.statement.For;
-import de.uka.ilkd.key.java.ast.statement.ForUpdates;
-import de.uka.ilkd.key.java.ast.statement.Guard;
-import de.uka.ilkd.key.java.ast.statement.LoopInit;
-import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.ast.statement.Switch;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
-
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Special "sorts" used for schema variables matching program constructs (class ProgramSV). Not
@@ -1313,21 +1296,6 @@ public abstract class ProgramSVSort extends SortImpl {
 
 
     // -------------------helper methods ------------------------------------
-
-    static boolean methodConstrReference(ProgramElement pe) {
-        return (pe instanceof MethodReference) || (pe instanceof ConstructorReference);
-    }
-
-    public ProgramElement getSVWithSort(ExtList l, Class<?> alternative) {
-        for (final Object o : l) {
-            if (o instanceof ProgramSV psv && (psv.sort() == this)) {
-                return (ProgramElement) o;
-            } else if ((alternative.isInstance(o)) && (!(o instanceof SchemaVariable))) {
-                return (ProgramElement) o;
-            }
-        }
-        return null;
-    }
 
     static KeYJavaType getKeYJavaType(ProgramElement pe, ExecutionContext ec, Services services) {
         return services.getTypeConverter().getKeYJavaType((Expression) pe, ec);

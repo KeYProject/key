@@ -3,44 +3,25 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Instanceof.
- *
- * @author <TT>AutoDoc</TT>
  */
-
 public class Instanceof extends TypeOperator {
-
-
-    /**
-     * Instanceof.
-     *
-     * @param children
-     *        an ExtList with all children of this node the first children in list will be
-     *        the expression on the left side, the second the one on the right side a type
-     *        reference.
-     */
-
-    public Instanceof(ExtList children) {
-        super(children);
-        assert this.getChildCount() == 2 : "not 2 children but " + this.getChildCount();
-    }
-
-
     public Instanceof(Expression unaryChild, TypeReference typeref) {
         super(unaryChild, typeref);
         assert this.getChildCount() == 2 : "not 2 children but " + this.getChildCount();

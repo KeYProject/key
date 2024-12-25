@@ -3,16 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * For.
@@ -42,11 +40,6 @@ public class For extends LoopStatement implements VariableScope {
 
     public For(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body) {
         super(inits, guard, updates, body);
-    }
-
-    public For(ExtList children) {
-        super(children.get(ILoopInit.class), children.get(IGuard.class),
-            children.get(IForUpdates.class), children.get(Statement.class), children);
     }
 
     public For(PositionInfo pi, List<Comment> c, ILoopInit inits, IForUpdates updates,

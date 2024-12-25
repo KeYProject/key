@@ -3,17 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.ccatch.CcatchNonstandardParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
-
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 public final class Ccatch extends BranchImp implements ParameterContainer, VariableScope {
     @Nullable
@@ -56,21 +53,6 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
         this(null, null, null, e, body);
     }
 
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain:
-     *        Comments, a* ParameterDeclaration (declaring the catched exceptions) a StatementBlock
-     *        (as the* action to do when catching)
-     */
-    public Ccatch(ExtList children) {
-        super(children);
-        parameter = children.get(ParameterDeclaration.class);
-        nonStdParameter =
-            children.get(CcatchNonstandardParameterDeclaration.class);
-        body = children.get(StatementBlock.class);
-    }
 
     @NonNull
     @Override

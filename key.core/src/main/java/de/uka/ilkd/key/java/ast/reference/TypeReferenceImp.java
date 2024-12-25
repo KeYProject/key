@@ -39,25 +39,6 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      */
     protected final ProgramElementName name;
 
-
-    /**
-     * Constructor for the transformation of RECODER ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: a
-     *        ReferencePrefix (as prefix of the type reference) a ProgramElementName (as name for
-     *        the type reference) Comments
-     * @param dim
-     *        the dimension of this type
-     */
-    public TypeReferenceImp(ExtList children, int dim) {
-        super(children);
-        prefix = children.get(ReferencePrefix.class);
-        name = children.get(ProgramElementName.class);
-        dimensions = dim;
-    }
-
-
     public TypeReferenceImp(ProgramElementName name) {
         this(name, 0, null);
     }

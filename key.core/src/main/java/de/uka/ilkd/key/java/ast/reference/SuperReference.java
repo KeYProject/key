@@ -3,15 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.reference;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Super reference.
@@ -48,17 +46,6 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
         super(pi, c);
         this.prefix = accessPath;
     }
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes.
-     */
-    public SuperReference(ExtList children) {
-        prefix = children.get(ReferencePrefix.class);
-    }
-
 
     public SourceElement getFirstElement() {
         return (prefix == null) ? this : prefix.getFirstElement();

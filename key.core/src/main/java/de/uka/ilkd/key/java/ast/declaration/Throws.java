@@ -3,15 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Throws.
@@ -20,8 +19,6 @@ import org.key_project.util.collection.ImmutableArray;
  */
 
 public class Throws extends JavaNonTerminalProgramElement implements TypeReferenceContainer {
-
-
     /**
      * Exceptions thrown.
      */
@@ -31,43 +28,28 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * Throws.
      */
     public Throws() {
-        this.exceptions = null;
+        this(new TypeReference[0]);
     }
 
     /**
      * Throws.
      *
-     * @param exception
-     *        a type reference.
+     * @param exception a type reference.
      */
     public Throws(TypeReference exception) {
-        this.exceptions = new ImmutableArray<>(exception);
+        this(new TypeReference[]{exception});
     }
 
     /**
      * Throws.
      *
-     * @param list
-     *        a type reference array.
+     * @param list a type reference array.
      */
     public Throws(TypeReference[] list) {
-        this.exceptions = new ImmutableArray<>(list);
+        this(null, null, new ImmutableArray<>(list));
     }
 
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: several of
-     *        TypeReference (as references to thrown exceptions), Comments
-     */
-    public Throws(ExtList children) {
-        super(children);
-        this.exceptions = new ImmutableArray<>(children.collect(TypeReference.class));
-    }
-
-    public Throws(PositionInfo pi, List<Comment> c, ImmutableArray<TypeReference> exc) {
+    public Throws(@Nullable PositionInfo pi, @Nullable List<Comment> c, ImmutableArray<TypeReference> exc) {
         super(pi, c);
         this.exceptions = exc;
     }
@@ -95,11 +77,9 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *        an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @throws ArrayIndexOutOfBoundsException
-     *         if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (exceptions != null) {
@@ -148,8 +128,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnThrows(this);

@@ -3,14 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Case.
@@ -58,25 +56,6 @@ public class Case extends BranchImp implements ExpressionContainer {
     public Case(Expression e, Statement[] body) {
         this.body = new ImmutableArray<>(body);
         this.expression = e;
-    }
-
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: Comments a
-     *        Statement (as the statement following case) Must NOT contain: an Expression indicating
-     *        the condition of the case as there are classes that are Expression and Statement, so
-     *        they might get mixed up. Use the second parameter of this constructor for the
-     *        expression.
-     * @param expr
-     *        the expression of the case
-     */
-    public Case(ExtList children, Expression expr, PositionInfo pos) {
-        super(children, pos);
-        this.expression = expr;
-        this.body = new ImmutableArray<>(children.collect(Statement.class));
     }
 
     public Case(Expression expr, ImmutableArray<Statement> body, PositionInfo pi,

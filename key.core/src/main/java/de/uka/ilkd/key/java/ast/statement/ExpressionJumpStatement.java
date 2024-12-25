@@ -3,35 +3,23 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.ExpressionContainer;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import org.jspecify.annotations.Nullable;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Expression jump statement.
- *
- * @author <TT>AutoDoc</TT>
  */
-
 public abstract class ExpressionJumpStatement extends JumpStatement implements ExpressionContainer {
-
     /**
      * Expression.
      */
-
     protected final Expression expression;
-
-    /**
-     * Expression jump statement. May contain: an Expression (as expression of the
-     * ExpressionJumpStatement), Comments
-     */
-    public ExpressionJumpStatement(ExtList children) {
-        super(children);
-        expression = children.get(Expression.class);
-    }
 
     /**
      * Expression jump statement.
@@ -43,14 +31,14 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     /**
      * Expression jump statement.
      *
-     * @param expr
-     *        an Expression used to jump
+     * @param expr an Expression used to jump
      */
     public ExpressionJumpStatement(Expression expr) {
         expression = expr;
     }
 
-    public ExpressionJumpStatement(Expression expression, PositionInfo pi, List<Comment> comments) {
+    public ExpressionJumpStatement(@Nullable PositionInfo pi, @Nullable List<Comment> comments,
+                                   Expression expression) {
         super(pi, comments);
         this.expression = expression;
     }
@@ -67,11 +55,9 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     /**
      * Return the expression at the specified index in this node's "virtual" expression array.
      *
-     * @param index
-     *        an index for an expression.
+     * @param index an index for an expression.
      * @return the expression with the given index.
-     * @exception ArrayIndexOutOfBoundsException
-     *            if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
         if (expression != null && index == 0) {
@@ -101,11 +87,9 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *        an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *            if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (expression != null) {

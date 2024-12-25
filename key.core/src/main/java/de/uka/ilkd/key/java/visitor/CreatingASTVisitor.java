@@ -162,7 +162,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             Expression guard = g == null ? null : g.getExpression();
             Statement body = changeList.removeFirstOccurrence(Statement.class);
 
-            While newX = new While(guard, body, pos);
+            While newX = new While(pos, guard, body);
             performActionOnLoopInvariant(x, newX);
             performActionOnLoopContract(x, newX);
             addChild(newX);
@@ -1274,7 +1274,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         DefaultAction def = new DefaultAction(x) {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
-                return new PackageSpecification(changeList);
+                return new PackageSpecification(pi, c, changeList);
             }
         };
         def.doAction(x);

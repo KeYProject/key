@@ -16,13 +16,11 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaDLFieldNames;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.ExtList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -202,15 +200,6 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     @Override
     public ReferencePrefix getReferencePrefix() {
         return null;
-    }
-
-    @Override
-    public Expression convertToProgram(Term t, ExtList l) {
-        if (isStatic()) {
-            return new FieldReference(this, new TypeRef(getContainerType()));
-        } else {
-            return this;
-        }
     }
 
 

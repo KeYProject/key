@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Static;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 
 public class ClassInitializer extends JavaDeclaration
@@ -37,24 +35,9 @@ public class ClassInitializer extends JavaDeclaration
         this.body = body;
     }
 
-    /**
-     * Class initializer.
-     *
-     * @param children
-     *        list with all children. May include: a StatementBlock (taken as body of the
-     *        ClassInitialiyer), several Modifier (taken as modifiers of the declaration), a Comment
-     */
-    public ClassInitializer(ExtList children) {
-        super(children);
-        body = children.get(StatementBlock.class);
-    }
-
-
-
     public StatementBlock getBody() {
         return body;
     }
-
 
     public int getStatementCount() {
         return (body != null) ? 1 : 0;

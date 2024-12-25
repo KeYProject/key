@@ -186,7 +186,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
             changeList.removeFirst();
             Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
-            While newLoop = new While(guard, body, x.getPositionInfo());
+            While newLoop = new While(x.getPositionInfo(), guard, body);
             services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();

@@ -3,31 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
-
+import java.util.List;
 
 /**
  * Modulo.
  */
 public class Modulo extends BinaryOperator {
-
-
-    /**
-     * Modulo.
-     */
-
-    public Modulo(ExtList children) {
-        super(children);
-    }
-
     public Modulo(Expression lhs, Expression rhs) {
         super(lhs, rhs);
     }

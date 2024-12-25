@@ -3,39 +3,33 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.literal;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.DoubleLDT;
-
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
-import org.key_project.util.ExtList;
+
+import java.util.List;
 
 /**
  * Double literal.
- *
- * @author <TT>AutoDoc</TT>
  */
-
-public non-sealed class DoubleLiteral extends Literal {
+public final class DoubleLiteral extends Literal {
 
     /**
      * Textual representation of the value.
      */
-
-    protected final String value;
+    private final String value;
 
     /**
      * Double literal.
      */
-
     public DoubleLiteral() {
-        this.value = "0.0";
+        this("0.0");
     }
 
     /**
@@ -44,22 +38,19 @@ public non-sealed class DoubleLiteral extends Literal {
      * @param value
      *        a double value.
      */
-
     public DoubleLiteral(double value) {
-        this.value = String.valueOf(value);
+        this(null, null, String.valueOf(value));
     }
 
     /**
      * Double literal.
      *
-     * @param children
-     *        list with all children(here:comments) May contain: Comments
-     * @param value
-     *        a string.
+     * @param pi
+     * @param c
+     * @param value    a string.
      */
-
-    public DoubleLiteral(ExtList children, String value) {
-        super(children);
+    public DoubleLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> c, String value) {
+        super(pi,c);
         this.value = value;
     }
 
@@ -70,15 +61,8 @@ public non-sealed class DoubleLiteral extends Literal {
      *        a string.
      */
 
-    public DoubleLiteral(String value) {
-        this.value = value;
+    public DoubleLiteral(String value) {this(null,null,value);
     }
-
-    public DoubleLiteral(PositionInfo pi, List<Comment> c, String value) {
-        super(pi, c);
-        this.value = value;
-    }
-
 
     @Override
     public boolean equals(Object o) {

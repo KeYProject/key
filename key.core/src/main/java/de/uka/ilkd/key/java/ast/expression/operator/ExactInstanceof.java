@@ -9,31 +9,10 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
-
 /**
  * Instanceof.
- *
- * @author <TT>AutoDoc</TT>
  */
-
 public class ExactInstanceof extends TypeOperator {
-
-
-    /**
-     * Instanceof.
-     *
-     * @param children
-     *        an ExtList with all children of this node the first children in list will be
-     *        the expression on the left side, the second the one on the right side a type
-     *        reference.
-     */
-
-    public ExactInstanceof(ExtList children) {
-        super(children);
-    }
-
-
     public ExactInstanceof(Expression unaryChild, TypeReference typeref) {
         super(unaryChild, typeref);
     }

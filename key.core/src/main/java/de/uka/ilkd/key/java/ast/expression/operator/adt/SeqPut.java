@@ -10,15 +10,7 @@ import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
-
 public class SeqPut extends Operator {
-
-    public SeqPut(ExtList children) {
-        super(children);
-    }
-
-
     @Override
     public int getPrecedence() {
         return 0;

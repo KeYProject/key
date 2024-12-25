@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-import java.util.Objects;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
@@ -14,9 +11,10 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * The array allocation operator. There are two variants for NewArray:
@@ -52,28 +50,6 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * the key java type of this array
      */
     private final KeYJavaType keyJavaType;
-
-
-    /**
-     * New array.
-     *
-     * @param children
-     *        an ExtList with the children of this node (remove the ArrayInitializer out of
-     *        the list).
-     * @param init
-     *        the arrayInitializer
-     * @param dimensions
-     *        an int value.
-     */
-
-    public NewArray(ExtList children, KeYJavaType keyJavaType, ArrayInitializer init,
-            int dimensions) {
-        super(children);
-        this.arrayInitializer = init;
-        this.dimensions = dimensions;
-        this.keyJavaType = keyJavaType;
-        assert dimensions > 0;
-    }
 
 
     /**

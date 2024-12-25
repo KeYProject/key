@@ -6,13 +6,13 @@ package de.uka.ilkd.key.java.ast;
 import de.uka.ilkd.key.java.ast.reference.PackageReference;
 import de.uka.ilkd.key.java.ast.reference.PackageReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.jspecify.annotations.Nullable;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Package specification. taken from COMPOST and changed to achieve an immutable structure
  */
-
 public class PackageSpecification extends JavaNonTerminalProgramElement
         implements PackageReferenceContainer {
 
@@ -20,25 +20,16 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
     /**
      * Reference.
      */
-
     protected final PackageReference reference;
 
-    /**
-     * Package specification.
-     *
-     * @param children
-     *        an ExtList with children
-     */
-
-    public PackageSpecification(ExtList children) {
-        super(children);
-        reference = children.get(PackageReference.class);
+    public PackageSpecification(PackageReference reference) {
+        this(null, null, reference);
     }
 
-    public PackageSpecification(PackageReference packageReference) {
+    public PackageSpecification(@Nullable PositionInfo pi, @Nullable List<Comment> c, PackageReference packageReference) {
+        super(pi, c);
         this.reference = packageReference;
     }
-
 
     public SourceElement getLastElement() {
         return reference;

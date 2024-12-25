@@ -86,29 +86,6 @@ public class ParameterDeclaration extends VariableDeclaration {
         this(mods, typeRef, var, parentIsInterfaceDeclaration, false);
     }
 
-
-    /**
-     * Parameter declaration.
-     *
-     * @param children
-     *        an ExtList of children. May contain: a VariableSpecification (specifying the
-     *        parameter) a TypeReference (as reference to the type of the declared variable) several
-     *        Modifier (taken as modifiers of the declaration), a Comment
-     * @param parentIsInterfaceDeclaration
-     *        a boolean set true iff the parent is an
-     *        InterfaceDeclaration
-     * @param parameterIsVarArg
-     *        true iff this the last parameter of a method with variable number of
-     *        arguments
-     */
-    public ParameterDeclaration(ExtList children, boolean parentIsInterfaceDeclaration,
-            boolean parameterIsVarArg) {
-        super(children, parentIsInterfaceDeclaration);
-        this.varSpec =
-            new ImmutableArray<>(children.get(VariableSpecification.class));
-        this.varArgParameter = parameterIsVarArg;
-    }
-
     public ParameterDeclaration(
             ImmutableArray<VariableSpecification> specs,
             PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,

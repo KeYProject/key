@@ -16,9 +16,8 @@
 
 package de.uka.ilkd.key.java.ast.expression.literal;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.SourceElement;
@@ -26,11 +25,10 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.CharListLDT;
-
-import org.key_project.logic.Name;
-import org.key_project.util.ExtList;
-
 import org.jspecify.annotations.Nullable;
+import org.key_project.logic.Name;
+
+import java.util.List;
 
 
 public final class StringLiteral extends Literal implements ReferencePrefix {
@@ -51,20 +49,6 @@ public final class StringLiteral extends Literal implements ReferencePrefix {
     public StringLiteral(String value) {
         this(null, null, value);
     }
-
-    /**
-     * String literal.
-     *
-     * @param children
-     *        an ExtList with children(here:comments)
-     * @param value
-     *        a string.
-     */
-    public StringLiteral(ExtList children, String value) {
-        super(children);
-        this.value = value;
-    }
-
 
     public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
         if (!(o instanceof StringLiteral)) {

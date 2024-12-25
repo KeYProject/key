@@ -3,21 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Loop statement.
- *
  */
 
 public abstract class LoopStatement extends JavaStatement
@@ -48,36 +44,11 @@ public abstract class LoopStatement extends JavaStatement
     @NonNull
     protected final Statement body;
 
-    /**
-     * Loop statement.
-     *
-     * @param body
-     *        a statement.
-     */
-    public LoopStatement(@NonNull Expression guard, @NonNull Statement body, ExtList comments) {
-        super(comments);
-        this.body = body;
-        this.updates = null;
-        this.inits = null;
-        this.guard = new Guard(guard);
-    }
-
-
-    public LoopStatement(Expression guard, @NonNull Statement body, ExtList comments,
-            PositionInfo pos) {
-        super(add(comments, pos));
-        this.body = body;
-        this.updates = null;
-        this.inits = null;
-        this.guard = new Guard(guard);
-    }
-
 
     /**
      * Loop statement.
      *
-     * @param body
-     *        a statement.
+     * @param body a statement.
      */
     public LoopStatement(Expression guard, @NonNull Statement body) {
         this.body = body;
@@ -98,17 +69,13 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Loop statement. This constructor is used for the transformation of Recoder to KeY.
      *
-     * @param inits
-     *        the initializers of the loop
-     * @param guard
-     *        the guard of the loop
-     * @param updates
-     *        the updates of the loop
-     * @param body
-     *        the body of the loop
+     * @param inits   the initializers of the loop
+     * @param guard   the guard of the loop
+     * @param updates the updates of the loop
+     * @param body    the body of the loop
      */
     public LoopStatement(LoopInitializer[] inits, Expression guard, Expression[] updates,
-            @NonNull Statement body) {
+                         @NonNull Statement body) {
         this.body = body;
         if (updates != null) {
             this.updates = new ForUpdates(new ImmutableArray<>(updates));
@@ -122,56 +89,15 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Loop statement. This constructor is used for the transformation of Recoder to KeY.
      *
-     * @param inits
-     *        the initializers of the loop
-     * @param guard
-     *        the guard of the loop
-     * @param updates
-     *        the updates of the loop
-     * @param body
-     *        the body of the loop
-     * @param comments
-     *        the comments attached to this statement.
+     * @param inits   the initializers of the loop
+     * @param guard   the guard of the loop
+     * @param updates the updates of the loop
+     * @param body    the body of the loop
+     * @param pos     the position of the loop
      */
     public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
-            @NonNull Statement body,
-            ExtList comments) {
-        super(comments);
-        this.body = body;
-        this.updates = updates;
-        this.inits = inits;
-        this.guard = guard;
-    }
-
-
-    public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
-            @NonNull Statement body,
-            ExtList comments, PositionInfo pos) {
-        super(add(comments, pos));
-        this.body = body;
-        this.updates = updates;
-        this.inits = inits;
-        this.guard = guard;
-    }
-
-
-    /**
-     * Loop statement. This constructor is used for the transformation of Recoder to KeY.
-     *
-     * @param inits
-     *        the initializers of the loop
-     * @param guard
-     *        the guard of the loop
-     * @param updates
-     *        the updates of the loop
-     * @param body
-     *        the body of the loop
-     * @param pos
-     *        the position of the loop
-     */
-    public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
-            @NonNull Statement body,
-            PositionInfo pos) {
+                         @NonNull Statement body,
+                         PositionInfo pos) {
         super(pos);
         this.body = body;
         this.updates = updates;
@@ -183,36 +109,27 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Loop statement. This constructor is used for the transformation of Recoder to KeY.
      *
-     * @param inits
-     *        the initializers of the loop
-     * @param guard
-     *        the guard of the loop
-     * @param updates
-     *        the updates of the loop
-     * @param body
-     *        the body of the loop
+     * @param inits   the initializers of the loop
+     * @param guard   the guard of the loop
+     * @param updates the updates of the loop
+     * @param body    the body of the loop
      */
     public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
-            @NonNull Statement body) {
+                         @NonNull Statement body) {
         this.body = body;
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
     }
 
-    public LoopStatement(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-            IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body) {
+    public LoopStatement(@Nullable PositionInfo pi, @Nullable List<Comment> comments, ILoopInit inits,
+                         IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body) {
         super(pi, comments);
         this.inits = inits;
         this.updates = updates;
         this.guard = guard;
         this.body = body;
 
-    }
-
-    static private ExtList add(ExtList e, Object o) {
-        e.add(o);
-        return e;
     }
 
     /**
@@ -240,11 +157,9 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *        an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *            if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (inits != null) {

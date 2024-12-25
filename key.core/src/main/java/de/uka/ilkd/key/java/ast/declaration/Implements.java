@@ -5,8 +5,6 @@ package de.uka.ilkd.key.java.ast.declaration;
 
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -42,18 +40,6 @@ public class Implements extends InheritanceSpecification {
 
     public Implements(TypeReference[] typeRefs) {
         super(typeRefs);
-    }
-
-    /**
-     * Implements.
-     *
-     * @param children
-     *        containing the children. May include: a Comment, several TypeReference (as
-     *        references to the supertypes)
-     *
-     */
-    public Implements(ExtList children) {
-        super(children);
     }
 
     public Implements(ImmutableArray<TypeReference> types) {

@@ -3,16 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-import org.key_project.util.ExtList;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is used for wrapping an enum into a standard class type.
@@ -32,28 +29,6 @@ public class EnumClassDeclaration extends ClassDeclaration {
      */
     private final List<IProgramVariable> constants = new ArrayList<>();
 
-    /**
-     * create a new EnumClassDeclaration that describes an enum defintion. It merely wraps a
-     * ClassDeclaration but has memory about which fields have been declared as enum constants.
-     *
-     * @param children
-     *        children in the ast (members)
-     * @param fullName
-     *        of the class/enum
-     * @param isLibrary
-     *        see class constructor
-     */
-    // TODO javaparser
-    public EnumClassDeclaration(
-            ExtList children, ProgramElementName fullName, boolean isLibrary
-    /* , List<EnumConstantDeclaration> enumConstantDeclarations */) {
-        super(children, fullName, isLibrary);
-
-        // for (EnumConstantDeclaration ecd : enumConstantDeclarations) {
-        // String constName = ecd.getEnumConstantSpecification().getName();
-        // constants.add(findAttr(constName));
-        // }
-    }
 
     /*
      * find the program variable for a constant given by name.

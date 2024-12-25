@@ -3,15 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
-
-import org.key_project.util.ExtList;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Operator base class.
@@ -31,7 +30,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     public static final int POSTFIX = 2;
 
     public Operator() {
-        this.children = null;
+        this(null, null, new ImmutableArray<>());
     }
 
     /**
@@ -43,21 +42,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      *        an expression.
      */
     public Operator(Expression lhs, Expression rhs) {
-        this.children = new ImmutableArray<>(lhs, rhs);
-    }
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. In this case the order of
-     *        the children is IMPORTANT. May contain: 2 of Expression (the first Expression as left
-     *        hand side, the second as right hand side), Comments
-     *
-     */
-    public Operator(ExtList children) {
-        super(children);
-        this.children = new ImmutableArray<>(children.collect(Expression.class));
+        this(null, null, new ImmutableArray<>(lhs, rhs));
     }
 
     /**
@@ -66,9 +51,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @param unaryChild
      *        an expression.
      */
-
     public Operator(Expression unaryChild) {
-        this.children = new ImmutableArray<>(unaryChild);
+        this(null, null, new ImmutableArray<>(unaryChild));
     }
 
     /**
@@ -77,17 +61,16 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @param arguments
      *        an array of expression.
      */
-
     public Operator(Expression[] arguments) {
-        this.children = new ImmutableArray<>(arguments);
+        this(null, null, new ImmutableArray<>(arguments));
     }
 
-    public Operator(PositionInfo pi, List<Comment> comments, ImmutableArray<Expression> children) {
+    public Operator(@Nullable PositionInfo pi, @Nullable List<Comment> comments, ImmutableArray<Expression> children) {
         super(pi, comments);
         this.children = children;
     }
 
-    public Operator(PositionInfo pi, List<Comment> c, Expression lhs, Expression rhs) {
+    public Operator(@Nullable PositionInfo pi, @Nullable List<Comment> c, Expression lhs, Expression rhs) {
         this(pi, c, new ImmutableArray<>(lhs, rhs));
     }
 

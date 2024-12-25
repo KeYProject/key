@@ -8,33 +8,15 @@ import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
-
 /**
  * Else.
  */
-
 public class Else extends BranchImp {
 
     /**
      * Body.
      */
     protected final Statement body;
-
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: a Body (as body
-     *        of Else), Comments
-     */
-    public Else(ExtList children) {
-        super(children);
-        body = children.get(Statement.class);
-    }
-
-
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.

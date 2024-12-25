@@ -3,17 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.reference;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Array reference.
@@ -56,48 +54,6 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
     public ArrayReference(ReferencePrefix accessPath, Expression[] initializers) {
         this.prefix = accessPath;
         this.inits = new ImmutableArray<>(initializers);
-    }
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: several of
-     *        Expression (as initializers of the array), Comments. MUST NOT CONTAIN: the
-     *        ReferencePrefix for the accessPath because Expression and ReferencePrefix might not be
-     *        disjunct.
-     * @param accessPath
-     *        a ReferencePrefix of the array reference.
-     */
-    public ArrayReference(ExtList children, ReferencePrefix accessPath, PositionInfo pi) {
-        super(children, pi);
-        Expression[] e = children.collect(Expression.class);
-        if (e.length > 1) {
-            Expression[] e1 = new Expression[e.length - 1];
-            System.arraycopy(e, 0, e1, 0, e1.length);
-            this.prefix = new ArrayReference(e1, accessPath);
-            e1 = new Expression[1];
-            e1[0] = e[e.length - 1];
-            this.inits = new ImmutableArray<>(e1);
-        } else {
-            this.prefix = accessPath;
-            this.inits = new ImmutableArray<>(e);
-        }
-    }
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: several of
-     *        Expression (as initializers of the array), Comments. MUST NOT CONTAIN: the
-     *        ReferencePrefix for the accessPath because Expression and ReferencePrefix might not be
-     *        disjunct.
-     * @param accessPath
-     *        a ReferencePrefix of the array reference.
-     */
-    public ArrayReference(ExtList children, ReferencePrefix accessPath) {
-        this(children, accessPath, children.get(PositionInfo.class));
     }
 
     private ArrayReference(Expression[] e, ReferencePrefix accessPath) {

@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.StatementBlock;
@@ -12,9 +10,9 @@ import de.uka.ilkd.key.java.ast.abstraction.Constructor;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 
 /**
@@ -24,23 +22,6 @@ import org.key_project.util.collection.ImmutableArray;
  * achieve an immutable structure
  */
 public class ConstructorDeclaration extends MethodDeclaration implements Constructor {
-
-    /**
-     * Constructor declaration.
-     *
-     * @parm children an ExtList with the children. May include: a TypeReference (as a reference to
-     *       the return type), a de.uka.ilkd.key.logic.ProgramElementName (as Name of the method),
-     *       several ParameterDeclaration (as parameters of the declared method), a StatementBlock
-     *       (as body of the declared method), several Modifier (taken as modifiers of the
-     *       declaration), a Comment
-     * @param parentIsInterfaceDeclaration
-     *        a boolean set true iff parent is an InterfaceDeclaration
-     */
-    public ConstructorDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
-        super(children, parentIsInterfaceDeclaration, null);
-    }
-
-
     /**
      * Constructor declaration.
      *

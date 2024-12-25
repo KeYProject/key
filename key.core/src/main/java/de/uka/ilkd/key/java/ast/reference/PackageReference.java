@@ -9,8 +9,6 @@ import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-import org.key_project.util.ExtList;
-
 /**
  * Package reference.
  *
@@ -29,20 +27,6 @@ public class PackageReference extends JavaNonTerminalProgramElement
      */
     protected final ProgramElementName name;
 
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: a
-     *        ProgramElementName (as the name of the method reference), a ReferencePrefix (as
-     *        accessPath to the package), Comments.
-     */
-    public PackageReference(ExtList children) {
-        prefix = children.get(PackageReference.class);
-        name = children.get(ProgramElementName.class);
-        assert name != null;
-    }
 
     public PackageReference(ProgramElementName name, ReferencePrefix prefix) {
         this.prefix = prefix;

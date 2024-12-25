@@ -16,4 +16,6 @@
  * {@link recoder.service.SourceInfo} implementations and should
  * not be modified from others.
  */
-package de.uka.ilkd.key.java.abstraction;
+@NullMarked package de.uka.ilkd.key.java.ast.abstraction;
+
+import org.jspecify.annotations.NullMarked;

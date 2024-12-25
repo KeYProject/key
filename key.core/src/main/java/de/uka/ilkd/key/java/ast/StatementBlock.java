@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramPrefixUtil;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
@@ -16,12 +13,12 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.util.Debug;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.key_project.util.collection.ImmutableArray;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Statement block. taken from COMPOST and changed to achieve an immutable structure
@@ -41,7 +38,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     private final MethodFrame innerMostMethodFrame;
 
     public StatementBlock(
-            PositionInfo pi, List<Comment> comments,
+            @Nullable PositionInfo pi, @Nullable List<Comment> comments,
             @NonNull ImmutableArray<? extends Statement> body) {
         super(pi, comments);
         this.body = body;

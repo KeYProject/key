@@ -3,17 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Redundant Parentheses. Modelled as a special "identity" unary "infix" operator.
@@ -22,23 +23,11 @@ import org.key_project.util.collection.ImmutableArray;
 public class ParenthesizedExpression extends Operator
         implements ExpressionStatement, ReferencePrefix {
 
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. In this case the order of
-     *        the children is IMPORTANT. May contain: several of Expression (should be one, the
-     *        first is taken as parenthesized expression), Comments
-     */
-    public ParenthesizedExpression(ExtList children) {
-        super(children);
-    }
-
     public ParenthesizedExpression(Expression child) {
-        super(child);
+        this(null, null, child);
     }
 
-    public ParenthesizedExpression(PositionInfo pi, List<Comment> c, Expression expr) {
+    public ParenthesizedExpression(@Nullable PositionInfo pi, @Nullable List<Comment> c, Expression expr) {
         super(pi, c, new ImmutableArray<>(expr));
     }
 
@@ -82,8 +71,7 @@ public class ParenthesizedExpression extends Operator
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnParenthesizedExpression(this);

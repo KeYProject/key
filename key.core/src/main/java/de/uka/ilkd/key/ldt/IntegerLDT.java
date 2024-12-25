@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -21,11 +22,12 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
-import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 
 /**
@@ -794,7 +796,7 @@ public final class IntegerLDT extends LDT {
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(Term t, List<SourceElement> children, Services services) {
         if (!containsFunction((Function) t.op())) {
             return null;
         }

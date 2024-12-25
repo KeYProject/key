@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Jump statement.
@@ -16,18 +14,6 @@ import org.key_project.util.ExtList;
  * @author <TT>AutoDoc</TT>
  */
 public abstract class JumpStatement extends JavaStatement {
-
-    /**
-     * Jump statement.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: Comments
-     */
-    public JumpStatement(ExtList children) {
-        super(children);
-    }
-
-
     /**
      * Jump statement.
      */

@@ -4,13 +4,16 @@
 package de.uka.ilkd.key.java.ast.expression.literal;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.FloatLDT;
-
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
-import org.key_project.util.ExtList;
+
+import java.util.List;
 
 /**
  * Float literal.
@@ -19,54 +22,42 @@ import org.key_project.util.ExtList;
  */
 
 public non-sealed class FloatLiteral extends Literal {
-
     /**
      * Textual representation of the value.
      */
-
     protected final String value;
 
     /**
      * Float literal.
      *
-     * @param value
-     *        a float value.
+     * @param value a float value.
      */
-
     public FloatLiteral(float value) {
-        super();
-        this.value = String.valueOf(value);
+        this(String.valueOf(value));
     }
 
     /**
      * Float literal.
      *
-     * @param children
-     *        an ExtList with all children(here:comments)
-     * @param value
-     *        a string.
+     * @param value a string.
      */
-
-    public FloatLiteral(ExtList children, String value) {
-        super(children);
-        this.value = value;
-    }
-
-    /**
-     * Float literal.
-     *
-     * @param value
-     *        a string.
-     */
-
     public FloatLiteral(String value) {
+        this(null, null, value);
+    }
+
+    public FloatLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> c, String value) {
+        super(pi, c);
         this.value = value;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) { return true; }
-        if (o == null || o.getClass() != this.getClass()) { return false; }
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
         return ((FloatLiteral) o).getValue().equals(getValue());
     }
 
@@ -89,8 +80,7 @@ public non-sealed class FloatLiteral extends Literal {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnFloatLiteral(this);

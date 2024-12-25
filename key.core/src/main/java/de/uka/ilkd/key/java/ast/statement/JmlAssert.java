@@ -49,16 +49,6 @@ public class JmlAssert extends JavaStatement {
         this.condition = condition;
     }
 
-    /**
-     * @param children
-     *        the children of this element
-     */
-    public JmlAssert(ExtList children) {
-        super(children);
-        this.kind = Objects.requireNonNull(children.get(TextualJMLAssertStatement.Kind.class));
-        this.condition = Objects.requireNonNull(children.get(KeyAst.Expression.class));
-    }
-
     public JmlAssert(JmlAssert other) {
         this(other.kind, other.condition, other.getPositionInfo());
     }

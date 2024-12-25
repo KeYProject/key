@@ -10,8 +10,6 @@ import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -43,9 +41,9 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
 
     private String altNameRepresentation;
 
-    private ArrayDeclaration(ExtList children, TypeReference baseType, ProgramElementName name,
-            KeYJavaType superType) {
-        super(addLength(children, superType), name, name, false);
+    private ArrayDeclaration(Modifier[] pi, ProgramElementName comments, TypeReference baseType, ProgramElementName name,
+                             KeYJavaType superType) {
+        super(pi, comments, name, name, false);
         assert name != null;
         this.baseType = baseType;
         this.dim = dimension();
@@ -64,7 +62,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
      *        an ExtList with the basetype and member declarations of this type
      */
     public ArrayDeclaration(ExtList children, TypeReference baseType, KeYJavaType superType) {
-        this(children, baseType, createName(baseType), superType);
+        this(children, comments, baseType, createName(baseType), superType);
     }
 
     /**

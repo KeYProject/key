@@ -3,26 +3,24 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
-import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.abstraction.Package;
+import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
-
-import org.key_project.util.ExtList;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Type declaration.
@@ -43,24 +41,21 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * JML modifiers of a type
      *
-     * @param strictlyPure
-     *        strictly pure
-     * @param pure
-     *        pure
-     * @param nullableByDefault
-     *        nullable by default
-     * @param specMathMode
-     *        spec math mode
+     * @param strictlyPure      strictly pure
+     * @param pure              pure
+     * @param nullableByDefault nullable by default
+     * @param specMathMode      spec math mode
      */
     public record JMLModifiers(
             boolean strictlyPure, boolean pure, boolean nullableByDefault,
-            SpecMathMode specMathMode) {}
+            SpecMathMode specMathMode) {
+    }
 
     protected final JMLModifiers jmlModifiers;
 
 
     public TypeDeclaration(
-            PositionInfo pi, List<Comment> comments,
+            @Nullable PositionInfo pi, @Nullable List<Comment> comments,
             @NonNull ImmutableArray<Modifier> modArray,
             ProgramElementName name, ProgramElementName fullName,
             ImmutableArray<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
@@ -74,26 +69,13 @@ public abstract class TypeDeclaration extends JavaDeclaration
         this.jmlModifiers = JMLInfoExtractor.parseClass(this);
     }
 
-    @Deprecated
-    public TypeDeclaration() {
-        this.name = null;
-        this.fullName = null;
-        this.members = null;
-        this.parentIsInterfaceDeclaration = false;
-        this.isLibrary = false;
-        this.jmlModifiers = JMLInfoExtractor.parseClass(this);
-    }
-
     /**
      * Type declaration.
      *
-     * @param mods
-     *        a modifier array.
-     * @param name
-     *        ProgramElementName of the type
-     * @param members
-     *        an array containing the memberdeclarations of
-     *        this type
+     * @param mods    a modifier array.
+     * @param name    ProgramElementName of the type
+     * @param members an array containing the memberdeclarations of
+     *                this type
      */
     public TypeDeclaration(
             Modifier[] mods,
@@ -112,26 +94,25 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     /**
-     * @param children
-     *        an ExtList of children.
-     * @param name
-     *        the ProgramElementName of the type
-     *        May contain:
-     *        several MemberDeclaration (as members of the type),
-     *        a parentIsInterfaceDeclaration (indicating if parent is interface),
-     *        several Modifier (as modifiers of the type decl),
-     *        Comments
+     * @param modifier
+     * @param name     the ProgramElementName of the type
+     *                 May contain:
+     *                 several MemberDeclaration (as members of the type),
+     *                 a parentIsInterfaceDeclaration (indicating if parent is interface),
+     *                 several Modifier (as modifiers of the type decl),
+     *                 Comments
      */
     public TypeDeclaration(
-            ExtList children,
-            ProgramElementName name,
+            PositionInfo pi, List<Comment> comments,
+            @NonNull ImmutableArray<Modifier> modifier, ProgramElementName name,
             ProgramElementName fullName,
+            ImmutableArray<MemberDeclaration> members,
+            @Nullable ParentIsInterfaceDeclaration piid,
             boolean isLibrary) {
-        super(children);
+        super(pi, comments, modifier);
         this.name = name;
         this.fullName = fullName;
-        this.members = new ImmutableArray<>(children.collect(MemberDeclaration.class));
-        ParentIsInterfaceDeclaration piid = children.get(ParentIsInterfaceDeclaration.class);
+        this.members = members;
         if (piid != null) {
             this.parentIsInterfaceDeclaration = (piid).getValue();
         } else {
@@ -139,25 +120,6 @@ public abstract class TypeDeclaration extends JavaDeclaration
         }
         this.isLibrary = isLibrary;
         this.jmlModifiers = JMLInfoExtractor.parseClass(this);
-    }
-
-    /**
-     * @param children
-     *        an ExtList of children.
-     *        May contain:
-     *        a ProgramElementName (as name),
-     *        several MemberDeclaration (as members of the type),
-     *        a parentIsInterfaceDeclaration (indicating if parent is interface),
-     *        several Modifier (as modifiers of the type decl),
-     *        Comments
-     */
-    public TypeDeclaration(
-            ExtList children,
-            ProgramElementName fullName,
-            boolean isLibrary) {
-        this(children,
-            children.get(ProgramElementName.class),
-            fullName, isLibrary);
     }
 
     @NonNull
@@ -194,7 +156,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * according to JLS 4.5.5
      *
      * @return the default value of the given type
-     *         according to JLS 4.5.5
+     * according to JLS 4.5.5
      */
     public Literal getDefaultValue() {
         return NullLiteral.NULL;

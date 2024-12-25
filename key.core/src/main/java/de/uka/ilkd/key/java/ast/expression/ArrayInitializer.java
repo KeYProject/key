@@ -3,16 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 
 /**
@@ -28,21 +26,6 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
     protected final ImmutableArray<Expression> children;
     protected final KeYJavaType kjt;
-
-    /**
-     * Array initializer.
-     *
-     * @param list
-     *        with all children. May contain: several of Expression (as the initializing
-     *        expression) Comments
-     */
-    public ArrayInitializer(ExtList list, KeYJavaType kjt) {
-        super(list);
-        assert kjt != null;
-        this.kjt = kjt;
-        this.children = new ImmutableArray<>(list.collect(Expression.class));
-    }
-
 
     /**
      * create a new array initializer with the given expressions as elements.

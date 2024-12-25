@@ -6,9 +6,9 @@ package de.uka.ilkd.key.java.ast.statement;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import org.jspecify.annotations.Nullable;
 
-import org.key_project.util.ExtList;
-
+import java.util.List;
 
 
 public class CatchAllStatement extends JavaNonTerminalProgramElement
@@ -17,22 +17,18 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
     private final LocationVariable param;
 
     public CatchAllStatement(StatementBlock body, LocationVariable param) {
+        this(null, null, body, param);
+    }
+
+    public CatchAllStatement(@Nullable PositionInfo pi, @Nullable List<Comment> comments, StatementBlock body, LocationVariable param) {
+        super(pi, comments);
         this.body = body;
         this.param = param;
     }
 
-
-    public CatchAllStatement(ExtList children) {
-        super(children); // for comments
-        this.body = children.get(StatementBlock.class);
-        this.param = children.get(LocationVariable.class);
-    }
-
-
     public Statement getBody() {
         return body;
     }
-
 
     public LocationVariable getParam() {
         return param;
@@ -69,11 +65,9 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
     /**
      * Returns the child at the specified index in this node's "virtual" child array.
      *
-     * @param index
-     *        an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *            if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (index == 0) {
@@ -90,8 +84,7 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnCatchAllStatement(this);

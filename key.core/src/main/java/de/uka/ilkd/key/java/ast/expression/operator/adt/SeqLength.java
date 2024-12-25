@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator.adt;
 
-import java.util.List;
-import java.util.Objects;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -15,9 +12,10 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a function giving the length of a sequence.
@@ -32,11 +30,6 @@ public class SeqLength extends Operator {
     public SeqLength(PositionInfo pi, List<Comment> c, Expression child) {
         super(pi, c, new ImmutableArray<>(Objects.requireNonNull(child)));
     }
-
-    public SeqLength(ExtList changeList) {
-        super(changeList);
-    }
-
 
     @Override
     public int getPrecedence() {

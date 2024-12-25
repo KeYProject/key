@@ -3,26 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator.adt;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 public class SetMinus extends BinaryOperator {
 
     public SetMinus(PositionInfo pi, List<Comment> c, Expression child, Expression right) {
         super(pi, c, child, right);
     }
-
-    public SetMinus(ExtList changeList) {
-        super(changeList);
-    }
-
 
     public int getPrecedence() {
         return 0;

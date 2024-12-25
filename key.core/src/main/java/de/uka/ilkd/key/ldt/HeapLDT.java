@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
@@ -19,12 +20,13 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 
 /**
@@ -471,15 +473,15 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(Term t, List<SourceElement> children, Services services) {
         if (t.op() instanceof SortDependingFunction
                 && ((SortDependingFunction) t.op()).isSimilar(select)) {
-            ProgramVariable heap = (ProgramVariable) children.remove(0);
+            ProgramVariable heap = (ProgramVariable) children.removeFirst();
             if (heap != getHeap()) {
                 throw new IllegalArgumentException("Can only translate field access to base heap.");
             }
-            ReferencePrefix prefix = (ReferencePrefix) children.remove(0);
-            ProgramVariable field = (ProgramVariable) children.remove(0);
+            ReferencePrefix prefix = (ReferencePrefix) children.removeFirst();
+            ProgramVariable field = (ProgramVariable) children.removeFirst();
 
             if (prefix instanceof NullLiteral) {
                 return new FieldReference(field, null);

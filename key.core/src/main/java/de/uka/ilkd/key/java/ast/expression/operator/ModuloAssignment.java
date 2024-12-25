@@ -3,34 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Modulo assignment.
  */
 
 public class ModuloAssignment extends Assignment {
-
-
-    /**
-     * Modulo assignment.
-     *
-     * @param children
-     *        an ExtList with all children of this node the first children in list will be
-     *        the one on the left side, the second the one on the right side.
-     */
-
-    public ModuloAssignment(ExtList children) {
-        super(children);
-    }
 
     public ModuloAssignment(PositionInfo pi, List<Comment> c, Expression target, Expression expr) {
         super(pi, c, target, expr);

@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.reference;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Occurs in a constructor declaration as the first statement as this(...) or super(...) reference.
@@ -48,31 +49,6 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      */
     public SpecialConstructorReference(ImmutableArray<Expression> arguments) {
         this.arguments = arguments;
-    }
-
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: several of
-     *        Expression (as initializers of the array), Comments
-     */
-    public SpecialConstructorReference(ExtList children) {
-        super(children);
-        this.arguments = new ImmutableArray<>(children.collect(Expression.class));
-    }
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: several of
-     *        Expression (as initializers of the array), Comments
-     */
-    public SpecialConstructorReference(ExtList children, PositionInfo pi) {
-        super(children, pi);
-        this.arguments = new ImmutableArray<>(children.collect(Expression.class));
     }
 
     public SpecialConstructorReference(ImmutableArray<Expression> arguments, PositionInfo pi,

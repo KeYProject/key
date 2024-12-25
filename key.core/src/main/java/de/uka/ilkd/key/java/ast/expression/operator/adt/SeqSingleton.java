@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator.adt;
 
-import java.util.List;
-import java.util.Objects;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -15,13 +12,15 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
+import java.util.Objects;
 
 public class SeqSingleton extends Operator {
 
-    public SeqSingleton(PositionInfo pi, List<Comment> c, Expression child) {
+    public SeqSingleton(@Nullable PositionInfo pi, @Nullable List<Comment> c, Expression child) {
         super(pi, c, new ImmutableArray<>(Objects.requireNonNull(child)));
     }
 
@@ -30,20 +29,13 @@ public class SeqSingleton extends Operator {
         super(child);
     }
 
-    public SeqSingleton(ExtList changeList) {
-        super(changeList);
-    }
-
-
     public int getPrecedence() {
         return 0;
     }
 
-
     public int getNotation() {
         return PREFIX;
     }
-
 
     public void visit(Visitor v) {
         v.performActionOnSeqSingleton(this);

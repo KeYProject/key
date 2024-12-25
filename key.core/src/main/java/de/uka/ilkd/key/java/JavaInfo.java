@@ -201,7 +201,7 @@ public final class JavaInfo {
     private void buildNameCache() {
         var types = kpmi.rec2key().keYTypes();
         nameCachedSize = types.size();
-        name2KJTCache = new LinkedHashMap<>();
+        name2KJTCache = new LinkedHashMap<>(nameCachedSize);
         Arrays.fill(commonTypes, null);
         for (final KeYJavaType type : types) {
             if (type.getJavaType() instanceof ArrayType) {
@@ -816,15 +816,7 @@ public final class JavaInfo {
      * reads a Java block given as a String
      */
     public JavaBlock readJavaBlock(String java) {
-        NamespaceSet nss = services.getNamespaces().copy();
-        // TODO
-        // final JavaBlock block = kpmi.readJavaBlock(java, nss);
-        final JavaBlock block = null;
-        // if we are here everything is fine and we can add the
-        // changes (may be new array types)
-        // Until end 2016, a protocol mode for namespaces was used here
-        // but was removed since unncessary. (mu 2016)
-        services.getNamespaces().add(nss);
+        final JavaBlock block = services.getJavaService().readBlock(java);
         return block;
     }
 
@@ -920,7 +912,7 @@ public final class JavaInfo {
      *         if the qualified name refers to an unknown type
      */
     public ProgramVariable getAttribute(String programName, String qualifiedClassName) {
-        if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
+        if (qualifiedClassName == null || qualifiedClassName.isEmpty()) {
             throw new IllegalArgumentException("Missing qualified classname");
         }
 
@@ -1170,7 +1162,7 @@ public final class JavaInfo {
 
 
     /**
-     * returns the default execution context. This is equiavlent to executing the program in a
+     * returns the default execution context. This is equivalent to executing the program in a
      * static method of a class placed in the default package
      *
      * @return the default execution context
@@ -1502,7 +1494,7 @@ public final class JavaInfo {
      *        the KeYJavaType of the context in which the type should be resolved
      * @return the KeYJavaType of the given type or <code>null</code> if type name is unknown
      */
-    public KeYJavaType getTypeByClassName(String name, KeYJavaType containerType) {
+    public @Nullable KeYJavaType getTypeByClassName(String name, KeYJavaType containerType) {
         KeYJavaType result = getTypeByName(name);
         if (result == null) {
             if (containerType != null) {

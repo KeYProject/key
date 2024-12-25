@@ -3,14 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Throw.
@@ -41,21 +39,9 @@ public class Throw extends ExpressionJumpStatement {
     /**
      * Throw.
      *
-     * @param children
-     *        an ExtList with all children
      */
-
-    public Throw(ExtList children) {
-        super(children);
-    }
-
-    /**
-     * Throw.
-     *
-     */
-
     public Throw(Expression expression, PositionInfo pi, List<Comment> comments) {
-        super(expression, pi, comments);
+        super(pi, comments, expression);
     }
 
     /**

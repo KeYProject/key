@@ -9,8 +9,6 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
-
 /**
  * Finally.
  *
@@ -39,18 +37,6 @@ public class Finally extends BranchImp {
         this.body = body;
     }
 
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: a Body (as body
-     *        of the Finally), Comments
-     */
-    public Finally(ExtList children) {
-        super(children);
-        body = children.get(StatementBlock.class);
-    }
 
     /**
      * Returns the number of children of this node.

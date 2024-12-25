@@ -3,17 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast;
 
-import java.net.URI;
-
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.pp.PrettyPrinter;
-
-import org.key_project.util.ExtList;
-
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URI;
 
 
 /**
@@ -23,7 +20,6 @@ import org.slf4j.LoggerFactory;
 public abstract class JavaSourceElement implements SourceElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaSourceElement.class);
 
-    @NonNull
     private final PositionInfo posInfo;
 
 
@@ -41,23 +37,8 @@ public abstract class JavaSourceElement implements SourceElement {
      * @param pi
      *        PositionInfo the PositionInfo of the element
      */
-    public JavaSourceElement(PositionInfo pi) {
+    public JavaSourceElement(@Nullable PositionInfo pi) {
         posInfo = getPosInfo(pi);
-    }
-
-    /**
-     * Java source element.
-     *
-     * @param children
-     *        a list of the children of this element. May contain: PositionInfo
-     */
-    public JavaSourceElement(ExtList children) {
-        posInfo = getPosInfo(children.get(PositionInfo.class));
-
-    }
-
-    public JavaSourceElement(ExtList children, PositionInfo pos) {
-        posInfo = getPosInfo(pos);
     }
 
     /**

@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ProgramPrefixUtil;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
@@ -14,9 +13,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Synchronized block.
@@ -71,23 +70,6 @@ public class SynchronizedBlock extends JavaStatement
     public SynchronizedBlock(Expression e, StatementBlock body) {
         expression = e;
         this.body = body;
-        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
-        prefixLength = info.getLength();
-        innerMostMethodFrame = info.getInnerMostMethodFrame();
-
-    }
-
-    /**
-     * Synchronized block.
-     *
-     * @param children
-     *        a list with all children
-     */
-
-    public SynchronizedBlock(ExtList children) {
-        super(children);
-        expression = children.get(Expression.class);
-        body = children.get(StatementBlock.class);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();

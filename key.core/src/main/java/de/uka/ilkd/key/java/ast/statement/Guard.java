@@ -19,10 +19,6 @@ public class Guard extends JavaNonTerminalProgramElement implements IGuard {
         expr = expression;
     }
 
-    public Guard(ExtList children) {
-        expr = children.get(Expression.class);
-    }
-
     public Guard(PositionInfo pi, List<Comment> o1, Expression expression) {
         super(pi, o1);
         this.expr = expression;

@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.Field;
@@ -14,12 +12,11 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
-/*
+/**
  * FieldSpecification taken from COMPOST and changed to achieve an immutable structure
  */
-
 public class FieldSpecification extends VariableSpecification implements Field {
 
     /**
@@ -28,7 +25,7 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     public FieldSpecification() {}
 
-    public FieldSpecification(ProgramVariable var) {
+    public FieldSpecification(IProgramVariable var) {
         this(var, var.getKeYJavaType());
     }
 
@@ -41,7 +38,7 @@ public class FieldSpecification extends VariableSpecification implements Field {
      *        the Type of this field
      */
 
-    public FieldSpecification(ProgramVariable var, Type type) {
+    public FieldSpecification(IProgramVariable var, Type type) {
         super(var, type);
     }
 
@@ -74,25 +71,6 @@ public class FieldSpecification extends VariableSpecification implements Field {
      */
     public FieldSpecification(ProgramVariable var, int dimensions, Expression init, Type type) {
         super(var, dimensions, init, type, null);
-    }
-
-
-    /**
-     * Field specification.
-     *
-     * @param children
-     *        an ExtList with the children. May contain: an Expression (as initializer of
-     *        the variable) a ProgramElementName (as name of the variable) a Comment
-     * @param var
-     *        the ProgramVariable representing this concrete field
-     * @param dimensions
-     *        an int defining the dimension
-     * @param type
-     *        the Type of this field
-     */
-
-    public FieldSpecification(ExtList children, ProgramVariable var, int dimensions, Type type) {
-        super(children, var, dimensions, type);
     }
 
     public FieldSpecification(PositionInfo pi, List<Comment> comments, Expression init,

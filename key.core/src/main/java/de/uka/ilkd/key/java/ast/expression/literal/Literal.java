@@ -16,19 +16,16 @@
 
 package de.uka.ilkd.key.java.ast.expression.literal;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.rule.MatchConditions;
-
-import org.key_project.logic.Name;
-import org.key_project.util.ExtList;
-
 import org.jspecify.annotations.Nullable;
+import org.key_project.logic.Name;
+
+import java.util.List;
 
 /**
  * Literal.
@@ -43,42 +40,8 @@ class Literal extends JavaProgramElement
 permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
         EmptySeqLiteral, EmptySetLiteral, FloatLiteral, FreeLiteral, NullLiteral, RealLiteral, StringLiteral
 {
-
     public Literal(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi, comments);
-    }
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes.
-     *        May contain: Comments
-     */
-    public Literal(ExtList children) {
-        super(children);
-    }
-
-    /**
-     * Literal with specific source code position.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: Comments
-     * @param pos
-     *        The specific source code position.
-     */
-    public Literal(ExtList children, PositionInfo pos) {
-        super(children, pos);
-    }
-
-    /**
-     * Literal with specific source code position.
-     *
-     * @param pos
-     *        The specific source code position.
-     */
-    public Literal(PositionInfo pos) {
-        super(pos);
     }
 
     public Literal() {

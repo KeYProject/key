@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -12,11 +10,12 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-
-import org.key_project.util.ExtList;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.List;
 
 /**
  * There are several types of class declarations:
@@ -96,40 +95,12 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
         this.isLocalClass = false;
     }
 
-    /**
-     * uses children list to create non-anonymous class
-     *
-     * @param children
-     *        the ExtList with all children building up this class declaration May contain:
-     *        a Extends (as pointer to a class), a Implements (as pointer to an interface)
-     *        ProgramElementName (as name), several MemberDeclaration (as members of the type), a
-     *        parentIsInterfaceDeclaration (indicating if parent is interface), several Modifier (as
-     *        modifiers of the type decl), a Comment
-     * @param fullName
-     *        the fully qualified ProgramElementName of this class
-     * @param isLibrary
-     *        a boolean flag indicating if this class represents a library class (such
-     *        classes have usually no method implementations but specifications)
-     */
-    public ClassDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary,
-            boolean innerClass, boolean anonymousClass, boolean localClass) {
-        super(children, fullName, isLibrary);
-        extending = children.get(Extends.class);
-        implementing = children.get(Implements.class);
-        this.isInnerClass = innerClass;
-        this.isAnonymousClass = anonymousClass;
-        this.isLocalClass = localClass;
-    }
-
-    public ClassDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary) {
-        this(children, fullName, isLibrary, false, false, false);
-    }
-
-    public ClassDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
-            ProgramElementName name, ProgramElementName fullName,
-            ImmutableArray<MemberDeclaration> members, boolean parentIsInterface,
-            boolean isLibrary, Extends extending, Implements implementing, boolean innerClass,
-            boolean localClassDeclaration, boolean isAnonymousClass) {
+    public ClassDeclaration(@Nullable PositionInfo pi, @Nullable List<Comment> c,
+                            ImmutableArray<Modifier> modArray,
+                            ProgramElementName name, ProgramElementName fullName,
+                            ImmutableArray<MemberDeclaration> members, boolean parentIsInterface,
+                            boolean isLibrary, Extends extending, Implements implementing, boolean innerClass,
+                            boolean localClassDeclaration, boolean isAnonymousClass) {
         super(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary);
         this.extending = extending;
         this.implementing = implementing;

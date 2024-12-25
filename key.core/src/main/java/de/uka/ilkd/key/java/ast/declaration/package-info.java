@@ -8,4 +8,7 @@
  * The modifiers themselves are collected in the subpackage
  * {@link recoder.java.declaration.modifier}.
  */
-package de.uka.ilkd.key.java.declaration;
+@NullMarked
+package de.uka.ilkd.key.java.ast.declaration;
+
+import org.jspecify.annotations.NullMarked;

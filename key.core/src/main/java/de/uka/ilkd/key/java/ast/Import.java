@@ -3,16 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Import.
- *
  */
 public class Import extends JavaNonTerminalProgramElement
         implements TypeReferenceContainer, PackageReferenceContainer {
@@ -20,7 +17,6 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Multi import flag.
      */
-
     protected final boolean isMultiImport;
 
 
@@ -29,15 +25,16 @@ public class Import extends JavaNonTerminalProgramElement
      */
     protected final TypeReferenceInfix reference;
 
+
     /**
      * children may contain: TypeReference (for import), a Comment
      *
-     * @param isMultiImport
-     *        indicates whether the import contains multiple imports
+     * @param comments
+     * @param isMultiImport indicates whether the import contains multiple imports
      */
-    public Import(ExtList children, boolean isMultiImport) {
-        super(children);
-        reference = children.get(TypeReferenceInfix.class);
+    public Import(PositionInfo pi, List<Comment> comments, TypeReferenceInfix reference, boolean isMultiImport) {
+        super(pi, comments);
+        this.reference = reference;
         this.isMultiImport = isMultiImport;
     }
 

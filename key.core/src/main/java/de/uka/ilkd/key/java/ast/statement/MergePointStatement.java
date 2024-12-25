@@ -16,16 +16,16 @@
 
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-import java.util.Objects;
-
-import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.ExpressionContainer;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * A statement indicating a merge point.
@@ -50,12 +50,6 @@ public class MergePointStatement extends JavaStatement
 
     public MergePointStatement(IProgramVariable indexPV) {
         this(null, null, null, indexPV);
-    }
-
-    public MergePointStatement(ExtList children) {
-        super(children);
-        identifier = Objects.requireNonNull(children.get(IProgramVariable.class));
-        // comments = children.get(Comment[].class);
     }
 
     public TextualJMLMergePointDecl getContext() {

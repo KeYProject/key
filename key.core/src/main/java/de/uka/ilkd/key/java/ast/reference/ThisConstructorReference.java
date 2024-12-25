@@ -5,8 +5,6 @@ package de.uka.ilkd.key.java.ast.reference;
 
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 
@@ -42,18 +40,6 @@ public class ThisConstructorReference extends SpecialConstructorReference {
      */
     public ThisConstructorReference(ImmutableArray<Expression> arguments) {
         super(arguments);
-    }
-
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: several of
-     *        Expression (as initializers of the array), Comments Must contain: execution context
-     */
-    public ThisConstructorReference(ExtList children) {
-        super(children);
     }
 
 

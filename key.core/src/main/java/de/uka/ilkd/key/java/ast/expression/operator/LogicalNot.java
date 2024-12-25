@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -13,29 +11,15 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Logical not.
  */
 
 public class LogicalNot extends Operator {
-
-
-    /**
-     * Logical not.
-     *
-     * @param children
-     *        an ExtList with all children of this node the first children in list will be
-     *        the one on the left side, the second the one on the right side.
-     */
-
-    public LogicalNot(ExtList children) {
-        super(children);
-    }
-
     public LogicalNot(PositionInfo pi, List<Comment> c, Expression child) {
         super(pi, c, new ImmutableArray<>(child));
     }

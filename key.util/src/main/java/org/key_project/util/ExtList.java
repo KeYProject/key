@@ -15,9 +15,6 @@ import org.jspecify.annotations.Nullable;
  * Has facilities to get elements of a certain type ({@link #get(Class)}, {@link #collect(Class)}).
  */
 public final class ExtList extends LinkedList<Object> {
-
-    private static final long serialVersionUID = 9182017368310263908L;
-
     public ExtList() {
         super();
     }

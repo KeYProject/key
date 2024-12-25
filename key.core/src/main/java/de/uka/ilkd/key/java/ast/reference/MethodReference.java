@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.reference;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -18,11 +17,11 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.Debug;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.List;
 
 /**
  * Method reference.
@@ -48,14 +47,6 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
     protected final ImmutableArray<? extends Expression> arguments;
 
-    public MethodReference(ExtList args, MethodName n, ReferencePrefix p, PositionInfo pos) {
-        super(pos);
-        this.prefix = p;
-        name = n;
-        Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-        this.arguments = new ImmutableArray<>(args.collect(Expression.class));
-    }
-
     public MethodReference(ImmutableArray<? extends Expression> args, MethodName n,
             ReferencePrefix p) {
         this.prefix = p;
@@ -73,16 +64,6 @@ public class MethodReference extends JavaNonTerminalProgramElement
         Debug.assertTrue(name != null, "Tried to reference unnamed method.");
         this.arguments = args;
         checkArguments();
-    }
-
-    public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
-        this(new ImmutableArray<>(children.collect(Expression.class)), n, p,
-            children.get(PositionInfo.class));
-    }
-
-    public MethodReference(ExtList children, MethodName n, ReferencePrefix p, PositionInfo pos,
-            String scope) {
-        this(new ImmutableArray<>(children.collect(Expression.class)), n, p, pos);
     }
 
     public MethodReference(PositionInfo pi, List<Comment> c, ReferencePrefix prefix,

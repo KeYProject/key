@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.PositionInfo;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclarationContainer;
@@ -16,9 +17,9 @@ import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.ast.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * The object allocation operator. There are two variants for New:
@@ -41,26 +42,6 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
 
     protected final ClassDeclaration anonymousClass;
     protected final ReferencePrefix accessPath;
-
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. a ClassDeclaration (in case
-     *        of an anonymous class decl) a TypeReference (the referred type) 2 of Expression (the
-     *        first Expression as left hand side, the second as right hand side), Comments; does NOT
-     *        contain: a ReferencePrefix for the constructor as it might be mixed up with the
-     *        TypeReference
-     * @param rp
-     *        a ReferencePrefix as access path for the constructor
-     */
-    public New(ExtList children, ReferencePrefix rp) {
-        super(children);
-        anonymousClass = children.get(ClassDeclaration.class);
-        accessPath = rp;
-    }
-
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.

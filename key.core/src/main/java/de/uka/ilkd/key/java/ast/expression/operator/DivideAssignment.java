@@ -3,39 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.jspecify.annotations.Nullable;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Divide assignment.
- *
- * @author <TT>AutoDoc</TT>
  */
-
 public class DivideAssignment extends Assignment {
-
-
-
-    /**
-     * Divide assignment.
-     *
-     * @param children
-     *        an ExtList with all children of this node the first children in list will be
-     *        the one on the left side, the second the one on the right side.
-     */
-
-    public DivideAssignment(ExtList children) {
-        super(children);
-    }
-
-    public DivideAssignment(PositionInfo pi, List<Comment> c, Expression target, Expression expr) {
+    public DivideAssignment(@Nullable PositionInfo pi, @Nullable List<Comment> c, Expression target, Expression expr) {
         super(pi, c, target, expr);
     }
 
@@ -44,7 +25,6 @@ public class DivideAssignment extends Assignment {
      *
      * @return the int value.
      */
-
     public int getArity() {
         return 2;
     }
@@ -54,7 +34,6 @@ public class DivideAssignment extends Assignment {
      *
      * @return the int value.
      */
-
     public int getPrecedence() {
         return 13;
     }
@@ -64,7 +43,6 @@ public class DivideAssignment extends Assignment {
      *
      * @return the int value.
      */
-
     public int getNotation() {
         return INFIX;
     }
@@ -73,8 +51,7 @@ public class DivideAssignment extends Assignment {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnDivideAssignment(this);

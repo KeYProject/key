@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -13,9 +12,9 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Binary not.
@@ -24,18 +23,6 @@ import org.key_project.util.collection.ImmutableArray;
  */
 
 public class BinaryNot extends Operator {
-
-    /**
-     * Binary not.
-     *
-     * @param children
-     *        list withh all children
-     */
-
-    public BinaryNot(ExtList children) {
-        super(children);
-    }
-
     public BinaryNot(PositionInfo pi, List<Comment> c, Expression child) {
         super(pi, c, new ImmutableArray<>(child));
     }
@@ -46,7 +33,6 @@ public class BinaryNot extends Operator {
      *
      * @return the int value.
      */
-
     public int getArity() {
         return 1;
     }
@@ -56,7 +42,6 @@ public class BinaryNot extends Operator {
      *
      * @return the int value.
      */
-
     public int getPrecedence() {
         return 1;
     }
@@ -66,7 +51,6 @@ public class BinaryNot extends Operator {
      *
      * @return the int value.
      */
-
     public int getNotation() {
         return PREFIX;
     }

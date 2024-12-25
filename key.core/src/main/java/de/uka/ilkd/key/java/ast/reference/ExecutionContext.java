@@ -65,23 +65,6 @@ public class ExecutionContext
     }
 
     /**
-     * creates an execution context reference
-     *
-     * @param children
-     *        an ExtList with the required children of the execution
-     *        context
-     */
-    public ExecutionContext(ExtList children) {
-        super(children);
-        this.classContext = children.get(TypeReference.class);
-        children.remove(this.classContext);
-        this.methodContext = children.get(IProgramMethod.class);
-        this.runtimeInstance = children.get(ReferencePrefix.class);
-    }
-
-
-
-    /**
      * Returns the number of children of this node.
      *
      * @return an int giving the number of children of this node

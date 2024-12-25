@@ -3,19 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.rule.MatchConditions;
-
-import org.key_project.util.ExtList;
-
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Top level implementation of a Java {@link ProgramElement}. taken from COMPOST and changed to
@@ -35,19 +32,6 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
         comments = NO_COMMENTS;
     }
 
-
-    /**
-     * Java program element.
-     *
-     * @param list
-     *        ExtList with comments
-     */
-    public JavaProgramElement(ExtList list) {
-        super(list);
-        comments = extractComments(list);
-    }
-
-
     /**
      * creates a java program element with the given position information
      *
@@ -59,29 +43,10 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
         comments = NO_COMMENTS;
     }
 
-
-    public JavaProgramElement(ExtList children, PositionInfo pos) {
-        super(children, pos);
-        comments = extractComments(children);
-    }
-
-    public JavaProgramElement(@NonNull PositionInfo pi, @Nullable List<Comment> comments) {
+    public JavaProgramElement(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi);
         this.comments = comments == null ? NO_COMMENTS : comments.toArray(new Comment[0]);
     }
-
-
-    /**
-     * collects comments contained in the given list
-     *
-     * @param list
-     *        the ExtList with children and comments of this node
-     */
-    private Comment[] extractComments(ExtList list) {
-        final Comment[] c = list.collect(Comment.class);
-        return c == null ? NO_COMMENTS : c;
-    }
-
 
     /**
      * Get comments.

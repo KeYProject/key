@@ -3,25 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.jspecify.annotations.Nullable;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 public class Intersect extends BinaryOperator {
-    public Intersect(PositionInfo pi, List<Comment> c, Expression lhs, Expression rhs) {
+    public Intersect(@Nullable PositionInfo pi, @Nullable List<Comment> c, Expression lhs, Expression rhs) {
         super(pi, c, lhs, rhs);
     }
-
-    public Intersect(ExtList children) {
-        super(children);
-    }
-
 
     public int getPrecedence() {
         return 0;

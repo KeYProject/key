@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
@@ -20,9 +21,10 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
-import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 
 public final class LocSetLDT extends LDT {
@@ -200,7 +202,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(Term t, List<SourceElement> children, Services services) {
         if (t.op().equals(empty)) {
             return EmptySetLiteral.LOCSET;
         }

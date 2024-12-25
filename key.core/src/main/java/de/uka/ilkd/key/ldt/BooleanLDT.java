@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -17,7 +18,8 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
-import org.key_project.util.ExtList;
+
+import java.util.List;
 
 
 /**
@@ -29,10 +31,10 @@ public final class BooleanLDT extends LDT {
     public static final Name NAME = new Name("boolean");
 
     /** the boolean literals as function symbols and terms */
-    private final JFunction bool_true;
-    private final Term term_bool_true;
-    private final JFunction bool_false;
-    private final Term term_bool_false;
+    private final JFunction boolTrue;
+    private final Term termBoolTrue;
+    private final JFunction boolFalse;
+    private final Term termBoolFalse;
 
 
     // -------------------------------------------------------------------------
@@ -41,11 +43,10 @@ public final class BooleanLDT extends LDT {
 
     public BooleanLDT(TermServices services) {
         super(NAME, services);
-
-        bool_true = addFunction(services, "TRUE");
-        term_bool_true = services.getTermBuilder().func(bool_true);
-        bool_false = addFunction(services, "FALSE");
-        term_bool_false = services.getTermBuilder().func(bool_false);
+        boolTrue = addFunction(services, "TRUE");
+        termBoolTrue = services.getTermBuilder().func(boolTrue);
+        boolFalse = addFunction(services, "FALSE");
+        termBoolFalse = services.getTermBuilder().func(boolFalse);
     }
 
 
@@ -54,12 +55,12 @@ public final class BooleanLDT extends LDT {
     // -------------------------------------------------------------------------
 
     public Term getFalseTerm() {
-        return term_bool_false;
+        return termBoolFalse;
     }
 
 
     public Term getTrueTerm() {
-        return term_bool_true;
+        return termBoolTrue;
     }
 
 
@@ -67,7 +68,7 @@ public final class BooleanLDT extends LDT {
      * returns the function representing the boolean value <tt>FALSE</tt>
      */
     public JFunction getFalseConst() {
-        return bool_false;
+        return boolFalse;
     }
 
 
@@ -75,7 +76,7 @@ public final class BooleanLDT extends LDT {
      * returns the function representing the boolean value <tt>TRUE</tt>
      */
     public JFunction getTrueConst() {
-        return bool_true;
+        return boolTrue;
     }
 
 
@@ -112,7 +113,7 @@ public final class BooleanLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, Services services) {
         if (lit instanceof BooleanLiteral) {
-            return (((BooleanLiteral) lit).getValue() ? term_bool_true : term_bool_false);
+            return (((BooleanLiteral) lit).getValue() ? termBoolTrue : termBoolFalse);
         }
         Debug.fail("booleanLDT: Wrong literal", lit);
         return null;
@@ -136,10 +137,10 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
-        if (t.op() == bool_true) {
+    public Expression translateTerm(Term t, List<SourceElement> children, Services services) {
+        if (t.op() == boolTrue) {
             return BooleanLiteral.TRUE;
-        } else if (t.op() == bool_false) {
+        } else if (t.op() == boolFalse) {
             return BooleanLiteral.FALSE;
         } else {
             assert false : "BooleanLDT: Cannot convert term to program: " + t;

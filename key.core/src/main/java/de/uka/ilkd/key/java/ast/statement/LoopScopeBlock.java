@@ -86,23 +86,6 @@ public final class LoopScopeBlock extends JavaStatement
 
     }
 
-    /**
-     * Synchronized block.
-     *
-     * @param children
-     *        a list with all children
-     */
-    public LoopScopeBlock(ExtList children) {
-        super(children);
-        indexPV = children.get(IProgramVariable.class);
-        body = children.get(StatementBlock.class);
-        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil
-                .computeEssentials(this);
-        prefixLength = info.getLength();
-        innerMostMethodFrame = info.getInnerMostMethodFrame();
-
-    }
-
     @Override
     public boolean hasNextPrefixElement() {
         return !body.isEmpty()

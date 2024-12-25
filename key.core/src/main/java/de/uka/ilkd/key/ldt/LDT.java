@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
@@ -22,7 +24,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -269,7 +270,7 @@ public abstract class LDT implements Named {
     public abstract boolean hasLiteralFunction(JFunction f);
 
     /** Is called whenever <code>hasLiteralFunction()</code> returns true. */
-    public abstract Expression translateTerm(Term t, ExtList children, Services services);
+    public abstract Expression translateTerm(Term t, List<SourceElement> children, Services services);
 
     public abstract Type getType(Term t);
 }

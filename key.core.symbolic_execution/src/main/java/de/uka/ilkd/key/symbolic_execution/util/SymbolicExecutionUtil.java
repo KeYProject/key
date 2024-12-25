@@ -5,7 +5,10 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.*;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.FieldDeclaration;
@@ -3969,7 +3972,7 @@ public final class SymbolicExecutionUtil {
                     if (tryStatement.getBranchCount() == 1
                             && tryStatement.getBranchList()
                                     .get(0) instanceof Catch catchStatement) {
-                        if (catchStatement.getBody() instanceof StatementBlock) {
+                        if (catchStatement.getBody() != null) {
                             StatementBlock catchBlock = catchStatement.getBody();
                             if (catchBlock.getBody().size() == 1
                                     && catchBlock.getBody()

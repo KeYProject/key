@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
@@ -16,7 +17,8 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.ExtList;
+
+import java.util.List;
 
 /**
  * The JavaDL theory class provides access to function symvols, sorts that are part of the core
@@ -196,7 +198,7 @@ public class JavaDLTheory extends LDT {
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    public Expression translateTerm(Term t, List<SourceElement> children, Services services) {
         assert false;
         return null;
     }

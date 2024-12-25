@@ -541,7 +541,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static While whileLoop(final Expression condition, final Statement body,
             final PositionInfo position) {
-        final While loop = new While(condition, body, position);
+        final While loop = new While(position, condition, body);
 
         return loop;
     }

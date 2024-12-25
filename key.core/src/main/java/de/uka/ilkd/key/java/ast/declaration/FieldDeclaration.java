@@ -3,16 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Field declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -46,21 +44,6 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
         fieldSpecs = new ImmutableArray<>(vars);
     }
 
-    /**
-     * Field declaration.
-     *
-     * @param children
-     *        an ExtList of children. May include: several FieldSpecification (for the
-     *        field) a TypeReference (as reference to the type of the declared variable) several
-     *        Modifier (taken as modifiers of the declaration), a Comment
-     * @param parentIsInterfaceDeclaration
-     *        a boolean set true
-     */
-    public FieldDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
-        super(children, parentIsInterfaceDeclaration);
-        fieldSpecs =
-            new ImmutableArray<>(children.collect(FieldSpecification.class));
-    }
 
     public FieldDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
             TypeReference type,

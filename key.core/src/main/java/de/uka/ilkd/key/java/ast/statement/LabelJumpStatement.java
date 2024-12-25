@@ -48,22 +48,11 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
 
     }
 
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes.
-     */
-    public LabelJumpStatement(ExtList children) {
-        super(children);
-        name = children.get(Label.class);
-    }
 
     public LabelJumpStatement(PositionInfo pi, List<Comment> c, Label name) {
         super(pi, c);
         this.name = name;
     }
-
 
     /**
      * Get name.

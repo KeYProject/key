@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
+import java.util.List;
+
 
 /**
  * If.
@@ -35,21 +34,6 @@ public class If extends BranchStatement implements ExpressionContainer {
      */
 
     protected final Expression expression;
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: Comments, a
-     *        Then, an Else, an Expression (as condition of If)
-     */
-    public If(ExtList children) {
-        super(children);
-        thenBranch = children.get(Then.class);
-        elseBranch = children.get(Else.class);
-        expression = children.get(Expression.class);
-        checkValidity();
-    }
 
     public If(PositionInfo pi, List<Comment> c, Expression accept, Then then, Else anElse) {
         super(pi, c);

@@ -361,7 +361,7 @@ public class EnhancedForElimination extends ProgramTransformer {
             makeBlock(iteratorVariable, valuesVariable, lvd, enhancedFor.getBody());
 
         // while
-        loop = new While(itGuard, block, null, new ExtList());
+        loop = new While(null, new ExtList(), itGuard, block);
 
         head = KeYJavaASTFactory.block(itinit, valuesInit);
 

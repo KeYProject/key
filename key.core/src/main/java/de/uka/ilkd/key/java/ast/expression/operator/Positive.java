@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -13,9 +11,9 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
 
 /**
  * Positive.
@@ -32,16 +30,6 @@ public class Positive extends Operator {
      */
     public Positive(Expression expr) {
         super(expr);
-    }
-
-    /**
-     * Positive.
-     *
-     * @param children
-     *        an ExtList with all children of this node
-     */
-    public Positive(ExtList children) {
-        super(children);
     }
 
     public Positive(PositionInfo pi, List<Comment> c, Expression child) {

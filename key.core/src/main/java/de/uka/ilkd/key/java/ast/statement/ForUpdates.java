@@ -22,15 +22,6 @@ public class ForUpdates extends JavaNonTerminalProgramElement
         updates = exprarr;
     }
 
-    public ForUpdates(ExtList ups, PositionInfo pos) {
-        super(pos);
-        Expression[] exps = new Expression[ups.size()];
-        for (int i = 0; i < exps.length; i++) {
-            exps[i] = (Expression) ups.get(i);
-        }
-        updates = new ImmutableArray<>(exps);
-    }
-
 
     /**
      * Get the number of expressions in this container.

@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.PositionInfo;
+import org.jspecify.annotations.Nullable;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Branch.
@@ -18,29 +17,11 @@ import org.key_project.util.ExtList;
  */
 
 public abstract class BranchImp extends JavaNonTerminalProgramElement implements Branch {
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: Comments
-     */
-    public BranchImp(ExtList children) {
-        super(children);
-    }
-
-
     public BranchImp() {
-        super();
+        this(null, null);
     }
 
-
-    public BranchImp(ExtList children, PositionInfo pos) {
-        super(children, pos);
-    }
-
-
-    public BranchImp(PositionInfo pi, List<Comment> comments) {
+    public BranchImp(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi, comments);
     }
 }

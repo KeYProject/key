@@ -4,17 +4,14 @@
 package de.uka.ilkd.key.java.ast;
 
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * A node representing a single source file containing {@link TypeDeclaration}s and an optional
@@ -59,21 +56,6 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
         this.packageSpec = packageSpec;
         this.imports = new ImmutableArray<>(imports);
         this.typeDeclarations = new ImmutableArray<>(typeDeclarations);
-    }
-
-
-    /**
-     * creates a compilation unit
-     *
-     * @param children
-     *        list with the children of this unit
-     */
-    public CompilationUnit(ExtList children) {
-        super(children);
-        packageSpec = children.get(PackageSpecification.class);
-        this.imports = new ImmutableArray<>(children.collect(Import.class));
-        this.typeDeclarations =
-            new ImmutableArray<>(children.collect(TypeDeclaration.class));
     }
 
     public CompilationUnit(

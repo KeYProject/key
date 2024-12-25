@@ -3,14 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ProgramPrefixUtil;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -34,31 +32,6 @@ public class LabeledStatement extends JavaStatement
 
     private final int prefixLength;
     private final MethodFrame innerMostMethodFrame;
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: a Label (as
-     *        name of the label) a Statement (as body of the labeled statement) Comments
-     */
-    public LabeledStatement(ExtList children, Label label, PositionInfo pos) {
-        super(children, pos);
-        name = label;
-
-        body = children.get(Statement.class);
-        firstActiveChildPos = body instanceof StatementBlock
-                ? ((StatementBlock) body).isEmpty() ? PosInProgram.TOP : PosInProgram.ONE_ZERO
-                : PosInProgram.ONE;
-
-        // otherwise it will crash later
-        assert body != null;
-        assert name != null;
-        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
-        prefixLength = info.getLength();
-        innerMostMethodFrame = info.getInnerMostMethodFrame();
-
-    }
 
     /**
      * Labeled statement.

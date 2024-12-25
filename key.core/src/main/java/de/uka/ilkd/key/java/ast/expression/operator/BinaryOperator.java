@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-import java.util.Objects;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
-
-import org.key_project.util.ExtList;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Operator of arity 2
@@ -24,15 +24,11 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public abstract class BinaryOperator extends Operator {
 
-    public BinaryOperator(ExtList children) {
-        super(children);
-    }
-
     public BinaryOperator(Expression lhs, Expression rhs) {
         super(lhs, rhs);
     }
 
-    public BinaryOperator(PositionInfo pi, List<Comment> c, Expression lhs, Expression rhs) {
+    public BinaryOperator(@Nullable PositionInfo pi, @Nullable List<Comment> c, Expression lhs, Expression rhs) {
         super(pi, c,
             new ImmutableArray<>(Objects.requireNonNull(lhs), Objects.requireNonNull(rhs)));
     }

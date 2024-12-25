@@ -3,17 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.jspecify.annotations.Nullable;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Catch.
- *
  */
 public class Catch extends BranchImp implements ParameterContainer, VariableScope {
 
@@ -41,10 +39,8 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
     /**
      * Catch.
      *
-     * @param e
-     *        a parameter declaration.
-     * @param body
-     *        a statement.
+     * @param e    a parameter declaration.
+     * @param body a statement.
      */
     public Catch(ParameterDeclaration e, StatementBlock body) {
         super();
@@ -52,22 +48,10 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
         parameter = e;
     }
 
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: Comments, a
-     *        ParameterDeclaration (declaring the catched exceptions) a StatementBlock (as the
-     *        action to do when catching)
-     */
-    public Catch(ExtList children) {
-        super(children);
-        parameter = children.get(ParameterDeclaration.class);
-        body = children.get(StatementBlock.class);
-    }
 
-    public Catch(PositionInfo pi, List<Comment> c, ParameterDeclaration param,
-            StatementBlock body) {
+    public Catch(@Nullable PositionInfo pi, @Nullable List<Comment> c,
+                 ParameterDeclaration param,
+                 StatementBlock body) {
         super(pi, c);
         this.parameter = param;
         this.body = body;
@@ -96,11 +80,9 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
     /**
      * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *        an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *            if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (parameter != null) {
@@ -191,8 +173,7 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnCatch(this);

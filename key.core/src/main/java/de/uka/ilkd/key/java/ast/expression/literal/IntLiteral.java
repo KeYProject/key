@@ -16,25 +16,19 @@
 
 package de.uka.ilkd.key.java.ast.expression.literal;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
-
 import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * Int literal.
- *
- * @author <TT>AutoDoc</TT>
  */
-
 public class IntLiteral extends AbstractIntegerLiteral {
 
     /**
@@ -93,23 +87,6 @@ public class IntLiteral extends AbstractIntegerLiteral {
      */
     public IntLiteral(String valStr) {
         this(null, null, parseFromString(valStr));
-    }
-
-    /**
-     * Constructor for Recoder2KeY transformation.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes, may contain: Comments
-     * @param valStr
-     *        the value of the literal
-     * @throws NumberFormatException
-     *         if the given String does not represent a syntactically valid
-     *         literal or represents a value out of int range
-     */
-    public IntLiteral(ExtList children, String valStr) {
-        super(children);
-        this.value = parseFromString(valStr);
-        this.valueStr = Long.toString(value).intern();
     }
 
     @Override

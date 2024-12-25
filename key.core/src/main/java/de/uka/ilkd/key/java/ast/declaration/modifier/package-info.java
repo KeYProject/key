@@ -3,4 +3,6 @@
  * the parent {@link recoder.java.declaration.Modifier} is the
  * {@link recoder.java.declaration.modifier.VisibilityModifier}.
  */
-package de.uka.ilkd.key.java.declaration.modifier;
+@NullMarked package de.uka.ilkd.key.java.ast.declaration.modifier;
+
+import org.jspecify.annotations.NullMarked;

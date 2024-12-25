@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -21,12 +19,11 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
+import java.util.List;
 
 public class DLEmbeddedExpression extends Operator {
     private final JFunction functionSymbol;
@@ -36,11 +33,6 @@ public class DLEmbeddedExpression extends Operator {
             @NonNull ImmutableArray<Expression> children) {
         super(pi, comments, children);
         this.functionSymbol = functionSymbol;
-    }
-
-    public DLEmbeddedExpression(JFunction f, ExtList children) {
-        super(children);
-        this.functionSymbol = f;
     }
 
     public JFunction getFunctionSymbol() {

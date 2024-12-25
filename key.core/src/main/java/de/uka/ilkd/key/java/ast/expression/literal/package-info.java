@@ -4,4 +4,6 @@
  * {@link recoder.java.expression.literal.NullLiteral} and
  * {@link recoder.java.expression.literal.StringLiteral}.
  */
-package de.uka.ilkd.key.java.expression.literal;
+@NullMarked package de.uka.ilkd.key.java.ast.expression.literal;
+
+import org.jspecify.annotations.NullMarked;

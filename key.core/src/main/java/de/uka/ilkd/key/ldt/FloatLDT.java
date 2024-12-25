@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Operator;
@@ -17,7 +18,8 @@ import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
-import org.key_project.util.ExtList;
+
+import java.util.List;
 
 public final class FloatLDT extends LDT implements FloatingPointLDT {
 
@@ -194,7 +196,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public FloatLiteral translateTerm(Term t, ExtList children, Services services) {
+    public FloatLiteral translateTerm(Term t, List<SourceElement> children, Services services) {
         if (!containsFunction((Function) t.op())) {
             return null;
         }

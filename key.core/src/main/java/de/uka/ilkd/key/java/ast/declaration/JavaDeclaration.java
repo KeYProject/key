@@ -16,18 +16,16 @@
 
 package de.uka.ilkd.key.java.ast.declaration;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.Declaration;
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.declaration.modifier.*;
-
-import org.key_project.util.ExtList;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
+import java.util.List;
 
 /**
  * Java declaration.
@@ -38,16 +36,14 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
         implements Declaration {
 
     /**
-     * Modifiers.
-     *
-     * Caches the wrapper for the modifiers. The wrapper is needed to get access
+     * Modifiers. Caches the wrapper for the modifiers. The wrapper is needed to get access
      * to the array without hurting immutability.
      */
-    @NonNull
     protected final ImmutableArray<Modifier> modArray;
 
-    public JavaDeclaration(PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray) {
+    public JavaDeclaration(@Nullable PositionInfo pi,
+                           @Nullable List<Comment> comments,
+                           @NonNull ImmutableArray<Modifier> modArray) {
         super(pi, comments);
         this.modArray = modArray;
     }
@@ -68,21 +64,6 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
     public JavaDeclaration(ImmutableArray<Modifier> mods) {
         this(null, null, mods);
     }
-
-
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May
-     *        include: several Modifier (taken as modifiers of the declaration),
-     *        a Comment
-     */
-    public JavaDeclaration(ExtList children) {
-        super(children);
-        modArray = new ImmutableArray<>(children.collect(Modifier.class));
-    }
-
 
     /**
      * Get modifiers.

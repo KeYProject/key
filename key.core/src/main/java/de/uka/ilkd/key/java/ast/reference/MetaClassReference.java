@@ -49,18 +49,6 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     }
 
     /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: a TypeReference
-     *        (as reference for the meta class), Comments
-     */
-    public MetaClassReference(ExtList children) {
-        super(children);
-        typeReference = children.get(TypeReference.class);
-    }
-
-    /**
      * Returns the number of children of this node.
      *
      * @return an int giving the number of children of this node

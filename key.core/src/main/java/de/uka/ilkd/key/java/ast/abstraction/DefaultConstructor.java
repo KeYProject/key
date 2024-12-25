@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.abstraction;
 
-import org.key_project.util.ExtList;
 
 /**
  * Default constructor of class types.
@@ -16,23 +15,13 @@ public class DefaultConstructor implements Constructor {
     protected final String name;
     protected final boolean parentIsPublic;
 
-
-    // ???use ProgramElementName instead of name?????
-    public DefaultConstructor(ExtList children) {
-        name = children.get(String.class);
-        parentIsPublic = children.get(Boolean.class);
-    }
-
     /**
      * Create a new default constructor for the given class type. The name of the constructor is set
      * appropriately.
      *
-     * @param name
-     *        of the Constructor
-     * @param parentIsPublic
-     *        is set true iff the parent is declared public.
+     * @param name           of the Constructor
+     * @param parentIsPublic is set true iff the parent is declared public.
      */
-    @Deprecated
     public DefaultConstructor(String name, boolean parentIsPublic) {
         this.parentIsPublic = parentIsPublic;
         this.name = name;
@@ -78,7 +67,7 @@ public class DefaultConstructor implements Constructor {
      * Checks if this member is public.
      *
      * @return <CODE>true</CODE>, if the containing class type is public, <CODE>false</CODE>
-     *         otherwise.
+     * otherwise.
      */
     public boolean isPublic() {
         return parentIsPublic;

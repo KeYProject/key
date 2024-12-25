@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -14,29 +13,18 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-
-import org.key_project.util.ExtList;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 
-/** The most weird ternary C operator ?: */
+import java.util.List;
+
+/**
+ * The most weird ternary C operator ?:
+ */
 
 public class Conditional extends Operator {
-
-
-    /**
-     * Conditional.
-     *
-     * @param children
-     *        list of children the first one is the guard expression, the second one the
-     *        then expression and the last one the else expr.
-     */
-
-    public Conditional(ExtList children) {
-        super(children);
-    }
-
     public Conditional(
-            PositionInfo pi, List<Comment> c, Expression accept, Expression accept1,
+            @Nullable PositionInfo pi, @Nullable List<Comment> c, Expression accept, Expression accept1,
             Expression accept2) {
         super(pi, c, new ImmutableArray<>(accept, accept1, accept2));
     }
@@ -86,8 +74,7 @@ public class Conditional extends Operator {
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
-     * @param v
-     *        the Visitor
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnConditional(this);
@@ -106,7 +93,7 @@ public class Conditional extends Operator {
             if (type1.getJavaType() == PrimitiveType.JAVA_BYTE
                     && type2.getJavaType() == PrimitiveType.JAVA_SHORT
                     || type1.getJavaType() == PrimitiveType.JAVA_SHORT
-                            && type2.getJavaType() == PrimitiveType.JAVA_BYTE) {
+                    && type2.getJavaType() == PrimitiveType.JAVA_BYTE) {
                 return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SHORT);
             }
             if (tc.isImplicitNarrowing(getExpressionAt(1), (PrimitiveType) type2.getJavaType())) {
@@ -134,7 +121,7 @@ public class Conditional extends Operator {
         }
 
         throw new RuntimeException("Could not determine type of conditional " + "expression\n"
-            + this + ". This usually means that " + "the Java program is not compilable.");
+                + this + ". This usually means that " + "the Java program is not compilable.");
     }
 
 }

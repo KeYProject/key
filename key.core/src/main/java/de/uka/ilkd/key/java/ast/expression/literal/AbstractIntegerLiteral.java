@@ -16,16 +16,13 @@
 
 package de.uka.ilkd.key.java.ast.expression.literal;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-
-import org.key_project.logic.Name;
-import org.key_project.util.ExtList;
-
 import org.jspecify.annotations.Nullable;
+import org.key_project.logic.Name;
+
+import java.util.List;
 
 /**
  * This class is a superclass for integer literals (Int, Long, Char).
@@ -38,16 +35,6 @@ import org.jspecify.annotations.Nullable;
 public abstract non-sealed class AbstractIntegerLiteral extends Literal {
     public AbstractIntegerLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi, comments);
-    }
-
-    /**
-     * Constructor for Recoder2KeY transformation.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes, may contain: Comments
-     */
-    protected AbstractIntegerLiteral(ExtList children) {
-        super(children);
     }
 
     /**

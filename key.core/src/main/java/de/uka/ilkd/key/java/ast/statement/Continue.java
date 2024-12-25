@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.statement;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-import org.key_project.util.ExtList;
+import java.util.List;
+
 
 /**
  * Continue.
@@ -35,16 +34,6 @@ public class Continue extends LabelJumpStatement {
         super(label);
     }
 
-    /**
-     * Constructor for the transformation of COMPOST ASTs to KeY.
-     *
-     * @param children
-     *        the children of this AST element as KeY classes. May contain: Comments, a
-     *        ProgramElementName (as label of the label jump statement)
-     */
-    public Continue(ExtList children) {
-        super(children);
-    }
 
     public Continue(PositionInfo pi, List<Comment> c, Label name) {
         super(pi, c, name);

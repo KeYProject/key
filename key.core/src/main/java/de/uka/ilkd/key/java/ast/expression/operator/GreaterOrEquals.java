@@ -3,37 +3,20 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.jspecify.annotations.Nullable;
 
-import org.key_project.util.ExtList;
+import java.util.List;
 
 /**
  * Greater or equals.
  */
-
 public class GreaterOrEquals extends ComparativeOperator {
-
-
-    /**
-     * Greater or equals.
-     *
-     * @param children
-     *        an ExtList with all children of this node the first children in list will be
-     *        the one on the left side, the second the one on the right side.
-     */
-
-    public GreaterOrEquals(ExtList children) {
-        super(children);
-    }
-
-    public GreaterOrEquals(PositionInfo pi, List<Comment> c, Expression lhs, Expression rhs) {
+    public GreaterOrEquals(@Nullable PositionInfo pi, @Nullable List<Comment> c, Expression lhs, Expression rhs) {
         super(pi, c, lhs, rhs);
-
     }
 
     /**
