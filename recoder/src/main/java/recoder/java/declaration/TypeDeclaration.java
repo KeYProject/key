@@ -61,7 +61,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     /**
      * Type declaration.
      */
-    public TypeDeclaration() {
+    protected TypeDeclaration() {
         // nothing to do here
     }
 
@@ -70,7 +70,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
      *
      * @param name an identifier.
      */
-    public TypeDeclaration(Identifier name) {
+    protected TypeDeclaration(Identifier name) {
         setIdentifier(name);
         // makeParentRoleValid() called by subclasses' constructors
     }
@@ -81,7 +81,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
      * @param mods a modifier mutable list.
      * @param name an identifier.
      */
-    public TypeDeclaration(ASTList<DeclarationSpecifier> mods, Identifier name) {
+    protected TypeDeclaration(ASTList<DeclarationSpecifier> mods, Identifier name) {
         super(mods);
         setIdentifier(name);
         // makeParentRoleValid() called by subclasses' constructors

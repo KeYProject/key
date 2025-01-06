@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -70,9 +70,9 @@ public class TacletMatchProgram {
      * @param op the {@link SchemaVariable} for which to get the instruction
      * @return the instruction for the specified variable
      */
-    public static MatchSchemaVariableInstruction<? extends org.key_project.logic.op.sv.SchemaVariable> getMatchInstructionForSV(
-            org.key_project.logic.op.sv.SchemaVariable op) {
-        MatchSchemaVariableInstruction<? extends org.key_project.logic.op.sv.SchemaVariable> instruction;
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> getMatchInstructionForSV(
+            SchemaVariable op) {
+        MatchSchemaVariableInstruction<? extends SchemaVariable> instruction;
 
         if (op instanceof FormulaSV formulaSV) {
             instruction = Instruction.matchFormulaSV(formulaSV);

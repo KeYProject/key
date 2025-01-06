@@ -168,7 +168,7 @@ public class TestCaseGenerator {
         junitFormat = settings.useJunit();
         useRFL = settings.useRFL();
         modDir = computeProjectSubPath(services.getJavaModel().getModelDir());
-        dontCopy = modDir + File.separator + TestCaseGenerator.DONT_COPY;
+        dontCopy = modDir + File.separator + DONT_COPY;
         directory = settings.getOutputFolderPath();
         sortDummyClass = new HashMap<>();
         info = new ProofInfo(proof);
@@ -489,12 +489,12 @@ public class TestCaseGenerator {
                 JAVA_FILE_EXTENSION_WITH_DOT);
         }
         createOpenJMLShellScript();
-        TestCaseGenerator.fileCounter++;
+        fileCounter++;
         return testSuite.toString();
     }
 
     public void initFileName() {
-        fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
+        fileName = "TestGeneric" + fileCounter;
         String mut = getMUTCall();
         if (mut == null) {
             mut = "<method under test> //Manually write a call to the method under test, "
@@ -523,7 +523,7 @@ public class TestCaseGenerator {
                 boolean success = false;
                 if (solver.getSocket().getQuery() != null) {
                     final Model m = solver.getSocket().getQuery().getModel();
-                    if (TestCaseGenerator.modelIsOK(m)) {
+                    if (modelIsOK(m)) {
                         logger.writeln("Generate: " + originalNodeName);
                         Map<String, Sort> typeInfMap =
                             generateTypeInferenceMap(solver.getProblem().getGoal().node());

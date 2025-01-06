@@ -24,7 +24,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
 
     protected final T taclet;
 
-    public TacletExecutor(T taclet) {
+    protected TacletExecutor(T taclet) {
         this.taclet = taclet;
     }
 

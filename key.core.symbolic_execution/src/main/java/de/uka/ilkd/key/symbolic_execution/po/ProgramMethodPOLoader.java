@@ -29,7 +29,7 @@ public class ProgramMethodPOLoader implements ProofObligationLoader {
             throws IOException {
         return new IPersistablePO.LoadedPOContainer(new ProgramMethodPO(initConfig,
             getName(properties),
-            ProgramMethodPO.getProgramMethod(initConfig, properties), getPrecondition(properties),
+            getProgramMethod(initConfig, properties), getPrecondition(properties),
             isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
     }
 

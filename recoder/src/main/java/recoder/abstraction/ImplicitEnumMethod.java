@@ -23,7 +23,7 @@ public abstract class ImplicitEnumMethod implements Method {
     /**
      * TODO param could actually be made EnumTypeDeclaration! Bytecode doesn't use this...
      */
-    public ImplicitEnumMethod(ClassType ownerClass) {
+    protected ImplicitEnumMethod(ClassType ownerClass) {
         super();
         if (ownerClass == null) {
             throw new NullPointerException();

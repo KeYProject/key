@@ -255,9 +255,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
         iconHeight = delegateView.getFontMetrics(delegateView.getFont()).getHeight();
         delegateView.setUI(new CacheLessMetalTreeUI());
 
-        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent()
+        delegateView.getInputMap(WHEN_FOCUSED).getParent()
                 .remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK));
-        delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent()
+        delegateView.getInputMap(WHEN_FOCUSED).getParent()
                 .remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_MASK));
 
         delegateView.setInvokesStopCellEditing(true);
@@ -314,7 +314,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         final ActionListener keyboardAction = (ActionEvent e) -> showSearchPanel();
 
         registerKeyboardAction(keyboardAction, SEARCH_KEY_STROKE,
-            JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+            WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
             KeYGuiExtension.KeyboardShortcuts.PROOF_TREE_VIEW);
@@ -1059,7 +1059,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * Renderer responsible for showing a single node of the proof tree.
      */
-    public class ProofRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
+    public class ProofRenderer extends DefaultTreeCellRenderer {
         private final List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
 
         public ProofRenderer() {

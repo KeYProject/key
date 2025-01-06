@@ -29,11 +29,11 @@ public abstract class AbstractIndex implements HashCode {
     int count;
     int ld;
 
-    public AbstractIndex() {
+    protected AbstractIndex() {
         this(4);
     }
 
-    public AbstractIndex(int initialCapacity) {
+    protected AbstractIndex(int initialCapacity) {
         if (initialCapacity < 4) {
             initialCapacity = 4;
         }

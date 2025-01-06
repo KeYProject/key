@@ -11,13 +11,13 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 
 /**
@@ -39,7 +39,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(org.key_project.logic.op.sv.SchemaVariable var,
+    public MatchConditions check(SchemaVariable var,
             SyntaxElement instCandidate,
             org.key_project.prover.rules.MatchConditions matchCond, LogicServices services) {
         SVInstantiations instantiations = (SVInstantiations) matchCond.getInstantiations();

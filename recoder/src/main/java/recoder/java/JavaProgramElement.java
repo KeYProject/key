@@ -25,7 +25,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
      * Java program element.
      */
 
-    public JavaProgramElement() {
+    protected JavaProgramElement() {
         // nothing to do here
     }
 

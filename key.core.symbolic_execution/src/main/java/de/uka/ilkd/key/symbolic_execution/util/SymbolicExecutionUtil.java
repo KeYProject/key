@@ -856,7 +856,7 @@ public final class SymbolicExecutionUtil {
             List<IProgramVariable> result, org.key_project.logic.Term term) {
         if (term != null) {
             if (term.op() instanceof ElementaryUpdate) {
-                if (SymbolicExecutionUtil.isHeapUpdate(services, term)) {
+                if (isHeapUpdate(services, term)) {
                     // Extract static variables from heap
                     Set<IProgramVariable> staticAttributes = new LinkedHashSet<>();
                     internalCollectStaticProgramVariablesOnHeap(services, staticAttributes, term);
@@ -2583,8 +2583,7 @@ public final class SymbolicExecutionUtil {
                         newSuccedents = newSuccedents.removeFirst(originalTerm);
                     }
                 }
-            } else if (goalTemplate.replaceWithExpressionAsObject() instanceof Term) {
-                Term replaceTerm = (Term) goalTemplate.replaceWithExpressionAsObject();
+            } else if (goalTemplate.replaceWithExpressionAsObject() instanceof Term replaceTerm) {
                 replaceTerm = instantiateTerm(node, replaceTerm, app, services);
                 Term originalTerm =
                     findReplacement(app.posInOccurrence().isInAntec() ? node.sequent().antecedent()
@@ -2808,7 +2807,7 @@ public final class SymbolicExecutionUtil {
         ImmutableList<Term> goalCondtions = ImmutableSLList.nil();
         for (Pair<Term, Node> pair : resultValuesAndConditions) {
             Term goalCondition = pair.first;
-            goalCondition = SymbolicExecutionUtil.replaceSkolemConstants(pair.second.sequent(),
+            goalCondition = replaceSkolemConstants(pair.second.sequent(),
                 goalCondition, services);
             goalCondition = removeLabelRecursive(services.getTermFactory(), goalCondition, label);
             goalCondtions = goalCondtions.append(goalCondition);
@@ -3639,7 +3638,7 @@ public final class SymbolicExecutionUtil {
     public static String getDisplayString(IProgramVariable pv) {
         if (pv != null) {
             if (pv.name() instanceof ProgramElementName name) {
-                if (SymbolicExecutionUtil.isStaticVariable(pv)) {
+                if (isStaticVariable(pv)) {
                     return name.toString();
                 } else {
                     return name.getProgramName();
@@ -3680,7 +3679,7 @@ public final class SymbolicExecutionUtil {
     public static IProgramVariable extractExceptionVariable(Proof proof) {
         Node root = proof.root();
         PosInOccurrence modalityTermPIO =
-            SymbolicExecutionUtil.findModalityWithMinSymbolicExecutionLabelId(root.sequent());
+            findModalityWithMinSymbolicExecutionLabelId(root.sequent());
         Term modalityTerm = modalityTermPIO != null ? (Term) modalityTermPIO.subTerm() : null;
         if (modalityTerm != null) {
             modalityTerm = TermBuilder.goBelowUpdates(modalityTerm);
@@ -4059,7 +4058,7 @@ public final class SymbolicExecutionUtil {
      */
     public static Term createSelectTerm(IExecutionVariable variable) {
         final Services services = variable.getServices();
-        if (SymbolicExecutionUtil.isStaticVariable(variable.getProgramVariable())) {
+        if (isStaticVariable(variable.getProgramVariable())) {
             // Static field access
             JFunction function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
                 (LocationVariable) variable.getProgramVariable(), services);

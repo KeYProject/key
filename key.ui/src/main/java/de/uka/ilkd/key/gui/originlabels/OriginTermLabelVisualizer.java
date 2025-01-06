@@ -293,7 +293,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         headPane.add(top);
 
         JPanel bot = new JPanel();
-        JLabel label = new JLabel("Proof: \"" + node.proof().name().toString() + "\"");
+        JLabel label = new JLabel("Proof: \"" + node.proof().name() + "\"");
         label.setMinimumSize(new Dimension(top.getWidth(), label.getMinimumSize().height));
         bot.setLayout(new BoxLayout(bot, BoxLayout.LINE_AXIS));
         bot.add(label);
@@ -590,7 +590,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
             if (origin != null) {
                 originTextLabel.setText(getShortOriginText(origin));
-                originTextLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+                originTextLabel.setHorizontalAlignment(TRAILING);
             }
 
             JPanel result = new JPanel(new BorderLayout(TREE_CELL_GAP, TREE_CELL_GAP));

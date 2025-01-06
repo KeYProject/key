@@ -110,7 +110,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param methodEnd the line the containing method of this breakpoint ends at
      * @param containerType the type of the element containing the breakpoint
      */
-    public AbstractConditionalBreakpoint(int hitCount, IProgramMethod pm, Proof proof,
+    protected AbstractConditionalBreakpoint(int hitCount, IProgramMethod pm, Proof proof,
             boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd,
             KeYJavaType containerType) {
         super(hitCount, proof, enabled);

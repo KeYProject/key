@@ -47,10 +47,10 @@ public record NotFreeIn(SchemaVariable first, SchemaVariable second) {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof NotFreeIn nfi)) {
+        if (!(o instanceof NotFreeIn(SchemaVariable first1, SchemaVariable second1))) {
             return false;
         }
-        return nfi.first == first() && nfi.second == second();
+        return first1 == first() && second1 == second();
     }
 
     public int hashCode() {

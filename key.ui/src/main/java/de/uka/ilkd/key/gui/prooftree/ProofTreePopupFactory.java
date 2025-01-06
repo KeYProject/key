@@ -56,9 +56,7 @@ public class ProofTreePopupFactory {
         // (take care to not filter out any GUIBranchNodes accidentally!)
         Object o = tp.getLastPathComponent();
         if (o instanceof GUIProofTreeNode n) {
-            if (n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
-                return false;
-            }
+            return !(n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp);
         }
         return true;
     }

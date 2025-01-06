@@ -42,7 +42,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      * The default factory.
      */
     public static final IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
-        () -> SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false,
+        () -> getSymbolicExecutionStrategyProperties(true, false,
             false, false, false, false);
 
     /**
@@ -321,7 +321,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
                     ALIAS_CHECK_IMMEDIATELY, null));
             // Model
             return new StrategySettingsDefinition(false, null, 1000, "Symbolic Execution Options",
-                SymbolicExecutionStrategy.DEFAULT_FACTORY,
+                DEFAULT_FACTORY,
                 new ArrayList<>(),
                 methodTreatment, loopTreatment, blockTreatment, branchHiding, aliasChecks);
         }

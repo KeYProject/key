@@ -44,7 +44,7 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public AbstractExecutionElement(ITreeSettings settings, Node proofNode) {
+    protected AbstractExecutionElement(ITreeSettings settings, Node proofNode) {
         assert settings != null;
         assert proofNode != null;
         this.settings = settings;

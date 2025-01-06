@@ -5,9 +5,9 @@ package de.uka.ilkd.key.rule.inst;
 
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableMap;
 
 /**
@@ -36,6 +36,4 @@ public class TacletInstantiations {
     public String toString() {
         return "rule: " + taclet() + "; instantiation: " + instantiations();
     }
-
-
 }
