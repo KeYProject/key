@@ -163,7 +163,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
         }
 
         if (intersectElements.isEmpty()) {
-            return DefaultImmutableSet.nil();
+            return nil();
         } else {
             return new DefaultImmutableSet<>(intersectElements);
         }
@@ -228,7 +228,7 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     @Override
     public ImmutableSet<T> remove(T element) {
         final ImmutableList<T> list = elementList.removeFirst(element);
-        return list.isEmpty() ? DefaultImmutableSet.nil() : new DefaultImmutableSet<>(list);
+        return list.isEmpty() ? nil() : new DefaultImmutableSet<>(list);
     }
 
     /**

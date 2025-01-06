@@ -26,7 +26,7 @@ public abstract class RustyASTWalker {
      *
      * @param root the ProgramElement where to begin
      */
-    public RustyASTWalker(RustyProgramElement root) {
+    protected RustyASTWalker(RustyProgramElement root) {
         this.root = root;
     }
 

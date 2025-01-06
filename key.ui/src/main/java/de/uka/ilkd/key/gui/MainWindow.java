@@ -298,7 +298,7 @@ public final class MainWindow extends JFrame {
         setIconImages(IconFactory.applicationLogos());
 
 
-        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);

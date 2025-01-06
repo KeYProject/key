@@ -58,8 +58,7 @@ public class BindVariablesInstruction {
 }
 
 
-private static class VariableSVBinder extends MatchSchemaVariableInstruction<@NonNull VariableSV>
-            implements MatchInstruction {
+private static class VariableSVBinder extends MatchSchemaVariableInstruction<@NonNull VariableSV> {
 
         public VariableSVBinder(VariableSV templateVar) {
             super(templateVar);

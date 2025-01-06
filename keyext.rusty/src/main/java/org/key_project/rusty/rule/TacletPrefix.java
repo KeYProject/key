@@ -54,10 +54,10 @@ public record TacletPrefix(int prefixLength, boolean context) implements org.key
         if (o == this) {
             return true;
         }
-        if (!(o instanceof TacletPrefix other)) {
+        if (!(o instanceof TacletPrefix(int length, boolean context1))) {
             return false;
         }
-        return (other.prefixLength() == prefixLength()) && (other.context() == context());
+        return (length == prefixLength()) && (context1 == context());
     }
 
     public int hashCode() {

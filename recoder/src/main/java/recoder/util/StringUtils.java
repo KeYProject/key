@@ -155,8 +155,8 @@ public class StringUtils {
      */
     public static String prependNameToSuffix(String prepend, String s) {
         String newBaseName;
-        String prefix = StringUtils.cutSuffix(s);
-        String suffix = StringUtils.getSuffix(s);
+        String prefix = cutSuffix(s);
+        String suffix = getSuffix(s);
         if (suffix == null) {
             // this was a simple class name without dot, no full class name
             newBaseName = prepend + s;

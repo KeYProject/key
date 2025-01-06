@@ -1144,7 +1144,7 @@ public class ExecutionNodeReader {
          *
          * @param name The name of this node.
          */
-        public AbstractKeYlessExecutionElement(String name) {
+        protected AbstractKeYlessExecutionElement(String name) {
             this.name = name;
         }
 
@@ -1302,7 +1302,7 @@ public class ExecutionNodeReader {
          * @param formatedPathCondition The formated path condition.
          * @param pathConditionChanged Is the path condition changed compared to parent?
          */
-        public AbstractKeYlessExecutionNode(IExecutionNode<?> parent, String name,
+        protected AbstractKeYlessExecutionNode(IExecutionNode<?> parent, String name,
                 String formatedPathCondition, boolean pathConditionChanged) {
             super(name);
             this.parent = parent;
@@ -1595,7 +1595,7 @@ public class ExecutionNodeReader {
          * @param blockOpened {@code false} block is definitively not opened, {@code true} block is
          *        or might be opened.
          */
-        public AbstractKeYlessExecutionBlockStartNode(IExecutionNode<?> parent, String name,
+        protected AbstractKeYlessExecutionBlockStartNode(IExecutionNode<?> parent, String name,
                 String formatedPathCondition, boolean pathConditionChanged, boolean blockOpened) {
             super(parent, name, formatedPathCondition, pathConditionChanged);
             this.blockOpened = blockOpened;
@@ -2129,7 +2129,7 @@ public class ExecutionNodeReader {
          * @param signature The signature.
          * @param formatedMethodReturn The formated method return condition.
          */
-        public AbstractKeYlessBaseExecutionNode(IExecutionNode<?> parent, String name,
+        protected AbstractKeYlessBaseExecutionNode(IExecutionNode<?> parent, String name,
                 String formatedPathCondition, boolean pathConditionChanged, String signature,
                 String formatedMethodReturn) {
             super(parent, name, formatedPathCondition, pathConditionChanged);

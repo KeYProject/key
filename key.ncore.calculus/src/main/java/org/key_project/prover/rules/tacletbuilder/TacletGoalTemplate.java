@@ -39,7 +39,8 @@ public abstract class TacletGoalTemplate {
      *        time unused (new) program variables that are introduced by an application of this
      *        template
      */
-    public TacletGoalTemplate(Sequent addedSeq, @NonNull ImmutableList<? extends Taclet> addedRules,
+    protected TacletGoalTemplate(Sequent addedSeq,
+            @NonNull ImmutableList<? extends Taclet> addedRules,
             @NonNull ImmutableSet<SchemaVariable> addedProgVars) {
         // TacletBuilder.checkContainsFreeVarSV(addedSeq, null, "add sequent");
 
@@ -57,7 +58,7 @@ public abstract class TacletGoalTemplate {
      * @param addedSeq new Sequent to be added
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
+    protected TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
         this(addedSeq, addedRules, DefaultImmutableSet.nil());
     }
 

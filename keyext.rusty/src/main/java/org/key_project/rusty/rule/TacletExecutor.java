@@ -20,7 +20,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 public abstract class TacletExecutor<T extends Taclet> extends
         org.key_project.prover.rules.TacletExecutor<@NonNull Goal, @NonNull RuleApp, @NonNull T> {
-    public TacletExecutor(T taclet) {
+    protected TacletExecutor(T taclet) {
         super(taclet);
     }
 

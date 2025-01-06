@@ -23,7 +23,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends @NonNull Operato
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);
 
-    public MatchSchemaVariableInstruction(SV op) {
+    protected MatchSchemaVariableInstruction(SV op) {
         super(op);
     }
 

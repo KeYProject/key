@@ -26,6 +26,7 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
@@ -245,15 +246,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
 
     private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
         final UpdateableOperator originalLhs = op.lhs();
-        if (originalLhs instanceof SchemaVariable) {
-            Object lhsInst = svInst.getInstantiation((SchemaVariable) originalLhs);
+        if (originalLhs instanceof SchemaVariable originalLhsAsSV) {
+            Object lhsInst = svInst.getInstantiation(originalLhsAsSV);
             if (lhsInst instanceof Term) {
                 lhsInst = ((Term) lhsInst).op();
             }
 
             final UpdateableOperator newLhs;
-            if (lhsInst instanceof UpdateableOperator) {
-                newLhs = (UpdateableOperator) lhsInst;
+            if (lhsInst instanceof UpdateableOperator updateableLhs) {
+                newLhs = updateableLhs;
             } else {
                 assert false : "not updateable: " + lhsInst;
                 throw new IllegalStateException("Encountered non-updateable operator " + lhsInst
@@ -287,11 +288,9 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                 instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
         } else if (p_operatorToBeInstantiated instanceof Modality mod) {
             instantiatedOp = instantiateModality(mod, jb);
-        } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
-            if (!(p_operatorToBeInstantiated instanceof ProgramSV)
-                    || !((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
-                instantiatedOp =
-                    (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
+        } else if (p_operatorToBeInstantiated instanceof SchemaVariable opAsSV) {
+            if (!(p_operatorToBeInstantiated instanceof ProgramSV opAsPSV) || !opAsPSV.isListSV()) {
+                instantiatedOp = (Operator) svInst.getInstantiation(opAsSV);
             }
         }
         assert instantiatedOp != null;
@@ -335,11 +334,11 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     public void visit(final Term visited) {
         // Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
-        if (visitedOp instanceof SchemaVariable && visitedOp.arity() == 0
-                && svInst.isInstantiated((SchemaVariable) visitedOp)
-                && (!(visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {
-            final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp,
-                svInst.getExecutionContext(), services));
+        if (visitedOp instanceof SchemaVariable visitedSV && visitedOp.arity() == 0
+                && svInst.isInstantiated(visitedSV)
+                && (!(visitedOp instanceof ProgramSV visitedAsPSV && visitedAsPSV.isListSV()))) {
+            final Term newTerm = toTerm(
+                svInst.getTermInstantiation(visitedSV, svInst.getExecutionContext(), services));
             final Term labeledTerm = TermLabelManager.label(services, termLabelState,
                 applicationPosInOccurrence, rule, ruleApp, goal, labelHint, visited, newTerm);
             pushNew(labeledTerm);

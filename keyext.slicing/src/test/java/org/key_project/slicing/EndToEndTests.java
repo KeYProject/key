@@ -57,7 +57,7 @@ class EndToEndTests {
         DependencyTracker tracker = proof.lookup(DependencyTracker.class);
         Node node26 = proof.findAny(n -> n != null && n.serialNr() == 26);
         int[] producingNodes =
-            new int[] { 15, 15, 13, 12, 11, 23, 25, 24, 22, 21, 19, 17, 2, 16, 0 };
+            { 15, 15, 13, 12, 11, 23, 25, 24, 22, 21, 19, 17, 2, 16, 0 };
         for (int i = 0; i < producingNodes.length; i++) {
             PosInOccurrence pio = PosInOccurrence.findInSequent(
                 node26.sequent(), i + 1, PosInTerm.getTopLevel());

@@ -62,7 +62,7 @@ public abstract class AbstractUpdateExtractor {
      * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
      * @param modalityPio The {@link PosInOccurrence} of the modality or its updates.
      */
-    public AbstractUpdateExtractor(Node node,
+    protected AbstractUpdateExtractor(Node node,
             PosInOccurrence modalityPio) {
         assert node != null;
         assert modalityPio != null;
@@ -477,8 +477,7 @@ public abstract class AbstractUpdateExtractor {
             Set<Term> objectsToIgnore) throws ProofInputException {
         term = OriginTermLabel.removeOriginLabels(term, getServices());
         final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
-        if (term.op() instanceof ProgramVariable) {
-            ProgramVariable var = (ProgramVariable) term.op();
+        if (term.op() instanceof ProgramVariable var) {
             if (!SymbolicExecutionUtil.isHeap(var, heapLDT) && !isImplicitProgramVariable(var)
                     && !objectsToIgnore.contains(term) && !hasFreeVariables(term)) {
                 toFill.add(new ExtractLocationParameter(var, true));

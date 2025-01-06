@@ -96,7 +96,7 @@ public abstract class AbstractProblemLoader {
      *        defined by the loaded proof or {@code false} otherwise which still allows to work with
      *        the loaded {@link InitConfig}.
      */
-    public AbstractProblemLoader(File file,
+    protected AbstractProblemLoader(File file,
             List<File> includes, Profile profileOfNewProofs,
             ProblemLoaderControl control) {
         this.file = file;

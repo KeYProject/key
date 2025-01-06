@@ -35,7 +35,7 @@ public abstract class ProgramSVSort extends SortImpl {
     public static final ProgramSVSort TYPE = new TypeReferenceSort();
     public static final ProgramSVSort TYPE_PRIMITIVE = new TypeReferencePrimitiveSort();
 
-    public ProgramSVSort(Name name) {
+    protected ProgramSVSort(Name name) {
         super(name, false, DefaultImmutableSet.nil());
         NAME2SORT.put(name, this);
     }

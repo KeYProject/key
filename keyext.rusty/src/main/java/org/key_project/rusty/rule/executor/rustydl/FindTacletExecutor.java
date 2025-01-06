@@ -18,7 +18,7 @@ import org.key_project.util.collection.ImmutableList;
 
 public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         extends TacletExecutor<TacletKind> {
-    public FindTacletExecutor(TacletKind taclet) {
+    protected FindTacletExecutor(TacletKind taclet) {
         super(taclet);
     }
 

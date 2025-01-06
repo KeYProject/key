@@ -191,7 +191,7 @@ public abstract class SequentView extends JEditorPane {
     public final void setFont() {
         Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
         if (myFont != null) {
-            putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+            putClientProperty(HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             setFont(myFont);
         } else {
             LOGGER.debug("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");

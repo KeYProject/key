@@ -38,7 +38,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * Operator.
      */
 
-    public Operator() {
+    protected Operator() {
         // nothing to do
     }
 
@@ -48,7 +48,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @param unaryChild an expression.
      */
 
-    public Operator(Expression unaryChild) {
+    protected Operator(Expression unaryChild) {
         children = new ASTArrayList<>(getArity());
         children.add(unaryChild);
         // makeParentRoleValid() called by subclasses' constructors
@@ -61,7 +61,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @param rhs an expression.
      */
 
-    public Operator(Expression lhs, Expression rhs) {
+    protected Operator(Expression lhs, Expression rhs) {
         children = new ASTArrayList<>(getArity());
         children.add(lhs);
         children.add(rhs);

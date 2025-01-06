@@ -781,7 +781,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
     }
 
-    private class IconCellRenderer extends DefaultListCellRenderer implements java.io.Serializable {
+    private class IconCellRenderer extends DefaultListCellRenderer {
         @Serial
         private static final long serialVersionUID = -8178991338906184819L;
 

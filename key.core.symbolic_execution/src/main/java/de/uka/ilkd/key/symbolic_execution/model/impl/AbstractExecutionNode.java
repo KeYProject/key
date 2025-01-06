@@ -109,7 +109,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
      */
-    public AbstractExecutionNode(ITreeSettings settings, Node proofNode) {
+    protected AbstractExecutionNode(ITreeSettings settings, Node proofNode) {
         super(settings, proofNode);
     }
 

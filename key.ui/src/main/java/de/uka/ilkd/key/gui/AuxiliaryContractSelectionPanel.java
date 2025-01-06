@@ -32,7 +32,7 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
     protected final JList<T> contractList;
     private final TitledBorder border;
 
-    public AuxiliaryContractSelectionPanel(final Services services,
+    protected AuxiliaryContractSelectionPanel(final Services services,
             final boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.services = services;
@@ -76,7 +76,7 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
                 lay.setAlignment(FlowLayout.LEFT);
                 JPanel result = new JPanel(lay);
                 result.add(label);
-                label.setVerticalAlignment(SwingConstants.TOP);
+                label.setVerticalAlignment(TOP);
 
                 // set background color
                 result.setBackground(supComp.getBackground());

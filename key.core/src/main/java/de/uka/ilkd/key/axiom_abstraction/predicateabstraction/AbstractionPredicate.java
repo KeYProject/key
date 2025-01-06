@@ -117,7 +117,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
         final Sort fInputSort = placeholder.sort();
 
         AbstractionPredicate result = new AbstractionPredicate(fInputSort) {
-            private final Name name = new Name("abstrPred_" + predicate.op().toString());
+            private final Name name = new Name("abstrPred_" + predicate.op());
             private Function<Term, Term> mapping = null;
 
             @Override

@@ -120,7 +120,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             Sort sort) {
         Name name = new Name(varfuncName);
         Operator[] operators =
-            new Operator[] { (OperatorSV) schemaVariables().lookup(name), variables().lookup(name),
+            { (OperatorSV) schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new Name(varfuncName)),
                 functions().lookup(name) };
 

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 

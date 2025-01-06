@@ -130,8 +130,8 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
         if (pe instanceof ProgramVariable pv) {
             return tb.var(pv);
         }
-        if (pe instanceof PathExpression path) {
-            return tb.var(services.getNamespaces().programVariables().lookup(path.var().name()));
+        if (pe instanceof PathExpression(org.key_project.rusty.ast.Identifier var)) {
+            return tb.var(services.getNamespaces().programVariables().lookup(var.name()));
         }
         if (pe instanceof LiteralExpression lit) {
             return convertLiteralExpression(lit, services);

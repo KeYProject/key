@@ -27,7 +27,7 @@ public abstract class AbstractEnvInput implements EnvInput {
     // constructors
     // -------------------------------------------------------------------------
 
-    public AbstractEnvInput(String name, String rustPath,
+    protected AbstractEnvInput(String name, String rustPath,
             Profile profile, List<File> includes) {
         assert profile != null;
         this.name = new Name(name);

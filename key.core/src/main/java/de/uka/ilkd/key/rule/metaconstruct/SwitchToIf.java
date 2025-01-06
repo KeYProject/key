@@ -23,8 +23,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * This class is used to perform program transformations needed for the symbolic execution of a

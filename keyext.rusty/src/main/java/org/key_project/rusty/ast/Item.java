@@ -6,5 +6,5 @@ package org.key_project.rusty.ast;
 
 import org.key_project.rusty.ast.stmt.Statement;
 
-public interface Item extends RustyProgramElement, Statement {
+public interface Item extends Statement {
 }

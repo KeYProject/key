@@ -119,7 +119,7 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
         if (visitedOp instanceof SchemaVariable sv && visitedOp.arity() == 0
                 && svInst.isInstantiated(sv)
                 && (!(visitedOp instanceof ProgramSV psv && psv.isListSV()))) {
-            final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp,
+            final Term newTerm = toTerm(svInst.getTermInstantiation(sv,
                 /* svInst.getExecutionContext(), */ services));
             pushNew(newTerm);
         } else {

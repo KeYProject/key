@@ -181,7 +181,7 @@ public class InvariantConfigurator {
                 getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
 
-                setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
                 final NamespaceSet nss = services.getNamespaces().copyWithParent();
                 parser = new KeyIO(services, nss);

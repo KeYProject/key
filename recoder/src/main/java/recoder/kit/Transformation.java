@@ -70,7 +70,7 @@ public abstract class Transformation {
      *
      * @param sc the service configuration to use.
      */
-    public Transformation(CrossReferenceServiceConfiguration sc) {
+    protected Transformation(CrossReferenceServiceConfiguration sc) {
         setServiceConfiguration(sc);
     }
 

@@ -278,7 +278,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         protected ImmutableList<Name> currNewNames = null;
         protected String notes = null;
 
-        public RuleInformation(String ruleName) {
+        protected RuleInformation(String ruleName) {
             this.currRuleName = ruleName.trim();
         }
 

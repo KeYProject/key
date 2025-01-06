@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.statement;
 
-import recoder.java.NonTerminalProgramElement;
 
 /**
  * Branch statement.
@@ -13,13 +12,13 @@ import recoder.java.NonTerminalProgramElement;
  * @author <TT>AutoDoc</TT>
  */
 
-public abstract class BranchStatement extends JavaStatement implements NonTerminalProgramElement {
+public abstract class BranchStatement extends JavaStatement {
 
     /**
      * Branch statement.
      */
 
-    public BranchStatement() {
+    protected BranchStatement() {
         // nothing to do
     }
 
