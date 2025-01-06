@@ -149,7 +149,7 @@ public class TacletPrefixBuilder {
             if (addRulePrefix != null
                     && addRulePrefix.prefixLength() != prefix.prefixLength()) {
                 throw new TacletPrefixBuilder.InvalidPrefixException(
-                    tacletBuilder.getName().toString(), (SchemaVariable) entry.key(),
+                    tacletBuilder.getName().toString(), entry.key(),
                     prefix, addRulePrefix.prefixLength());
             }
         }
@@ -158,7 +158,7 @@ public class TacletPrefixBuilder {
 
         for (var tacletGoalTemplate : addRule.goalTemplates()) {
             for (var taclet : tacletGoalTemplate.rules()) {
-                checkPrefixInAddRules((Taclet) taclet);
+                checkPrefixInAddRules(taclet);
             }
         }
     }
@@ -205,7 +205,7 @@ public class TacletPrefixBuilder {
             return;
         }
         for (final var entry : prefixMap) {
-            var sv = (SchemaVariable) entry.key();
+            var sv = entry.key();
             if (occurrsOnlyInFindOrRepl(sv)) {
                 prefixMap = prefixMap.put(entry.key(), entry.value().setContext(true));
             }

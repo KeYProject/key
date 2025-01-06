@@ -96,9 +96,9 @@ public class NoPosTacletApp extends TacletApp {
 
     protected MatchConditions setupMatchConditions(PosInOccurrence pos, Services services) {
         var svInst =
-            (org.key_project.rusty.rule.inst.SVInstantiations) (taclet() instanceof NoFindTaclet
+            taclet() instanceof NoFindTaclet
                     ? instantiations()
-                    : instantiations().clearUpdateContext());
+                    : instantiations().clearUpdateContext();
 
         org.key_project.rusty.rule.MatchConditions mc;
         if (svInst.isEmpty()) {

@@ -41,7 +41,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import bibliothek.gui.dock.common.action.CAction;
@@ -994,7 +993,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                                 pio.sequentFormula())
                             .sequent();
                     mediator.getSelectionModel().setSelectedSequentAndRuleApp(
-                        ossParentNode.getNode(), (Sequent) modifiedSequent, ossNode.getRuleApp());
+                        ossParentNode.getNode(), modifiedSequent, ossNode.getRuleApp());
                 } else {
                     mediator.nonGoalNodeChosen(node);
                 }

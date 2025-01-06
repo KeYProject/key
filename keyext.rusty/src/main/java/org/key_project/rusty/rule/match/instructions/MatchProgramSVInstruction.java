@@ -40,7 +40,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
 
         if (svSort.canStandFor(instantiationCandidate)) {
             return addInstantiation(instantiationCandidate,
-                (org.key_project.rusty.rule.MatchConditions) matchCond, services);
+                matchCond, services);
         }
 
         return null;

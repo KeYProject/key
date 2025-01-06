@@ -135,7 +135,7 @@ public class PosTacletApp extends TacletApp {
             while (it.hasNext()) {
                 SchemaVariable varSV = it.next();
                 Term inst = (Term) insts.getInstantiation(varSV);
-                if (inst != null && k.contains((QuantifiableVariable) inst.op())) {
+                if (inst != null && k.contains(inst.op())) {
                     insts = replaceInstantiation(taclet, insts, varSV, services);
                 }
             }

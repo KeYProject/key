@@ -6,7 +6,6 @@ package de.uka.ilkd.key.proof;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.PosInTerm;

@@ -74,7 +74,7 @@ public final class SymbolicExecutionSideProofUtil {
         for (SequentFormula sf : goalSequent.antecedent()) {
             if (sf != currentSF) {
                 if (!containsModalityOrQuery(sf)) {
-                    sequentToProve = (Sequent) sequentToProve.addFormula(sf, true, false).sequent();
+                    sequentToProve = sequentToProve.addFormula(sf, true, false).sequent();
                 }
             }
         }
@@ -82,7 +82,7 @@ public final class SymbolicExecutionSideProofUtil {
             if (sf != currentSF) {
                 if (!containsModalityOrQuery(sf)) {
                     sequentToProve =
-                        (Sequent) sequentToProve.addFormula(sf, false, false).sequent();
+                        sequentToProve.addFormula(sf, false, false).sequent();
                 }
             }
         }

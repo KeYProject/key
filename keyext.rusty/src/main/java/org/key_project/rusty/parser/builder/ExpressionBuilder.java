@@ -559,7 +559,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Sequent visitSeq(KeYRustyParser.SeqContext ctx) {
-        return RustySequentKit.createSequent((ImmutableList<SequentFormula>) accept(ctx.ant),
+        return RustySequentKit.createSequent(accept(ctx.ant),
             accept(ctx.suc));
     }
 
@@ -588,7 +588,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             return RustySequentKit.createSequent(newAnt, s.succedent().asList());
         }
         if (ss != null) {
-            return RustySequentKit.createSequent(ImmutableSLList.<SequentFormula>nil(), ss);
+            return RustySequentKit.createSequent(ImmutableSLList.nil(), ss);
         }
         assert (false);
         return null;
@@ -598,7 +598,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     public ImmutableList<SequentFormula> visitSemisequent(KeYRustyParser.SemisequentContext ctx) {
         ImmutableList<SequentFormula> ss = accept(ctx.ss);
         if (ss == null) {
-            ss = ImmutableSLList.<SequentFormula>nil();
+            ss = ImmutableSLList.nil();
         }
         Term head = accept(ctx.term());
         if (head != null) {

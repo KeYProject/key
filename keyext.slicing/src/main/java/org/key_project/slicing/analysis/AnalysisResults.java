@@ -166,7 +166,7 @@ public final class AnalysisResults {
 
     private ImmutableList<SequentFormula> reduce(ImmutableList<SequentFormula> semi, Node node,
             boolean antec) {
-        ImmutableList<SequentFormula> semiList = ImmutableSLList.<SequentFormula>nil();
+        ImmutableList<SequentFormula> semiList = ImmutableSLList.nil();
         for (SequentFormula sf : semi) {
             var graphNode = dependencyGraph.getGraphNode(node.proof(), node.getBranchLocation(),
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), antec));

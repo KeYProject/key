@@ -427,7 +427,7 @@ public abstract class TacletApp implements RuleApp {
             if (appMC == null) {
                 return null;
             } else {
-                app = app.setMatchConditions((MatchConditions) appMC, services);
+                app = app.setMatchConditions(appMC, services);
             }
         }
 
@@ -653,7 +653,7 @@ public abstract class TacletApp implements RuleApp {
         ruleSuccTail = ruleSuccTail.tail();
         while (itCand.hasNext()) {
             res = res.prepend(findIfFormulaInstantiationsHelp(ruleSuccTail, ruleAntecTail, instSucc,
-                instAntec, instAlreadyMatched.prepend(itCand.next()), (MatchConditions) itMC.next(),
+                instAntec, instAlreadyMatched.prepend(itCand.next()), itMC.next(),
                 services));
         }
 
@@ -741,7 +741,7 @@ public abstract class TacletApp implements RuleApp {
                     + "or the if formulas have already been instantiated";
 
         MatchConditions mc =
-            (MatchConditions) taclet().getMatcher().matchAssumes(p_list, matchConditions,
+            taclet().getMatcher().matchAssumes(p_list, matchConditions,
                 p_services);
 
         return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
@@ -888,7 +888,7 @@ public abstract class TacletApp implements RuleApp {
             Services services, boolean interesting) {
 
         final MatchConditions cond =
-            (MatchConditions) taclet().getMatcher().matchSV(sv, pe, matchConditions, services);
+            taclet().getMatcher().matchSV(sv, pe, matchConditions, services);
 
         if (cond == null) {
             throw new IllegalInstantiationException(

@@ -108,7 +108,7 @@ public class VMTacletMatcher implements TacletMatcher {
             final var svIterator = result.getInstantiations().svIterator();
 
             if (!svIterator.hasNext()) {
-                return (MatchConditions) checkVariableConditions(null, null, result, services);// XXX
+                return checkVariableConditions(null, null, result, services);// XXX
             }
 
             while (result != null && svIterator.hasNext()) {
@@ -130,7 +130,7 @@ public class VMTacletMatcher implements TacletMatcher {
      * @param v the bound variable to be searched
      */
     private boolean varIsBound(SchemaVariable v) {
-        return (v instanceof QuantifiableVariable) && boundVars.contains((QuantifiableVariable) v);
+        return (v instanceof QuantifiableVariable) && boundVars.contains(v);
     }
 
     /**
@@ -332,7 +332,7 @@ public class VMTacletMatcher implements TacletMatcher {
             matchCond = instr.match(term, matchCond, services);
             matchCond = checkVariableConditions(sv, syntaxElement, matchCond, services);
         } else if (syntaxElement instanceof RustyProgramElement pe) {
-            matchCond = instr.match(pe, (MatchConditions) matchCond, services);
+            matchCond = instr.match(pe, matchCond, services);
             matchCond = checkConditions(matchCond, services);
         }
         return (MatchConditions) matchCond;

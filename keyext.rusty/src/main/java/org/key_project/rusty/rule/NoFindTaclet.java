@@ -76,7 +76,7 @@ public class NoFindTaclet extends Taclet {
         final var attrs = new TacletAttributes(displayName(), null);
 
         return new NoFindTaclet(new Name(s), applPart,
-            (ImmutableList<TacletGoalTemplate>) goalTemplates(), ruleSets, attrs,
+            goalTemplates(), ruleSets, attrs,
             prefixMap, tacletAnnotations);
     }
 }

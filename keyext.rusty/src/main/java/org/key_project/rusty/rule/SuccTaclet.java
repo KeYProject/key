@@ -80,7 +80,7 @@ public class SuccTaclet extends FindTaclet {
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
         return new SuccTaclet(new Name(s), applPart,
-            (ImmutableList<TacletGoalTemplate>) goalTemplates(), ruleSets, attrs, find,
+            goalTemplates(), ruleSets, attrs, find,
             ignoreTopLevelUpdates, prefixMap, tacletAnnotations);
     }
 

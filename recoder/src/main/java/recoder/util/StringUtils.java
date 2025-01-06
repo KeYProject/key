@@ -83,7 +83,7 @@ public class StringUtils {
      * Normalize a name without dot-suffix
      */
     public static String basenameDot(String s) {
-        int lastIndex = s.lastIndexOf(".");
+        int lastIndex = s.lastIndexOf('.');
         if (lastIndex == -1) {
             return s;
         }
@@ -94,7 +94,7 @@ public class StringUtils {
      * Normalize a name without directory prefix
      */
     public static String cutSuffix(String s) {
-        int lastIndex = s.lastIndexOf(".");
+        int lastIndex = s.lastIndexOf('.');
         if (lastIndex == -1) {
             return s;
         }
@@ -116,8 +116,8 @@ public class StringUtils {
      * Normalize a string without enclosing double quotes.
      */
     public static String removeDoubleQuotes(String s) {
-        int firstIndex = s.indexOf("\"");
-        int lastIndex = s.lastIndexOf("\"");
+        int firstIndex = s.indexOf('"');
+        int lastIndex = s.lastIndexOf('"');
         if (lastIndex == -1 && firstIndex == -1) {
             return s; // none in.
         }
@@ -142,7 +142,7 @@ public class StringUtils {
      * Return a suffix of a dotted name string.
      */
     public static String getSuffix(String s) {
-        int lastIndex = s.lastIndexOf(".");
+        int lastIndex = s.lastIndexOf('.');
         if (lastIndex == -1) {
             return null;
         }

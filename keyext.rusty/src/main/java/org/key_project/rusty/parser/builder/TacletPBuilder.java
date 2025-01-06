@@ -446,7 +446,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public ImmutableSet<SchemaVariable> visitAddprogvar(KeYRustyParser.AddprogvarContext ctx) {
         final Collection<? extends SchemaVariable> accept = accept(ctx.pvs);
-        return Immutables.<SchemaVariable>createSetFrom(Objects.requireNonNull(accept));
+        return Immutables.createSetFrom(Objects.requireNonNull(accept));
     }
 
     @Override
