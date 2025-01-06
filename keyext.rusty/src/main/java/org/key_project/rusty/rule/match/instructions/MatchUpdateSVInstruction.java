@@ -26,7 +26,7 @@ public class MatchUpdateSVInstruction extends MatchSchemaVariableInstruction<@No
 
     @Override
     public MatchConditions match(SyntaxElementCursor cursor, MatchConditions mc,
-                                 LogicServices services) {
+            LogicServices services) {
         MatchConditions result = match((Term) cursor.getCurrentNode(), mc, services);
         if (result != null) {
             cursor.gotoNextSibling();

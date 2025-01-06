@@ -32,12 +32,13 @@ public abstract class Taclet extends
      */
     protected Taclet(Name name, org.key_project.prover.rules.TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
-                     ImmutableList<RuleSet> ruleSets,
+            ImmutableList<RuleSet> ruleSets,
             org.key_project.prover.rules.TacletAttributes attrs,
             ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             boolean surviveSmbExec,
             ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, surviveSmbExec, tacletAnnotations);
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, surviveSmbExec,
+            tacletAnnotations);
     }
 
     /**
@@ -51,11 +52,11 @@ public abstract class Taclet extends
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-                     ImmutableList<TacletGoalTemplate> goalTemplates,
-                     ImmutableList<RuleSet> ruleSets,
-                     org.key_project.prover.rules.TacletAttributes attrs,
-                     ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-                     ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            org.key_project.prover.rules.TacletAttributes attrs,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, false,
             tacletAnnotations);
     }

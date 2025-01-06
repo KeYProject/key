@@ -35,7 +35,7 @@ public class NoFindTaclet extends Taclet {
      */
     public NoFindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
-                        ImmutableList<RuleSet> ruleSets,
+            ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {

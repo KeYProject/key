@@ -5,20 +5,18 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
-import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.Node;
 import org.key_project.rusty.rule.inst.GenericSortCondition;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.key_project.util.collection.ImmutableSet;
 
 public abstract class TacletExecutor<T extends Taclet> extends
         org.key_project.prover.rules.TacletExecutor<@NonNull Goal, @NonNull RuleApp, @NonNull T> {
@@ -50,20 +48,20 @@ public abstract class TacletExecutor<T extends Taclet> extends
      * @return the (partially) instantiated term
      */
     protected Term syntacticalReplace(Term term, PosInOccurrence applicationPosInOccurrence,
-                                      MatchConditions mc, Goal goal, RuleApp ruleApp, Services services) {
+            MatchConditions mc, Goal goal, RuleApp ruleApp, Services services) {
         final SyntacticalReplaceVisitor srVisitor =
-                new SyntacticalReplaceVisitor(applicationPosInOccurrence,
-                        mc.getInstantiations(), goal, taclet, ruleApp, services);
+            new SyntacticalReplaceVisitor(applicationPosInOccurrence,
+                mc.getInstantiations(), goal, taclet, ruleApp, services);
         term.execPostOrder(srVisitor);
         return srVisitor.getTerm();
     }
 
     @Override
     protected Term syntacticalReplace(Term term, PosInOccurrence applicationPosInOccurrence,
-                                      org.key_project.prover.rules.MatchConditions mc, @NonNull Goal goal,
-                                      @NonNull RuleApp ruleApp, LogicServices services, Object... instantiationInfo) {
+            org.key_project.prover.rules.MatchConditions mc, @NonNull Goal goal,
+            @NonNull RuleApp ruleApp, LogicServices services, Object... instantiationInfo) {
         return syntacticalReplace(term, applicationPosInOccurrence, (MatchConditions) mc, goal,
-                ruleApp, (Services) services);
+            ruleApp, (Services) services);
     }
 
     /**
@@ -138,15 +136,15 @@ public abstract class TacletExecutor<T extends Taclet> extends
     }
 
     protected void applyAddProgVars(ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> pvs,
-                                    SequentChangeInfo currentSequent,
-                                    Goal goal,
-                                    PosInOccurrence posOfFind,
-                                    LogicServices p_services, org.key_project.prover.rules.MatchConditions matchCond) {
-      // TODO
+            SequentChangeInfo currentSequent,
+            Goal goal,
+            PosInOccurrence posOfFind,
+            LogicServices p_services, org.key_project.prover.rules.MatchConditions matchCond) {
+        // TODO
     }
 
 
-        @Override
+    @Override
     protected SequentFormula createSequentFormula(Term form) {
         return new SequentFormula(form);
     }

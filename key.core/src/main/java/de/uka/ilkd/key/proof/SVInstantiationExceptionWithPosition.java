@@ -22,7 +22,7 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
     private final Position position;
     private final boolean inIfSequent;
 
-    public SVInstantiationExceptionWithPosition(String description, Position position,
+    protected SVInstantiationExceptionWithPosition(String description, Position position,
             boolean inIfSequent) {
         super(description);
         this.position = position;

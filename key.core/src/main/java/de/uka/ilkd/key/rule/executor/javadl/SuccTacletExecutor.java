@@ -12,8 +12,8 @@ import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
-import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
@@ -36,11 +36,12 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet>
         if (gt instanceof AntecSuccTacletGoalTemplate) {
             final Sequent replWith = ((AntecSuccTacletGoalTemplate) gt).replaceWith();
 
-            replaceAtPos(replWith.succedent(), currentSequent, posOfFind, matchCond, goal, ruleApp, services, termLabelState,
-                    new TacletLabelHint(TacletOperation.REPLACE_AT_SUCCEDENT, replWith)
-            );
+            replaceAtPos(replWith.succedent(), currentSequent, posOfFind, matchCond, goal, ruleApp,
+                services, termLabelState,
+                new TacletLabelHint(TacletOperation.REPLACE_AT_SUCCEDENT, replWith));
             if (!replWith.antecedent().isEmpty()) {
-                addToAntec(replWith.antecedent(), currentSequent, null, posOfFind, matchCond, goal, ruleApp, services, termLabelState,
+                addToAntec(replWith.antecedent(), currentSequent, null, posOfFind, matchCond, goal,
+                    ruleApp, services, termLabelState,
                     new TacletLabelHint(TacletOperation.REPLACE_TO_ANTECEDENT, replWith));
             }
         }
@@ -54,10 +55,11 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet>
             SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
             MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
-        addToAntec(add.antecedent(), currentSequent, null, posOfFind, matchCond, goal, ruleApp, services, termLabelState,
+        addToAntec(add.antecedent(), currentSequent, null, posOfFind, matchCond, goal, ruleApp,
+            services, termLabelState,
             new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
-        addToSucc(add.succedent(), currentSequent, whereToAdd, posOfFind, matchCond, goal, ruleApp, services, termLabelState,
-            new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add)
-        );
+        addToSucc(add.succedent(), currentSequent, whereToAdd, posOfFind, matchCond, goal, ruleApp,
+            services, termLabelState,
+            new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add));
     }
 }

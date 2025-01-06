@@ -31,7 +31,7 @@ public final class FreeLabelInVariableCondition extends VariableConditionAdapter
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
-                         Services services) {
+            Services services) {
         Label prgLabel = null;
         ProgramElement program = null;
 

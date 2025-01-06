@@ -8,7 +8,6 @@ import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.MatchConditions;
-import org.key_project.rusty.Services;
 
 /**
  * The match instruction reports a success if the top level operator of the term to be matched is
@@ -29,7 +28,7 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
      */
     @Override
     public final MatchConditions match(Term instantiationCandidate, MatchConditions matchConditions,
-                                       LogicServices services) {
+            LogicServices services) {
         if (instantiationCandidate.op() == op) {
             return matchConditions;
         }
@@ -41,7 +40,7 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
      */
     @Override
     public MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
-                                 LogicServices services) {
+            LogicServices services) {
         if (instantiationCandidate == op) {
             return matchConditions;
         }

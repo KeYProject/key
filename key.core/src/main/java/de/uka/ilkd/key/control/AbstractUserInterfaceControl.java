@@ -48,7 +48,7 @@ public abstract class AbstractUserInterfaceControl
     /**
      * Constructor.
      */
-    public AbstractUserInterfaceControl() {
+    protected AbstractUserInterfaceControl() {
         addProverTaskListener(new ProofMacroListenerAdapter());
     }
 

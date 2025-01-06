@@ -14,7 +14,7 @@ import org.key_project.logic.Name;
 
 public abstract class MetaArithBitMaskOp extends AbstractTermTransformer {
 
-    public MetaArithBitMaskOp(Name name) {
+    protected MetaArithBitMaskOp(Name name) {
         super(name, 2);
     }
 

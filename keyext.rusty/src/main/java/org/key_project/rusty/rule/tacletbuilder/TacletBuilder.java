@@ -34,7 +34,8 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
     protected ImmutableList<NewDependingOn> varsNewDependingOn =
         ImmutableSLList.nil();
-    protected ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goals = ImmutableSLList.nil();
+    protected ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goals =
+        ImmutableSLList.nil();
     protected TacletAttributes attrs = new TacletAttributes(null, null);
 
     /**

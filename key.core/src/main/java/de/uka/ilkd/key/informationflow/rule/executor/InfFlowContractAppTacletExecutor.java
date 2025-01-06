@@ -9,8 +9,6 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.util.properties.Properties;
 
@@ -47,36 +45,39 @@ public class InfFlowContractAppTacletExecutor
      * it is added at the head of the antecedent). Of course it has to be ensured that the position
      * information describes one occurrence in the antecedent of the sequent.
      *
-     * @param semi                       the Semisequent with the the ConstrainedFormulae to be added
-     * @param currentSequent             the Sequent which is the current (intermediate) result of applying the
-     *                                   taclet
-     * @param pos                        the PosInOccurrence describing the place in the sequent or null for head of
-     *                                   antecedent
+     * @param semi the Semisequent with the the ConstrainedFormulae to be added
+     * @param currentSequent the Sequent which is the current (intermediate) result of applying the
+     *        taclet
+     * @param pos the PosInOccurrence describing the place in the sequent or null for head of
+     *        antecedent
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
-     *                                   rewritten
-     * @param matchCond                  the MatchConditions containing in particular the instantiations of the
-     *                                   schemavariables
+     *        rewritten
+     * @param matchCond the MatchConditions containing in particular the instantiations of the
+     *        schemavariables
      * @param services
-     * @param instantiationInfo          additional instantiation information concerning label:
-     *                                   <ul>
-     *                                       <li>termLabelState: The {@link TermLabelState} of the current rule application.</li>
-     *                                       <li>labelHint: The hint used to maintain {@link TermLabel}s. the instantiations of the
-     *                                   schemavariables</li>
-     *                                   </ul>
+     * @param instantiationInfo additional instantiation information concerning label:
+     *        <ul>
+     *        <li>termLabelState: The {@link TermLabelState} of the current rule application.</li>
+     *        <li>labelHint: The hint used to maintain {@link TermLabel}s. the instantiations of the
+     *        schemavariables</li>
+     *        </ul>
      */
     @Override
-    protected void addToAntec(Semisequent semi, SequentChangeInfo currentSequent, PosInOccurrence pos, PosInOccurrence applicationPosInOccurrence,
-                              MatchConditions matchCond, Goal goal,
-                              org.key_project.prover.rules.RuleApp tacletApp,
-                              LogicServices services, Object... instantionInfo) {
+    protected void addToAntec(Semisequent semi, SequentChangeInfo currentSequent,
+            PosInOccurrence pos, PosInOccurrence applicationPosInOccurrence,
+            MatchConditions matchCond, Goal goal,
+            org.key_project.prover.rules.RuleApp tacletApp,
+            LogicServices services, Object... instantionInfo) {
 
         final ImmutableList<org.key_project.prover.sequent.SequentFormula> replacements =
-            instantiateSemisequent(semi, pos, matchCond, goal, tacletApp, goal.getOverlayServices(), instantionInfo);
+            instantiateSemisequent(semi, pos, matchCond, goal, tacletApp, goal.getOverlayServices(),
+                instantionInfo);
         assert replacements.size() == 1
                 : "information flow taclets must have " + "exactly one add!";
         updateStrategyInfo(goal.proof().openEnabledGoals().head(),
             (Term) replacements.iterator().next().formula());
-        super.addToAntec(semi, currentSequent, pos, applicationPosInOccurrence, matchCond, goal, tacletApp, services, instantionInfo);
+        super.addToAntec(semi, currentSequent, pos, applicationPosInOccurrence, matchCond, goal,
+            tacletApp, services, instantionInfo);
     }
 
     /**

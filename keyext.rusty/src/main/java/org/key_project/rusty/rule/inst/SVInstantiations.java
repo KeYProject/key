@@ -134,7 +134,8 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * @param entry the InstantiationEntry
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry, LogicServices services) {
+    public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry,
+            LogicServices services) {
         return new SVInstantiations(map.put(sv, entry), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions()).checkSorts(sv, entry, false,
                 services);
@@ -178,7 +179,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
     }
 
     private SVInstantiations checkCondition(GenericSortCondition p_c, boolean p_forceRebuild,
-                                            LogicServices services) {
+            LogicServices services) {
         Boolean b = getGenericSortInstantiations().checkCondition(p_c);
 
         if (b == null) {
@@ -339,7 +340,8 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
                 && genericSortConditions.isEmpty() && genericSortInstantiations.isEmpty());
     }
 
-    public SVInstantiations union(org.key_project.prover.rules.inst.SVInstantiations p_other, LogicServices services) {
+    public SVInstantiations union(org.key_project.prover.rules.inst.SVInstantiations p_other,
+            LogicServices services) {
         final var other = (SVInstantiations) p_other;
         ImmutableMap<SchemaVariable, InstantiationEntry<?>> result = map;
 

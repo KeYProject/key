@@ -39,7 +39,7 @@ public class SuccTaclet extends FindTaclet {
      */
     public SuccTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
-                      ImmutableList<RuleSet> ruleSets,
+            ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {

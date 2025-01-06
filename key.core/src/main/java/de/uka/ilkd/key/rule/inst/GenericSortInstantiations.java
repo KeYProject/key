@@ -8,15 +8,13 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import org.key_project.logic.op.sv.OperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
@@ -319,7 +317,8 @@ public final class GenericSortInstantiations {
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
             ImmutableList<GenericSortCondition> p_conditions,
             ImmutableList<GenericSort> p_pushedBack, GenericSort p_gs,
-            ImmutableList<Sort> p_subsorts, ImmutableList<Sort> p_chosenList, LogicServices services) {
+            ImmutableList<Sort> p_subsorts, ImmutableList<Sort> p_chosenList,
+            LogicServices services) {
         for (Sort chosen : p_chosenList) {
             if (!isSupersortOf(chosen, p_subsorts) // this test is unnecessary in some cases
                     || !p_gs.isPossibleInstantiation(chosen)) {
@@ -548,7 +547,7 @@ public final class GenericSortInstantiations {
      * PRECONDITION: !p_sorts.isEmpty ()
      */
     private static ImmutableList<Sort> minimalSupersorts(ImmutableList<Sort> p_sorts,
-                                                         LogicServices services) {
+            LogicServices services) {
 
         // if the list only consists of a single sort, return this sort
         if (p_sorts.size() == 1) {

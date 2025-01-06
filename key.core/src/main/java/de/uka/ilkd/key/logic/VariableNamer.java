@@ -26,14 +26,12 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
-import org.key_project.logic.sort.Sort;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.NewVarcond;
+import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
@@ -94,7 +92,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * @param services pointer to services object
      */
-    public VariableNamer(Services services) {
+    protected VariableNamer(Services services) {
         this.services = services;
     }
 
@@ -439,7 +437,8 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         // determine a suitable base name
         String basename = null;
-        de.uka.ilkd.key.rule.NewVarcond nv = (de.uka.ilkd.key.rule.NewVarcond) app.taclet().varDeclaredNew(var);
+        de.uka.ilkd.key.rule.NewVarcond nv =
+            (de.uka.ilkd.key.rule.NewVarcond) app.taclet().varDeclaredNew(var);
         if (nv != null) {
             Type type = nv.getType();
             if (type != null) {

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
 import java.util.Objects;
 
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -11,8 +10,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
@@ -20,7 +17,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
 
 import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
 
@@ -360,7 +356,8 @@ public class EqualityModuloProofIrrelevancy {
             return false;
         }
 
-        if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(_this.assumesFormulaInstantiations(),
+        if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(
+            _this.assumesFormulaInstantiations(),
             that.assumesFormulaInstantiations(),
             EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy)) {
             return false;

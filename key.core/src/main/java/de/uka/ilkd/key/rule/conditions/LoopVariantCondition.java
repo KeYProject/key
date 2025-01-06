@@ -10,10 +10,10 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.prover.rules.MatchConditions;
-import org.key_project.prover.rules.VariableCondition;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.VariableCondition;
 
 /**
  * Extracts the variant for a loop term.
@@ -31,7 +31,7 @@ public class LoopVariantCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                 MatchConditions matchCond, LogicServices p_services) {
+            MatchConditions matchCond, LogicServices p_services) {
         final var svInst = matchCond.getInstantiations();
         final var services = (Services) p_services;
 
@@ -53,7 +53,8 @@ public class LoopVariantCondition implements VariableCondition {
         }
 
         return matchCond.setInstantiations(//
-                ((de.uka.ilkd.key.rule.inst.SVInstantiations)svInst).add(variantSV, variant, services));
+            ((de.uka.ilkd.key.rule.inst.SVInstantiations) svInst).add(variantSV, variant,
+                services));
     }
 
     @Override

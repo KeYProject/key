@@ -5,7 +5,6 @@ package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.logic.op.OperatorSV;
 
-import recoder.java.Expression;
 import recoder.java.LoopInitializer;
 import recoder.java.SourceVisitor;
 import recoder.java.StatementContainer;

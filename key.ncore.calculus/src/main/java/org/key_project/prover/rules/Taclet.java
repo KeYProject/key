@@ -110,12 +110,12 @@ public abstract class Taclet implements Rule {
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-                     ImmutableList<TacletGoalTemplate> goalTemplates,
-                     ImmutableList<RuleSet> ruleSets,
-                     TacletAttributes attrs,
-                     ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
-                     boolean surviveSmbExec,
-                     ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs,
+            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
+            boolean surviveSmbExec,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
         this.name = name;
         assumesSequent = applPart.assumesSequent();
@@ -158,12 +158,12 @@ public abstract class Taclet implements Rule {
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-                     ImmutableList<TacletGoalTemplate> goalTemplates,
-                     ImmutableList<RuleSet> ruleSets,
-                     TacletAttributes attrs, ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
-                     ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs, ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, false,
-                tacletAnnotations);
+            tacletAnnotations);
     }
 
     /**
@@ -430,6 +430,7 @@ public abstract class Taclet implements Rule {
     public TacletExecutor<?, ?, ?> getExecutor() {
         return executor;
     }
+
     public abstract Taclet setName(String s);
 
     public ImmutableList<RuleSet> getRuleSets() {

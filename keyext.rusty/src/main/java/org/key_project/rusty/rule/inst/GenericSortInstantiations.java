@@ -14,7 +14,6 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.sort.GenericSort;
 import org.key_project.util.collection.*;
@@ -301,7 +300,8 @@ public final class GenericSortInstantiations {
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
             ImmutableList<GenericSortCondition> p_conditions,
             ImmutableList<GenericSort> p_pushedBack, GenericSort p_gs,
-            ImmutableList<Sort> p_subsorts, ImmutableList<Sort> p_chosenList, LogicServices services) {
+            ImmutableList<Sort> p_subsorts, ImmutableList<Sort> p_chosenList,
+            LogicServices services) {
         for (Sort chosen : p_chosenList) {
             if (!isSupersortOf(chosen, p_subsorts) // this test is unnecessary in some cases
                     || !p_gs.isPossibleInstantiation(chosen)) {

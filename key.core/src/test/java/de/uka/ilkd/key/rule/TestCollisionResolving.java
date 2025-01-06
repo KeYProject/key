@@ -334,7 +334,8 @@ public class TestCollisionResolving {
         PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
         MatchConditions mc =
-                (MatchConditions) taclet.getMatcher().matchFind(term.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, null);
+            (MatchConditions) taclet.getMatcher().matchFind(term.sub(0),
+                MatchConditions.EMPTY_MATCHCONDITIONS, null);
         TacletApp app = PosTacletApp.createPosTacletApp(taclet, mc, pos, services);
         TacletApp app1 = app.prepareUserInstantiation(services);
         assertSame(app, app1, "Actually there are no conflicts yet.");

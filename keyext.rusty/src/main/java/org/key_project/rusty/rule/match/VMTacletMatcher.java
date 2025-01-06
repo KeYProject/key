@@ -4,15 +4,14 @@
 package org.key_project.rusty.rule.match;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
-import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.UpdateApplication;
 import org.key_project.rusty.rule.*;
@@ -24,10 +23,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
-
-import org.key_project.logic.op.sv.SchemaVariable;
-
-import org.jspecify.annotations.NonNull;
 
 import static org.key_project.rusty.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -89,13 +84,13 @@ public class VMTacletMatcher implements TacletMatcher {
     public org.key_project.prover.rules.MatchConditions matchFind(
             Term term,
             org.key_project.prover.rules.MatchConditions matchCond,
-                                     LogicServices services) {
+            LogicServices services) {
         if (findMatchProgram == TacletMatchProgram.EMPTY_PROGRAM) {
             return null;
         }
         if (ignoreTopLevelUpdates) {
             Pair</* term below updates */Term, MatchConditions> resultUpdateMatch =
-                    matchAndIgnoreUpdatePrefix(term, (MatchConditions) matchCond);
+                matchAndIgnoreUpdatePrefix(term, (MatchConditions) matchCond);
             term = resultUpdateMatch.first;
             matchCond = resultUpdateMatch.second;
         }
@@ -106,7 +101,8 @@ public class VMTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
     @Override
-    public final MatchConditions checkConditions(org.key_project.prover.rules.MatchConditions cond, LogicServices services) {
+    public final MatchConditions checkConditions(org.key_project.prover.rules.MatchConditions cond,
+            LogicServices services) {
         MatchConditions result = (MatchConditions) cond;
         if (result != null) {
             final var svIterator = result.getInstantiations().svIterator();
@@ -157,9 +153,9 @@ public class VMTacletMatcher implements TacletMatcher {
      */
     @Override
     public final MatchConditions checkVariableConditions(SchemaVariable var,
-                                                         SyntaxElement instantiationCandidate,
-                                                         org.key_project.prover.rules.MatchConditions matchCond,
-                                                         LogicServices services) {
+            SyntaxElement instantiationCandidate,
+            org.key_project.prover.rules.MatchConditions matchCond,
+            LogicServices services) {
         if (matchCond != null) {
             if (instantiationCandidate instanceof Term term) {
                 if (!(term.op() instanceof QuantifiableVariable)) {
@@ -209,9 +205,9 @@ public class VMTacletMatcher implements TacletMatcher {
 
     @Override
     public final AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
-                                                 org.key_project.logic.Term p_template,
-                                                 org.key_project.prover.rules.MatchConditions p_matchCond,
-                                                 LogicServices p_services) {
+            org.key_project.logic.Term p_template,
+            org.key_project.prover.rules.MatchConditions p_matchCond,
+            LogicServices p_services) {
         TacletMatchProgram prg = assumesMatchPrograms.get(p_template);
         MatchConditions matchCond = (MatchConditions) p_matchCond;
 
@@ -282,7 +278,7 @@ public class VMTacletMatcher implements TacletMatcher {
     @Override
     public final MatchConditions matchAssumes(
             Iterable<AssumesFormulaInstantiation> p_toMatch,
-     org.key_project.prover.rules.MatchConditions p_matchCond, LogicServices p_services) {
+            org.key_project.prover.rules.MatchConditions p_matchCond, LogicServices p_services) {
 
         final var anteIterator = assumesSequent.antecedent().iterator();
         final var succIterator = assumesSequent.succedent().iterator();
@@ -325,12 +321,12 @@ public class VMTacletMatcher implements TacletMatcher {
      */
     @Override
     public MatchConditions matchSV(SchemaVariable sv,
-                                   SyntaxElement syntaxElement,
-                                   org.key_project.prover.rules.MatchConditions matchCond,
-                                   LogicServices services) {
+            SyntaxElement syntaxElement,
+            org.key_project.prover.rules.MatchConditions matchCond,
+            LogicServices services) {
 
         final MatchSchemaVariableInstruction<? extends SchemaVariable> instr =
-                TacletMatchProgram.getMatchInstructionForSV(sv);
+            TacletMatchProgram.getMatchInstructionForSV(sv);
 
         if (syntaxElement instanceof Term term) {
             matchCond = instr.match(term, matchCond, services);

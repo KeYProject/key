@@ -8,7 +8,6 @@ import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.MatchConditions;
-import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.Modality;
 
 import org.jspecify.annotations.NonNull;
@@ -30,7 +29,7 @@ public class MatchModalityInstruction extends Instruction<@NonNull Modality>
      */
     @Override
     public final MatchConditions match(Term t, MatchConditions matchConditions,
-                                       LogicServices services) {
+            LogicServices services) {
         return match(t.op(), matchConditions, services);
     }
 
@@ -39,7 +38,7 @@ public class MatchModalityInstruction extends Instruction<@NonNull Modality>
      */
     @Override
     public MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
-                                 LogicServices services) {
+            LogicServices services) {
         if (instantiationCandidate instanceof Modality mod1 && mod1.kind() == op.kind()) {
             return matchConditions;
         } else {

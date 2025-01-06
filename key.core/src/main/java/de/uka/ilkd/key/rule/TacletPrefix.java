@@ -8,7 +8,6 @@ import java.util.Iterator;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 
-import org.key_project.prover.rules.Taclet;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -30,7 +29,8 @@ public class TacletPrefix implements org.key_project.prover.rules.TacletPrefix {
      * @param prefix the SetOf<SchemaVariable> that is the prefix of a termsv or formulasv
      * @param context a boolean marker
      */
-    public TacletPrefix(ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> prefix, boolean context) {
+    public TacletPrefix(ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> prefix,
+            boolean context) {
         this.prefix = prefix;
         this.context = context;
     }

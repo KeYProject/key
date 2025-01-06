@@ -31,13 +31,13 @@ public class MatchElementaryUpdateInstruction extends Instruction<@NonNull Eleme
 
     @Override
     public MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-                                 LogicServices services) {
+            LogicServices services) {
         return match((ElementaryUpdate) instantiationCandidate.op(), matchCond, services);
     }
 
     public MatchConditions match(ElementaryUpdate instantiationCandidateOp,
-                                 MatchConditions matchCond,
-                                 LogicServices services) {
+            MatchConditions matchCond,
+            LogicServices services) {
         if (instantiationCandidateOp != op) {
             matchCond = leftHandSide.match(instantiationCandidateOp.lhs(), matchCond, services);
         }
@@ -46,7 +46,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<@NonNull Eleme
 
     @Override
     public MatchConditions match(SyntaxElementCursor cursor, MatchConditions matchConditions,
-                                 LogicServices services) {
+            LogicServices services) {
         cursor.goToNext();
         var node = cursor.getCurrentNode();
         if (!(node instanceof ElementaryUpdate eu))

@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import org.key_project.prover.rules.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -44,7 +44,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     static final String USE_IF = InfFlowContractAppTaclet.USE_IF;
     private static final String IF_CONTRACT_APPLICATION = "information_flow_contract_appl";
 
-    public AbstractInfFlowContractAppTacletBuilder(final Services services) {
+    protected AbstractInfFlowContractAppTacletBuilder(final Services services) {
         super(services);
     }
 

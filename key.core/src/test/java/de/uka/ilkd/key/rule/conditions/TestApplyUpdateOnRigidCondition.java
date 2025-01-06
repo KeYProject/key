@@ -13,16 +13,17 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.MatchConditions;
 
 import org.junit.jupiter.api.Test;
-import org.key_project.prover.rules.MatchConditions;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestApplyUpdateOnRigidCondition {
 
-    private static MatchConditions EMPTY_MATCHCONDITIONS = de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
+    private static MatchConditions EMPTY_MATCHCONDITIONS =
+        de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
 
     @Test
     void updateWithoutVariables() {
@@ -278,7 +279,8 @@ public class TestApplyUpdateOnRigidCondition {
             return term;
         }
 
-        return ((de.uka.ilkd.key.rule.MatchConditions)mc).getInstantiations().getTermInstantiation(result, null, TacletForTests.services());
+        return ((de.uka.ilkd.key.rule.MatchConditions) mc).getInstantiations()
+                .getTermInstantiation(result, null, TacletForTests.services());
     }
 
 }

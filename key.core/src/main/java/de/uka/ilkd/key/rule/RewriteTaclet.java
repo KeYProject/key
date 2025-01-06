@@ -105,23 +105,23 @@ public class RewriteTaclet extends FindTaclet {
      * @param choices the SetOf<Choices> to which this taclet belongs to
      */
     public RewriteTaclet(Name name, TacletApplPart applPart,
-                         ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
-                         ImmutableList<RuleSet> ruleSets,
-                         TacletAttributes attrs, Term find,
-                         ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-                         int p_applicationRestriction, ChoiceExpr choices,
-                         ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs, Term find,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            int p_applicationRestriction, ChoiceExpr choices,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
             p_applicationRestriction, choices, false, tacletAnnotations);
     }
 
     public RewriteTaclet(Name name, TacletApplPart applPart,
-                         ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
-                         ImmutableList<RuleSet> ruleSets,
+            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
-                         ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             int p_applicationRestriction, ChoiceExpr choices,
-                         boolean surviveSymbExec,
+            boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices,
             surviveSymbExec, tacletAnnotations);
@@ -264,14 +264,16 @@ public class RewriteTaclet extends FindTaclet {
 
     public SequentFormula getRewriteResult(Goal goal, TermLabelState termLabelState,
             Services services, TacletApp app) {
-        return ((RewriteTacletExecutor)getExecutor()).getRewriteResult(goal, termLabelState, services, app);
+        return ((RewriteTacletExecutor) getExecutor()).getRewriteResult(goal, termLabelState,
+            services, app);
     }
 
     @Override
     public RewriteTaclet setName(String s) {
-        final TacletApplPart applPart = new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
-            varsNewDependingOn(), getVariableConditions());
-        final TacletAttributes attrs = new TacletAttributes(displayName(),trigger);
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
+        final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
 
         return new RewriteTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs, find,
             prefixMap, applicationRestriction, choices, getSurviveSymbExec(), tacletAnnotations);

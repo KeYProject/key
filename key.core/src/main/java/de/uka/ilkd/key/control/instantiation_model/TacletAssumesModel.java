@@ -34,18 +34,19 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
      */
     private static final long serialVersionUID = -5388696072469119661L;
 
-    private static final AssumesFormulaInstantiation manualTextIF = new AssumesFormulaInstantiation() {
+    private static final AssumesFormulaInstantiation manualTextIF =
+        new AssumesFormulaInstantiation() {
 
-        @Override
-        public String toString(LogicServices services) {
-            return "Manual Input";
-        }
+            @Override
+            public String toString(LogicServices services) {
+                return "Manual Input";
+            }
 
-        @Override
-        public SequentFormula getSequentFormula() {
-            return null;
-        }
-    };
+            @Override
+            public SequentFormula getSequentFormula() {
+                return null;
+            }
+        };
 
     private String manualInput;
     private final Term ifFma;

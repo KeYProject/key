@@ -5,7 +5,6 @@ package de.uka.ilkd.key.control.instantiation_model;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.java.Position;
@@ -32,10 +31,9 @@ import de.uka.ilkd.key.rule.inst.*;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
-import org.key_project.logic.sort.Sort;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
@@ -102,8 +100,10 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * creates a Vector with the row entries of the table
      */
-    private ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> createEntryArray(TacletApp tacletApp) {
-        ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> rowVec = new ArrayList<>();
+    private ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> createEntryArray(
+            TacletApp tacletApp) {
+        ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> rowVec =
+            new ArrayList<>();
         int count = 0;
 
         for (var entry : tacletApp.instantiations().getInstantiationMap()) {
@@ -123,7 +123,8 @@ public class TacletFindModel extends AbstractTableModel {
                 String proposal = instantiationProposers.getProposal(tacletApp, var, services,
                     goal.node(), proposals);
 
-                Pair<org.key_project.logic.op.sv.SchemaVariable, String> pair = new Pair<>(var, proposal);
+                Pair<org.key_project.logic.op.sv.SchemaVariable, String> pair =
+                    new Pair<>(var, proposal);
 
                 if (proposal != null) {
                     // A proposal is available ...

@@ -53,8 +53,8 @@ public abstract class FindTaclet extends Taclet {
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
-                         ImmutableList<RuleSet> ruleSets,
-                         org.key_project.prover.rules.TacletAttributes attrs, Term find,
+            ImmutableList<RuleSet> ruleSets,
+            org.key_project.prover.rules.TacletAttributes attrs, Term find,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             boolean surviveSymbExec,
             ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
@@ -80,7 +80,7 @@ public abstract class FindTaclet extends Taclet {
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
-                         ImmutableList<RuleSet> ruleSets,
+            ImmutableList<RuleSet> ruleSets,
             org.key_project.prover.rules.TacletAttributes attrs, Term find,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {

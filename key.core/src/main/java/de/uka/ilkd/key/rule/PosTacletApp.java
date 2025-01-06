@@ -13,12 +13,12 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.inst.SVInstantiations;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.prover.rules.MatchConditions;
 
 /**
  * A position taclet application object, contains already the information to which term/formula of
@@ -53,7 +53,8 @@ public class PosTacletApp extends TacletApp {
     }
 
     public static PosTacletApp createPosTacletApp(FindTaclet taclet,
-            SVInstantiations instantiations, ImmutableList<AssumesFormulaInstantiation> ifInstantiations,
+            SVInstantiations instantiations,
+            ImmutableList<AssumesFormulaInstantiation> ifInstantiations,
             PosInOccurrence pos, Services services) {
         Debug.assertTrue(ifInstsCorrectSize(taclet, ifInstantiations),
             "If instantiations list has wrong size");
@@ -205,7 +206,8 @@ public class PosTacletApp extends TacletApp {
             Services services) {
         if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),
-                instantiations().addInterestingList(sv, list, services), assumesFormulaInstantiations(),
+                instantiations().addInterestingList(sv, list, services),
+                assumesFormulaInstantiations(),
                 posInOccurrence(), services);
         } else {
             return createPosTacletApp((FindTaclet) taclet(),
@@ -262,9 +264,9 @@ public class PosTacletApp extends TacletApp {
     @Override
     protected TacletApp setAllInstantiations(org.key_project.prover.rules.MatchConditions mc,
             ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
-                                             Services services) {
+            Services services) {
         return createPosTacletApp((FindTaclet) taclet(),
-                mc.getInstantiations(), assumesInstantiations,
+            mc.getInstantiations(), assumesInstantiations,
             posInOccurrence(), services);
     }
 

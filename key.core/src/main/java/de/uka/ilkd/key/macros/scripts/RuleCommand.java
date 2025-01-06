@@ -199,7 +199,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             if (appMC == null) {
                 return null;
             } else {
-                result = result.setMatchConditions((MatchConditions) appMC, services);
+                result = result.setMatchConditions(appMC, services);
             }
         }
 

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.api;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
@@ -21,7 +20,6 @@ import org.key_project.prover.rules.inst.SVInstantiations;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.slf4j.Logger;
@@ -59,7 +57,7 @@ public class Matcher {
      */
     // List of VarAssignment
     public List<VariableAssignments> matchPattern(String pattern, Sequent currentSeq,
-                                                  VariableAssignments assignments) {
+            VariableAssignments assignments) {
         // copy services in order to not accidently set assignments and namespace for environment
         Services copyServices = api.getEnv().getServices().copy(false);
         // Aufbau der Deklarationen fuer den NameSpace
@@ -84,12 +82,12 @@ public class Matcher {
         if (size > 0) {
             // Iteratoren durch die Sequent
             ImmutableArray<AssumesFormulaInstantiation> antecCand =
-                    AssumesFormulaInstSeq.createList(currentSeq, true, copyServices);
+                AssumesFormulaInstSeq.createList(currentSeq, true, copyServices);
             ImmutableArray<AssumesFormulaInstantiation> succCand =
-                    AssumesFormulaInstSeq.createList(currentSeq, false, copyServices);
+                AssumesFormulaInstSeq.createList(currentSeq, false, copyServices);
 
             org.key_project.prover.sequent.SequentFormula[] patternArray =
-                    new org.key_project.prover.sequent.SequentFormula[patternSeq.size()];
+                new org.key_project.prover.sequent.SequentFormula[patternSeq.size()];
             int i = 0;
             for (SequentFormula fm : patternSeq) {
                 patternArray[i++] = fm;
@@ -106,7 +104,8 @@ public class Matcher {
                 boolean inAntecedent = node.isAntecedent();
                 LOGGER.debug(inAntecedent ? "In Antec: " : "In Succ");
 
-                AssumesMatchResult ma = tacletMatcher.matchAssumes((inAntecedent ? antecCand : succCand),
+                AssumesMatchResult ma =
+                    tacletMatcher.matchAssumes((inAntecedent ? antecCand : succCand),
                         node.getPatternTerm(), node.getMatchConditions(), copyServices);
 
                 if (ma.matchConditions().isEmpty()) {

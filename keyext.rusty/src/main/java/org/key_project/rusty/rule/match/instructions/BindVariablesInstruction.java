@@ -33,7 +33,8 @@ public class BindVariablesInstruction {
      * have been assigned to the same abstract name and the sorts are equal.
      */
     private MatchConditions match(
-            BoundVariable instantiationCandidate, MatchConditions matchCond, LogicServices services) {
+            BoundVariable instantiationCandidate, MatchConditions matchCond,
+            LogicServices services) {
         if (templateVar != instantiationCandidate) {
             if (instantiationCandidate.sort() != templateVar.sort()) {
                 matchCond = null;

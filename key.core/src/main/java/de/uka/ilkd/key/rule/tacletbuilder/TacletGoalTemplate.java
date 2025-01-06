@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.logic.op.sv.SchemaVariable;
@@ -18,7 +17,8 @@ import org.key_project.util.collection.ImmutableSet;
  * sequents that have to be added, new rules and rule variables. The replacewith-goal is implemented
  * in subclasses
  */
-public class TacletGoalTemplate extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate {
+public class TacletGoalTemplate
+        extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate {
 
     /**
      * creates new Goaldescription
@@ -30,11 +30,11 @@ public class TacletGoalTemplate extends org.key_project.prover.rules.tacletbuild
      *        template
      */
     public TacletGoalTemplate(Sequent addedSeq,
-                              ImmutableList<Taclet> addedRules,
+            ImmutableList<Taclet> addedRules,
             ImmutableSet<SchemaVariable> addedProgVars) {
         super(addedSeq, addedRules, addedProgVars);
         TacletBuilder.checkContainsFreeVarSV(addedSeq,
-                null, "add sequent");
+            null, "add sequent");
     }
 
     /**
@@ -77,7 +77,8 @@ public class TacletGoalTemplate extends org.key_project.prover.rules.tacletbuild
      * @return all variables that occur bound in this goal template
      */
     public ImmutableSet<org.key_project.logic.op.QuantifiableVariable> getBoundVariables() {
-        ImmutableSet<org.key_project.logic.op.QuantifiableVariable> result = DefaultImmutableSet.nil();
+        ImmutableSet<org.key_project.logic.op.QuantifiableVariable> result =
+            DefaultImmutableSet.nil();
 
         for (Taclet taclet : rules()) {
             result = result.union(taclet.getBoundVariables());

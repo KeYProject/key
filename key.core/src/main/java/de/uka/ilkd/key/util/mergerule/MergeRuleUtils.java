@@ -496,7 +496,7 @@ public class MergeRuleUtils {
             HashMap<Function, LogicVariable> replMap, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        if (term.op() instanceof Function constant && ((Function) term.op()).isSkolemConstant()
+        if (term.op() instanceof Function constant && constant.isSkolemConstant()
                 && (restrictTo == null || restrictTo.contains(term.op()))) {
 
             if (!replMap.containsKey(constant)) {
@@ -1291,7 +1291,7 @@ public class MergeRuleUtils {
             localNamespaces, services.getProof().abbreviations());
 
         ImmutableSet<LocationVariable> containedLocVars =
-            MergeRuleUtils.getLocationVariables(formula, services);
+            getLocationVariables(formula, services);
 
         int nrContainedPlaceholders = 0;
         LocationVariable usedPlaceholder = null;
@@ -1484,7 +1484,7 @@ public class MergeRuleUtils {
     private static ApplyStrategyInfo tryToProve(Term toProve, Services services, boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
         return tryToProve(// Sequent to prove
-            JavaDLSequentKit.createSequent(ImmutableSLList.<SequentFormula>nil(),
+            JavaDLSequentKit.createSequent(ImmutableSLList.nil(),
                 ImmutableSLList.singleton(new SequentFormula(toProve))),
             services, doSplit, sideProofName, timeout);
     }

@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletAnnotation;
@@ -36,8 +37,6 @@ import org.key_project.rusty.rule.RewriteTaclet.ApplicationRestriction;
 import org.key_project.rusty.rule.tacletbuilder.*;
 import org.key_project.rusty.util.parsing.BuildingException;
 import org.key_project.util.collection.*;
-
-import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;

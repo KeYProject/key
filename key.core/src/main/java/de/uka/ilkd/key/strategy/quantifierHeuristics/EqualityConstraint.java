@@ -223,7 +223,7 @@ public class EqualityConstraint implements Constraint {
 
         if (!newConstraint.isSatisfiable()) {
             unchanged.setVal(false);
-            return Constraint.TOP;
+            return TOP;
         }
 
         if (newConstraint == this) {
@@ -329,28 +329,28 @@ public class EqualityConstraint implements Constraint {
                 return normalize((Metavariable) op1, t0, modifyThis, services);
             }
 
-            return Constraint.TOP;
+            return TOP;
         } else if (op0 instanceof Metavariable) {
             if (t1.sort().extendsTrans(t0.sort())) {
                 return normalize((Metavariable) op0, t1, modifyThis, services);
             }
 
-            return Constraint.TOP;
+            return TOP;
         }
 
         if (!(op0 instanceof ProgramVariable) && op0 != op1) {
-            return Constraint.TOP;
+            return TOP;
         }
 
 
         if (t0.sort() != t1.sort() || t0.arity() != t1.arity()) {
-            return Constraint.TOP;
+            return TOP;
         }
 
 
         nat = handleJava(t0, t1, nat);
         if (nat == FAILED) {
-            return Constraint.TOP;
+            return TOP;
         }
 
 
@@ -378,7 +378,7 @@ public class EqualityConstraint implements Constraint {
          * DefaultImmutableSet.<Sort>nil().add(t0.sort()).add(t1.sort());
          */
         // assert false : "metavariables disabled";
-        return Constraint.TOP;
+        return TOP;
         // final Sort intersectionSort =
         // IntersectionSort.getIntersectionSort(set, services);
         //
@@ -447,13 +447,13 @@ public class EqualityConstraint implements Constraint {
             ImmutableList<QuantifiableVariable> subCmpBoundVars = cmpBoundVars;
 
             if (t0.varsBoundHere(i).size() != t1.varsBoundHere(i).size()) {
-                return Constraint.TOP;
+                return TOP;
             }
             for (int j = 0; j < t0.varsBoundHere(i).size(); j++) {
                 final QuantifiableVariable ownVar = t0.varsBoundHere(i).get(j);
                 final QuantifiableVariable cmpVar = t1.varsBoundHere(i).get(j);
                 if (ownVar.sort() != cmpVar.sort()) {
-                    return Constraint.TOP;
+                    return TOP;
                 }
 
                 subOwnBoundVars = subOwnBoundVars.prepend(ownVar);
@@ -464,7 +464,7 @@ public class EqualityConstraint implements Constraint {
                 subOwnBoundVars, subCmpBoundVars, nat, modifyThis, services);
 
             if (!newConstraint.isSatisfiable()) {
-                return Constraint.TOP;
+                return TOP;
             }
             modifyThis = modifyThis || newConstraint != this;
         }
@@ -509,7 +509,7 @@ public class EqualityConstraint implements Constraint {
         if (!((t1.op() instanceof QuantifiableVariable)
                 && compareBoundVariables((QuantifiableVariable) t0.op(),
                     (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars))) {
-            return Constraint.TOP;
+            return TOP;
         }
         return this;
     }
@@ -550,14 +550,14 @@ public class EqualityConstraint implements Constraint {
         // correct
 
         if (!t.isRigid()) {
-            return Constraint.TOP;
+            return TOP;
         }
 
         // metavariable instantiations must not contain free variables
         if (!t.freeVars().isEmpty() ||
                 (modifyThis ? hasCycle(mv, t, services) : hasCycleByInst(mv, t, services))) {
             // cycle
-            return Constraint.TOP;
+            return TOP;
         } else if (map.containsKey(mv)) {
             return unifyHelp(valueOf(mv), t, modifyThis, services);
         }
@@ -711,7 +711,7 @@ public class EqualityConstraint implements Constraint {
             newConstraint = ((EqualityConstraint) newConstraint).normalize(entry.getKey(),
                 entry.getValue(), newCIsNew, services);
             if (!newConstraint.isSatisfiable()) {
-                return Constraint.TOP;
+                return TOP;
             }
             newCIsNew = newCIsNew || newConstraint != this;
         }

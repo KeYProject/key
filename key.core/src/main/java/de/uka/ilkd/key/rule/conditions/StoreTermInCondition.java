@@ -6,12 +6,12 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.LightweightSyntacticalReplaceVisitor;
+
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
-
-import org.key_project.logic.SyntaxElement;
 
 /**
  * Stores the given {@link Term}, after substitution of {@link SchemaVariable}s, into the given
@@ -30,8 +30,9 @@ public class StoreTermInCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-                                 MatchConditions matchCond, LogicServices services) {
-        final var svInst = (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
+            MatchConditions matchCond, LogicServices services) {
+        final var svInst =
+            (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
 
         if (svInst.getInstantiation(storeInSV) != null) {
             return matchCond;

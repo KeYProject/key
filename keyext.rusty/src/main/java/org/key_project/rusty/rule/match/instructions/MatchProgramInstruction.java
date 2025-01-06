@@ -25,7 +25,7 @@ public class MatchProgramInstruction implements MatchInstruction {
         final var rb = (RustyBlock) cursor.getCurrentNode();
         final MatchConditions result = pe.match(
             new SourceData(rb.program(), -1, (Services) services),
-                (org.key_project.rusty.rule.MatchConditions) matchConditions);
+            (org.key_project.rusty.rule.MatchConditions) matchConditions);
         if (result != null) {
             // TODO: Should the cursor be advanced by the match in the PEs?
             cursor.gotoParent();

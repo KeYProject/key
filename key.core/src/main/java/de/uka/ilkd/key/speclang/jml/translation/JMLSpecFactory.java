@@ -1511,8 +1511,7 @@ public class JMLSpecFactory {
     }
 
     public @Nullable String checkSetStatementAssignee(Term assignee) {
-        if (assignee.op() instanceof LocationVariable) {
-            var variable = (LocationVariable) assignee.op();
+        if (assignee.op() instanceof LocationVariable variable) {
             if (variable.isGhost()) {
                 return null;
             } else {

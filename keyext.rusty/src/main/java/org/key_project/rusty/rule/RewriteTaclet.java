@@ -117,8 +117,8 @@ public class RewriteTaclet extends FindTaclet {
      */
     public RewriteTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
-                         ImmutableList<RuleSet> ruleSets,
-                         TacletAttributes attrs, Term find,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs, Term find,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ApplicationRestriction p_applicationRestriction,
             ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
@@ -128,9 +128,9 @@ public class RewriteTaclet extends FindTaclet {
 
     public RewriteTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
-                         ImmutableList<RuleSet> ruleSets,
+            ImmutableList<RuleSet> ruleSets,
 
-                         TacletAttributes attrs, Term find,
+            TacletAttributes attrs, Term find,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ApplicationRestriction p_applicationRestriction, boolean surviveSymbExec,
             ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
@@ -209,8 +209,8 @@ public class RewriteTaclet extends FindTaclet {
             new TacletAttributes(displayName(), null);
 
         return new RewriteTaclet(new Name(s), applPart, goalTemplates(),
-                ruleSets, attrs, find,
-                prefixMap, applicationRestriction, tacletAnnotations);
+            ruleSets, attrs, find,
+            prefixMap, applicationRestriction, tacletAnnotations);
     }
 
     public MatchConditions checkPrefix(PosInOccurrence p_pos, MatchConditions p_mc) {

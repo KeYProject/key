@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.tacletbuilder;
 
-import org.jspecify.annotations.NonNull;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * this class contains the goals of the schematic theory specific rules (Taclet). There are new

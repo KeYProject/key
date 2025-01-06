@@ -25,8 +25,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.sequent.*;
 import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestMatchTaclet {
 
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
-            de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
+        de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
     private static TermBuilder TB;
 
     FindTaclet if_addrule_conflict;

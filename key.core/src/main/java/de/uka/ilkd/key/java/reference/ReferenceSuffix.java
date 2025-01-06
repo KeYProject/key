@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.ModelElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Reference;
-import de.uka.ilkd.key.java.SourceElement;
 
 /**
  * Reference suffix. There are only few pure suffices, e.g. {@link SuperConstructorReference}. This

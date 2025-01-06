@@ -35,7 +35,6 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.Streams;
 
 import org.jspecify.annotations.Nullable;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

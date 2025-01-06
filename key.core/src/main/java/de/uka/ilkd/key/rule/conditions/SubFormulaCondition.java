@@ -34,7 +34,7 @@ public class SubFormulaCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
-                         Services services) {
+            Services services) {
         if (!(var instanceof FormulaSV) || var != this.a) {
             return false;
         }

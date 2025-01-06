@@ -34,12 +34,13 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
      */
     @Override
     public MatchConditions match(Term instantiationCandidate,
-                                                            MatchConditions matchCond,
-                                                            LogicServices services) {
+            MatchConditions matchCond,
+            LogicServices services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         if (svSort.canStandFor(instantiationCandidate)) {
-            return addInstantiation(instantiationCandidate, (org.key_project.rusty.rule.MatchConditions) matchCond, services);
+            return addInstantiation(instantiationCandidate,
+                (org.key_project.rusty.rule.MatchConditions) matchCond, services);
         }
 
         return null;
@@ -50,8 +51,8 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
      */
     @Override
     public MatchConditions match(Operator instantiationCandidate,
-                                 MatchConditions matchConditions,
-                                 LogicServices services) {
+            MatchConditions matchConditions,
+            LogicServices services) {
         if (instantiationCandidate instanceof RustyProgramElement pe) {
             return match(pe, matchConditions, services);
         }
@@ -98,7 +99,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<@N
             Services services) {
 
         final SVInstantiations instantiations =
-                (SVInstantiations) matchCond.getInstantiations();
+            (SVInstantiations) matchCond.getInstantiations();
         final Object inMap = instantiations.getInstantiation(op);
 
         if (inMap == null) {

@@ -7,12 +7,12 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
+
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
-
-import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.inst.SVInstantiations;
 
 
@@ -30,8 +30,8 @@ public final class ObserverCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                 MatchConditions mc,
-                                 LogicServices services) {
+            MatchConditions mc,
+            LogicServices services) {
         SVInstantiations svInst = mc.getInstantiations();
         final Term obsInst = (Term) svInst.getInstantiation(obs);
 
@@ -44,7 +44,8 @@ public final class ObserverCondition implements VariableCondition {
         final Term heapInst = (Term) svInst.getInstantiation(heap);
         final Term properHeapInst = obsInst.sub(0);
         if (heapInst == null) {
-            svInst = ((de.uka.ilkd.key.rule.inst.SVInstantiations)svInst).add(heap, properHeapInst, services);
+            svInst = ((de.uka.ilkd.key.rule.inst.SVInstantiations) svInst).add(heap, properHeapInst,
+                services);
             return mc.setInstantiations(svInst);
         } else if (heapInst.equals(properHeapInst)) {
             return mc;

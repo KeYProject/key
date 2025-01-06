@@ -13,12 +13,10 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
-
 import de.uka.ilkd.key.rule.Taclet;
 
-import org.jspecify.annotations.Nullable;
-import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
 import org.key_project.prover.rules.NewDependingOn;
 import org.key_project.prover.rules.NewVarcond;
@@ -28,6 +26,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * abstract taclet builder class to be inherited from taclet builders specialised for their concrete
@@ -44,7 +44,8 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.nil();
     protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
     protected ImmutableList<NewDependingOn> varsNewDependingOn = ImmutableSLList.nil();
-    protected ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goals = ImmutableSLList.nil();
+    protected ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goals =
+        ImmutableSLList.nil();
     protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
     protected TacletAttributes attrs = new TacletAttributes(null, null);
 
@@ -281,7 +282,8 @@ public abstract class TacletBuilder<T extends Taclet> {
         return varsNotFreeIn.iterator();
     }
 
-    public void setTacletGoalTemplates(ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> g) {
+    public void setTacletGoalTemplates(
+            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> g) {
         goals = g;
     }
 
@@ -322,7 +324,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
     public void setHelpText(@Nullable Object accept) {
-        //throw new RuntimeException("To be implemented");
+        // throw new RuntimeException("To be implemented");
     }
 
     public static class TacletBuilderException extends IllegalArgumentException {

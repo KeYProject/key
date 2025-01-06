@@ -79,7 +79,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     public static ImmutableSet<RewriteTaclet> createInvTaclet(Services services) {
         final TermBuilder TB = services.getTermBuilder();
         final KeYJavaType kjt = services.getJavaInfo().getJavaLangObject();
-        final String prefix = WellDefinednessCheck.INV_TACLET;
+        final String prefix = INV_TACLET;
         final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
         final TermSV heapSV =
             SchemaVariableFactory.createTermSV(new Name("h"), heap.sort());
@@ -94,8 +94,8 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final Term pre = TB.and(wdSelf, wdHeaps, wellFormed);
         final Term staticPre = TB.and(wdHeaps, wellFormed);
         final RewriteTaclet inv =
-            WellDefinednessCheck.createTaclet(prefix, var, invTerm, pre, false, services);
-        final RewriteTaclet staticInv = WellDefinednessCheck.createTaclet(prefix + "_Static", var,
+            createTaclet(prefix, var, invTerm, pre, false, services);
+        final RewriteTaclet staticInv = createTaclet(prefix + "_Static", var,
             staticInvTerm, staticPre, true, services);
         return DefaultImmutableSet.<RewriteTaclet>nil().add(inv).add(staticInv);
     }

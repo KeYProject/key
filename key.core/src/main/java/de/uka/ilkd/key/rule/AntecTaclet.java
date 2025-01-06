@@ -6,11 +6,11 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.ChoiceExpr;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.executor.javadl.AntecTacletExecutor;
+
+import org.key_project.logic.Name;
 import org.key_project.prover.rules.*;
 import org.key_project.prover.rules.TacletPrefix;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
-
-import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -38,10 +38,11 @@ public class AntecTaclet extends FindTaclet {
      *        SchemaVariable in the Taclet
      */
     public AntecTaclet(Name name, TacletApplPart applPart,
-                       ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> heuristics,
-                       TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
-                       ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, TacletPrefix> prefixMap, ChoiceExpr choices,
-                       ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> heuristics,
+            TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, TacletPrefix> prefixMap,
+            ChoiceExpr choices,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, heuristics, attrs, find, prefixMap, choices,
             tacletAnnotations);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
@@ -76,9 +77,10 @@ public class AntecTaclet extends FindTaclet {
 
     @Override
     public AntecTaclet setName(String s) {
-        final TacletApplPart applPart = new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
-            varsNewDependingOn(), getVariableConditions());
-        final TacletAttributes attrs = new TacletAttributes(displayName(),trigger);
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
+        final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
 
         return new AntecTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs, find,
             ignoreTopLevelUpdates, prefixMap, choices, tacletAnnotations);

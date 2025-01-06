@@ -51,7 +51,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
      *        information for local classes.
      */
     protected RecoderModelTransformer(CrossReferenceServiceConfiguration services,
-                                      TransformerCache cache) {
+            TransformerCache cache) {
         super(services);
         this.services = services;
         this.cache = Objects.requireNonNull(cache);

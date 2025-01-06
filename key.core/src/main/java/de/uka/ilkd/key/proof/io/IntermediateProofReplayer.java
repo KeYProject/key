@@ -235,9 +235,8 @@ public class IntermediateProofReplayer {
                     proof.getServices().getNameRecorder()
                             .setProposals(currInterm.getIntermediateRuleApp().getNewNames());
 
-                    if (currInterm.getIntermediateRuleApp() instanceof TacletAppIntermediate) {
-                        TacletAppIntermediate appInterm =
-                            (TacletAppIntermediate) currInterm.getIntermediateRuleApp();
+                    if (currInterm
+                            .getIntermediateRuleApp() instanceof TacletAppIntermediate appInterm) {
 
                         try {
                             currGoal.apply(constructTacletApp(appInterm, currGoal));
@@ -268,13 +267,11 @@ public class IntermediateProofReplayer {
                         }
 
                     } else if (currInterm
-                            .getIntermediateRuleApp() instanceof BuiltInAppIntermediate) {
-                        BuiltInAppIntermediate appInterm =
-                            (BuiltInAppIntermediate) currInterm.getIntermediateRuleApp();
+                            .getIntermediateRuleApp() instanceof BuiltInAppIntermediate appInterm) {
 
                         if (appInterm instanceof MergeAppIntermediate joinAppInterm) {
                             HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo =
-                                joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
+                                joinPartnerNodes.get(joinAppInterm.getId());
 
                             if (partnerNodesInfo == null
                                     || partnerNodesInfo.size() < joinAppInterm.getNrPartners()) {
@@ -497,7 +494,8 @@ public class IntermediateProofReplayer {
         ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
             ifFormulaList =
-                ifFormulaList.append(new AssumesFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
+                ifFormulaList
+                        .append(new AssumesFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
         }
         for (String ifFormulaStr : currInterm.getIfDirectFormulaList()) {
             // MU 2019: #1487. We have to use the right namespaces to not
@@ -505,7 +503,8 @@ public class IntermediateProofReplayer {
             NamespaceSet nss = currGoal.getLocalNamespaces();
             Term term = parseTerm(ifFormulaStr, proof, nss.variables(), nss.programVariables(),
                 nss.functions());
-            ifFormulaList = ifFormulaList.append(new AssumesFormulaInstDirect(new SequentFormula(term)));
+            ifFormulaList =
+                ifFormulaList.append(new AssumesFormulaInstDirect(new SequentFormula(term)));
         }
 
         if (!ourApp.ifInstsCorrectSize(ifFormulaList)) {

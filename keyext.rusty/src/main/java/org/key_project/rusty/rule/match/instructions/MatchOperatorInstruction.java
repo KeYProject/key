@@ -10,7 +10,7 @@ import org.key_project.prover.rules.MatchConditions;
 public interface MatchOperatorInstruction extends MatchInstruction {
 
     MatchConditions match(Operator instantiationCandidate,
-                          MatchConditions matchConditions,
-                          LogicServices services);
+            MatchConditions matchConditions,
+            LogicServices services);
 
 }

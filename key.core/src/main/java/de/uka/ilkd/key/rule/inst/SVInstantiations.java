@@ -18,8 +18,8 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -139,7 +139,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
     }
 
     public SVInstantiations add(SchemaVariable sv, ImmutableArray<TermLabel> labels,
-                                LogicServices services) {
+            LogicServices services) {
         return add(sv, new TermLabelInstantiationEntry(labels), services);
     }
 
@@ -147,8 +147,9 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * Add the given additional condition for the generic sort instantiations
      */
     public SVInstantiations add(SchemaVariable sv, Modality.JavaModalityKind kind,
-                                LogicServices services) throws SortException {
-        return add(sv, new InstantiationEntry<>(kind) {}, services);
+            LogicServices services) throws SortException {
+        return add(sv, new InstantiationEntry<>(kind) {
+        }, services);
     }
 
     public SVInstantiations addList(SchemaVariable sv, Object[] list, LogicServices services) {
@@ -172,12 +173,12 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
 
 
     public SVInstantiations addInteresting(SchemaVariable sv, ProgramElement pe,
-                                           LogicServices services) {
+            LogicServices services) {
         return addInteresting(sv, new ProgramInstantiation(pe), services);
     }
 
     public SVInstantiations addInterestingList(SchemaVariable sv, Object[] list,
-                                               LogicServices services) {
+            LogicServices services) {
         return addInteresting(sv,
             new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)), services);
     }
@@ -214,7 +215,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
         "Conditions for sorts" + " cannot be satisfied\n" + "(This exception object is static)");
 
     private SVInstantiations checkSorts(SchemaVariable p_sv, InstantiationEntry<?> p_entry,
-                                        boolean p_forceRebuild, LogicServices services) {
+            boolean p_forceRebuild, LogicServices services) {
         if (p_sv instanceof OperatorSV asv) {
             Boolean b = getGenericSortInstantiations().checkSorts(asv, p_entry);
 
@@ -231,7 +232,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
     }
 
     private SVInstantiations checkCondition(GenericSortCondition p_c, boolean p_forceRebuild,
-                                            LogicServices services) {
+            LogicServices services) {
         Boolean b = getGenericSortInstantiations().checkCondition(p_c);
 
         if (b == null) {
@@ -259,14 +260,15 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * @param entry the InstantiationEntry
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry, LogicServices services) {
+    public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry,
+            LogicServices services) {
         return new SVInstantiations(map.put(sv, entry), interesting(), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions()).checkSorts(sv, entry, false,
                 services);
     }
 
     public SVInstantiations addInteresting(SchemaVariable sv, InstantiationEntry<?> entry,
-                                           LogicServices services) {
+            LogicServices services) {
         return new SVInstantiations(map.put(sv, entry), interesting().put(sv, entry),
             getUpdateContext(), getGenericSortInstantiations(), getGenericSortConditions())
                     .checkSorts(sv, entry, false, services);
@@ -296,7 +298,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * @param entry the InstantiationEntry the SchemaVariable is instantiated with
      */
     public SVInstantiations replace(SchemaVariable sv, InstantiationEntry<?> entry,
-                                    Services services) {
+            Services services) {
         return new SVInstantiations(map.remove(sv).put(sv, entry), interesting(),
             getUpdateContext(), getGenericSortConditions()).checkSorts(sv, entry, true, services);
     }
@@ -434,14 +436,16 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
      *         stored
      */
-    public Term getTermInstantiation(SchemaVariable sv, ExecutionContext ec, LogicServices services) {
+    public Term getTermInstantiation(SchemaVariable sv, ExecutionContext ec,
+            LogicServices services) {
         final Object inst = getInstantiation(sv);
         if (inst == null) {
             return null;
         } else if (inst instanceof Term) {
             return (Term) inst;
         } else if (inst instanceof ProgramElement) {
-            return ((Services)services).getTypeConverter().convertToLogicElement((ProgramElement) inst, ec);
+            return ((Services) services).getTypeConverter()
+                    .convertToLogicElement((ProgramElement) inst, ec);
         } else {
             throw CONVERT_INSTANTIATION_EXCEPTION;
         }
@@ -609,7 +613,8 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
         return result;
     }
 
-    public SVInstantiations union(org.key_project.prover.rules.inst.SVInstantiations p_other, LogicServices services) {
+    public SVInstantiations union(org.key_project.prover.rules.inst.SVInstantiations p_other,
+            LogicServices services) {
         final var other = (SVInstantiations) p_other;
         ImmutableMap<SchemaVariable, InstantiationEntry<?>> result = map;
 
@@ -647,7 +652,8 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
     /**
      * Add the given additional condition for the generic sort instantiations
      */
-    public SVInstantiations add(GenericSortCondition p_c, LogicServices services) throws SortException {
+    public SVInstantiations add(GenericSortCondition p_c, LogicServices services)
+            throws SortException {
         return new SVInstantiations(map, interesting(), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions().prepend(p_c))
                     .checkCondition(p_c, false, services);

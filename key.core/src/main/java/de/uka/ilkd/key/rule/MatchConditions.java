@@ -6,16 +6,17 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.jspecify.annotations.NonNull;
 
 
 /**
  * Simple container class containing the information resulting from a Taclet.match-call
  */
-public class MatchConditions extends org.key_project.prover.rules.MatchConditions  {
+public class MatchConditions extends org.key_project.prover.rules.MatchConditions {
 
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
-            new MatchConditions(SVInstantiations.EMPTY_SVINSTANTIATIONS, RenameTable.EMPTY_TABLE);
+        new MatchConditions(SVInstantiations.EMPTY_SVINSTANTIATIONS, RenameTable.EMPTY_TABLE);
 
     private final RenameTable renameTable;
 
@@ -25,7 +26,7 @@ public class MatchConditions extends org.key_project.prover.rules.MatchCondition
     }
 
     public MatchConditions(@NonNull SVInstantiations p_instantiations,
-                           @NonNull RenameTable p_renameTable) {
+            @NonNull RenameTable p_renameTable) {
         super(p_instantiations);
         assert p_instantiations != null;
         assert p_renameTable != null;
@@ -38,7 +39,8 @@ public class MatchConditions extends org.key_project.prover.rules.MatchCondition
     }
 
     @Override
-    public MatchConditions setInstantiations(org.key_project.prover.rules.inst.SVInstantiations p_instantiations) {
+    public MatchConditions setInstantiations(
+            org.key_project.prover.rules.inst.SVInstantiations p_instantiations) {
         if (instantiations == p_instantiations) {
             return this;
         } else {

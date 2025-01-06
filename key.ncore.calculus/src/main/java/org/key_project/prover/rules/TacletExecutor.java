@@ -232,7 +232,8 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
             Goal goal, App ruleApp, LogicServices services, Object... instantiationInfo) {
         if (!semi.isEmpty()) {
             final ImmutableList<SequentFormula> replacements =
-                    instantiateSemisequent(semi, pos, matchCond, goal, ruleApp, services, instantiationInfo);
+                instantiateSemisequent(semi, pos, matchCond, goal, ruleApp, services,
+                    instantiationInfo);
             currentSequent.combine(currentSequent.sequent().changeFormula(replacements, pos));
         } else {
             currentSequent.combine(currentSequent.sequent().removeFormula(pos));
@@ -243,25 +244,25 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * instantiates the constrained formulas of semisequent <code>semi</code> and adds the
      * instantiatied formulas at the specified position to <code>goal</code>
      *
-     * @param semi                       the Semisequent with the the ConstrainedFormulae to be added
-     * @param currentSequent             the Sequent which is the current (intermediate) result of applying the
-     *                                   taclet
-     * @param pos                        the PosInOccurrence describing the place in the sequent
+     * @param semi the Semisequent with the the ConstrainedFormulae to be added
+     * @param currentSequent the Sequent which is the current (intermediate) result of applying the
+     *        taclet
+     * @param pos the PosInOccurrence describing the place in the sequent
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
-     *                                   rewritten
-     * @param antec                      boolean true(false) if elements have to be added to the antecedent(succedent)
-     *                                   (only looked at if pos == null)
-     * @param matchCond                  the MatchConditions containing in particular
-     * @param services                   the LogicServices encapsulating all logic and program information
-     * @param instantiationInfo          additional instantiation information concerning label:
+     *        rewritten
+     * @param antec boolean true(false) if elements have to be added to the antecedent(succedent)
+     *        (only looked at if pos == null)
+     * @param matchCond the MatchConditions containing in particular
+     * @param services the LogicServices encapsulating all logic and program information
+     * @param instantiationInfo additional instantiation information concerning label:
      */
     protected void addToPos(Semisequent semi,
-                            SequentChangeInfo currentSequent,
-                            PosInOccurrence pos,
-                            PosInOccurrence applicationPosInOccurrence, boolean antec,
-                            MatchConditions matchCond, Goal goal, App tacletApp,
-                            LogicServices services,
-                            Object... instantiationInfo) {
+            SequentChangeInfo currentSequent,
+            PosInOccurrence pos,
+            PosInOccurrence applicationPosInOccurrence, boolean antec,
+            MatchConditions matchCond, Goal goal, App tacletApp,
+            LogicServices services,
+            Object... instantiationInfo) {
         final ImmutableList<SequentFormula> replacements =
             instantiateSemisequent(semi, applicationPosInOccurrence,
                 matchCond, goal, tacletApp, services, instantiationInfo);

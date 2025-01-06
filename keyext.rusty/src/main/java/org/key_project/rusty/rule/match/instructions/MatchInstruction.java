@@ -12,5 +12,5 @@ import org.key_project.prover.rules.MatchConditions;
  */
 public interface MatchInstruction {
     MatchConditions match(SyntaxElementCursor cursor, MatchConditions matchConditions,
-                          LogicServices services);
+            LogicServices services);
 }

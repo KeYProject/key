@@ -36,7 +36,7 @@ public class AntecTaclet extends FindTaclet {
      */
     public AntecTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
-                       ImmutableList<RuleSet> ruleSets,
+            ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
             boolean ignoreTopLevelUpdates,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,

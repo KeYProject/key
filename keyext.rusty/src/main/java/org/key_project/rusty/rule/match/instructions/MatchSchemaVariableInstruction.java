@@ -34,8 +34,8 @@ public abstract class MatchSchemaVariableInstruction<SV extends @NonNull Operato
      * given term.
      */
     protected final MatchConditions addInstantiation(Term term,
-                                                     MatchConditions matchCond,
-                                                     LogicServices services) {
+            MatchConditions matchCond,
+            LogicServices services) {
         if (op.isRigid() && !term.isRigid()) {
             return null;
         }
@@ -71,8 +71,8 @@ public abstract class MatchSchemaVariableInstruction<SV extends @NonNull Operato
      *         the pair ({@link SchemaVariable}, {@link RustyProgramElement}) added
      */
     public MatchConditions match(RustyProgramElement instantiationCandidate,
-                                 MatchConditions mc,
-                                 LogicServices services) {
+            MatchConditions mc,
+            LogicServices services) {
         return null;
     }
 }

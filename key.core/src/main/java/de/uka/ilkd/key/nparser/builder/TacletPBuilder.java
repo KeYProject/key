@@ -28,8 +28,8 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
-import org.key_project.logic.sort.Sort;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.prover.rules.Trigger;
@@ -758,7 +758,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public ImmutableSet<SchemaVariable> visitAddprogvar(KeYParser.AddprogvarContext ctx) {
         final Collection<? extends SchemaVariable> accept = accept(ctx.pvs);
-        return Immutables.<SchemaVariable>createSetFrom(Objects.requireNonNull(accept));
+        return Immutables.createSetFrom(Objects.requireNonNull(accept));
     }
 
     @Override

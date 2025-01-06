@@ -314,9 +314,8 @@ public abstract class TacletIndex {
             HashMap<Object, ImmutableList<NoPosTacletApp>> map, ProgramElement pe,
             PrefixOccurrences prefixOccurrences) {
         ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
-        if (pe instanceof ProgramPrefix) {
+        if (pe instanceof ProgramPrefix nt) {
             int next = prefixOccurrences.occurred(pe);
-            NonTerminalProgramElement nt = (NonTerminalProgramElement) pe;
             if (next < nt.getChildCount()) {
                 return getJavaTacletList(map, nt.getChildAt(next), prefixOccurrences);
             }

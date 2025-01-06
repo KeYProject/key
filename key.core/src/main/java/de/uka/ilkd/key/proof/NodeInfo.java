@@ -24,13 +24,13 @@ import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import org.key_project.prover.rules.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
 import org.key_project.logic.Name;
 import org.key_project.proof.LocationVariableTracker;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
@@ -231,7 +231,7 @@ public class NodeInfo {
         return app instanceof AbstractAuxiliaryContractBuiltInRuleApp
                 || app instanceof AbstractContractRuleApp
                 || app instanceof LoopInvariantBuiltInRuleApp || app instanceof TacletApp
-                        && NodeInfo.isSymbolicExecution(((TacletApp) app).taclet());
+                        && isSymbolicExecution(((TacletApp) app).taclet());
     }
 
     public static boolean isSymbolicExecution(Taclet t) {

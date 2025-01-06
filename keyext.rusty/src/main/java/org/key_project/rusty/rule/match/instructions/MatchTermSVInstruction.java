@@ -26,7 +26,7 @@ public class MatchTermSVInstruction extends MatchSchemaVariableInstruction<@NonN
 
     @Override
     public MatchConditions match(SyntaxElementCursor cursor, MatchConditions mc,
-                                 LogicServices services) {
+            LogicServices services) {
         final MatchConditions result = match((Term) cursor.getCurrentNode(), mc, services);
         if (result != null) {
             cursor.gotoNextSibling();

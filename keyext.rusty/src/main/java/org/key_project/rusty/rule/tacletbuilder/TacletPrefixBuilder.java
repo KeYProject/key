@@ -130,7 +130,8 @@ public class TacletPrefixBuilder {
             visit(find);
         }
 
-        for (final org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate tgt : tacletBuilder.goalTemplates()) {
+        for (final org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate tgt : tacletBuilder
+                .goalTemplates()) {
             visit(tgt);
             for (var tacletInAddRule : tgt.rules()) {
                 checkPrefixInAddRules(tacletInAddRule);

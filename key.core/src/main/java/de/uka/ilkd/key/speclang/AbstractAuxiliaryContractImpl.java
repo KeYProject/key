@@ -149,7 +149,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param hasModifiable a map specifying on which heaps this contract has a modifiable clause.
      * @param functionalContracts the functional contracts corresponding to this contract.
      */
-    public AbstractAuxiliaryContractImpl(final String baseName, final StatementBlock block,
+    protected AbstractAuxiliaryContractImpl(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method,
             final Modality.JavaModalityKind modalityKind,
             final Map<LocationVariable, Term> preconditions,
@@ -1078,7 +1078,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          *        modifiable clause.
          * @param services services.
          */
-        public Creator(final String baseName, final StatementBlock block, final List<Label> labels,
+        protected Creator(final String baseName, final StatementBlock block,
+                final List<Label> labels,
                 final IProgramMethod method, final Behavior behavior, final Variables variables,
                 final Map<LocationVariable, Term> requires,
                 final Map<LocationVariable, Term> requiresFree, final Term measuredBy,
@@ -1600,7 +1601,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param contracts the contracts to combine.
          * @param services services.
          */
-        public Combinator(final T[] contracts, final Services services) {
+        protected Combinator(final T[] contracts, final Services services) {
             super(services.getTermFactory(), services);
             this.contracts = sort(contracts);
             preconditions = new LinkedHashMap<>();

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.FormulaTagManager;
 import de.uka.ilkd.key.proof.Goal;
@@ -123,7 +122,8 @@ public class AssumesInstantiator {
     private ImmutableArray<AssumesFormulaInstantiation> selectNewFormulas(boolean p_antec) {
         final ImmutableArray<AssumesFormulaInstantiation> allSequentFormulas =
             getAllSequentFormulas(p_antec);
-        final AssumesFormulaInstantiation[] res = new AssumesFormulaInstantiation[allSequentFormulas.size()];
+        final AssumesFormulaInstantiation[] res =
+            new AssumesFormulaInstantiation[allSequentFormulas.size()];
 
         int i = 0;
         for (final AssumesFormulaInstantiation ifInstantiation : allSequentFormulas) {
@@ -143,7 +143,8 @@ public class AssumesInstantiator {
     private boolean isNewFormula(AssumesFormulaInstSeq p_ifInstantiation) {
         final boolean antec = p_ifInstantiation.inAntec();
 
-        final ImmutableArray<AssumesFormulaInstantiation> cache = getNewSequentFormulasFromCache(antec);
+        final ImmutableArray<AssumesFormulaInstantiation> cache =
+            getNewSequentFormulasFromCache(antec);
 
         if (cache != null) {
             return cache.contains(p_ifInstantiation);
@@ -176,7 +177,8 @@ public class AssumesInstantiator {
         return tacletAppContainer.getAge() < formulaAge;
     }
 
-    private ImmutableArray<AssumesFormulaInstantiation> getNewSequentFormulasFromCache(boolean p_antec) {
+    private ImmutableArray<AssumesFormulaInstantiation> getNewSequentFormulasFromCache(
+            boolean p_antec) {
         return ifInstCache.get(p_antec, tacletAppContainer.getAge());
     }
 
@@ -225,17 +227,19 @@ public class AssumesInstantiator {
         final ImmutableArray<AssumesFormulaInstantiation> formulas =
             getSequentFormulas(antec, !lastIfFormula || p_alreadyMatchedNewFor);
         final AssumesMatchResult mr = getTaclet().getMatcher().matchAssumes(formulas,
-            (Term) p_ifSeqTail.head().formula(), p_matchCond, getServices());
+            p_ifSeqTail.head().formula(), p_matchCond, getServices());
 
         // For each matching formula call the method again to match
         // the remaining terms
-        Iterator<? extends org.key_project.prover.rules.MatchConditions> itMC = mr.matchConditions().iterator();
+        Iterator<? extends org.key_project.prover.rules.MatchConditions> itMC =
+            mr.matchConditions().iterator();
         p_ifSeqTail = p_ifSeqTail.tail();
         for (final AssumesFormulaInstantiation ifInstantiation : mr.candidates()) {
             final boolean nextAlreadyMatchedNewFor = lastIfFormula || p_alreadyMatchedNewFor
                     || isNewFormula((AssumesFormulaInstSeq) ifInstantiation);
             findIfFormulaInstantiationsHelp(p_ifSeqTail, p_ifSeqTail2nd,
-                p_alreadyMatched.prepend(ifInstantiation), (MatchConditions) itMC.next(), nextAlreadyMatchedNewFor);
+                p_alreadyMatched.prepend(ifInstantiation), (MatchConditions) itMC.next(),
+                nextAlreadyMatchedNewFor);
         }
     }
 

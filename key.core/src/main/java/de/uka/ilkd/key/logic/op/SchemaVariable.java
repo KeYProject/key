@@ -6,7 +6,6 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.util.pp.Layouter;
 
-import org.key_project.logic.Named;
 import org.key_project.logic.ParsableVariable;
 
 /**
@@ -15,7 +14,8 @@ import org.key_project.logic.ParsableVariable;
  * for other TermSymbols. The TermSymbols a SchemaVariable is allowed to match is specified by their
  * type and sort.
  */
-public interface SchemaVariable extends org.key_project.logic.op.sv.SchemaVariable, ParsableVariable, Named {
+public interface SchemaVariable
+        extends org.key_project.logic.op.sv.SchemaVariable, ParsableVariable {
     /**
      * Creates a parseable string representation of the declaration of the schema variable.
      *

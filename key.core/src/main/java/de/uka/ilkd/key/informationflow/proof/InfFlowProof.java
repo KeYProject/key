@@ -11,8 +11,9 @@ import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.Taclet;
-import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+
 import org.key_project.logic.Named;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;

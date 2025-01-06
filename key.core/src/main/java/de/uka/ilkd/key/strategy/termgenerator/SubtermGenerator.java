@@ -76,7 +76,7 @@ public abstract class SubtermGenerator implements TermGenerator {
         protected final MutableState mState;
         protected final Services services;
 
-        public SubIterator(Term t, MutableState mState, Services services) {
+        protected SubIterator(Term t, MutableState mState, Services services) {
             termStack = ImmutableSLList.<Term>nil().prepend(t);
             this.mState = mState;
             this.services = services;

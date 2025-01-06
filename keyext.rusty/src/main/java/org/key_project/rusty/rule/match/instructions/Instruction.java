@@ -91,6 +91,6 @@ public abstract class Instruction<Op extends Operator> implements MatchInstructi
      *         the pair {@code (sv, instantiationCandidate)} added
      */
     public abstract MatchConditions match(Term instantiationCandidate,
-                                          MatchConditions matchCond,
-                                          LogicServices services);
+            MatchConditions matchCond,
+            LogicServices services);
 }
