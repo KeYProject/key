@@ -192,7 +192,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
         String name = op.name().toString();
         String prefixedname = PREFIX + name;
 
-        List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
+        List<SExpr> children = trans.translate(term.subs(), UNIVERSE);
         SExpr.Type exprType = term.sort() == JavaDLTheory.FORMULA ? BOOL : UNIVERSE;
         SExpr result = new SExpr(prefixedname, exprType, children);
 

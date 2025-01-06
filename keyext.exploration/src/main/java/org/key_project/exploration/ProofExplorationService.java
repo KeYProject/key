@@ -8,13 +8,13 @@ import java.util.Objects;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
@@ -205,8 +205,7 @@ public class ProofExplorationService {
 
     private TacletApp createHideTerm(PosInOccurrence pio) {
         FindTaclet tap = getHideTaclet(pio.isInAntec());
-        MatchConditions match = tap.getMatcher().matchFind((Term) pio.subTerm(),
-            MatchConditions.EMPTY_MATCHCONDITIONS, services);
-        return PosTacletApp.createPosTacletApp(tap, match, pio, services);
+        final var matchingConditions = tap.getMatcher().matchFind(pio.subTerm(), MatchConditions.EMPTY_MATCHCONDITIONS, services);
+        return PosTacletApp.createPosTacletApp(tap, matchingConditions, pio, services);
     }
 }

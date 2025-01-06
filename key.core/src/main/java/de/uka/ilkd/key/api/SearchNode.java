@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.inst.SVInstantiations;
 import org.key_project.prover.sequent.SequentFormula;
 
 /**
@@ -19,11 +19,11 @@ public final class SearchNode {
     private final MatchConditions mc;
 
 
-    public SearchNode(SequentFormula[] pattern, int succAntPos) {
+    public SearchNode(SequentFormula[] pattern, int succAntPos, MatchConditions mc) {
         this.pattern = pattern;
         this.pos = 0;
         this.succAntPos = succAntPos;
-        this.mc = MatchConditions.EMPTY_MATCHCONDITIONS;
+        this.mc = mc;
     }
 
     public SearchNode(SearchNode parent, MatchConditions cond) {

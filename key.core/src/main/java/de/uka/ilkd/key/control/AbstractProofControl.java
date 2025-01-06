@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,8 @@ import de.uka.ilkd.key.strategy.DelegationBasedAutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -67,7 +70,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * @param defaultProverTaskListener The default {@link ProverTaskListener} which will be added
      *        to all started {@link ApplyStrategy} instances.
      */
-    public AbstractProofControl(ProverTaskListener defaultProverTaskListener) {
+    protected AbstractProofControl(ProverTaskListener defaultProverTaskListener) {
         this(defaultProverTaskListener, null);
     }
 
@@ -78,8 +81,8 @@ public abstract class AbstractProofControl implements ProofControl {
      *        to all started {@link ApplyStrategy} instances.
      * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
      */
-    public AbstractProofControl(ProverTaskListener defaultProverTaskListener,
-            RuleCompletionHandler ruleCompletionHandler) {
+    protected AbstractProofControl(ProverTaskListener defaultProverTaskListener,
+                                   RuleCompletionHandler ruleCompletionHandler) {
         this.ruleCompletionHandler = ruleCompletionHandler;
         this.defaultProverTaskListener = defaultProverTaskListener;
     }
@@ -154,7 +157,7 @@ public abstract class AbstractProofControl implements ProofControl {
     private ImmutableList<TacletApp> filterTaclet(Goal focusedGoal,
             ImmutableList<NoPosTacletApp> tacletInstances,
             PosInOccurrence pos) {
-        java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<>();
+        HashSet<Taclet> applicableRules = new HashSet<>();
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
         for (NoPosTacletApp app : tacletInstances) {
             if (isMinimizeInteraction()) {
@@ -165,9 +168,9 @@ public abstract class AbstractProofControl implements ProofControl {
                 }
                 if (ifCandidates.size() == 1 && pos != null) {
                     TacletApp a = ifCandidates.head();
-                    ImmutableList<IfFormulaInstantiation> ifs = a.ifFormulaInstantiations();
+                    ImmutableList<AssumesFormulaInstantiation> ifs = a.assumesFormulaInstantiations();
                     if (ifs != null && ifs.size() == 1
-                            && ifs.head() instanceof IfFormulaInstSeq ifis) {
+                            && ifs.head() instanceof AssumesFormulaInstSeq ifis) {
                         if (ifis.toPosInOccurrence().equals(pos.topLevel())) {
                             continue; // skip app if find and if same formula
                         }
@@ -199,7 +202,7 @@ public abstract class AbstractProofControl implements ProofControl {
         Iterator<TacletApp> it = applics.iterator();
         if (applics.size() == 1) {
             TacletApp firstApp = it.next();
-            boolean ifSeqInteraction = !firstApp.taclet().ifSequent().isEmpty();
+            boolean ifSeqInteraction = !firstApp.taclet().assumesSequent().isEmpty();
             if (isMinimizeInteraction() && !firstApp.complete()) {
                 ImmutableList<TacletApp> ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(), services);
@@ -247,8 +250,8 @@ public abstract class AbstractProofControl implements ProofControl {
 
     @Override
     public void applyInteractive(RuleApp app, Goal goal) {
-        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
-        var node = goal.node();
+        final Node node = goal.node();
+        node.getNodeInfo().setInteractiveRuleApplication(true);
         goal.apply(app);
         emitInteractiveRuleApplication(node, app);
     }

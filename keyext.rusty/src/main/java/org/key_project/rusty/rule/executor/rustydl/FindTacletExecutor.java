@@ -23,7 +23,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, org.key_project.prover.rules.RuleApp ruleApp) {
         final var services = goal.getOverlayServices();
         // Number without the if-goal eventually needed
         final int numberOfNewGoals = taclet.goalTemplates().size();
@@ -46,7 +46,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
             final SequentChangeInfo currentSequent = newSequentsIt.next();
 
             applyReplacewith(gt, currentSequent, tacletApp.posInOccurrence(), mc,
-                currentGoal, ruleApp, services);
+                currentGoal, tacletApp, services);
 
             /*
              * update position information, as original formula may no longer be in the current
@@ -56,7 +56,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
                 updatePositionInformation(tacletApp, gt, currentSequent);
 
             applyAdd(gt.sequent(), currentSequent, posWhereToAdd,
-                tacletApp.posInOccurrence(), mc, goal, ruleApp, services);
+                tacletApp.posInOccurrence(), mc, goal, tacletApp, services);
 
             applyAddrule(gt.rules(), currentGoal, services, mc);
 

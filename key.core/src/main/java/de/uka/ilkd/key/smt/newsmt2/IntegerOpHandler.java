@@ -98,7 +98,7 @@ public class IntegerOpHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-        List<SExpr> children = trans.translate(term.subs(), IntegerOpHandler.INT);
+        List<SExpr> children = trans.translate(term.subs(), INT);
         Operator op = term.op();
         String smtOp = supportedOperators.get(op);
         assert smtOp != null;
@@ -107,7 +107,7 @@ public class IntegerOpHandler implements SMTHandler {
         if (predicateOperators.contains(op)) {
             resultType = Type.BOOL;
         } else {
-            resultType = IntegerOpHandler.INT;
+            resultType = INT;
         }
 
         return new SExpr(smtOp, resultType, children);

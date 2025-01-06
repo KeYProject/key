@@ -7,10 +7,11 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.rusty.logic.BoundVarsVisitor;
 import org.key_project.rusty.rule.match.VMTacletMatcher;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -30,16 +31,13 @@ public abstract class Taclet extends
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, org.key_project.prover.rules.TacletApplPart applPart,
-            ImmutableList<? extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+                     ImmutableList<RuleSet> ruleSets,
             org.key_project.prover.rules.TacletAttributes attrs,
             ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             boolean surviveSmbExec,
             ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, prefixMap, surviveSmbExec, tacletAnnotations);
-    }
-
-    public final TacletMatcher getMatcher() {
-        return (TacletMatcher) super.getMatcher();
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, surviveSmbExec, tacletAnnotations);
     }
 
     /**
@@ -53,11 +51,12 @@ public abstract class Taclet extends
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<? extends TacletGoalTemplate> goalTemplates,
-            org.key_project.prover.rules.TacletAttributes attrs,
-            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, attrs, prefixMap, false,
+                     ImmutableList<TacletGoalTemplate> goalTemplates,
+                     ImmutableList<RuleSet> ruleSets,
+                     org.key_project.prover.rules.TacletAttributes attrs,
+                     ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+                     ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
+        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, false,
             tacletAnnotations);
     }
 

@@ -5,9 +5,11 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.rules.TacletAttributes;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.rusty.rule.executor.rustydl.NoFindTacletExecutor;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -33,10 +35,11 @@ public class NoFindTaclet extends Taclet {
      */
     public NoFindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
-            org.key_project.prover.rules.TacletAttributes attrs,
+                        ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, prefixMap,
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
             tacletAnnotations);
         createTacletServices();
     }
@@ -70,10 +73,10 @@ public class NoFindTaclet extends Taclet {
         final TacletApplPart applPart =
             new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
                 varsNewDependingOn(), getVariableConditions());
-        final var attrs = new org.key_project.prover.rules.TacletAttributes(displayName(), null);
+        final var attrs = new TacletAttributes(displayName(), null);
 
         return new NoFindTaclet(new Name(s), applPart,
-            (ImmutableList<TacletGoalTemplate>) goalTemplates(), attrs,
+            (ImmutableList<TacletGoalTemplate>) goalTemplates(), ruleSets, attrs,
             prefixMap, tacletAnnotations);
     }
 }

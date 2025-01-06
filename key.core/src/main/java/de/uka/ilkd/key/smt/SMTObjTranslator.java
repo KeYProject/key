@@ -1103,7 +1103,7 @@ public class SMTObjTranslator implements SMTTranslator {
             return nullConstant;
         } else if (op instanceof QuantifiableVariable qop) {
             // translate as variable or constant
-            SMTTermVariable var = translateVariable((QuantifiableVariable) op);
+            SMTTermVariable var = translateVariable(qop);
             if (quantifiedVariables.contains(var)) {
                 return var;
             } else {

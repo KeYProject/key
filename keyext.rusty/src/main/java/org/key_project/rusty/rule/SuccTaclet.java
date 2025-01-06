@@ -5,12 +5,12 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.rules.TacletAttributes;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.rusty.rule.executor.rustydl.SuccTacletExecutor;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -39,10 +39,11 @@ public class SuccTaclet extends FindTaclet {
      */
     public SuccTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates,
+                      ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, find, prefixMap,
+        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
             tacletAnnotations);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
         createTacletServices();
@@ -79,7 +80,7 @@ public class SuccTaclet extends FindTaclet {
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
         return new SuccTaclet(new Name(s), applPart,
-            (ImmutableList<TacletGoalTemplate>) goalTemplates(), attrs, find,
+            (ImmutableList<TacletGoalTemplate>) goalTemplates(), ruleSets, attrs, find,
             ignoreTopLevelUpdates, prefixMap, tacletAnnotations);
     }
 

@@ -48,8 +48,8 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp extends AbstractBu
      * @param occurrence the position at which the rule is applied.
      * @param ifInstantiations if instantiations.
      */
-    public AbstractAuxiliaryContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
-            ImmutableList<PosInOccurrence> ifInstantiations) {
+    protected AbstractAuxiliaryContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
+                                                      ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
 

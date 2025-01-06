@@ -5,15 +5,16 @@ package org.key_project.rusty.rule.inst;
 
 import java.util.Iterator;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.OperatorSV;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.PosInProgram;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.Modality;
-import org.key_project.rusty.logic.op.sv.OperatorSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariableFactory;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.util.collection.*;
@@ -91,11 +92,11 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * @param subst the Term the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, Term subst, Services services) {
+    public SVInstantiations add(SchemaVariable sv, Term subst, LogicServices services) {
         return add(sv, new TermInstantiation(sv, subst), services);
     }
 
-    public SVInstantiations add(SchemaVariable sv, ProgramList pes, Services services) {
+    public SVInstantiations add(SchemaVariable sv, ProgramList pes, LogicServices services) {
         return add(sv, new ProgramListInstantiation(pes.list()), services);
     }
 
@@ -103,12 +104,12 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * Add the given additional condition for the generic sort instantiations
      */
     public SVInstantiations add(SchemaVariable sv, Modality.RustyModalityKind kind,
-            Services services) throws SortException {
+            LogicServices services) throws SortException {
         return add(sv, new InstantiationEntry<>(kind) {
         }, services);
     }
 
-    public SVInstantiations addList(SchemaVariable sv, Object[] list, Services services) {
+    public SVInstantiations addList(SchemaVariable sv, Object[] list, LogicServices services) {
         return add(sv, new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)),
             services);
     }
@@ -121,7 +122,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * @param pe the ProgramElement the SchemaVariable is instantiated with
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, RustyProgramElement pe, Services services) {
+    public SVInstantiations add(SchemaVariable sv, RustyProgramElement pe, LogicServices services) {
         return add(sv, new ProgramInstantiation(pe), services);
     }
 
@@ -133,7 +134,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * @param entry the InstantiationEntry
      * @return SVInstantiations the new SVInstantiations containing the given pair
      */
-    public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry, Services services) {
+    public SVInstantiations add(SchemaVariable sv, InstantiationEntry<?> entry, LogicServices services) {
         return new SVInstantiations(map.put(sv, entry), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions()).checkSorts(sv, entry, false,
                 services);
@@ -160,7 +161,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
         "Conditions for sorts" + " cannot be satisfied\n" + "(This exception object is static)");
 
     private SVInstantiations checkSorts(SchemaVariable p_sv, InstantiationEntry<?> p_entry,
-            boolean p_forceRebuild, Services services) {
+            boolean p_forceRebuild, LogicServices services) {
         if (p_sv instanceof OperatorSV asv) {
             Boolean b = getGenericSortInstantiations().checkSorts(asv, p_entry);
 
@@ -177,7 +178,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
     }
 
     private SVInstantiations checkCondition(GenericSortCondition p_c, boolean p_forceRebuild,
-            Services services) {
+                                            LogicServices services) {
         Boolean b = getGenericSortInstantiations().checkCondition(p_c);
 
         if (b == null) {
@@ -191,7 +192,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
         return this;
     }
 
-    private SVInstantiations rebuildSorts(Services services) {
+    private SVInstantiations rebuildSorts(LogicServices services) {
         genericSortInstantiations =
             GenericSortInstantiations.create(map.iterator(), getGenericSortConditions(), services);
         return this;
@@ -243,14 +244,14 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
      *         stored
      */
-    public Term getTermInstantiation(SchemaVariable sv, Services services) {
+    public Term getTermInstantiation(SchemaVariable sv, LogicServices services) {
         final Object inst = getInstantiation(sv);
         if (inst == null) {
             return null;
         } else if (inst instanceof Term) {
             return (Term) inst;
         } else if (inst instanceof RustyProgramElement pe) {
-            return convertToLogicElement(pe, services);
+            return convertToLogicElement(pe, (Services) services);
         } else {
             throw CONVERT_INSTANTIATION_EXCEPTION;
         }
@@ -307,6 +308,15 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
      *
      * @return the Iterator
      */
+    public ImmutableMap<SchemaVariable, InstantiationEntry<?>> getInstantiationMap() {
+        return map;
+    }
+
+    /**
+     * returns iterator of the mapped pair {@code (SchemaVariables, InstantiationEntry)}
+     *
+     * @return the Iterator
+     */
     public Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> pairIterator() {
         return map.iterator();
     }
@@ -329,7 +339,8 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
                 && genericSortConditions.isEmpty() && genericSortInstantiations.isEmpty());
     }
 
-    public SVInstantiations union(SVInstantiations other, Services services) {
+    public SVInstantiations union(org.key_project.prover.rules.inst.SVInstantiations p_other, LogicServices services) {
+        final var other = (SVInstantiations) p_other;
         ImmutableMap<SchemaVariable, InstantiationEntry<?>> result = map;
 
         for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry : other.map) {

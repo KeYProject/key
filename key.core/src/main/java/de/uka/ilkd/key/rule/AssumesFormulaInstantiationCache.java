@@ -7,27 +7,28 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.Pair;
 
 // a simple cache for the results of the method <code>createList</code>
-public final class IfFormulaInstantiationCache {
+public final class AssumesFormulaInstantiationCache {
 
-    private final LRUCache<Integer, Pair<Semisequent, ImmutableArray<IfFormulaInstantiation>>> antecCache =
+    private final LRUCache<Integer, Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>>> antecCache =
         new LRUCache<>(50);
-    private final LRUCache<Integer, Pair<Semisequent, ImmutableArray<IfFormulaInstantiation>>> succCache =
+    private final LRUCache<Integer, Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>>> succCache =
         new LRUCache<>(50);
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final ReadLock readLock = lock.readLock();
     private final WriteLock writeLock = lock.writeLock();
 
-    public ImmutableArray<IfFormulaInstantiation> get(boolean antec, Semisequent s) {
+    public ImmutableArray<AssumesFormulaInstantiation> get(boolean antec, Semisequent s) {
         try {
             readLock.lock();
-            final Pair<Semisequent, ImmutableArray<IfFormulaInstantiation>> p =
+            final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>> p =
                 (antec ? antecCache : succCache).get(System.identityHashCode(s));
             return p != null && p.first == s ? p.second : null;
         } finally {
@@ -36,7 +37,7 @@ public final class IfFormulaInstantiationCache {
     }
 
     public void put(boolean antec, Semisequent s,
-            ImmutableArray<IfFormulaInstantiation> value) {
+            ImmutableArray<AssumesFormulaInstantiation> value) {
         try {
             writeLock.lock();
             (antec ? antecCache : succCache).put(System.identityHashCode(s), new Pair<>(s, value));

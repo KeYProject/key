@@ -31,7 +31,7 @@ public abstract class TacletVisitor implements DefaultVisitor {
     }
 
     public String visit(Taclet taclet, boolean visitAddrules) {
-        visit(taclet.ifSequent());
+        visit(taclet.assumesSequent());
         visitFindPart(taclet);
         visitGoalTemplates(taclet, visitAddrules);
         return failureDescription;
@@ -52,8 +52,7 @@ public abstract class TacletVisitor implements DefaultVisitor {
     }
 
     protected void visitGoalTemplates(Taclet taclet, boolean visitAddrules) {
-        for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
-            TacletGoalTemplate gt = tacletGoalTemplate;
+        for (var gt : taclet.goalTemplates()) {
             visit(gt.sequent());
             if (gt instanceof RewriteTacletGoalTemplate) {
                 ((RewriteTacletGoalTemplate) gt).replaceWith().execPostOrder(this);
@@ -63,8 +62,8 @@ public abstract class TacletVisitor implements DefaultVisitor {
                 }
             }
             if (visitAddrules) {
-                for (Taclet taclet1 : gt.rules()) {
-                    visit(taclet1, true);
+                for (var taclet1 : gt.rules()) {
+                    visit((Taclet) taclet1, true);
                 }
             }
         }

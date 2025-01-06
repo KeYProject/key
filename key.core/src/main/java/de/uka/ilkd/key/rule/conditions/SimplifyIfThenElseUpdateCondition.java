@@ -12,12 +12,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.VariableCondition;
 
 import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.rules.inst.SVInstantiations;
 
 public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
@@ -153,8 +155,9 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
-            Services services) {
+                                 MatchConditions mc,
+                                 LogicServices p_services) {
+        final Services services = (Services) p_services;
         SVInstantiations svInst = mc.getInstantiations();
 
         Term u1Inst = (Term) svInst.getInstantiation(u1);
@@ -174,7 +177,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         if (properResultInst == null) {
             return null;
         } else if (resultInst == null) {
-            svInst = svInst.add(result, properResultInst, services);
+            svInst = ((de.uka.ilkd.key.rule.inst.SVInstantiations)svInst).add(result, properResultInst, services);
             return mc.setInstantiations(svInst);
         } else if (resultInst.equals(properResultInst)) {
             return mc;

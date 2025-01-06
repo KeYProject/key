@@ -5,18 +5,18 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -62,18 +62,18 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
 
         // compare the if-sequent instantiations
-        final ImmutableList<IfFormulaInstantiation> newAppIfFmlInstantiations =
-            newApp.ifFormulaInstantiations();
-        final ImmutableList<IfFormulaInstantiation> cmpIfFmlInstantiations =
-            cmp.ifFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> newAppIfFmlInstantiations =
+            newApp.assumesFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> cmpIfFmlInstantiations =
+            cmp.assumesFormulaInstantiations();
         if (newAppIfFmlInstantiations == null || cmpIfFmlInstantiations == null) {
             if (newAppIfFmlInstantiations != null || cmpIfFmlInstantiations != null) {
                 return false;
             }
         } else {
 
-            final Iterator<IfFormulaInstantiation> it0 = newAppIfFmlInstantiations.iterator();
-            final Iterator<IfFormulaInstantiation> it1 = cmpIfFmlInstantiations.iterator();
+            final Iterator<AssumesFormulaInstantiation> it0 = newAppIfFmlInstantiations.iterator();
+            final Iterator<AssumesFormulaInstantiation> it1 = cmpIfFmlInstantiations.iterator();
 
             while (it0.hasNext()) {
                 // this test should be improved
@@ -91,10 +91,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
             return false;
         }
 
-        final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting0 =
-            inst0.interesting();
-        final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting1 =
-            inst1.interesting();
+        final var interesting0 = inst0.interesting();
+        final var interesting1 = inst1.interesting();
         return subset(interesting0, interesting1) && subset(interesting1, interesting0);
     }
 

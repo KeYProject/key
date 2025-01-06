@@ -114,8 +114,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
                 (ImmutableArray<QuantifiableVariable>) term.boundVars());
         }
 
-        with = syntacticalReplace(with, posOfFind, mc, goal, ruleApp,
-            services);
+        with = syntacticalReplace(with, posOfFind, mc, goal, ruleApp, services);
 
         /*
          * if (!with.sort().extendsTrans(maxSort)) {

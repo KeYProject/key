@@ -9,8 +9,8 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.rusty.logic.op.ProgramVariable;
-import org.key_project.rusty.rule.RuleSet;
 
 import org.jspecify.annotations.NonNull;
 

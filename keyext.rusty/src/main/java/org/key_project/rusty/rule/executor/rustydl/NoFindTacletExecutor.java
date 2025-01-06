@@ -25,11 +25,11 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * @param ruleApp the taclet application that is executed
      */
     @Override
-    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, org.key_project.prover.rules.RuleApp ruleApp) {
         // Number without the if-goal eventually needed
         int numberOfNewGoals = taclet.goalTemplates().size();
 
-        var tacletApp = (TacletApp) ruleApp;
+        final var tacletApp = (TacletApp) ruleApp;
         MatchConditions mc = tacletApp.matchConditions();
 
         ImmutableList<SequentChangeInfo> newSequentsForGoals =
@@ -50,7 +50,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
 
             SequentChangeInfo currentSequent = newSequentsIt.next();
 
-            applyAdd(gt.sequent(), currentSequent, services, mc, goal, ruleApp);
+            applyAdd(gt.sequent(), currentSequent, services, mc, goal, tacletApp);
 
             applyAddrule(gt.rules(), currentGoal, services, mc);
 

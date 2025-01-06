@@ -17,7 +17,7 @@ import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.TacletIndex;
 import org.key_project.rusty.proof.io.consistency.FileRepo;
 import org.key_project.rusty.rule.BuiltInRule;
-import org.key_project.rusty.rule.RuleSet;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.rusty.rule.Taclet;
 import org.key_project.rusty.rule.tacletbuilder.TacletBuilder;
 import org.key_project.rusty.settings.ProofSettings;

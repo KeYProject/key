@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.match.instructions;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.logic.Term;
-import org.key_project.rusty.Services;
+import org.key_project.prover.rules.MatchConditions;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
-import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.match.TacletMatchProgram;
 
 import org.jspecify.annotations.NonNull;
@@ -31,13 +31,13 @@ public class MatchElementaryUpdateInstruction extends Instruction<@NonNull Eleme
 
     @Override
     public MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-            Services services) {
+                                 LogicServices services) {
         return match((ElementaryUpdate) instantiationCandidate.op(), matchCond, services);
     }
 
     public MatchConditions match(ElementaryUpdate instantiationCandidateOp,
-            MatchConditions matchCond,
-            Services services) {
+                                 MatchConditions matchCond,
+                                 LogicServices services) {
         if (instantiationCandidateOp != op) {
             matchCond = leftHandSide.match(instantiationCandidateOp.lhs(), matchCond, services);
         }
@@ -46,7 +46,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<@NonNull Eleme
 
     @Override
     public MatchConditions match(SyntaxElementCursor cursor, MatchConditions matchConditions,
-            Services services) {
+                                 LogicServices services) {
         cursor.goToNext();
         var node = cursor.getCurrentNode();
         if (!(node instanceof ElementaryUpdate eu))

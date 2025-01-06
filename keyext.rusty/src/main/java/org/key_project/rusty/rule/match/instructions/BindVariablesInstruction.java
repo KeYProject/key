@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.match.instructions;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.rules.MatchConditions;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.BoundVariable;
 import org.key_project.rusty.logic.op.sv.VariableSV;
-import org.key_project.rusty.rule.MatchConditions;
 
 import org.jspecify.annotations.NonNull;
 
@@ -32,7 +33,7 @@ public class BindVariablesInstruction {
      * have been assigned to the same abstract name and the sorts are equal.
      */
     private MatchConditions match(
-            BoundVariable instantiationCandidate, MatchConditions matchCond, Services services) {
+            BoundVariable instantiationCandidate, MatchConditions matchCond, LogicServices services) {
         if (templateVar != instantiationCandidate) {
             if (instantiationCandidate.sort() != templateVar.sort()) {
                 matchCond = null;
@@ -43,7 +44,8 @@ public class BindVariablesInstruction {
 
     @Override
     public MatchConditions match(
-            SyntaxElementCursor cursor, MatchConditions matchConditions, Services services) {
+            SyntaxElementCursor cursor,
+            MatchConditions matchConditions, LogicServices services) {
         var node = cursor.getCurrentNode();
         if (!(node instanceof BoundVariable bv)) {
             return null;
@@ -76,19 +78,19 @@ private static class VariableSVBinder extends MatchSchemaVariableInstruction<@No
 
         @Override
         public MatchConditions match(
-                SyntaxElementCursor cursor, MatchConditions matchConditions, Services services) {
+                SyntaxElementCursor cursor, MatchConditions matchConditions, LogicServices services) {
             var node = cursor.getCurrentNode();
             if (!(node instanceof BoundVariable bv)) {
                 return null;
             }
-            var result = match(bv, matchConditions, services);
+            var result = match(bv, matchConditions, (Services) services);
             cursor.gotoNextSibling();
             return result;
         }
 
         @Override
         public MatchConditions match(
-                Term instantiationCandidate, MatchConditions matchCond, Services services) {
+                Term instantiationCandidate, MatchConditions matchCond, LogicServices services) {
             throw new UnsupportedOperationException();
         }
     }}

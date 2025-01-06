@@ -7,7 +7,7 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.rule.RuleSet;
+import org.key_project.prover.rules.RuleSet;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;

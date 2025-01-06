@@ -4,16 +4,20 @@
 package org.key_project.rusty.rule;
 
 
-import org.key_project.logic.Term;
-import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
-import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.rule.inst.SVInstantiations;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.inst.SVInstantiations;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 public class NoPosTacletApp extends TacletApp {
     /**
@@ -94,14 +98,14 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     protected MatchConditions setupMatchConditions(PosInOccurrence pos, Services services) {
-        SVInstantiations svInst = taclet() instanceof NoFindTaclet ? instantiations()
-                : instantiations().clearUpdateContext();
+        var svInst = (org.key_project.rusty.rule.inst.SVInstantiations) (taclet() instanceof NoFindTaclet ? instantiations()
+                : instantiations().clearUpdateContext());
 
-        MatchConditions mc;
+        org.key_project.rusty.rule.MatchConditions mc;
         if (svInst.isEmpty()) {
-            mc = MatchConditions.EMPTY_MATCHCONDITIONS;
+            mc = org.key_project.rusty.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
         } else {
-            mc = new MatchConditions(svInst);
+            mc = new org.key_project.rusty.rule.MatchConditions(svInst);
         }
 
         if (taclet() instanceof RewriteTaclet) {
@@ -156,7 +160,6 @@ public class NoPosTacletApp extends TacletApp {
         }
 
         MatchConditions mc = setupMatchConditions(pos, services);
-
         if (mc == null) {
             return null;
         }
@@ -180,7 +183,7 @@ public class NoPosTacletApp extends TacletApp {
             return null;
         }
 
-        if (updateContextFixed && !updateContextCompatible(res)) {
+        if (updateContextFixed && !updateContextCompatible((org.key_project.rusty.rule.MatchConditions)res)) {
             /*
              * LOGGER.debug("NoPosTacletApp: Incompatible context", instantiations.getUpdateContext
              * (), res.matchConditions().getInstantiations().getUpdateContext());
@@ -212,7 +215,7 @@ public class NoPosTacletApp extends TacletApp {
         return createNoPosTacletApp(taclet(), mc.getInstantiations(), ifInstantiations, services);
     }
 
-    private boolean updateContextCompatible(MatchConditions p_mc) {
+    private boolean updateContextCompatible(org.key_project.rusty.rule.MatchConditions p_mc) {
         return instantiations.getUpdateContext()
                 .equals(p_mc.getInstantiations().getUpdateContext());
     }
@@ -226,7 +229,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     @Override
     public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
-            Services services) {
+                                      Services services) {
         /*
          * if (interesting) {
          * return createNoPosTacletApp(taclet(),

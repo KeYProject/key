@@ -25,6 +25,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
@@ -286,7 +287,7 @@ public class QueryExpand implements BuiltInRule {
 
         for (QueryEvalPos qep : qeps) {
             Pair<Term, Term> queryExp =
-                QueryExpand.INSTANCE.queryEvalTerm(services, qep.query, qep.instVars);
+                INSTANCE.queryEvalTerm(services, qep.query, qep.instVars);
             Term queryExpTerm = tb.and(queryExp.first, tb.equals(qep.query, queryExp.second));
             final Term termToInsert;
             if (qep.positivePosition) {

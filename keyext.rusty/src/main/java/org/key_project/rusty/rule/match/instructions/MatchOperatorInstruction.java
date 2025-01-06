@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.match.instructions;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.Operator;
-import org.key_project.rusty.Services;
-import org.key_project.rusty.rule.MatchConditions;
+import org.key_project.prover.rules.MatchConditions;
 
 public interface MatchOperatorInstruction extends MatchInstruction {
 
-    MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
-            Services services);
+    MatchConditions match(Operator instantiationCandidate,
+                          MatchConditions matchConditions,
+                          LogicServices services);
 
 }

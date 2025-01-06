@@ -27,20 +27,20 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -341,14 +341,14 @@ public final class TruthValueTracingUtil {
             }
         }
         if (isClosingRule(tacletApp.taclet())) {
-            if (tacletApp.ifInstsComplete() && tacletApp.ifFormulaInstantiations() != null) {
-                for (IfFormulaInstantiation ifInst : tacletApp.ifFormulaInstantiations()) {
-                    assert ifInst instanceof IfFormulaInstSeq;
+            if (tacletApp.ifInstsComplete() && tacletApp.assumesFormulaInstantiations() != null) {
+                for (AssumesFormulaInstantiation ifInst : tacletApp.assumesFormulaInstantiations()) {
+                    assert ifInst instanceof AssumesFormulaInstSeq;
                     Term term = (Term) ifInst.getSequentFormula().formula();
                     TermLabel label = term.getLabel(termLabelName);
                     if (label instanceof FormulaTermLabel) {
                         result.add(new LabelOccurrence((FormulaTermLabel) label,
-                            ((IfFormulaInstSeq) ifInst).inAntec()));
+                            ((AssumesFormulaInstSeq) ifInst).inAntec()));
                     }
                 }
             }
@@ -559,8 +559,8 @@ public final class TruthValueTracingUtil {
                 }
                 // Check if instantiations
                 if (parentRuleApp instanceof TacletApp ta) {
-                    if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
-                        for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
+                    if (ta.ifInstsComplete() && ta.assumesFormulaInstantiations() != null) {
+                        for (AssumesFormulaInstantiation ifInst : ta.assumesFormulaInstantiations()) {
                             checkForNewMinorIds(childNode,
                                 (Term) ifInst.getSequentFormula().formula(),
                                 termLabelName, parentPio, tb, results);

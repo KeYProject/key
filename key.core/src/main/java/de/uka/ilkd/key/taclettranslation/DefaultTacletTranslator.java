@@ -17,7 +17,7 @@ import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
@@ -189,8 +189,8 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
                     "Not AntecTaclet, not SuccTaclet, not RewriteTaclet, not NoFindTaclet");
             }
         }
-        if (taclet.ifSequent() != null) {
-            if ((assum = translate(taclet.ifSequent(), services)) == null) {
+        if (taclet.assumesSequent() != null) {
+            if ((assum = translate(taclet.assumesSequent(), services)) == null) {
                 assum = TacletSections.ASSUM.getDefaultValue(services);
             }
         }

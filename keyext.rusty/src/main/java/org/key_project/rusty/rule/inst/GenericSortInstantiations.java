@@ -9,12 +9,13 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.OperatorSV;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.sort.GenericSort;
 import org.key_project.util.collection.*;
 
@@ -40,7 +41,7 @@ public final class GenericSortInstantiations {
      */
     public static GenericSortInstantiations create(
             Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> p_instantiations,
-            ImmutableList<GenericSortCondition> p_conditions, Services services) {
+            ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
 
         ImmutableList<GenericSort> sorts = ImmutableSLList.nil();
         GenericSortCondition c;
@@ -76,7 +77,7 @@ public final class GenericSortInstantiations {
      * @throws GenericSortException if no instantiations has been found
      */
     public static GenericSortInstantiations create(ImmutableList<GenericSort> p_sorts,
-            ImmutableList<GenericSortCondition> p_conditions, Services services) {
+            ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
 
         if (p_sorts.isEmpty()) {
             return EMPTY_INSTANTIATIONS;
@@ -192,7 +193,7 @@ public final class GenericSortInstantiations {
      * @return the/a found solution
      */
     private static ImmutableMap<GenericSort, Sort> solve(ImmutableList<GenericSort> p_sorts,
-            ImmutableList<GenericSortCondition> p_conditions, Services services) {
+            ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
 
         ImmutableMap<GenericSort, Sort> res;
 
@@ -233,7 +234,7 @@ public final class GenericSortInstantiations {
     private static ImmutableMap<GenericSort, Sort> solveHelp(
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
             ImmutableList<GenericSortCondition> p_conditions,
-            ImmutableList<GenericSort> p_pushedBack, Services services) {
+            ImmutableList<GenericSort> p_pushedBack, LogicServices services) {
 
         if (p_remainingSorts.isEmpty()) {
             return solveForcedInst(p_pushedBack, p_curRes, p_conditions, services);
@@ -300,7 +301,7 @@ public final class GenericSortInstantiations {
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
             ImmutableList<GenericSortCondition> p_conditions,
             ImmutableList<GenericSort> p_pushedBack, GenericSort p_gs,
-            ImmutableList<Sort> p_subsorts, ImmutableList<Sort> p_chosenList, Services services) {
+            ImmutableList<Sort> p_subsorts, ImmutableList<Sort> p_chosenList, LogicServices services) {
         for (Sort chosen : p_chosenList) {
             if (!isSupersortOf(chosen, p_subsorts) // this test is unnecessary in some cases
                     || !p_gs.isPossibleInstantiation(chosen)) {
@@ -384,7 +385,7 @@ public final class GenericSortInstantiations {
      */
     private static ImmutableMap<GenericSort, Sort> solveForcedInst(
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
-            ImmutableList<GenericSortCondition> p_conditions, Services services) {
+            ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
 
         if (p_remainingSorts.isEmpty()) {
             return p_curRes; // nothing further to be done
@@ -414,7 +415,7 @@ public final class GenericSortInstantiations {
      */
     private static ImmutableMap<GenericSort, Sort> solveForcedInstHelp(
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
-            Services services) {
+            LogicServices services) {
 
         if (p_remainingSorts.isEmpty()) {
             // we're done
@@ -529,7 +530,7 @@ public final class GenericSortInstantiations {
      * PRECONDITION: !p_sorts.isEmpty ()
      */
     private static ImmutableList<Sort> minimalSupersorts(ImmutableList<Sort> p_sorts,
-            Services services) {
+            LogicServices services) {
 
         // if the list only consists of a single sort, return this sort
         if (p_sorts.size() == 1) {

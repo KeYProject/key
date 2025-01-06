@@ -82,7 +82,7 @@ public final class ProgVarReplacer {
             if (newInsts != insts) {
                 NoPosTacletApp newNoPosTacletApp =
                     NoPosTacletApp.createNoPosTacletApp(noPosTacletApp.taclet(), newInsts,
-                        noPosTacletApp.ifFormulaInstantiations(), services);
+                        noPosTacletApp.assumesFormulaInstantiations(), services);
                 appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
                 appsToBeAdded = appsToBeAdded.add(newNoPosTacletApp);
             }
@@ -100,10 +100,8 @@ public final class ProgVarReplacer {
         SVInstantiations result = insts;
 
         Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it;
-        it = insts.pairIterator();
-        while (it.hasNext()) {
-            ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
-            SchemaVariable sv = e.key();
+        for (var e : insts.getInstantiationMap()) {
+            var sv = e.key();
             InstantiationEntry<?> ie = e.value();
             Object inst = ie.getInstantiation();
 

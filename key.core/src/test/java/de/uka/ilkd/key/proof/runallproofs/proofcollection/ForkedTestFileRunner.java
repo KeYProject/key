@@ -138,8 +138,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
          */
         Path exceptionFile = getLocationOfSerializedException(pathToTempDir);
         if (exceptionFile.toFile().exists()) {
-            Throwable t = ForkedTestFileRunner.readObject(exceptionFile, Throwable.class);
-            Assertions.fail("Subprocess returned exception", t);
+            Throwable t = readObject(exceptionFile, Throwable.class);
+            fail("Subprocess returned exception", t);
         }
 
         /*
@@ -148,7 +148,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
         Path testResultsFile = getLocationOfSerializedTestResults(pathToTempDir);
         assertTrue(testResultsFile.toFile().exists(),
             "File containing serialized test results not present.");
-        TestResult[] array = ForkedTestFileRunner.readObject(testResultsFile, TestResult[].class);
+        TestResult[] array = readObject(testResultsFile, TestResult[].class);
 
         return Arrays.asList(array);
     }
@@ -165,8 +165,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
 
         boolean error = false;
         try {
-            TestFile[] testFiles = ForkedTestFileRunner
-                    .readObject(getLocationOfSerializedTestFiles(tempDirectory), TestFile[].class);
+            TestFile[] testFiles = readObject(getLocationOfSerializedTestFiles(tempDirectory), TestFile[].class);
             installTimeoutWatchdog(testFiles[0].getSettings(), tempDirectory);
             ArrayList<TestResult> testResults = new ArrayList<>();
             for (TestFile testFile : testFiles) {
@@ -237,7 +236,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     if (verbose) {
                         LOGGER.info("Timeout watcher launched (" + timeout + " secs.)");
                     }
-                    Thread.sleep(timeout * 1000L);
+                    sleep(timeout * 1000L);
                     InterruptedException ex =
                         new InterruptedException("forkTimeout (" + timeout + "sec.) elapsed");
                     writeObject(getLocationOfSerializedException(tempDirectory), ex);

@@ -35,6 +35,9 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
@@ -128,7 +131,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         for (NoPosTacletApp app : allApps) {
             final Taclet tac = app.taclet();
             if (!(tac instanceof RewriteTaclet) || !tac.hasReplaceWith()
-                    || !tac.ifSequent().isEmpty() || tac.goalTemplates().size() != 1
+                    || !tac.assumesSequent().isEmpty() || tac.goalTemplates().size() != 1
                     || !tac.goalTemplates().head().sequent().isEmpty() || !tac.varsNew().isEmpty()
                     || !tac.varsNewDependingOn().isEmpty()
                     || ((RewriteTaclet) tac).getApplicationRestriction() != RewriteTaclet.NONE
@@ -422,8 +425,8 @@ public final class OneStepSimplifier implements BuiltInRule {
                 inAntecedent); // It is required to create a new PosInOccurrence because formula and
                                // pio.constrainedFormula().formula() are only equals module
                                // renamings and term labels
-        ImmutableList<IfFormulaInstantiation> ifInst = ImmutableSLList.nil();
-        ifInst = ifInst.append(new IfFormulaInstDirect(pio.sequentFormula()));
+        ImmutableList<AssumesFormulaInstantiation> ifInst = ImmutableSLList.nil();
+        ifInst = ifInst.append(new AssumesFormulaInstDirect(pio.sequentFormula()));
         TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO,
             lastProof.getServices());
         return ta;

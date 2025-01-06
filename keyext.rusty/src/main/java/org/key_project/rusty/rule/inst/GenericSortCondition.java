@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.inst;
 
+import org.key_project.logic.op.sv.OperatorSV;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
-import org.key_project.rusty.logic.op.sv.OperatorSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.TermSV;
 import org.key_project.rusty.logic.sort.GenericSort;
 
@@ -23,7 +23,7 @@ public abstract class GenericSortCondition {
      *         sorts that don't match)
      */
     public static GenericSortCondition createCondition(SchemaVariable sv,
-            InstantiationEntry<?> p_entry) {
+                                                       InstantiationEntry<?> p_entry) {
 
         if (!(p_entry instanceof TermInstantiation ti)) {
             return null;

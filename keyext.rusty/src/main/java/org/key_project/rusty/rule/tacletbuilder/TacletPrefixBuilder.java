@@ -7,10 +7,14 @@ package org.key_project.rusty.rule.tacletbuilder;
 import java.util.Iterator;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.NotFreeIn;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.logic.op.Modality;
-import org.key_project.rusty.logic.op.sv.*;
+import org.key_project.rusty.logic.op.sv.FormulaSV;
+import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
+import org.key_project.rusty.logic.op.sv.TermSV;
+import org.key_project.rusty.logic.op.sv.UpdateSV;
 import org.key_project.rusty.rule.*;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
@@ -108,7 +112,7 @@ public class TacletPrefixBuilder {
         }
     }
 
-    private void visit(TacletGoalTemplate templ) {
+    private void visit(org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate templ) {
         visit(templ.sequent());
         if (templ instanceof RewriteTacletGoalTemplate rtgt) {
             visit(rtgt.replaceWith());
@@ -126,16 +130,16 @@ public class TacletPrefixBuilder {
             visit(find);
         }
 
-        for (final TacletGoalTemplate tgt : tacletBuilder.goalTemplates()) {
+        for (final org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate tgt : tacletBuilder.goalTemplates()) {
             visit(tgt);
-            for (Taclet tacletInAddRule : tgt.rules()) {
+            for (var tacletInAddRule : tgt.rules()) {
                 checkPrefixInAddRules(tacletInAddRule);
             }
         }
     }
 
 
-    private void checkPrefixInAddRules(Taclet addRule) {
+    private void checkPrefixInAddRules(org.key_project.prover.rules.Taclet addRule) {
         final var addRuleSV2PrefixMap = addRule.prefixMap();
         for (final var entry : prefixMap) {
             final TacletPrefix addRulePrefix = (TacletPrefix) addRuleSV2PrefixMap.get(entry.key());
@@ -163,7 +167,7 @@ public class TacletPrefixBuilder {
         RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder =
             (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
         int count = 0;
-        for (TacletGoalTemplate tmpl : rwtacletBuilder.goalTemplates()) {
+        for (var tmpl : rwtacletBuilder.goalTemplates()) {
             if (tmpl instanceof RewriteTacletGoalTemplate rtgt) {
                 if (rtgt.replaceWith() != null) {
                     count++;
@@ -181,13 +185,13 @@ public class TacletPrefixBuilder {
             (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
         TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
         svc.visit(rwtacletBuilder.ifSequent());
-        for (TacletGoalTemplate tacletGoalTemplate : rwtacletBuilder.goalTemplates()) {
-            TacletGoalTemplate tmpl = tacletGoalTemplate;
+        for (var tacletGoalTemplate : rwtacletBuilder.goalTemplates()) {
+            TacletGoalTemplate tmpl = (TacletGoalTemplate) tacletGoalTemplate;
             // if (tmpl instanceof RewriteTacletGoalTemplate) {
             // RewriteTacletGoalTemplate
             // gt=(RewriteTacletGoalTemplate)tmpl;
             svc.visit(tmpl.sequent());
-            for (Taclet taclet : tmpl.rules()) { // addrules
+            for (org.key_project.rusty.rule.Taclet taclet : tmpl.rules()) { // addrules
                 svc.visit(taclet, true);
             }
         }

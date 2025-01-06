@@ -34,7 +34,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
     protected ImmutableList<NewDependingOn> varsNewDependingOn =
         ImmutableSLList.nil();
-    protected ImmutableList<TacletGoalTemplate> goals = ImmutableSLList.nil();
+    protected ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goals = ImmutableSLList.nil();
     protected TacletAttributes attrs = new TacletAttributes(null, null);
 
     /**
@@ -44,6 +44,8 @@ public abstract class TacletBuilder<T extends Taclet> {
         ImmutableSLList.nil();
     protected ImmutableSet<TacletAnnotation> tacletAnnotations =
         DefaultImmutableSet.nil();
+
+    protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
 
     public void setAnnotations(ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
@@ -204,7 +206,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         return ifseq;
     }
 
-    public ImmutableList<TacletGoalTemplate> goalTemplates() {
+    public ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates() {
         return goals;
     }
 

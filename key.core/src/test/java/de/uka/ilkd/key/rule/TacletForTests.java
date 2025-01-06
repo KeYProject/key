@@ -12,9 +12,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.*;
@@ -26,7 +24,9 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
@@ -152,7 +152,7 @@ public class TacletForTests {
         return nss.ruleSets();
     }
 
-    public static Namespace<JFunction> getFunctions() {
+    public static Namespace<? extends Function> getFunctions() {
         return nss.functions();
     }
 

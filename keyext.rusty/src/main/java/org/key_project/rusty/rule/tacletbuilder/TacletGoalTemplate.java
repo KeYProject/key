@@ -4,8 +4,8 @@
 package org.key_project.rusty.rule.tacletbuilder;
 
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.BoundVarsVisitor;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.Taclet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -65,10 +65,6 @@ public class TacletGoalTemplate
      */
     public ImmutableList<Taclet> rules() {
         return (ImmutableList<@NonNull Taclet>) super.rules();
-    }
-
-    public ImmutableSet<SchemaVariable> addedProgVars() {
-        return (ImmutableSet<SchemaVariable>) super.addedProgVars();
     }
 
     public Object replaceWithExpressionAsObject() {

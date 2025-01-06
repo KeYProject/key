@@ -5,12 +5,7 @@ package org.key_project.rusty.rule;
 
 import java.util.*;
 
-import org.key_project.logic.Name;
-import org.key_project.logic.Namespace;
-import org.key_project.logic.Term;
-import org.key_project.logic.op.Function;
-import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.AssumesMatchResult;
 import org.key_project.prover.sequent.*;
@@ -24,7 +19,21 @@ import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.rusty.proof.VariableNameProposer;
 import org.key_project.rusty.rule.inst.*;
+
+import org.key_project.logic.Term;
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.OperatorSV;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.inst.SVInstantiations;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
+
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -36,12 +45,12 @@ public abstract class TacletApp implements RuleApp {
     /**
      * contains the instantiations of the schema variables of the Taclet
      */
-    protected final SVInstantiations instantiations;
+    protected final org.key_project.rusty.rule.inst.SVInstantiations instantiations;
 
     /**
      * caches a created match condition {@code (instantiations, RenameTable.EMPTY)}
      */
-    private final MatchConditions matchConditions;
+    private final org.key_project.rusty.rule.MatchConditions matchConditions;
 
     /**
      * chosen instantiations for the assumes-sequent formulas
@@ -63,15 +72,15 @@ public abstract class TacletApp implements RuleApp {
      * constructs a TacletApp for the given taclet, with an empty instantiation map
      */
     TacletApp(Taclet taclet) {
-        this(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, null);
+        this(taclet, org.key_project.rusty.rule.inst.SVInstantiations.EMPTY_SVINSTANTIATIONS, null);
     }
 
     TacletApp(Taclet taclet, SVInstantiations instantiations,
             ImmutableList<AssumesFormulaInstantiation> ifInstantiations) {
         this.taclet = taclet;
-        this.instantiations = instantiations;
+        this.instantiations = (org.key_project.rusty.rule.inst.SVInstantiations) instantiations;
         this.assumesInstantiations = ifInstantiations;
-        this.matchConditions = new MatchConditions(instantiations);
+        this.matchConditions = new org.key_project.rusty.rule.MatchConditions(this.instantiations);
     }
 
     /**
@@ -98,11 +107,11 @@ public abstract class TacletApp implements RuleApp {
      *
      * @return the SVInstantiations needed to instantiate the Taclet
      */
-    public SVInstantiations instantiations() {
+    public org.key_project.rusty.rule.inst.SVInstantiations instantiations() {
         return instantiations;
     }
 
-    public MatchConditions matchConditions() {
+    public org.key_project.rusty.rule.MatchConditions matchConditions() {
         return matchConditions;
     }
 
@@ -144,9 +153,8 @@ public abstract class TacletApp implements RuleApp {
 
     public static boolean checkNoFreeVars(Taclet taclet, SVInstantiations instantiations,
             PosInOccurrence pos) {
-        Iterator<SchemaVariable> it = instantiations.svIterator();
-        while (it.hasNext()) {
-            SchemaVariable sv = it.next();
+        for (var pair: ((org.key_project.rusty.rule.inst.SVInstantiations) instantiations).getInstantiationMap()) {
+            final var sv = pair.key();
             if (sv instanceof TermSV || sv instanceof FormulaSV) {
                 // TODO: Is this enough? Do we need, e.g., sort checks?
                 var t = (Term) instantiations.getInstantiation(sv);
@@ -197,13 +205,8 @@ public abstract class TacletApp implements RuleApp {
     protected static SVInstantiations resolveCollisionVarSV(Taclet taclet, SVInstantiations insts,
             Services services) {
         HashMap<BoundVariable, SchemaVariable> collMap = new LinkedHashMap<>();
-
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-            insts.pairIterator();
-        while (it.hasNext()) {
-            ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair = it.next();
-            if (pair.key() instanceof VariableSV) {
-                SchemaVariable varSV = pair.key();
+        for (final var pair: ((org.key_project.rusty.rule.inst.SVInstantiations)insts).getInstantiationMap()) {
+            if (pair.key() instanceof VariableSV varSV) {
                 Term value = (Term) pair.value().getInstantiation();
                 if (!collMap.containsKey(value.op())) {
                     collMap.put((BoundVariable) value.op(), varSV);
@@ -237,8 +240,8 @@ public abstract class TacletApp implements RuleApp {
         if (taclet instanceof RewriteTaclet rwt) {
             ImmutableList<Term> oldUpdCtx =
                 matchConditions().getInstantiations().getUpdateContext();
-            MatchConditions newConditions = rwt.checkPrefix(posInOccurrence(),
-                MatchConditions.EMPTY_MATCHCONDITIONS);
+            var newConditions = rwt.checkPrefix(posInOccurrence(),
+                   org.key_project.rusty.rule.MatchConditions.EMPTY_MATCHCONDITIONS);
             if (newConditions == null) {
                 return false;
             }
@@ -357,11 +360,9 @@ public abstract class TacletApp implements RuleApp {
             TacletSchemaVariableCollector coll =
                 new TacletSchemaVariableCollector(instantiations());
             coll.visitWithoutAddrule(taclet());
-            Iterator<SchemaVariable> it = coll.varIterator();
-            while (it.hasNext()) {
-                SchemaVariable var = it.next();
-                if (!instantiations().isInstantiated(var)) {
-                    localMissingVars = localMissingVars.add(var);
+            for (var svInTaclet : coll.vars()) {
+                if (!instantiations().isInstantiated(svInTaclet)) {
+                    localMissingVars = localMissingVars.add(svInTaclet);
                 }
             }
             missingVars = localMissingVars;
@@ -382,7 +383,7 @@ public abstract class TacletApp implements RuleApp {
     }
 
     public <F extends Function> void registerSkolemConstants(Namespace<@NonNull F> functions) {
-        final SVInstantiations insts = instantiations();
+        final var insts = instantiations();
         final Iterator<SchemaVariable> svIt = insts.svIterator();
         while (svIt.hasNext()) {
             final SchemaVariable sv = svIt.next();
@@ -423,12 +424,12 @@ public abstract class TacletApp implements RuleApp {
             return null;
 
         if (app != this) {
-            final MatchConditions appMC =
+            final var appMC =
                 app.taclet().getMatcher().checkConditions(app.matchConditions(), services);
             if (appMC == null) {
                 return null;
             } else {
-                app = app.setMatchConditions(appMC, services);
+                app = app.setMatchConditions((MatchConditions) appMC, services);
             }
         }
 
@@ -742,7 +743,7 @@ public abstract class TacletApp implements RuleApp {
                     + "or the if formulas have already been instantiated";
 
         MatchConditions mc =
-            taclet().getMatcher().matchAssumes(p_list, matchConditions, p_services);
+                (MatchConditions) taclet().getMatcher().matchAssumes(p_list, matchConditions, p_services);
 
         return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
     }
@@ -888,7 +889,7 @@ public abstract class TacletApp implements RuleApp {
             Services services, boolean interesting) {
 
         final MatchConditions cond =
-            taclet().getMatcher().matchSV(sv, pe, matchConditions, services);
+                (MatchConditions) taclet().getMatcher().matchSV(sv, pe, matchConditions, services);
 
         if (cond == null) {
             throw new IllegalInstantiationException(

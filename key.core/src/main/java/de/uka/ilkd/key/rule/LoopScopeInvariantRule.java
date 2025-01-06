@@ -423,7 +423,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         if (prefixElems.size() > 0
                 && (prefixElems.last() instanceof LabeledStatement lastLabeledStmt)
-                && ((LabeledStatement) prefixElems.last()).getBody().equals(whileLoop)) {
+                && lastLabeledStmt.getBody().equals(whileLoop)) {
             loopLabel = Optional.of(lastLabeledStmt.getLabel());
             stmtToRepl = lastLabeledStmt.getBody();
         }

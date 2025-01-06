@@ -32,13 +32,13 @@ public class ConstantCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
-            Services services) {
+                         Services services) {
         if ((!(var instanceof TermSV) || var != this.t)
                 && (!(var instanceof FormulaSV) || var != this.t)) {
             return true;
         }
         if (var instanceof TermSV) {
-            Term tInst = (Term) instMap.getInstantiation((TermSV) t);
+            Term tInst = instMap.getInstantiation((TermSV) t);
             boolean atomic = (tInst.arity() == 0);
             return negated != atomic;
         }

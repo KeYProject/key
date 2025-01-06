@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules.tacletbuilder;
 
+import org.jspecify.annotations.NonNull;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.Taclet;
@@ -19,13 +20,13 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public abstract class TacletGoalTemplate {
     /** stores sequent that is one of the new goals */
-    private final Sequent addedSeq;
+    protected final Sequent addedSeq;
 
     /** stores list of Taclet which are introduced */
-    private ImmutableList<? extends Taclet> addedRules = ImmutableSLList.nil();
+    protected final ImmutableList<? extends Taclet> addedRules;
 
     /** program variables added by this taclet to the namespace */
-    private ImmutableSet<? extends SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
+    protected final ImmutableSet<SchemaVariable> addedProgVars;
 
     private String name = null;
 
@@ -38,8 +39,8 @@ public abstract class TacletGoalTemplate {
      *        time unused (new) program variables that are introduced by an application of this
      *        template
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<? extends Taclet> addedRules,
-            ImmutableSet<? extends SchemaVariable> addedProgVars) {
+    public TacletGoalTemplate(Sequent addedSeq, @NonNull ImmutableList<? extends Taclet> addedRules,
+            @NonNull ImmutableSet<SchemaVariable> addedProgVars) {
         // TacletBuilder.checkContainsFreeVarSV(addedSeq, null, "add sequent");
 
         this.addedRules = addedRules;
@@ -78,7 +79,7 @@ public abstract class TacletGoalTemplate {
         return addedRules;
     }
 
-    public ImmutableSet<? extends SchemaVariable> addedProgVars() {
+    public ImmutableSet<SchemaVariable> addedProgVars() {
         return addedProgVars;
     }
 
@@ -99,6 +100,34 @@ public abstract class TacletGoalTemplate {
 
     public String name() {
         return name;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (o == null) {
+            return false;
+        }
+        if (o == this) {
+            return true;
+        }
+
+        if (getClass() != o.getClass()) {
+            return false;
+        }
+
+        TacletGoalTemplate other = (TacletGoalTemplate) o;
+
+        return addedSeq.equals(other.addedSeq) && addedRules.equals(other.addedRules);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 37 * result + addedSeq.hashCode();
+        result = 37 * result + addedRules.hashCode();
+        return result;
     }
 
     @Override

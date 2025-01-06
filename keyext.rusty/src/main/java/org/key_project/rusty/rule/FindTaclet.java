@@ -6,9 +6,10 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.rusty.logic.BoundVarsVisitor;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -51,12 +52,13 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<? extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
-            org.key_project.prover.rules.TacletAttributes attrs, Term find,
+            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+                         ImmutableList<RuleSet> ruleSets,
+                         org.key_project.prover.rules.TacletAttributes attrs, Term find,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             boolean surviveSymbExec,
             ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, prefixMap, surviveSymbExec,
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, surviveSymbExec,
             tacletAnnotations);
         this.find = find;
     }
@@ -77,11 +79,12 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<? extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+                         ImmutableList<RuleSet> ruleSets,
             org.key_project.prover.rules.TacletAttributes attrs, Term find,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, attrs, find, prefixMap, false,
+        this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, false,
             tacletAnnotations);
     }
 

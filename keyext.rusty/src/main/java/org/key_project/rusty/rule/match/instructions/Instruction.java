@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.match.instructions;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.rules.MatchConditions;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.*;
-import org.key_project.rusty.rule.MatchConditions;
 
 import org.jspecify.annotations.NonNull;
 
@@ -89,6 +90,7 @@ public abstract class Instruction<Op extends Operator> implements MatchInstructi
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
      *         the pair {@code (sv, instantiationCandidate)} added
      */
-    public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-            Services services);
+    public abstract MatchConditions match(Term instantiationCandidate,
+                                          MatchConditions matchCond,
+                                          LogicServices services);
 }

@@ -4,10 +4,10 @@
 package org.key_project.rusty.ast;
 
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyBlock;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

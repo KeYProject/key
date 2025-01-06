@@ -11,12 +11,17 @@ import java.util.Set;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
-import de.uka.ilkd.key.rule.*;
 
+import de.uka.ilkd.key.rule.Taclet;
+
+import org.jspecify.annotations.Nullable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.*;
+import org.key_project.prover.rules.NewDependingOn;
+import org.key_project.prover.rules.NewVarcond;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -38,11 +43,10 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected Sequent ifseq = JavaDLSequentKit.getInstance().getEmptySequent();
     protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.nil();
     protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
-    protected ImmutableList<NewDependingOn> varsNewDependingOn =
-        ImmutableSLList.nil();
-    protected ImmutableList<TacletGoalTemplate> goals = ImmutableSLList.nil();
+    protected ImmutableList<NewDependingOn> varsNewDependingOn = ImmutableSLList.nil();
+    protected ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goals = ImmutableSLList.nil();
     protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
-    protected final TacletAttributes attrs = new TacletAttributes();
+    protected TacletAttributes attrs = new TacletAttributes(null, null);
 
     /**
      * List of additional generic conditions on the instantiations of schema variables.
@@ -91,15 +95,12 @@ public abstract class TacletBuilder<T extends Taclet> {
         }
     }
 
-
-
     /**
      * sets the trigger
      */
     public void setTrigger(Trigger trigger) {
-        attrs.setTrigger(trigger);
+        attrs = new TacletAttributes(attrs.displayName(), trigger);
     }
-
 
     /**
      * returns the name of the Taclet to be built
@@ -120,11 +121,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      * sets an optional display name (presented to the user)
      */
     public void setDisplayName(String s) {
-        attrs.setDisplayName(s);
-    }
-
-    public void setHelpText(String s) {
-        attrs.setHelpText(s);
+        attrs = new TacletAttributes(s, attrs.trigger());
     }
 
     /**
@@ -163,7 +160,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      * same type as peerSV
      */
     public void addVarsNew(SchemaVariable v, SchemaVariable peerSV) {
-        addVarsNew(new NewVarcond(v, peerSV));
+        addVarsNew(new de.uka.ilkd.key.rule.NewVarcond(v, peerSV));
     }
 
     /**
@@ -174,7 +171,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         if (type == null) {
             throw new NullPointerException("given type is null");
         }
-        addVarsNew(new NewVarcond(v, type));
+        addVarsNew(new de.uka.ilkd.key.rule.NewVarcond(v, type));
     }
 
     /**
@@ -276,7 +273,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         return ifseq;
     }
 
-    public ImmutableList<TacletGoalTemplate> goalTemplates() {
+    public ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates() {
         return goals;
     }
 
@@ -284,7 +281,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         return varsNotFreeIn.iterator();
     }
 
-    public void setTacletGoalTemplates(ImmutableList<TacletGoalTemplate> g) {
+    public void setTacletGoalTemplates(ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> g) {
         goals = g;
     }
 
@@ -303,11 +300,9 @@ public abstract class TacletBuilder<T extends Taclet> {
         if (goal2Choices == null || goals.isEmpty()) {
             return getTaclet();
         } else {
-            ImmutableList<TacletGoalTemplate> oldGoals = goals;
-            Iterator<TacletGoalTemplate> it = oldGoals.iterator();
+            var oldGoals = goals;
             T result;
-            while (it.hasNext()) {
-                TacletGoalTemplate goal = it.next();
+            for (var goal : oldGoals) {
                 if (goal2Choices.get(goal) != null && !goal2Choices.get(goal).eval(active)) {
                     goals = goals.removeAll(goal);
                 }
@@ -324,6 +319,10 @@ public abstract class TacletBuilder<T extends Taclet> {
 
     public void setOrigin(String origin) {
         this.origin = origin;
+    }
+
+    public void setHelpText(@Nullable Object accept) {
+        //throw new RuntimeException("To be implemented");
     }
 
     public static class TacletBuilderException extends IllegalArgumentException {

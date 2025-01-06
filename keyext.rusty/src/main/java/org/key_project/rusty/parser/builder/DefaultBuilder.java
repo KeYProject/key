@@ -21,9 +21,9 @@ import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.parser.KeYRustyParser;
-import org.key_project.rusty.rule.RuleSet;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;

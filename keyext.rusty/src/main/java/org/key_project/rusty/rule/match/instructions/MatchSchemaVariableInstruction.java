@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.match.instructions;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.OperatorSV;
+import org.key_project.prover.rules.MatchConditions;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.logic.op.sv.OperatorSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.inst.IllegalInstantiationException;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 
@@ -33,13 +33,14 @@ public abstract class MatchSchemaVariableInstruction<SV extends @NonNull Operato
      * schemavariable has been already matched to a term <tt>t2</tt> which is not unifiable with the
      * given term.
      */
-    protected final MatchConditions addInstantiation(Term term, MatchConditions matchCond,
-            Services services) {
+    protected final MatchConditions addInstantiation(Term term,
+                                                     MatchConditions matchCond,
+                                                     LogicServices services) {
         if (op.isRigid() && !term.isRigid()) {
             return null;
         }
 
-        final SVInstantiations inst = matchCond.getInstantiations();
+        final SVInstantiations inst = (SVInstantiations) matchCond.getInstantiations();
 
         final Term t = inst.getTermInstantiation(op, services);
         if (t != null) {
@@ -69,8 +70,9 @@ public abstract class MatchSchemaVariableInstruction<SV extends @NonNull Operato
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
      *         the pair ({@link SchemaVariable}, {@link RustyProgramElement}) added
      */
-    public MatchConditions match(RustyProgramElement instantiationCandidate, MatchConditions mc,
-            Services services) {
+    public MatchConditions match(RustyProgramElement instantiationCandidate,
+                                 MatchConditions mc,
+                                 LogicServices services) {
         return null;
     }
 }

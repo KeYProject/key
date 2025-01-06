@@ -7,14 +7,16 @@ import java.util.Iterator;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.inst.SVInstantiations;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.prover.rules.MatchConditions;
+
 
 /**
  * A position taclet application object, contains already the information to which term/formula of
@@ -43,7 +45,7 @@ public class PosTacletApp extends TacletApp {
      * @return new PosTacletApp or null if conditions (assertions) have been hurted
      */
     public static PosTacletApp createPosTacletApp(FindTaclet taclet,
-            SVInstantiations instantiations, PosInOccurrence pos, Services services) {
+                                                  SVInstantiations instantiations, PosInOccurrence pos, Services services) {
         return createPosTacletApp(taclet, instantiations, null, pos, services);
     }
 

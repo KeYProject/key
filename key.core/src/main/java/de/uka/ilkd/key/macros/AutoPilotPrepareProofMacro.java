@@ -14,6 +14,7 @@ import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {

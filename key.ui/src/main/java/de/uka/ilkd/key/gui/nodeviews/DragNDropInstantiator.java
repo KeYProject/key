@@ -21,14 +21,16 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
@@ -344,23 +346,23 @@ public class DragNDropInstantiator extends DropTargetAdapter {
 
         ImmutableList<PosTacletApp> result = ImmutableSLList.nil();
 
-        final ImmutableList<IfFormulaInstantiation> ifFmlInst;
+        final ImmutableList<AssumesFormulaInstantiation> ifFmlInst;
 
         if (ifPIO == null || !ifPIO.isTopLevel()) {
             // if formula have to be top level formulas
             // TODO: should update prefix be allowed?
             ifFmlInst = null;
         } else {
-            final IfFormulaInstSeq ifInst =
-                new IfFormulaInstSeq(seq, ifPIO.isInAntec(),
+            final AssumesFormulaInstSeq ifInst =
+                new AssumesFormulaInstSeq(seq, ifPIO.isInAntec(),
                     ifPIO.sequentFormula());
-            ifFmlInst = ImmutableSLList.<IfFormulaInstantiation>nil().prepend(ifInst);
+            ifFmlInst = ImmutableSLList.<AssumesFormulaInstantiation>nil().prepend(ifInst);
         }
 
         for (PosTacletApp app1 : apps) {
             PosTacletApp app = app1;
 
-            final Sequent ifSequent = app.taclet().ifSequent();
+            final Sequent ifSequent = app.taclet().assumesSequent();
             if (ifSequent != null && !ifSequent.isEmpty()) {
                 if (ifSequent.size() != 1) {
                     // currently dnd is only supported for taclets with exact one formula
@@ -373,7 +375,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                 } else {
                     // the right side is not checked in tacletapp
                     // not sure where to incorporate the check...
-                    if (((IfFormulaInstSeq) ifFmlInst.head())
+                    if (((AssumesFormulaInstSeq) ifFmlInst.head())
                             .inAntec() == (ifSequent.succedent().isEmpty())) {
                         app = (PosTacletApp) app.setIfFormulaInstantiations(ifFmlInst, services);
                     }
@@ -413,7 +415,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             PosTacletApp app = app1;
 
             final SchemaVariable missingSV;
-            final Sequent ifSequent = app.taclet().ifSequent();
+            final Sequent ifSequent = app.taclet().assumesSequent();
 
             if ((ifSequent != null && !ifSequent.isEmpty())
                     || app.uninstantiatedVars().size() != 1) {
@@ -524,7 +526,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
              * <tt>replacewith</tt> part and returns true if the test is positive
              */
             public boolean satisfiesFilterCondition(Taclet taclet) {
-                return taclet.ifSequent() != null && !taclet.ifSequent().isEmpty()
+                return taclet.assumesSequent() != null && !taclet.assumesSequent().isEmpty()
                         && taclet instanceof FindTaclet && taclet.hasReplaceWith();
             }
         }
@@ -543,7 +545,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
              * <em>no</em> <tt>replacewith</tt> part and returns true if the test is positive
              */
             public boolean satisfiesFilterCondition(Taclet taclet) {
-                return taclet.ifSequent() != null && !taclet.ifSequent().isEmpty()
+                return taclet.assumesSequent() != null && !taclet.assumesSequent().isEmpty()
                         && taclet instanceof FindTaclet && !taclet.hasReplaceWith();
             }
         }
@@ -581,7 +583,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
              */
             public boolean satisfiesFilterCondition(Taclet taclet) {
                 // TODO: the null checks should be unneccessary
-                return (taclet.ifSequent() == null || taclet.ifSequent().isEmpty())
+                return (taclet.assumesSequent() == null || taclet.assumesSequent().isEmpty())
                         && taclet instanceof FindTaclet
                         && goalTemplatesContainAddrules(taclet.goalTemplates());
             }
@@ -601,7 +603,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
              */
             public boolean satisfiesFilterCondition(Taclet taclet) {
                 // TODO: the null checks should be unneccessary
-                final Sequent ifSequent = taclet.ifSequent();
+                final Sequent ifSequent = taclet.assumesSequent();
                 return ((ifSequent == null || ifSequent.isEmpty()) && taclet instanceof FindTaclet);
 
             }

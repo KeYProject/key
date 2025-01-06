@@ -142,9 +142,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
                 return false;
             }
 
-            if (!(inst.getFirst().actualResult instanceof ProgramVariable)) {
-                return false;
-            }
+            return inst.getFirst().actualResult instanceof ProgramVariable;
         }
 
         return true;

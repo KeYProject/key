@@ -1,11 +1,16 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.rusty.rule;
+package org.key_project.prover.rules;
+
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 
+/**
+ * this class represents a heuristic. Taclets can belong to different heuristics and are executed
+ * automatic if these are selected. A heuristic is just a name.
+ */
 public record RuleSet(Name name) implements Named {
     /**
      * creates a heuristic
@@ -33,8 +38,8 @@ public record RuleSet(Name name) implements Named {
      * returns true it the o is the same object as this
      */
     public boolean equals(Object o) {
-        if (o instanceof RuleSet rs) {
-            return this.name().equals(rs.name());
+        if (o instanceof RuleSet) {
+            return this.name().equals(((RuleSet) o).name());
         }
         return false;
     }

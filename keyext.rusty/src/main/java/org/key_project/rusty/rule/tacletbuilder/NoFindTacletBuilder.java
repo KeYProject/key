@@ -24,7 +24,7 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
         NoFindTaclet t = new NoFindTaclet(this.name,
             new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
                 variableConditions),
-            goals, attrs, prefixBuilder.getPrefixMap(), tacletAnnotations);
+            goals, ruleSets, attrs, prefixBuilder.getPrefixMap(), tacletAnnotations);
         // t.setOrigin(origin);
         return t;
     }

@@ -7,6 +7,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -17,6 +18,7 @@ import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableList;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.key_project.util.collection.ImmutableSet;
 
 public abstract class TacletExecutor<T extends Taclet> extends
         org.key_project.prover.rules.TacletExecutor<@NonNull Goal, @NonNull RuleApp, @NonNull T> {
@@ -24,23 +26,44 @@ public abstract class TacletExecutor<T extends Taclet> extends
         super(taclet);
     }
 
-    /**
-     * applies the given rule application to the specified goal
-     *
-     * @param goal the goal that the rule application should refer to.
-     * @param ruleApp the rule application that is executed.
-     * @return List of the goals created by the rule which have to be proved. If this is a
-     *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
-     *         goal that should be closed (with the constraint this taclet is applied under).
-     */
-    public abstract ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp);
+    @Override
+    protected Term not(Term t, @NonNull Goal goal) {
+        return goal.getOverlayServices().getTermBuilder().not(t);
+    }
 
     @Override
-    public <Goal extends @NonNull ProofGoal<Goal>> ImmutableList<Goal> apply(
-            ProofGoal<@NonNull Goal> goal, org.key_project.prover.rules.RuleApp ruleApp) {
-        // TODO @ DD
-        return (ImmutableList<Goal>) apply((org.key_project.rusty.proof.Goal) goal,
-            (RuleApp) ruleApp);
+    protected Term and(Term t1, Term t2, @NonNull Goal goal) {
+        return goal.getOverlayServices().getTermBuilder().and(t1, t2);
+    }
+
+    /**
+     * a new term is created by replacing variables of term whose replacement is found in the given
+     * SVInstantiations
+     *
+     * @param term the {@link Term} the syntactical replacement is performed on
+     * @param applicationPosInOccurrence the {@link PosInOccurrence} of the find term in the sequent
+     *        this taclet is applied to
+     * @param mc the {@link MatchConditions} with all instantiations and the constraint
+     * @param goal the {@link Goal} on which this taclet is applied
+     * @param ruleApp the {@link RuleApp} with application information
+     * @param services the {@link Services} with the Rust model information
+     * @return the (partially) instantiated term
+     */
+    protected Term syntacticalReplace(Term term, PosInOccurrence applicationPosInOccurrence,
+                                      MatchConditions mc, Goal goal, RuleApp ruleApp, Services services) {
+        final SyntacticalReplaceVisitor srVisitor =
+                new SyntacticalReplaceVisitor(applicationPosInOccurrence,
+                        mc.getInstantiations(), goal, taclet, ruleApp, services);
+        term.execPostOrder(srVisitor);
+        return srVisitor.getTerm();
+    }
+
+    @Override
+    protected Term syntacticalReplace(Term term, PosInOccurrence applicationPosInOccurrence,
+                                      org.key_project.prover.rules.MatchConditions mc, @NonNull Goal goal,
+                                      @NonNull RuleApp ruleApp, LogicServices services, Object... instantiationInfo) {
+        return syntacticalReplace(term, applicationPosInOccurrence, (MatchConditions) mc, goal,
+                ruleApp, (Services) services);
     }
 
     /**
@@ -82,7 +105,7 @@ public abstract class TacletExecutor<T extends Taclet> extends
             final TacletSchemaVariableCollector collector = new TacletSchemaVariableCollector();
             collector.visit(tacletToAdd, true);// true, because
             // descend into addrules
-            for (SchemaVariable sv : collector.vars()) {
+            for (var sv : collector.vars()) {
                 if (matchCond.getInstantiations().isInstantiated(sv)) {
                     neededInstances = neededInstances.add(sv,
                         matchCond.getInstantiations().getInstantiationEntry(sv), services);
@@ -100,42 +123,12 @@ public abstract class TacletExecutor<T extends Taclet> extends
         }
     }
 
-    /**
-     * a new term is created by replacing variables of term whose replacement is found in the given
-     * SVInstantiations
-     *
-     * @param term the {@link Term} the syntactical replacement is performed on
-     * @param applicationPosInOccurrence the {@link PosInOccurrence} of the find term in the sequent
-     *        this taclet is applied to
-     * @param mc the {@link MatchConditions} with all instantiations and the constraint
-     * @param goal the {@link Goal} on which this taclet is applied
-     * @param ruleApp the {@link RuleApp} with application information
-     * @param services the {@link Services} with the Rust model information
-     * @return the (partially) instantiated term
-     */
-    protected Term syntacticalReplace(Term term, PosInOccurrence applicationPosInOccurrence,
-            MatchConditions mc, Goal goal, RuleApp ruleApp, Services services) {
-        final SyntacticalReplaceVisitor srVisitor =
-            new SyntacticalReplaceVisitor(applicationPosInOccurrence,
-                mc.getInstantiations(), goal, taclet, ruleApp, services);
-        term.execPostOrder(srVisitor);
-        return srVisitor.getTerm();
-    }
 
-    @Override
-    protected Term not(Term t, @NonNull Goal goal) {
-        return goal.getOverlayServices().getTermBuilder().not(t);
-    }
-
-    @Override
-    protected Term and(Term t1, Term t2, @NonNull Goal goal) {
-        return goal.getOverlayServices().getTermBuilder().and(t1, t2);
-    }
 
     @Override
     protected Term applyContextUpdate(org.key_project.prover.rules.inst.SVInstantiations p_svInst,
             Term formula, @NonNull Goal goal) {
-        var svInst = (SVInstantiations) p_svInst;
+        final var svInst = (SVInstantiations) p_svInst;
         if (svInst.getUpdateContext().isEmpty()) {
             return formula;
         } else {
@@ -144,15 +137,16 @@ public abstract class TacletExecutor<T extends Taclet> extends
         }
     }
 
-    @Override
-    protected Term syntacticalReplace(Term term, PosInOccurrence applicationPosInOccurrence,
-            org.key_project.prover.rules.MatchConditions mc, @NonNull Goal goal,
-            @NonNull RuleApp ruleApp, LogicServices services) {
-        return syntacticalReplace(term, applicationPosInOccurrence, (MatchConditions) mc, goal,
-            ruleApp, (Services) services);
+    protected void applyAddProgVars(ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> pvs,
+                                    SequentChangeInfo currentSequent,
+                                    Goal goal,
+                                    PosInOccurrence posOfFind,
+                                    LogicServices p_services, org.key_project.prover.rules.MatchConditions matchCond) {
+      // TODO
     }
 
-    @Override
+
+        @Override
     protected SequentFormula createSequentFormula(Term form) {
         return new SequentFormula(form);
     }

@@ -68,7 +68,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
             trans.addKnownSymbol(name);
         }
 
-        List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
+        List<SExpr> children = trans.translate(term.subs(), UNIVERSE);
         SExpr.Type exprType = term.sort() == JavaDLTheory.FORMULA ? BOOL : UNIVERSE;
         return new SExpr(name, exprType, children);
     }

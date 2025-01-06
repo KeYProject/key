@@ -19,14 +19,14 @@ public abstract class Modifier extends JavaProgramElement {
      * Modifier.
      */
 
-    public Modifier() {}
+    protected Modifier() {}
 
     /**
      * Modifier.
      *
      * @param children May contain: some Comments
      */
-    public Modifier(ExtList children) {
+    protected Modifier(ExtList children) {
         super(children);
     }
 

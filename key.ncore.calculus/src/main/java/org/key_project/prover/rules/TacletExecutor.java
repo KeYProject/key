@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.jspecify.annotations.NonNull;
 
 public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends @NonNull RuleApp, T extends Taclet>
-        implements RuleExecutor {
+        implements RuleExecutor<Goal> {
     protected static final String AUTO_NAME = "_taclet";
 
     protected final T taclet;
@@ -121,7 +121,9 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
         return res;
     }
 
-    protected abstract SequentFormula createSequentFormula(Term form);
+    protected SequentFormula createSequentFormula(org.key_project.logic.Term form) {
+        return new SequentFormula(form);
+    }
 
     protected abstract Term not(Term t, Goal goal);
 
@@ -155,7 +157,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *
      * @param rules the rules to be added
      * @param goal the goal describing the node where the rules should be added
-     * @param services the Services encapsulating all Rust information
+     * @param services the LogicServices encapsulating all logic and program information
      * @param matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
      */
@@ -163,11 +165,9 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
             LogicServices services,
             MatchConditions matchCond);
 
-    protected void applyAddProgVars(ImmutableSet<? extends SchemaVariable> pvs,
+    protected abstract void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
             SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,
-            LogicServices services, MatchConditions matchCond) {
-        // TODO @ DD
-    }
+            LogicServices services, MatchConditions matchCond);
 
     /**
      * adds SequentFormula to antecedent depending on position information (if none is handed over
@@ -183,14 +183,14 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *        rewritten
      * @param matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
-     * @param services the Services encapsulating all Rust information
+     * @param services the LogicServices encapsulating all logic and program information
      */
     protected void addToAntec(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
-            App tacletApp, LogicServices services) {
+            App tacletApp, LogicServices services, Object... instantiationInfo) {
         addToPos(semi, currentSequent, pos, applicationPosInOccurrence, true,
-            matchCond, goal, services, tacletApp);
+            matchCond, goal, tacletApp, services, instantiationInfo);
     }
 
     /**
@@ -206,14 +206,14 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
      * @param goal the Goal that knows the node the formulae have to be added
-     * @param services the Services encapsulating all Rust information
+     * @param services the LogicServices encapsulating all logic information
      */
     protected void addToSucc(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos,
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
-            App ruleApp, LogicServices services) {
+            App ruleApp, LogicServices services, Object... instantiationInfo) {
         addToPos(semi, currentSequent, pos, applicationPosInOccurrence, false,
-            matchCond, goal, services, ruleApp);
+            matchCond, goal, ruleApp, services, instantiationInfo);
     }
 
     /**
@@ -225,38 +225,46 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *        taclet
      * @param pos the PosInOccurrence describing the place in the sequent
      * @param matchCond the MatchConditions containing in particular
-     * @param services the Services encapsulating all Rust information
+     * @param services the LogicServices encapsulating all logic and program information
      */
     protected void replaceAtPos(Semisequent semi,
             SequentChangeInfo currentSequent, PosInOccurrence pos, MatchConditions matchCond,
-            Goal goal, App ruleApp, LogicServices services) {
-        final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi,
-            pos, matchCond, goal, ruleApp, services);
-        currentSequent.combine(currentSequent.sequent().changeFormula(replacements, pos));
+            Goal goal, App ruleApp, LogicServices services, Object... instantiationInfo) {
+        if (!semi.isEmpty()) {
+            final ImmutableList<SequentFormula> replacements =
+                    instantiateSemisequent(semi, pos, matchCond, goal, ruleApp, services, instantiationInfo);
+            currentSequent.combine(currentSequent.sequent().changeFormula(replacements, pos));
+        } else {
+            currentSequent.combine(currentSequent.sequent().removeFormula(pos));
+        }
     }
 
     /**
      * instantiates the constrained formulas of semisequent <code>semi</code> and adds the
      * instantiatied formulas at the specified position to <code>goal</code>
      *
-     * @param semi the Semisequent with the the ConstrainedFormulae to be added
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the
-     *        taclet
-     * @param pos the PosInOccurrence describing the place in the sequent
+     * @param semi                       the Semisequent with the the ConstrainedFormulae to be added
+     * @param currentSequent             the Sequent which is the current (intermediate) result of applying the
+     *                                   taclet
+     * @param pos                        the PosInOccurrence describing the place in the sequent
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
-     *        rewritten
-     * @param antec boolean true(false) if elements have to be added to the antecedent(succedent)
-     *        (only looked at if pos == null)
-     * @param matchCond the MatchConditions containing in particular
-     * @param services the Services encapsulating all Rust information
+     *                                   rewritten
+     * @param antec                      boolean true(false) if elements have to be added to the antecedent(succedent)
+     *                                   (only looked at if pos == null)
+     * @param matchCond                  the MatchConditions containing in particular
+     * @param services                   the LogicServices encapsulating all logic and program information
+     * @param instantiationInfo          additional instantiation information concerning label:
      */
-    private void addToPos(Semisequent semi, SequentChangeInfo currentSequent,
-            PosInOccurrence pos,
-            PosInOccurrence applicationPosInOccurrence, boolean antec,
-            MatchConditions matchCond, Goal goal, LogicServices services, App tacletApp) {
+    protected void addToPos(Semisequent semi,
+                            SequentChangeInfo currentSequent,
+                            PosInOccurrence pos,
+                            PosInOccurrence applicationPosInOccurrence, boolean antec,
+                            MatchConditions matchCond, Goal goal, App tacletApp,
+                            LogicServices services,
+                            Object... instantiationInfo) {
         final ImmutableList<SequentFormula> replacements =
             instantiateSemisequent(semi, applicationPosInOccurrence,
-                matchCond, goal, tacletApp, services);
+                matchCond, goal, tacletApp, services, instantiationInfo);
         if (pos != null) {
             currentSequent.combine(currentSequent.sequent().addFormula(replacements, pos));
         } else {
@@ -269,22 +277,22 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * instantiated formula) is returned.
      *
      * @param schemaFormula the SequentFormula to be instantiated
-     * @param services the Services object carrying ja related information
+     * @param services the LogicServices object carrying ja related information
      * @param matchCond the MatchConditions object with the instantiations of the schemavariables,
      *        constraints etc.
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
      *        rewritten
      * @return the as far as possible instantiated SequentFormula
      */
-    private SequentFormula instantiateReplacement(
+    protected SequentFormula instantiateReplacement(
             SequentFormula schemaFormula, LogicServices services, MatchConditions matchCond,
             PosInOccurrence applicationPosInOccurrence, Goal goal,
-            App tacletApp) {
+            App tacletApp, Object... instantiationInfo) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(),
             applicationPosInOccurrence, matchCond,
-            goal, tacletApp, services);
+            goal, tacletApp, services, instantiationInfo);
 
         instantiatedFormula = applyContextUpdate(svInst, instantiatedFormula, goal);
 
@@ -303,12 +311,12 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * @param mc the {@link MatchConditions} with all instantiations and the constraint
      * @param goal the {@link Goal} on which this taclet is applied
      * @param ruleApp the {@link RuleApp} with application information
-     * @param services the {@link LogicServices} with the Rust model information
+     * @param services the {@link LogicServices} with the logic and program model information
      * @return the (partially) instantiated term
      */
     protected abstract Term syntacticalReplace(Term term,
             PosInOccurrence applicationPosInOccurrence,
-            MatchConditions mc, Goal goal, App ruleApp, LogicServices services);
+            MatchConditions mc, Goal goal, App ruleApp, LogicServices services, Object... args);
 
     /**
      * instantiates the given semisequent with the instantiations found in Matchconditions
@@ -318,17 +326,17 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *        rewritten
      * @param matchCond the MatchConditions including the mapping Schemavariables to concrete logic
      *        elements
-     * @param services the Services
+     * @param services the LogicServices
      * @return the instantiated formulas of the semisequent as list
      */
     protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi,
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
-            App tacletApp, LogicServices services) {
+            App tacletApp, LogicServices services, Object... instantiationInfo) {
         ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(sf, services,
-                matchCond, applicationPosInOccurrence, goal, tacletApp));
+                matchCond, applicationPosInOccurrence, goal, tacletApp, instantiationInfo));
         }
 
         return replacements;

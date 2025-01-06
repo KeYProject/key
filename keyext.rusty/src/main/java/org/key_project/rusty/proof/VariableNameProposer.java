@@ -7,9 +7,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.SkolemTermSV;
 import org.key_project.rusty.logic.op.sv.VariableSV;
 import org.key_project.rusty.rule.TacletApp;
@@ -48,7 +48,7 @@ public class VariableNameProposer implements InstantiationProposer {
      * declared as skolem term SV.
      */
     private String getNameProposalForSkolemTermVariable(SchemaVariable p_var,
-            Services services, ImmutableList<String> previousProposals) {
+                                                        Services services, ImmutableList<String> previousProposals) {
         return getNameProposalForSkolemTermVariable(
             createBaseNameProposalBasedOnCorrespondence(p_var), services,
             previousProposals);

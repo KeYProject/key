@@ -73,7 +73,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
-            Services services) {
+                         Services services) {
 
         if (!fst.isComplete(var, subst, svInst, services)
                 || !snd.isComplete(var, subst, svInst, services)) {

@@ -50,7 +50,7 @@ public class ParserMessageTest {
         File testDataDir = new File(HelperClassForTests.TESTCASE_DIRECTORY, "parserMessageTest");
         var data = new LinkedList<Arguments>();
         final var files = testDataDir.listFiles();
-        Assertions.assertNotNull(files);
+        assertNotNull(files);
         for (File file : files) {
             if (file.isDirectory()) {
                 if (!new File(file, "IGNORE").exists()) {

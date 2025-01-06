@@ -5,7 +5,10 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.rules.TacletAttributes;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.rusty.rule.executor.rustydl.AntecTacletExecutor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -32,12 +35,13 @@ public class AntecTaclet extends FindTaclet {
      *        SchemaVariable in the Taclet
      */
     public AntecTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<? extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
-            org.key_project.prover.rules.TacletAttributes attrs, Term find,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+                       ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs, Term find,
             boolean ignoreTopLevelUpdates,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, find, prefixMap,
+        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
             tacletAnnotations);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
         createTacletServices();
@@ -71,10 +75,9 @@ public class AntecTaclet extends FindTaclet {
         final TacletApplPart applPart =
             new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
                 varsNewDependingOn(), getVariableConditions());
-        final org.key_project.prover.rules.TacletAttributes attrs =
-            new org.key_project.prover.rules.TacletAttributes(displayName(), null);
+        final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
-        return new AntecTaclet(new Name(s), applPart, goalTemplates(), attrs, find,
+        return new AntecTaclet(new Name(s), applPart, goalTemplates(), ruleSets, attrs, find,
             ignoreTopLevelUpdates, prefixMap, tacletAnnotations);
     }
 }

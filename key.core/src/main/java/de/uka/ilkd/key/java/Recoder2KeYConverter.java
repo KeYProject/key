@@ -2092,17 +2092,13 @@ public class Recoder2KeYConverter {
          * separate javaUnaryMinus(...)
          */
         if (arg.getChildCount() > 0) {
-            if (arg.getChildAt(0) instanceof recoder.java.expression.literal.IntLiteral) {
-                recoder.java.expression.literal.IntLiteral lit =
-                    (recoder.java.expression.literal.IntLiteral) arg.getChildAt(0);
+            if (arg.getChildAt(0) instanceof recoder.java.expression.literal.IntLiteral lit) {
                 // decimal: unary minus belongs to the literal
                 if (AbstractIntegerLiteral.representsDecLiteral(lit.getValue())) {
                     // encode the minus into the literal
                     return new IntLiteral(collectComments(lit), "-" + lit.getValue());
                 }
-            } else if (arg.getChildAt(0) instanceof recoder.java.expression.literal.LongLiteral) {
-                recoder.java.expression.literal.LongLiteral lit =
-                    (recoder.java.expression.literal.LongLiteral) arg.getChildAt(0);
+            } else if (arg.getChildAt(0) instanceof recoder.java.expression.literal.LongLiteral lit) {
                 // decimal: unary minus belongs to the literal
                 if (AbstractIntegerLiteral.representsDecLiteral(lit.getValue())) {
                     // encode the minus into the literal

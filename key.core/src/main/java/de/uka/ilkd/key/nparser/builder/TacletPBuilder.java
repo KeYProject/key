@@ -29,6 +29,10 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletAnnotation;
+import org.key_project.prover.rules.Trigger;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
@@ -139,7 +143,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         Sequent ifSeq = JavaDLSequentKit.getInstance().getEmptySequent();
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
         if (ctx.LEMMA() != null) {
-            tacletAnnotations = tacletAnnotations.add(de.uka.ilkd.key.rule.TacletAnnotation.LEMMA);
+            tacletAnnotations = tacletAnnotations.add(TacletAnnotation.LEMMA);
         }
         String name = ctx.name.getText();
         ChoiceExpr ch = accept(ctx.option_list());

@@ -4,11 +4,14 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletAnnotation;
+import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.rules.TacletAttributes;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -55,10 +58,12 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ChoiceExpr choices, boolean surviveSymbExec,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+                         ImmutableList<TacletGoalTemplate> goalTemplates,
+                         ImmutableList<RuleSet> ruleSets,
+                         TacletAttributes attrs, Term find,
+                         ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+                         ChoiceExpr choices, boolean surviveSymbExec,
+                         ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, surviveSymbExec,
             tacletAnnotations);
         this.find = find;
@@ -81,8 +86,10 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+                         ImmutableList<TacletGoalTemplate> goalTemplates,
+                         ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs, Term find,
+                         ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices, false,
             tacletAnnotations);
@@ -108,7 +115,7 @@ public abstract class FindTaclet extends Taclet {
         if (tacletAsString == null) {
             StringBuffer sb = new StringBuffer();
             sb = sb.append(name()).append(" {\n");
-            sb = toStringIf(sb);
+            sb = toStringAssumes(sb);
             sb = toStringFind(sb);
             sb = toStringVarCond(sb);
             sb = toStringGoalTemplates(sb);
@@ -124,12 +131,12 @@ public abstract class FindTaclet extends Taclet {
     /**
      * @return Set of schemavariables of the if and the (optional) find part
      */
-    public ImmutableSet<SchemaVariable> getIfFindVariables() {
+    public ImmutableSet<SchemaVariable> getAssumesAndFindVariables() {
         if (ifFindVariables == null) {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
             find().execPostOrder(svc);
 
-            ifFindVariables = getIfVariables();
+            ifFindVariables = getAssumesVariables();
 
             for (final SchemaVariable sv : svc.vars()) {
                 ifFindVariables = ifFindVariables.add(sv);
@@ -155,7 +162,7 @@ public abstract class FindTaclet extends Taclet {
     /**
      * returns the variables that occur bound in the find part
      */
-    protected ImmutableSet<QuantifiableVariable> getBoundVariablesHelper() {
+    protected ImmutableSet<org.key_project.logic.op.QuantifiableVariable> getBoundVariablesHelper() {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(find());
         return bvv.getBoundVariables();
