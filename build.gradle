@@ -163,7 +163,7 @@ subprojects {
         }
     }
 
-    task testFast(type: Test) {
+    tasks.register('testFast', Test) {
         group "verification"
         useJUnitPlatform {
             excludeTags "slow", "performance", "interactive", "testRunAllProofs"
@@ -189,14 +189,14 @@ subprojects {
     // The following two tasks can be used to execute main methods from the project
     // The main class is set via "gradle -DmainClass=... execute --args ..."
     // see https://stackoverflow.com/questions/21358466/gradle-to-execute-java-class-without-modifying-build-gradle
-    task execute(type: JavaExec) {
+    tasks.register('execute', JavaExec) {
         description 'Execute main method from the project. Set main class via "gradle -DmainClass=... execute --args ..."'
         group "application"
         mainClass.set(System.getProperty('mainClass'))
         classpath = sourceSets.main.runtimeClasspath
     }
 
-    task executeInTests(type: JavaExec) {
+    tasks.register('executeInTests', JavaExec) {
         description 'Execute main method from the project (tests loaded). Set main class via "gradle -DmainClass=... execute --args ..."'
         group "application"
         mainClass.set(System.getProperty('mainClass'))
@@ -213,7 +213,7 @@ subprojects {
         ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
     }
 
-    task pmdMainChanged(type: Pmd) {
+    tasks.register('pmdMainChanged', Pmd) {
         // Specify all files that should be checked
         def changedFiles = getChangedFiles()
         source pmdMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
@@ -239,7 +239,7 @@ subprojects {
     }
 
 
-    task checkstyleMainChanged(type: Checkstyle) {
+    tasks.register('checkstyleMainChanged', Checkstyle) {
         // Specify all files that should be checked
         def changedFiles = getChangedFiles()
         source checkstyleMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
@@ -274,13 +274,13 @@ subprojects {
         }
     }
 
-    task sourcesJar(type: Jar) {
+    tasks.register('sourcesJar', Jar) {
         description = 'Create a jar file with the sources from this project'
         from sourceSets.main.allJava
         archiveClassifier = 'sources'
     }
 
-    task javadocJar(type: Jar) {
+    tasks.register('javadocJar', Jar) {
         description = 'Create a jar file with the javadocs from this project'
         from javadoc
         archiveClassifier = 'javadoc'
@@ -485,7 +485,7 @@ subprojects {
     }
 }
 
-task start {
+tasks.register('start'){
     description "Use :key.ui:run instead"
     doFirst {
         println "Use :key.ui:run instead"
@@ -493,7 +493,7 @@ task start {
 }
 
 // Generation of a JavaDoc across sub projects.
-task alldoc(type: Javadoc) {
+tasks.register('alldoc', Javadoc){
     group "documentation"
     description "Generate a JavaDoc across sub projects"
     def projects = subprojects
@@ -525,7 +525,7 @@ task alldoc(type: Javadoc) {
 }
 
 // Creates a jar file with the javadoc over all sub projects.
-task alldocJar(type: Zip) {
+tasks.register('alldocJar', Zip){
     dependsOn alldoc
     description 'Create a jar file with the javadoc over all sub projects'
     from alldoc

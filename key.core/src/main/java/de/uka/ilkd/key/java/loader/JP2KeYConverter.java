@@ -61,8 +61,10 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
+import de.uka.ilkd.key.util.pp.Layouter;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -292,8 +294,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(CatchClause n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        ParameterDeclaration param = accept(n.getParameter());
-        return new Catch(pi, c, param, accept(n.getBody()));
+        if(n instanceof KeyCatchClauseSV sv) {
+            var v = lookupSchemaVariable(new Name(sv.getSchemaVar()));
+            if (!(v instanceof ProgramSV)) {
+                reportError(n, "Catch");
+            }
+            return v;
+        }else {
+            ParameterDeclaration param = accept(n.getParameter());
+            return new Catch(pi, c, param, accept(n.getBody()));
+        }
     }
 
     @Override

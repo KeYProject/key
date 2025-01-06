@@ -35,7 +35,7 @@ dependencies {
     runtimeOnly project(":keyext.proofmanagement")
 }
 
-task createExamplesZip(type: Zip) {
+tasks.register('createExamplesZip', Zip) {
     description 'Create "examples.zip" containing all KeY examples'
     destinationDirectory = file("$buildDir/resources/main/")
     archiveFileName = "examples.zip"
@@ -72,18 +72,18 @@ run {
 }
 
 
-task runDebug(type:JavaExec) {
+tasks.register('runDebug', JavaExec) {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
     systemProperties["KeyDebugFlag"] = "on"
 }
 
-task runExperimental(type:JavaExec) {
+tasks.register('runExperimental', JavaExec) {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
     args "--experimental"
 }
 
 
-task runWithProfiler(type: JavaExec) {
+tasks.register('runWithProfiler', JavaExec) {
     group("application")
     description("""Run key.ui with flight recoder enabled. 
                    See https://www.baeldung.com/java-flight-recorder-monitoring for a how to.""")

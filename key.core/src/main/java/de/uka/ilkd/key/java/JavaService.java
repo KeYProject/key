@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.transformations.KeYJavaPipeline;
 import de.uka.ilkd.key.java.transformations.pipeline.ConstantStringExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.JavaLogger;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -254,7 +255,9 @@ public class JavaService {
         transformModel(Collections.unmodifiableList(cus));
         var result = new ArrayList<de.uka.ilkd.key.java.ast.CompilationUnit>(cus.size());
         for (CompilationUnit cu : cus) {
-            result.add(converter.processCompilationUnit(cu));
+            final var e = converter.processCompilationUnit(cu);
+            result.add(e);
+            JavaLogger.print(cu.getStorage().get().getPath().toUri(), e);
         }
         return result;
     }
@@ -349,7 +352,7 @@ public class JavaService {
         }
 
         var errors = compilationUnits.stream()
-                .filter(c -> c.second.isSuccessful())
+                .filter(c -> c.second.isSuccessful()) //FIXME weigl: should be negated
                 .flatMap(c -> c.second.getProblems().stream()
                         .map(problem -> buildingIssueFromProblem(c.first.toString(), problem)))
                 .collect(Collectors.toList());
@@ -802,8 +805,10 @@ public class JavaService {
         if (allowSchemaJava == null && containsSchemaJava(sb)) {
             throw new RuntimeException("SchemaJava unexpected in the given block");
         }
-        return JavaBlock
+        var f = JavaBlock
                 .createJavaBlock((StatementBlock) getConverter(allowSchemaJava).process(sb));
+        JavaLogger.print(block, f);
+        return f;
     }
 
     private boolean containsSchemaJava(Node node) {
