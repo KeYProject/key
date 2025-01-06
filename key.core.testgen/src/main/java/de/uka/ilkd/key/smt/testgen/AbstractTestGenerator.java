@@ -289,7 +289,7 @@ public abstract class AbstractTestGenerator {
             if (hasModalities(sf.formula(), false)) {
                 continue;
             }
-            newSequent = (Sequent) newSequent.addFormula(sf, true, false).sequent();
+            newSequent = newSequent.addFormula(sf, true, false).sequent();
         }
         it = oldSequent.succedent().iterator();
         while (it.hasNext()) {
@@ -297,7 +297,7 @@ public abstract class AbstractTestGenerator {
             if (hasModalities(sf.formula(), removePostCondition)) {
                 continue;
             }
-            newSequent = (Sequent) newSequent.addFormula(sf, false, false).sequent();
+            newSequent = newSequent.addFormula(sf, false, false).sequent();
         }
         // Check if a proof with the same sequent already exists.
         if (otherProofs != null) {

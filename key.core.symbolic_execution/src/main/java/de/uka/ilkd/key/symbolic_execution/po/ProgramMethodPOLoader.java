@@ -12,7 +12,6 @@ import de.uka.ilkd.key.settings.Configuration;
 
 import org.jspecify.annotations.NullMarked;
 
-import static de.uka.ilkd.key.proof.init.AbstractPO.getName;
 import static de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO.*;
 
 @NullMarked

@@ -176,7 +176,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                 new ImmutableArray<>(newTerm), modalityTerm.boundVars(),
                 modalityTerm.getLabels());
             Term newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
-            sequentToProve = (Sequent) sequentToProve
+            sequentToProve = sequentToProve
                     .addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false)
                     .sequent();
             // Compute results and their conditions

@@ -192,7 +192,7 @@ public final class SymbolicExecutionUtil {
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true);
         // Create Sequent to prove
         Sequent sequentToProve =
-            (Sequent) JavaDLSequentKit.getInstance().getEmptySequent()
+            JavaDLSequentKit.getInstance().getEmptySequent()
                     .addFormula(new SequentFormula(term), false, true)
                     .sequent();
         // Return created Sequent and the used predicate to identify the value interested in.
@@ -3082,11 +3082,11 @@ public final class SymbolicExecutionUtil {
                 addLabelRecursiveToNonSkolem(factory, newSuccedentToProve, RESULT_LABEL);
         }
         Sequent sequentToProve = newSuccedentToProve != null
-                ? (Sequent) originalSequentWithoutMethodFrame
+                ? originalSequentWithoutMethodFrame
                         .addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent()
                 : originalSequentWithoutMethodFrame;
         if (additionalAntecedent != null) {
-            sequentToProve = (Sequent) sequentToProve
+            sequentToProve = sequentToProve
                     .addFormula(new SequentFormula(additionalAntecedent), true, false).sequent();
         }
         return sequentToProve;
@@ -3118,7 +3118,7 @@ public final class SymbolicExecutionUtil {
                     Term newEquality =
                         factory.createTerm(equality.op(), new ImmutableArray<>(newSubs),
                             equality.boundVars(), equality.getLabels());
-                    sequent = (Sequent) sequent.changeFormula(new SequentFormula(newEquality),
+                    sequent = sequent.changeFormula(new SequentFormula(newEquality),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
                 }
             } else if (skolemEquality == 1) {
@@ -3134,7 +3134,7 @@ public final class SymbolicExecutionUtil {
                     Term newEquality =
                         factory.createTerm(equality.op(), new ImmutableArray<>(newSubs),
                             equality.boundVars(), equality.getLabels());
-                    sequent = (Sequent) sequent.changeFormula(new SequentFormula(newEquality),
+                    sequent = sequent.changeFormula(new SequentFormula(newEquality),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)).sequent();
                 }
             }
@@ -3305,7 +3305,7 @@ public final class SymbolicExecutionUtil {
             }
         }
         if (remove) {
-            return (Sequent) sequent
+            return sequent
                     .removeFormula(new PosInOccurrence(sf, PosInTerm.getTopLevel(), antecedent))
                     .sequent();
         } else {

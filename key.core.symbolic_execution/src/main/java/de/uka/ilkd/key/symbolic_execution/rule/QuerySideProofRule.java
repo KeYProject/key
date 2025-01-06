@@ -224,7 +224,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             JFunction newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
             Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
             sequentToProve =
-                (Sequent) sequentToProve.addFormula(new SequentFormula(newTerm), false, false)
+                sequentToProve.addFormula(new SequentFormula(newTerm), false, false)
                         .sequent();
             // Compute results and their conditions
             List<ResultsAndCondition> conditionsAndResultsMap =
