@@ -4,9 +4,6 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
