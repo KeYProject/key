@@ -578,7 +578,7 @@ public abstract class TacletIndex {
          * fields to indicate the position of the next relevant child (the next possible prefix
          * element or real statement
          */
-        static final int[] nextChild = new int[] { 0, 1, 0, 1, 1, 1, 0 };
+        static final int[] nextChild = { 0, 1, 0, 1, 1, 1, 0 };
 
         PrefixOccurrences() {
             reset();

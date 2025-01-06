@@ -19,7 +19,7 @@ class TestSMTFocusResults {
 
     @Test
     void parsesCvc5Format() {
-        String[] cvc5Output = new String[] {
+        String[] cvc5Output = {
             "(",
             "L_5",
             "L_12",

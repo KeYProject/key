@@ -661,7 +661,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>expression</code>
      */
     public static Case caseBlock(final Expression expression, final Statement statement) {
-        final Statement[] statements = new Statement[] { statement };
+        final Statement[] statements = { statement };
         final Case block = caseBlock(expression, statements);
 
         return block;
@@ -789,7 +789,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static StatementBlock insertStatementInBlock(final Statement statement,
             final StatementBlock block) {
-        final Statement[] statements = new Statement[] { statement };
+        final Statement[] statements = { statement };
         final StatementBlock statementBlock =
             insertStatementInBlock(statements, block);
 
@@ -952,7 +952,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link Default} that contains <code>statement</code>
      */
     public static Default defaultBlock(final Statement statement) {
-        final Statement[] statements = new Statement[] { statement };
+        final Statement[] statements = { statement };
         final Default block = defaultBlock(statements);
 
         return block;
@@ -1234,7 +1234,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static ArrayReference arrayFieldAccess(final ReferencePrefix array,
             final Expression index) {
-        final Expression[] indices = new Expression[] { index };
+        final Expression[] indices = { index };
         final ArrayReference access = new ArrayReference(array, indices);
 
         return access;
@@ -2151,7 +2151,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static NewArray newArray(final TypeReference typeRef, final int dimensions,
             final Expression size, final KeYJavaType keyJavaType) {
-        final Expression[] sizes = new Expression[] { size };
+        final Expression[] sizes = { size };
         final NewArray newArray =
             newArray(typeRef, dimensions, sizes, null, keyJavaType);
 
@@ -2497,7 +2497,7 @@ public abstract class KeYJavaASTFactory {
      *         events during the execution of <code>statement</code>
      */
     public static Try tryBlock(final Statement statement, final Branch branch) {
-        final Branch[] branches = new Branch[] { branch };
+        final Branch[] branches = { branch };
         final Try tryBlock = tryBlock(statement, branches);
 
         return tryBlock;

@@ -173,8 +173,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             return createInstantiation(owner, (FormulaSV) sv, services);
         }
         throw new IllegalTacletException("The taclet contains a schema variable which"
-            + "is not supported.\n" + "Taclet: " + owner.name().toString() + "\n"
-            + "SchemaVariable: " + sv.name().toString() + "\n");
+            + "is not supported.\n" + "Taclet: " + owner.name() + "\n"
+            + "SchemaVariable: " + sv.name() + "\n");
     }
 
     /**

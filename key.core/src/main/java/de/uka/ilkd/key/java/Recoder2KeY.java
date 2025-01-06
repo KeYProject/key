@@ -824,7 +824,7 @@ public class Recoder2KeY implements JavaReader {
 
         ConstructorNormalformBuilder cnb;
 
-        RecoderModelTransformer[] transformer = new RecoderModelTransformer[] {
+        RecoderModelTransformer[] transformer = {
             new EnumClassBuilder(servConf, cache), new JMLTransformer(servConf, cache),
             new ImplicitFieldAdder(servConf, cache),
             new InstanceAllocationMethodBuilder(servConf, cache),
@@ -1217,7 +1217,7 @@ public class Recoder2KeY implements JavaReader {
         fileStart = fileStart == -1 ? errorMessage.indexOf("\"ARCHIVE:") : fileStart;
         if (fileStart != -1) {
             fileStart += 1;
-            int fileEnd = errorMessage.indexOf("\"", fileStart);
+            int fileEnd = errorMessage.indexOf('"', fileStart);
 
             url =
                 errorMessage.substring(fileStart, fileEnd == -1 ? errorMessage.length() : fileEnd);

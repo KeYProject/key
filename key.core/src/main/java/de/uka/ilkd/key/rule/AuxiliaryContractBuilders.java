@@ -1209,7 +1209,7 @@ public final class AuxiliaryContractBuilders {
             LocationVariable continuedLoopVariable =
                 AbstractAuxiliaryContractRule.createLocalVariable("continuedLoop",
                     services.getJavaInfo().getKeYJavaType("boolean"), services);
-            final LocationVariable[] loopVariables = new LocationVariable[] { conditionVariable,
+            final LocationVariable[] loopVariables = { conditionVariable,
                 brokeLoopVariable, continuedLoopVariable };
             return loopVariables;
         }
@@ -1731,7 +1731,7 @@ public final class AuxiliaryContractBuilders {
                 terms.exception);
             postNext = TermLabelManager.refactorTerm(termLabelState, services, null, postNext, rule,
                 goal, AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT, null);
-            final Term[] posts = new Term[] { post, postNext };
+            final Term[] posts = { post, postNext };
             return posts;
         }
     }

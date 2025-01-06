@@ -865,9 +865,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         // prepare common assumption
-        final Term[] uAnon = new Term[] { inst.u, anonUpdate };
+        final Term[] uAnon = { inst.u, anonUpdate };
         final Term[] uBeforeLoopDefAnonVariant =
-            new Term[] { inst.u, beforeLoopUpdate, anonUpdate, variantUpdate };
+            { inst.u, beforeLoopUpdate, anonUpdate, variantUpdate };
         final Term uAnonInv =
             tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
 

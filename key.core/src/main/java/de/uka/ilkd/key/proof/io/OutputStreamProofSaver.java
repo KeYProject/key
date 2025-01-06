@@ -252,7 +252,7 @@ public class OutputStreamProofSaver {
      */
     private String makePathsRelative(String header) {
         final String[] search =
-            new String[] { "\\javaSource", "\\bootclasspath", "\\classpath", "\\include" };
+            { "\\javaSource", "\\bootclasspath", "\\classpath", "\\include" };
         final String basePath;
         String tmp = header;
         try {

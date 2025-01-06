@@ -1736,7 +1736,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 // term);
                 return term;
             }
-            Term[] params = new Term[] { heap, replaceHeap(term.sub(1), heap, ctx), term.sub(2) };
+            Term[] params = { heap, replaceHeap(term.sub(1), heap, ctx), term.sub(2) };
             return capsulateTf(ctx,
                 () -> getServices().getTermFactory().createTerm(term.op(), params));
         } else if (term.op() instanceof ObserverFunction) {

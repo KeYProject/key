@@ -122,7 +122,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
     public LogicVariable getInstantiationOfLogicVar(Sort instantiation, LogicVariable lv) {
         LogicVariable res = getLogicVariable(
-            new Name(instantiation.name().toString() + "__" + lv.name().toString()), instantiation);
+            new Name(instantiation.name() + "__" + lv.name()), instantiation);
         for (TranslationListener l : listener) {
             l.eventSort(instantiation);
         }

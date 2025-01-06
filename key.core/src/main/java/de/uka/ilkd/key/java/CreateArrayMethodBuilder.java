@@ -206,7 +206,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     public IProgramMethod getArrayInstanceAllocatorMethod(TypeReference arrayTypeReference) {
 
-        final Modifier[] modifiers = new Modifier[] { new Private(), new Static() };
+        final Modifier[] modifiers = { new Private(), new Static() };
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
@@ -306,7 +306,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     public IProgramMethod getCreateArrayHelperMethod(TypeReference arrayTypeReference,
             ProgramVariable length, ImmutableList<Field> fields) {
 
-        final Modifier[] modifiers = new Modifier[] { new Private() };
+        final Modifier[] modifiers = { new Private() };
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
         final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
@@ -325,7 +325,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     public IProgramMethod getCreateArrayMethod(TypeReference arrayTypeReference,
             IProgramMethod prepare, ImmutableList<Field> fields) {
 
-        final Modifier[] modifiers = new Modifier[] { new Protected(), new Static() };
+        final Modifier[] modifiers = { new Protected(), new Static() };
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 

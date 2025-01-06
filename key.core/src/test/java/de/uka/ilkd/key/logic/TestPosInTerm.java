@@ -56,7 +56,7 @@ public class TestPosInTerm {
 
     @Test
     public void testUpDownWithCopy() {
-        int[] pos = new int[] { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
+        int[] pos = { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
 
         PosInTerm pit = toPosInTerm(pos);
 
@@ -92,10 +92,10 @@ public class TestPosInTerm {
 
     @Test
     public void testEquals() {
-        int[] pos = new int[] { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
-        int[] pos2 = new int[] { 10, 2, 5, 20, 4, 100, 75, 65, 23, 40, 2, 0, 1, 0, 1 };
-        int[] pos3 = new int[] { 10, 2, 5, 20, 4, 100, 25, 2, 0, 1, 0, 1 };
-        int[] pos4 = new int[] { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1, 67, 68, 69 };
+        int[] pos = { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
+        int[] pos2 = { 10, 2, 5, 20, 4, 100, 75, 65, 23, 40, 2, 0, 1, 0, 1 };
+        int[] pos3 = { 10, 2, 5, 20, 4, 100, 25, 2, 0, 1, 0, 1 };
+        int[] pos4 = { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1, 67, 68, 69 };
 
 
         PosInTerm pit1 = toPosInTerm(pos);
@@ -110,9 +110,9 @@ public class TestPosInTerm {
 
     @Test
     public void testFirstN() {
-        int[] pos = new int[] { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
-        int[] posN4 = new int[] { 10, 2, 5, 20 };
-        int[] posN7 = new int[] { 10, 2, 5, 20, 4, 100, 25 };
+        int[] pos = { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
+        int[] posN4 = { 10, 2, 5, 20 };
+        int[] posN7 = { 10, 2, 5, 20, 4, 100, 25 };
 
         PosInTerm pit = toPosInTerm(pos);
 
@@ -129,7 +129,7 @@ public class TestPosInTerm {
 
     @Test
     public void testIntegerList() {
-        int[] pos = new int[] { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
+        int[] pos = { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
 
         PosInTerm pit = toPosInTerm(pos);
 
@@ -140,7 +140,7 @@ public class TestPosInTerm {
 
     @Test
     public void testParseReverseString() {
-        int[] pos = new int[] { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
+        int[] pos = { 10, 2, 5, 20, 4, 100, 25, 65, 23, 40, 2, 0, 1, 0, 1 };
 
         PosInTerm pit = toPosInTerm(pos);
 

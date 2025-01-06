@@ -77,7 +77,7 @@ public class RuleIndependentData {
          * Update data in file: PercentageOverTime.data
          */
         File percentageOverTimeFile = new File(ruleIndependentDataDir, "PercentageOverTime.data");
-        String[] columns = new String[] { "System.currentTimeMillis()", "computeCostPercentage",
+        String[] columns = { "System.currentTimeMillis()", "computeCostPercentage",
             "instantiateAppPercentage" };
         String description = "Percentages of how much time computeCost() and instantiateApp() take "
             + "in overall applyStrategy() execution.";

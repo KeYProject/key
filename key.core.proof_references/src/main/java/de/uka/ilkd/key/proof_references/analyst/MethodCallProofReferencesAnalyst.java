@@ -27,6 +27,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
@@ -117,12 +118,9 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                     "Rule \"staticMethodCallStaticWithAssignmentViaTypereference\" expected, but is \""
                         + MiscTools.getRuleName(node) + "\".");
             }
-            org.key_project.logic.op.sv.SchemaVariable methodSV =
-                app.instantiations().lookupVar(new Name("#mn"));
-            org.key_project.logic.op.sv.SchemaVariable typeSV =
-                app.instantiations().lookupVar(new Name("#t"));
-            org.key_project.logic.op.sv.SchemaVariable argsSV =
-                app.instantiations().lookupVar(new Name("#elist"));
+            SchemaVariable methodSV = app.instantiations().lookupVar(new Name("#mn"));
+            SchemaVariable typeSV = app.instantiations().lookupVar(new Name("#t"));
+            SchemaVariable argsSV = app.instantiations().lookupVar(new Name("#elist"));
 
             ProgramElementName method =
                 (ProgramElementName) app.instantiations().getInstantiation(methodSV);

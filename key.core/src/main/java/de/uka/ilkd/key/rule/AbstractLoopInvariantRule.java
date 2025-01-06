@@ -119,9 +119,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Term reachableOut = localOuts.stream().map(tb::reachableValue)
                 .reduce(tb.tt(), tb::and);
 
-        final Term[] uAnon = new Term[] { inst.u, additionalHeapTerms.anonUpdate };
+        final Term[] uAnon = { inst.u, additionalHeapTerms.anonUpdate };
         final Term[] uBeforeLoopDefAnonVariant =
-            new Term[] { inst.u, beforeLoopUpdate, additionalHeapTerms.anonUpdate, variantUpdate };
+            { inst.u, beforeLoopUpdate, additionalHeapTerms.anonUpdate, variantUpdate };
         final Term uAnonInv =
             tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
 

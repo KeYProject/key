@@ -131,7 +131,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             assert flag != null : "a label flag must not be null";
             final Statement assign =
                 KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE, x.getPositionInfo());
-            final Statement[] statements = new Statement[] { assign, breakOut };
+            final Statement[] statements = { assign, breakOut };
             addChild(new StatementBlock(statements));
             changed();
         } else {
