@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -19,6 +18,9 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -644,8 +646,8 @@ public class TestApplyTaclet {
 
         Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
         SequentFormula ifformula = new SequentFormula(ifterm);
-        ImmutableList<IfFormulaInstantiation> ifInsts = ImmutableSLList
-                .<IfFormulaInstantiation>nil().prepend(new IfFormulaInstDirect(ifformula));
+        ImmutableList<AssumesFormulaInstantiation> ifInsts = ImmutableSLList
+                .<AssumesFormulaInstantiation>nil().prepend(new AssumesFormulaInstDirect(ifformula));
         appIt = rApplist.iterator();
         while (appIt.hasNext()) {
             TacletApp a =

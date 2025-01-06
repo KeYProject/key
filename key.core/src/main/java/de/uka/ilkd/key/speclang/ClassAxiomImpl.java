@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.rule.RuleSet;
+import org.key_project.prover.rules.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;

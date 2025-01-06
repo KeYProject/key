@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+import org.key_project.logic.LogicServices;
 
 public class MatchUpdateSVInstruction extends MatchSchemaVariableInstruction<UpdateSV> {
 
@@ -19,13 +20,13 @@ public class MatchUpdateSVInstruction extends MatchSchemaVariableInstruction<Upd
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Term subst, MatchConditions mc, Services services) {
+    public MatchConditions match(Term subst, MatchConditions mc, LogicServices services) {
         return addInstantiation(subst, mc, services);
     }
 
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
-            Services services) {
+            LogicServices services) {
         MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNextSibling();

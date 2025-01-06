@@ -7,13 +7,13 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -108,7 +108,7 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
      */
     public void visit(Taclet taclet, boolean visitAddrules) {
         SchemaVariable findSV = null;
-        visit(taclet.ifSequent());
+        visit(taclet.assumesSequent());
         if (taclet instanceof FindTaclet) {
             final Term findTerm = ((FindTaclet) taclet).find();
             findTerm.execPostOrder(this);
@@ -119,8 +119,7 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
                 findSV = (SchemaVariable) findTerm.sub(2).op();
             }
         }
-        for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
-            TacletGoalTemplate gt = tacletGoalTemplate;
+        for (var gt : taclet.goalTemplates()) {
             visit(gt.sequent());
             if (gt instanceof RewriteTacletGoalTemplate) {
                 final Term replaceWithTerm = ((RewriteTacletGoalTemplate) gt).replaceWith();
@@ -134,8 +133,8 @@ public class SVNameCorrespondenceCollector implements DefaultVisitor {
                 }
             }
             if (visitAddrules) {
-                for (Taclet taclet1 : gt.rules()) {
-                    visit(taclet1, true);
+                for (var taclet1 : gt.rules()) {
+                    visit((Taclet) taclet1, true);
                 }
             }
         }

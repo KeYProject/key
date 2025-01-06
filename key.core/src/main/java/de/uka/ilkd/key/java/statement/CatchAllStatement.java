@@ -12,7 +12,7 @@ import org.key_project.util.ExtList;
 
 
 public class CatchAllStatement extends JavaNonTerminalProgramElement
-        implements Statement, NonTerminalProgramElement, StatementContainer {
+        implements Statement, StatementContainer {
     private final StatementBlock body;
     private final LocationVariable param;
 

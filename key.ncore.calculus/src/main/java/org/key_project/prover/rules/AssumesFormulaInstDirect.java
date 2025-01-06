@@ -1,11 +1,11 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.rule;
+package org.key_project.prover.rules;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 
+import org.key_project.logic.LogicServices;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.SequentFormula;
 
 
@@ -13,14 +13,14 @@ import org.key_project.prover.sequent.SequentFormula;
  * Instantiation of an if-formula that has to be proven by an explicit if-goal
  */
 
-public class IfFormulaInstDirect implements IfFormulaInstantiation {
+public class AssumesFormulaInstDirect implements AssumesFormulaInstantiation {
 
     /**
      * Simply the formula
      */
     private final SequentFormula cf;
 
-    public IfFormulaInstDirect(SequentFormula p_cf) {
+    public AssumesFormulaInstDirect(SequentFormula p_cf) {
         cf = p_cf;
     }
 
@@ -36,10 +36,10 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
     }
 
     public boolean equals(Object p_obj) {
-        if (!(p_obj instanceof IfFormulaInstDirect)) {
+        if (!(p_obj instanceof AssumesFormulaInstDirect)) {
             return false;
         }
-        return cf.equals(((IfFormulaInstDirect) p_obj).cf);
+        return cf.equals(((AssumesFormulaInstDirect) p_obj).cf);
     }
 
     public int hashCode() {
@@ -48,7 +48,7 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
         return result;
     }
 
-    public String toString(Services services) {
-        return ProofSaver.printAnything(cf.formula(), services);
+    public String toString(LogicServices services) {
+        return cf.toString();
     }
 }

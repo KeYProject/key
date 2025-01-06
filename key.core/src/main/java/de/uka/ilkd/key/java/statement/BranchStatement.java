@@ -14,9 +14,9 @@ import org.key_project.util.ExtList;
  * @author <TT>AutoDoc</TT>
  */
 
-public abstract class BranchStatement extends JavaStatement implements NonTerminalProgramElement {
+public abstract class BranchStatement extends JavaStatement {
 
-    public BranchStatement() {
+    protected BranchStatement() {
 
     }
 
@@ -26,7 +26,7 @@ public abstract class BranchStatement extends JavaStatement implements NonTermin
      *
      * @param children the children of this AST element as KeY classes. May contain: Comments
      */
-    public BranchStatement(ExtList children) {
+    protected BranchStatement(ExtList children) {
         super(children);
     }
 

@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -19,7 +18,6 @@ import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.speclang.Contract;
@@ -27,12 +25,15 @@ import de.uka.ilkd.key.speclang.OperationContract;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
@@ -266,7 +267,7 @@ public abstract class AbstractProofReplayer {
         ourApp = IntermediateProofReplayer.constructInsts(ourApp, currGoal,
             getInterestingInstantiations(instantantions), services);
 
-        ImmutableList<IfFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
+        ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
         List<Pair<PosInOccurrence, Boolean>> oldFormulas = RuleAppUtil
                 .ifInstsOfRuleApp(originalStep.getAppliedRuleApp(), originalStep)
                 .stream()
@@ -274,9 +275,9 @@ public abstract class AbstractProofReplayer {
                 .collect(Collectors.toList());
         // add direct instantiations
         if (tacletApp instanceof PosTacletApp posTacletApp) {
-            if (posTacletApp.ifFormulaInstantiations() != null) {
-                for (IfFormulaInstantiation x : posTacletApp.ifFormulaInstantiations()) {
-                    if (x instanceof IfFormulaInstDirect) {
+            if (posTacletApp.assumesFormulaInstantiations() != null) {
+                for (AssumesFormulaInstantiation x : posTacletApp.assumesFormulaInstantiations()) {
+                    if (x instanceof AssumesFormulaInstDirect) {
                         oldFormulas.add(new Pair<>(new PosInOccurrence(x.getSequentFormula(),
                             PosInTerm.getTopLevel(), true), false));
                     }
@@ -295,11 +296,11 @@ public abstract class AbstractProofReplayer {
             }
             if (oldFormulaPioSpec.second) {
                 ifFormulaList = ifFormulaList.append(
-                    new IfFormulaInstSeq(currGoal.sequent(), oldFormulaPio.isInAntec(),
+                    new AssumesFormulaInstSeq(currGoal.sequent(), oldFormulaPio.isInAntec(),
                         newPio.sequentFormula()));
             } else {
                 ifFormulaList = ifFormulaList.append(
-                    new IfFormulaInstDirect(newPio.sequentFormula()));
+                    new AssumesFormulaInstDirect(newPio.sequentFormula()));
             }
         }
 
@@ -348,8 +349,7 @@ public abstract class AbstractProofReplayer {
     public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
         Collection<String> s = new ArrayList<>();
 
-        for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair : inst
-                .interesting()) {
+        for (final var pair : inst.interesting()) {
             final SchemaVariable var = pair.key();
 
             final Object value = pair.value().getInstantiation();

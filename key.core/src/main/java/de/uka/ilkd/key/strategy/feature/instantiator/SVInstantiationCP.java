@@ -5,7 +5,6 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;

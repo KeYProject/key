@@ -7,6 +7,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 
 import org.jspecify.annotations.NonNull;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 
 public interface RuleApp {
@@ -37,4 +38,5 @@ public interface RuleApp {
         return rule().displayName();
     }
 
+    PosInOccurrence posInOccurrence();
 }

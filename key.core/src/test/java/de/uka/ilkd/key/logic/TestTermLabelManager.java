@@ -126,11 +126,11 @@ public class TestTermLabelManager {
         two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
         Sequent sequent = JavaDLSequentKit.getInstance().getEmptySequent();
         sequent =
-            (Sequent) sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
-        sequent = (Sequent) sequent.addFormula(pos.sequentFormula(), true, false)
+                sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
+        sequent = sequent.addFormula(pos.sequentFormula(), true, false)
                 .sequent();
         sequent =
-            (Sequent) sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
+                sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
         // Test supported rule
         Rule rule = new DummyRule("rule");
         Term taclet = TB.tt();
@@ -619,7 +619,7 @@ public class TestTermLabelManager {
      */
     @Test
     public void testGetTermLabelManager() {
-        Assertions.assertNull(TermLabelManager.getTermLabelManager(null));
+        assertNull(TermLabelManager.getTermLabelManager(null));
         Services services = new Services(JavaProfile.getDefaultProfile());
         TermLabelManager manager = TermLabelManager.getTermLabelManager(services);
         assertSame(services.getProfile().getTermLabelManager(), manager);

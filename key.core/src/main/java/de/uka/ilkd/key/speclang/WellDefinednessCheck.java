@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
+import org.key_project.prover.rules.RuleSet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;

@@ -50,7 +50,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     protected final JMLModifiers jmlModifiers;
 
 
-    public TypeDeclaration() {
+    protected TypeDeclaration() {
         this.name = null;
         this.fullName = null;
         this.members = null;
@@ -66,8 +66,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
      * @param name ProgramElementName of the type
      * @param members an array containing the memberdeclarations of this type
      */
-    public TypeDeclaration(Modifier[] mods, ProgramElementName name, ProgramElementName fullName,
-            MemberDeclaration[] members, boolean parentIsInterfaceDeclaration, boolean isLibrary) {
+    protected TypeDeclaration(Modifier[] mods, ProgramElementName name, ProgramElementName fullName,
+                              MemberDeclaration[] members, boolean parentIsInterfaceDeclaration, boolean isLibrary) {
         super(mods);
         this.name = name;
         this.fullName = fullName;
@@ -83,8 +83,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
      *        members of the type), a parentIsInterfaceDeclaration (indicating if parent is
      *        interface), several Modifier (as modifiers of the type decl), Comments
      */
-    public TypeDeclaration(ExtList children, ProgramElementName name, ProgramElementName fullName,
-            boolean isLibrary) {
+    protected TypeDeclaration(ExtList children, ProgramElementName name, ProgramElementName fullName,
+                              boolean isLibrary) {
         super(children);
         this.name = name;
         this.fullName = fullName;
@@ -104,7 +104,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
      *        MemberDeclaration (as members of the type), a parentIsInterfaceDeclaration (indicating
      *        if parent is interface), several Modifier (as modifiers of the type decl), Comments
      */
-    public TypeDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary) {
+    protected TypeDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary) {
         this(children, children.get(ProgramElementName.class), fullName, isLibrary);
     }
 

@@ -32,7 +32,7 @@ public final class LocalVariableCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement candidate, SVInstantiations svInst,
-            Services services) {
+                         Services services) {
 
         if (var != this.var) {
             return true;

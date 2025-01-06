@@ -7,10 +7,12 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.TermSV;
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.VariableCondition;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
@@ -30,7 +32,7 @@ public final class EqualUniqueCondition implements VariableCondition {
 
 
     private static Term equalUnique(Term t1, Term t2, TermServices services) {
-        if (!(t1.op() instanceof JFunction && t2.op() instanceof JFunction
+        if (!(t1.op() instanceof Function && t2.op() instanceof Function
                 && ((Function) t1.op()).isUnique() && ((Function) t2.op()).isUnique())) {
             return null;
         } else if (t1.op() == t2.op()) {
@@ -48,17 +50,17 @@ public final class EqualUniqueCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
-            Services services) {
-        SVInstantiations svInst = mc.getInstantiations();
-        Term tInst = (Term) svInst.getInstantiation(t);
-        Term t2Inst = (Term) svInst.getInstantiation(t2);
+                                 MatchConditions mc,
+                                 LogicServices services) {
+        var svInst = (de.uka.ilkd.key.rule.inst.SVInstantiations) mc.getInstantiations();
+        Term tInst = svInst.getInstantiation(t);
+        Term t2Inst = svInst.getInstantiation(t2);
         Term resInst = (Term) svInst.getInstantiation(res);
         if (tInst == null || t2Inst == null) {
             return mc;
         }
 
-        Term properResInst = equalUnique(tInst, t2Inst, services);
+        Term properResInst = equalUnique(tInst, t2Inst, (TermServices) services);
         if (properResInst == null) {
             return null;
         } else if (resInst == null) {

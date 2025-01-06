@@ -10,6 +10,7 @@ import java.util.Deque;
  * A cursor (or walker) for navigating {@link SyntaxElement}s in pre-order.
  */
 public class SyntaxElementCursor {
+
     public boolean hasNext() {
         return !path.isEmpty() || node.getChildCount() > 0;
     }

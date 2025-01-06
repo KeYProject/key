@@ -15,15 +15,7 @@ import org.key_project.logic.ParsableVariable;
  * for other TermSymbols. The TermSymbols a SchemaVariable is allowed to match is specified by their
  * type and sort.
  */
-public interface SchemaVariable extends ParsableVariable, Named {
-
-    /**
-     * @return true if the schemavariable has the strict modifier which forces the instantiation to
-     *         have exactly the same sort as the schemavariable (or if the sv is of generic sort -
-     *         the instantiation of the generic sort)
-     */
-    boolean isStrict();
-
+public interface SchemaVariable extends org.key_project.logic.op.sv.SchemaVariable, ParsableVariable, Named {
     /**
      * Creates a parseable string representation of the declaration of the schema variable.
      *

@@ -15,11 +15,12 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.rules.VariableCondition;
 import org.key_project.util.collection.ImmutableMapEntry;
 
 /**
@@ -37,36 +38,35 @@ public final class NewJumpLabelCondition implements VariableCondition {
                     + "program schemavariable of sort LABEL.");
         }
 
-        labelSV = (ProgramSV) sv;
+        labelSV = psv;
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond, Services services) {
-        if (var != labelSV && matchCond.getInstantiations().isInstantiated(labelSV)) {
+    public MatchConditions check(org.key_project.logic.op.sv.SchemaVariable var,
+                                 SyntaxElement instCandidate,
+                                 org.key_project.prover.rules.MatchConditions matchCond, LogicServices services) {
+        SVInstantiations instantiations = (SVInstantiations) matchCond.getInstantiations();
+        if (var != labelSV && instantiations.isInstantiated(labelSV)) {
             var = labelSV;
-            instCandidate = (SyntaxElement) matchCond.getInstantiations().getInstantiation(labelSV);
+            instCandidate = (SyntaxElement) instantiations.getInstantiation(labelSV);
         }
 
         if (var == labelSV) {
             if (!(instCandidate instanceof Label)) {
                 return null;
             }
-            final List<ProgramElement> programs = collect(matchCond.getInstantiations());
-            programs.add(matchCond.getInstantiations().getContextInstantiation().contextProgram());
+            final List<ProgramElement> programs = collect(instantiations);
+            programs.add(instantiations.getContextInstantiation().contextProgram());
             if (!isUnique((Label) instCandidate, programs, services)) {
                 return null;
             }
         }
-        return matchCond;
+        return (MatchConditions) matchCond;
     }
 
     private List<ProgramElement> collect(SVInstantiations inst) {
         final List<ProgramElement> result = new LinkedList<>();
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-            inst.pairIterator();
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
+        for (final var entry : inst.getInstantiationMap()) {
             if (entry.key() != labelSV && entry.value() != null
                     && entry.value().getInstantiation() instanceof ProgramElement) {
                 result.add((ProgramElement) entry.value().getInstantiation());
@@ -75,9 +75,10 @@ public final class NewJumpLabelCondition implements VariableCondition {
         return result;
     }
 
-    private boolean isUnique(Label label, List<ProgramElement> programs, Services services) {
+    private boolean isUnique(Label label, List<ProgramElement> programs, LogicServices services) {
+        final Services javaServices = (Services) services;
         for (final ProgramElement pe : programs) {
-            final LabelCollector lc = new LabelCollector(pe, services);
+            final LabelCollector lc = new LabelCollector(pe, javaServices);
             lc.start();
             if (lc.contains(label)) {
                 return false;

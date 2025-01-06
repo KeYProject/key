@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -15,7 +14,7 @@ import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.FormulaChangeInfo;
@@ -30,7 +29,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
     public static final AtomicLong PERF_TERM_LABELS = new AtomicLong();
 
-    public FindTacletExecutor(TacletKind taclet) {
+    protected FindTacletExecutor(TacletKind taclet) {
         super(taclet);
     }
 
@@ -88,7 +87,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param ruleApp the taclet application that is executed.
      */
     @Override
-    public final ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public final ImmutableList<Goal> apply(Goal goal, org.key_project.prover.rules.RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
         var services = goal.getOverlayServices();
         // Number without the if-goal eventually needed
@@ -98,23 +97,21 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         final MatchConditions mc = tacletApp.matchConditions();
 
         final ImmutableList<SequentChangeInfo> newSequentsForGoals =
-            checkIfGoals(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
+            checkAssumesGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
 
         final ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
-        final Iterator<TacletGoalTemplate> it = taclet.goalTemplates().iterator();
         final Iterator<Goal> goalIt = newGoals.iterator();
         final Iterator<SequentChangeInfo> newSequentsIt =
             newSequentsForGoals.iterator();
 
-        while (it.hasNext()) {
-            final TacletGoalTemplate gt = it.next();
+        for (var gt : taclet.goalTemplates()) {
             final Goal currentGoal = goalIt.next();
             final SequentChangeInfo currentSequent = newSequentsIt.next();
 
             var timeApply = System.nanoTime();
             applyReplacewith(gt, termLabelState, currentSequent, tacletApp.posInOccurrence(), mc,
-                currentGoal, ruleApp, services);
+                currentGoal, tacletApp, services);
 
             /*
              * update position information, as original formula may no longer be in the current
@@ -124,7 +121,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
                 updatePositionInformation(tacletApp, gt, currentSequent);
 
             applyAdd(gt.sequent(), termLabelState, currentSequent, posWhereToAdd,
-                tacletApp.posInOccurrence(), mc, goal, ruleApp, services);
+                tacletApp.posInOccurrence(), mc, goal, tacletApp, services);
 
             applyAddrule(gt.rules(), currentGoal, services, mc);
 
@@ -147,7 +144,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
 
             timeTermLabels = System.nanoTime() + timeTermLabels;
             TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(),
-                ruleApp.rule(), currentGoal, null, null);
+                    tacletApp.rule(), currentGoal, null, null);
             PERF_TERM_LABELS.getAndAdd(System.nanoTime() - timeTermLabels);
         }
 
@@ -159,7 +156,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
             final Goal nextGoal = goalIt.next();
             nextGoal.setSequent(newSequentsIt.next());
             TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(),
-                ruleApp.rule(), nextGoal, null, null);
+                    tacletApp.rule(), nextGoal, null, null);
         }
 
         assert !goalIt.hasNext();

@@ -250,7 +250,7 @@ public class TestProofUserManager {
         // Test dispose of not registered proof
         Proof fourthProof = new Proof("TestProofUserManager 4",
             new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
-        Assertions.assertFalse(fourthProof.isDisposed());
+        assertFalse(fourthProof.isDisposed());
         assertEquals(0, ProofUserManager.getInstance().getProofs().length);
         ProofUserManager.getInstance().removeUserAndDispose(fourthProof, new Object());
         assertTrue(fourthProof.isDisposed());

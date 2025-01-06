@@ -56,7 +56,7 @@ public final class TypeCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable p_var, SyntaxElement candidate, SVInstantiations svInst,
-            Services services) {
+                         Services services) {
 
         if (!resolver.isComplete(p_var, candidate, svInst, services)) {
             // instantiation not yet complete

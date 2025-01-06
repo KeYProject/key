@@ -104,7 +104,7 @@ public class TriggeredInstantiations implements TermGenerator {
                 if (tapp.uninstantiatedVars().size() <= 1) {
                     SVInstantiations svInst = tapp.instantiations();
 
-                    final OperatorSV sv = taclet.getTrigger().triggerVar();
+                    final var sv = taclet.getTrigger().triggerVar();
                     final Sort svSort;
                     if (sv.sort() instanceof GenericSort) {
                         svSort = svInst.getGenericSortInstantiations().getRealSort(sv, services);
@@ -114,7 +114,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
                     final Metavariable mv = new Metavariable(new Name("$MV$" + sv.name()), svSort);
 
-                    final Term trigger = instantiateTerm(taclet.getTrigger().getTerm(), services,
+                    final Term trigger = instantiateTerm((Term)taclet.getTrigger().getTerm(), services,
                         svInst.replace(sv, services.getTermFactory().createTerm(mv), services));
 
                     final Set<org.key_project.logic.Term> instances =
@@ -213,9 +213,9 @@ public class TriggeredInstantiations implements TermGenerator {
             final Term middle) {
         ImmutableList<Term> conditions;
         conditions = ImmutableSLList.nil();
-        for (Term singleAvoidCond : app.taclet().getTrigger().avoidConditions()) {
+        for (var singleAvoidCond : app.taclet().getTrigger().avoidConditions()) {
             conditions =
-                conditions.append(instantiateTerm(singleAvoidCond, services, app.instantiations()
+                conditions.append(instantiateTerm((Term) singleAvoidCond, services, app.instantiations()
                         .replace(app.taclet().getTrigger().triggerVar(), middle, services)));
         }
         return conditions;

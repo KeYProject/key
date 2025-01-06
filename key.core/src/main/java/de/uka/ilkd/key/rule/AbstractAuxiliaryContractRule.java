@@ -208,7 +208,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          * @param formula the formula on which the rule is to be applied.
          * @param goal the current goal.
          */
-        public Instantiator(final Term formula, final Goal goal) {
+        protected Instantiator(final Term formula, final Goal goal) {
             this.formula = formula;
             this.goal = goal;
             this.services = goal.getOverlayServices();

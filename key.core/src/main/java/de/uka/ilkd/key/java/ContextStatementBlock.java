@@ -223,10 +223,6 @@ public class ContextStatementBlock extends StatementBlock {
         matchCond =
             makeContextInfoComplete(matchCond, newSource, prefix, pos, relPos, src, services);
 
-        if (matchCond == null) {
-            return null;
-        }
-
         return matchCond;
     }
 

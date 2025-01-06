@@ -85,7 +85,7 @@ public class MasterHandlerTest {
         }
 
         Path directory = Paths.get(url.toURI());
-        Assertions.assertTrue(Files.isDirectory(directory));
+        assertTrue(Files.isDirectory(directory));
 
         List<Path> files;
         try (var s = Files.list(directory)) {

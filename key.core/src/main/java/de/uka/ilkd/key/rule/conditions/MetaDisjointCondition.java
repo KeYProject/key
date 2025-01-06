@@ -68,9 +68,9 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
-            Services services) {
-        final Term s1Inst = (Term) svInst.getInstantiation(var1);
-        final Term s2Inst = (Term) svInst.getInstantiation(var2);
+                         Services services) {
+        final Term s1Inst = svInst.getInstantiation(var1);
+        final Term s2Inst = svInst.getInstantiation(var2);
         if (s1Inst == null || s2Inst == null) {
             return true;
         } else {

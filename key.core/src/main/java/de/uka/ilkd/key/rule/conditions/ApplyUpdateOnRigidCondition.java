@@ -7,13 +7,17 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.UpdateSV;
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.VariableCondition;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -200,9 +204,9 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
-            Services services) {
-        SVInstantiations svInst = mc.getInstantiations();
+                                 MatchConditions mc,
+                                 LogicServices services) {
+        var svInst = mc.getInstantiations();
         Term uInst = (Term) svInst.getInstantiation(u);
         Term phiInst = (Term) svInst.getInstantiation(phi);
         Term resultInst = (Term) svInst.getInstantiation(result);
@@ -213,9 +217,9 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         if (!phiInst.op().isRigid() || phiInst.op().arity() == 0) {
             return null;
         }
-        Term properResultInst = applyUpdateOnRigid(uInst, phiInst, services);
+        Term properResultInst = applyUpdateOnRigid(uInst, phiInst, (TermServices) services);
         if (resultInst == null) {
-            svInst = svInst.add(result, properResultInst, services);
+            svInst = ((de.uka.ilkd.key.rule.inst.SVInstantiations)svInst).add(result, properResultInst, services);
             return mc.setInstantiations(svInst);
         } else if (RENAMING_TERM_PROPERTY.equalsModThisProperty(resultInst, properResultInst)) {
             return mc;

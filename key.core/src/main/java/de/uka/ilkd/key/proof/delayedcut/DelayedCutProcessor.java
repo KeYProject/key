@@ -280,9 +280,8 @@ public class DelayedCutProcessor implements Runnable {
     private LinkedList<Goal> apply(Goal goal, RuleApp app, TermServices services) {
         if (app instanceof TacletApp tapp) {
             final SVInstantiations insts = tapp.instantiations();
-            final Iterator<SchemaVariable> svIt = insts.svIterator();
-            while (svIt.hasNext()) {
-                final SchemaVariable sv = svIt.next();
+            for (var entry : insts.getInstantiationMap()) {
+                final org.key_project.logic.op.sv.SchemaVariable sv = entry.key();
                 if (sv instanceof SkolemTermSV) {
                     final Term inst = (Term) insts.getInstantiation(sv);
                     services.getNamespaces().functions().remove(inst.op().name());
@@ -328,7 +327,7 @@ public class DelayedCutProcessor implements Runnable {
         if (oldRuleApp instanceof PosTacletApp) {
             PosTacletApp app = (PosTacletApp) oldRuleApp;
             return PosTacletApp.createPosTacletApp((FindTaclet) app.taclet(), app.instantiations(),
-                app.ifFormulaInstantiations(), newPos, services);
+                app.assumesFormulaInstantiations(), newPos, services);
         }
 
         if (oldRuleApp instanceof IBuiltInRuleApp) {

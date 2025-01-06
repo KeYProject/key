@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
  * Buit-in rule interface. As applications of this rule kind may not be successful in each case one
  * has to ensure that the goal split is done only iff the application was successful.
  */
-public interface BuiltInRule extends Rule, RuleExecutor {
+public interface BuiltInRule extends Rule, RuleExecutor<Goal> {
 
     /**
      * returns true iff a rule is applicable at the given position. This does not necessarily mean
@@ -33,9 +33,8 @@ public interface BuiltInRule extends Rule, RuleExecutor {
     IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);
 
     @Override
-    default <Goal extends @NonNull ProofGoal<Goal>> ImmutableList<Goal> apply(ProofGoal<Goal> goal,
-            RuleApp ruleApp) {
-        return (ImmutableList<Goal>) apply((de.uka.ilkd.key.proof.Goal) goal,
+    default ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+        return apply(goal,
             (de.uka.ilkd.key.rule.RuleApp) ruleApp);
     }
 

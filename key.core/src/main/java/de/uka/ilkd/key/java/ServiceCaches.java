@@ -12,7 +12,7 @@ import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermTacletAppIndex;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
-import de.uka.ilkd.key.rule.IfFormulaInstantiationCache;
+import de.uka.ilkd.key.rule.AssumesFormulaInstantiationCache;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
@@ -144,8 +144,8 @@ public class ServiceCaches {
     private final IfInstantiationCachePool ifInstantiationCache = new IfInstantiationCachePool();
 
     /** Cache used IfFormulaInstSeq */
-    private final IfFormulaInstantiationCache ifFormulaInstantiationCache =
-        new IfFormulaInstantiationCache();
+    private final AssumesFormulaInstantiationCache assumesFormulaInstantiationCache =
+        new AssumesFormulaInstantiationCache();
 
     /** applied rule apps name cache */
     private final AppliedRuleAppsNameCache appliedRuleAppsNameCache =
@@ -220,8 +220,8 @@ public class ServiceCaches {
         return ifInstantiationCache;
     }
 
-    public final IfFormulaInstantiationCache getIfFormulaInstantiationCache() {
-        return ifFormulaInstantiationCache;
+    public final AssumesFormulaInstantiationCache getIfFormulaInstantiationCache() {
+        return assumesFormulaInstantiationCache;
     }
 
     public AppliedRuleAppsNameCache getAppliedRuleAppsNameCache() {

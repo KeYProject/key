@@ -243,7 +243,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                 arrayRef)));
 
         body.add(new MethodReference(new ImmutableArray<>(),
-            new ProgramElementName(CreateArrayMethodBuilder.IMPLICIT_ARRAY_CREATION_HELPER),
+            new ProgramElementName(IMPLICIT_ARRAY_CREATION_HELPER),
             newObject));
 
         body.add(new Return(newObject));
@@ -367,7 +367,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
 
         final LocalVariableDeclaration forInit =
-            KeYJavaASTFactory.declare(new ProgramElementName("i"), zero, integerType);
+            declare(new ProgramElementName("i"), zero, integerType);
 
         final ProgramVariable pv =
             (ProgramVariable) forInit.getVariables().get(0).getProgramVariable();

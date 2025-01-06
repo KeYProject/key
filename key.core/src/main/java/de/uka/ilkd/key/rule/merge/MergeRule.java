@@ -361,7 +361,7 @@ public class MergeRule implements BuiltInRule {
             // about 8-10 on, or sometimes even earlier.
             if (rightSide1.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING
                     && rightSide2.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING && !proofClosed
-                    && !MergeRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
+                    && !RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
 
                 Term predicateTerm =
                     tb.func(new JFunction(new Name("P"), JavaDLTheory.FORMULA, v.sort()),

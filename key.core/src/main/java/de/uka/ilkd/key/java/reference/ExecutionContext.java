@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import org.key_project.util.ExtList;
 
 public class ExecutionContext extends JavaNonTerminalProgramElement
-        implements IExecutionContext, Reference {
+        implements IExecutionContext {
 
     /**
      * the class context

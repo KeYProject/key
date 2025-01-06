@@ -9,8 +9,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 

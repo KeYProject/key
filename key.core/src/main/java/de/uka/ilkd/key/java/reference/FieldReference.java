@@ -12,7 +12,7 @@ import org.key_project.util.ExtList;
 
 
 public class FieldReference extends VariableReference
-        implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
+        implements MemberReference, ReferenceSuffix, TypeReferenceContainer {
 
     /**
      * Reference prefix.

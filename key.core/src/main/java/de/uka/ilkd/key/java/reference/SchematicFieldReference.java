@@ -17,8 +17,7 @@ import org.key_project.util.ExtList;
  *
  * @author <TT>AutoDoc</TT>
  */
-public class SchematicFieldReference extends FieldReference
-        implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
+public class SchematicFieldReference extends FieldReference {
 
     /**
      * Reference suffix

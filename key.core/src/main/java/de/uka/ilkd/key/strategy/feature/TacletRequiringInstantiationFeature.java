@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -24,7 +24,7 @@ public class TacletRequiringInstantiationFeature extends BinaryTacletAppFeature 
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final ImmutableSet<SchemaVariable> neededVars = app.uninstantiatedVars();
-        final ImmutableSet<SchemaVariable> ifFindVars = app.taclet().getIfFindVariables();
+        final ImmutableSet<SchemaVariable> ifFindVars = app.taclet().getAssumesAndFindVariables();
         for (SchemaVariable neededVar : neededVars) {
             if (!ifFindVars.contains(neededVar)) {
                 return true;

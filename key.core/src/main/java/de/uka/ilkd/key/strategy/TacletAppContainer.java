@@ -8,11 +8,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
@@ -47,7 +49,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     private ImmutableList<NoPosTacletApp> incMatchIfFormulas(Goal p_goal) {
-        final IfInstantiator instantiator = new IfInstantiator(this, p_goal);
+        final AssumesInstantiator instantiator = new AssumesInstantiator(this, p_goal);
         instantiator.findIfFormulaInstantiations();
         return instantiator.getResults();
     }
@@ -233,20 +235,20 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      *         valid are still valid, i.e. the referenced formulas still exist
      */
     protected boolean ifFormulasStillValid(Goal p_goal) {
-        if (getTacletApp().taclet().ifSequent().isEmpty()) {
+        if (getTacletApp().taclet().assumesSequent().isEmpty()) {
             return true;
         }
         if (!getTacletApp().ifInstsComplete()) {
             return false;
         }
 
-        final Iterator<IfFormulaInstantiation> it =
-            getTacletApp().ifFormulaInstantiations().iterator();
+        final Iterator<AssumesFormulaInstantiation> it =
+            getTacletApp().assumesFormulaInstantiations().iterator();
         final Sequent seq = p_goal.sequent();
 
         while (it.hasNext()) {
-            final IfFormulaInstantiation ifInst2 = it.next();
-            if (!(ifInst2 instanceof final IfFormulaInstSeq ifInst))
+            final AssumesFormulaInstantiation ifInst2 = it.next();
+            if (!(ifInst2 instanceof final AssumesFormulaInstSeq ifInst))
             // faster than assertTrue
             {
                 Debug.fail("Don't know what to do with the " + "assumes-instantiation ", ifInst2);

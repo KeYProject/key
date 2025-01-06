@@ -32,7 +32,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  */
 public class MethodBodyStatement extends JavaNonTerminalProgramElement
-        implements Statement, NonTerminalProgramElement {
+        implements Statement {
 
     /**
      * the variable the result of the method execution is assigned to if the method is declared void

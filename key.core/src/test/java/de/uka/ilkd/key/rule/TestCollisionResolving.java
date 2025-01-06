@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
@@ -333,7 +334,7 @@ public class TestCollisionResolving {
         PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
         MatchConditions mc =
-            taclet.getMatcher().matchFind(term.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, null);
+                (MatchConditions) taclet.getMatcher().matchFind(term.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, null);
         TacletApp app = PosTacletApp.createPosTacletApp(taclet, mc, pos, services);
         TacletApp app1 = app.prepareUserInstantiation(services);
         assertSame(app, app1, "Actually there are no conflicts yet.");

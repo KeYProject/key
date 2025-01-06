@@ -51,6 +51,26 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind implements 
     }
 
     @Override
+    public boolean isVariable() {
+        return false;
+    }
+
+    @Override
+    public boolean isTerm() {
+        return false;
+    }
+
+    @Override
+    public boolean isFormula() {
+        return false;
+    }
+
+    @Override
+    public boolean isSkolemTerm() {
+        return false;
+    }
+
+    @Override
     public void layout(Layouter<?> l) {
         l.beginC(0).beginC().print("\\schemaVar \\modalOperator {").brk(0);
         boolean first = true;

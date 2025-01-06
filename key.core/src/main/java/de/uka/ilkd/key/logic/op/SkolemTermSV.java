@@ -30,11 +30,6 @@ public final class SkolemTermSV extends OperatorSV implements TerminalSyntaxElem
     }
 
     @Override
-    public String toString() {
-        return toString(sort().toString() + " skolem term");
-    }
-
-    @Override
     public void layout(Layouter<?> l) {
         l.print("\\schemaVar ");
         if (sort() == JavaDLTheory.FORMULA) {
@@ -43,5 +38,15 @@ public final class SkolemTermSV extends OperatorSV implements TerminalSyntaxElem
             l.print("\\skolemTerm ").print(sort().name().toString());
         }
         l.print(" ").print(name().toString());
+    }
+
+    @Override
+    public boolean isSkolemTerm() {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return toString(sort().toString() + " skolem term");
     }
 }

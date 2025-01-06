@@ -31,7 +31,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -41,7 +40,6 @@ import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -50,6 +48,9 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -766,7 +767,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             cmpVar1 = cmpVar1 - formulaSV1;
             map.put("sans_formula_sv", -cmpVar1);
 
-            map.put("if_seq", taclet1.ifSequent().isEmpty() ? 1 : -1);
+            map.put("if_seq", taclet1.assumesSequent().isEmpty() ? 1 : -1);
 
             map.put("num_goals", taclet1.goalTemplates().size());
 

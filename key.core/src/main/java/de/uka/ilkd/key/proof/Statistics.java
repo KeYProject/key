@@ -202,7 +202,7 @@ public class Statistics {
                         + ((InfFlowProof) proof).getSideProofStatistics().autoModeTimeInMillis;
                 final SideProofStatistics side = ((InfFlowProof) proof).getSideProofStatistics()
                         .add(this).setAutoModeTime(autoTime);
-                stat = Statistics.create(side, proof.creationTime);
+                stat = create(side, proof.creationTime);
             }
         }
 

@@ -12,17 +12,6 @@ import org.key_project.util.collection.ImmutableList;
 /**
  * Executes a Rule with respect to a given instantiation of the schemavariables.
  */
-public interface RuleExecutor extends org.key_project.prover.rules.RuleExecutor {
-
-    /**
-     * applies the given rule application to the specified goal
-     *
-     * @param goal the goal that the rule application should refer to.
-     * @param ruleApp the rule application that is executed.
-     * @return List of the goals created by the rule which have to be proved. If this is a
-     *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
-     *         goal that should be closed (with the constraint this taclet is applied under).
-     */
-    ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp);
+public interface RuleExecutor extends org.key_project.prover.rules.RuleExecutor<Goal> {
 
 }

@@ -317,18 +317,18 @@ public class SExprs {
     }
 
     public static SExpr greaterEqual(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr(">=", Type.BOOL, SExprs.coerce(a, IntegerOpHandler.INT),
-            SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr(">=", Type.BOOL, coerce(a, IntegerOpHandler.INT),
+            coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr lessEqual(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("<=", Type.BOOL, SExprs.coerce(a, IntegerOpHandler.INT),
-            SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr("<=", Type.BOOL, coerce(a, IntegerOpHandler.INT),
+            coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr lessThan(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("<", Type.BOOL, SExprs.coerce(a, IntegerOpHandler.INT),
-            SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr("<", Type.BOOL, coerce(a, IntegerOpHandler.INT),
+            coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr eq(SExpr a, SExpr b) throws SMTTranslationException {
@@ -336,18 +336,18 @@ public class SExprs {
     }
 
     public static SExpr minus(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("-", IntegerOpHandler.INT, SExprs.coerce(a, IntegerOpHandler.INT),
-            SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr("-", IntegerOpHandler.INT, coerce(a, IntegerOpHandler.INT),
+            coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr plus(SExpr a, SExpr b) throws SMTTranslationException {
-        return new SExpr("+", IntegerOpHandler.INT, SExprs.coerce(a, IntegerOpHandler.INT),
-            SExprs.coerce(b, IntegerOpHandler.INT));
+        return new SExpr("+", IntegerOpHandler.INT, coerce(a, IntegerOpHandler.INT),
+            coerce(b, IntegerOpHandler.INT));
     }
 
     public static SExpr ite(SExpr cond, SExpr _then, SExpr _else) throws SMTTranslationException {
-        return new SExpr("ite", Type.UNIVERSE, SExprs.coerce(cond, Type.BOOL),
-            SExprs.coerce(_then, Type.UNIVERSE), SExprs.coerce(_else, Type.UNIVERSE));
+        return new SExpr("ite", Type.UNIVERSE, coerce(cond, Type.BOOL),
+            coerce(_then, Type.UNIVERSE), coerce(_else, Type.UNIVERSE));
     }
 
     public static SExpr let(String var, SExpr val, SExpr in) {

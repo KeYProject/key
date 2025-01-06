@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -74,10 +74,10 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
             }
         }
         if (ruleApp instanceof TacletApp ta) {
-            if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
+            if (ta.ifInstsComplete() && ta.assumesFormulaInstantiations() != null) {
                 Map<org.key_project.prover.sequent.SequentFormula, FormulaTermLabel> ifLabels =
                     new LinkedHashMap<>();
-                for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
+                for (AssumesFormulaInstantiation ifInst : ta.assumesFormulaInstantiations()) {
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(
                         ((Term) ifInst.getSequentFormula().formula()).getLabels());
                     if (ifLabel != null) {

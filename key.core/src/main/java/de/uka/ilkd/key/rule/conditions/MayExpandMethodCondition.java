@@ -112,7 +112,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
-            Services services) {
+                         Services services) {
         Map<String, String> tacletOptions =
             services.getProof().getSettings().getChoiceSettings().getDefaultChoices();
 

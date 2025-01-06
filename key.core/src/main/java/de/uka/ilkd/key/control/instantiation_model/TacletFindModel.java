@@ -33,6 +33,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
@@ -47,7 +48,7 @@ public class TacletFindModel extends AbstractTableModel {
      */
     private static final long serialVersionUID = 5285420522875326156L;
     /** the instantiations entries */
-    private final ArrayList<Pair<SchemaVariable, String>> entries;
+    private final ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> entries;
     /** the related rule application */
     private final TacletApp originalApp;
     /** the integer defines the row until which no editing is possible */
@@ -101,14 +102,11 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * creates a Vector with the row entries of the table
      */
-    private ArrayList<Pair<SchemaVariable, String>> createEntryArray(TacletApp tacletApp) {
-        ArrayList<Pair<SchemaVariable, String>> rowVec = new ArrayList<>();
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-            tacletApp.instantiations().pairIterator();
+    private ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> createEntryArray(TacletApp tacletApp) {
+        ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> rowVec = new ArrayList<>();
         int count = 0;
 
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
+        for (var entry : tacletApp.instantiations().getInstantiationMap()) {
             rowVec.add(new Pair<>(entry.key(),
                 ProofSaver.printAnything(entry.value(), services)));
             count++;
@@ -120,12 +118,12 @@ public class TacletFindModel extends AbstractTableModel {
 
         for (SchemaVariable var : tacletApp.uninstantiatedVars()) {
 
-            if (!tacletApp.taclet().getIfFindVariables().contains(var)) {
+            if (!tacletApp.taclet().getAssumesAndFindVariables().contains(var)) {
                 // create an appropriate and unique proposal for the name ...
                 String proposal = instantiationProposers.getProposal(tacletApp, var, services,
                     goal.node(), proposals);
 
-                Pair<SchemaVariable, String> pair = new Pair<>(var, proposal);
+                Pair<org.key_project.logic.op.sv.SchemaVariable, String> pair = new Pair<>(var, proposal);
 
                 if (proposal != null) {
                     // A proposal is available ...
@@ -467,7 +465,7 @@ public class TacletFindModel extends AbstractTableModel {
      */
     private int getSVRow(SchemaVariable sv) {
         int rowIndex = 0;
-        for (Pair<SchemaVariable, String> pair : entries) {
+        for (final var pair : entries) {
             if (pair.first.equals(sv)) {
                 return rowIndex;
             }

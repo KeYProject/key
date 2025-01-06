@@ -24,12 +24,14 @@ class Sequent extends org.key_project.prover.sequent.Sequent {
             protected org.key_project.prover.sequent.Sequent createSequent(
                     Semisequent newAntecedent,
                     Semisequent newSuccedent) {
-                return new Sequent(newAntecedent, newSuccedent);
+                return newAntecedent.isEmpty() && newSuccedent.isEmpty() ?
+                        this :
+                        new Sequent(newAntecedent, newSuccedent);
             }
 
             @Override
             protected Semisequent createSemisequent(ImmutableList<SequentFormula> formulas) {
-                return new de.uka.ilkd.key.proof.calculus.Semisequent(formulas);
+                return formulas.isEmpty() ? de.uka.ilkd.key.proof.calculus.Semisequent.EMPTY_SEMISEQUENT : new de.uka.ilkd.key.proof.calculus.Semisequent(formulas);
             }
 
             @Override

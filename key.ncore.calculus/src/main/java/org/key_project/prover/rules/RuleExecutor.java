@@ -8,7 +8,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
-public interface RuleExecutor {
+public interface RuleExecutor<Goal extends @NonNull ProofGoal<Goal>> {
 
     /**
      * applies the given rule application to the specified goal
@@ -19,6 +19,5 @@ public interface RuleExecutor {
      *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
      *         goal that should be closed (with the constraint this taclet is applied under).
      */
-    <Goal extends @NonNull ProofGoal<Goal>> ImmutableList<Goal> apply(ProofGoal<Goal> goal,
-            RuleApp ruleApp);
+     ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp);
 }

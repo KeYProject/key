@@ -6,50 +6,52 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-
+import org.jspecify.annotations.NonNull;
 
 
 /**
  * Simple container class containing the information resulting from a Taclet.match-call
  */
-public class MatchConditions {
+public class MatchConditions extends org.key_project.prover.rules.MatchConditions  {
 
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
-        new MatchConditions(SVInstantiations.EMPTY_SVINSTANTIATIONS, RenameTable.EMPTY_TABLE);
+            new MatchConditions(SVInstantiations.EMPTY_SVINSTANTIATIONS, RenameTable.EMPTY_TABLE);
 
-    private final SVInstantiations instantiations;
     private final RenameTable renameTable;
 
     public MatchConditions() {
-        this.instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+        super(SVInstantiations.EMPTY_SVINSTANTIATIONS);
         this.renameTable = RenameTable.EMPTY_TABLE;
     }
 
-    public MatchConditions(SVInstantiations p_instantiations, RenameTable p_renameTable) {
+    public MatchConditions(@NonNull SVInstantiations p_instantiations,
+                           @NonNull RenameTable p_renameTable) {
+        super(p_instantiations);
         assert p_instantiations != null;
         assert p_renameTable != null;
-        instantiations = p_instantiations;
         renameTable = p_renameTable;
     }
 
+    @Override
     public SVInstantiations getInstantiations() {
-        return instantiations;
+        return (SVInstantiations) instantiations;
     }
 
-    public MatchConditions setInstantiations(SVInstantiations p_instantiations) {
+    @Override
+    public MatchConditions setInstantiations(org.key_project.prover.rules.inst.SVInstantiations p_instantiations) {
         if (instantiations == p_instantiations) {
             return this;
         } else {
-            return new MatchConditions(p_instantiations, renameTable);
+            return new MatchConditions((SVInstantiations) p_instantiations, renameTable);
         }
     }
 
     public MatchConditions extendRenameTable() {
-        return new MatchConditions(instantiations, renameTable.extend());
+        return new MatchConditions((SVInstantiations) instantiations, renameTable.extend());
     }
 
     public MatchConditions addRenaming(QuantifiableVariable q1, QuantifiableVariable q2) {
-        return new MatchConditions(instantiations, renameTable.assign(q1, q2));
+        return new MatchConditions((SVInstantiations) instantiations, renameTable.assign(q1, q2));
     }
 
     public RenameTable renameTable() {
@@ -57,7 +59,7 @@ public class MatchConditions {
     }
 
     public MatchConditions shrinkRenameTable() {
-        return new MatchConditions(instantiations, renameTable.parent());
+        return new MatchConditions((SVInstantiations) instantiations, renameTable.parent());
     }
 
 

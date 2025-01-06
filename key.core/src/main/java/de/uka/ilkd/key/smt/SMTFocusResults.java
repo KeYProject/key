@@ -8,7 +8,6 @@ import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentFormula;

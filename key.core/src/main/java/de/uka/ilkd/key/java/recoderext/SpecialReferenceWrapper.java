@@ -9,7 +9,7 @@ import recoder.java.reference.ThisReference;
 import recoder.java.reference.TypeReference;
 
 public class SpecialReferenceWrapper extends ThisReference
-        implements Expression, KeYRecoderExtension, ReferencePrefix {
+        implements KeYRecoderExtension {
 
     /**
      *

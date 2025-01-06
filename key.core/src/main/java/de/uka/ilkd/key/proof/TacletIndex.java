@@ -17,6 +17,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.OperatorSV;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;

@@ -222,7 +222,7 @@ public class TestJMLTranslator {
         Term expected = TB.func(services.getTypeConverter().getIntegerLDT().getModuloInt(),
             TB.bsum(i, TB.zTerm("0"), TB.zTerm("2147483647"), TB.var(i)));
         assertNotNull(result);
-        Assertions.assertSame(q, result.sub(0).op());
+        assertSame(q, result.sub(0).op());
         assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected),
             "Result was: " + result + "; \nExpected was: " + expected);
         assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -239,7 +239,7 @@ public class TestJMLTranslator {
         LogicVariable i = new LogicVariable(new Name("i"), nss.sorts().lookup(new Name("int")));
         Term expected = TB.bsum(i, TB.zTerm("0"), TB.zTerm("2147483647"), TB.var(i));
         assertNotNull(result);
-        Assertions.assertSame(q, result.op());
+        assertSame(q, result.op());
         assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected),
             "Result was: " + result + "; \nExpected was: " + expected);
         assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -255,7 +255,7 @@ public class TestJMLTranslator {
         Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
             new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
-        Assertions.assertSame(unionOp, result.op());
+        assertSame(unionOp, result.op());
         Term guard = TB.and(TB.convertToFormula(TB.created(TB.var(o))),
             TB.not(TB.equals(TB.var(o), TB.NULL())));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[] { o },
@@ -276,7 +276,7 @@ public class TestJMLTranslator {
         Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
             new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
-        Assertions.assertSame(unionOp, result.op());
+        assertSame(unionOp, result.op());
         Term guard =
             TB.or(TB.convertToFormula(TB.created(TB.var(o))), TB.equals(TB.var(o), TB.NULL()));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[] { o },

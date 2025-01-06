@@ -46,7 +46,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
      * @param root the ProgramElement where to begin
      * @param services the Services object
      */
-    public JavaASTVisitor(ProgramElement root, Services services) {
+    protected JavaASTVisitor(ProgramElement root, Services services) {
         super(root);
         this.services = services;
     }

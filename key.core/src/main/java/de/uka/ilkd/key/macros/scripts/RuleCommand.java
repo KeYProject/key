@@ -8,7 +8,6 @@ import java.util.*;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.Varargs;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -194,12 +194,12 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
 
         if (recheckMatchConditions) {
-            final MatchConditions appMC =
+            final var appMC =
                 result.taclet().getMatcher().checkConditions(result.matchConditions(), services);
             if (appMC == null) {
                 return null;
             } else {
-                result = result.setMatchConditions(appMC, services);
+                result = result.setMatchConditions((MatchConditions) appMC, services);
             }
         }
 
@@ -368,9 +368,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 boolean add =
                     p.on == null || RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.on);
 
-                Iterator<SchemaVariable> it = pta.instantiations().svIterator();
-                while (it.hasNext()) {
-                    SchemaVariable sv = it.next();
+                for (var entry : pta.instantiations().getInstantiationMap()) {
+                    final org.key_project.logic.op.sv.SchemaVariable sv = entry.key();
                     Term userInst = p.instantiations.get(sv.name().toString());
                     Object ptaInst =
                         pta.instantiations().getInstantiationEntry(sv).getInstantiation();

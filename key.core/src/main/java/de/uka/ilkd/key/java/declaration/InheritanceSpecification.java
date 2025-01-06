@@ -32,7 +32,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      * Inheritance specification.
      */
 
-    public InheritanceSpecification() {
+    protected InheritanceSpecification() {
         this.supertypes = null;
     }
 
@@ -42,7 +42,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      * @param supertype a type reference.
      */
 
-    public InheritanceSpecification(TypeReference supertype) {
+    protected InheritanceSpecification(TypeReference supertype) {
         this.supertypes = new ImmutableArray<>(supertype);
     }
 
@@ -52,7 +52,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      * @param supertypes a type reference mutable list.
      */
 
-    public InheritanceSpecification(TypeReference[] supertypes) {
+    protected InheritanceSpecification(TypeReference[] supertypes) {
         this.supertypes = new ImmutableArray<>(supertypes);
     }
 

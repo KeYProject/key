@@ -222,7 +222,7 @@ public class FloatHandler implements SMTHandler {
         String exp = "#b" + extractBits(repr, 23, 8);
         String mantissa = "#b" + extractBits(repr, 0, 23);
 
-        return new SExpr("fp", FloatHandler.FLOAT, sign, exp, mantissa);
+        return new SExpr("fp", FLOAT, sign, exp, mantissa);
     }
 
     /**
@@ -239,7 +239,7 @@ public class FloatHandler implements SMTHandler {
         String exp = "#b" + extractBits(repr, 52, 11);
         String mantissa = "#b" + extractBits(repr, 0, 52);
 
-        return new SExpr("fp", FloatHandler.DOUBLE, sign, exp, mantissa);
+        return new SExpr("fp", DOUBLE, sign, exp, mantissa);
     }
 
     private static String extractBits(long value, int fromBit, int count) {

@@ -14,7 +14,7 @@ import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ReferenceSuffix;
 
 public class ExpressionSVWrapper extends Literal
-        implements Expression, LoopInitializer, KeYRecoderExtension, SVWrapper, ReferencePrefix {
+        implements LoopInitializer, KeYRecoderExtension, SVWrapper, ReferencePrefix {
 
     /**
      *

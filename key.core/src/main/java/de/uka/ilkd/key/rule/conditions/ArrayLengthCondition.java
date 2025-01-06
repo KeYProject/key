@@ -28,7 +28,7 @@ public final class ArrayLengthCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
-            Services services) {
+                         Services services) {
         if (var == reference) {
             ProgramVariable attribute;
             if (subst instanceof FieldReference) {

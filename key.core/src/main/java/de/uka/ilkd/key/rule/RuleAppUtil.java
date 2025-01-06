@@ -12,6 +12,8 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
@@ -38,12 +40,12 @@ public final class RuleAppUtil {
         // taclets with \find or similar
         if (ruleApp instanceof PosTacletApp posTacletApp) {
 
-            if (posTacletApp.ifFormulaInstantiations() != null) {
-                for (IfFormulaInstantiation x : posTacletApp.ifFormulaInstantiations()) {
+            if (posTacletApp.assumesFormulaInstantiations() != null) {
+                for (AssumesFormulaInstantiation x : posTacletApp.assumesFormulaInstantiations()) {
 
-                    if (x instanceof IfFormulaInstSeq) {
-                        boolean antec = ((IfFormulaInstSeq) x).inAntec();
-                        inputs.add(new PosInOccurrence(x.getSequentFormula(),
+                    if (x instanceof AssumesFormulaInstSeq assumes) {
+                        boolean antec = assumes.inAntec();
+                        inputs.add(new PosInOccurrence(assumes.getSequentFormula(),
                             PosInTerm.getTopLevel(), antec));
                     }
                 }

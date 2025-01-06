@@ -27,7 +27,7 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public abstract class InitArray extends ProgramTransformer {
 
-    public InitArray(String name, ProgramElement body) {
+    protected InitArray(String name, ProgramElement body) {
         super(name, body);
     }
 
