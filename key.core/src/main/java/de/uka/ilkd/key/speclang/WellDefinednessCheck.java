@@ -599,7 +599,7 @@ public abstract class WellDefinednessCheck implements Contract {
                 : TB.tt();
 
         final Term[] result =
-            new Term[] { wellFormed, selfNotNull, selfCreated, selfExactType, invTerm,
+            { wellFormed, selfNotNull, selfCreated, selfExactType, invTerm,
                 paramsOK, implicitPre, mbyAtPreDef };
 
         for (Term t : result) {

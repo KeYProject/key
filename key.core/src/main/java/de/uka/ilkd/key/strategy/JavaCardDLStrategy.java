@@ -353,7 +353,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             add(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
                 applyTF(superFor, not(ff.program))), longConst(50)));
 
-        final String[] exceptionsWithPenalty = new String[] { "java.lang.NullPointerException",
+        final String[] exceptionsWithPenalty = { "java.lang.NullPointerException",
             "java.lang.ArrayIndexOutOfBoundsException", "java.lang.ArrayStoreException",
             "java.lang.ClassCastException" };
 
