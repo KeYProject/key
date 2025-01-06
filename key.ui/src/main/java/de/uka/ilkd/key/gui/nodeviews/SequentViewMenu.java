@@ -42,7 +42,7 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
     /**
      * Creates an empty menu.
      */
-    public SequentViewMenu() {}
+    protected SequentViewMenu() {}
 
     /**
      * Creates a new menu that displays all applicable actions at the given position.

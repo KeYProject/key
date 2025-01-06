@@ -73,7 +73,7 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     @Override
     public List<Path> getProofFiles() throws ProofManagementException {
         try {
-            return getFiles(rootPath, ProofBundleHandler.PROOF_MATCHER);
+            return getFiles(rootPath, PROOF_MATCHER);
         } catch (IOException e) {
             // we wrap the exception, this allows for easier Checker interface
             throw new ProofManagementException("Can no access the proof bundle.", e);
@@ -82,19 +82,19 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
 
     @Override
     public List<Path> getKeYFiles() throws IOException {
-        return getFiles(rootPath, ProofBundleHandler.KEY_MATCHER);
+        return getFiles(rootPath, KEY_MATCHER);
     }
 
     @Override
     public List<Path> getSourceFiles() throws IOException {
         Path srcPath = rootPath.resolve(Paths.get("src"));
-        return getFiles(srcPath, ProofBundleHandler.SRC_MATCHER);
+        return getFiles(srcPath, SRC_MATCHER);
     }
 
     @Override
     public List<Path> getClasspathFiles() throws IOException {
         Path classpath = rootPath.resolve(Paths.get("classpath"));
-        return getFiles(classpath, ProofBundleHandler.CLASSPATH_MATCHER);
+        return getFiles(classpath, CLASSPATH_MATCHER);
     }
 
     @Override

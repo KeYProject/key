@@ -83,7 +83,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
         if (sourceElement instanceof Assignment assignment) {
             for (int i = 1; i < assignment.getChildCount(); i++) {
                 SourceElement childElement = assignment.getChildAt(i);
-                if (childElement instanceof FieldReference field && ((FieldReference) childElement)
+                if (childElement instanceof FieldReference field && field
                         .getProgramVariable().name().toString().equals(fullFieldName)) {
                     ProgramVariable progVar = field.getProgramVariable();
                     if (fullFieldName.equals(progVar.toString())) {
@@ -96,7 +96,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
         } else if (sourceElement instanceof NonTerminalProgramElement programElement) {
             for (int i = 0; i < programElement.getChildCount(); i++) {
                 SourceElement childElement = programElement.getChildAt(i);
-                if (childElement instanceof FieldReference field && ((FieldReference) childElement)
+                if (childElement instanceof FieldReference field && field
                         .getProgramVariable().name().toString().equals(fullFieldName)) {
                     ProgramVariable progVar = field.getProgramVariable();
                     if (fullFieldName.equals(progVar.toString())) {

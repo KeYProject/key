@@ -273,7 +273,7 @@ public final class XMLUtil {
             sb.append(" ");
             sb.append(attributeName);
             sb.append("=\"");
-            sb.append(XMLUtil.encodeText(value));
+            sb.append(encodeText(value));
             sb.append("\"");
         }
     }

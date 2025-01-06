@@ -65,7 +65,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
      *        {@link IExecutionNode}.
      * @param methodCall The {@link IExecutionMethodCall} which is now returned.
      */
-    public AbstractExecutionMethodReturn(ITreeSettings settings, Node proofNode,
+    protected AbstractExecutionMethodReturn(ITreeSettings settings, Node proofNode,
             ExecutionMethodCall methodCall) {
         super(settings, proofNode);
         assert methodCall != null;

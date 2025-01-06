@@ -22,6 +22,7 @@ import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;

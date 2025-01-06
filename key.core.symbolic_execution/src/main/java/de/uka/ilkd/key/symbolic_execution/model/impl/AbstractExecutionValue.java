@@ -56,7 +56,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * @param condition The condition.
      * @param value The value.
      */
-    public AbstractExecutionValue(ITreeSettings settings, Node proofNode,
+    protected AbstractExecutionValue(ITreeSettings settings, Node proofNode,
             IExecutionVariable variable, Term condition, Term value) {
         super(settings, proofNode);
         this.variable = variable;

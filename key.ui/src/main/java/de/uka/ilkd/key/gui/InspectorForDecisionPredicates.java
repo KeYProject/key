@@ -41,7 +41,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
     @Override
     public String check(String toBeChecked) {
         if (toBeChecked.isEmpty()) {
-            return CheckedUserInputInspector.NO_USER_INPUT;
+            return NO_USER_INPUT;
         }
         Term term = translate(services, toBeChecked);
 

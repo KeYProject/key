@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestSetAsListOfString {
 
-    final String[] str = new String[] { "Dies", "ist", "ein", "Test" };
+    final String[] str = { "Dies", "ist", "ein", "Test" };
 
     // test if String is SAME as one in the array arr
     private boolean isInArray(String str, String[] arr) {

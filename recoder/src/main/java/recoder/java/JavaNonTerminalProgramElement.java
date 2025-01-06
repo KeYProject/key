@@ -20,7 +20,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
      * Java program element.
      */
 
-    public JavaNonTerminalProgramElement() {
+    protected JavaNonTerminalProgramElement() {
         // nothing to do here
     }
 

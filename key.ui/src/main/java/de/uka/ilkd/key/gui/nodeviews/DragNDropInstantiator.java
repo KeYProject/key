@@ -465,8 +465,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            if (e.getSource() instanceof DefaultTacletMenuItem) {
-                final TacletMenuItem item = (TacletMenuItem) e.getSource();
+            if (e.getSource() instanceof DefaultTacletMenuItem item) {
                 DragNDropInstantiator.this.execute((PosTacletApp) item.connectedTo());
             }
         }

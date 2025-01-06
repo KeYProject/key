@@ -64,7 +64,7 @@ public final class KeYGuiExtensionFacade {
             }
         };
 
-        return KeYGuiExtensionFacade.getMainMenuExtensions().stream()
+        return getMainMenuExtensions().stream()
                 .flatMap(it -> it.getMainMenuActions(mainWindow).stream())
                 .sorted(Comparator.comparingInt(func));
     }

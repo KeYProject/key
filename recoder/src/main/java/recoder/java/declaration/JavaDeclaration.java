@@ -30,7 +30,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Java declaration.
      */
 
-    public JavaDeclaration() {
+    protected JavaDeclaration() {
         // nothing to do here
     }
 
@@ -40,7 +40,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * @param mods a modifier mutable list.
      */
 
-    public JavaDeclaration(ASTList<DeclarationSpecifier> mods) {
+    protected JavaDeclaration(ASTList<DeclarationSpecifier> mods) {
         setDeclarationSpecifiers(mods);
         // makeParentRoleValid() called by subclasses' constructors
     }

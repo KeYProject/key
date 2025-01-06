@@ -59,7 +59,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
      * @param additionalCondition An optional additional condition to consider.
      * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
      */
-    public AbstractExecutionVariable(ITreeSettings settings, Node proofNode,
+    protected AbstractExecutionVariable(ITreeSettings settings, Node proofNode,
             IProgramVariable programVariable, IExecutionValue parentValue, Term arrayIndex,
             Term additionalCondition, PosInOccurrence modalityPIO) {
         super(settings, proofNode);

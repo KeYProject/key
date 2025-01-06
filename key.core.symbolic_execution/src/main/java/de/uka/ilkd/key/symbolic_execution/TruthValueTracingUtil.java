@@ -237,8 +237,7 @@ public final class TruthValueTracingUtil {
         boolean checkPerformed = false;
         if (childIndexOnParent >= 0) {
             Node parent = child.parent();
-            if (parent.getAppliedRuleApp() instanceof TacletApp) {
-                TacletApp tacletApp = (TacletApp) parent.getAppliedRuleApp();
+            if (parent.getAppliedRuleApp() instanceof TacletApp tacletApp) {
                 List<LabelOccurrence> labels =
                     findInvolvedLabels(parent.sequent(), tacletApp, termLabelName);
                 if (!labels.isEmpty()) {

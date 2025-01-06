@@ -7,9 +7,9 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 
 /**

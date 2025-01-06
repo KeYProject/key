@@ -5,9 +5,9 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableSet;
 public class TacletPrefix implements org.key_project.prover.rules.TacletPrefix {
 
     /** the prefix of the taclet */
-    private final ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> prefix;
+    private final ImmutableSet<SchemaVariable> prefix;
     /** used by rewrite taclets to mark the context */
     private final boolean context;
 
@@ -29,7 +29,7 @@ public class TacletPrefix implements org.key_project.prover.rules.TacletPrefix {
      * @param prefix the SetOf<SchemaVariable> that is the prefix of a termsv or formulasv
      * @param context a boolean marker
      */
-    public TacletPrefix(ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> prefix,
+    public TacletPrefix(ImmutableSet<SchemaVariable> prefix,
             boolean context) {
         this.prefix = prefix;
         this.context = context;
@@ -40,11 +40,11 @@ public class TacletPrefix implements org.key_project.prover.rules.TacletPrefix {
      *
      * @return the prefix
      */
-    public ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> prefix() {
+    public ImmutableSet<SchemaVariable> prefix() {
         return prefix;
     }
 
-    public Iterator<org.key_project.logic.op.sv.SchemaVariable> iterator() {
+    public Iterator<SchemaVariable> iterator() {
         return prefix().iterator();
     }
 

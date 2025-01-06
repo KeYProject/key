@@ -82,7 +82,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
         tacletInfo = new JTextArea(
             TacletDescriber.getTacletDescription(mainWindow.getMediator(), ruleApp,
-                SequentView.getLineWidth()));
+                getLineWidth()));
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
             new EmptyBorder(new Insets(4, 0, 0, 0))));

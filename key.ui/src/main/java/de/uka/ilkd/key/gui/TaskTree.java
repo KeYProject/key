@@ -342,8 +342,7 @@ public class TaskTree extends JPanel {
     } // end of prooftreelistener
 
 
-    private static final class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer
-            implements java.io.Serializable {
+    private static final class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer {
         private static final long serialVersionUID = 2423935787625012908L;
         private static final Icon KEY_ICON = IconFactory.keyHole(20, 20);
         private static final Icon KEY_CLOSED_ICON = IconFactory.keyHoleClosed(20);

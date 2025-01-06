@@ -6,8 +6,8 @@ package de.uka.ilkd.key.rule.inst;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

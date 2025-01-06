@@ -48,10 +48,10 @@ public record NewDependingOn(SchemaVariable first, SchemaVariable second) {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof NewDependingOn nfi)) {
+        if (!(o instanceof NewDependingOn(SchemaVariable first1, SchemaVariable second1))) {
             return false;
         }
-        return (nfi.first == first() && nfi.second == second());
+        return (first1 == first() && second1 == second());
     }
 
     public int hashCode() {

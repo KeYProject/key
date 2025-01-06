@@ -14,7 +14,7 @@ import recoder.list.generic.ASTList;
 /**
  * @author Tobias Gutzmann
  */
-public class EnumConstantDeclaration extends FieldDeclaration implements MemberDeclaration {
+public class EnumConstantDeclaration extends FieldDeclaration {
     /**
      * serialization id
      */

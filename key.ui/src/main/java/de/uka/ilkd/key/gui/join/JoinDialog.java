@@ -197,57 +197,57 @@ public class JoinDialog extends StdDialog {
 
         private Box createLeftAlignedComponent(JComponent comp) {
 
-            Box box = Box.createHorizontalBox();
+            Box box = createHorizontalBox();
             box.add(comp);
-            box.add(Box.createHorizontalGlue());
+            box.add(createHorizontalGlue());
             return box;
         }
 
         private void create() {
 
 
-            Box box = Box.createHorizontalBox();
+            Box box = createHorizontalBox();
 
 
             box.add(getHeadline());
-            box.add(Box.createHorizontalGlue());
+            box.add(createHorizontalGlue());
 
 
-            this.add(Box.createVerticalStrut(5));
+            this.add(createVerticalStrut(5));
             this.add(box);
-            this.add(Box.createVerticalStrut(5));
+            this.add(createVerticalStrut(5));
 
 
-            box = Box.createHorizontalBox();
-            Box vertBox = Box.createVerticalBox();
+            box = createHorizontalBox();
+            Box vertBox = createVerticalBox();
             vertBox.add(createLeftAlignedComponent(getHeadline()));
             vertBox.add(new JScrollPane(getSequentViewer1()));
             box.add(vertBox);
 
 
-            vertBox = Box.createVerticalBox();
+            vertBox = createVerticalBox();
             JLabel label = new JLabel("<html><b>with</b></html>");
 
 
             label.setFont(this.getFont());
             vertBox.add(createLeftAlignedComponent(label));
 
-            Box horzBox = Box.createHorizontalBox();
+            Box horzBox = createHorizontalBox();
             horzBox.add(new JScrollPane(getChoiceList()));
-            horzBox.add(Box.createHorizontalStrut(5));
+            horzBox.add(createHorizontalStrut(5));
             horzBox.add(new JScrollPane(getSequentViewer2()));
             vertBox.add(horzBox);
             box.add(vertBox);
 
             this.add(box);
 
-            this.add(Box.createVerticalStrut(5));
+            this.add(createVerticalStrut(5));
 
             this.add(createLeftAlignedComponent(getInfoPredicate()));
             this.add(getPredicateInput());
-            this.add(Box.createVerticalStrut(5));
+            this.add(createVerticalStrut(5));
             this.add(getInfoBoxPane());
-            this.add(Box.createVerticalStrut(5));
+            this.add(createVerticalStrut(5));
 
 
 

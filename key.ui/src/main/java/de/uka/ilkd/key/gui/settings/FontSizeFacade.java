@@ -15,7 +15,7 @@ import javax.swing.plaf.FontUIResource;
  * @version 1 (10.05.19)
  */
 public final class FontSizeFacade {
-    private static final String[] KEYS = new String[] { "Button.font", "CheckBox.font",
+    private static final String[] KEYS = { "Button.font", "CheckBox.font",
         "CheckBoxMenuItem.acceleratorFont", "CheckBoxMenuItem.font", "ColorChooser.font",
         "ComboBox.font", "EditorPane.font", "FormattedTextField.font", "IconButton.font",
         "InternalFrame.optionDialogTitleFont", "InternalFrame.paletteTitleFont",

@@ -32,6 +32,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
@@ -1164,8 +1165,8 @@ public class PrettyPrinter implements Visitor {
             }
         }
 
-        if (exec instanceof ExecutionContext) {
-            performActionOnExecutionContext((ExecutionContext) exec);
+        if (exec instanceof ExecutionContext executionContext) {
+            performActionOnExecutionContext(executionContext);
         } else if (exec != null) {
             performActionOnSchemaVariable((SchemaVariable) exec);
         }
@@ -1203,8 +1204,8 @@ public class PrettyPrinter implements Visitor {
         final TypeReference tr = x.getBodySourceAsTypeReference();
         if (tr instanceof SchemaTypeReference) {
             performActionOnSchemaTypeReference((SchemaTypeReference) tr);
-        } else if (tr instanceof SchemaVariable) {
-            performActionOnSchemaVariable((SchemaVariable) tr);
+        } else if (tr instanceof SchemaVariable sv) {
+            performActionOnSchemaVariable(sv);
         } else {
             tr.visit(this);
         }

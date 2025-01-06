@@ -10,7 +10,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.symbolic_execution.util.EqualsHashCodeResetter;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,7 +42,7 @@ public class TestEqualsHashCodeResetter {
         assertSame(a2b, a2r.wrappedElement());
         assertSame(a1b, a1ar.wrappedElement());
         assertSame(bb, br.wrappedElement());
-        Assertions.assertNull(nullr.wrappedElement());
+        assertNull(nullr.wrappedElement());
     }
 
     /**
@@ -125,19 +124,19 @@ public class TestEqualsHashCodeResetter {
         beanSet.add(a2b); // Replaces existing element a1b
         beanSet.add(bb);
         assertEquals(2, beanSet.size());
-        Assertions.assertTrue(beanSet.contains(a1b));
-        Assertions.assertTrue(beanSet.contains(a2b));
-        Assertions.assertTrue(beanSet.contains(bb));
+        assertTrue(beanSet.contains(a1b));
+        assertTrue(beanSet.contains(a2b));
+        assertTrue(beanSet.contains(bb));
         // Test resetter in LinkedHashSet
         Set<EqualsHashCodeResetter<MyBean>> set = new LinkedHashSet<>();
         set.add(a1r);
         set.add(a2r);
         set.add(br);
         assertEquals(3, set.size());
-        Assertions.assertTrue(set.contains(a1r));
-        Assertions.assertTrue(set.contains(a2r));
-        Assertions.assertTrue(set.contains(a1ar));
-        Assertions.assertTrue(set.contains(br));
+        assertTrue(set.contains(a1r));
+        assertTrue(set.contains(a2r));
+        assertTrue(set.contains(a1ar));
+        assertTrue(set.contains(br));
     }
 
     /**

@@ -132,24 +132,24 @@ public class ClassFile extends ByteCodeElement implements ClassType {
     }
 
     public final boolean isInterface() {
-        return (accessFlags & AccessFlags.INTERFACE) != 0;
+        return (accessFlags & INTERFACE) != 0;
     }
 
     public boolean isOrdinaryInterface() {
-        return (accessFlags & AccessFlags.INTERFACE) != 0
-                && (accessFlags & AccessFlags.ANNOTATION) == 0;
+        return (accessFlags & INTERFACE) != 0
+                && (accessFlags & ANNOTATION) == 0;
     }
 
     public boolean isAnnotationType() {
-        return (accessFlags & AccessFlags.ANNOTATION) != 0;
+        return (accessFlags & ANNOTATION) != 0;
     }
 
     public boolean isEnumType() {
-        return (accessFlags & AccessFlags.ENUM) != 0;
+        return (accessFlags & ENUM) != 0;
     }
 
     public boolean isOrdinaryClass() {
-        return (accessFlags & AccessFlags.INTERFACE) == 0 && (accessFlags & AccessFlags.ENUM) == 0;
+        return (accessFlags & INTERFACE) == 0 && (accessFlags & ENUM) == 0;
     }
 
     public final List<ClassType> getSupertypes() {

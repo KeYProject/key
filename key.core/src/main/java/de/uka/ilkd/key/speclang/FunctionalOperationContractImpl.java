@@ -1476,14 +1476,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public Term getPre() {
-        assert originalPres.values().size() == 1
+        assert originalPres.size() == 1
                 : "information flow extension not compatible with multi-heap setting";
         return originalPres.values().iterator().next();
     }
 
     @Override
     public Term getPost() {
-        assert originalPosts.values().size() == 1
+        assert originalPosts.size() == 1
                 : "information flow extension not compatible with multi-heap setting";
         return originalPosts.values().iterator().next();
     }

@@ -51,7 +51,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
     /** the base title; used title = basetitle + ( nrOfItems ) */
     private final String baseTitle;
 
-    public InsertionTacletBrowserMenuItem(String title, JFrame parent, NotationInfo notInfo,
+    protected InsertionTacletBrowserMenuItem(String title, JFrame parent, NotationInfo notInfo,
             Services services) {
 
         super(title);

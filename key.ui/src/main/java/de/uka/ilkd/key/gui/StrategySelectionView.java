@@ -152,7 +152,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         JPanel goPanel = new JPanel();
         GridBagLayout goLayout = new GridBagLayout();
         goPanel.setLayout(goLayout);
-        goPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        goPanel.setAlignmentX(LEFT_ALIGNMENT);
 
         gbcpanel5.gridx = 1;
         gbcpanel5.gridy = 0;
@@ -203,12 +203,12 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 predefChanged = true;
                 refreshDefaultButton();
             });
-            maxSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
+            maxSlider.setAlignmentX(LEFT_ALIGNMENT);
             box.add(maxSlider);
             box.add(Box.createVerticalStrut(8));
         }
 
-        javaDLOptionsScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        javaDLOptionsScrollPane.setAlignmentX(LEFT_ALIGNMENT);
         box.add(javaDLOptionsScrollPane);
 
         // //////////////////////////////////////////////////////////////////////
@@ -219,7 +219,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             javaDLOptionsPanel.setLayout(javaDLOptionsLayout);
 
             javaDLOptionsScrollPane.getVerticalScrollBar().setUnitIncrement(10);
-            javaDLOptionsScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+            javaDLOptionsScrollPane.setAlignmentX(LEFT_ALIGNMENT);
             box.add(javaDLOptionsScrollPane);
 
             int yCoord = 0;

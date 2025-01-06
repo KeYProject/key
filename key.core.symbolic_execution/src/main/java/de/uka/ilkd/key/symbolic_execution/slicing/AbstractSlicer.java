@@ -949,7 +949,7 @@ public abstract class AbstractSlicer {
         Term[] terms = new Term[expressions.size()];
         int i = 0;
         for (Expression expression : expressions) {
-            terms[i] = AbstractSlicer.toTerm(services, expression, ec);
+            terms[i] = toTerm(services, expression, ec);
             i++;
         }
         return new ImmutableArray<>(terms);

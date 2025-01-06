@@ -49,7 +49,7 @@ public abstract class ServiceConfiguration {
 
     private ConstantEvaluator constantEvaluator;
 
-    public ServiceConfiguration() {
+    protected ServiceConfiguration() {
         makeServices();
         initServices();
     }

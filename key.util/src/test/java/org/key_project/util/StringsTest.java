@@ -14,7 +14,7 @@ class StringsTest {
 
     @Test
     void containsWholeWord() {
-        String[] sentences = new String[] {
+        String[] sentences = {
             "asfKeY;prover",
             "KeY prover",
             "KeY,prover",

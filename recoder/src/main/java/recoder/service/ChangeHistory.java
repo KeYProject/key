@@ -612,8 +612,7 @@ public class ChangeHistory extends AbstractService {
         if (parent == null) {
             CompilationUnit x = (CompilationUnit) child;
             x.setDataLocation(null); // assume that this unit is new
-        } else if (parent instanceof CompilationUnit) {
-            CompilationUnit x = (CompilationUnit) parent;
+        } else if (parent instanceof CompilationUnit x) {
             switch (role) {
             case 0:
                 x.setPackageSpecification((PackageSpecification) child);
@@ -637,8 +636,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof Import) {
-            Import x = (Import) parent;
+        } else if (parent instanceof Import x) {
             switch (role) {
             case 0:
                 x.setReference((TypeReferenceInfix) child);
@@ -649,8 +647,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof PackageSpecification) {
-            PackageSpecification x = (PackageSpecification) parent;
+        } else if (parent instanceof PackageSpecification x) {
             switch (role) {
             case 0:
                 x.setPackageReference((PackageReference) child);
@@ -666,16 +663,14 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof StatementBlock) {
-            StatementBlock x = (StatementBlock) parent;
+        } else if (parent instanceof StatementBlock x) {
             ASTList<Statement> list = x.getBody();
             if (list == null) {
                 list = new ASTArrayList<>();
                 x.setBody(list);
             }
             list.add(index, (Statement) child);
-        } else if (parent instanceof ClassDeclaration) {
-            ClassDeclaration x = (ClassDeclaration) parent;
+        } else if (parent instanceof ClassDeclaration x) {
             switch (role) {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
@@ -713,8 +708,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof EnumDeclaration) {
-            EnumDeclaration x = (EnumDeclaration) parent;
+        } else if (parent instanceof EnumDeclaration x) {
             switch (role) {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
@@ -741,8 +735,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof ClassInitializer) {
-            ClassInitializer x = (ClassInitializer) parent;
+        } else if (parent instanceof ClassInitializer x) {
             switch (role) {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
@@ -758,9 +751,8 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof FieldDeclaration) {
+        } else if (parent instanceof FieldDeclaration x) {
             // also EnumConstantDeclaration
-            FieldDeclaration x = (FieldDeclaration) parent;
             switch (role) {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
@@ -784,17 +776,15 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof InheritanceSpecification) {
-            InheritanceSpecification x = (InheritanceSpecification) parent;
+        } else if (parent instanceof InheritanceSpecification x) {
             ASTList<TypeReference> list = x.getSupertypes();
             if (list == null) {
                 list = new ASTArrayList<>();
                 x.setSupertypes(list);
             }
             list.add(index, (TypeReference) child);
-        } else if (parent instanceof InterfaceDeclaration) {
+        } else if (parent instanceof InterfaceDeclaration x) {
             // Includes AnnotationDeclaration
-            InterfaceDeclaration x = (InterfaceDeclaration) parent;
             switch (role) {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
@@ -829,8 +819,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof LocalVariableDeclaration) {
-            LocalVariableDeclaration x = (LocalVariableDeclaration) parent;
+        } else if (parent instanceof LocalVariableDeclaration x) {
             switch (role) {
             case 0:
                 ASTList<DeclarationSpecifier> list2 = x.getDeclarationSpecifiers();
@@ -854,8 +843,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof MethodDeclaration) {
-            MethodDeclaration x = (MethodDeclaration) parent;
+        } else if (parent instanceof MethodDeclaration x) {
             switch (role) {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
@@ -906,8 +894,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof ParameterDeclaration) {
-            ParameterDeclaration x = (ParameterDeclaration) parent;
+        } else if (parent instanceof ParameterDeclaration x) {
             switch (role) {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
@@ -926,16 +913,14 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof Throws) {
-            Throws x = (Throws) parent;
+        } else if (parent instanceof Throws x) {
             ASTList<TypeReference> list = x.getExceptions();
             if (list == null) {
                 list = new ASTArrayList<>();
                 x.setExceptions(list);
             }
             list.add(index, (TypeReference) child);
-        } else if (parent instanceof VariableSpecification) {
-            VariableSpecification x = (VariableSpecification) parent;
+        } else if (parent instanceof VariableSpecification x) {
             switch (role) {
             case 0:
                 x.setIdentifier((Identifier) child);
@@ -946,16 +931,14 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof ArrayInitializer) {
-            ArrayInitializer x = (ArrayInitializer) parent;
+        } else if (parent instanceof ArrayInitializer x) {
             ASTList<Expression> list = x.getArguments();
             if (list == null) {
                 list = new ASTArrayList<>();
                 x.setArguments(list);
             }
             list.add(index, (Expression) child);
-        } else if (parent instanceof Operator) {
-            Operator x = (Operator) parent;
+        } else if (parent instanceof Operator x) {
 
             if (role == 0) {
                 ASTList<Expression> list = x.getArguments();
@@ -966,8 +949,7 @@ public class ChangeHistory extends AbstractService {
                 list.add(index, (Expression) child);
             }
             if (parent instanceof TypeOperator) {
-                if (parent instanceof New) {
-                    New y = (New) parent;
+                if (parent instanceof New y) {
                     switch (role) {
                     case 0:
                         break;
@@ -983,8 +965,7 @@ public class ChangeHistory extends AbstractService {
                     default:
                         throw new IllegalChangeReportException("Illegal child role in " + dc);
                     }
-                } else if (parent instanceof NewArray) {
-                    NewArray y = (NewArray) parent;
+                } else if (parent instanceof NewArray y) {
                     switch (role) {
                     case 0:
                         break;
@@ -1011,11 +992,9 @@ public class ChangeHistory extends AbstractService {
                     }
                 }
             }
-        } else if (parent instanceof ArrayLengthReference) {
-            ArrayLengthReference x = (ArrayLengthReference) parent;
+        } else if (parent instanceof ArrayLengthReference x) {
             x.setReferencePrefix((ReferencePrefix) child);
-        } else if (parent instanceof ArrayReference) {
-            ArrayReference x = (ArrayReference) parent;
+        } else if (parent instanceof ArrayReference x) {
             switch (role) {
             case 0:
                 x.setReferencePrefix((ReferencePrefix) child);
@@ -1031,8 +1010,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof FieldReference) {
-            FieldReference x = (FieldReference) parent;
+        } else if (parent instanceof FieldReference x) {
             switch (role) {
             case 0:
                 x.setReferencePrefix((ReferencePrefix) child);
@@ -1043,14 +1021,11 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof VariableReference) {
-            VariableReference x = (VariableReference) parent;
+        } else if (parent instanceof VariableReference x) {
             x.setIdentifier((Identifier) child);
-        } else if (parent instanceof MetaClassReference) {
-            MetaClassReference x = (MetaClassReference) parent;
+        } else if (parent instanceof MetaClassReference x) {
             x.setReferencePrefix((ReferencePrefix) child);
-        } else if (parent instanceof MethodReference) {
-            MethodReference x = (MethodReference) parent;
+        } else if (parent instanceof MethodReference x) {
             switch (role) {
             case 0:
                 x.setReferencePrefix((ReferencePrefix) child);
@@ -1077,9 +1052,8 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof TypeReferenceInfix) {
+        } else if (parent instanceof TypeReferenceInfix x) {
             // includes PackageReference, TypeReference, URQ
-            TypeReferenceInfix x = (TypeReferenceInfix) parent;
             switch (role) {
             case 0:
                 x.setReferencePrefix((ReferencePrefix) child);
@@ -1088,8 +1062,7 @@ public class ChangeHistory extends AbstractService {
                 x.setIdentifier((Identifier) child);
                 break;
             case 2:
-                if (x instanceof TypeReference) {
-                    TypeReference y = (TypeReference) x;
+                if (x instanceof TypeReference y) {
                     ASTList<TypeArgumentDeclaration> list2 = y.getTypeArguments();
                     if (list2 == null) {
                         list2 = new ASTArrayList<>();
@@ -1097,8 +1070,7 @@ public class ChangeHistory extends AbstractService {
                     }
                     list2.add(index, (TypeArgumentDeclaration) child);
                     break;
-                } else if (x instanceof UncollatedReferenceQualifier) {
-                    UncollatedReferenceQualifier y = (UncollatedReferenceQualifier) x;
+                } else if (x instanceof UncollatedReferenceQualifier y) {
                     ASTList<TypeArgumentDeclaration> list2 = y.getTypeArguments();
                     if (list2 == null) {
                         list2 = new ASTArrayList<>();
@@ -1111,8 +1083,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof EnumConstructorReference) {
-            EnumConstructorReference x = (EnumConstructorReference) parent;
+        } else if (parent instanceof EnumConstructorReference x) {
             switch (role) {
             case 0:
                 x.setClassDeclaration((ClassDeclaration) child);
@@ -1128,8 +1099,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof SuperConstructorReference) {
-            SuperConstructorReference x = (SuperConstructorReference) parent;
+        } else if (parent instanceof SuperConstructorReference x) {
             switch (role) {
             case 0:
                 x.setReferencePrefix((ReferencePrefix) child);
@@ -1145,26 +1115,21 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof SuperReference) {
-            SuperReference x = (SuperReference) parent;
+        } else if (parent instanceof SuperReference x) {
             x.setReferencePrefix((ReferencePrefix) child);
-        } else if (parent instanceof ThisConstructorReference) {
-            ThisConstructorReference x = (ThisConstructorReference) parent;
+        } else if (parent instanceof ThisConstructorReference x) {
             ASTList<Expression> list = x.getArguments();
             if (list == null) {
                 list = new ASTArrayList<>();
                 x.setArguments(list);
             }
             list.add(index, (Expression) child);
-        } else if (parent instanceof ThisReference) {
-            ThisReference x = (ThisReference) parent;
+        } else if (parent instanceof ThisReference x) {
             x.setReferencePrefix((ReferencePrefix) child);
-        } else if (parent instanceof LabelJumpStatement) {
+        } else if (parent instanceof LabelJumpStatement x) {
             // includes break and continue
-            LabelJumpStatement x = (LabelJumpStatement) parent;
             x.setIdentifier((Identifier) child);
-        } else if (parent instanceof Assert) {
-            Assert x = (Assert) parent;
+        } else if (parent instanceof Assert x) {
             switch (role) {
             case 0:
                 x.setCondition((Expression) child);
@@ -1175,8 +1140,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof Case) {
-            Case x = (Case) parent;
+        } else if (parent instanceof Case x) {
             switch (role) {
             case 0:
                 x.setExpression((Expression) child);
@@ -1192,8 +1156,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof Catch) {
-            Catch x = (Catch) parent;
+        } else if (parent instanceof Catch x) {
             switch (role) {
             case 0:
                 x.setParameterDeclaration((ParameterDeclaration) child);
@@ -1204,16 +1167,14 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof Default) {
-            Default x = (Default) parent;
+        } else if (parent instanceof Default x) {
             ASTList<Statement> list = x.getBody();
             if (list == null) {
                 list = new ASTArrayList<>();
                 x.setBody(list);
             }
             list.add(index, (Statement) child);
-        } else if (parent instanceof LoopStatement) {
-            LoopStatement x = (LoopStatement) parent;
+        } else if (parent instanceof LoopStatement x) {
             switch (role) {
             case 0:
                 ASTList<LoopInitializer> list = x.getInitializers();
@@ -1240,14 +1201,11 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof Else) {
-            Else x = (Else) parent;
+        } else if (parent instanceof Else x) {
             x.setBody((Statement) child);
-        } else if (parent instanceof Finally) {
-            Finally x = (Finally) parent;
+        } else if (parent instanceof Finally x) {
             x.setBody((StatementBlock) child);
-        } else if (parent instanceof If) {
-            If x = (If) parent;
+        } else if (parent instanceof If x) {
             switch (role) {
             case 0:
                 x.setExpression((Expression) child);
@@ -1261,8 +1219,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof LabeledStatement) {
-            LabeledStatement x = (LabeledStatement) parent;
+        } else if (parent instanceof LabeledStatement x) {
             switch (role) {
             case 0:
                 x.setIdentifier((Identifier) child);
@@ -1273,12 +1230,10 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof ExpressionJumpStatement) {
+        } else if (parent instanceof ExpressionJumpStatement x) {
             // Return and Throw
-            ExpressionJumpStatement x = (ExpressionJumpStatement) parent;
             x.setExpression((Expression) child);
-        } else if (parent instanceof Switch) {
-            Switch x = (Switch) parent;
+        } else if (parent instanceof Switch x) {
             switch (role) {
             case 0:
                 x.setExpression((Expression) child);
@@ -1294,8 +1249,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof SynchronizedBlock) {
-            SynchronizedBlock x = (SynchronizedBlock) parent;
+        } else if (parent instanceof SynchronizedBlock x) {
             switch (role) {
             case 0:
                 x.setExpression((Expression) child);
@@ -1306,11 +1260,9 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof Then) {
-            Then x = (Then) parent;
+        } else if (parent instanceof Then x) {
             x.setBody((Statement) child);
-        } else if (parent instanceof Try) {
-            Try x = (Try) parent;
+        } else if (parent instanceof Try x) {
             switch (role) {
             case 0:
                 x.setBody((StatementBlock) child);
@@ -1326,8 +1278,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof AnnotationUseSpecification) {
-            AnnotationUseSpecification x = (AnnotationUseSpecification) parent;
+        } else if (parent instanceof AnnotationUseSpecification x) {
             switch (role) {
             case 0:
                 x.setTypeReference((TypeReference) child);
@@ -1343,8 +1294,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof AnnotationElementValuePair) {
-            AnnotationElementValuePair x = (AnnotationElementValuePair) parent;
+        } else if (parent instanceof AnnotationElementValuePair x) {
             switch (role) {
             case 0:
                 x.setElement((AnnotationPropertyReference) child);
@@ -1355,11 +1305,9 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof TypeArgumentDeclaration) {
-            TypeArgumentDeclaration x = (TypeArgumentDeclaration) parent;
+        } else if (parent instanceof TypeArgumentDeclaration x) {
             x.setTypeReference((TypeReference) child);
-        } else if (parent instanceof TypeParameterDeclaration) {
-            TypeParameterDeclaration x = (TypeParameterDeclaration) parent;
+        } else if (parent instanceof TypeParameterDeclaration x) {
             switch (role) {
             case 0:
                 x.setIdentifier((Identifier) child);
@@ -1375,8 +1323,7 @@ public class ChangeHistory extends AbstractService {
             default:
                 throw new IllegalChangeReportException("Illegal child role in " + dc);
             }
-        } else if (parent instanceof AnnotationPropertyReference) {
-            AnnotationPropertyReference x = (AnnotationPropertyReference) parent;
+        } else if (parent instanceof AnnotationPropertyReference x) {
             x.setIdentifier((Identifier) child);
         } else {
             throw new IllegalChangeReportException("Unknown parent type in " + dc);

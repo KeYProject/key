@@ -7,11 +7,11 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 
 public final class ArrayLengthCondition extends VariableConditionAdapter {
@@ -31,8 +31,8 @@ public final class ArrayLengthCondition extends VariableConditionAdapter {
             Services services) {
         if (var == reference) {
             ProgramVariable attribute;
-            if (subst instanceof FieldReference) {
-                attribute = ((FieldReference) subst).getProgramVariable();
+            if (subst instanceof FieldReference fieldReference) {
+                attribute = fieldReference.getProgramVariable();
             } else {
                 attribute = (ProgramVariable) subst;
             }
