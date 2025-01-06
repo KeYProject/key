@@ -18,10 +18,8 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.Named;
-import org.key_project.prover.rules.*;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.NewVarcond;
+import org.key_project.prover.rules.*;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -32,7 +30,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
 
-import static org.key_project.util.Strings.formatAsList;
 
 
 /**
@@ -120,13 +117,14 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-                     ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
-                     ImmutableList<RuleSet> ruleSets,
-                     TacletAttributes attrs,
-                     ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-                     ChoiceExpr choices, boolean surviveSmbExec,
-                     ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, surviveSmbExec, tacletAnnotations);
+            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ChoiceExpr choices, boolean surviveSmbExec,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, surviveSmbExec,
+            tacletAnnotations);
         this.choices = choices;
     }
 
@@ -142,10 +140,10 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-                     ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
-                     ImmutableList<RuleSet> ruleSets,
+            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
-                     ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
             tacletAnnotations);

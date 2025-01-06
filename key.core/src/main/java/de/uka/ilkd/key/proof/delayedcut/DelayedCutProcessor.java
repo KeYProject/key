@@ -9,7 +9,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -324,14 +323,12 @@ public class DelayedCutProcessor implements Runnable {
             throw new RuntimeException("Problem with replaying node " + pair.node.serialNr(), e);
         }
 
-        if (oldRuleApp instanceof PosTacletApp) {
-            PosTacletApp app = (PosTacletApp) oldRuleApp;
+        if (oldRuleApp instanceof PosTacletApp app) {
             return PosTacletApp.createPosTacletApp((FindTaclet) app.taclet(), app.instantiations(),
                 app.assumesFormulaInstantiations(), newPos, services);
         }
 
-        if (oldRuleApp instanceof IBuiltInRuleApp) {
-            IBuiltInRuleApp app = (IBuiltInRuleApp) oldRuleApp;
+        if (oldRuleApp instanceof IBuiltInRuleApp app) {
             return app.replacePos(newPos);
         }
 

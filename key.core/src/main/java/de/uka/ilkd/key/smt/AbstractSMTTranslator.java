@@ -186,7 +186,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         // add one variable for each sort
         for (Sort s : this.usedRealSort.keySet()) {
             if (!s.equals(JavaDLTheory.FORMULA)) {
-                LogicVariable l = new LogicVariable(new Name("dummy_" + s.name().toString()), s);
+                LogicVariable l = new LogicVariable(new Name("dummy_" + s.name()), s);
                 this.addFunction(l, new ArrayList<>(), s, services);
                 this.translateFunc(l, new ArrayList<>());
             }
@@ -1866,10 +1866,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             boolean alreadyContains = true;
             while (alreadyContains) {
                 i++;
-                newName = new StringBuilder("bindp_" + fun.name().toString() + "_" + i);
+                newName = new StringBuilder("bindp_" + fun.name() + "_" + i);
                 alreadyContains = false;
                 for (StringBuilder s : uninterpretedBindingPredicateNames.values()) {
-                    alreadyContains = alreadyContains || s.toString().equals(newName.toString());
+                    alreadyContains = alreadyContains || s.toString().contentEquals(newName);
                 }
             }
 
@@ -1978,10 +1978,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             boolean alreadyContains = true;
             while (alreadyContains) {
                 i++;
-                newName = new StringBuilder("bindf_" + fun.name().toString() + "_" + i);
+                newName = new StringBuilder("bindf_" + fun.name() + "_" + i);
                 alreadyContains = false;
                 for (StringBuilder s : uninterpretedBindingFunctionNames.values()) {
-                    alreadyContains = alreadyContains || s.toString().equals(newName.toString());
+                    alreadyContains = alreadyContains || s.toString().contentEquals(newName);
                 }
             }
             // add the free variables of the bound terms as parameter

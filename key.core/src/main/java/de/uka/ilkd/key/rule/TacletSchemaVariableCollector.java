@@ -14,16 +14,16 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
-import org.jspecify.annotations.NonNull;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -67,7 +67,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
      * @return the extended list of found schemavariables
      */
     protected ImmutableList<SchemaVariable> collectSVInProgram(@NonNull JavaBlock jb,
-                                                               @NonNull ImmutableList<SchemaVariable> vars) {
+            @NonNull ImmutableList<SchemaVariable> vars) {
 
         ProgramSVCollector prgSVColl = new ProgramSVCollector(jb.program(), vars, instantiations);
         prgSVColl.start();
@@ -188,7 +188,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
      *        false) or if the visitor descends into them (iff true)
      */
     public void visit(@NonNull Taclet taclet,
-                      boolean visitAddrules) {
+            boolean visitAddrules) {
         visit(taclet.assumesSequent());
         visitFindPart(taclet);
         visitGoalTemplates(taclet, visitAddrules);

@@ -15,15 +15,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import org.key_project.logic.LogicServices;
-import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.MatchConditions;
-import org.key_project.prover.rules.VariableCondition;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
-import org.key_project.prover.rules.inst.SVInstantiations;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.VariableCondition;
 
 /**
  * Checks whether a loop has an invariant (either normal or "free").
@@ -41,9 +40,10 @@ public class HasLoopInvariantCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                 MatchConditions matchCond, LogicServices p_services) {
+            MatchConditions matchCond, LogicServices p_services) {
         final Services services = (Services) p_services;
-        final var svInst = (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
+        final var svInst =
+            (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
 
         final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
         final LoopSpecification loopSpec = //

@@ -16,10 +16,10 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
@@ -54,7 +54,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
                 term.getLabels());
         }
 
-        with = (Term) syntacticalReplace(with, posOfFind, mc, goal, ruleApp, services, termLabelState, labelHint);
+        with = (Term) syntacticalReplace(with, posOfFind, mc, goal, ruleApp, services,
+            termLabelState, labelHint);
 
         if (!with.sort().extendsTrans(maxSort)) {
             with = services.getTermBuilder().cast(maxSort, with);
@@ -147,17 +148,19 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
             MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
         if (posOfFind.isInAntec()) {
-            addToAntec(add.antecedent(), currentSequent, whereToAdd, posOfFind, matchCond, goal, ruleApp, services, termLabelState,
+            addToAntec(add.antecedent(), currentSequent, whereToAdd, posOfFind, matchCond, goal,
+                ruleApp, services, termLabelState,
                 new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
-            addToSucc(add.succedent(), currentSequent, null, posOfFind, matchCond, goal, ruleApp, services, termLabelState,
-                new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add)
-            );
+            addToSucc(add.succedent(), currentSequent, null, posOfFind, matchCond, goal, ruleApp,
+                services, termLabelState,
+                new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add));
         } else {
-            addToAntec(add.antecedent(), currentSequent, null, posOfFind, matchCond, goal, ruleApp, services, termLabelState,
+            addToAntec(add.antecedent(), currentSequent, null, posOfFind, matchCond, goal, ruleApp,
+                services, termLabelState,
                 new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
-            addToSucc(add.succedent(), currentSequent, whereToAdd, posOfFind, matchCond, goal, ruleApp, services, termLabelState,
-                new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add)
-            );
+            addToSucc(add.succedent(), currentSequent, whereToAdd, posOfFind, matchCond, goal,
+                ruleApp, services, termLabelState,
+                new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add));
         }
     }
 }

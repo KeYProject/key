@@ -24,7 +24,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
     public static RuleAppCost create(int p_cost) {
         if (p_cost == 0) {
-            return NumberRuleAppCost.getZeroCost();
+            return getZeroCost();
         }
 
         NumberRuleAppCost ac;
@@ -113,7 +113,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         } else if (cost2.getValue() == 0) {
             return this;
         } else {
-            return NumberRuleAppCost.create(getValue() + cost2.getValue());
+            return create(getValue() + cost2.getValue());
         }
     }
 

@@ -20,15 +20,14 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
-import org.key_project.prover.sequent.*;
 import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +39,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestSchemaModalOperators {
 
-    public static final MatchConditions EMPTY_MATCHCONDITIONS = de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
+    public static final MatchConditions EMPTY_MATCHCONDITIONS =
+        de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
     final String[] strs = { "i=5", "\\<{ while(i>0) {i--;} }\\> i=0", "i=3",
         "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3", "i=3",
         "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3" };

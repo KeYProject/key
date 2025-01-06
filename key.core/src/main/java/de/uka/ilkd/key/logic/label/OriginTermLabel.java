@@ -97,7 +97,7 @@ public class OriginTermLabel implements TermLabel {
 
         Term term = (Term) pio.subTerm();
 
-        OriginTermLabel originLabel = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+        OriginTermLabel originLabel = (OriginTermLabel) term.getLabel(NAME);
 
         // If the term has no origin label,
         // iterate over its parent terms until we find one with an origin label,
@@ -106,7 +106,7 @@ public class OriginTermLabel implements TermLabel {
             pio = pio.up();
             term = (Term) pio.subTerm();
 
-            originLabel = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
+            originLabel = (OriginTermLabel) term.getLabel(NAME);
         }
 
         if (originLabel != null && originLabel.getOrigin().specType != SpecType.NONE) {
@@ -260,7 +260,7 @@ public class OriginTermLabel implements TermLabel {
         for (int i = 1; i <= seq.size(); ++i) {
             SequentFormula oldFormula = seq.getFormulabyNr(i);
             SequentFormula newFormula = new SequentFormula(
-                OriginTermLabel.removeOriginLabels((Term) oldFormula.formula(), services));
+                removeOriginLabels((Term) oldFormula.formula(), services));
             SequentChangeInfo change =
                 seq.changeFormula(newFormula,
                     PosInOccurrence.findInSequent(seq, i,
@@ -738,7 +738,7 @@ public class OriginTermLabel implements TermLabel {
                 return specType + " @ [no file]";
             } else {
                 var path = fileName.toString();
-                var name = path.substring(path.lastIndexOf('/') + 1, path.length());
+                var name = path.substring(path.lastIndexOf('/') + 1);
                 return specType + " @ file " + name + " @ line " + line;
             }
         }

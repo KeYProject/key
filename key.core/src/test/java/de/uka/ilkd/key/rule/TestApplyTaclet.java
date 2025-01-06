@@ -647,7 +647,8 @@ public class TestApplyTaclet {
         Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
         SequentFormula ifformula = new SequentFormula(ifterm);
         ImmutableList<AssumesFormulaInstantiation> ifInsts = ImmutableSLList
-                .<AssumesFormulaInstantiation>nil().prepend(new AssumesFormulaInstDirect(ifformula));
+                .<AssumesFormulaInstantiation>nil()
+                .prepend(new AssumesFormulaInstDirect(ifformula));
         appIt = rApplist.iterator();
         while (appIt.hasNext()) {
             TacletApp a =

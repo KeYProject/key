@@ -23,8 +23,8 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.key_project.logic.Namespace;
-import org.key_project.prover.sequent.Sequent;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.Sequent;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;

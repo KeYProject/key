@@ -32,7 +32,7 @@ public class InfFlowCheckInfo {
     public static boolean isInfFlow(Goal goal) {
         // StrategyProperties stratProps =
         // goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
-        Property<Boolean> ifProp = InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
+        Property<Boolean> ifProp = INF_FLOW_CHECK_PROPERTY;
         // String ifStrat = StrategyProperties.INF_FLOW_CHECK_PROPERTY;
         // String ifTrue = StrategyProperties.INF_FLOW_CHECK_TRUE;
 

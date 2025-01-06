@@ -24,7 +24,7 @@ public final class DifferentInstantiationCondition extends VariableConditionAdap
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement candidate, SVInstantiations svInst,
-                         Services services) {
+            Services services) {
         if (var == var1) {
             final Object inst2 = svInst.getInstantiation(var2);
             return inst2 == null || !inst2.equals(candidate);

@@ -8,10 +8,9 @@ import de.uka.ilkd.key.java.TerminalProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 
-import org.key_project.logic.Named;
 
 public interface IProgramVariable
-        extends TerminalProgramElement, Named, org.key_project.logic.op.SortedOperator, Operator {
+        extends TerminalProgramElement, org.key_project.logic.op.SortedOperator, Operator {
     KeYJavaType getKeYJavaType();
 
     KeYJavaType getKeYJavaType(Services javaServ);

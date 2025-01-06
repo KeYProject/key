@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.match.vm;
 import java.util.ArrayDeque;
 
 import de.uka.ilkd.key.logic.Term;
-import org.key_project.logic.SyntaxElement;
 
 /**
  * An iterator that walks in first-depth order through the term. It allows to jump to siblings.

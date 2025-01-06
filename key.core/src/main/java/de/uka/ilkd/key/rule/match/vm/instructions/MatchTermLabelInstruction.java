@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
@@ -51,7 +50,7 @@ public class MatchTermLabelInstruction implements MatchInstruction {
      */
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
-                                 LogicServices services) {
+            LogicServices services) {
         final Term term = termPosition.getCurrentSubterm();
         MatchConditions result = matchConditions;
         // TODO: Define a sane version of taclet matching for term labels

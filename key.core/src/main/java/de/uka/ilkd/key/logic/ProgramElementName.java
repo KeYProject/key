@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * represents a name that is part of a program
  */
 public class ProgramElementName extends Name
-        implements TerminalProgramElement, Label, ReferenceSuffix, MethodName {
+        implements Label, ReferenceSuffix, MethodName {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramElementName.class);
 
     private final String qualifierString;

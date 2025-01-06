@@ -251,7 +251,8 @@ public class LogicPrinter {
      * @param declareSchemaVars Should declarations for the schema variables used in the taclet be
      *        pretty-printed?
      */
-    public void printTaclet(org.key_project.prover.rules.Taclet taclet, SVInstantiations sv, boolean showWholeTaclet,
+    public void printTaclet(org.key_project.prover.rules.Taclet taclet, SVInstantiations sv,
+            boolean showWholeTaclet,
             boolean declareSchemaVars) {
         instantiations = sv;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
@@ -261,10 +262,11 @@ public class LogicPrinter {
             layouter.print(taclet.name().toString()).print(" {");
         }
         if (declareSchemaVars) {
-            Set<SchemaVariable> schemaVars = ((de.uka.ilkd.key.rule.Taclet)taclet).collectSchemaVars();
+            Set<SchemaVariable> schemaVars =
+                ((de.uka.ilkd.key.rule.Taclet) taclet).collectSchemaVars();
             for (SchemaVariable schemaVar : schemaVars) {
                 layouter.nl();
-                ((de.uka.ilkd.key.logic.op.SchemaVariable)schemaVar).layout(layouter);
+                ((de.uka.ilkd.key.logic.op.SchemaVariable) schemaVar).layout(layouter);
                 layouter.print(";");
             }
             layouter.nl();
@@ -342,10 +344,14 @@ public class LogicPrinter {
     }
 
     protected void printVarCond(Taclet taclet) {
-        final ImmutableList<? extends org.key_project.prover.rules.NewVarcond> varsNew = taclet.varsNew();
-        final ImmutableList<? extends org.key_project.prover.rules.NewDependingOn> varsNewDependingOn = taclet.varsNewDependingOn();
-        final ImmutableList<? extends org.key_project.prover.rules.NotFreeIn> varsNotFreeIn = taclet.varsNotFreeIn();
-        final ImmutableList<? extends VariableCondition> variableConditions = taclet.getVariableConditions();
+        final ImmutableList<? extends org.key_project.prover.rules.NewVarcond> varsNew =
+            taclet.varsNew();
+        final ImmutableList<? extends org.key_project.prover.rules.NewDependingOn> varsNewDependingOn =
+            taclet.varsNewDependingOn();
+        final ImmutableList<? extends org.key_project.prover.rules.NotFreeIn> varsNotFreeIn =
+            taclet.varsNotFreeIn();
+        final ImmutableList<? extends VariableCondition> variableConditions =
+            taclet.getVariableConditions();
 
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()
                 || !varsNewDependingOn.isEmpty()) {

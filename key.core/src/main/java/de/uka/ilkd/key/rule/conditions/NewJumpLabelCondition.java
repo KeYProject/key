@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,13 +14,11 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.VariableCondition;
-import org.key_project.util.collection.ImmutableMapEntry;
 
 /**
  * This variable condition ensures that no other label of the same name exists in the context
@@ -43,8 +40,8 @@ public final class NewJumpLabelCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(org.key_project.logic.op.sv.SchemaVariable var,
-                                 SyntaxElement instCandidate,
-                                 org.key_project.prover.rules.MatchConditions matchCond, LogicServices services) {
+            SyntaxElement instCandidate,
+            org.key_project.prover.rules.MatchConditions matchCond, LogicServices services) {
         SVInstantiations instantiations = (SVInstantiations) matchCond.getInstantiations();
         if (var != labelSV && instantiations.isInstantiated(labelSV)) {
             var = labelSV;

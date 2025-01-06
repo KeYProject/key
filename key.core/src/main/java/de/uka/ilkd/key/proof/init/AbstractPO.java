@@ -532,8 +532,8 @@ public abstract class AbstractPO implements IPersistablePO {
     @Override
     public Configuration createLoaderConfig() {
         var c = new Configuration();
-        c.set(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
-        c.set(IPersistablePO.PROPERTY_NAME, name);
+        c.set(PROPERTY_CLASS, getClass().getCanonicalName());
+        c.set(PROPERTY_NAME, name);
         return c;
     }
 
@@ -544,7 +544,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @return The name value.
      */
     public static String getName(Configuration properties) {
-        return properties.getString(IPersistablePO.PROPERTY_NAME);
+        return properties.getString(PROPERTY_NAME);
     }
 
     /**

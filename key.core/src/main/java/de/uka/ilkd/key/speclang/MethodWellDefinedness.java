@@ -291,7 +291,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         }
         final Term[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
         if (isNormal(services)) {
-            prefix = WellDefinednessCheck.OP_TACLET;
+            prefix = OP_TACLET;
             final boolean isConstructor =
                 target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor();
             final Term pre =
@@ -302,7 +302,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps, TB.var(selfSV),
                 TB.func(target, args), TB.and(wdArgs, pre), isStatic || isConstructor, services);
         } else {
-            prefix = WellDefinednessCheck.OP_EXC_TACLET;
+            prefix = OP_EXC_TACLET;
             return createExcTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
                 TB.func(target, args), services);
         }
@@ -326,7 +326,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final String n;
         if (n1.equals(n2)) {
             n = n1;
-        } else if (n1.startsWith(WellDefinednessCheck.OP_EXC_TACLET)) {
+        } else if (n1.startsWith(OP_EXC_TACLET)) {
             n = n2;
         } else {
             n = n1;

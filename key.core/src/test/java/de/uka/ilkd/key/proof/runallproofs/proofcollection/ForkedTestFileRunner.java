@@ -15,7 +15,6 @@ import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.IOForwarder;
 
-import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,7 +164,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
 
         boolean error = false;
         try {
-            TestFile[] testFiles = readObject(getLocationOfSerializedTestFiles(tempDirectory), TestFile[].class);
+            TestFile[] testFiles =
+                readObject(getLocationOfSerializedTestFiles(tempDirectory), TestFile[].class);
             installTimeoutWatchdog(testFiles[0].getSettings(), tempDirectory);
             ArrayList<TestResult> testResults = new ArrayList<>();
             for (TestFile testFile : testFiles) {

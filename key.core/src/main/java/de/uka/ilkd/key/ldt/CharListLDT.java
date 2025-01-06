@@ -98,7 +98,7 @@ public final class CharListLDT extends LDT {
         if (t.op().arity() == 0) {
             return new StringBuffer();
         } else {
-            return printLastFirst(t.sub(0)).append(t.op().name().toString());
+            return printLastFirst(t.sub(0)).append(t.op().name());
         }
     }
 

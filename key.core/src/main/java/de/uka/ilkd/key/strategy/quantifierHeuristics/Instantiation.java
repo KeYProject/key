@@ -135,7 +135,7 @@ class Instantiation {
      */
     private void addInstance(Substitution sub, long cost) {
         final Term inst =
-            sub.getSubstitutedTerm((de.uka.ilkd.key.logic.op.QuantifiableVariable) firstVar);
+            sub.getSubstitutedTerm(firstVar);
         final Long oldCost = instancesWithCosts.get(inst);
         if (oldCost == null || oldCost >= cost) {
             instancesWithCosts.put(inst, cost);
@@ -172,7 +172,7 @@ class Instantiation {
      * Try to find the cost of an instance(inst) according its quantified formula and current goal.
      */
     static RuleAppCost computeCost(Term inst, Term form, Sequent seq, Services services) {
-        return Instantiation.create(form, seq, services).computeCostHelp(inst);
+        return create(form, seq, services).computeCostHelp(inst);
     }
 
     private RuleAppCost computeCostHelp(Term inst) {

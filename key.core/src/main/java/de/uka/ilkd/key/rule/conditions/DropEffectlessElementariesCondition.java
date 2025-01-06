@@ -16,13 +16,10 @@ import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
-
 import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
-
-import org.key_project.logic.SyntaxElement;
-import org.key_project.prover.rules.inst.SVInstantiations;
 
 
 public final class DropEffectlessElementariesCondition implements VariableCondition {
@@ -77,7 +74,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     }
 
 
-    private static Term dropEffectlessElementaries(Term update, Term target, LogicServices p_services) {
+    private static Term dropEffectlessElementaries(Term update, Term target,
+            LogicServices p_services) {
         final Services services = (Services) p_services;
         TermProgramVariableCollector collector = services.getFactory().create(services);
         target.execPostOrder(collector);
@@ -91,10 +89,10 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                 MatchConditions mc,
-                                 LogicServices services) {
+            MatchConditions mc,
+            LogicServices services) {
         de.uka.ilkd.key.rule.inst.SVInstantiations svInst =
-                (de.uka.ilkd.key.rule.inst.SVInstantiations) mc.getInstantiations();
+            (de.uka.ilkd.key.rule.inst.SVInstantiations) mc.getInstantiations();
         Term uInst = (Term) svInst.getInstantiation(u);
         Term xInst = (Term) svInst.getInstantiation(x);
         Term resultInst = (Term) svInst.getInstantiation(result);

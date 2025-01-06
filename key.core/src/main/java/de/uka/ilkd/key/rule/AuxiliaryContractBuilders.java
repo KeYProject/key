@@ -434,7 +434,7 @@ public final class AuxiliaryContractBuilders {
                 LocationVariable value = entry.getValue();
 
                 String newName =
-                    services.getTermBuilder().newName(value.name().toString() + suffix);
+                    services.getTermBuilder().newName(value.name() + suffix);
                 LocationVariable newValue =
                     new LocationVariable(new ProgramElementName(newName), value.getKeYJavaType());
 

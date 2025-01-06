@@ -42,7 +42,7 @@ public final class EnumTypeCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement candidate, SVInstantiations svInst,
-                         Services services) {
+            Services services) {
 
         if (!resolver.isComplete(var, candidate, svInst, services)) {
             // not yet complete

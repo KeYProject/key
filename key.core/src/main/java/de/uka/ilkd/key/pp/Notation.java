@@ -198,7 +198,7 @@ public abstract class Notation {
         }
 
         public void print(Term t, LogicPrinter sp) {
-            sp.printModalityTerm("\\modality{" + t.op().name().toString() + "}", t.javaBlock(),
+            sp.printModalityTerm("\\modality{" + t.op().name() + "}", t.javaBlock(),
                 "\\endmodality", t, ass);
         }
     }

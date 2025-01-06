@@ -222,7 +222,7 @@ public class MasterHandler {
         } else {
             // unknown value depends on quantified variables
             var names = freeVars.stream()
-                    .map(x -> new SExpr(LogicalVariableHandler.VAR_PREFIX + x.name().toString()))
+                    .map(x -> new SExpr(LogicalVariableHandler.VAR_PREFIX + x.name()))
                     .toList();
             var types = freeVars.stream()
                     .map(x -> LogicalVariableHandler.makeVarDecl("", x.sort()).getChildren().get(0))

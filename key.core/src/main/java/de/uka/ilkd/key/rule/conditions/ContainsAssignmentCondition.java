@@ -58,7 +58,7 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
      */
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
-                         Services services) {
+            Services services) {
         if (var != expression) {
             return true;
         }

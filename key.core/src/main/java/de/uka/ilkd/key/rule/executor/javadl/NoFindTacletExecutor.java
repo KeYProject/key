@@ -39,12 +39,12 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
             SequentChangeInfo currentSequent,
             MatchConditions matchCond,
             Goal goal, RuleApp ruleApp) {
-        addToAntec(add.antecedent(), currentSequent, null, null, matchCond, goal, ruleApp, goal.getOverlayServices(), termLabelState,
-            new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add)
-        );
-        addToSucc(add.succedent(), currentSequent, null, null, matchCond, goal, ruleApp, goal.getOverlayServices(), termLabelState,
-            new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add)
-        );
+        addToAntec(add.antecedent(), currentSequent, null, null, matchCond, goal, ruleApp,
+            goal.getOverlayServices(), termLabelState,
+            new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
+        addToSucc(add.succedent(), currentSequent, null, null, matchCond, goal, ruleApp,
+            goal.getOverlayServices(), termLabelState,
+            new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add));
     }
 
     /**
@@ -99,8 +99,8 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
             currentGoal.setBranchLabel(gt.name());
             timeTermLabels = System.nanoTime() + timeTermLabels;
             TermLabelManager.refactorSequent(termLabelState, services,
-                    ruleApp.posInOccurrence(),
-                    (Rule) ruleApp.rule(), currentGoal, null, null);
+                ruleApp.posInOccurrence(),
+                (Rule) ruleApp.rule(), currentGoal, null, null);
             PERF_TERM_LABELS.getAndAdd(System.nanoTime() - timeTermLabels);
         }
 

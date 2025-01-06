@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -16,12 +15,12 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.inst.SVInstantiations;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.prover.rules.MatchConditions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +67,8 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     public static NoPosTacletApp createNoPosTacletApp(Taclet taclet,
-            SVInstantiations instantiations, ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
+            SVInstantiations instantiations,
+            ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             Services services) {
         Debug.assertTrue(ifInstsCorrectSize(taclet, assumesInstantiations),
             "If instantiations list has wrong size");
@@ -134,7 +134,8 @@ public class NoPosTacletApp extends TacletApp {
      * @return true iff all variable conditions x not free in y are hold
      */
     protected static boolean checkVarCondNotFreeIn(Taclet taclet, SVInstantiations instantiations) {
-        for (var pair : ((de.uka.ilkd.key.rule.inst.SVInstantiations)instantiations).getInstantiationMap()) {
+        for (var pair : ((de.uka.ilkd.key.rule.inst.SVInstantiations) instantiations)
+                .getInstantiationMap()) {
             final var sv = pair.key();
 
             if (sv instanceof ModalOperatorSV || sv instanceof ProgramSV || sv instanceof VariableSV
@@ -186,7 +187,8 @@ public class NoPosTacletApp extends TacletApp {
             Services services) {
         if (interesting) {
             return createNoPosTacletApp(taclet(),
-                instantiations().addInterestingList(sv, list, services), assumesFormulaInstantiations(),
+                instantiations().addInterestingList(sv, list, services),
+                assumesFormulaInstantiations(),
                 services);
         } else {
             return createNoPosTacletApp(taclet(), instantiations().addList(sv, list, services),
@@ -249,7 +251,8 @@ public class NoPosTacletApp extends TacletApp {
      */
     @Override
     public TacletApp setMatchConditions(MatchConditions mc, Services services) {
-        return createNoPosTacletApp(taclet(), mc.getInstantiations(), assumesFormulaInstantiations(),
+        return createNoPosTacletApp(taclet(), mc.getInstantiations(),
+            assumesFormulaInstantiations(),
             services);
     }
 
@@ -260,8 +263,9 @@ public class NoPosTacletApp extends TacletApp {
      */
     @Override
     protected TacletApp setAllInstantiations(org.key_project.prover.rules.MatchConditions mc,
-                                             ImmutableList<AssumesFormulaInstantiation> assumesInstantiations, Services services) {
-        return createNoPosTacletApp(taclet(), mc.getInstantiations(), assumesInstantiations, services);
+            ImmutableList<AssumesFormulaInstantiation> assumesInstantiations, Services services) {
+        return createNoPosTacletApp(taclet(), mc.getInstantiations(), assumesInstantiations,
+            services);
     }
 
 
@@ -336,7 +340,7 @@ public class NoPosTacletApp extends TacletApp {
             // the following check will partly be repeated within the
             // constructor; this could be optimised
             if (res == null || !checkVarCondNotFreeIn(taclet(),
-                    res.getInstantiations(), pos)) {
+                res.getInstantiations(), pos)) {
                 return null;
             }
         } else {
@@ -350,7 +354,8 @@ public class NoPosTacletApp extends TacletApp {
             return null;
         }
 
-        if (updateContextFixed && !updateContextCompatible((de.uka.ilkd.key.rule.MatchConditions) res)) {
+        if (updateContextFixed
+                && !updateContextCompatible((de.uka.ilkd.key.rule.MatchConditions) res)) {
             /*
              * LOGGER.debug("NoPosTacletApp: Incompatible context", instantiations.getUpdateContext
              * (), res.matchConditions().getInstantiations().getUpdateContext());

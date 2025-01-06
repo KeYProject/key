@@ -11,16 +11,16 @@ import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import org.key_project.logic.LogicServices;
-import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.MatchConditions;
-import org.key_project.prover.rules.VariableCondition;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SortException;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.VariableCondition;
 
 
 /**
@@ -56,7 +56,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
-                                 MatchConditions matchCond, LogicServices services) {
+            MatchConditions matchCond, LogicServices services) {
         if (var != exprOrTypeSV) {
             return matchCond;
         }

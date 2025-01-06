@@ -26,5 +26,5 @@ public interface InstantiationProposer {
      *        for name uniqueness), or null
      */
     String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
-                       ImmutableList<String> previousProposals);
+            ImmutableList<String> previousProposals);
 }

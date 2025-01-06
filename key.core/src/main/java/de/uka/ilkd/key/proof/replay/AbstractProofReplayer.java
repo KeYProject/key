@@ -229,8 +229,8 @@ public abstract class AbstractProofReplayer {
             for (NoPosTacletApp partialApp : currGoal.indexOfTaclets()
                     .getPartialInstantiatedApps()) {
                 if ((Object) originalTacletApp instanceof TacletApp cmp
-                        ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(partialApp, cmp)
-                        : false) {
+                        && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(partialApp,
+                            cmp)) {
                     ourApp = partialApp;
                     break;
                 }
@@ -332,8 +332,7 @@ public abstract class AbstractProofReplayer {
                 : newSequent.succedent();
         for (SequentFormula newFormula : semiSeq.asList()) {
             if ((Object) oldFormula instanceof SequentFormula that
-                    ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(newFormula, that)
-                    : false) {
+                    && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(newFormula, that)) {
                 return oldPos.replaceSequentFormula(newFormula);
             }
         }

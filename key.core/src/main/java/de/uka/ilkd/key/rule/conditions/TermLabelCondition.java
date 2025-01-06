@@ -34,7 +34,7 @@ public class TermLabelCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
-                         Services services) {
+            Services services) {
         assert instMap.getInstantiation(l) instanceof ImmutableArray<?>;
         ImmutableArray<?> tInsts = (ImmutableArray<?>) instMap.getInstantiation(l);
         boolean hasLabel = hasLabel(tInsts, ln);

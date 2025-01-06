@@ -145,11 +145,11 @@ class UniTrigger implements Trigger {
 
         while (true) {
             for (var quantifiableVariable : checkForCycle.freeVars()) {
-                final QuantifiableVariable termVar = (QuantifiableVariable) quantifiableVariable;
+                final QuantifiableVariable termVar = quantifiableVariable;
                 if (!body.contains(termVar)) {
                     final var termVarterm = (de.uka.ilkd.key.logic.Term) varMap.get(termVar);
                     if (termVarterm != null) {
-                        if (termVarterm.freeVars().contains((QuantifiableVariable) var)) {
+                        if (termVarterm.freeVars().contains(var)) {
                             return true;
                         }
                         fringe = fringe.prepend(termVarterm);

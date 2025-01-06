@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.sv.OperatorSV;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +71,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      *         the pair ({@link SchemaVariable}, {@link ProgramElement}) added
      */
     public MatchConditions match(ProgramElement instantiationCandidate,
-                                 MatchConditions mc,
+            MatchConditions mc,
             LogicServices services) {
         return null;
     }

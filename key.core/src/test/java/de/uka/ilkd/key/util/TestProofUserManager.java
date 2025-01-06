@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 
 import org.key_project.util.java.ArrayUtil;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

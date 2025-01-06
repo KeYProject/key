@@ -31,7 +31,7 @@ public final class TermSV extends OperatorSV implements TerminalSyntaxElement {
 
     @Override
     public String toString() {
-        return toString(sort().toString() + " term");
+        return toString(sort() + " term");
     }
 
     @Override

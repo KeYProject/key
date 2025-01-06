@@ -47,6 +47,6 @@ public final class SkolemTermSV extends OperatorSV implements TerminalSyntaxElem
 
     @Override
     public String toString() {
-        return toString(sort().toString() + " skolem term");
+        return toString(sort() + " skolem term");
     }
 }

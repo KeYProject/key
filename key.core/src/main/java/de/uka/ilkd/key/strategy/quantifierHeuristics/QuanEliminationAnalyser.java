@@ -114,7 +114,7 @@ public class QuanEliminationAnalyser {
     public boolean isEliminableVariableSomePaths(QuantifiableVariable var, Term matrix,
             boolean ex) {
         if (!((de.uka.ilkd.key.logic.Term) matrix).freeVars()
-                .contains((de.uka.ilkd.key.logic.op.QuantifiableVariable) var)) {
+                .contains(var)) {
             return true;
         }
 
@@ -194,9 +194,9 @@ public class QuanEliminationAnalyser {
         final var leftOp = left.op();
         final var rightOp = right.op();
         return leftOp == var
-                && !right.freeVars().contains((de.uka.ilkd.key.logic.op.QuantifiableVariable) var)
+                && !right.freeVars().contains(var)
                 || rightOp == var && !left.freeVars()
-                        .contains((de.uka.ilkd.key.logic.op.QuantifiableVariable) var);
+                        .contains(var);
     }
 
 }

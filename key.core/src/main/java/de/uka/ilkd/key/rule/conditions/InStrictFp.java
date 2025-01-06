@@ -32,7 +32,7 @@ public final class InStrictFp extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
-                         Services services) {
+            Services services) {
 
         ExecutionContext ec = instMap.getExecutionContext();
 

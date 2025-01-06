@@ -18,7 +18,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
  */
 public abstract class AbstractInfFlowPO extends AbstractOperationPO implements InfFlowPO {
 
-    public AbstractInfFlowPO(InitConfig initConfig, String name) {
+    protected AbstractInfFlowPO(InitConfig initConfig, String name) {
         super(initConfig, name);
     }
 

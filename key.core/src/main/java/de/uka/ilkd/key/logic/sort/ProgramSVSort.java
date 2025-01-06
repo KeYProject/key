@@ -277,7 +277,7 @@ public abstract class ProgramSVSort extends SortImpl {
 
     // --------------------------------------------------------------------------
 
-    public ProgramSVSort(Name name) {
+    protected ProgramSVSort(Name name) {
         super(name, DefaultImmutableSet.nil(), false, "", "");
         NAME2SORT.put(name, this);
     }

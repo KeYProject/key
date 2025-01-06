@@ -168,7 +168,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
     private static abstract class CofactorItem {
         public final Polynomial cofactor;
 
-        public CofactorItem(Polynomial cofactor) {
+        protected CofactorItem(Polynomial cofactor) {
             this.cofactor = cofactor;
         }
     }

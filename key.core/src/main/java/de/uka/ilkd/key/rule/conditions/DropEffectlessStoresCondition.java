@@ -8,13 +8,13 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.TermSV;
+
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
-
-import org.key_project.logic.SyntaxElement;
-import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
@@ -69,8 +69,8 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                 MatchConditions mc,
-                                 LogicServices p_services) {
+            MatchConditions mc,
+            LogicServices p_services) {
         final Services services = (Services) p_services;
         var svInst = (de.uka.ilkd.key.rule.inst.SVInstantiations) mc.getInstantiations();
         Term hInst = svInst.getInstantiation(h);
@@ -83,7 +83,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
         }
 
         final Term properResultInst = dropEffectlessStores(
-                services.getTermBuilder().store(hInst, oInst, fInst, xInst), services);
+            services.getTermBuilder().store(hInst, oInst, fInst, xInst), services);
         if (properResultInst == null) {
             return null;
         } else if (resultInst == null) {

@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
@@ -118,9 +117,12 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                     "Rule \"staticMethodCallStaticWithAssignmentViaTypereference\" expected, but is \""
                         + MiscTools.getRuleName(node) + "\".");
             }
-            org.key_project.logic.op.sv.SchemaVariable methodSV = app.instantiations().lookupVar(new Name("#mn"));
-            org.key_project.logic.op.sv.SchemaVariable typeSV = app.instantiations().lookupVar(new Name("#t"));
-            org.key_project.logic.op.sv.SchemaVariable argsSV = app.instantiations().lookupVar(new Name("#elist"));
+            org.key_project.logic.op.sv.SchemaVariable methodSV =
+                app.instantiations().lookupVar(new Name("#mn"));
+            org.key_project.logic.op.sv.SchemaVariable typeSV =
+                app.instantiations().lookupVar(new Name("#t"));
+            org.key_project.logic.op.sv.SchemaVariable argsSV =
+                app.instantiations().lookupVar(new Name("#elist"));
 
             ProgramElementName method =
                 (ProgramElementName) app.instantiations().getInstantiation(methodSV);

@@ -10,12 +10,12 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.LightweightSyntacticalReplaceVisitor;
+
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
-
-import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.inst.SVInstantiations;
 
 /**
@@ -40,7 +40,7 @@ public class StoreStmtInCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-                                 MatchConditions matchCond, LogicServices services) {
+            MatchConditions matchCond, LogicServices services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         if (svInst.getInstantiation(storeInSV) != null) {
@@ -48,7 +48,8 @@ public class StoreStmtInCondition implements VariableCondition {
         }
 
         final LightweightSyntacticalReplaceVisitor replVisitor = //
-            new LightweightSyntacticalReplaceVisitor((de.uka.ilkd.key.rule.inst.SVInstantiations) svInst, (Services) services);
+            new LightweightSyntacticalReplaceVisitor(
+                (de.uka.ilkd.key.rule.inst.SVInstantiations) svInst, (Services) services);
         term.execPostOrder(replVisitor);
         final Term instantiatedTerm = replVisitor.getTerm();
 

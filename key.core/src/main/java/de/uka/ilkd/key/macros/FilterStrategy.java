@@ -17,7 +17,7 @@ public abstract class FilterStrategy implements Strategy {
 
     private final Strategy delegate;
 
-    public FilterStrategy(Strategy delegate) {
+    protected FilterStrategy(Strategy delegate) {
         this.delegate = delegate;
     }
 

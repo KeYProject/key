@@ -10,13 +10,12 @@ import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.ProgramSV;
+
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-
-import org.key_project.logic.SyntaxElement;
 
 /**
  * Checks whether the given statement is labeled, i.e., actual a LabeledStatement. This information
@@ -35,8 +34,9 @@ public class IsLabeledCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-                                 MatchConditions matchCond, LogicServices services) {
-        final var svInst = (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
+            MatchConditions matchCond, LogicServices services) {
+        final var svInst =
+            (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
 
         final JavaStatement stmt = (JavaStatement) svInst.getInstantiation(stmtSV);
 

@@ -18,36 +18,36 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
-import de.uka.ilkd.key.rule.executor.RuleExecutor;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 
 /**
  * Encapsulates the application engine of taclets.
  *
  * Several methods require instantiationInformation objects:
- *  in this implementation the following additional instantiation information concerning labels must be provided:
+ * in this implementation the following additional instantiation information concerning labels must
+ * be provided:
  * <ul>
- *   <li>termLabelState: The {@link TermLabelState} of the current rule application.</li>
- *   <li>labelHint: The hint used to maintain {@link TermLabel}s. the instantiations of the schemavariables</li>
+ * <li>termLabelState: The {@link TermLabelState} of the current rule application.</li>
+ * <li>labelHint: The hint used to maintain {@link TermLabel}s. the instantiations of the
+ * schemavariables</li>
  * </ul>
  *
  * @param <TacletKind> The kind of taclet that is executed.
  */
-public abstract class TacletExecutor<TacletKind extends Taclet> extends org.key_project.prover.rules.TacletExecutor<Goal, RuleApp, TacletKind> {
+public abstract class TacletExecutor<TacletKind extends Taclet>
+        extends org.key_project.prover.rules.TacletExecutor<Goal, RuleApp, TacletKind> {
 
     protected TacletExecutor(TacletKind taclet) {
         super(taclet);
@@ -60,54 +60,55 @@ public abstract class TacletExecutor<TacletKind extends Taclet> extends org.key_
 
     @Override
     protected Term and(Term t1, Term t2, Goal goal) {
-        return goal.getOverlayServices().getTermBuilder().
-                and((de.uka.ilkd.key.logic.Term) t1, (de.uka.ilkd.key.logic.Term) t2);
+        return goal.getOverlayServices().getTermBuilder().and((de.uka.ilkd.key.logic.Term) t1,
+            (de.uka.ilkd.key.logic.Term) t2);
     }
 
     /**
      * a new term is created by replacing variables of term whose replacement is found in the given
      * SVInstantiations
      *
-     * @param term                       the {@link Term} the syntactical replacement is performed on
+     * @param term the {@link Term} the syntactical replacement is performed on
      * @param applicationPosInOccurrence the {@link PosInOccurrence} of the find term in the sequent
-     *                                   this taclet is applied to
-     * @param mc                         the {@link MatchConditions} with all instantiations and the constraint
-     * @param goal                       the {@link Goal} on which this taclet is applied
-     * @param ruleApp                    the {@link RuleApp} with application information
+     *        this taclet is applied to
+     * @param mc the {@link MatchConditions} with all instantiations and the constraint
+     * @param goal the {@link Goal} on which this taclet is applied
+     * @param ruleApp the {@link RuleApp} with application information
      * @param services
-     * @param instantiationInfo          additional instantiation information concerning label:
-     *                                   <ul>
-     *                                       <li>termLabelState: The {@link TermLabelState} of the current rule application.</li>
-     *                                       <li>labelHint: The hint used to maintain {@link TermLabel}s. the instantiations of the
-     *                                   schemavariables</li>
-     *                                   </ul>
+     * @param instantiationInfo additional instantiation information concerning label:
+     *        <ul>
+     *        <li>termLabelState: The {@link TermLabelState} of the current rule application.</li>
+     *        <li>labelHint: The hint used to maintain {@link TermLabel}s. the instantiations of the
+     *        schemavariables</li>
+     *        </ul>
      * @return the (partially) instantiated term
      */
     @Override
     protected Term syntacticalReplace(Term term,
-                                      PosInOccurrence applicationPosInOccurrence,
-                                      org.key_project.prover.rules.MatchConditions mc, Goal goal,
-                                      RuleApp ruleApp,
-                                      LogicServices services,
-                                      Object... /* TermLabelState, TacletLabelHint */ instantiationInfo) {
+            PosInOccurrence applicationPosInOccurrence,
+            org.key_project.prover.rules.MatchConditions mc, Goal goal,
+            RuleApp ruleApp,
+            LogicServices services,
+            Object... /* TermLabelState, TacletLabelHint */ instantiationInfo) {
         final SyntacticalReplaceVisitor srVisitor =
-            new SyntacticalReplaceVisitor((TermLabelState)instantiationInfo[0],
-                    (TacletLabelHint)instantiationInfo[1], applicationPosInOccurrence,
-                    (SVInstantiations) mc.getInstantiations(), goal, taclet,
-                    (de.uka.ilkd.key.rule.RuleApp) ruleApp);
+            new SyntacticalReplaceVisitor((TermLabelState) instantiationInfo[0],
+                (TacletLabelHint) instantiationInfo[1], applicationPosInOccurrence,
+                (SVInstantiations) mc.getInstantiations(), goal, taclet,
+                (de.uka.ilkd.key.rule.RuleApp) ruleApp);
         term.execPostOrder(srVisitor);
         return srVisitor.getTerm();
     }
 
-    protected Term applyContextUpdate(org.key_project.prover.rules.inst.SVInstantiations p_svInst, Term formula, Goal goal) {
-        //var instantiatedFormula = (de.uka.ilkd.key.logic.Term) formula;
+    protected Term applyContextUpdate(org.key_project.prover.rules.inst.SVInstantiations p_svInst,
+            Term formula, Goal goal) {
+        // var instantiatedFormula = (de.uka.ilkd.key.logic.Term) formula;
         final SVInstantiations svInst = (SVInstantiations) p_svInst;
         if (svInst.getUpdateContext().isEmpty()) {
             return formula;
         }
         return goal.getOverlayServices().getTermBuilder()
                 .applyUpdatePairsSequential(svInst.getUpdateContext(),
-                        (de.uka.ilkd.key.logic.Term) formula);
+                    (de.uka.ilkd.key.logic.Term) formula);
     }
 
     /**
@@ -118,12 +119,12 @@ public abstract class TacletExecutor<TacletKind extends Taclet> extends org.key_
      *        rewritten
      * @param matchCond the MatchConditions including the mapping Schemavariables to concrete logic
      *        elements
-     * @param instantiationInfo          additional instantiation information concerning label:
-     *                                   <ul>
-     *                                       <li>termLabelState: The {@link TermLabelState} of the current rule application.</li>
-     *                                       <li>labelHint: The hint used to maintain {@link TermLabel}s. the instantiations of the
-     *                                   schemavariables</li>
-     *                                   </ul>
+     * @param instantiationInfo additional instantiation information concerning label:
+     *        <ul>
+     *        <li>termLabelState: The {@link TermLabelState} of the current rule application.</li>
+     *        <li>labelHint: The hint used to maintain {@link TermLabel}s. the instantiations of the
+     *        schemavariables</li>
+     *        </ul>
      * @return the instantiated formulas of the semisequent as list
      */
     @Override
@@ -132,14 +133,15 @@ public abstract class TacletExecutor<TacletKind extends Taclet> extends org.key_
             PosInOccurrence applicationPosInOccurrence,
             org.key_project.prover.rules.MatchConditions matchCond, Goal goal,
             RuleApp tacletApp, LogicServices services,
-            Object... instantiationInfo) { //TermLabelState termLabelState, TacletLabelHint labelHint) {
+            Object... instantiationInfo) { // TermLabelState termLabelState, TacletLabelHint
+                                           // labelHint) {
 
         ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(sf, services,
                 matchCond, applicationPosInOccurrence, goal, tacletApp, instantiationInfo[0],
-                    new TacletLabelHint((TacletLabelHint) instantiationInfo[1], sf)));
+                new TacletLabelHint((TacletLabelHint) instantiationInfo[1], sf)));
         }
 
         return replacements;
@@ -157,14 +159,14 @@ public abstract class TacletExecutor<TacletKind extends Taclet> extends org.key_
      */
     @Override
     protected void applyAddrule(ImmutableList<? extends org.key_project.prover.rules.Taclet> rules,
-                                Goal goal,
-                                LogicServices services,
-                                org.key_project.prover.rules.MatchConditions p_matchCond) {
+            Goal goal,
+            LogicServices services,
+            org.key_project.prover.rules.MatchConditions p_matchCond) {
         var matchCond = (MatchConditions) p_matchCond;
         for (var tacletToAdd : rules) {
             final Node n = goal.node();
             tacletToAdd = tacletToAdd
-                    .setName(tacletToAdd.name().toString() + AUTO_NAME + n.getUniqueTacletId());
+                    .setName(tacletToAdd.name() + AUTO_NAME + n.getUniqueTacletId());
 
 
             // the new Taclet may contain variables with a known

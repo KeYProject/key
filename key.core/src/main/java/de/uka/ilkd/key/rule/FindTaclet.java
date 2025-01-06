@@ -5,8 +5,8 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.*;
 
-import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.prover.rules.TacletApplPart;
@@ -58,12 +58,12 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-                         ImmutableList<TacletGoalTemplate> goalTemplates,
-                         ImmutableList<RuleSet> ruleSets,
-                         TacletAttributes attrs, Term find,
-                         ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-                         ChoiceExpr choices, boolean surviveSymbExec,
-                         ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs, Term find,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ChoiceExpr choices, boolean surviveSymbExec,
+            ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, surviveSymbExec,
             tacletAnnotations);
         this.find = find;
@@ -86,10 +86,10 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-                         ImmutableList<TacletGoalTemplate> goalTemplates,
-                         ImmutableList<RuleSet> ruleSets,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
-                         ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices, false,
             tacletAnnotations);

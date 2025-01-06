@@ -220,7 +220,7 @@ public abstract class AbstractProblemLoader {
      *        defined by the loaded proof or {@code false} otherwise which still allows to work with
      *        the loaded {@link InitConfig}.
      */
-    public AbstractProblemLoader(File file, List<File> classPath, File bootClassPath,
+    protected AbstractProblemLoader(File file, List<File> classPath, File bootClassPath,
             List<File> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
             ProblemLoaderControl control,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,

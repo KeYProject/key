@@ -300,12 +300,10 @@ public class InfFlowProofSymbols {
         assert symb != null;
         boolean l = false;
 
-        if (symb instanceof Sort) {
-            final Sort s = (Sort) symb;
+        if (symb instanceof Sort s) {
             addSort(s, l);
         }
-        if (symb instanceof SortedOperator) {
-            final SortedOperator s = (SortedOperator) symb;
+        if (symb instanceof SortedOperator s) {
             addSort(s.sort(), l);
         }
         if (symb instanceof JFunction f) {

@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+
 import org.key_project.logic.LogicServices;
 
 public class MatchFormulaSVInstruction extends MatchSchemaVariableInstruction<FormulaSV> {
@@ -30,7 +30,7 @@ public class MatchFormulaSVInstruction extends MatchSchemaVariableInstruction<Fo
 
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
-                                 LogicServices services) {
+            LogicServices services) {
 
         final MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {

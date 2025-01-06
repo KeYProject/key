@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
@@ -114,8 +113,9 @@ public class TriggeredInstantiations implements TermGenerator {
 
                     final Metavariable mv = new Metavariable(new Name("$MV$" + sv.name()), svSort);
 
-                    final Term trigger = instantiateTerm((Term)taclet.getTrigger().getTerm(), services,
-                        svInst.replace(sv, services.getTermFactory().createTerm(mv), services));
+                    final Term trigger =
+                        instantiateTerm((Term) taclet.getTrigger().getTerm(), services,
+                            svInst.replace(sv, services.getTermFactory().createTerm(mv), services));
 
                     final Set<org.key_project.logic.Term> instances =
                         computeInstances(services, comprehension, mv, trigger, terms, axioms, tapp);
@@ -215,8 +215,9 @@ public class TriggeredInstantiations implements TermGenerator {
         conditions = ImmutableSLList.nil();
         for (var singleAvoidCond : app.taclet().getTrigger().avoidConditions()) {
             conditions =
-                conditions.append(instantiateTerm((Term) singleAvoidCond, services, app.instantiations()
-                        .replace(app.taclet().getTrigger().triggerVar(), middle, services)));
+                conditions.append(
+                    instantiateTerm((Term) singleAvoidCond, services, app.instantiations()
+                            .replace(app.taclet().getTrigger().triggerVar(), middle, services)));
         }
         return conditions;
     }

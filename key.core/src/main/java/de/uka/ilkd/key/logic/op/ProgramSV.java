@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * The particular construct being matched is determined by the ProgramSVSort of the schema variable.
  */
 public final class ProgramSV extends OperatorSV
-        implements ProgramConstruct, UpdateableOperator, SyntaxElement {
+        implements ProgramConstruct, UpdateableOperator {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION =

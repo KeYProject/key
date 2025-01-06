@@ -14,17 +14,18 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.MatchConditions;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.key_project.prover.rules.MatchConditions;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class VMTacletMatcherTest {
 
     private static final int NR_TACLETS = 6;
-    public static final MatchConditions EMPTY_MATCHCONDITIONS = de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
+    public static final MatchConditions EMPTY_MATCHCONDITIONS =
+        de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
 
     private static Services services;
     private static final Taclet[] taclet = new Taclet[NR_TACLETS];

@@ -10,7 +10,6 @@ import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
 import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
@@ -93,14 +92,17 @@ public class InfFlowContractAppFeature implements Feature {
 
 
         // compare the if-sequent instantiations
-        if (newApp.assumesFormulaInstantiations() == null || cmp.assumesFormulaInstantiations() == null) {
-            if (newApp.assumesFormulaInstantiations() != null || cmp.assumesFormulaInstantiations() != null) {
+        if (newApp.assumesFormulaInstantiations() == null
+                || cmp.assumesFormulaInstantiations() == null) {
+            if (newApp.assumesFormulaInstantiations() != null
+                    || cmp.assumesFormulaInstantiations() != null) {
                 return false;
             }
         } else {
             final Iterator<AssumesFormulaInstantiation> it0 =
                 newApp.assumesFormulaInstantiations().iterator();
-            final Iterator<AssumesFormulaInstantiation> it1 = cmp.assumesFormulaInstantiations().iterator();
+            final Iterator<AssumesFormulaInstantiation> it1 =
+                cmp.assumesFormulaInstantiations().iterator();
 
             while (it0.hasNext()) {
                 // this test should be improved
@@ -125,7 +127,8 @@ public class InfFlowContractAppFeature implements Feature {
     }
 
 
-    private boolean subset(ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> insts0,
+    private boolean subset(
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> insts0,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> insts1) {
 
         for (final ImmutableMapEntry<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {

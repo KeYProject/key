@@ -316,7 +316,7 @@ public class TacletAppIndex {
     }
 
     private void updateIndices(SequentChangeInfo sci) {
-        seq = (Sequent) sci.sequent();
+        seq = sci.sequent();
 
         antecIndex =
             antecIndex.sequentChanged(sci, getServices(), tacletIndex, newRuleListener);

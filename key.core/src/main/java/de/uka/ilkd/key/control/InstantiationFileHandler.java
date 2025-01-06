@@ -64,7 +64,7 @@ public class InstantiationFileHandler {
         java.util.List<List<String>> instList = new LinkedList<>();
         java.util.List<String> instantiations = new LinkedList<>();
         try (BufferedReader br = new BufferedReader(
-            new FileReader(INSTANTIATION_DIR + File.separator + taclet.name().toString(),
+            new FileReader(INSTANTIATION_DIR + File.separator + taclet.name(),
                 StandardCharsets.UTF_8))) {
             String line = br.readLine();
             StringBuilder sb = new StringBuilder();
@@ -108,7 +108,7 @@ public class InstantiationFileHandler {
         int start = model.tacletApp().instantiations().size();
         java.util.List<List<String>> instList = getInstantiationListsFor(taclet);
         try (BufferedWriter bw = new BufferedWriter(
-            new FileWriter(INSTANTIATION_DIR + File.separator + taclet.name().toString(),
+            new FileWriter(INSTANTIATION_DIR + File.separator + taclet.name(),
                 StandardCharsets.UTF_8))) {
             StringBuilder sb = new StringBuilder();
             for (int i = start; i < tableModel.getRowCount(); i++) {

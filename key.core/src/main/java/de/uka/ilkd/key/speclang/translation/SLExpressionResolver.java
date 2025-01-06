@@ -25,7 +25,7 @@ public abstract class SLExpressionResolver {
     protected final SLResolverManager manager;
     protected final KeYJavaType specInClass;
 
-    public SLExpressionResolver(JavaInfo javaInfo, SLResolverManager manager,
+    protected SLExpressionResolver(JavaInfo javaInfo, SLResolverManager manager,
             KeYJavaType specInClass) {
         assert javaInfo != null;
         assert manager != null;

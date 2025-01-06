@@ -28,12 +28,14 @@ public abstract class VariableConditionAdapter implements VariableCondition {
      * @return true iff condition is fulfilled
      */
     public abstract boolean check(SchemaVariable var, SyntaxElement instCandidate,
-                                  SVInstantiations instMap, Services services);
+            SVInstantiations instMap, Services services);
 
 
 
-    public final MatchConditions check(org.key_project.logic.op.sv.SchemaVariable var, SyntaxElement instCandidate,
-                                       org.key_project.prover.rules.MatchConditions mc, LogicServices services) {
-        return check((SchemaVariable) var, instCandidate, (SVInstantiations) mc.getInstantiations(), (Services) services) ? (MatchConditions) mc : null;
+    public final MatchConditions check(org.key_project.logic.op.sv.SchemaVariable var,
+            SyntaxElement instCandidate,
+            org.key_project.prover.rules.MatchConditions mc, LogicServices services) {
+        return check((SchemaVariable) var, instCandidate, (SVInstantiations) mc.getInstantiations(),
+            (Services) services) ? (MatchConditions) mc : null;
     }
 }

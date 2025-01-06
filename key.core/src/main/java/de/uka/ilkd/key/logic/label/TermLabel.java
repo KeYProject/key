@@ -18,7 +18,6 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
-import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -152,7 +151,7 @@ import org.key_project.prover.sequent.SequentFormula;
  * @see TermLabelManager
  */
 // spotless:on
-public interface TermLabel extends Named, SyntaxElement, /* TODO: Remove */ TerminalSyntaxElement {
+public interface TermLabel extends Named, /* TODO: Remove */ TerminalSyntaxElement {
 
     /**
      * Retrieves the i-th parameter object of this term label.

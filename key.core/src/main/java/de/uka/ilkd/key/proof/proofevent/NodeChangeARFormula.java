@@ -13,7 +13,7 @@ public abstract class NodeChangeARFormula implements NodeChange {
 
     final PosInOccurrence pos;
 
-    public NodeChangeARFormula(PosInOccurrence p_pos) {
+    protected NodeChangeARFormula(PosInOccurrence p_pos) {
         pos = p_pos;
     }
 
