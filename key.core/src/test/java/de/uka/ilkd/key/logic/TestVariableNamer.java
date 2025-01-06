@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.Collections;
-import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -20,7 +19,6 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 
@@ -30,7 +28,6 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.*;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.Test;

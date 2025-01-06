@@ -12,7 +12,8 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Abstract base class for schema variables.
  */
-public abstract class OperatorSV extends AbstractSortedOperator implements org.key_project.logic.op.sv.OperatorSV, SchemaVariable {
+public abstract class OperatorSV extends AbstractSortedOperator
+        implements org.key_project.logic.op.sv.OperatorSV, SchemaVariable {
 
     private final boolean isStrict;
 
@@ -76,6 +77,7 @@ public abstract class OperatorSV extends AbstractSortedOperator implements org.k
     public boolean isFormula() {
         return false;
     }
+
     @Override
     public boolean isSkolemTerm() {
         return false;

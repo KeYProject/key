@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+
 import org.key_project.logic.LogicServices;
 
 /**
@@ -29,7 +29,7 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
      */
     @Override
     public final MatchConditions match(Term instantiationCandidate, MatchConditions matchConditions,
-                                       LogicServices services) {
+            LogicServices services) {
         if (instantiationCandidate.op() == op) {
             return matchConditions;
         }
@@ -41,7 +41,7 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
      */
     @Override
     public MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
-                                 LogicServices services) {
+            LogicServices services) {
         if (instantiationCandidate == op) {
             return matchConditions;
         }
@@ -53,7 +53,7 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
      */
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
-                                 LogicServices services) {
+            LogicServices services) {
         MatchConditions result = match(termPosition.getCurrentSubterm(), matchConditions, services);
         if (result != null) {
             termPosition.gotoNext();

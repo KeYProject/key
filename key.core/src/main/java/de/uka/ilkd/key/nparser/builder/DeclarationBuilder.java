@@ -17,11 +17,11 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
-import org.key_project.prover.rules.RuleSet;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
 

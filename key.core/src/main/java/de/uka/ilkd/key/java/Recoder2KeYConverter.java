@@ -490,7 +490,7 @@ public class Recoder2KeYConverter {
             final StringBuilder sb = new StringBuilder(className);
             sb.append('(');
             for (Object p : parameter) {
-                sb.append(p.toString());
+                sb.append(p);
                 sb.append(',');
             }
             if (sb.charAt(sb.length() - 1) == ',') {
@@ -2098,7 +2098,8 @@ public class Recoder2KeYConverter {
                     // encode the minus into the literal
                     return new IntLiteral(collectComments(lit), "-" + lit.getValue());
                 }
-            } else if (arg.getChildAt(0) instanceof recoder.java.expression.literal.LongLiteral lit) {
+            } else if (arg
+                    .getChildAt(0) instanceof recoder.java.expression.literal.LongLiteral lit) {
                 // decimal: unary minus belongs to the literal
                 if (AbstractIntegerLiteral.representsDecLiteral(lit.getValue())) {
                     // encode the minus into the literal

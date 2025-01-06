@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
-import org.key_project.logic.op.sv.SchemaVariable;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletPrefix;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
@@ -187,7 +187,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * @return a term that can be used for instantiating the schema variable.
      */
     private Term createInstantiation(Taclet owner, VariableSV sv, TermServices services) {
-        Name name = createUniqueName(services, "v_" + sv.name().toString());
+        Name name = createUniqueName(services, "v_" + sv.name());
         Sort sort = replaceSort(sv.sort(), services);
         LogicVariable variable = new LogicVariable(name, sort);
         return services.getTermFactory().createTerm(variable);
@@ -220,7 +220,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
         Sort[] argSorts = computeArgSorts(prefix, services);
         Term[] args = computeArgs(owner, prefix, services);
-        Name name = createUniqueName(services, "f_" + sv.name().toString());
+        Name name = createUniqueName(services, "f_" + sv.name());
 
         JFunction function =
             new JFunction(name, replaceSort(sv.sort(), services), argSorts);

@@ -25,7 +25,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandler.SymbolIntroducer;
-import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 
 import org.key_project.logic.Name;

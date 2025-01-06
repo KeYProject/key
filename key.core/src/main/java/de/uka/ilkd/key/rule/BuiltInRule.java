@@ -6,13 +6,11 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 
-import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleExecutor;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**

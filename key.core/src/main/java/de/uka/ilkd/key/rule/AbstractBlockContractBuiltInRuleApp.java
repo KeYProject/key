@@ -39,7 +39,7 @@ public abstract class AbstractBlockContractBuiltInRuleApp
      * @param ifInstantiations if instantiations.
      */
     protected AbstractBlockContractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence occurrence,
-                                                  ImmutableList<PosInOccurrence> ifInstantiations) {
+            ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
     }
 

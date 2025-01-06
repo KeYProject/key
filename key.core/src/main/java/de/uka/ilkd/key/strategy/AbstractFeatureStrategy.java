@@ -9,7 +9,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.RuleApp;
-import org.key_project.prover.rules.RuleSet;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;

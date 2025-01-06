@@ -16,7 +16,6 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import org.key_project.prover.rules.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -48,7 +48,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
     private Term replacewith;
 
 
-    public AbstractInfFlowUnfoldTacletBuilder(Services services) {
+    protected AbstractInfFlowUnfoldTacletBuilder(Services services) {
         super(services);
     }
 

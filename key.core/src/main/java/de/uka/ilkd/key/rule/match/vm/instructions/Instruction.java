@@ -10,12 +10,13 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 
-import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 /** Class encoding the instructions of the matching vm */
-public abstract class Instruction<OP extends org.key_project.logic.op.Operator> implements MatchInstruction {
+public abstract class Instruction<OP extends org.key_project.logic.op.Operator>
+        implements MatchInstruction {
 
     public static Instruction<Operator> matchOp(Operator op) {
         return new MatchOpIdentityInstruction<>(op);

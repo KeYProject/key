@@ -14,9 +14,9 @@ import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -87,7 +87,8 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param ruleApp the taclet application that is executed.
      */
     @Override
-    public final ImmutableList<Goal> apply(Goal goal, org.key_project.prover.rules.RuleApp ruleApp) {
+    public final ImmutableList<Goal> apply(Goal goal,
+            org.key_project.prover.rules.RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
         var services = goal.getOverlayServices();
         // Number without the if-goal eventually needed
@@ -144,7 +145,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
 
             timeTermLabels = System.nanoTime() + timeTermLabels;
             TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(),
-                    tacletApp.rule(), currentGoal, null, null);
+                tacletApp.rule(), currentGoal, null, null);
             PERF_TERM_LABELS.getAndAdd(System.nanoTime() - timeTermLabels);
         }
 
@@ -156,7 +157,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
             final Goal nextGoal = goalIt.next();
             nextGoal.setSequent(newSequentsIt.next());
             TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(),
-                    tacletApp.rule(), nextGoal, null, null);
+                tacletApp.rule(), nextGoal, null, null);
         }
 
         assert !goalIt.hasNext();

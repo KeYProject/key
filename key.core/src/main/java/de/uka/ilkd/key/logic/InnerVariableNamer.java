@@ -8,12 +8,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.TacletApp;
 import org.key_project.logic.Name;
-import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.collection.ImmutableList;
 
 
 /**

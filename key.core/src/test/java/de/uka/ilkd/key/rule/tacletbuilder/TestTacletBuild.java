@@ -81,7 +81,8 @@ public class TestTacletBuild {
     public void testUniquenessOfIfAndFindVarSVsInIfAndFind() {
         boolean thrown = false;
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        Term A = tf.createTerm((Operator)TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
+        Term A = tf.createTerm((Operator) TacletForTests.getFunctions().lookup(new Name("A")),
+            NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
         Sequent seq =
             JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t1)));
@@ -102,7 +103,8 @@ public class TestTacletBuild {
     public void testUniquenessOfIfAndFindVarSVBothInIf() {
         boolean thrown = false;
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        Term A = tf.createTerm((Operator)TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
+        Term A = tf.createTerm((Operator) TacletForTests.getFunctions().lookup(new Name("A")),
+            NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
         Term t2 = tb.ex((QuantifiableVariable) u, A);
         Sequent seq = JavaDLSequentKit
@@ -124,7 +126,8 @@ public class TestTacletBuild {
     public void testUniquenessOfIfAndFindVarSVsInFind() {
         boolean thrown = false;
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        Term A = tf.createTerm((Operator)TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
+        Term A = tf.createTerm((Operator) TacletForTests.getFunctions().lookup(new Name("A")),
+            NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setFind(tf.createTerm(Junctor.AND, t1, t1));

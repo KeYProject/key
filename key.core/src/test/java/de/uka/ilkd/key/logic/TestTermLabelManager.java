@@ -40,7 +40,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -126,11 +125,11 @@ public class TestTermLabelManager {
         two = TB.label(two, new ParameterlessTermLabel(new Name("APPLICATION")));
         Sequent sequent = JavaDLSequentKit.getInstance().getEmptySequent();
         sequent =
-                sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
+            sequent.addFormula(new SequentFormula(TB.inInt(one)), true, true).sequent();
         sequent = sequent.addFormula(pos.sequentFormula(), true, false)
                 .sequent();
         sequent =
-                sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
+            sequent.addFormula(new SequentFormula(TB.inInt(two)), false, true).sequent();
         // Test supported rule
         Rule rule = new DummyRule("rule");
         Term taclet = TB.tt();
@@ -180,7 +179,7 @@ public class TestTermLabelManager {
         if (changed) {
             for (int i = 0; i < expected.getLabels().size(); i++) {
                 if (RefactoringScope.SEQUENT.equals(scope)) {
-                    assertEquals(expected.getLabels().get(i).name().toString() + "-CHANGED",
+                    assertEquals(expected.getLabels().get(i).name() + "-CHANGED",
                         current.getLabels().get(i).name().toString());
                 } else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE
                         .equals(scope)) {
@@ -745,7 +744,7 @@ public class TestTermLabelManager {
                     changedLabels.add(label);
                 } else {
                     changed |= changedLabels.add(
-                        new ParameterlessTermLabel(new Name(label.name().toString() + "-CHANGED")));
+                        new ParameterlessTermLabel(new Name(label.name() + "-CHANGED")));
                 }
             }
             labels.replaceWith(changedLabels, changed);

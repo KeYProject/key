@@ -378,7 +378,7 @@ class TermImpl implements Term {
             sb.append("(").append(sub(0)).append(")");
             return sb.toString();
         } else {
-            sb.append(op().name().toString());
+            sb.append(op().name());
             if (!boundVars.isEmpty()) {
                 sb.append(Strings.formatAsList(boundVars(), "{", ",", "}"));
             }

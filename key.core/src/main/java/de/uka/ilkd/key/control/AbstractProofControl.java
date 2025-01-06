@@ -82,7 +82,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
      */
     protected AbstractProofControl(ProverTaskListener defaultProverTaskListener,
-                                   RuleCompletionHandler ruleCompletionHandler) {
+            RuleCompletionHandler ruleCompletionHandler) {
         this.ruleCompletionHandler = ruleCompletionHandler;
         this.defaultProverTaskListener = defaultProverTaskListener;
     }
@@ -168,7 +168,8 @@ public abstract class AbstractProofControl implements ProofControl {
                 }
                 if (ifCandidates.size() == 1 && pos != null) {
                     TacletApp a = ifCandidates.head();
-                    ImmutableList<AssumesFormulaInstantiation> ifs = a.assumesFormulaInstantiations();
+                    ImmutableList<AssumesFormulaInstantiation> ifs =
+                        a.assumesFormulaInstantiations();
                     if (ifs != null && ifs.size() == 1
                             && ifs.head() instanceof AssumesFormulaInstSeq ifis) {
                         if (ifis.toPosInOccurrence().equals(pos.topLevel())) {

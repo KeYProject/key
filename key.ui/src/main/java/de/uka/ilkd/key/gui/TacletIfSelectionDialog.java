@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,16 +87,18 @@ public class TacletIfSelectionDialog extends JPanel {
                     }
                 };
             p.add(label);
-            JComboBox<AssumesFormulaInstantiation> ifChoice = new JComboBox<>(model.ifChoiceModel(i)) {
-                /**
-                 *
-                 */
-                private static final long serialVersionUID = -6429999070946158788L;
+            JComboBox<AssumesFormulaInstantiation> ifChoice =
+                new JComboBox<>(model.ifChoiceModel(i)) {
+                    /**
+                     *
+                     */
+                    private static final long serialVersionUID = -6429999070946158788L;
 
-                public java.awt.Dimension getPreferredSize() {
-                    return new java.awt.Dimension(800, (int) super.getPreferredSize().getHeight());
-                }
-            };
+                    public java.awt.Dimension getPreferredSize() {
+                        return new java.awt.Dimension(800,
+                            (int) super.getPreferredSize().getHeight());
+                    }
+                };
             IfComboRenderer rend = new IfComboRenderer(model.proof().getServices());
             ifChoice.setRenderer(rend);
             ifChoice.addActionListener(e -> {
@@ -198,8 +201,10 @@ public class TacletIfSelectionDialog extends JPanel {
             this.services = services;
         }
 
-        public Component getListCellRendererComponent(JList<? extends AssumesFormulaInstantiation> list,
-                AssumesFormulaInstantiation value, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(
+                JList<? extends AssumesFormulaInstantiation> list,
+                AssumesFormulaInstantiation value, int index, boolean isSelected,
+                boolean cellHasFocus) {
             cellRenderer.setOpaque(true);
             final String valStr = value.toString(services);
             if (isSelected) {

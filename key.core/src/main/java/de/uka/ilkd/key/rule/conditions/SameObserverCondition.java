@@ -9,14 +9,14 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.speclang.Contract;
+
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
-import de.uka.ilkd.key.speclang.Contract;
-
-import org.key_project.logic.ParsableVariable;
-import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -71,8 +71,8 @@ public final class SameObserverCondition implements VariableCondition {
     // explanation see class javadoc.
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-                                 MatchConditions mc,
-                                 LogicServices p_services) {
+            MatchConditions mc,
+            LogicServices p_services) {
         final Services services = (Services) p_services;
         var svInst = (de.uka.ilkd.key.rule.inst.SVInstantiations) mc.getInstantiations();
         final Term term1 = (Term) svInst.getInstantiation(schema1);

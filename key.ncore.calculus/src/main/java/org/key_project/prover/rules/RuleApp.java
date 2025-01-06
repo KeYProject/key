@@ -5,9 +5,9 @@ package org.key_project.prover.rules;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
-import org.key_project.prover.sequent.PosInOccurrence;
 
 
 public interface RuleApp {

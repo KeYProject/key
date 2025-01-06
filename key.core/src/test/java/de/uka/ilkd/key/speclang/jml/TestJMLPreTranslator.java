@@ -11,7 +11,6 @@ import de.uka.ilkd.key.speclang.njml.*;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.Token;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

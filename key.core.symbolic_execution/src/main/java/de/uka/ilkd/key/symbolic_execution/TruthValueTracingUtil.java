@@ -342,7 +342,8 @@ public final class TruthValueTracingUtil {
         }
         if (isClosingRule(tacletApp.taclet())) {
             if (tacletApp.ifInstsComplete() && tacletApp.assumesFormulaInstantiations() != null) {
-                for (AssumesFormulaInstantiation ifInst : tacletApp.assumesFormulaInstantiations()) {
+                for (AssumesFormulaInstantiation ifInst : tacletApp
+                        .assumesFormulaInstantiations()) {
                     assert ifInst instanceof AssumesFormulaInstSeq;
                     Term term = (Term) ifInst.getSequentFormula().formula();
                     TermLabel label = term.getLabel(termLabelName);
@@ -560,7 +561,8 @@ public final class TruthValueTracingUtil {
                 // Check if instantiations
                 if (parentRuleApp instanceof TacletApp ta) {
                     if (ta.ifInstsComplete() && ta.assumesFormulaInstantiations() != null) {
-                        for (AssumesFormulaInstantiation ifInst : ta.assumesFormulaInstantiations()) {
+                        for (AssumesFormulaInstantiation ifInst : ta
+                                .assumesFormulaInstantiations()) {
                             checkForNewMinorIds(childNode,
                                 (Term) ifInst.getSequentFormula().formula(),
                                 termLabelName, parentPio, tb, results);

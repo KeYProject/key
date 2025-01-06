@@ -17,8 +17,8 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
-
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
+
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -171,7 +171,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
                             RewriteTaclet rw = (RewriteTaclet) pta.taclet();
                             if (pta.complete()) {
                                 SequentFormula rewriteResult =
-                                        ((RewriteTacletExecutor)rw.getExecutor()).getRewriteResult(
+                                    ((RewriteTacletExecutor) rw.getExecutor()).getRewriteResult(
                                         goalold, null, goalold.proof().getServices(), pta);
 
                                 executeRewriteTaclet(p, pta, goalold, rewriteResult);

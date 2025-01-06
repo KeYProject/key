@@ -352,7 +352,8 @@ public class OutputStreamProofSaver {
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
         output.append(newNames2Proof(node));
         output.append(getInteresting(appliedRuleApp.instantiations()));
-        final ImmutableList<AssumesFormulaInstantiation> l = appliedRuleApp.assumesFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> l =
+            appliedRuleApp.assumesFormulaInstantiations();
         if (l != null) {
             output.append(ifFormulaInsts(node, l));
         }

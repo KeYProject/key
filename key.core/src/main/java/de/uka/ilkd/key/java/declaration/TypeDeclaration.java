@@ -67,7 +67,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
      * @param members an array containing the memberdeclarations of this type
      */
     protected TypeDeclaration(Modifier[] mods, ProgramElementName name, ProgramElementName fullName,
-                              MemberDeclaration[] members, boolean parentIsInterfaceDeclaration, boolean isLibrary) {
+            MemberDeclaration[] members, boolean parentIsInterfaceDeclaration, boolean isLibrary) {
         super(mods);
         this.name = name;
         this.fullName = fullName;
@@ -83,8 +83,9 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
      *        members of the type), a parentIsInterfaceDeclaration (indicating if parent is
      *        interface), several Modifier (as modifiers of the type decl), Comments
      */
-    protected TypeDeclaration(ExtList children, ProgramElementName name, ProgramElementName fullName,
-                              boolean isLibrary) {
+    protected TypeDeclaration(ExtList children, ProgramElementName name,
+            ProgramElementName fullName,
+            boolean isLibrary) {
         super(children);
         this.name = name;
         this.fullName = fullName;

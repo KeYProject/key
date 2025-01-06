@@ -7,9 +7,9 @@ import de.uka.ilkd.key.logic.ChoiceExpr;
 import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
 
 import org.key_project.logic.Name;
-import org.key_project.prover.rules.*;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.*;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -38,10 +38,10 @@ public class NoFindTaclet extends Taclet {
      * @param choices the SetOf<Choices> to which this taclet belongs to
      */
     public NoFindTaclet(Name name, TacletApplPart applPart,
-                        ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
-                        TacletAttributes attrs,
-                        ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-                        ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
             tacletAnnotations);
         createTacletServices();
@@ -73,8 +73,9 @@ public class NoFindTaclet extends Taclet {
 
     @Override
     public NoFindTaclet setName(String s) {
-        final TacletApplPart applPart = new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
-            varsNewDependingOn(), getVariableConditions());
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
 
         return new NoFindTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,

@@ -158,7 +158,7 @@ public class ClausesGraph {
     private boolean directlyConnected(Term formula0, Term formula1) {
         // TODO: fix casts
         return containsExistentialVariables(
-            intersectQV((ImmutableSet<QuantifiableVariable>) formula0.freeVars(),
+            intersectQV(formula0.freeVars(),
                 (ImmutableSet<QuantifiableVariable>) formula1.freeVars()));
     }
 

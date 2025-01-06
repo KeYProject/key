@@ -1125,7 +1125,7 @@ public class Proof implements ProofObject<Goal>, Named {
         }
         result.append("\nProoftree:\n");
         if (countNodes() < 50) {
-            result.append(root.toString());
+            result.append(root);
         } else {
             result.append("<too large to include>");
         }

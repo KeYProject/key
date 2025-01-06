@@ -5,7 +5,6 @@ package de.uka.ilkd.key.logic;
 
 import org.key_project.logic.PosInTerm;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

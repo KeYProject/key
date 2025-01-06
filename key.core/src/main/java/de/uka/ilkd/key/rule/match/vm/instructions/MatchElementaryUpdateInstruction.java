@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -12,6 +11,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TacletMatchProgram;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+
 import org.key_project.logic.LogicServices;
 
 public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpdate> {
@@ -46,7 +46,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
 
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
-                                 LogicServices services) {
+            LogicServices services) {
         final MatchConditions result =
             match(termPosition.getCurrentSubterm(), matchConditions, services);
         if (result != null) {

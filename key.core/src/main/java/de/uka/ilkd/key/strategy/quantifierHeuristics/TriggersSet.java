@@ -105,7 +105,7 @@ public class TriggersSet {
         while (it.hasNext()) {
             final var clause = (de.uka.ilkd.key.logic.Term) it.next();
             // a trigger should contain the first variable of allTerm
-            if (clause.freeVars().contains((de.uka.ilkd.key.logic.op.QuantifiableVariable) var)) {
+            if (clause.freeVars().contains(var)) {
                 ClauseTrigger ct = new ClauseTrigger(clause);
                 ct.createTriggers(services);
             }

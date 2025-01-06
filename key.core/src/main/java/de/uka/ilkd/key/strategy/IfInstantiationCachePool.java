@@ -90,7 +90,8 @@ public class IfInstantiationCachePool {
             }
         }
 
-        public void put(boolean antec, Long key, ImmutableArray<AssumesFormulaInstantiation> value) {
+        public void put(boolean antec, Long key,
+                ImmutableArray<AssumesFormulaInstantiation> value) {
             final HashMap<Long, ImmutableArray<AssumesFormulaInstantiation>> cache =
                 antec ? antecCache : succCache;
             try {

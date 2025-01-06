@@ -146,7 +146,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     private ImmutableList<RuleAppContainer> addContainer(NoPosTacletApp app,
             ImmutableList<RuleAppContainer> targetList, Goal p_goal) {
         return targetList.prepend(
-            TacletAppContainer.createContainer(app, getPosInOccurrence(p_goal), p_goal, false));
+            createContainer(app, getPosInOccurrence(p_goal), p_goal, false));
     }
 
     /**
@@ -158,7 +158,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         if (!sufficientlyCompleteApp(app)) {
             return targetList;
         }
-        return targetList.prepend(TacletAppContainer.createContainer(app,
+        return targetList.prepend(createContainer(app,
             getPosInOccurrence(p_goal), p_goal, cost, false));
     }
 

@@ -5,7 +5,6 @@ package org.key_project.prover.rules;
 
 
 import org.key_project.logic.LogicServices;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.SequentFormula;
 
 

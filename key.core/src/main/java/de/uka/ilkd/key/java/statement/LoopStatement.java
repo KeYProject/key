@@ -133,7 +133,7 @@ public abstract class LoopStatement extends JavaStatement
      * @param body the body of the loop
      */
     protected LoopStatement(LoopInitializer[] inits, Expression guard, Expression[] updates,
-                            Statement body) {
+            Statement body) {
         this.body = body;
         if (updates != null) {
             this.updates = new ForUpdates(new ImmutableArray<>(updates));
@@ -154,7 +154,7 @@ public abstract class LoopStatement extends JavaStatement
      * @param comments the comments attached to this statement.
      */
     protected LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body,
-                            ExtList comments) {
+            ExtList comments) {
         super(comments);
         this.body = body;
         this.updates = updates;
@@ -164,7 +164,7 @@ public abstract class LoopStatement extends JavaStatement
 
 
     protected LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body,
-                            ExtList comments, PositionInfo pos) {
+            ExtList comments, PositionInfo pos) {
         super(add(comments, pos));
         this.body = body;
         this.updates = updates;
@@ -183,7 +183,7 @@ public abstract class LoopStatement extends JavaStatement
      * @param pos the position of the loop
      */
     protected LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body,
-                            PositionInfo pos) {
+            PositionInfo pos) {
         super(pos);
         this.body = body;
         this.updates = updates;

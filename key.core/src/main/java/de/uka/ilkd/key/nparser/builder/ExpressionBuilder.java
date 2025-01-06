@@ -38,8 +38,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.TermCreationException;
-import org.key_project.logic.sort.Sort;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
@@ -1356,9 +1356,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     addWarning("");
                 }
                 return current;
-            } else if (ctxSuffix instanceof KeYParser.Attribute_simpleContext) {
-                KeYParser.Attribute_simpleContext attrid =
-                    (KeYParser.Attribute_simpleContext) ctxSuffix;
+            } else if (ctxSuffix instanceof KeYParser.Attribute_simpleContext attrid) {
                 String memberName = attrid.id.getText();
                 Sort seqSort = lookupSort("Seq");
                 if (current.sort() == seqSort) {
@@ -1392,9 +1390,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         current = replaceHeap(current, heap, ctxSuffix);
                     }
                 }
-            } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
-                KeYParser.Attribute_complexContext attrid =
-                    (KeYParser.Attribute_complexContext) ctxSuffix;
+            } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext attrid) {
                 Term heap = accept(attrid.heap);
                 String classRef = attrid.sort.getText();
                 String memberName = attrid.id.getText();

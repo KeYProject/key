@@ -347,8 +347,7 @@ public final class ProblemInitializer {
 
         if (term.op() instanceof JFunction fn) {
             namespaces.functions().add(fn);
-        } else if (term.op() instanceof ProgramVariable) {
-            final ProgramVariable pv = (ProgramVariable) term.op();
+        } else if (term.op() instanceof ProgramVariable pv) {
             if (namespaces.programVariables().lookup(pv.name()) == null) {
                 rootGoal.addProgramVariable((ProgramVariable) term.op());
             }
