@@ -56,7 +56,7 @@ public class FunctionPerformanceData {
         if (table == null) {
             try {
                 File ruleDataLocation = new File(dataDir, ruleName + ".data");
-                String[] columns = new String[] { "nodeId", "astCount", "proofTreeDepth",
+                String[] columns = { "nodeId", "astCount", "proofTreeDepth",
                     "numberInvocations", "         duration", "averageTimePerInvocation" };
                 String description = "Profiling data for rule " + ruleName;
                 table = new DataRecordingTable(ruleDataLocation, columns, description);

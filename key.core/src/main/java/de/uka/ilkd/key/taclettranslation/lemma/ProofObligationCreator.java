@@ -137,7 +137,7 @@ public class ProofObligationCreator {
         LemmaGenerator generator = new GenericRemovingLemmaGenerator();
         TacletFormula tacletFormula = generator.translate(taclet, initConfig.getServices());
         Term formula = tacletFormula.getFormula(initConfig.getServices());
-        String name = "Taclet: " + taclet.name().toString();
+        String name = "Taclet: " + taclet.name();
 
         UserDefinedSymbols userDefinedSymbols = new UserDefinedSymbols(symbolsForAxioms);
 

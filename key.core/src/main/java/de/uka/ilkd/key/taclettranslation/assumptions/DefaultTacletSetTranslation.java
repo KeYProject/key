@@ -195,7 +195,7 @@ public final class DefaultTacletSetTranslation
         if (!usedFormulaSV.isEmpty()) {
             toStore.append("\\predicates{\n\n");
             for (SchemaVariable var : usedFormulaSV) {
-                toStore.append(var.name().toString()).append(";\n");
+                toStore.append(var.name()).append(";\n");
             }
             toStore.append("}\n\n\n");
         }
@@ -203,7 +203,7 @@ public final class DefaultTacletSetTranslation
         toStore.append("\\problem{\n\n");
         int i = 0;
         for (TacletFormula tf : list) {
-            toStore.append("//").append(tf.getTaclet().name().toString()).append("\n");
+            toStore.append("//").append(tf.getTaclet().name()).append("\n");
             toStore.append(convertTerm(tf.getFormula(services)));
             if (i != list.size() - 1) {
                 toStore.append("\n\n& //and\n\n");

@@ -96,7 +96,7 @@ public class SolverPropertiesLoader {
     /**
      * The default message DELIMITERS, if none are given in the .props file.
      */
-    private static final String[] DEFAULT_DELIMITERS = new String[] { "\n", "\r" };
+    private static final String[] DEFAULT_DELIMITERS = { "\n", "\r" };
     /**
      * The default solver TIMEOUT, if none is given in the .props file.
      */

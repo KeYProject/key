@@ -148,7 +148,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate =
             updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiableClauses);
-        final Term[] updates = new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
+        final Term[] updates = { contextUpdate, remembranceUpdate, anonymisationUpdate };
         return updates;
     }
 

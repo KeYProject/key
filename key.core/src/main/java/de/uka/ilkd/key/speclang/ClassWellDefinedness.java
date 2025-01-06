@@ -86,7 +86,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final TermSV sv = SchemaVariableFactory.createTermSV(new Name("a"), kjt.getSort());
         final Term var = TB.var(sv);
         final Term wdSelf = TB.wd(var);
-        final Term[] heaps = new Term[] { TB.var(heapSV) };
+        final Term[] heaps = { TB.var(heapSV) };
         final Term staticInvTerm = TB.staticInv(heaps, kjt);
         final Term invTerm = TB.inv(heaps, var);
         final Term wdHeaps = TB.and(TB.wd(heaps));

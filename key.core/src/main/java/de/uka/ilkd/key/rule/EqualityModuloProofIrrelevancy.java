@@ -335,8 +335,7 @@ public class EqualityModuloProofIrrelevancy {
      * @return the hash code modulo proof irrelevancy for the given argument
      */
     public static int hashCodeModProofIrrelevancy(Taclet taclet) {
-        return EqualityModuloProofIrrelevancy
-                .hashCodeModProofIrrelevancy(taclet.assumesSequent().getFormulabyNr(1));
+        return hashCodeModProofIrrelevancy(taclet.assumesSequent().getFormulabyNr(1));
     }
 
 
@@ -366,7 +365,7 @@ public class EqualityModuloProofIrrelevancy {
             return false;
         }
         final MatchConditions matchConditions = _this.matchConditions();
-        if (!EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(matchConditions,
+        if (!equalsModProofIrrelevancy(matchConditions,
             that.matchConditions())) {
             return false;
         }
@@ -392,7 +391,7 @@ public class EqualityModuloProofIrrelevancy {
             EqualsModProofIrrelevancyUtil.hashCodeImmutableList(app.assumesFormulaInstantiations(),
                 EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
             app.instantiations(),
-            EqualityModuloProofIrrelevancy.hashCodeModProofIrrelevancy(matchConditions),
+            hashCodeModProofIrrelevancy(matchConditions),
             app.uninstantiatedVars(),
             app.isUpdateContextFixed(),
             app.rule());
@@ -488,7 +487,7 @@ public class EqualityModuloProofIrrelevancy {
         } else if (that == null || _this == null) {
             return false;
         }
-        return EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(
+        return equalsModProofIrrelevancy(
             _this.getSequentFormula(), that.getSequentFormula());
     }
 
@@ -499,7 +498,6 @@ public class EqualityModuloProofIrrelevancy {
      * @return the hash code modulo proof irrelevancy for the given argument
      */
     public static int hashCodeModProofIrrelevancy(AssumesFormulaInstantiation ifInst) {
-        return EqualityModuloProofIrrelevancy
-                .hashCodeModProofIrrelevancy(ifInst.getSequentFormula());
+        return hashCodeModProofIrrelevancy(ifInst.getSequentFormula());
     }
 }

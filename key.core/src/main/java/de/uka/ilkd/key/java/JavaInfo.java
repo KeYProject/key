@@ -1140,7 +1140,7 @@ public final class JavaInfo {
         }
 
         final String[] fullNames =
-            new String[] { "java.lang.Object", "java.lang.Cloneable", "java.io.Serializable" };
+            { "java.lang.Object", "java.lang.Cloneable", "java.io.Serializable" };
 
         for (int i = 0; i < fullNames.length; i++) {
             commonTypes[i] = getTypeByClassName(fullNames[i]);
