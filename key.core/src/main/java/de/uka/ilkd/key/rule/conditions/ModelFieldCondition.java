@@ -49,7 +49,7 @@ public class ModelFieldCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement subst,
-            SVInstantiations instMap, Services services) {
+                         SVInstantiations instMap, Services services) {
 
         if (var == field) {
             ProgramVariable attribute;

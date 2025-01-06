@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
@@ -93,14 +93,14 @@ public class InfFlowContractAppFeature implements Feature {
 
 
         // compare the if-sequent instantiations
-        if (newApp.ifFormulaInstantiations() == null || cmp.ifFormulaInstantiations() == null) {
-            if (newApp.ifFormulaInstantiations() != null || cmp.ifFormulaInstantiations() != null) {
+        if (newApp.assumesFormulaInstantiations() == null || cmp.assumesFormulaInstantiations() == null) {
+            if (newApp.assumesFormulaInstantiations() != null || cmp.assumesFormulaInstantiations() != null) {
                 return false;
             }
         } else {
-            final Iterator<IfFormulaInstantiation> it0 =
-                newApp.ifFormulaInstantiations().iterator();
-            final Iterator<IfFormulaInstantiation> it1 = cmp.ifFormulaInstantiations().iterator();
+            final Iterator<AssumesFormulaInstantiation> it0 =
+                newApp.assumesFormulaInstantiations().iterator();
+            final Iterator<AssumesFormulaInstantiation> it1 = cmp.assumesFormulaInstantiations().iterator();
 
             while (it0.hasNext()) {
                 // this test should be improved
@@ -119,18 +119,16 @@ public class InfFlowContractAppFeature implements Feature {
             return false;
         }
 
-        final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting0 =
-            inst0.interesting();
-        final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting1 =
-            inst1.interesting();
+        final var interesting0 = inst0.interesting();
+        final var interesting1 = inst1.interesting();
         return subset(interesting0, interesting1) && subset(interesting1, interesting0);
     }
 
 
-    private boolean subset(ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
-            ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
+    private boolean subset(ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> insts0,
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> insts1) {
 
-        for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
+        for (final ImmutableMapEntry<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
             if (entry0.key() instanceof SkolemTermSV || entry0.key() instanceof VariableSV) {
                 continue;
             }
@@ -156,13 +154,13 @@ public class InfFlowContractAppFeature implements Feature {
     protected boolean duplicateFindTaclet(TacletApp app,
             PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
-        assert app.ifFormulaInstantiations().size() >= 1
+        assert app.assumesFormulaInstantiations().size() >= 1
                 : "Featureis only applicable to rules with at least one assumes.";
 
         final SequentFormula focusFor = pos.sequentFormula();
         final boolean antec = pos.isInAntec();
         final SequentFormula assumesFor =
-            app.ifFormulaInstantiations().iterator().next().getSequentFormula();
+            app.assumesFormulaInstantiations().iterator().next().getSequentFormula();
 
         // assumtion has to occour before the find-term in the sequent in order
         // to avoid duplicated applications
@@ -216,8 +214,8 @@ public class InfFlowContractAppFeature implements Feature {
             return NumberRuleAppCost.getZeroCost();
         }
 
-        if (!isInfFlowProof(goal.proof()) || app.ifFormulaInstantiations() == null
-                || app.ifFormulaInstantiations().size() < 1
+        if (!isInfFlowProof(goal.proof()) || app.assumesFormulaInstantiations() == null
+                || app.assumesFormulaInstantiations().size() < 1
                 || duplicateFindTaclet(app, pos, goal)) {
             return TopRuleAppCost.INSTANCE;
         }
@@ -226,7 +224,7 @@ public class InfFlowContractAppFeature implements Feature {
         // called method in execution B automatically
         final SequentFormula focusFor = pos.sequentFormula();
         final SequentFormula assumesFor =
-            app.ifFormulaInstantiations().iterator().next().getSequentFormula();
+            app.assumesFormulaInstantiations().iterator().next().getSequentFormula();
 
         ArrayList<org.key_project.prover.sequent.SequentFormula> relatesTerms =
             getRelatesTerms(goal);

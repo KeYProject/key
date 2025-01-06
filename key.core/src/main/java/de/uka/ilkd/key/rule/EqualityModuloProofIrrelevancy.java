@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
@@ -306,14 +307,14 @@ public class EqualityModuloProofIrrelevancy {
             return false;
         }
 
-        if ((_this.ifSequent() == null && that.ifSequent() != null)
-                || (_this.ifSequent() != null && that.ifSequent() == null)) {
+        if ((_this.assumesSequent() == null && that.assumesSequent() != null)
+                || (_this.assumesSequent() != null && that.assumesSequent() == null)) {
             return false;
         } else {
             ImmutableList<org.key_project.prover.sequent.SequentFormula> if1 =
-                _this.ifSequent().asList();
+                _this.assumesSequent().asList();
             ImmutableList<org.key_project.prover.sequent.SequentFormula> if2 =
-                that.ifSequent().asList();
+                that.assumesSequent().asList();
             while (!if1.isEmpty() && !if2.isEmpty()
                     && equalsModProofIrrelevancy(if1.head(), if2.head())) {
                 if1 = if1.tail();
@@ -339,7 +340,7 @@ public class EqualityModuloProofIrrelevancy {
      */
     public static int hashCodeModProofIrrelevancy(Taclet taclet) {
         return EqualityModuloProofIrrelevancy
-                .hashCodeModProofIrrelevancy(taclet.ifSequent().getFormulabyNr(1));
+                .hashCodeModProofIrrelevancy(taclet.assumesSequent().getFormulabyNr(1));
     }
 
 
@@ -359,8 +360,8 @@ public class EqualityModuloProofIrrelevancy {
             return false;
         }
 
-        if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(_this.ifFormulaInstantiations(),
-            that.ifFormulaInstantiations(),
+        if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(_this.assumesFormulaInstantiations(),
+            that.assumesFormulaInstantiations(),
             EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy)) {
             return false;
         }
@@ -391,7 +392,7 @@ public class EqualityModuloProofIrrelevancy {
     public static int hashCodeModProofIrrelevancy(TacletApp app) {
         MatchConditions matchConditions = app.matchConditions();
         return Objects.hash(
-            EqualsModProofIrrelevancyUtil.hashCodeImmutableList(app.ifFormulaInstantiations(),
+            EqualsModProofIrrelevancyUtil.hashCodeImmutableList(app.assumesFormulaInstantiations(),
                 EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
             app.instantiations(),
             EqualityModuloProofIrrelevancy.hashCodeModProofIrrelevancy(matchConditions),
@@ -449,10 +450,7 @@ public class EqualityModuloProofIrrelevancy {
             return false;
         }
 
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-            _this.pairIterator();
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
+        for (final var e : _this.getInstantiationMap()) {
             final Object inst = e.value().getInstantiation();
             if (inst instanceof Term instAsTerm) {
                 if (!instAsTerm.equalsModProperty(
@@ -482,12 +480,12 @@ public class EqualityModuloProofIrrelevancy {
     /**
      * test for equality modulo proof irrelevancy for the given arguments
      *
-     * @param _this the first IfFormulaInstantiation
-     * @param that the second IfFormulaInstantiation
+     * @param _this the first AssumesFormulaInstantiation
+     * @param that the second AssumesFormulaInstantiation
      * @return true if both arguments are equal modulo proof irrelevancy
      */
-    public static boolean equalsModProofIrrelevancy(IfFormulaInstantiation _this,
-            IfFormulaInstantiation that) {
+    public static boolean equalsModProofIrrelevancy(AssumesFormulaInstantiation _this,
+            AssumesFormulaInstantiation that) {
         if (_this == that) {
             return true;
         } else if (that == null || _this == null) {
@@ -500,10 +498,10 @@ public class EqualityModuloProofIrrelevancy {
     /**
      * computes the hash code modulo proof irrelevancy for the given argument
      *
-     * @param ifInst the {@link IfFormulaInstantiation} for which to compute the hash
+     * @param ifInst the {@link AssumesFormulaInstantiation} for which to compute the hash
      * @return the hash code modulo proof irrelevancy for the given argument
      */
-    public static int hashCodeModProofIrrelevancy(IfFormulaInstantiation ifInst) {
+    public static int hashCodeModProofIrrelevancy(AssumesFormulaInstantiation ifInst) {
         return EqualityModuloProofIrrelevancy
                 .hashCodeModProofIrrelevancy(ifInst.getSequentFormula());
     }

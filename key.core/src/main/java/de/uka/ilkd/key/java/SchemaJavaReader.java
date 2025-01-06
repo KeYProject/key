@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.key_project.logic.Namespace;
 

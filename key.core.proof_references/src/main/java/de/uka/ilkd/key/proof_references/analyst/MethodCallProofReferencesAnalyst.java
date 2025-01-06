@@ -118,9 +118,9 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                     "Rule \"staticMethodCallStaticWithAssignmentViaTypereference\" expected, but is \""
                         + MiscTools.getRuleName(node) + "\".");
             }
-            SchemaVariable methodSV = app.instantiations().lookupVar(new Name("#mn"));
-            SchemaVariable typeSV = app.instantiations().lookupVar(new Name("#t"));
-            SchemaVariable argsSV = app.instantiations().lookupVar(new Name("#elist"));
+            org.key_project.logic.op.sv.SchemaVariable methodSV = app.instantiations().lookupVar(new Name("#mn"));
+            org.key_project.logic.op.sv.SchemaVariable typeSV = app.instantiations().lookupVar(new Name("#t"));
+            org.key_project.logic.op.sv.SchemaVariable argsSV = app.instantiations().lookupVar(new Name("#elist"));
 
             ProgramElementName method =
                 (ProgramElementName) app.instantiations().getInstantiation(methodSV);

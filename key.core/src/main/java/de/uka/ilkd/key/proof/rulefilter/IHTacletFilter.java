@@ -6,7 +6,7 @@ package de.uka.ilkd.key.proof.rulefilter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import de.uka.ilkd.key.rule.RuleSet;
+import org.key_project.prover.rules.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.util.collection.ImmutableList;

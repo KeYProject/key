@@ -7,7 +7,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.rules.VariableCondition;
 
 
 /**
@@ -26,13 +28,12 @@ public abstract class VariableConditionAdapter implements VariableCondition {
      * @return true iff condition is fulfilled
      */
     public abstract boolean check(SchemaVariable var, SyntaxElement instCandidate,
-            SVInstantiations instMap, Services services);
+                                  SVInstantiations instMap, Services services);
 
 
 
-    @Override
-    public final MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc, Services services) {
-        return check(var, instCandidate, mc.getInstantiations(), services) ? mc : null;
+    public final MatchConditions check(org.key_project.logic.op.sv.SchemaVariable var, SyntaxElement instCandidate,
+                                       org.key_project.prover.rules.MatchConditions mc, LogicServices services) {
+        return check((SchemaVariable) var, instCandidate, (SVInstantiations) mc.getInstantiations(), (Services) services) ? (MatchConditions) mc : null;
     }
 }

@@ -53,9 +53,7 @@ class TestEqualsModProofIrrelevancy {
                     node1.sequent().getFormulabyNr(j);
                 SequentFormula sf2 =
                     node2.sequent().getFormulabyNr(j);
-                Assertions.assertTrue((Object) sf2 instanceof SequentFormula that
-                        ? EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(sf1, that)
-                        : false);
+                Assertions.assertTrue((Object) sf2 instanceof SequentFormula that && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(sf1, that));
             }
             if (node1.getAppliedRuleApp() != null) {
                 Assertions.assertTrue(

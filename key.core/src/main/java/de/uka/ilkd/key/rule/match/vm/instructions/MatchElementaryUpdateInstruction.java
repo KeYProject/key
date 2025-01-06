@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TacletMatchProgram;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+import org.key_project.logic.LogicServices;
 
 public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpdate> {
 
@@ -31,7 +32,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
 
     @Override
     public MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-            Services services) {
+            LogicServices services) {
         final Operator instantiationCandidateOp = instantiationCandidate.op();
         if (instantiationCandidateOp != op) {
             if (instantiationCandidateOp instanceof ElementaryUpdate instElUpdate) {
@@ -45,7 +46,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
 
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
-            Services services) {
+                                 LogicServices services) {
         final MatchConditions result =
             match(termPosition.getCurrentSubterm(), matchConditions, services);
         if (result != null) {

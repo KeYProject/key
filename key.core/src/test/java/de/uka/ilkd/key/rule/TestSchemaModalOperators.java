@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.*;
+import org.key_project.prover.rules.MatchConditions;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -39,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestSchemaModalOperators {
 
+    public static final MatchConditions EMPTY_MATCHCONDITIONS = de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
     final String[] strs = { "i=5", "\\<{ while(i>0) {i--;} }\\> i=0", "i=3",
         "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3", "i=3",
         "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3" };
@@ -149,7 +151,7 @@ public class TestSchemaModalOperators {
 
         Term goal = TB.prog(Modality.JavaModalityKind.DIA, JavaBlock.EMPTY_JAVABLOCK, TB.ff());
         MatchConditions mc =
-            t.getMatcher().matchFind(goal, MatchConditions.EMPTY_MATCHCONDITIONS, services);
+            t.getMatcher().matchFind(goal, EMPTY_MATCHCONDITIONS, services);
         assertNotNull(mc);
         assertNotNull(mc.getInstantiations().getInstantiation(osv));
         assertTrue(mc.getInstantiations().isInstantiated(osv),
@@ -189,11 +191,11 @@ public class TestSchemaModalOperators {
         var antec1 = parseTermForSemisequent("i=5");
         var succ = parseTermForSemisequent("\\<{ i--; while(i>0) {i--;} }\\> i=0");
 
-        Assertions.assertEquals(seq.antecedent().get(0), antec0.get(0),
+        assertEquals(seq.antecedent().get(0), antec0.get(0),
             "Wrong antecedent after testSchemaModal1");
-        Assertions.assertEquals(seq.antecedent().get(1), antec1.get(0),
+        assertEquals(seq.antecedent().get(1), antec1.get(0),
             "Wrong antecedent after testSchemaModal1");
-        Assertions.assertEquals(seq.succedent().getFirst(), succ.get(0),
+        assertEquals(seq.succedent().getFirst(), succ.get(0),
             "Wrong succedent after testSchemaModal1");
 
 
@@ -223,9 +225,9 @@ public class TestSchemaModalOperators {
         var antec0 = parseTermForSemisequent("i=3");
         var succ = parseTermForSemisequent("\\[{ i++; i--; }\\] i=3");
 
-        Assertions.assertEquals(seq.antecedent().get(0), antec0.get(0),
+        assertEquals(seq.antecedent().get(0), antec0.get(0),
             "Wrong antecedent after testSchemaModal2");
-        Assertions.assertEquals(seq.succedent().getFirst(), succ.get(0),
+        assertEquals(seq.succedent().getFirst(), succ.get(0),
             "Wrong succedent after testSchemaModal2");
 
         // Debug.ENABLE_DEBUG = false;
@@ -261,17 +263,17 @@ public class TestSchemaModalOperators {
         var succ2 = parseTermForSemisequent("\\[{ if(i==3) {i++;} else {i--;} }\\] i=3");
 
 
-        Assertions.assertEquals(antec0.get(0), seq0.antecedent().get(0),
+        assertEquals(antec0.get(0), seq0.antecedent().get(0),
             "Wrong antecedent after testSchemaModal3");
-        Assertions.assertEquals(antec0.get(0), seq1.antecedent().get(0),
+        assertEquals(antec0.get(0), seq1.antecedent().get(0),
             "Wrong antecedent after testSchemaModal3");
-        Assertions.assertEquals(antec0.get(0), seq2.antecedent().get(0),
+        assertEquals(antec0.get(0), seq2.antecedent().get(0),
             "Wrong antecedent after testSchemaModal3");
-        Assertions.assertEquals(succ0.get(0), seq0.succedent().getFirst(),
+        assertEquals(succ0.get(0), seq0.succedent().getFirst(),
             "Wrong succedent after testSchemaModal3");
-        Assertions.assertEquals(succ1.get(0), seq1.succedent().getFirst(),
+        assertEquals(succ1.get(0), seq1.succedent().getFirst(),
             "Wrong succedent after testSchemaModal3");
-        Assertions.assertEquals(succ2.get(0), seq2.succedent().getFirst(),
+        assertEquals(succ2.get(0), seq2.succedent().getFirst(),
             "Wrong succedent after testSchemaModal3");
 
         // Debug.ENABLE_DEBUG = false;

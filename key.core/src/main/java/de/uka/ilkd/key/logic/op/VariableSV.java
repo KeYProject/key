@@ -37,5 +37,8 @@ public final class VariableSV extends OperatorSV
                 .print(name().toString());
     }
 
-
+    @Override
+    public boolean isVariable() {
+        return true;
+    }
 }

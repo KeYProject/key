@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermLabelInstantiationEntry;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -26,7 +27,7 @@ public class MatchTermLabelInstruction implements MatchInstruction {
     }
 
     private MatchConditions match(TermLabelSV sv, Term instantiationCandidate,
-            MatchConditions matchCond, Services services) {
+            MatchConditions matchCond, LogicServices services) {
 
         final SVInstantiations svInsts = matchCond.getInstantiations();
         final TermLabelInstantiationEntry inst =
@@ -50,7 +51,7 @@ public class MatchTermLabelInstruction implements MatchInstruction {
      */
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
-            Services services) {
+                                 LogicServices services) {
         final Term term = termPosition.getCurrentSubterm();
         MatchConditions result = matchConditions;
         // TODO: Define a sane version of taclet matching for term labels

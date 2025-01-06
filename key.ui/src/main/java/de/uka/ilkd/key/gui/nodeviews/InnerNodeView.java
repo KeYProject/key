@@ -24,6 +24,8 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
@@ -120,12 +122,12 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
      * @throws BadLocationException
      */
     private void highlightIfFormulas(TacletApp tapp) throws BadLocationException {
-        final ImmutableList<IfFormulaInstantiation> ifs = tapp.ifFormulaInstantiations();
+        final ImmutableList<AssumesFormulaInstantiation> ifs = tapp.assumesFormulaInstantiations();
         if (ifs == null) {
             return;
         }
-        for (final IfFormulaInstantiation inst2 : ifs) {
-            if (!(inst2 instanceof IfFormulaInstSeq inst)) {
+        for (final AssumesFormulaInstantiation inst2 : ifs) {
+            if (!(inst2 instanceof AssumesFormulaInstSeq inst)) {
                 continue;
             }
             final PosInOccurrence pos =

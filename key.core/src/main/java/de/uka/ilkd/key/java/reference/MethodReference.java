@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * @author <TT>AutoDoc</TT>
  */
 public class MethodReference extends JavaNonTerminalProgramElement
-        implements MethodOrConstructorReference, MemberReference, ReferencePrefix, ReferenceSuffix,
+        implements MethodOrConstructorReference, ReferenceSuffix,
         ExpressionStatement, TypeReferenceContainer, NameReference {
 
     /**

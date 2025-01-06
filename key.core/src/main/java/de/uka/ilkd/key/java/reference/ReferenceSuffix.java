@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.SourceElement;
  * se.
  */
 
-public interface ReferenceSuffix extends ModelElement, ProgramElement, SourceElement {
+public interface ReferenceSuffix extends ProgramElement {
 
     /**
      * @return the prefix in the access path, or null if there is none.

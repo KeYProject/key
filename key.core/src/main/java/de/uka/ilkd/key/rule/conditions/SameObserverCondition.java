@@ -8,11 +8,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.VariableCondition;
 import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.logic.ParsableVariable;
@@ -71,9 +71,10 @@ public final class SameObserverCondition implements VariableCondition {
     // explanation see class javadoc.
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions mc,
-            Services services) {
-        SVInstantiations svInst = mc.getInstantiations();
+                                 MatchConditions mc,
+                                 LogicServices p_services) {
+        final Services services = (Services) p_services;
+        var svInst = (de.uka.ilkd.key.rule.inst.SVInstantiations) mc.getInstantiations();
         final Term term1 = (Term) svInst.getInstantiation(schema1);
         final Term term2 = (Term) svInst.getInstantiation(schema2);
 

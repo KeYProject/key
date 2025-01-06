@@ -39,7 +39,7 @@ public interface TacletMatcher {
      * @return the match conditions resulting from matching <code>var</code> with
      *         <code>instantiationCandidate</code> or <code>null</code> if a match was not possible
      */
-    MatchConditions checkVariableConditions(SchemaVariable var,
+    MatchConditions checkVariableConditions(org.key_project.logic.op.sv.SchemaVariable var,
             SyntaxElement instantiationCandidate, MatchConditions matchCond,
             LogicServices services);
 
@@ -88,6 +88,6 @@ public interface TacletMatcher {
     MatchConditions matchAssumes(Iterable<AssumesFormulaInstantiation> toMatch,
             MatchConditions matchCond, LogicServices services);
 
-    MatchConditions matchSV(SchemaVariable sv, Term term, MatchConditions matchConditions,
+    MatchConditions matchSV(SchemaVariable sv, SyntaxElement se, MatchConditions matchConditions,
             LogicServices services);
 }

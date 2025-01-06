@@ -7,7 +7,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -16,11 +15,15 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 import org.junit.jupiter.api.Test;
+import org.key_project.prover.rules.MatchConditions;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestApplyUpdateOnRigidCondition {
+
+    private static MatchConditions EMPTY_MATCHCONDITIONS = de.uka.ilkd.key.rule.MatchConditions.EMPTY_MATCHCONDITIONS;
+
     @Test
     void updateWithoutVariables() {
         Term term = TacletForTests.parseTerm("{i:=0}\\forall int a; a = i");
@@ -146,7 +149,7 @@ public class TestApplyUpdateOnRigidCondition {
         SchemaVariable result = SchemaVariableFactory.createFormulaSV(new Name("result"));
 
         SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
-        MatchConditions mc = MatchConditions.EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        MatchConditions mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, phi, result);
 
         // u uninstantiated
@@ -156,7 +159,7 @@ public class TestApplyUpdateOnRigidCondition {
 
         Term update = TacletForTests.parseTerm("{i:=0}0").sub(0);
         svInst = svInst.add(u, update, TacletForTests.services());
-        mc = MatchConditions.EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
 
         mc = cond.check(null, null, mc, TacletForTests.services());
         assert mc != null;
@@ -178,7 +181,7 @@ public class TestApplyUpdateOnRigidCondition {
         svInst = svInst.add(phi, term.sub(1), TacletForTests.services());
         svInst = svInst.add(result, preInstResult, TacletForTests.services());
 
-        MatchConditions mc = MatchConditions.EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        MatchConditions mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, phi, result);
 
         mc = cond.check(null, null, mc, TacletForTests.services());
@@ -200,7 +203,7 @@ public class TestApplyUpdateOnRigidCondition {
         svInst = svInst.add(phi, term.sub(1), TacletForTests.services());
         svInst = svInst.add(result, preInstWrongResult, TacletForTests.services());
 
-        MatchConditions mc = MatchConditions.EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        MatchConditions mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, phi, result);
 
         mc = cond.check(null, null, mc, TacletForTests.services());
@@ -267,7 +270,7 @@ public class TestApplyUpdateOnRigidCondition {
         svInst = svInst.add(tOrPhi, arg, TacletForTests.services());
 
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, tOrPhi, result);
-        MatchConditions mc = MatchConditions.EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
+        MatchConditions mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         // First two arguments are not used by this check
         mc = cond.check(null, null, mc, TacletForTests.services());
 
@@ -275,7 +278,7 @@ public class TestApplyUpdateOnRigidCondition {
             return term;
         }
 
-        return mc.getInstantiations().getTermInstantiation(result, null, TacletForTests.services());
+        return ((de.uka.ilkd.key.rule.MatchConditions)mc).getInstantiations().getTermInstantiation(result, null, TacletForTests.services());
     }
 
 }

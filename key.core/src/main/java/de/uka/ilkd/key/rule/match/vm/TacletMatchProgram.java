@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.match.vm.instructions.Instruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -69,9 +70,9 @@ public class TacletMatchProgram {
      * @param op the {@link SchemaVariable} for which to get the instruction
      * @return the instruction for the specified variable
      */
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> getMatchInstructionForSV(
-            SchemaVariable op) {
-        MatchSchemaVariableInstruction<? extends SchemaVariable> instruction;
+    public static MatchSchemaVariableInstruction<? extends org.key_project.logic.op.sv.SchemaVariable> getMatchInstructionForSV(
+            org.key_project.logic.op.sv.SchemaVariable op) {
+        MatchSchemaVariableInstruction<? extends org.key_project.logic.op.sv.SchemaVariable> instruction;
 
         if (op instanceof FormulaSV formulaSV) {
             instruction = Instruction.matchFormulaSV(formulaSV);
@@ -155,7 +156,7 @@ public class TacletMatchProgram {
      * @param services the {@link Services}
      * @return {@code null} if no match was found or the match result
      */
-    public MatchConditions match(Term p_toMatch, MatchConditions p_matchCond, Services services) {
+    public MatchConditions match(Term p_toMatch, MatchConditions p_matchCond, LogicServices services) {
 
         MatchConditions mc = p_matchCond;
 

@@ -177,7 +177,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             instPanel.setBorder(indents);
             tabContent.add(instPanel);
 
-            if (!model[i].application().taclet().ifSequent().isEmpty()) {
+            if (!model[i].application().taclet().assumesSequent().isEmpty()) {
 
                 TacletIfSelectionDialog ifSelection = new TacletIfSelectionDialog(model[i], this);
                 dataTable[i].setIfSelectionPanel(ifSelection);

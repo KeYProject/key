@@ -34,7 +34,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
-            Services services) {
+                         Services services) {
         final Object o = instMap.getInstantiation(field);
         if (!(o instanceof Term f)) {
             return false;

@@ -104,9 +104,9 @@ public class TestPosInTerm {
         assertEquals(pit1, pit2);
         assertEquals(pit1.hashCode(), pit2.hashCode());
 
-        Assertions.assertNotEquals(pit1, toPosInTerm(pos2));
-        Assertions.assertNotEquals(pit1, toPosInTerm(pos3));
-        Assertions.assertNotEquals(pit1, toPosInTerm(pos4));
+        assertNotEquals(pit1, toPosInTerm(pos2));
+        assertNotEquals(pit1, toPosInTerm(pos3));
+        assertNotEquals(pit1, toPosInTerm(pos4));
     }
 
     @Test

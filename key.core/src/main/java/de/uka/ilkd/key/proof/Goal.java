@@ -374,7 +374,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
             assert sci.sequent().equals(sci.getOriginalSequent());
             return;
         }
-        node().setSequent((Sequent) sci.sequent());
+        node().setSequent(sci.sequent());
         node().getNodeInfo().setSequentChangeInfo(sci);
         var time = System.nanoTime();
         // updates the index

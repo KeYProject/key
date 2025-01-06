@@ -16,6 +16,8 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SortException;
 
 import org.key_project.logic.Namespace;
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -117,15 +119,15 @@ public class TacletInstantiationModel {
     }
 
     private void initIfChoiceModels() {
-        Sequent ifseq = taclet().ifSequent();
+        Sequent ifseq = taclet().assumesSequent();
         int asize = ifseq.antecedent().size();
         int size = asize + ifseq.succedent().size();
 
         if (size > 0) {
-            ImmutableArray<IfFormulaInstantiation> antecCand =
-                IfFormulaInstSeq.createList(seq, true, services);
-            ImmutableArray<IfFormulaInstantiation> succCand =
-                IfFormulaInstSeq.createList(seq, false, services);
+            ImmutableArray<AssumesFormulaInstantiation> antecCand =
+                AssumesFormulaInstSeq.createList(seq, true, services);
+            ImmutableArray<AssumesFormulaInstantiation> succCand =
+                AssumesFormulaInstSeq.createList(seq, false, services);
 
             Iterator<org.key_project.prover.sequent.SequentFormula> it = ifseq.iterator();
             Term ifFma;
@@ -137,8 +139,8 @@ public class TacletInstantiationModel {
                 ifFma = (Term) it.next().formula();
                 ifChoiceModel[i] =
                     new TacletAssumesModel(
-                        ifFma, taclet().getMatcher().matchIf((i < asize ? antecCand : succCand),
-                            ifFma, matchCond, services).getFormulas(),
+                        ifFma, taclet().getMatcher().matchAssumes((i < asize ? antecCand : succCand),
+                            ifFma, matchCond, services).candidates(),
                         app, goal, services, nss, scm);
             }
         } else {
@@ -149,7 +151,7 @@ public class TacletInstantiationModel {
     private TacletApp createTacletAppFromIfs(TacletApp tacletApp) throws IfMismatchException,
             SVInstantiationParserException, MissingInstantiationException, SortMismatchException {
 
-        ImmutableList<IfFormulaInstantiation> instList =
+        ImmutableList<AssumesFormulaInstantiation> instList =
             ImmutableSLList.nil();
 
         for (int i = ifChoiceModel.length - 1; i >= 0; --i) {

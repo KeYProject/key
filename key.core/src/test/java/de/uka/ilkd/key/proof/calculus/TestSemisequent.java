@@ -108,7 +108,7 @@ public class TestSemisequent {
         } catch (IndexOutOfBoundsException iob) {
             return;
         }
-        Assertions.fail();
+        fail();
     }
 
 

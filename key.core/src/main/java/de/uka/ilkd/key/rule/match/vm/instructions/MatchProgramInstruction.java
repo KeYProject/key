@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
+import org.key_project.logic.LogicServices;
 
 public class MatchProgramInstruction implements MatchInstruction {
 
@@ -19,9 +20,9 @@ public class MatchProgramInstruction implements MatchInstruction {
 
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
-            Services services) {
+                                 LogicServices services) {
         final MatchConditions result = pe.match(
-            new SourceData(termPosition.getCurrentSubterm().javaBlock().program(), -1, services),
+            new SourceData(termPosition.getCurrentSubterm().javaBlock().program(), -1, (Services) services),
             matchConditions);
         if (result != null) {
             termPosition.gotoNext();

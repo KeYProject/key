@@ -134,7 +134,7 @@ public class TestTermFactory {
         try {
             Term t_px_or_py = tf.createTerm(Junctor.OR, invalidBuilt, t1());
         } catch (Exception e) {
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -342,10 +342,10 @@ public class TestTermFactory {
         Term withJBChildAgain = tf.createTerm(Junctor.NOT, withJB);
         Term withJBChildChildAgain = tf.createTerm(Junctor.NOT, withJBChild);
         // Test caching
-        Assertions.assertSame(noJB, noJBAgain);
-        Assertions.assertSame(noJBWithChild, noJBWithChildAgain);
-        Assertions.assertNotSame(withJB, withJBAgain);
-        Assertions.assertNotSame(withJBChild, withJBChildAgain);
-        Assertions.assertNotSame(withJBChildChild, withJBChildChildAgain);
+        assertSame(noJB, noJBAgain);
+        assertSame(noJBWithChild, noJBWithChildAgain);
+        assertNotSame(withJB, withJBAgain);
+        assertNotSame(withJBChild, withJBChildAgain);
+        assertNotSame(withJBChildChild, withJBChildChildAgain);
     }
 }

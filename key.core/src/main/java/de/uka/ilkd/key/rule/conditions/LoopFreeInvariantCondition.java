@@ -16,14 +16,15 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.VariableCondition;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.rules.inst.SVInstantiations;
 
 /**
  * Extracts the free loop invariants for the given loop term. Free invariants are only assumed, but
@@ -45,8 +46,9 @@ public class LoopFreeInvariantCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond, Services services) {
-        final SVInstantiations svInst = matchCond.getInstantiations();
+                                 MatchConditions matchCond, LogicServices p_services) {
+        final Services services = (Services) p_services;
+        final var svInst = (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
         final TermBuilder tb = services.getTermBuilder();
 
         if (svInst.getInstantiation(invSV) != null) {

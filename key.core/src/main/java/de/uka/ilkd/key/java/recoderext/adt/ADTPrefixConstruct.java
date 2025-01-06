@@ -17,15 +17,15 @@ public abstract class ADTPrefixConstruct extends Operator implements ReferencePr
     private static final long serialVersionUID = 2903025447315816147L;
     private ReferenceSuffix suffix;
 
-    public ADTPrefixConstruct() {
+    protected ADTPrefixConstruct() {
         super();
     }
 
-    public ADTPrefixConstruct(Expression unary) {
+    protected ADTPrefixConstruct(Expression unary) {
         super(unary);
     }
 
-    public ADTPrefixConstruct(Expression lhs, Expression rhs) {
+    protected ADTPrefixConstruct(Expression lhs, Expression rhs) {
         super(lhs, rhs);
     }
 

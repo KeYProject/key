@@ -59,7 +59,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
-            Services services) {
+                         Services services) {
 
         ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
         MethodName mn = (MethodName) svInst.getInstantiation(methname);

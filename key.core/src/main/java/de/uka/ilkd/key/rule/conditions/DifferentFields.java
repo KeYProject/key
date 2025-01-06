@@ -28,7 +28,7 @@ public final class DifferentFields extends VariableConditionAdapter {
 
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
-            Services services) {
+                         Services services) {
 
         if (var == var1) {
             final Object inst2 = instMap.getInstantiation(var2);

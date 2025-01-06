@@ -32,7 +32,7 @@ public final class AlternativeVariableCondition extends VariableConditionAdapter
      */
     @Override
     public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
-            Services services) {
+                         Services services) {
         return delegate0.check(var, subst, svInst, services)
                 || delegate1.check(var, subst, svInst, services);
 

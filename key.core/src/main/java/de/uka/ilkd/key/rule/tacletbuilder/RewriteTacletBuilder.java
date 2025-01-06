@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.TacletApplPart;
+import org.key_project.prover.rules.TacletApplPart;
 
 /** class builds RewriteTaclet objects. */
 public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBuilder<T> {
