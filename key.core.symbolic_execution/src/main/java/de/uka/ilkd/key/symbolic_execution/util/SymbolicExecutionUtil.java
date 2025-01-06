@@ -2760,8 +2760,7 @@ public final class SymbolicExecutionUtil {
             Services services) {
         if (term != null) {
             SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(new TermLabelState(),
-                null, tacletApp.posInOccurrence(), tacletApp.instantiations(), null,
-                tacletApp.taclet(), tacletApp);
+                null, tacletApp.posInOccurrence(), services, tacletApp.taclet(), tacletApp, true);
             term.execPostOrder(visitor);
             return visitor.getTerm();
         } else {
