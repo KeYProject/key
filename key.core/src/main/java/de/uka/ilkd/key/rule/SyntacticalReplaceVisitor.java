@@ -107,14 +107,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param ruleApp the rule application
      * @param useTermCache the TermBuilder to use (allows to use the non cached version)
      */
-    protected SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
+    public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
             PosInOccurrence applicationPosInOccurrence,
             Services services,
             Rule rule, RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
         this.services = services;
         this.tb = this.services.getTermBuilder(useTermCache);
-        this.svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+        this.svInst = ruleApp instanceof TacletApp tacletApp ? tacletApp.instantiations()
+                : SVInstantiations.EMPTY_SVINSTANTIATIONS;
         this.applicationPosInOccurrence = applicationPosInOccurrence;
         this.rule = rule;
         this.ruleApp = ruleApp;
@@ -144,13 +145,6 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             Rule rule, RuleApp ruleApp) {
         this(termLabelState, labelHint, applicationPosInOccurrence, svInst, goal, rule, ruleApp,
             true);
-    }
-
-    public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, Goal goal, Rule rule, RuleApp ruleApp,
-            boolean useTermCache) {
-        this(termLabelState, labelHint, applicationPosInOccurrence,
-            SVInstantiations.EMPTY_SVINSTANTIATIONS, goal, rule, ruleApp, useTermCache);
     }
 
     /**
