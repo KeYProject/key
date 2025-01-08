@@ -115,24 +115,28 @@ public class HirRustyReader {
                         .findFirst().orElse(null);
                 assert myAdd != null;
                 var target = services.getRustInfo().getFunction(myAdd);
-                services.getNamespaces().functions().addSafely(target);
-                var factory = new ContractFactory(services);
-                var tb = services.getTermBuilder();
-                var a = ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(0)).pattern())
-                        .pv();
-                var b = ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(1)).pattern())
-                        .pv();
-                var result = new ProgramVariable(new Name("result"), a.getKeYRustyType());
-                var pre = tb.geq(tb.var(a), tb.zero());
-                var post = tb.equals(tb.var(result), tb.add(tb.var(a), tb.var(b)));
-                var pvs = new ProgramVariableCollection(null, ImmutableList.of(a, b), result);
-                FunctionalOperationContract contract = factory.func("my_contract",
-                    target, true, pre, null, post, null, pvs, true);
-                services.getSpecificationRepository().addContract(contract);
-                ContractPO proofObl = contract.createProofObl(new InitConfig(services));
-                proofObl.readProblem();
-                System.out.println(proofObl.getPO().getProof(0).getOpenGoals()
-                        .head().getNode().sequent());
+                if (services.getNamespaces().functions().lookup(target.name()) == null) {
+                    services.getNamespaces().functions().add(target);
+                    var factory = new ContractFactory(services);
+                    var tb = services.getTermBuilder();
+                    var a =
+                        ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(0)).pattern())
+                                .pv();
+                    var b =
+                        ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(1)).pattern())
+                                .pv();
+                    var result = new ProgramVariable(new Name("result"), a.getKeYRustyType());
+                    var pre = tb.geq(tb.var(a), tb.zero());
+                    var post = tb.equals(tb.var(result), tb.add(tb.var(a), tb.var(b)));
+                    var pvs = new ProgramVariableCollection(null, ImmutableList.of(a, b), result);
+                    FunctionalOperationContract contract = factory.func("my_contract",
+                        target, true, pre, null, post, null, pvs, true);
+                    services.getSpecificationRepository().addContract(contract);
+                    ContractPO proofObl = contract.createProofObl(new InitConfig(services));
+                    proofObl.readProblem();
+                    System.out.println(proofObl.getPO().getProof(0).getOpenGoals()
+                            .head().getNode().sequent());
+                }
             }
             return new RustyBlock(es.getExpression());
         } catch (IOException e) {

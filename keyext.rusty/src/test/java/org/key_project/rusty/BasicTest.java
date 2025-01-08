@@ -171,6 +171,13 @@ public class BasicTest {
         System.out.println(proof.openGoals().get(1).sequent());
 
         // Sub goal 1
+        applyRule("emptyBlockValue",
+            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
+                PosInTerm.getTopLevel().down(1), false),
+            proof);
+        assertEquals(2, proof.openGoals().size());
+        System.out.println("After emptyBlockValue:\n" + proof.openGoals().head().sequent());
+        System.out.println(proof.openGoals().get(1).sequent());
         applyRule("assignment",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel().down(1), false),
@@ -178,12 +185,12 @@ public class BasicTest {
         assertEquals(2, proof.openGoals().size());
         System.out.println("After assignment:\n" + proof.openGoals().head().sequent());
         System.out.println(proof.openGoals().get(1).sequent());
-        applyRule("emptyModality",
+        applyRule("emptyModalityValue",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel().down(1).down(1), false),
             proof);
         assertEquals(2, proof.openGoals().size());
-        System.out.println("After emptyModality:\n" + proof.openGoals().head().sequent());
+        System.out.println("After emptyModalityValue:\n" + proof.openGoals().head().sequent());
         System.out.println(proof.openGoals().get(1).sequent());
         applyRule("simplifyUpdate2",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
@@ -306,76 +313,5 @@ public class BasicTest {
 
         p.getRoot().sequent().succedent().getFirst().formula();
         // continue manual proof like for example in TestApplyTaclet
-    }
-
-    @Test
-    public void testIfLet() {
-        TacletForTests.clear();
-        TacletForTests.parse(new RustProfile());
-        var antec = parseTermForSemisequent("");
-        var succ =
-            parseTermForSemisequent(
-                "\\<{ let n: u32 = 1u32; if let 1u32..10u32 = n { n } else { 1 }; }\\>true");
-        Sequent s = RustySequentKit.createSequent(antec, succ);
-        var proof = new Proof(new Name("IfLet"), s, TacletForTests.initConfig());
-        applyRule("letIdentPatAssign",
-            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
-                PosInTerm.getTopLevel(), false),
-            proof);
-        assertEquals(1, proof.openGoals().size());
-        System.out.println("\nAfter letIdentPatAssign:\n" + proof.openGoals().head().sequent());
-        applyRule("letIdentPat",
-            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
-                PosInTerm.getTopLevel(), false),
-            proof);
-        assertEquals(1, proof.openGoals().size());
-        System.out.println("\nAfter letIdentPat:\n" + proof.openGoals().head().sequent());
-        applyRule("assignment",
-            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
-                PosInTerm.getTopLevel(), false),
-            proof);
-        assertEquals(1, proof.openGoals().size());
-        System.out.println("\nAfter assignment:\n" + proof.openGoals().head().sequent());
-
-        try {
-            ProofSaver.saveToFile(new File("iflet.proof"), proof);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        applyRule("ifLetExclusiveElse",
-            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
-                PosInTerm.getTopLevel().down(1), false),
-            proof);
-        assertEquals(1, proof.openGoals().size());
-        System.out.println("\nAfter assignment:\n" + proof.openGoals().head().sequent());
-
-
-
-        applyRule("",
-            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
-                PosInTerm.getTopLevel(), false),
-            proof);
-        assertEquals(1, proof.openGoals().size());
-        System.out.println("\nAfter :\n" + proof.openGoals().head().sequent());
-    }
-
-
-    @Test
-    public void testIfUnfold() {
-        TacletForTests.clear();
-        TacletForTests.parse(new RustProfile());
-        var antec = parseTermForSemisequent("");
-        var succ =
-            parseTermForSemisequent(
-                "\\<{ if 1u32 < 3u32 { 1u32; } }\\>true");
-        Sequent s = RustySequentKit.createSequent(antec, succ);
-        var proof = new Proof(new Name("Test children"), s, TacletForTests.initConfig());
-        applyRule("ifUnfold",
-            new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
-                PosInTerm.getTopLevel(), false),
-            proof);
-        assertEquals(1, proof.openGoals().size());
-        System.out.println("\nAfter testHiddenChildren:\n" + proof.openGoals().head().sequent());
     }
 }

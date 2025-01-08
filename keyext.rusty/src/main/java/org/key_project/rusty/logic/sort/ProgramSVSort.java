@@ -38,6 +38,8 @@ public abstract class ProgramSVSort extends SortImpl {
         new TypedSimpleExpressionSort(PrimitiveType.U64);
     public static final ProgramSVSort SIMPLE_EXPRESSION_U128 =
         new TypedSimpleExpressionSort(PrimitiveType.U128);
+    public static final ProgramSVSort SIMPLE_EXPRESSION_USIZE =
+        new TypedSimpleExpressionSort(PrimitiveType.USIZE);
     public static final ProgramSVSort NON_SIMPLE_EXPRESSION = new NonSimpleExpressionSort();
     public static final ProgramSVSort EXPRESSION = new ExpressionSort();
     public static final ProgramSVSort BLOCK_EXPRESSION = new BlockExpressionSort();
@@ -297,7 +299,8 @@ public abstract class ProgramSVSort extends SortImpl {
         private final Type type;
 
         public TypedSimpleExpressionSort(PrimitiveType type) {
-            super(new Name("Rust" + type.toString().toUpperCase() + "Expression"));
+            super(new Name("Rust" + type.toString().substring(0, 1).toUpperCase()
+                + type.toString().substring(1) + "Expression"));
             this.type = type;
         }
 
