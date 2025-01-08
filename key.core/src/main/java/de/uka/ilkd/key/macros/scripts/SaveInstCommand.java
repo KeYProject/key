@@ -71,9 +71,9 @@ public class SaveInstCommand extends AbstractCommand<Map<String, String>> {
                             abbrMap.put((Term) inst, key, true);
                         } else {
                             throw new ScriptException(String.format(
-                                    "Tried to remember instantiation of schema variable %s "
-                                            + "as \"%s\", but instantiation is \"%s\" and not a function",
-                                    value, key, inst == null ? "null" : inst.toString()));
+                                "Tried to remember instantiation of schema variable %s "
+                                    + "as \"%s\", but instantiation is \"%s\" and not a function",
+                                value, key, inst == null ? "null" : inst.toString()));
                         }
                     }
                 }

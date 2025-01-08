@@ -12,7 +12,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.Function;
@@ -200,7 +199,7 @@ public abstract class Notation {
 
         public void print(Term t, LogicPrinter sp) {
             sp.printModalityTerm("\\modality{" + t.op().name() + "}", t.javaBlock(),
-                    "\\endmodality", t, ass);
+                "\\endmodality", t, ass);
         }
     }
 
@@ -218,7 +217,7 @@ public abstract class Notation {
             assert t.op() == UpdateApplication.UPDATE_APPLICATION;
             final Operator targetOp = UpdateApplication.getTarget(t).op();
             final int assTarget =
-                    (t.sort() == JavaDLTheory.FORMULA ? (targetOp.arity() == 1 ? 60 : 85) : 110);
+                (t.sort() == JavaDLTheory.FORMULA ? (targetOp.arity() == 1 ? 60 : 85) : 110);
 
             sp.printUpdateApplicationTerm("{", "}", t, assTarget);
         }
@@ -268,8 +267,8 @@ public abstract class Notation {
         public void print(Term t, LogicPrinter sp) {
             QuantifiableVariable v = instQV(t, sp, 1);
             final int assTarget =
-                    (t.sort() == JavaDLTheory.FORMULA ? (t.sub(1).op() == Equality.EQUALS ? 75 : 60)
-                            : 110);
+                (t.sort() == JavaDLTheory.FORMULA ? (t.sub(1).op() == Equality.EQUALS ? 75 : 60)
+                        : 110);
             sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1), assTarget);
         }
 
