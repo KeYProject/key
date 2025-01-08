@@ -266,7 +266,7 @@ public class LogicPrinter {
                 ((de.uka.ilkd.key.rule.Taclet) taclet).collectSchemaVars();
             for (SchemaVariable schemaVar : schemaVars) {
                 layouter.nl();
-                ((de.uka.ilkd.key.logic.op.SchemaVariable) schemaVar).layout(layouter);
+                ((de.uka.ilkd.key.logic.op.Layoutable) schemaVar).layout(layouter);
                 layouter.print(";");
             }
             layouter.nl();

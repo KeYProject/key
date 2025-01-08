@@ -4,8 +4,10 @@
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -13,7 +15,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Abstract base class for schema variables.
  */
 public abstract class OperatorSV extends AbstractSortedOperator
-        implements org.key_project.logic.op.sv.OperatorSV, SchemaVariable {
+        implements org.key_project.logic.op.sv.OperatorSV, SchemaVariable, ParsableVariable, Layoutable {
 
     private final boolean isStrict;
 
