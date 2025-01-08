@@ -24,6 +24,7 @@ import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.resolution.types.ResolvedVoidType;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -61,10 +62,8 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
-import de.uka.ilkd.key.util.pp.Layouter;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -294,13 +293,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(CatchClause n, Void arg) {
         var pi = createPositionInfo(n);
         var c = createComments(n);
-        if(n instanceof KeyCatchClauseSV sv) {
+        if (n instanceof KeyCatchClauseSV sv) {
             var v = lookupSchemaVariable(new Name(sv.getSchemaVar()));
             if (!(v instanceof ProgramSV)) {
                 reportError(n, "Catch");
             }
             return v;
-        }else {
+        } else {
             ParameterDeclaration param = accept(n.getParameter());
             return new Catch(pi, c, param, accept(n.getBody()));
         }
@@ -530,12 +529,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         if (n.containsData(JMLTransformer.KEY_CONSTRUCT)) {
             var construct = n.getData(JMLTransformer.KEY_CONSTRUCT);
-            if (construct instanceof TextualJMLAssertStatement) {
-                var a = (TextualJMLAssertStatement) construct;
+            if (construct instanceof TextualJMLAssertStatement a) {
                 return new JmlAssert(a.getKind(), a.getContext(), pi);
             }
-            if (construct instanceof TextualJMLMergePointDecl) {
-                var a = (TextualJMLMergePointDecl) construct;
+            if (construct instanceof TextualJMLMergePointDecl a) {
                 var loc =
                         new LocationVariable(services.getVariableNamer().getTemporaryNameProposal("x"),
                                 services.getNamespaces().sorts().lookup("boolean"));
@@ -588,53 +585,39 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var c = createComments(n);
         if (n.getNameAsString().startsWith("#")) {
             var scope = (ReferencePrefix) n.getScope().accept(this, arg);
-            var name = (SchemaVariable) lookupSchemaVariable(n.getName());
+            var name = lookupSchemaVariable(n.getName());
             return new SchematicFieldReference(pi, c, name, scope);
         }
-
-        // TODO weigl inspect this case
         try {
             ResolvedValueDeclaration target = n.resolve();
+            var rtype = n.calculateResolvedType();
+            var kjt = getKeYJavaType(rtype);
+
+            var descriptor = "L%s/%s;".formatted(
+                    n.getScope().toString().replace(".", "/"),
+                    n.getNameAsString());
+
+            // If this is an access to <expr>.length, and <expr> is of type array.
+            // then we need to use the special single field of array.
+            if (target == JavaSymbolSolver.ArrayLengthValueDeclaration.INSTANCE) {
+                ReferencePrefix prefix = accept(n.getScope());
+                return new FieldReference(pi, c, services.getJavaInfo().getArrayLength(), prefix);
+            }
+
+            boolean notFullyQualifiedName = !rtype.toDescriptor().equals(descriptor);
+            ProgramVariable variable =
+                    new LocationVariable(new ProgramElementName(n.getNameAsString()), kjt);
+
+            if (notFullyQualifiedName) { // regular field access
+                ReferencePrefix prefix = accept(n.getScope());
+                return new FieldReference(pi, c, variable, prefix);
+            } else {
+                return new FieldReference(pi, c, variable, translatePackageReference(n.getScope()));
+            }
         } catch (UnsolvedSymbolException e) {
             ResolvedType type = n.calculateResolvedType();
             var keyType = getKeYJavaType(type);
             return new TypeRef(keyType);
-        }
-
-        /*
-         * var ast = target.toAst().orElseThrow();
-         * ProgramVariable pv = null;
-         * if (target instanceof JavaParserFieldDeclaration) {
-         * // Field declarations can have multiple variables
-         * var decl = ((JavaParserFieldDeclaration) target).getVariableDeclarator();
-         * var keyDecl = (VariableSpecification) mapping.nodeToKeY(decl);
-         * pv = (ProgramVariable) keyDecl.getProgramVariable();
-         * } else {
-         * for (VariableSpecification variable : other.getVariables()) {
-         * if (variable.getName() != null && JavaDLFieldNames.split(variable.getName()).name()
-         * .equals(target.getName())) {
-         * pv = (ProgramVariable) variable.getProgramVariable();
-         * break;
-         * }
-         * }
-         * }
-         * if (pv == null) {
-         * return reportUnsupportedElement(n);
-         * }
-         */
-
-        var rtype = n.calculateResolvedType();
-        var kjt = getKeYJavaType(rtype);
-        var descriptor =
-                "L" + n.getScope().toString().replace(".", "/") + "/" + n.getNameAsString() + ";";
-        boolean notFullyQualifiedName = !rtype.toDescriptor().equals(descriptor);
-        ProgramVariable variable =
-                new LocationVariable(new ProgramElementName(n.getNameAsString()), kjt);
-        if (notFullyQualifiedName) { // regular field access
-            ReferencePrefix prefix = accept(n.getScope());
-            return new FieldReference(pi, c, variable, prefix);
-        } else {
-            return new FieldReference(pi, c, variable, translatePackageReference(n.getScope()));
         }
     }
 

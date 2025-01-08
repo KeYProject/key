@@ -310,14 +310,9 @@ public class JP2KeYTypeConverter {
         var res = jp2KeY.getSuperArrayType();
         if (res == null) {
             res = createSuperArrayType();
-            // we want to have exactly one
-            // length attribute for this R2K
-            // instance (resolving
-            // a.length=a.length might get
-            // impossible otherwise),
-            // therefore we introduce a 'super
-            // array class' which contains the
-            // length attribute
+            // we want to have exactly one length attribute for this R2K
+            // instance (resolving a.length=a.length might get impossible otherwise),
+            // therefore we introduce a 'super' array class' which contains the length attribute
             jp2KeY.setSuperArrayType(res);
         }
 

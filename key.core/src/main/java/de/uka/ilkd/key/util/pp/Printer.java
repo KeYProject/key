@@ -144,8 +144,8 @@ class Printer<M> {
         try {
             marginStack.remove(marginStack.size() - 1);
         } catch (IndexOutOfBoundsException e) {
-            //weigl FIXME: ignore this exception.
-            // throw new UnbalancedBlocksException();
+            //FIXME weigl: ignore this exception.
+            throw new UnbalancedBlocksException();
         }
     }
 
@@ -154,8 +154,7 @@ class Printer<M> {
         try {
             return marginStack.getLast();
         } catch (NoSuchElementException e) {
-            return 0;
-            //throw new UnbalancedBlocksException();
+            throw new UnbalancedBlocksException();
         }
     }
 

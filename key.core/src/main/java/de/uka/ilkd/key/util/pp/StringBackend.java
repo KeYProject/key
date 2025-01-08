@@ -9,7 +9,7 @@ package de.uka.ilkd.key.util.pp;
  * of characters written by this so far. The method {@link #toString()} gets the output written so
  * far.
  */
-public class StringBackend<M> {
+public class  StringBackend<M> {
     protected final StringBuilder out;
 
     /**

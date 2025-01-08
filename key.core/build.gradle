@@ -20,7 +20,7 @@ dependencies {
 
     api project(':key.util')
 
-    def JP_VERSION = "3.26.3-K9-SNAPSHOT"
+    def JP_VERSION = "3.26.3-K10-SNAPSHOT"
     api "org.key-project.proofjava:javaparser-core:$JP_VERSION"
     api "org.key-project.proofjava:javaparser-core-serialization:$JP_VERSION"
     api "org.key-project.proofjava:javaparser-symbol-solver-core:$JP_VERSION"

@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -26,15 +23,16 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
-
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Iterator;
+import java.util.Set;
 
 import static de.uka.ilkd.key.pp.PosTableLayouter.DEFAULT_LINE_WIDTH;
 
@@ -77,7 +75,7 @@ public class LogicPrinter {
     private final StorePrinter storePrinter;
 
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
-        QuantifiableVariablePrintMode.NORMAL;
+            QuantifiableVariablePrintMode.NORMAL;
 
     private enum QuantifiableVariablePrintMode {
         NORMAL, WITH_OUT_DECLARATION
@@ -87,12 +85,9 @@ public class LogicPrinter {
      * Creates a LogicPrinter. Sets the sequent to be printed, as well as a ProgramPrinter to print
      * Java programs and a NotationInfo which determines the concrete syntax.
      *
-     * @param notationInfo
-     *        the NotationInfo for the concrete syntax
-     * @param services
-     *        services.
-     * @param layouter
-     *        the layouter to use
+     * @param notationInfo the NotationInfo for the concrete syntax
+     * @param services     services.
+     * @param layouter     the layouter to use
      */
     public LogicPrinter(NotationInfo notationInfo, Services services, PosTableLayouter layouter) {
         this.notationInfo = notationInfo;
@@ -108,10 +103,8 @@ public class LogicPrinter {
     /**
      * Creates a LogicPrinter that does not create a position table.
      *
-     * @param notationInfo
-     *        the NotationInfo for the concrete syntax
-     * @param services
-     *        The Services object
+     * @param notationInfo the NotationInfo for the concrete syntax
+     * @param services     The Services object
      */
     public static LogicPrinter purePrinter(NotationInfo notationInfo, Services services) {
         return new LogicPrinter(notationInfo, services, PosTableLayouter.pure());
@@ -125,7 +118,7 @@ public class LogicPrinter {
     }
 
     public static SequentViewLogicPrinter quickPrinter(Services services,
-            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+                                                       boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
             ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
@@ -140,32 +133,26 @@ public class LogicPrinter {
     /**
      * Converts a term to a string.
      *
-     * @param t
-     *        a term.
-     * @param services
-     *        services.
+     * @param t        a term.
+     * @param services services.
      * @return the printed term.
      */
     public static String quickPrintTerm(Term t, Services services) {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+                NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
 
     /**
      * Converts a term to a string.
      *
-     * @param t
-     *        a term.
-     * @param services
-     *        services.
-     * @param usePrettyPrinting
-     *        whether to use pretty-printing.
-     * @param useUnicodeSymbols
-     *        whether to use unicode symbols.
+     * @param t                 a term.
+     * @param services          services.
+     * @param usePrettyPrinting whether to use pretty-printing.
+     * @param useUnicodeSymbols whether to use unicode symbols.
      * @return the printed term.
      */
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting,
-            boolean useUnicodeSymbols) {
+                                        boolean useUnicodeSymbols) {
         var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
         p.printTerm(t);
         return p.result();
@@ -174,15 +161,13 @@ public class LogicPrinter {
     /**
      * Converts a semisequent to a string.
      *
-     * @param s
-     *        a semisequent.
-     * @param services
-     *        services.
+     * @param s        a semisequent.
+     * @param services services.
      * @return the printed semisequent.
      */
     public static String quickPrintSemisequent(Semisequent s, Services services) {
         var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+                NotationInfo.DEFAULT_UNICODE_ENABLED);
         p.printSemisequent(s);
         return p.result();
     }
@@ -190,15 +175,13 @@ public class LogicPrinter {
     /**
      * Converts a sequent to a string.
      *
-     * @param s
-     *        a sequent.
-     * @param services
-     *        services.
+     * @param s        a sequent.
+     * @param services services.
      * @return the printed sequent.
      */
     public static String quickPrintSequent(Sequent s, Services services) {
         var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-            NotationInfo.DEFAULT_UNICODE_ENABLED);
+                NotationInfo.DEFAULT_UNICODE_ENABLED);
         p.printSequent(s);
         return p.result();
     }
@@ -222,8 +205,7 @@ public class LogicPrinter {
      * set line width is the maximum of {@link PosTableLayouter#DEFAULT_LINE_WIDTH} and the given
      * value
      *
-     * @param lineWidth
-     *        the max. number of character to put on one line
+     * @param lineWidth the max. number of character to put on one line
      */
     public void setLineWidth(int lineWidth) {
         this.layouter.setLineWidth(Math.max(lineWidth, DEFAULT_LINE_WIDTH));
@@ -233,11 +215,9 @@ public class LogicPrinter {
      * Reprints the sequent. This can be useful if settings like PresentationFeatures or
      * abbreviations have changed.
      *
-     * @param filter
-     *        The SequentPrintFilter for seq
-     * @param lineWidth
-     *        the max. number of character to put on one line (the actual taken linewidth
-     *        is the max of {@link PosTableLayouter#DEFAULT_LINE_WIDTH} and the given value
+     * @param filter    The SequentPrintFilter for seq
+     * @param lineWidth the max. number of character to put on one line (the actual taken linewidth
+     *                  is the max of {@link PosTableLayouter#DEFAULT_LINE_WIDTH} and the given value
      */
     public void update(SequentPrintFilter filter, int lineWidth) {
         setLineWidth(lineWidth);
@@ -257,18 +237,14 @@ public class LogicPrinter {
     /**
      * Pretty-print a taclet. Line-breaks are taken care of.
      *
-     * @param taclet
-     *        The Taclet to be pretty-printed.
-     * @param sv
-     *        The instantiations of the SchemaVariables
-     * @param showWholeTaclet
-     *        Should the find, varcond and heuristic part be pretty-printed?
-     * @param declareSchemaVars
-     *        Should declarations for the schema variables used in the taclet be
-     *        pretty-printed?
+     * @param taclet            The Taclet to be pretty-printed.
+     * @param sv                The instantiations of the SchemaVariables
+     * @param showWholeTaclet   Should the find, varcond and heuristic part be pretty-printed?
+     * @param declareSchemaVars Should declarations for the schema variables used in the taclet be
+     *                          pretty-printed?
      */
     public void printTaclet(Taclet taclet, SVInstantiations sv, boolean showWholeTaclet,
-            boolean declareSchemaVars) {
+                            boolean declareSchemaVars) {
         instantiations = sv;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
 
@@ -315,8 +291,7 @@ public class LogicPrinter {
     /**
      * Pretty-print a taclet. Line-breaks are taken care of. No instantiation is applied.
      *
-     * @param taclet
-     *        The Taclet to be pretty-printed.
+     * @param taclet The Taclet to be pretty-printed.
      */
     public void printTaclet(Taclet taclet) {
         // the last argument used to be false. Changed that - M.Ulbrich
@@ -455,7 +430,7 @@ public class LogicPrinter {
             return;
         }
         layouter.nl().beginRelativeC().print("\\heuristics(").brk(0);
-        for (Iterator<RuleSet> it = taclet.getRuleSets().iterator(); it.hasNext();) {
+        for (Iterator<RuleSet> it = taclet.getRuleSets().iterator(); it.hasNext(); ) {
             RuleSet tgt = it.next();
             printHeuristic(tgt);
             if (it.hasNext()) {
@@ -527,8 +502,8 @@ public class LogicPrinter {
             layouter.nl().print("\\closegoal").brk();
         }
 
-        for (final Iterator<TacletGoalTemplate> it = taclet.goalTemplates().reverse().iterator(); it
-                .hasNext();) {
+        for (final Iterator<TacletGoalTemplate> it = taclet.goalTemplates().reverse().iterator();
+             it.hasNext(); ) {
             printGoalTemplate(it.next());
             if (it.hasNext()) {
                 layouter.print(";");
@@ -620,16 +595,15 @@ public class LogicPrinter {
 
     private void printSourceElement(SourceElement element) {
         new PrettyPrinter(layouter, instantiations, services,
-            notationInfo.isPrettySyntax(),
-            notationInfo.isUnicodeEnabled()).print(element);
+                notationInfo.isPrettySyntax(),
+                notationInfo.isUnicodeEnabled()).print(element);
     }
 
     /**
      * Pretty-prints a ProgramElement.
      *
-     * @param pe
-     *        You've guessed it, the ProgramElement to be pretty-printedprint(Term t,
-     *        LogicPrinter sp)
+     * @param pe You've guessed it, the ProgramElement to be pretty-printedprint(Term t,
+     *           LogicPrinter sp)
      */
     public void printProgramElement(ProgramElement pe) {
         if (pe instanceof ProgramVariable) {
@@ -643,8 +617,7 @@ public class LogicPrinter {
      * Pretty-Prints a ProgramVariable in the logic, not in Java blocks. Prints out the full (logic)
      * name, so if A.b is private, it becomes a.A::b .
      *
-     * @param pv
-     *        The ProgramVariable in the logicprint(Term t, LogicPrinter sp)
+     * @param pv The ProgramVariable in the logicprint(Term t, LogicPrinter sp)
      */
     public void printProgramVariable(ProgramVariable pv) {
         LOGGER.debug("PP PV {}", pv.name());
@@ -654,8 +627,7 @@ public class LogicPrinter {
     /**
      * Pretty-prints a ProgramSV.
      *
-     * @param pe
-     *        the ProgramSV to be pretty-printed.
+     * @param pe the ProgramSV to be pretty-printed.
      */
     public void printProgramSV(ProgramSV pe) {
         printSourceElement(pe);
@@ -673,8 +645,7 @@ public class LogicPrinter {
      * a line of its own, and formulae are indented w.r.t. the arrow. A line-break is printed after
      * the Sequent.
      *
-     * @param filter
-     *        The SequentPrintFilter for seq
+     * @param filter The SequentPrintFilter for seq
      */
     public void printFilteredSequent(SequentPrintFilter filter) {
         try {
@@ -734,8 +705,7 @@ public class LogicPrinter {
      * a line of its own, and formulae are indented w.r.t. the arrow. A line-break is printed after
      * the Sequent. No filtering is done.
      *
-     * @param seq
-     *        The Sequent to be pretty-printed
+     * @param seq The Sequent to be pretty-printed
      */
     public void printSequent(Sequent seq) {
         layouter.beginC(0);
@@ -746,8 +716,7 @@ public class LogicPrinter {
     /**
      * Pretty-prints a Semisequent. Formulae are separated by commas.
      *
-     * @param semiseq
-     *        the semisequent to be printed
+     * @param semiseq the semisequent to be printed
      */
     public void printSemisequent(Semisequent semiseq) {
         for (int i = 0; i < semiseq.size(); i++) {
@@ -778,10 +747,10 @@ public class LogicPrinter {
     /**
      * Pretty-prints a constrained formula. The constraint "Constraint.BOTTOM" is suppressed
      *
-     * @param cfma
-     *        the constrained formula to be printed
+     * @param cfma the constrained formula to be printed
      */
     public void printConstrainedFormula(SequentFormula cfma) {
+        System.out.println(cfma.toString());
         printTerm(cfma.formula());
     }
 
@@ -789,8 +758,7 @@ public class LogicPrinter {
      * Pretty-prints a term or formula. How it is rendered depends on the NotationInfo given to the
      * constructor.
      *
-     * @param t
-     *        the Term to be printed
+     * @param t the Term to be printed
      */
     public void printTerm(Term t) {
         if (notationInfo.getAbbrevMap().isEnabled(t)) {
@@ -818,10 +786,9 @@ public class LogicPrinter {
      * configured via GUI, see de.uka.ilkd.key.gui.actions.TermLabelMenu. Default is to
      * print all TermLabels.
      *
-     * @param t
-     *        {@link Term} whose visible {@link TermLabel}s will be determined.
+     * @param t {@link Term} whose visible {@link TermLabel}s will be determined.
      * @return List of visible {@link TermLabel}s, i.e. labels that are syntactically added to a
-     *         {@link Term} while printing.
+     * {@link Term} while printing.
      */
     protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t) {
         return t.getLabels();
@@ -865,8 +832,7 @@ public class LogicPrinter {
     /**
      * Pretty-prints a set of terms.
      *
-     * @param terms
-     *        the terms to be printed
+     * @param terms the terms to be printed
      */
     public void printTerm(ImmutableSet<Term> terms) {
         layouter.print("{");
@@ -898,8 +864,7 @@ public class LogicPrinter {
      * a &amp; b &amp; c
      * </pre>
      *
-     * @param t
-     *        the Term to be printed
+     * @param t the Term to be printed
      */
     public void printTermContinuingBlock(Term t) {
         if (t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
@@ -921,8 +886,7 @@ public class LogicPrinter {
      * are printed, i.e. <code>f</code> instead of <code>f()</code>. If the term doesn't fit on one
      * line, <code>t2...tn</code> are aligned below <code>t1</code>.
      *
-     * @param t
-     *        the term to be printed.
+     * @param t the term to be printed.
      */
     public void printFunctionTerm(Term t) {
         boolean isKeyword = false;
@@ -1196,8 +1160,8 @@ public class LogicPrinter {
                     String p;
                     try {
                         boolean canonical =
-                            obs.isStatic() || ((obs instanceof IProgramMethod) && javaInfo
-                                    .isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType));
+                                obs.isStatic() || ((obs instanceof IProgramMethod) && javaInfo
+                                        .isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType));
                         if (canonical) {
                             p = fieldName;
                         } else {
@@ -1342,14 +1306,10 @@ public class LogicPrinter {
      * Print a unary term in prefix style. For instance <code>!a</code>. No line breaks are
      * possible.
      *
-     * @param name
-     *        the prefix operator
-     * @param t
-     *        whole term
-     * @param sub
-     *        the subterm to be printed
-     * @param ass
-     *        the associativity for the subterm
+     * @param name the prefix operator
+     * @param t    whole term
+     * @param sub  the subterm to be printed
+     * @param ass  the associativity for the subterm
      */
     public void printPrefixTerm(String name, Term t, Term sub, int ass) {
         layouter.startTerm(1);
@@ -1367,12 +1327,9 @@ public class LogicPrinter {
      * Print a unary term in postfix style. For instance <code>t.a</code>, where <code>.a</code> is
      * the postfix operator. No line breaks are possible.
      *
-     * @param name
-     *        the postfix operator
-     * @param t
-     *        the subterm to be printed
-     * @param ass
-     *        the associativity for the subterm
+     * @param name the postfix operator
+     * @param t    the subterm to be printed
+     * @param ass  the associativity for the subterm
      */
     public void printPostfixTerm(Term t, int ass, String name) {
         layouter.startTerm(1);
@@ -1393,18 +1350,12 @@ public class LogicPrinter {
      * <p>
      * The subterms are printed using {@link #printTermContinuingBlock(Term)}.
      *
-     * @param l
-     *        the left subterm
-     * @param assLeft
-     *        associativity for left subterm
-     * @param name
-     *        the infix operator
-     * @param t
-     *        whole term
-     * @param r
-     *        the right subterm
-     * @param assRight
-     *        associativity for right subterm
+     * @param l        the left subterm
+     * @param assLeft  associativity for left subterm
+     * @param name     the infix operator
+     * @param t        whole term
+     * @param r        the right subterm
+     * @param assRight associativity for right subterm
      */
     public void printInfixTerm(Term l, int assLeft, String name, Term t, Term r, int assRight) {
         int indent = name.length() + 1;
@@ -1418,21 +1369,15 @@ public class LogicPrinter {
      * {@link #printTermContinuingBlock(Term)} for the idea. Otherwise, like
      * {@link #printInfixTerm(Term, int, String, Term, Term, int)}.
      *
-     * @param l
-     *        the left subterm
-     * @param assLeft
-     *        associativity for left subterm
-     * @param name
-     *        the infix operator
-     * @param t
-     *        whole term
-     * @param r
-     *        the right subterm
-     * @param assRight
-     *        associativity for right subterm
+     * @param l        the left subterm
+     * @param assLeft  associativity for left subterm
+     * @param name     the infix operator
+     * @param t        whole term
+     * @param r        the right subterm
+     * @param assRight associativity for right subterm
      */
     public void printInfixTermContinuingBlock(Term l, int assLeft, String name, Term t, Term r,
-            int assRight) {
+                                              int assRight) {
         boolean isKeyword = false;
         if (services != null) {
             LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
@@ -1464,14 +1409,10 @@ public class LogicPrinter {
      *   t
      * </pre>
      *
-     * @param l
-     *        the left brace
-     * @param r
-     *        the right brace
-     * @param t
-     *        the update term
-     * @param ass3
-     *        associativity for phi
+     * @param l    the left brace
+     * @param r    the right brace
+     * @param t    the update term
+     * @param ass3 associativity for phi
      */
     public void printUpdateApplicationTerm(String l, String r, Term t, int ass3) {
         assert t.op() instanceof UpdateApplication && t.arity() == 2;
@@ -1496,10 +1437,8 @@ public class LogicPrinter {
     /**
      * Print an elementary update. This looks like <code>loc := val</code>
      *
-     * @param asgn
-     *        the assignment operator (including spaces)
-     * @param ass2
-     *        associativity for the new values
+     * @param asgn the assignment operator (including spaces)
+     * @param ass2 associativity for the new values
      */
     public void printElementaryUpdate(String asgn, Term t, int ass2) {
         ElementaryUpdate op = (ElementaryUpdate) t.op();
@@ -1546,7 +1485,7 @@ public class LogicPrinter {
     }
 
     private void printVariables(ImmutableArray<QuantifiableVariable> vars,
-            QuantifiableVariablePrintMode mode) {
+                                QuantifiableVariablePrintMode mode) {
         int size = vars.size();
         for (int j = 0; j != size; j++) {
             final QuantifiableVariable v = vars.get(j);
@@ -1618,23 +1557,16 @@ public class LogicPrinter {
      *   s
      * </pre>
      *
-     * @param l
-     *        the String used as left brace symbol
-     * @param v
-     *        the {@link QuantifiableVariable} to be substituted
-     * @param t
-     *        the Term to be used as new value
-     * @param ass2
-     *        the int defining the associativity for the new value
-     * @param r
-     *        the String used as right brace symbol
-     * @param phi
-     *        the substituted term/formula
-     * @param ass3
-     *        the int defining the associativity for phi
+     * @param l    the String used as left brace symbol
+     * @param v    the {@link QuantifiableVariable} to be substituted
+     * @param t    the Term to be used as new value
+     * @param ass2 the int defining the associativity for the new value
+     * @param r    the String used as right brace symbol
+     * @param phi  the substituted term/formula
+     * @param ass3 the int defining the associativity for phi
      */
     public void printSubstTerm(String l, QuantifiableVariable v, Term t, int ass2, String r,
-            Term phi, int ass3) {
+                               Term phi, int ass3) {
         layouter.beginC().print(l);
         printVariables(new ImmutableArray<>(v), quantifiableVariablePrintMode);
         layouter.startTerm(2);
@@ -1656,17 +1588,13 @@ public class LogicPrinter {
      * Note that the parameter <code>var</code> has to contain the variable name with colon and
      * sort.
      *
-     * @param name
-     *        the name of the quantifier
-     * @param vars
-     *        the quantified variables (+colon and sort)
-     * @param phi
-     *        the quantified formula
-     * @param ass
-     *        associativity for phi
+     * @param name the name of the quantifier
+     * @param vars the quantified variables (+colon and sort)
+     * @param phi  the quantified formula
+     * @param ass  associativity for phi
      */
     public void printQuantifierTerm(String name, ImmutableArray<QuantifiableVariable> vars,
-            Term phi, int ass) {
+                                    Term phi, int ass) {
         layouter.beginC();
         layouter.keyWord(name);
         layouter.print(" ");
@@ -1680,8 +1608,7 @@ public class LogicPrinter {
     /**
      * Print a constant. This just prints the string <code>s</code> and marks it as a nullary term.
      *
-     * @param s
-     *        the constant
+     * @param s the constant
      */
     public void printConstant(String s) {
         layouter.startTerm(0);
@@ -1691,10 +1618,8 @@ public class LogicPrinter {
     /**
      * Print a constant. This just prints the string <code>s</code> and marks it as a nullary term.
      *
-     * @param t
-     *        constant as term to be printed
-     * @param s
-     *        name of the constant
+     * @param t constant as term to be printed
+     * @param s name of the constant
      */
     public void printConstant(Term t, String s) {
         layouter.startTerm(0);
@@ -1717,8 +1642,7 @@ public class LogicPrinter {
      * result is indented according to the surrounding material. The first `executable' statement is
      * marked for highlighting.
      *
-     * @param j
-     *        the Java block to be printed
+     * @param j the Java block to be printed
      */
     public void printJavaBlock(JavaBlock j) {
         printSourceElement(j.program());
@@ -1747,9 +1671,9 @@ public class LogicPrinter {
                         ta[i] = phi.sub(i);
                     }
                     final Modality m =
-                        Modality.getModality((Modality.JavaModalityKind) o, mod.program());
+                            Modality.getModality((Modality.JavaModalityKind) o, mod.program());
                     final Term term = services.getTermFactory().createTerm(m, ta,
-                        phi.boundVars(), null);
+                            phi.boundVars(), null);
                     notationInfo.getNotation(m).print(term, this);
                     return;
                 }
@@ -1799,10 +1723,8 @@ public class LogicPrinter {
      * {@link #printTermContinuingBlock(Term)}. This currently only makes a difference for infix
      * operators.
      *
-     * @param t
-     *        the subterm to print
-     * @param ass
-     *        the associativity for this subterm
+     * @param t   the subterm to print
+     * @param ass the associativity for this subterm
      */
     protected void maybeParens(Term t, int ass) {
         if (t.op() instanceof SchemaVariable && instantiations != null
@@ -1846,10 +1768,8 @@ public class LogicPrinter {
      * returns true if an attribute term shall be printed in short form. In opposite to the other
      * <tt>printInShortForm</tt> methods it takes care of meta variable instantiations
      *
-     * @param attributeProgramName
-     *        the String of the attribute's program name
-     * @param t
-     *        the Term used as reference prefix
+     * @param attributeProgramName the String of the attribute's program name
+     * @param t                    the Term used as reference prefix
      * @return true if an attribute term shall be printed in short form.
      */
     public boolean printInShortForm(String attributeProgramName, Term t) {
@@ -1862,10 +1782,8 @@ public class LogicPrinter {
      * tests if the program name together with the prefix sort determines the attribute in a unique
      * way
      *
-     * @param programName
-     *        the String denoting the program name of the attribute
-     * @param sort
-     *        the ObjectSort in whose reachable hierarchy we test for uniqueness
+     * @param programName the String denoting the program name of the attribute
+     * @param sort        the ObjectSort in whose reachable hierarchy we test for uniqueness
      * @return true if the attribute is uniquely determined
      */
     public boolean printInShortForm(String programName, Sort sort) {
@@ -1875,8 +1793,7 @@ public class LogicPrinter {
     /**
      * escapes special characters by their HTML encoding
      *
-     * @param text
-     *        the String to be displayed as part of an HTML side
+     * @param text the String to be displayed as part of an HTML side
      * @return the text with special characters replaced
      */
     public static String escapeHTML(String text, boolean escapeWhitespace) {
@@ -1885,21 +1802,21 @@ public class LogicPrinter {
         for (int i = 0, sz = text.length(); i < sz; i++) {
             char c = text.charAt(i);
             switch (c) {
-            case '<' -> sb.append("&lt;");
-            case '>' -> sb.append("&gt;");
-            case '&' -> sb.append("&amp;");
-            case '\"' -> sb.append("&quot;");
-            case '\'' -> sb.append("&#039;");
-            case '(' -> sb.append("&#040;");
-            case ')' -> sb.append("&#041;");
-            case '#' -> sb.append("&#035;");
-            case '+' -> sb.append("&#043;");
-            case '-' -> sb.append("&#045;");
-            case '%' -> sb.append("&#037;");
-            case ';' -> sb.append("&#059;");
-            case '\n' -> sb.append(escapeWhitespace ? "<br>" : c);
-            case ' ' -> sb.append(escapeWhitespace ? "&nbsp;" : c);
-            default -> sb.append(c);
+                case '<' -> sb.append("&lt;");
+                case '>' -> sb.append("&gt;");
+                case '&' -> sb.append("&amp;");
+                case '\"' -> sb.append("&quot;");
+                case '\'' -> sb.append("&#039;");
+                case '(' -> sb.append("&#040;");
+                case ')' -> sb.append("&#041;");
+                case '#' -> sb.append("&#035;");
+                case '+' -> sb.append("&#043;");
+                case '-' -> sb.append("&#045;");
+                case '%' -> sb.append("&#037;");
+                case ';' -> sb.append("&#059;");
+                case '\n' -> sb.append(escapeWhitespace ? "<br>" : c);
+                case ' ' -> sb.append(escapeWhitespace ? "&nbsp;" : c);
+                default -> sb.append(c);
             }
 
         }
@@ -1910,12 +1827,9 @@ public class LogicPrinter {
      * tests if the program name together with the prefix sort determines the attribute in a unique
      * way
      *
-     * @param programName
-     *        the String denoting the program name of the attribute
-     * @param sort
-     *        the ObjectSort specifying the hierarchy where to test for uniqueness
-     * @param services
-     *        the Services class used to access the type hierarchy
+     * @param programName the String denoting the program name of the attribute
+     * @param sort        the ObjectSort specifying the hierarchy where to test for uniqueness
+     * @param services    the Services class used to access the type hierarchy
      * @return true if the attribute is uniquely determined
      */
     public static boolean printInShortForm(String programName, Sort sort, Services services) {

@@ -80,7 +80,7 @@ public final class JavaInfo {
     /**
      * caches the arrays' length attribute
      */
-    private ProgramVariable length;
+    private LocationVariable length;
 
     /**
      * caches the program variable for {@code <inv>}
@@ -1279,11 +1279,11 @@ public final class JavaInfo {
     /**
      * returns the length attribute for arrays
      */
-    public ProgramVariable getArrayLength() {
+    public LocationVariable getArrayLength() {
         if (length == null) {
             final SuperArrayDeclaration sad =
-                (SuperArrayDeclaration) rec2key().getSuperArrayType().getJavaType();
-            length = (ProgramVariable) sad.length().getVariables().get(0).getProgramVariable();
+                    (SuperArrayDeclaration) rec2key().getSuperArrayType().getJavaType();
+            length = (LocationVariable) sad.length().getVariables().get(0).getProgramVariable();
             assert "length".equals(length.name().toString()) : "Wrong array length";
         }
 

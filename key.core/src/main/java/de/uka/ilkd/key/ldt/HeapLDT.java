@@ -372,8 +372,10 @@ public final class HeapLDT extends LDT {
      * to the namespace as a side effect.
      */
     public JFunction getFieldSymbolForPV(LocationVariable fieldPV, Services services) {
-        assert fieldPV.isMember();
-        assert fieldPV != services.getJavaInfo().getArrayLength();
+        assert fieldPV.isMember() : "Given LocationVariable is not marked as a member variable of a class";
+
+        assert fieldPV != services.getJavaInfo().getArrayLength()
+                : "Given LocationVariable is the length field of an array.";
 
         final Name name = new Name(getFieldSymbolName(fieldPV));
         JFunction result = services.getNamespaces().functions().lookup(name);
