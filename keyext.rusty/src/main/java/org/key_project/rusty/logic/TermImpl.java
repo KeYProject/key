@@ -47,6 +47,11 @@ class TermImpl implements Term {
     }
 
     /**
+     * Cached {@link #hashCode()} value.
+     */
+    private int hashcode = -1;
+
+    /**
      * A cached value for computing the term's rigidness.
      */
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
@@ -299,14 +304,17 @@ class TermImpl implements Term {
 
     @Override
     public final int hashCode() {
-        int hashcode = 5;
-        hashcode = hashcode * 17 + op().hashCode();
-        hashcode = hashcode * 17 + subs().hashCode();
-        hashcode = hashcode * 17 + boundVars().hashCode();
-
-        if (hashcode == -1) {
-            hashcode = 0;
+        if (hashcode != -1) {
+            return hashcode;
         }
-        return hashcode;
+        int hash = 5;
+        hash = hash * 17 + op().hashCode();
+        hash = hash * 17 + subs().hashCode();
+        hash = hash * 17 + boundVars().hashCode();
+        if (hash == -1) {
+            hash = 0;
+        }
+        this.hashcode = hash;
+        return hash;
     }
 }

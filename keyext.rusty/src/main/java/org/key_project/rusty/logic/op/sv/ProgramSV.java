@@ -99,8 +99,6 @@ public final class ProgramSV extends OperatorSV
             return addProgramInstantiation(EMPTY_LIST_INSTANTIATION, matchCond, services);
         }
 
-        SVInstantiations instantiations = matchCond.getInstantiations();
-
         final java.util.ArrayList<RustyProgramElement> matchedElements =
             new java.util.ArrayList<>();
 

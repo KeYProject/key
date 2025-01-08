@@ -25,6 +25,8 @@ public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBra
     protected final Expr value;
     private final int prefixLength;
 
+    private int hashCode = -1;
+
     public BlockExpression(ImmutableList<Statement> statements, Expr value) {
         this.statements = statements;
         this.value = value;
@@ -120,5 +122,26 @@ public class BlockExpression implements Expr, ProgramPrefix, ThenBranch, ElseBra
         }
 
         return new ImmutableArray<>(prefix);
+    }
+
+    @Override
+    public int hashCode() {
+        if (hashCode == -1) {
+            return hashCode;
+        }
+        final int hash = computeHashCode();
+        this.hashCode = hash;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        BlockExpression that = (BlockExpression) o;
+        return prefixLength == that.prefixLength && Objects.equals(statements, that.statements)
+                && Objects.equals(value, that.value);
     }
 }

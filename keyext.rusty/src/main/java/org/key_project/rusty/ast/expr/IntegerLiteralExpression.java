@@ -92,4 +92,19 @@ public class IntegerLiteralExpression extends LiteralExpression {
     public void visit(Visitor v) {
         v.performActionOnIntegerLiteralExpression(this);
     }
+
+    @Override
+    public int hashCode() {
+        return 5 + value.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj.getClass() != this.getClass())
+            return false;
+        IntegerLiteralExpression other = (IntegerLiteralExpression) obj;
+        return value.equals(other.value);
+    }
 }

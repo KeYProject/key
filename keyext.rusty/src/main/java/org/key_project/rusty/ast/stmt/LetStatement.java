@@ -20,6 +20,8 @@ public class LetStatement implements Statement, VariableDeclaration {
     private final RustType type;
     private final Expr init;
 
+    private int hashCode = -1;
+
     public LetStatement(Pattern pat, RustType type, @Nullable Expr init) {
         this.pat = pat;
         this.type = type;
@@ -58,5 +60,26 @@ public class LetStatement implements Statement, VariableDeclaration {
     @Override
     public void visit(Visitor v) {
         throw new RuntimeException("TODO @ DD");
+    }
+
+    @Override
+    public int hashCode() {
+        if (hashCode == -1) {
+            return hashCode;
+        }
+        final int hash = computeHashCode();
+        this.hashCode = hash;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        final LetStatement that = (LetStatement) obj;
+        return pat.equals(that.pat) && Objects.equals(type, that.type)
+                && Objects.equals(init, that.init);
     }
 }

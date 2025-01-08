@@ -1,0 +1,38 @@
+\profile "Rust Profile";
+
+\problem {
+\<{
+  b = false;
+  if b {
+    i = 3u32
+  } else {
+    i = 2u32
+  };
+  i
+}\> i = Z(2(#))
+}
+
+\proof {
+(branch "dummy ID"
+(rule "assignment" (formula "1"))
+(rule "ifElseSplit" (formula "1"))
+(branch
+   (rule "applyOnRigidFormula" (formula "1"))
+   (rule "applyOnPV" (formula "1") (term "0"))
+   (rule "simplifyUpdate1" (formula "1") (term "1"))
+   (rule "bool_not_equal_2" (formula "1"))
+   (rule "closeFalse" (formula "1"))
+)
+(branch
+   (rule "emptyBlock" (formula "2") (term "1"))
+   (rule "assignment" (formula "2") (term "1"))
+   (rule "emptyModality" (formula "2") (term "1,1"))
+   (rule "simplifyUpdate2" (formula "2"))
+   (rule "applyOnRigidFormula" (formula "2"))
+   (rule "applyOnPV" (formula "2") (term "0"))
+   (rule "simplifyUpdate1" (formula "2") (term "1"))
+   (rule "eqClose" (formula "2"))
+   (rule "closeTrue" (formula "2"))
+)
+)
+}

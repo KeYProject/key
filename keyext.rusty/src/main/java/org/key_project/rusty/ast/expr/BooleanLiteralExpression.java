@@ -47,4 +47,19 @@ public class BooleanLiteralExpression extends LiteralExpression {
     public void visit(Visitor v) {
         v.performActionOnBooleanLiteralExpression(this);
     }
+
+    @Override
+    public int hashCode() {
+        return value ? 29 : 37;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj.getClass() != this.getClass())
+            return false;
+        BooleanLiteralExpression other = (BooleanLiteralExpression) obj;
+        return value == other.value;
+    }
 }

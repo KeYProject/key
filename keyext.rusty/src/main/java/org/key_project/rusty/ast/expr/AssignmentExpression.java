@@ -11,6 +11,7 @@ import org.jspecify.annotations.NonNull;
 public class AssignmentExpression implements Expr {
     private final Expr lhs;
     private final Expr rhs;
+    private int hashCode = -1;
 
     public AssignmentExpression(Expr lhs, Expr rhs) {
         this.lhs = lhs;
@@ -49,5 +50,25 @@ public class AssignmentExpression implements Expr {
     @Override
     public void visit(Visitor v) {
         v.performActionOnAssignmentExpression(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        AssignmentExpression that = (AssignmentExpression) o;
+        return lhs.equals(that.lhs) && rhs.equals(that.rhs);
+    }
+
+    @Override
+    public int hashCode() {
+        if (hashCode == -1) {
+            return hashCode;
+        }
+        final int hash = computeHashCode();
+        this.hashCode = hash;
+        return hash;
     }
 }

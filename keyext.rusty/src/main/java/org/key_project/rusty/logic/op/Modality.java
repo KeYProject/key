@@ -13,7 +13,6 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.RustyBlock;
 import org.key_project.rusty.logic.RustyDLTheory;
-import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
 

@@ -31,4 +31,16 @@ public class EmptyStatement implements Statement, TerminalSyntaxElement {
     public String toString() {
         return ";";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass())
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return 32472243;
+    }
 }

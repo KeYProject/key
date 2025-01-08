@@ -42,4 +42,19 @@ public class ExpressionStatement implements Statement {
     public void visit(Visitor v) {
         v.performActionOnExpressionStatement(this);
     }
+
+    @Override
+    public int hashCode() {
+        return expression.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        ExpressionStatement that = (ExpressionStatement) obj;
+        return expression.equals(that.expression);
+    }
 }
