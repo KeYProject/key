@@ -110,7 +110,6 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
 
         source.next();
         return matchCond;
-
     }
 
 
