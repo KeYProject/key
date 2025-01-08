@@ -6,13 +6,14 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 
 public class SeqContainsExecutableCodeFeature extends BinaryFeature {
 

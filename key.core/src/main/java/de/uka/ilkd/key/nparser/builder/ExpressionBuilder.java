@@ -21,7 +21,6 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.KeYLexer;
 import de.uka.ilkd.key.nparser.KeYParser;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.nparser.KeYParser.FloatLiteralContext;
 import de.uka.ilkd.key.nparser.KeYParser.RealLiteralContext;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
@@ -37,9 +37,13 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
 
@@ -539,9 +543,9 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Sequent visitSeq(KeYParser.SeqContext ctx) {
-        Semisequent ant = accept(ctx.ant);
-        Semisequent suc = accept(ctx.suc);
-        return Sequent.createSequent(ant, suc);
+        ImmutableList<SequentFormula> ant = accept(ctx.ant);
+        ImmutableList<SequentFormula> suc = accept(ctx.suc);
+        return JavaDLSequentKit.createSequent(ant, suc);
     }
 
     @Override
@@ -553,38 +557,37 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Object visitTermorseq(KeYParser.TermorseqContext ctx) {
         Term head = accept(ctx.head);
         Sequent s = accept(ctx.s);
-        Semisequent ss = accept(ctx.ss);
+        ImmutableList<SequentFormula> ss = accept(ctx.ss);
         if (head != null && s == null && ss == null) {
             return head;
         }
         if (head != null && ss != null) {
             // A sequent with only head in the antecedent.
-            Semisequent ant = Semisequent.EMPTY_SEMISEQUENT;
-            ant = ant.insertFirst(new SequentFormula(head)).semisequent();
-            return Sequent.createSequent(ant, ss);
+            var ant = ImmutableSLList.singleton(new SequentFormula(head));
+            return JavaDLSequentKit.createSequent(ant, ss);
         }
         if (head != null && s != null) {
             // A sequent. Prepend head to the antecedent.
-            Semisequent newAnt = s.antecedent();
-            newAnt = newAnt.insertFirst(new SequentFormula(head)).semisequent();
-            return Sequent.createSequent(newAnt, s.succedent());
+            var newAnt = s.antecedent().
+                    insertFirst(new SequentFormula(head)).getFormulaList();
+            return JavaDLSequentKit.createSequent(newAnt, s.succedent().asList());
         }
         if (ss != null) {
-            return Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, ss);
+            return JavaDLSequentKit.createSequent(ImmutableSLList.nil(), ss);
         }
         assert (false);
         return null;
     }
 
     @Override
-    public Semisequent visitSemisequent(KeYParser.SemisequentContext ctx) {
-        Semisequent ss = accept(ctx.ss);
+    public ImmutableList<SequentFormula> visitSemisequent(KeYParser.SemisequentContext ctx) {
+        ImmutableList<SequentFormula> ss = accept(ctx.ss);
         if (ss == null) {
-            ss = Semisequent.EMPTY_SEMISEQUENT;
+            ss = ImmutableSLList.nil();
         }
         Term head = accept(ctx.term());
         if (head != null) {
-            ss = ss.insertFirst(new SequentFormula(head)).semisequent();
+            ss = ss.prepend(new SequentFormula(head));
         }
         return ss;
     }
@@ -1352,9 +1355,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                     addWarning("");
                 }
                 return current;
-            } else if (ctxSuffix instanceof KeYParser.Attribute_simpleContext) {
-                KeYParser.Attribute_simpleContext attrid =
-                    (KeYParser.Attribute_simpleContext) ctxSuffix;
+            } else if (ctxSuffix instanceof KeYParser.Attribute_simpleContext attrid) {
                 String memberName = attrid.id.getText();
                 Sort seqSort = lookupSort("Seq");
                 if (current.sort() == seqSort) {
@@ -1388,9 +1389,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                         current = replaceHeap(current, heap, ctxSuffix);
                     }
                 }
-            } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
-                KeYParser.Attribute_complexContext attrid =
-                    (KeYParser.Attribute_complexContext) ctxSuffix;
+            } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext attrid) {
                 Term heap = accept(attrid.heap);
                 String classRef = attrid.sort.getText();
                 String memberName = attrid.id.getText();
@@ -1736,7 +1735,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 // term);
                 return term;
             }
-            Term[] params = new Term[] { heap, replaceHeap(term.sub(1), heap, ctx), term.sub(2) };
+            Term[] params = { heap, replaceHeap(term.sub(1), heap, ctx), term.sub(2) };
             return capsulateTf(ctx,
                 () -> getServices().getTermFactory().createTerm(term.op(), params));
         } else if (term.op() instanceof ObserverFunction) {

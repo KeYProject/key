@@ -7,15 +7,14 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Triple;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.DependencyTracker;
-import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
@@ -329,7 +328,7 @@ public class DependencyGraph {
     public Collection<GraphNode> nodeAndPreviousDerivations(GraphNode node) {
         Collection<GraphNode> all = new ArrayList<>();
         all.add(node);
-        if (node instanceof EqualsModProofIrrelevancy) {
+        if (node instanceof TrackedFormula) {
             all = graph.getVerticesModProofIrrelevancy(node);
         }
         return all;
@@ -350,7 +349,8 @@ public class DependencyGraph {
         }
         while (true) {
             TrackedFormula formula =
-                new TrackedFormula(pio.sequentFormula(), locationGuess, pio.isInAntec(),
+                new TrackedFormula(pio.sequentFormula(), locationGuess,
+                    pio.isInAntec(),
                     proof.getServices());
             if (containsNode(formula)) {
                 return formula;

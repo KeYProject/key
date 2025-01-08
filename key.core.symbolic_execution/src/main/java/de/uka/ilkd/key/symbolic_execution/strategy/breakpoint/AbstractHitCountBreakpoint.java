@@ -40,7 +40,7 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
      * @param proof the {@link Proof} that will be executed and should stop
      * @param enabled flag if the Breakpoint is enabled
      */
-    public AbstractHitCountBreakpoint(int hitCount, Proof proof, boolean enabled) {
+    protected AbstractHitCountBreakpoint(int hitCount, Proof proof, boolean enabled) {
         super(proof, enabled);
         this.hitCount = hitCount;
     }

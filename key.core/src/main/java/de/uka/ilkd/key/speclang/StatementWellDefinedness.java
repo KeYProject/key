@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
 
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -54,7 +54,8 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return
      */
-    abstract SequentFormula generateSequent(SequentTerms seqTerms, TermServices services);
+    abstract SequentFormula generateSequent(SequentTerms seqTerms,
+            TermServices services);
 
     public abstract SpecificationElement getStatement();
 
@@ -121,7 +122,8 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services The current services reference
      * @return The proof sequent for the well-definedness check
      */
-    public SequentFormula generateSequent(LocationVariable self, LocationVariable exception,
+    public SequentFormula generateSequent(LocationVariable self,
+            LocationVariable exception,
             LocationVariable result, LocationVariable heap, LocationVariable heapAtPre,
             Term anonHeap,
             ImmutableSet<LocationVariable> ps, Term leadingUpdate, Term localAnonUpdate,

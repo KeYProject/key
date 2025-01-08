@@ -92,12 +92,12 @@ public class TestJavaInfo {
 
     }
 
-    private static final String[] implictFieldsClassOnly = new String[] {
+    private static final String[] implictFieldsClassOnly = {
         ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS,
         ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS,
         ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED };
 
-    private static final String[] generalImplicitFields = new String[] {
+    private static final String[] generalImplicitFields = {
         ImplicitFieldAdder.IMPLICIT_CREATED, ImplicitFieldAdder.IMPLICIT_INITIALIZED };
 
 
@@ -178,7 +178,7 @@ public class TestJavaInfo {
     @Test
     public void testGetPrimitiveKJT() {
         final String[] primitiveTypeNames =
-            new String[] { "long", "int", "short", "byte", "char", "boolean" };
+            { "long", "int", "short", "byte", "char", "boolean" };
 
         for (String primitiveTypeName : primitiveTypeNames) {
             assertNotNull(javaInfo.getPrimitiveKeYJavaType(primitiveTypeName),

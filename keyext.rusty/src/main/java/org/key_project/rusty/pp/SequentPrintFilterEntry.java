@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.pp;
 
-import org.key_project.rusty.logic.SequentFormula;
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * One element of a sequent as delivered by SequentPrintFilter
@@ -12,7 +12,7 @@ public interface SequentPrintFilterEntry {
     /**
      * Formula to display
      */
-    SequentFormula getFilteredFormula();
+    org.key_project.prover.sequent.SequentFormula getFilteredFormula();
 
     /**
      * Original formula from sequent

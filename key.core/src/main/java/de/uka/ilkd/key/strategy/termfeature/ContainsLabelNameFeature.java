@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 public class ContainsLabelNameFeature extends BinaryFeature {
     private final Name labelName;
@@ -20,6 +20,9 @@ public class ContainsLabelNameFeature extends BinaryFeature {
 
     @Override
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return pos != null && pos.subTerm().getLabel(labelName) != null;
+        if (pos == null)
+            return false;
+        var term = (de.uka.ilkd.key.logic.Term) pos.subTerm();
+        return term.getLabel(labelName) != null;
     }
 }

@@ -32,10 +32,7 @@ public final class VariableSV extends OperatorSV
     }
 
     @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\variables ").print(sort().name().toString()).print(" ")
-                .print(name().toString());
+    public boolean isVariable() {
+        return true;
     }
-
-
 }

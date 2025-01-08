@@ -9,19 +9,16 @@ import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.Semisequent;
 import org.key_project.rusty.ast.visitor.ProgramSVCollector;
 import org.key_project.rusty.logic.RustyBlock;
-import org.key_project.rusty.logic.Semisequent;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import org.key_project.rusty.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -145,7 +142,7 @@ public class TacletSchemaVariableCollector implements Visitor<@NonNull Term> {
      * @param semiseq the Semisequent to visit
      */
     private void visit(Semisequent semiseq) {
-        for (SequentFormula aSemiseq : semiseq) {
+        for (var aSemiseq : semiseq) {
             aSemiseq.formula().execPostOrder(this);
         }
     }
@@ -156,7 +153,7 @@ public class TacletSchemaVariableCollector implements Visitor<@NonNull Term> {
      *
      * @param seq the Sequent to visit
      */
-    public void visit(Sequent seq) {
+    public void visit(org.key_project.prover.sequent.Sequent seq) {
         visit(seq.antecedent());
         visit(seq.succedent());
     }
@@ -169,7 +166,7 @@ public class TacletSchemaVariableCollector implements Visitor<@NonNull Term> {
      *        false) or if the visitor descends into them (iff true)
      */
     public void visit(Taclet taclet, boolean visitAddrules) {
-        visit(taclet.ifSequent());
+        visit(taclet.assumesSequent());
         visitFindPart(taclet);
         visitGoalTemplates(taclet, visitAddrules);
     }
@@ -183,7 +180,7 @@ public class TacletSchemaVariableCollector implements Visitor<@NonNull Term> {
 
 
     protected void visitGoalTemplates(Taclet taclet, boolean visitAddrules) {
-        for (TacletGoalTemplate tacletGoalTemplate : taclet.goalTemplates()) {
+        for (var tacletGoalTemplate : taclet.goalTemplates()) {
             visit(tacletGoalTemplate.sequent());
             if (tacletGoalTemplate instanceof RewriteTacletGoalTemplate rt) {
                 rt.replaceWith().execPostOrder(this);
@@ -193,8 +190,8 @@ public class TacletSchemaVariableCollector implements Visitor<@NonNull Term> {
                 }
             }
             if (visitAddrules) {
-                for (Taclet taclet1 : tacletGoalTemplate.rules()) {
-                    visit(taclet1, true);
+                for (var taclet1 : tacletGoalTemplate.rules()) {
+                    visit((Taclet) taclet1, true);
                 }
             }
         }

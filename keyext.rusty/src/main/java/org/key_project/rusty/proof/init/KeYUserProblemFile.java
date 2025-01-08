@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.key_project.logic.Name;
-import org.key_project.rusty.logic.Sequent;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.parser.ChoiceInformation;
 import org.key_project.rusty.parser.KeYAst;
 import org.key_project.rusty.parser.ProofReplayer;

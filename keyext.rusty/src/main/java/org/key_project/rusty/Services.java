@@ -4,7 +4,6 @@
 package org.key_project.rusty;
 
 
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 

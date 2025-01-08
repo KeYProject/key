@@ -11,15 +11,18 @@ import java.util.Set;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.rules.*;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.Choice;
 import org.key_project.rusty.logic.ChoiceExpr;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.VariableSV;
-import org.key_project.rusty.rule.*;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
+import org.key_project.rusty.rule.NewVarcond;
+import org.key_project.rusty.rule.Taclet;
+import org.key_project.rusty.rule.VariableCondition;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -31,13 +34,13 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected Taclet taclet;
 
     protected Name name = NONAME;
-    protected Sequent ifseq = Sequent.EMPTY_SEQUENT;
+    protected Sequent ifseq = RustySequentKit.getInstance().getEmptySequent();
     protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.nil();
     protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
     protected ImmutableList<NewDependingOn> varsNewDependingOn =
         ImmutableSLList.nil();
-    protected ImmutableList<TacletGoalTemplate> goals = ImmutableSLList.nil();
-    protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
+    protected ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goals =
+            ImmutableSLList.nil();    protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
     protected TacletAttributes attrs = new TacletAttributes(null, null);
 
     /**
@@ -49,6 +52,8 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected ChoiceExpr choices = ChoiceExpr.TRUE;
     protected ImmutableSet<TacletAnnotation> tacletAnnotations =
         DefaultImmutableSet.nil();
+
+    protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
 
     public void setAnnotations(ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this.tacletAnnotations = tacletAnnotations;
@@ -64,8 +69,8 @@ public abstract class TacletBuilder<T extends Taclet> {
         return false;
     }
 
-    private static boolean containsFreeVarSV(Sequent sequent) {
-        for (final SequentFormula cf : sequent) {
+    private static boolean containsFreeVarSV(org.key_project.prover.sequent.Sequent sequent) {
+        for (final var cf : sequent) {
             if (containsFreeVarSV(cf.formula())) {
                 return true;
             }
@@ -73,7 +78,8 @@ public abstract class TacletBuilder<T extends Taclet> {
         return false;
     }
 
-    static void checkContainsFreeVarSV(Sequent seq, Name tacletName, String str) {
+    static void checkContainsFreeVarSV(org.key_project.prover.sequent.Sequent seq, Name tacletName,
+            String str) {
         if (containsFreeVarSV(seq)) {
             throw new TacletBuilderException(tacletName,
                 "Free Variable in " + str + " in Taclet / sequent: " + seq);
@@ -118,7 +124,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     /**
      * sets the ifseq of the Taclet to be built
      */
-    public void setIfSequent(Sequent seq) {
+    public void setIfSequent(org.key_project.prover.sequent.Sequent seq) {
         checkContainsFreeVarSV(seq, getName(), "sequent");
         this.ifseq = seq;
     }
@@ -205,11 +211,11 @@ public abstract class TacletBuilder<T extends Taclet> {
      */
     public abstract void addTacletGoalTemplate(TacletGoalTemplate goal);
 
-    public Sequent ifSequent() {
+    public org.key_project.prover.sequent.Sequent ifSequent() {
         return ifseq;
     }
 
-    public ImmutableList<TacletGoalTemplate> goalTemplates() {
+    public ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates() {
         return goals;
     }
 

@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 
 /**
@@ -20,7 +21,8 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     private EqNonDuplicateAppFeature() {}
 
-    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public boolean filter(TacletApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         if (!app.ifInstsComplete()) {
@@ -30,7 +32,8 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
         return noDuplicateFindTaclet(app, pos, goal);
     }
 
-    protected boolean comparePio(TacletApp newApp, TacletApp oldApp, PosInOccurrence newPio,
+    protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
+            PosInOccurrence newPio,
             PosInOccurrence oldPio) {
         return oldPio.eqEquals(newPio);
     }

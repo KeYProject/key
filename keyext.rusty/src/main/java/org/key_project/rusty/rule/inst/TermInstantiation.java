@@ -4,8 +4,8 @@
 package org.key_project.rusty.rule.inst;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
 public class TermInstantiation extends InstantiationEntry<Term> {
     private static final RigidnessException RIGIDNESS_EXCEPTION = new RigidnessException(

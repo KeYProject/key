@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -27,7 +26,9 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -75,7 +76,8 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param useTermCache the TermBuilder to use (allows to use the non cached version)
      */
     private SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
+            PosInOccurrence applicationPosInOccurrence,
+            SVInstantiations svInst, Goal goal,
             Rule rule, RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
         this.services = goal.getOverlayServices();
@@ -105,13 +107,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param ruleApp the rule application
      * @param useTermCache the TermBuilder to use (allows to use the non cached version)
      */
-    protected SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, Services services,
+    public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
+            PosInOccurrence applicationPosInOccurrence,
+            Services services,
             Rule rule, RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
         this.services = services;
         this.tb = this.services.getTermBuilder(useTermCache);
-        this.svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+        this.svInst = ruleApp instanceof TacletApp tacletApp ? tacletApp.instantiations()
+                : SVInstantiations.EMPTY_SVINSTANTIATIONS;
         this.applicationPosInOccurrence = applicationPosInOccurrence;
         this.rule = rule;
         this.ruleApp = ruleApp;
@@ -136,17 +140,11 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param ruleApp the rule application
      */
     public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, SVInstantiations svInst, Goal goal,
+            PosInOccurrence applicationPosInOccurrence,
+            SVInstantiations svInst, Goal goal,
             Rule rule, RuleApp ruleApp) {
         this(termLabelState, labelHint, applicationPosInOccurrence, svInst, goal, rule, ruleApp,
             true);
-    }
-
-    public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence, Goal goal, Rule rule, RuleApp ruleApp,
-            boolean useTermCache) {
-        this(termLabelState, labelHint, applicationPosInOccurrence,
-            SVInstantiations.EMPTY_SVINSTANTIATIONS, goal, rule, ruleApp, useTermCache);
     }
 
     /**
@@ -242,15 +240,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
 
     private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
         final UpdateableOperator originalLhs = op.lhs();
-        if (originalLhs instanceof SchemaVariable) {
-            Object lhsInst = svInst.getInstantiation((SchemaVariable) originalLhs);
+        if (originalLhs instanceof SchemaVariable originalLhsAsSV) {
+            Object lhsInst = svInst.getInstantiation(originalLhsAsSV);
             if (lhsInst instanceof Term) {
                 lhsInst = ((Term) lhsInst).op();
             }
 
             final UpdateableOperator newLhs;
-            if (lhsInst instanceof UpdateableOperator) {
-                newLhs = (UpdateableOperator) lhsInst;
+            if (lhsInst instanceof UpdateableOperator updateableLhs) {
+                newLhs = updateableLhs;
             } else {
                 assert false : "not updateable: " + lhsInst;
                 throw new IllegalStateException("Encountered non-updateable operator " + lhsInst
@@ -284,11 +282,9 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                 instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
         } else if (p_operatorToBeInstantiated instanceof Modality mod) {
             instantiatedOp = instantiateModality(mod, jb);
-        } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
-            if (!(p_operatorToBeInstantiated instanceof ProgramSV)
-                    || !((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
-                instantiatedOp =
-                    (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
+        } else if (p_operatorToBeInstantiated instanceof SchemaVariable opAsSV) {
+            if (!(p_operatorToBeInstantiated instanceof ProgramSV opAsPSV) || !opAsPSV.isListSV()) {
+                instantiatedOp = (Operator) svInst.getInstantiation(opAsSV);
             }
         }
         assert instantiatedOp != null;
@@ -332,11 +328,11 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     public void visit(final Term visited) {
         // Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
-        if (visitedOp instanceof SchemaVariable && visitedOp.arity() == 0
-                && svInst.isInstantiated((SchemaVariable) visitedOp)
-                && (!(visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {
-            final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp,
-                svInst.getExecutionContext(), services));
+        if (visitedOp instanceof SchemaVariable visitedSV && visitedOp.arity() == 0
+                && svInst.isInstantiated(visitedSV)
+                && (!(visitedOp instanceof ProgramSV visitedAsPSV && visitedAsPSV.isListSV()))) {
+            final Term newTerm = toTerm(
+                svInst.getTermInstantiation(visitedSV, svInst.getExecutionContext(), services));
             final Term labeledTerm = TermLabelManager.label(services, termLabelState,
                 applicationPosInOccurrence, rule, ruleApp, goal, labelHint, visited, newTerm);
             pushNew(labeledTerm);

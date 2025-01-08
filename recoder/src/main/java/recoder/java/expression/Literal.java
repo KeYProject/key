@@ -25,7 +25,7 @@ public abstract class Literal extends JavaProgramElement
      * Literal.
      */
 
-    public Literal() {
+    protected Literal() {
         // nothing to do
     }
 

@@ -33,7 +33,8 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
      * @param preservesPos whether the position should be preserved
      * @param services the services instance
      */
-    public CreatingASTVisitor(RustyProgramElement root, boolean preservesPos, Services services) {
+    protected CreatingASTVisitor(RustyProgramElement root, boolean preservesPos,
+            Services services) {
         super(root, services);
         this.preservesPositionInfo = preservesPos;
     }

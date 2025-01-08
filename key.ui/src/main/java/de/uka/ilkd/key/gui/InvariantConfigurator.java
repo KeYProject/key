@@ -29,7 +29,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.logic.sort.Sort;
-import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -181,7 +181,7 @@ public class InvariantConfigurator {
                 getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
 
-                setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
                 final NamespaceSet nss = services.getNamespaces().copyWithParent();
                 parser = new KeyIO(services, nss);

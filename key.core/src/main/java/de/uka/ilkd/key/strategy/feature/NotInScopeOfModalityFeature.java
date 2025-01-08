@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 
 /**
@@ -34,7 +34,7 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
         final PIOPathIterator it = pos.iterator();
 
         while (it.next() != -1) {
-            final Operator op = it.getSubTerm().op();
+            final var op = it.getSubTerm().op();
 
             if (op instanceof Modality) {
                 return true;

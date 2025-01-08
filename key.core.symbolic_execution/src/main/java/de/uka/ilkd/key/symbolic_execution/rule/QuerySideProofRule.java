@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -28,7 +24,11 @@ import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
-import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -139,7 +139,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             if (Transformer.inTransformer(pio)) {
                 return false;
             }
-            Term term = pio.subTerm();
+            Term term = (Term) pio.subTerm();
             if (term != null) {
                 if (term.op() == Equality.EQUALS) {
                     applicable = isApplicableQuery(goal, term.sub(0), pio)
@@ -159,7 +159,8 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * @param pio The {@link PosInOccurrence} in the {@link Goal}.
      * @return {@code true} is applicable, {@code false} is not applicable
      */
-    private boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence pio) {
+    private boolean isApplicableQuery(Goal goal, Term pmTerm,
+            PosInOccurrence pio) {
         if (pmTerm.op() instanceof IProgramMethod pm && pmTerm.freeVars().isEmpty()) {
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
             if (pm.isStatic()
@@ -167,7 +168,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                             && !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
                 PIOPathIterator it = pio.iterator();
                 while (it.next() != -1) {
-                    Term focus = it.getSubTerm();
+                    var focus = it.getSubTerm();
                     if (focus.op() instanceof UpdateApplication || focus.op() instanceof Modality) {
                         return false;
                     }
@@ -196,8 +197,8 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             // Extract required Terms from goal
             PosInOccurrence pio = ruleApp.posInOccurrence();
             Sequent goalSequent = goal.sequent();
-            SequentFormula equalitySF = pio.sequentFormula();
-            Term equalityTerm = pio.subTerm();
+            var equalitySF = pio.sequentFormula();
+            Term equalityTerm = (Term) pio.subTerm();
             Term queryTerm;
             Term varTerm;
             boolean varFirst;
@@ -213,7 +214,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             Term queryConditionTerm = null;
             if (equalitySF.formula().op() == Junctor.IMP
                     && equalitySF.formula().sub(1) == equalityTerm) {
-                queryConditionTerm = equalitySF.formula().sub(0);
+                queryConditionTerm = (Term) equalitySF.formula().sub(0);
             }
             // Compute sequent for side proof to compute query in.
             // New OneStepSimplifier is required because it has an internal state and the default
@@ -226,7 +227,8 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             JFunction newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
             Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
             sequentToProve =
-                sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
+                sequentToProve.addFormula(new SequentFormula(newTerm), false, false)
+                        .sequent();
             // Compute results and their conditions
             List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
                 computeResultsAndConditions(goal, sideProofEnv, sequentToProve,

@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -12,6 +10,8 @@ import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -40,7 +40,8 @@ public class FocussedRuleApplicationManager
     private boolean onlyModifyFocussedFormula;
 
     private FocussedRuleApplicationManager(AutomatedRuleApplicationManager delegate, Goal goal,
-            FormulaTag focussedFormula, PosInOccurrence focussedSubterm,
+            FormulaTag focussedFormula,
+            PosInOccurrence focussedSubterm,
             boolean onlyModifyFocussedFormula) {
         this.delegate = delegate;
         this.rootManager =
@@ -101,7 +102,8 @@ public class FocussedRuleApplicationManager
         }
     }
 
-    protected boolean isRuleApplicationForFocussedFormula(RuleApp rule, PosInOccurrence pos) {
+    protected boolean isRuleApplicationForFocussedFormula(RuleApp rule,
+            PosInOccurrence pos) {
         /*
          * filter the rule applications, only allow applications within the focussed subterm or to
          * other formulas that have been added after creation of the manager (we rely on the fact
@@ -138,22 +140,25 @@ public class FocussedRuleApplicationManager
         delegate.rulesAdded(applicableRules, pos);
     }
 
-    private boolean isSameFormula(PosInOccurrence pio1, PosInOccurrence pio2) {
+    private boolean isSameFormula(PosInOccurrence pio1,
+            PosInOccurrence pio2) {
         return pio2.isInAntec() == pio1.isInAntec()
                 && pio2.sequentFormula().equals(pio1.sequentFormula());
     }
 
     private PosInOccurrence getPIOForFocussedSubterm() {
-        final PosInOccurrence formula = goal.getFormulaTagManager().getPosForTag(focussedFormula);
+        final PosInOccurrence formula =
+            goal.getFormulaTagManager().getPosForTag(focussedFormula);
 
         if (formula == null) {
             return null;
         }
 
-        return focussedSubterm.replaceConstrainedFormula(formula.sequentFormula());
+        return focussedSubterm.replaceSequentFormula(formula.sequentFormula());
     }
 
-    private boolean isBelow(PosInOccurrence over, PosInOccurrence under) {
+    private boolean isBelow(PosInOccurrence over,
+            PosInOccurrence under) {
         final PIOPathIterator overIt = over.iterator();
         final PIOPathIterator underIt = under.iterator();
 

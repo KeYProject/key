@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -63,7 +63,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @param additionalCondition An optional additional condition to consider.
      */
     public ExecutionVariable(IExecutionNode<?> parentNode, Node proofNode,
-            PosInOccurrence modalityPIO, IProgramVariable programVariable,
+            PosInOccurrence modalityPIO,
+            IProgramVariable programVariable,
             Term additionalCondition) {
         this(parentNode, proofNode, modalityPIO, null, programVariable, additionalCondition);
     }

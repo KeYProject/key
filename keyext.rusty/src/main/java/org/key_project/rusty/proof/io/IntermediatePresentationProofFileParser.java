@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.logic.Name;
-import org.key_project.rusty.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.io.intermediate.*;
 import org.key_project.util.collection.ImmutableList;
@@ -287,7 +287,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         protected ImmutableList<Name> currNewNames = null;
         protected String notes = null;
 
-        public RuleInformation(String ruleName) {
+        protected RuleInformation(String ruleName) {
             this.currRuleName = ruleName.trim();
         }
     }

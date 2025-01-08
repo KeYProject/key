@@ -4,13 +4,11 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -28,7 +26,10 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class encapsulates the registration of a proof for a given problem. It then starts a proof
@@ -62,8 +63,9 @@ public class ProofStarter {
         }
 
         public UserProvidedInput(Term formula, ProofEnvironment env) {
-            this(Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
-                    .insertFirst(new SequentFormula(formula)).semisequent()),
+            this(
+                JavaDLSequentKit.createSuccSequent(
+                    ImmutableSLList.<SequentFormula>nil().prepend(new SequentFormula(formula))),
                 env);
         }
 

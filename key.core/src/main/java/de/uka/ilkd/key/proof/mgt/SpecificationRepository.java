@@ -22,10 +22,10 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -38,6 +38,9 @@ import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -164,8 +167,9 @@ public final class SpecificationRepository {
         // create taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setFind(limitedTerm);
-        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-            ImmutableSLList.nil(), unlimitedTerm));
+        tacletBuilder.addTacletGoalTemplate(
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
+                ImmutableSLList.nil(), unlimitedTerm));
         tacletBuilder.setName(
             MiscTools.toValidTacletName("unlimit " + getUniqueNameForObserver(unlimited)));
         return tacletBuilder.getTaclet();
@@ -191,7 +195,7 @@ public final class SpecificationRepository {
         tacletBuilder.setFind(tb.func(unlimited, subs));
         final SequentFormula cf = new SequentFormula(tb.equals(limitedTerm, unlimitedTerm));
         final Sequent addedSeq =
-            Sequent.createAnteSequent(Semisequent.EMPTY_SEMISEQUENT.insertFirst(cf).semisequent());
+            JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(cf));
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(addedSeq,
             ImmutableSLList.nil(), tb.func(unlimited, subs)));
         tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);

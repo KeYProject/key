@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
@@ -57,6 +56,7 @@ import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.sort.Sort;
 
 /**

@@ -10,7 +10,13 @@ import java.util.stream.Collectors;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletAnnotation;
+import org.key_project.prover.rules.Trigger;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ast.abstraction.PrimitiveType;
@@ -18,7 +24,6 @@ import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.OperatorSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariableFactory;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.rusty.parser.KeYRustyParser;
@@ -26,6 +31,7 @@ import org.key_project.rusty.parser.SchemaVariableModifierSet;
 import org.key_project.rusty.parser.varcond.ArgumentType;
 import org.key_project.rusty.parser.varcond.TacletBuilderCommand;
 import org.key_project.rusty.parser.varcond.TacletBuilderManipulators;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.RewriteTaclet.ApplicationRestriction;
 import org.key_project.rusty.rule.tacletbuilder.*;
@@ -137,7 +143,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public Taclet visitTaclet(KeYRustyParser.TacletContext ctx) {
-        Sequent ifSeq = Sequent.EMPTY_SEQUENT;
+        Sequent ifSeq = RustySequentKit.getInstance().getEmptySequent();
         ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.nil();
         if (ctx.LEMMA() != null) {
             tacletAnnotations = tacletAnnotations.add(TacletAnnotation.LEMMA);
@@ -157,9 +163,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             TacletBuilder<?> b = createTacletBuilderFor(null,
                 new ApplicationRestriction(ApplicationRestriction.NONE), ctx);
             currentTBuilder.push(b);
-            SequentFormula sform = new SequentFormula(form);
-            Semisequent semi = new Semisequent(sform);
-            Sequent addSeq = Sequent.createAnteSequent(semi);
+            Sequent addSeq = RustySequentKit
+                    .createAnteSequent(ImmutableSLList.singleton(new SequentFormula(form)));
             ImmutableList<Taclet> noTaclets = ImmutableSLList.nil();
             DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.nil();
             addGoalTemplate(null, null, addSeq, noTaclets, noSV, null, ctx);
@@ -468,7 +473,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         var soc = this.goalChoice;
         String name = accept(ctx.string_value());
 
-        Sequent addSeq = Sequent.EMPTY_SEQUENT;
+        Sequent addSeq = RustySequentKit.getInstance().getEmptySequent();
         ImmutableSLList<Taclet> addRList = ImmutableSLList.nil();
         DefaultImmutableSet<SchemaVariable> addpv = DefaultImmutableSet.nil();
 
@@ -506,7 +511,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public ImmutableSet<SchemaVariable> visitAddprogvar(KeYRustyParser.AddprogvarContext ctx) {
         final Collection<? extends SchemaVariable> accept = accept(ctx.pvs);
-        return Immutables.<SchemaVariable>createSetFrom(Objects.requireNonNull(accept));
+        return Immutables.createSetFrom(Objects.requireNonNull(accept));
     }
 
     @Override

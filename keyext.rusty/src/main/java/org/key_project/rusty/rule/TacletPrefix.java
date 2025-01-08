@@ -10,14 +10,15 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
  * @param prefixLength the prefix of the taclet
  * @param context used by rewrite taclets to mark the context
  */
-public record TacletPrefix(int prefixLength,boolean context){
-/**
- * creates the prefix
- *
- * @param prefixLength the SetOf<SchemaVariable> that is the prefix of a termsv or formulasv
- * @param context a boolean marker
- */
-public TacletPrefix{}
+public record TacletPrefix(int prefixLength, boolean context) implements org.key_project.prover.rules.TacletPrefix {
+    /**
+     * creates the prefix
+     *
+     * @param prefixLength  the SetOf<SchemaVariable> that is the prefix of a termsv or formulasv
+     * @param context a boolean marker
+     */
+    public TacletPrefix {
+    }
 
 /**
  * returns a new TacletPrefix with the context flag set to the given boolean value
@@ -42,7 +43,15 @@ public TacletPrefix increase(){return new TacletPrefix(prefixLength+1,context);}
  */
 public TacletPrefix decrease(SchemaVariable var){assert prefixLength>0;return new TacletPrefix(prefixLength-1,context);}
 
-public boolean equals(Object o){if(o==this){return true;}if(!(o instanceof TacletPrefix other)){return false;}return(other.prefixLength()==prefixLength())&&(other.context()==context());}
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof TacletPrefix(int length, boolean context1))) {
+            return false;
+        }
+        return (length == prefixLength()) && (context1 == context());
+    }
 
 public int hashCode(){int result=17;result=37*result+prefixLength();result=37*result+(context()?0:1);return result;}
 

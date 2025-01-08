@@ -32,6 +32,9 @@ import de.uka.ilkd.key.util.SideProofUtil;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -68,8 +71,9 @@ public abstract class AbstractSlicer {
     public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation,
             ImmutableList<ISymbolicEquivalenceClass> sec) throws ProofInputException {
         // Solve this reference
-        PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
-        Term topLevel = pio.sequentFormula().formula();
+        PosInOccurrence pio =
+            seedNode.getAppliedRuleApp().posInOccurrence();
+        var topLevel = pio.sequentFormula().formula();
         Term modalityTerm = TermBuilder.goBelowUpdates(topLevel);
         Services services = seedNode.proof().getServices();
         ExecutionContext ec =
@@ -94,8 +98,9 @@ public abstract class AbstractSlicer {
             throw new IllegalStateException(
                 "No rule applied on seed Node '" + seedNode.serialNr() + "'.");
         }
-        PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
-        Term applicationTerm = pio.subTerm();
+        PosInOccurrence pio =
+            seedNode.getAppliedRuleApp().posInOccurrence();
+        Term applicationTerm = (Term) pio.subTerm();
         Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(applicationTerm);
         Term modalityTerm = pair.second;
         SymbolicExecutionTermLabel label =
@@ -208,8 +213,9 @@ public abstract class AbstractSlicer {
      *         supported.
      */
     protected SequentInfo analyzeSequent(Node node, ImmutableList<ISymbolicEquivalenceClass> sec) {
-        PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
-        Term topLevel = pio.sequentFormula().formula();
+        PosInOccurrence pio =
+            node.getAppliedRuleApp().posInOccurrence();
+        Term topLevel = (Term) pio.sequentFormula().formula();
         Pair<ImmutableList<Term>, Term> pair = TermBuilder.goBelowUpdates2(topLevel);
         Term modalityTerm = pair.second;
         SymbolicExecutionTermLabel label =
@@ -284,13 +290,13 @@ public abstract class AbstractSlicer {
     protected void analyzeSequent(Services services, Sequent sequent,
             Map<Location, SortedSet<Location>> aliases, ReferencePrefix thisReference) {
         for (SequentFormula sf : sequent.antecedent()) {
-            Term term = sf.formula();
+            Term term = (Term) sf.formula();
             if (Equality.EQUALS == term.op()) {
                 analyzeEquality(services, term, aliases, thisReference);
             }
         }
         for (SequentFormula sf : sequent.succedent()) {
-            Term term = sf.formula();
+            Term term = (Term) sf.formula();
             if (Junctor.NOT == term.op()) {
                 Term negatedTerm = term.sub(0);
                 if (Equality.EQUALS == negatedTerm.op()) {
@@ -792,7 +798,7 @@ public abstract class AbstractSlicer {
      */
     protected ReferencePrefix toReferencePrefix(SourceElement sourceElement) {
         if (sourceElement instanceof PassiveExpression) {
-            if (((PassiveExpression) sourceElement).getChildCount() != 1) {
+            if (sourceElement.getChildCount() != 1) {
                 throw new IllegalStateException(
                     "PassiveExpression '" + sourceElement + "' has not exactly one child.");
             }
@@ -943,7 +949,7 @@ public abstract class AbstractSlicer {
         Term[] terms = new Term[expressions.size()];
         int i = 0;
         for (Expression expression : expressions) {
-            terms[i] = AbstractSlicer.toTerm(services, expression, ec);
+            terms[i] = toTerm(services, expression, ec);
             i++;
         }
         return new ImmutableArray<>(terms);

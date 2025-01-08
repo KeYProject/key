@@ -4,8 +4,8 @@
 package org.key_project.rusty.rule.tacletbuilder;
 
 import org.key_project.logic.Term;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.rule.Taclet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -24,21 +24,23 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
      * @param replacewith the Term that replaces another one
      * @param pvs the set of schema variables
      */
-    public RewriteTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
+    public RewriteTacletGoalTemplate(org.key_project.prover.sequent.Sequent addedSeq,
+            ImmutableList<Taclet> addedRules,
             Term replacewith, ImmutableSet<SchemaVariable> pvs) {
         super(addedSeq, addedRules, pvs);
         // TacletBuilder.checkContainsFreeVarSV(replacewith, null, "replacewith term");
         this.replacewith = replacewith;
     }
 
-    public RewriteTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
+    public RewriteTacletGoalTemplate(org.key_project.prover.sequent.Sequent addedSeq,
+            ImmutableList<Taclet> addedRules,
             Term replacewith) {
         this(addedSeq, addedRules, replacewith, DefaultImmutableSet.nil());
     }
 
 
     public RewriteTacletGoalTemplate(Term replacewith) {
-        this(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), replacewith);
+        this(RustySequentKit.getInstance().getEmptySequent(), ImmutableSLList.nil(), replacewith);
     }
 
 

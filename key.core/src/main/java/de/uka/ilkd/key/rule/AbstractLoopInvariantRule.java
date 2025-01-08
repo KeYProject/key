@@ -25,7 +25,8 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
-import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -118,9 +119,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Term reachableOut = localOuts.stream().map(tb::reachableValue)
                 .reduce(tb.tt(), tb::and);
 
-        final Term[] uAnon = new Term[] { inst.u, additionalHeapTerms.anonUpdate };
+        final Term[] uAnon = { inst.u, additionalHeapTerms.anonUpdate };
         final Term[] uBeforeLoopDefAnonVariant =
-            new Term[] { inst.u, beforeLoopUpdate, additionalHeapTerms.anonUpdate, variantUpdate };
+            { inst.u, beforeLoopUpdate, additionalHeapTerms.anonUpdate, variantUpdate };
         final Term uAnonInv =
             tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
 
@@ -140,7 +141,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             return false;
         }
 
-        final Term progPost = splitUpdates(pio.subTerm(), goal.proof().getServices()).second;
+        final Term progPost = splitUpdates((Term) pio.subTerm(), goal.proof().getServices()).second;
         JavaBlock javaBlock = progPost.javaBlock();
 
         return !javaBlock.isEmpty() && JavaTools.getActiveStatement(javaBlock) instanceof While;
@@ -200,7 +201,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         }
 
         for (ProgramVariable pv : localOuts) {
-            final String pvBeforeLoopName = tb.newName(pv.name().toString() + "Before_LOOP");
+            final String pvBeforeLoopName = tb.newName(pv.name() + "Before_LOOP");
             final LocationVariable pvBeforeLoop =
                 new LocationVariable(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType());
             progVarNS.addSafely(pvBeforeLoop);
@@ -367,7 +368,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      */
     protected static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
             Services services) throws RuleAbortException {
-        final Term focusTerm = app.posInOccurrence().subTerm();
+        final Term focusTerm = (Term) app.posInOccurrence().subTerm();
 
         if (focusTerm == lastFocusTerm && lastInstantiation.inv == services
                 .getSpecificationRepository().getLoopSpec(lastInstantiation.loop)) {

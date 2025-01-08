@@ -64,7 +64,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * @param services pointer to services object
      */
-    public VariableNamer(Services services) {
+    protected VariableNamer(Services services) {
         this.services = services;
     }
 

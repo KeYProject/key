@@ -43,7 +43,7 @@ public abstract class TwoPassTransformation extends Transformation {
      *
      * @param sc the service configuration to use.
      */
-    public TwoPassTransformation(CrossReferenceServiceConfiguration sc) {
+    protected TwoPassTransformation(CrossReferenceServiceConfiguration sc) {
         super(sc);
     }
 

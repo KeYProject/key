@@ -14,6 +14,8 @@ import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+import org.key_project.logic.LogicServices;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +35,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * already a pair <tt>(this,x)</tt> exists where <tt>x!=pe</tt>
      */
     protected MatchConditions addInstantiation(ProgramElement pe, MatchConditions matchCond,
-            Services services) {
+            LogicServices services) {
 
         final SVInstantiations instantiations = matchCond.getInstantiations();
         final Object inMap = instantiations.getInstantiation(op);
@@ -48,8 +50,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
             Object peForCompare = pe;
             if (inMap instanceof Term) {
                 try {
-                    peForCompare = services.getTypeConverter().convertToLogicElement(pe,
-                        matchCond.getInstantiations().getExecutionContext());
+                    peForCompare =
+                        ((Services) services).getTypeConverter().convertToLogicElement(pe,
+                            matchCond.getInstantiations().getExecutionContext());
                 } catch (RuntimeException re) {
                     return null;
                 }
@@ -66,8 +69,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Operator instantiationCandidate, MatchConditions matchConditions,
-            Services services) {
+    public MatchConditions match(Operator instantiationCandidate,
+            MatchConditions matchConditions,
+            LogicServices services) {
         if (instantiationCandidate instanceof ProgramElement) {
             return match((ProgramElement) instantiationCandidate, matchConditions, services);
         }
@@ -78,8 +82,9 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-            Services services) {
+    public MatchConditions match(Term instantiationCandidate,
+            MatchConditions matchCond,
+            LogicServices services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         if (svSort.canStandFor(instantiationCandidate)) {
@@ -93,12 +98,13 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(ProgramElement instantiationCandidate, MatchConditions matchCond,
-            Services services) {
+    public MatchConditions match(ProgramElement instantiationCandidate,
+            MatchConditions matchCond,
+            LogicServices services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         if (svSort.canStandFor(instantiationCandidate,
-            matchCond.getInstantiations().getExecutionContext(), services)) {
+            matchCond.getInstantiations().getExecutionContext(), (Services) services)) {
             return addInstantiation(instantiationCandidate, matchCond, services);
         }
 
@@ -110,9 +116,11 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
-            Services services) {
-        MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
+    public MatchConditions match(TermNavigator termPosition,
+            MatchConditions mc,
+            LogicServices services) {
+        MatchConditions result =
+            match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNextSibling();
         }

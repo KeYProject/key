@@ -9,7 +9,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -18,6 +17,9 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -164,7 +166,8 @@ public class DelayedCutProcessor implements Runnable {
         return goal.apply(app);
     }
 
-    private ImmutableList<Goal> apply(final String tacletName, Goal goal, PosInOccurrence pio) {
+    private ImmutableList<Goal> apply(final String tacletName, Goal goal,
+            PosInOccurrence pio) {
         TacletFilter filter = new TacletFilter() {
             @Override
             protected boolean filter(Taclet taclet) {
@@ -186,7 +189,8 @@ public class DelayedCutProcessor implements Runnable {
      */
     private ImmutableList<Goal> hide(DelayedCut cut, Goal goal) {
 
-        SequentFormula sf = getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
+        SequentFormula sf =
+            getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
 
         PosInOccurrence pio =
             new PosInOccurrence(sf, PosInTerm.getTopLevel(), cut.isDecisionPredicateInAntecendet());
@@ -275,9 +279,8 @@ public class DelayedCutProcessor implements Runnable {
     private LinkedList<Goal> apply(Goal goal, RuleApp app, TermServices services) {
         if (app instanceof TacletApp tapp) {
             final SVInstantiations insts = tapp.instantiations();
-            final Iterator<SchemaVariable> svIt = insts.svIterator();
-            while (svIt.hasNext()) {
-                final SchemaVariable sv = svIt.next();
+            for (var entry : insts.getInstantiationMap()) {
+                final org.key_project.logic.op.sv.SchemaVariable sv = entry.key();
                 if (sv instanceof SkolemTermSV) {
                     final Term inst = (Term) insts.getInstantiation(sv);
                     services.getNamespaces().functions().remove(inst.op().name());
@@ -320,14 +323,12 @@ public class DelayedCutProcessor implements Runnable {
             throw new RuntimeException("Problem with replaying node " + pair.node.serialNr(), e);
         }
 
-        if (oldRuleApp instanceof PosTacletApp) {
-            PosTacletApp app = (PosTacletApp) oldRuleApp;
+        if (oldRuleApp instanceof PosTacletApp app) {
             return PosTacletApp.createPosTacletApp((FindTaclet) app.taclet(), app.instantiations(),
-                app.ifFormulaInstantiations(), newPos, services);
+                app.assumesFormulaInstantiations(), newPos, services);
         }
 
-        if (oldRuleApp instanceof IBuiltInRuleApp) {
-            IBuiltInRuleApp app = (IBuiltInRuleApp) oldRuleApp;
+        if (oldRuleApp instanceof IBuiltInRuleApp app) {
             return app.replacePos(newPos);
         }
 
@@ -335,7 +336,8 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private void check(Goal goal, final RuleApp app, PosInOccurrence newPos, Services services) {
+    private void check(Goal goal, final RuleApp app,
+            PosInOccurrence newPos, Services services) {
         if (newPos == null) {
             return;
         }
@@ -391,7 +393,8 @@ public class DelayedCutProcessor implements Runnable {
         int formulaNumber =
             pair.node.sequent().formulaNumberInSequent(oldRuleApp.posInOccurrence().isInAntec(),
                 oldRuleApp.posInOccurrence().sequentFormula());
-        return PosInOccurrence.findInSequent(pair.goal.sequent(), formulaNumber,
+        return PosInOccurrence.findInSequent(pair.goal.sequent(),
+            formulaNumber,
             oldRuleApp.posInOccurrence().posInTerm());
     }
 

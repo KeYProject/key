@@ -7,7 +7,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -94,7 +96,7 @@ public abstract class AbstractProblemLoader {
      *        defined by the loaded proof or {@code false} otherwise which still allows to work with
      *        the loaded {@link InitConfig}.
      */
-    public AbstractProblemLoader(File file,
+    protected AbstractProblemLoader(File file,
             List<File> includes, Profile profileOfNewProofs,
             ProblemLoaderControl control) {
         this.file = file;

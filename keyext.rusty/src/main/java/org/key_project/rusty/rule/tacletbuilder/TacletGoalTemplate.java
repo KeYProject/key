@@ -4,32 +4,22 @@
 package org.key_project.rusty.rule.tacletbuilder;
 
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.BoundVarsVisitor;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.Taclet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * this class contains the goals of the schematic theory specific rules (Taclet). There are new
  * sequents that have to be added, new rules and rule variables. The replacewith-goal is implemented
  * in subclasses
  */
-public class TacletGoalTemplate {
-    /** stores sequent that is one of the new goals */
-    private Sequent addedSeq = Sequent.EMPTY_SEQUENT;
-
-    /** stores list of Taclet which are introduced */
-    private ImmutableList<Taclet> addedRules = ImmutableSLList.nil();
-
-    /** program variables added by this taclet to the namespace */
-    private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
-
-    private String name = null;
-
+public class TacletGoalTemplate
+        extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate {
     /**
      * creates new Goaldescription
      *
@@ -39,13 +29,10 @@ public class TacletGoalTemplate {
      *        time unused (new) program variables that are introduced by an application of this
      *        template
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
+    public TacletGoalTemplate(org.key_project.prover.sequent.Sequent addedSeq,
+            ImmutableList<Taclet> addedRules,
             ImmutableSet<SchemaVariable> addedProgVars) {
-        // TacletBuilder.checkContainsFreeVarSV(addedSeq, null, "add sequent");
-
-        this.addedRules = addedRules;
-        this.addedSeq = addedSeq;
-        this.addedProgVars = addedProgVars;
+        super(addedSeq, addedRules, addedProgVars);
     }
 
     /**
@@ -57,7 +44,8 @@ public class TacletGoalTemplate {
      * @param addedSeq new Sequent to be added
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
      */
-    public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
+    public TacletGoalTemplate(org.key_project.prover.sequent.Sequent addedSeq,
+            ImmutableList<Taclet> addedRules) {
         this(addedSeq, addedRules, DefaultImmutableSet.nil());
     }
 
@@ -66,8 +54,8 @@ public class TacletGoalTemplate {
      *
      * @return Sequent to be added as Goal or Sequent.EMPTY_SEQUENT if no such Sequent exists
      */
-    public Sequent sequent() {
-        return addedSeq;
+    public org.key_project.prover.sequent.Sequent sequent() {
+        return super.sequent();
     }
 
     /**
@@ -76,11 +64,7 @@ public class TacletGoalTemplate {
      * @return IList<Taclet> contains new introduced rules
      */
     public ImmutableList<Taclet> rules() {
-        return addedRules;
-    }
-
-    public ImmutableSet<SchemaVariable> addedProgVars() {
-        return addedProgVars;
+        return (ImmutableList<@NonNull Taclet>) super.rules();
     }
 
     public Object replaceWithExpressionAsObject() {
@@ -103,14 +87,6 @@ public class TacletGoalTemplate {
         bvv.visit(sequent());
 
         return result.union(bvv.getBoundVariables());
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String name() {
-        return name;
     }
 
     @Override

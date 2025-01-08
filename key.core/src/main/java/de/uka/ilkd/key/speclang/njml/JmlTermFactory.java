@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -1283,7 +1282,7 @@ public final class JmlTermFactory {
         ProgramVariable pv = (ProgramVariable) symbol;
         try {
             Term resultTerm =
-                pv instanceof ProgramConstant pc ? tb.var(pc) : tb.var((LocationVariable) pv);
+                pv instanceof ProgramConstant pc ? tb.var(pc) : tb.var(pv);
             return new SLExpression(resultTerm);
         } catch (TermCreationException ex) {
             throw exc.createException0("Cannot create term " + pv.name(), ex);

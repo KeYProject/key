@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -53,12 +53,14 @@ public class WellDefinednessMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         return new WellDefinednessStrategy();
     }
 
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
         if (proof == null || proof.isDisposed() || !WellDefinednessCheck.isOn()) {
             return false;
         }
@@ -101,7 +103,8 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+        public RuleAppCost computeCost(RuleApp ruleApp,
+                PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if (name.startsWith(WD_PREFIX)) {
@@ -112,7 +115,8 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+                Goal goal) {
             return true;
         }
 

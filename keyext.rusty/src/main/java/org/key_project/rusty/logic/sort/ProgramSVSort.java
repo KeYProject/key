@@ -52,7 +52,7 @@ public abstract class ProgramSVSort extends SortImpl {
     public static final ProgramSVSort TYPE = new TypeReferenceSort();
     public static final ProgramSVSort TYPE_PRIMITIVE = new TypeReferencePrimitiveSort();
 
-    public ProgramSVSort(Name name) {
+    protected ProgramSVSort(Name name) {
         super(name, false, DefaultImmutableSet.nil());
         NAME2SORT.put(name, this);
     }
@@ -264,10 +264,8 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         public boolean canStandFor(RustyProgramElement check, Services services) {
-            if (!(check instanceof Expr))
-                return false;
+            return check instanceof Expr;
             // TODO: check type here
-            return true;
         }
     }
 

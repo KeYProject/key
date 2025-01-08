@@ -6,11 +6,12 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.OperatorSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.op.sv.OperatorSV;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);
 
-    public MatchSchemaVariableInstruction(SV op) {
+    protected MatchSchemaVariableInstruction(SV op) {
         super(op);
     }
 
@@ -33,7 +34,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      * given term.
      */
     protected final MatchConditions addInstantiation(Term term, MatchConditions matchCond,
-            Services services) {
+            LogicServices services) {
 
         if (op.isRigid() && !term.isRigid()) {
             return null;
@@ -43,7 +44,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
 
         final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
         if (t != null) {
-            if (!t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
+            if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(t, term)) {
                 return null;
             } else {
                 return matchCond;
@@ -69,8 +70,9 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
      *         the pair ({@link SchemaVariable}, {@link ProgramElement}) added
      */
-    public MatchConditions match(ProgramElement instantiationCandidate, MatchConditions mc,
-            Services services) {
+    public MatchConditions match(ProgramElement instantiationCandidate,
+            MatchConditions mc,
+            LogicServices services) {
         return null;
     }
 

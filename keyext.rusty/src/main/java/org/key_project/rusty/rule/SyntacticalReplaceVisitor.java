@@ -12,12 +12,12 @@ import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.UpdateableOperator;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.ContextBlockExpression;
 import org.key_project.rusty.ast.visitor.ProgramContextAdder;
 import org.key_project.rusty.ast.visitor.ProgramReplaceVisitor;
-import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.logic.RustyBlock;
 import org.key_project.rusty.logic.TermBuilder;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
@@ -120,7 +120,7 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
         if (visitedOp instanceof SchemaVariable sv && visitedOp.arity() == 0
                 && svInst.isInstantiated(sv)
                 && (!(visitedOp instanceof ProgramSV psv && psv.isListSV()))) {
-            final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp,
+            final Term newTerm = toTerm(svInst.getTermInstantiation(sv,
                 /* svInst.getExecutionContext(), */ services));
             pushNew(newTerm);
         } else {

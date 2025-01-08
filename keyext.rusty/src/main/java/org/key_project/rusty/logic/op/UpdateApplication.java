@@ -8,7 +8,6 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractOperator;
-import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
 
@@ -19,7 +18,7 @@ import org.jspecify.annotations.NonNull;
  * Singleton class defining a binary operator {u}t that applies updates u to terms, formulas, or
  * other updates t.
  */
-public final class UpdateApplication extends AbstractOperator implements Operator {
+public final class UpdateApplication extends AbstractOperator {
 
     public static final UpdateApplication UPDATE_APPLICATION = new UpdateApplication();
 

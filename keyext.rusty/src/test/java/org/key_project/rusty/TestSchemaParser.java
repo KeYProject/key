@@ -5,8 +5,8 @@ package org.key_project.rusty;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.ast.SchemaRustyReader;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.SchemaVariableFactory;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.rusty.util.TacletForTests;

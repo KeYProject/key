@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.executor.rustydl;
 
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.PosInOccurrence;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentChangeInfo;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.AntecTaclet;
 import org.key_project.rusty.rule.MatchConditions;
@@ -28,7 +28,8 @@ public class AntecTacletExecutor<TacletKind extends AntecTaclet>
     }
 
     @Override
-    protected void applyAdd(Sequent add, SequentChangeInfo currentSequent,
+    protected void applyAdd(org.key_project.prover.sequent.Sequent add,
+            SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd, PosInOccurrence posOfFind, MatchConditions matchCond,
             Goal goal, RuleApp ruleApp, Services services) {
         addToAntec(add.antecedent(), currentSequent, whereToAdd,

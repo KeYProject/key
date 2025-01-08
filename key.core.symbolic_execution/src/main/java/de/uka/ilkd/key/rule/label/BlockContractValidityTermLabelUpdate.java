@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.label;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.BlockContractValidityTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
@@ -34,7 +34,7 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
      */
     @Override
     public ImmutableList<Name> getSupportedRuleNames() {
-        return ImmutableSLList.<Name>nil().append(BlockContractInternalRule.INSTANCE.name());
+        return ImmutableSLList.singleton(BlockContractInternalRule.INSTANCE.name());
     }
 
     /**

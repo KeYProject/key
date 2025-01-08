@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -208,7 +208,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          * @param formula the formula on which the rule is to be applied.
          * @param goal the current goal.
          */
-        public Instantiator(final Term formula, final Goal goal) {
+        protected Instantiator(final Term formula, final Goal goal) {
             this.formula = formula;
             this.goal = goal;
             this.services = goal.getOverlayServices();

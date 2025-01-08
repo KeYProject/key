@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -25,13 +24,14 @@ import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
 import org.key_project.logic.Name;
 import org.key_project.proof.LocationVariableTracker;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -231,7 +231,7 @@ public class NodeInfo {
         return app instanceof AbstractAuxiliaryContractBuiltInRuleApp
                 || app instanceof AbstractContractRuleApp
                 || app instanceof LoopInvariantBuiltInRuleApp || app instanceof TacletApp
-                        && NodeInfo.isSymbolicExecution(((TacletApp) app).taclet());
+                        && isSymbolicExecution(((TacletApp) app).taclet());
     }
 
     public static boolean isSymbolicExecution(Taclet t) {

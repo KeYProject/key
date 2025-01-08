@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -62,7 +62,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
         Services services = goal.proof().getServices();
         ImmutableSet<FunctionalOperationContract> contracts =
             UseOperationContractRule.getApplicableContracts(UseOperationContractRule
-                    .computeInstantiation(posInOccurrence().subTerm(), services),
+                    .computeInstantiation((Term) posInOccurrence().subTerm(), services),
                 services);
         if (contracts.size() != 1) {
             return this; // incomplete app;
@@ -80,7 +80,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
         Services services = goal.proof().getServices();
         ImmutableSet<FunctionalOperationContract> contracts =
             UseOperationContractRule.getApplicableContracts(UseOperationContractRule
-                    .computeInstantiation(posInOccurrence().subTerm(), services),
+                    .computeInstantiation((Term) posInOccurrence().subTerm(), services),
                 services);
         var m = ((Modality) programTerm().op()).<Modality.JavaModalityKind>kind();
         heapContext = HeapContext.getModifiableHeaps(goal.proof().getServices(), m.transaction());
@@ -90,7 +90,8 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     }
 
     @Override
-    public ContractRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public ContractRuleApp setIfInsts(
+            ImmutableList<PosInOccurrence> ifInsts) {
         super.setMutable(ifInsts);
         return this;
     }
@@ -109,7 +110,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 
     @Override
     public IObserverFunction getObserverFunction(Services services) {
-        return UseOperationContractRule.computeInstantiation(posInOccurrence().subTerm(),
+        return UseOperationContractRule.computeInstantiation((Term) posInOccurrence().subTerm(),
             services).pm;
     }
 

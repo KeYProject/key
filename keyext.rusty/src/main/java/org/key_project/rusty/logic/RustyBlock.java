@@ -34,14 +34,13 @@ public record RustyBlock(RustyProgramElement program) implements Program {
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
-        if (!(o instanceof RustyBlock rb)) return false;
-        if (rb.program() == null) return program() == null;
-        return rb.program().equals(program());
+        if (!(o instanceof RustyBlock(RustyProgramElement program1))) return false;
+        if (program1 == null) return program() == null;
+        return program1.equals(program());
     }
 
-    /**
-     * returns the hashCode
-     */
+    /** returns the hashCode */
+    @Override
     public int hashCode() {
         return 17 + ((program() == null) ? 0 : program().hashCode());
     }

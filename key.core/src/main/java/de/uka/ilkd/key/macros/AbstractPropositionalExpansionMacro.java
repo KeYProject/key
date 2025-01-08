@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional rules.
@@ -55,7 +55,8 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
     protected abstract boolean allowOSS();
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         return new PropExpansionStrategy(proof.getActiveStrategy(), getAdmittedRuleNames(),
             allowOSS());
     }
@@ -68,7 +69,8 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * @param goal context
      * @return true if rule may be applied
      */
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio,
+    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
+            PosInOccurrence pio,
             Goal goal) {
         return true;
     }
@@ -98,7 +100,8 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+        public RuleAppCost computeCost(RuleApp ruleApp,
+                PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if (ruleApp instanceof OneStepSimplifierRuleApp && allowOSS) {
@@ -118,7 +121,8 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+                Goal goal) {
             return delegate.isApprovedApp(app, pio, goal);
         }
 

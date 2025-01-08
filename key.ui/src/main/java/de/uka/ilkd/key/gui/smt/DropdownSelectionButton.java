@@ -531,8 +531,8 @@ public class DropdownSelectionButton {
          */
         public void setText(String t) {
             text = t;
-            putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, toolTip);
+            putValue(NAME, text);
+            putValue(SHORT_DESCRIPTION, toolTip);
         }
 
         /**

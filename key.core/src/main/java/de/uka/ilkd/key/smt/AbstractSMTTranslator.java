@@ -11,7 +11,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.assumptions.DefaultTacletSetTranslation;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
@@ -185,7 +185,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         // add one variable for each sort
         for (Sort s : this.usedRealSort.keySet()) {
             if (!s.equals(JavaDLTheory.FORMULA)) {
-                LogicVariable l = new LogicVariable(new Name("dummy_" + s.name().toString()), s);
+                LogicVariable l = new LogicVariable(new Name("dummy_" + s.name()), s);
                 this.addFunction(l, new ArrayList<>(), s, services);
                 this.translateFunc(l, new ArrayList<>());
             }
@@ -1821,13 +1821,15 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             for (int i = 0; i < t.arity(); i++) {
                 // the terms only have to match on those positions where functions are defined
                 if (fun.bindVarsAt(i)) {
+                    org.key_project.logic.Term term1 = t.sub(i);
+                    org.key_project.logic.Term formula = term.sub(i);
                     termsMatch = termsMatch
-                            && t.sub(i).equalsModProperty(term.sub(i), RENAMING_TERM_PROPERTY);
+                            && RENAMING_TERM_PROPERTY.equalsModThisProperty(term1, formula);
                 }
             }
 
             // the terms also match, if the entire sequence matches
-            termsMatch = (termsMatch || t.equalsModProperty(term, RENAMING_TERM_PROPERTY));
+            termsMatch = (termsMatch || RENAMING_TERM_PROPERTY.equalsModThisProperty(t, term));
 
             if (termsMatch) {
                 used = t;
@@ -1863,10 +1865,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             boolean alreadyContains = true;
             while (alreadyContains) {
                 i++;
-                newName = new StringBuilder("bindp_" + fun.name().toString() + "_" + i);
+                newName = new StringBuilder("bindp_" + fun.name() + "_" + i);
                 alreadyContains = false;
                 for (StringBuilder s : uninterpretedBindingPredicateNames.values()) {
-                    alreadyContains = alreadyContains || s.toString().equals(newName.toString());
+                    alreadyContains = alreadyContains || s.toString().contentEquals(newName);
                 }
             }
 
@@ -1931,13 +1933,15 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             for (int i = 0; i < t.arity(); i++) {
                 // the terms only have to match on those positions where functions are defined
                 if (fun.bindVarsAt(i)) {
+                    org.key_project.logic.Term term1 = t.sub(i);
+                    org.key_project.logic.Term formula = term.sub(i);
                     termsMatch = termsMatch
-                            && t.sub(i).equalsModProperty(term.sub(i), RENAMING_TERM_PROPERTY);
+                            && RENAMING_TERM_PROPERTY.equalsModThisProperty(term1, formula);
                 }
             }
 
             // the terms also match, if the entire terms match
-            termsMatch = (termsMatch || t.equalsModProperty(term, RENAMING_TERM_PROPERTY));
+            termsMatch = (termsMatch || RENAMING_TERM_PROPERTY.equalsModThisProperty(t, term));
 
             if (termsMatch) {
                 used = t;
@@ -1973,10 +1977,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             boolean alreadyContains = true;
             while (alreadyContains) {
                 i++;
-                newName = new StringBuilder("bindf_" + fun.name().toString() + "_" + i);
+                newName = new StringBuilder("bindf_" + fun.name() + "_" + i);
                 alreadyContains = false;
                 for (StringBuilder s : uninterpretedBindingFunctionNames.values()) {
-                    alreadyContains = alreadyContains || s.toString().equals(newName.toString());
+                    alreadyContains = alreadyContains || s.toString().contentEquals(newName);
                 }
             }
             // add the free variables of the bound terms as parameter
@@ -2106,7 +2110,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             Services services) throws IllegalFormulaException {
         // check, if the modality was already translated.
         for (Term toMatch : modalityPredicates.keySet()) {
-            if (toMatch.equalsModProperty(t, RENAMING_TERM_PROPERTY)) {
+            if (RENAMING_TERM_PROPERTY.equalsModThisProperty(toMatch, t)) {
                 return modalityPredicates.get(toMatch);
             }
         }
@@ -2256,7 +2260,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             ArrayList<StringBuilder> sub) {
         StringBuilder name = null;
         for (Term t : usedBsumTerms.keySet()) {
-            if (t.equalsModProperty(bsumterm, RENAMING_TERM_PROPERTY)) {
+            if (RENAMING_TERM_PROPERTY.equalsModThisProperty(t, bsumterm)) {
                 name = usedBsumTerms.get(t);
             }
         }
@@ -2294,7 +2298,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             ArrayList<StringBuilder> sub) {
         StringBuilder name = null;
         for (Term t : usedBprodTerms.keySet()) {
-            if (t.equalsModProperty(bprodterm, RENAMING_TERM_PROPERTY)) {
+            if (RENAMING_TERM_PROPERTY.equalsModThisProperty(t, bprodterm)) {
                 name = usedBprodTerms.get(t);
             }
         }

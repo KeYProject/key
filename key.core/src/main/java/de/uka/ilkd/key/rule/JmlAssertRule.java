@@ -20,7 +20,9 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kin
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -74,7 +76,8 @@ public final class JmlAssertRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
+    public boolean isApplicable(Goal goal,
+            PosInOccurrence occurrence) {
         if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -83,7 +86,7 @@ public final class JmlAssertRule implements BuiltInRule {
             return false;
         }
 
-        Term target = occurrence.subTerm();
+        Term target = (Term) occurrence.subTerm();
         if (target.op() instanceof UpdateApplication) {
             target = UpdateApplication.getTarget(target);
         }
@@ -112,7 +115,7 @@ public final class JmlAssertRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final PosInOccurrence occurrence = ruleApp.posInOccurrence();
 
-        final Term formula = occurrence.subTerm();
+        final Term formula = (Term) occurrence.subTerm();
         final Term update = UpdateApplication.getUpdate(formula);
 
         Term target = formula;
@@ -157,13 +160,15 @@ public final class JmlAssertRule implements BuiltInRule {
         return result;
     }
 
-    private void setUpValidityRule(Goal goal, PosInOccurrence occurrence, Term update,
+    private void setUpValidityRule(Goal goal,
+            PosInOccurrence occurrence, Term update,
             Term condition, TermBuilder tb) {
         goal.setBranchLabel("Validity");
         goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
     }
 
-    private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence, Term update, Term target,
+    private void setUpUsageGoal(Goal goal, PosInOccurrence occurrence,
+            Term update, Term target,
             Term condition, TermBuilder tb, Services services) {
         goal.setBranchLabel("Usage");
         final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);

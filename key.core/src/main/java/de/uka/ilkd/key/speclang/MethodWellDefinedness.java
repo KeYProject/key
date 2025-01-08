@@ -57,7 +57,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.modelField = false;
         final OriginalVariables origVars = contract.getOrigVars();
         final LocationVariable h = getHeap();
-        final LocationVariable hPre = (LocationVariable) origVars.atPres.get(h);
+        final LocationVariable hPre = origVars.atPres.get(h);
 
         setRequires(contract.getRequires(h));
         setModifiable(
@@ -83,7 +83,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.contract = contract;
         this.modelField = true;
         final LocationVariable h = getHeap();
-        final LocationVariable hPre = (LocationVariable) contract.getOrigVars().atPres.get(h);
+        final LocationVariable hPre = contract.getOrigVars().atPres.get(h);
 
         setRequires(contract.getRequires(h));
         setModifiable(TB.strictlyNothing(), services);
@@ -115,7 +115,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         this.modelField = true;
         final OriginalVariables origVars = contract.getOrigVars();
         final LocationVariable h = getHeap();
-        final LocationVariable hPre = (LocationVariable) origVars.atPres.get(h);
+        final LocationVariable hPre = origVars.atPres.get(h);
 
         setRequires(contract.getRequires(h));
         setModifiable(TB.strictlyNothing(), services);
@@ -275,7 +275,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final LocationVariable heap = getHeap();
         final LocationVariable heapAtPre;
         if (getOrigVars().atPres != null && getOrigVars().atPres.get(heap) != null) {
-            heapAtPre = (LocationVariable) getOrigVars().atPres.get(heap);
+            heapAtPre = getOrigVars().atPres.get(heap);
         } else {
             heapAtPre = heap;
         }
@@ -291,7 +291,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         }
         final Term[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
         if (isNormal(services)) {
-            prefix = WellDefinednessCheck.OP_TACLET;
+            prefix = OP_TACLET;
             final boolean isConstructor =
                 target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor();
             final Term pre =
@@ -302,7 +302,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps, TB.var(selfSV),
                 TB.func(target, args), TB.and(wdArgs, pre), isStatic || isConstructor, services);
         } else {
-            prefix = WellDefinednessCheck.OP_EXC_TACLET;
+            prefix = OP_EXC_TACLET;
             return createExcTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
                 TB.func(target, args), services);
         }
@@ -326,7 +326,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final String n;
         if (n1.equals(n2)) {
             n = n1;
-        } else if (n1.startsWith(WellDefinednessCheck.OP_EXC_TACLET)) {
+        } else if (n1.startsWith(OP_EXC_TACLET)) {
             n = n2;
         } else {
             n = n1;

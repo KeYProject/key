@@ -17,7 +17,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -43,7 +45,8 @@ public final class SetStatementRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence occurrence) {
+    public boolean isApplicable(Goal goal,
+            PosInOccurrence occurrence) {
         if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -52,7 +55,7 @@ public final class SetStatementRule implements BuiltInRule {
             return false;
         }
 
-        Term target = occurrence.subTerm();
+        Term target = (Term) occurrence.subTerm();
         if (target.op() instanceof UpdateApplication) {
             target = UpdateApplication.getTarget(target);
         }
@@ -80,7 +83,7 @@ public final class SetStatementRule implements BuiltInRule {
         final var services = goal.getOverlayServices();
         final TermBuilder tb = services.getTermBuilder();
         final PosInOccurrence occurrence = ruleApp.posInOccurrence();
-        final Term formula = occurrence.subTerm();
+        final Term formula = (Term) occurrence.subTerm();
         assert formula.op() instanceof UpdateApplication
                 : "Currently, this can only be applied if there is an update application in front of the modality";
 

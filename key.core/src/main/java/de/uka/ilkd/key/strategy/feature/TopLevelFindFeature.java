@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Feature for investigating whether the focus of a rule application is a top-level formula, a

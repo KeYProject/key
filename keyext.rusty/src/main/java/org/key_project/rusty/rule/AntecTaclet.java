@@ -5,10 +5,14 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.rules.TacletAttributes;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.rusty.rule.executor.rustydl.AntecTacletExecutor;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -70,8 +74,9 @@ public class AntecTaclet extends FindTaclet {
 
     @Override
     public AntecTaclet setName(String s) {
-        final TacletApplPart applPart = new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(),
-            varsNewDependingOn(), getVariableConditions());
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
         return new AntecTaclet(new Name(s), applPart, goalTemplates(), ruleSets, attrs, find,

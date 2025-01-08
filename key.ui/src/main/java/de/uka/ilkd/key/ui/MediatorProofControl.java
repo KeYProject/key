@@ -17,7 +17,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroWorker;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.prover.ProverTaskListener;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -54,7 +54,8 @@ public class MediatorProofControl extends AbstractProofControl {
      * {@inheritDoc}
      */
     @Override
-    public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos) {
+    public boolean selectedTaclet(Taclet taclet, Goal goal,
+            PosInOccurrence pos) {
         boolean result = super.selectedTaclet(taclet, goal, pos);
         if (!result) {
             ui.notify(new GeneralFailureEvent("Taclet application failed." + taclet.name()));

@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
-import java.util.Collection;
-
 import org.key_project.logic.op.Function;
-import org.key_project.ncore.proof.ProofGoal;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.*;
+import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.RuleApp;
@@ -18,8 +20,12 @@ import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 
-public final class Goal implements ProofGoal {
+import java.util.Collection;
+
+
+public final class Goal implements ProofGoal<@NonNull Goal> {
     private Node node;
     /**
      * The namespaces local to this goal. This may evolve over time.
@@ -96,7 +102,7 @@ public final class Goal implements ProofGoal {
         getNode().setAppliedRuleApp(app);
     }
 
-    public Sequent sequent() {
+    public org.key_project.prover.sequent.Sequent sequent() {
         return getNode().sequent();
     }
 
@@ -116,9 +122,14 @@ public final class Goal implements ProofGoal {
          * caught.
          */
         final ImmutableList<Goal> goalList;
-        goalList = ruleApp.execute(this);
-        // can be null when the taclet failed to apply (RuleAbortException)
-        if (goalList == null) {
+        ruleApp.execute(localNamespaces.functions());
+        addAppliedRuleApp(ruleApp);
+
+        try {
+            goalList = ruleApp.rule().getExecutor().apply(this, ruleApp);
+        } catch (RuleAbortException rae) {
+            removeLastAppliedRuleApp();
+            getNode().setAppliedRuleApp(null);
             return null;
         }
 
@@ -176,6 +187,14 @@ public final class Goal implements ProofGoal {
         }
 
         return goalList;
+    }
+
+    /**
+     * PRECONDITION: appliedRuleApps.size () > 0
+     */
+    public void removeLastAppliedRuleApp() {
+        appliedRuleApps = appliedRuleApps.tail();
+        // node ().setAppliedRuleApp ( null );
     }
 
     /**

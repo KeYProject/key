@@ -3,11 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.executor.rustydl;
 
+import org.key_project.logic.IntIterator;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.*;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.RewriteTaclet;
@@ -63,7 +67,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             PosInOccurrence posOfFind, MatchConditions matchCond, Goal goal, RuleApp ruleApp,
             Services services) {
         if (gt instanceof RewriteTacletGoalTemplate rwtgt) {
-            final SequentFormula cf = applyReplacewithHelper(goal,
+            final org.key_project.prover.sequent.SequentFormula cf = applyReplacewithHelper(goal,
                 rwtgt, posOfFind, services, matchCond, ruleApp);
             currentSequent.combine(currentSequent.sequent().changeFormula(cf, posOfFind));
         } else {
@@ -74,7 +78,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
         }
     }
 
-    private SequentFormula applyReplacewithHelper(Goal goal,
+    private org.key_project.prover.sequent.SequentFormula applyReplacewithHelper(Goal goal,
             RewriteTacletGoalTemplate gt, PosInOccurrence posOfFind, Services services,
             MatchConditions matchCond, RuleApp ruleApp) {
         final Term term = posOfFind.sequentFormula().formula();
@@ -110,8 +114,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
                 (ImmutableArray<QuantifiableVariable>) term.boundVars());
         }
 
-        with = syntacticalReplace(with, posOfFind, mc, goal, ruleApp,
-            services);
+        with = syntacticalReplace(with, posOfFind, mc, goal, ruleApp, services);
 
         /*
          * if (!with.sort().extendsTrans(maxSort)) {

@@ -5,9 +5,6 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -18,6 +15,9 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * <p>
@@ -49,9 +49,10 @@ public class CutHeapObjectsFeature extends BinaryFeature {
                 Term cutFormulaC0 = cutFormula.sub(0);
                 Term cutFormulaC1 = cutFormula.sub(1);
                 boolean contains = false;
-                Iterator<SequentFormula> iter = goal.sequent().iterator();
+                Iterator<org.key_project.prover.sequent.SequentFormula> iter =
+                    goal.sequent().iterator();
                 while (!contains && iter.hasNext()) {
-                    Term formula = iter.next().formula();
+                    var formula = iter.next().formula();
                     if (formula.op() == Junctor.NOT) {
                         formula = formula.sub(0);
                     }

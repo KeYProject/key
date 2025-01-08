@@ -5,12 +5,13 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 public class OneOfCP implements Feature {
 

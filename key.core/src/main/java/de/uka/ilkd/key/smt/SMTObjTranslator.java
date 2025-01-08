@@ -11,10 +11,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
 import de.uka.ilkd.key.smt.lang.*;
@@ -22,6 +20,7 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.slf4j.Logger;
@@ -1103,7 +1102,7 @@ public class SMTObjTranslator implements SMTTranslator {
             return nullConstant;
         } else if (op instanceof QuantifiableVariable qop) {
             // translate as variable or constant
-            SMTTermVariable var = translateVariable((QuantifiableVariable) op);
+            SMTTermVariable var = translateVariable(qop);
             if (quantifiedVariables.contains(var)) {
                 return var;
             } else {

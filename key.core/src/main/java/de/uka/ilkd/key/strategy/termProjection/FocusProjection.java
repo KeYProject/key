@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termProjection;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Projection of a rule application to its focus (the term or formula that the rule operates on,
@@ -38,7 +39,7 @@ public class FocusProjection implements ProjectionToTerm {
             pos = pos.up();
         }
 
-        return pos.subTerm();
+        return (Term) pos.subTerm();
     }
 
 }

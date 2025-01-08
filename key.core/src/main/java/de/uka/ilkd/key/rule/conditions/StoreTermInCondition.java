@@ -5,13 +5,13 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.LightweightSyntacticalReplaceVisitor;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.VariableCondition;
 
 /**
  * Stores the given {@link Term}, after substitution of {@link SchemaVariable}s, into the given
@@ -30,15 +30,16 @@ public class StoreTermInCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
-            MatchConditions matchCond, Services services) {
-        final SVInstantiations svInst = matchCond.getInstantiations();
+            MatchConditions matchCond, LogicServices services) {
+        final var svInst =
+            (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
 
         if (svInst.getInstantiation(storeInSV) != null) {
             return matchCond;
         }
 
         final LightweightSyntacticalReplaceVisitor replVisitor = //
-            new LightweightSyntacticalReplaceVisitor(svInst, services);
+            new LightweightSyntacticalReplaceVisitor(svInst, (Services) services);
         term.execPostOrder(replVisitor);
         final Term instantiatedTerm = replVisitor.getTerm();
 

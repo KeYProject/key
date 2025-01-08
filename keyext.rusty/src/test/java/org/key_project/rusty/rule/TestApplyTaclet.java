@@ -6,12 +6,21 @@ package org.key_project.rusty.rule;
 import java.util.Iterator;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.*;
 import org.key_project.rusty.logic.op.Quantifier;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.proof.*;
+import org.key_project.rusty.proof.Goal;
+import org.key_project.rusty.proof.Node;
+import org.key_project.rusty.proof.Proof;
+import org.key_project.rusty.proof.TacletIndex;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.util.TacletForTests;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -46,14 +55,14 @@ public class TestApplyTaclet {
     };
     Proof[] proof;
 
-
-    private static Semisequent parseTermForSemisequent(String t) {
+    private static ImmutableList<SequentFormula> parseTermForSemisequent(String t) {
         if ("".equals(t)) {
-            return Semisequent.EMPTY_SEMISEQUENT;
+            return ImmutableSLList.nil();
         }
         SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
-        return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
+        return ImmutableSLList.singleton(cf0);
     }
+
 
     private Goal createGoal(Node n, TacletIndex tacletIndex) {
         final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
@@ -70,9 +79,9 @@ public class TestApplyTaclet {
         proof = new Proof[strings.length / 2];
 
         for (int i = 0; i < proof.length; i++) {
-            Semisequent antec = parseTermForSemisequent(strings[2 * i]);
-            Semisequent succ = parseTermForSemisequent(strings[2 * i + 1]);
-            Sequent s = Sequent.createSequent(antec, succ);
+            var antec = parseTermForSemisequent(strings[2 * i]);
+            var succ = parseTermForSemisequent(strings[2 * i + 1]);
+            final Sequent s = RustySequentKit.createSequent(antec, succ);
             proof[i] = new Proof("TestApplyTaclet", TacletForTests.initConfig());
             proof[i].setRoot(new Node(proof[i], s));
         }
@@ -92,7 +101,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal);
+        ImmutableList<Goal> goals = goal.apply(rApp);
         assertEquals(1, goals.size(), "Too many or zero goals for imp-right.");
         Sequent seq = goals.head().sequent();
         assertEquals(seq.antecedent().getFirst().formula(), fma.sub(0),
@@ -116,7 +125,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal);
+        ImmutableList<Goal> goals = goal.apply(rApp);
         assertEquals(1, goals.size(), "Too many or zero goals for imp_right_add.");
         Sequent seq = goals.head().sequent();
         assertEquals(seq.antecedent().getFirst().formula(), fma.sub(0),
@@ -132,7 +141,7 @@ public class TestApplyTaclet {
                     .getInstantiation(TacletForTests.getSchemaVariables().lookup(new Name("b"))),
             aimpb, "Inserted cut rule's b should be instantiated to A -> B.");
         assertTrue(rApp.complete(), "Rule App should be complete");
-        goals = nfapp.head().execute(goals.head());
+        goals = goals.head().apply(nfapp.head());
         Sequent seq1 = goals.head().sequent();
         Sequent seq2 = goals.tail().head().sequent();
         assertEquals(2, goals.size(), "Preinstantiated cut-rule should be executed");
@@ -161,11 +170,10 @@ public class TestApplyTaclet {
         TacletApp rApp = rApplist.head();
         rApp = rApp.tryToInstantiate(TacletForTests.services());
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal);
+        ImmutableList<Goal> goals = goal.apply(rApp);
         assertEquals(1, goals.size(), "Too many or zero goals for all-right.");
         Sequent seq = goals.head().sequent();
-        assertEquals(Semisequent.EMPTY_SEMISEQUENT, seq.antecedent(),
-            "Wrong antecedent after all-right");
+        assertTrue(seq.antecedent().isEmpty(), "Wrong antecedent after all-right");
         assertEquals(TacletForTests.getFunctions().lookup(new Name("p")),
             seq.succedent().getFirst().formula().op(),
             "Wrong succedent after all-right (op mismatch)");
@@ -196,7 +204,7 @@ public class TestApplyTaclet {
                                                                                                   // ever
                                                                                                   // pass??
         assertTrue(appList.head().complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = appList.head().execute(goal);
+        ImmutableList<Goal> goals = goal.apply(appList.head());
         assertEquals(1, goals.size(), "Wrong number of goals for close.");
         proof[2].closeGoal(goals.head());
         assertTrue(proof[2].closed(), "Proof should be closed.");
@@ -224,7 +232,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal);
+        ImmutableList<Goal> goals = goal.apply(rApp);
         assertEquals(2, goals.size(), "Too many or zero goals for imp-left.");
         Sequent seq = goals.head().sequent();
         if (!seq.succedent().isEmpty()) {
@@ -260,7 +268,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal);
+        ImmutableList<Goal> goals = goal.apply(rApp);
         assertEquals(1, goals.size(), "Too many or zero goals for contradiction.");
         Sequent seq = goals.head().sequent();
         Term term = seq.succedent().getFirst().formula().sub(1).sub(0).sub(0);
@@ -284,7 +292,7 @@ public class TestApplyTaclet {
             TacletForTests.getSchemaVariables().lookup(new Name("b")), t_c, false,
             proof[0].getServices());
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.execute(goal);
+        ImmutableList<Goal> goals = goal.apply(rApp);
         assertEquals(2, goals.size(), "Too many or too few goals.");
         Sequent seq1 = goals.head().sequent();
         goals = goals.tail();
@@ -362,7 +370,7 @@ public class TestApplyTaclet {
         Goal goal = createGoal(proof[1].root(), tacletIndex);
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(pio, null);
-        ImmutableList<Goal> goals = rApplist.head().execute(goal);
+        ImmutableList<Goal> goals = goal.apply(rApplist.head());
 
         assertEquals(2, goals.size(), "Expected two goals");
         assertTrue(
@@ -399,7 +407,7 @@ public class TestApplyTaclet {
 
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(pio, null);
-        ImmutableList<Goal> goals = rApplist.head().execute(goal);
+        ImmutableList<Goal> goals = goal.apply(rApplist.head());
 
         assertEquals(1, goals.size(), "Expected one goal");
         assertTrue(goals.head().sequent().isEmpty(),
@@ -421,11 +429,11 @@ public class TestApplyTaclet {
 
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(pio, null);
-        ImmutableList<Goal> goals = rApplist.head().execute(goal);
+        ImmutableList<Goal> goals = goal.apply(rApplist.head());
 
 
         assertEquals(1, goals.size(), "Expected one goal");
-        Iterator<SequentFormula> it = goals.head().sequent().antecedent().iterator();
+        final var it = goals.head().sequent().antecedent().iterator();
         assertTrue(
             goals.head().sequent().antecedent().size() == 2
                     && it.next().formula().equals(TacletForTests.parseTerm("A"))
@@ -449,7 +457,7 @@ public class TestApplyTaclet {
 
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(pio, null);
-        ImmutableList<Goal> goals = rApplist.head().execute(goal);
+        ImmutableList<Goal> goals = goal.apply(rApplist.head());
 
 
         seq = goals.head().sequent();
@@ -461,11 +469,11 @@ public class TestApplyTaclet {
 
         rApplist = goal.ruleAppIndex().getTacletAppAt(pio, null);
 
-        goals = rApplist.head().execute(goal);
+        goals = goal.apply(rApplist.head());
 
         assertEquals(1, goals.size(), "Expected one goal");
 
-        Iterator<SequentFormula> it = goals.head().sequent().antecedent().iterator();
+        final var it = goals.head().sequent().antecedent().iterator();
 
         assertTrue(
             goals.head().sequent().antecedent().size() == 2
@@ -499,7 +507,7 @@ public class TestApplyTaclet {
         assertEquals(1, appList.size(), "Expected one match.");
         assertTrue(appList.head().complete(), "Rule App should be complete");
 
-        ImmutableList<Goal> goals = appList.head().execute(goal);
+        ImmutableList<Goal> goals = goal.apply(appList.head());
         assertEquals(1, goals.size(), "Too many or zero goals.");
         Sequent seq = goals.head().sequent();
         Sequent correctSeq = proof[9].root().sequent();
@@ -531,9 +539,10 @@ public class TestApplyTaclet {
         assertEquals(0, appList.size(), "Did not expect a match.");
 
         Term ifterm = TacletForTests.parseTerm("{i:=0}(f(const)=f(f(const)))");
-        SequentFormula ifformula = new SequentFormula(ifterm);
-        ImmutableList<IfFormulaInstantiation> ifInsts = ImmutableSLList
-                .<IfFormulaInstantiation>nil().prepend(new IfFormulaInstDirect(ifformula));
+        org.key_project.prover.sequent.SequentFormula ifformula = new SequentFormula(ifterm);
+        ImmutableList<AssumesFormulaInstantiation> ifInsts = ImmutableSLList
+                .<AssumesFormulaInstantiation>nil()
+                .prepend(new AssumesFormulaInstDirect(ifformula));
         appIt = rApplist.iterator();
         while (appIt.hasNext()) {
             TacletApp a =
@@ -546,20 +555,19 @@ public class TestApplyTaclet {
         assertEquals(1, appList.size(), "Expected one match.");
         assertTrue(appList.head().complete(), "Rule App should be complete");
 
-        ImmutableList<Goal> goals = appList.head().execute(goal);
+        ImmutableList<Goal> goals = goal.apply(appList.head());
         assertEquals(2, goals.size(), "Expected two goals.");
 
-        { // Goal one
-            Sequent correctSeq =
-                proof[11].root().sequent().addFormula(ifformula, true, true).sequent();
-            assertEquals(goals.head().sequent(), correctSeq, "Wrong result");
-        }
+        // Goal one
+        final var correctSeqGoal1 =
+            proof[11].root().sequent().addFormula(ifformula, true, true).sequent();
+        assertEquals(goals.head().sequent(), correctSeqGoal1, "Wrong result");
 
-        { // Goal two
-            Sequent correctSeq =
-                proof[10].root().sequent().addFormula(ifformula, false, true).sequent();
-            assertEquals(goals.tail().head().sequent(), correctSeq, "Wrong result");
-        }
+
+        // Goal two
+        final var correctSeqGoal2 =
+            proof[10].root().sequent().addFormula(ifformula, false, true).sequent();
+        assertEquals(goals.tail().head().sequent(), correctSeqGoal2, "Wrong result");
     }
 
     @Test
@@ -578,7 +586,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        ImmutableList<Goal> goals = rApplist.head().execute(goal);
+        ImmutableList<Goal> goals = goal.apply(rApplist.head());
         assertEquals(1, goals.size(), "Expected one goal.");
 
         goal = goals.head();
@@ -590,7 +598,7 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Expected one rule application.");
         assertTrue(rApplist.head().complete(), "Rule App should be complete");
 
-        goals = rApplist.head().execute(goal);
+        goals = goal.apply(rApplist.head());
         assertEquals(1, goals.size(), "Expected one goal.");
 
         Sequent seq = goals.head().sequent();

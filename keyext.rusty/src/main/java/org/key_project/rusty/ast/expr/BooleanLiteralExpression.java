@@ -38,22 +38,6 @@ public class BooleanLiteralExpression extends LiteralExpression {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj == null || obj.getClass() != this.getClass()) {
-            return false;
-        }
-        return value == (((BooleanLiteralExpression) obj).value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Boolean.hashCode(value);
-    }
-
-    @Override
     public Name getLDTName() {
         return BoolLDT.NAME;
     }
@@ -70,5 +54,20 @@ public class BooleanLiteralExpression extends LiteralExpression {
     @Override
     public Type type(Services services) {
         return PrimitiveType.BOOL;
+    }
+
+    @Override
+    public int hashCode() {
+        return value ? 29 : 37;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj.getClass() != this.getClass())
+            return false;
+        BooleanLiteralExpression other = (BooleanLiteralExpression) obj;
+        return value == other.value;
     }
 }

@@ -6,9 +6,11 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.rusty.logic.BoundVarsVisitor;
 import org.key_project.rusty.logic.ChoiceExpr;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -26,7 +28,7 @@ public abstract class FindTaclet extends Taclet {
     protected final Term find;
 
     /** Set of schemavariables of the {@code if} and the (optional) {@code find} part */
-    private ImmutableSet<SchemaVariable> ifFindVariables = null;
+    private ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> ifFindVariables = null;
 
     /**
      * this method is used to determine if top level updates are allowed to be ignored. This is the
@@ -53,11 +55,13 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            org.key_project.prover.rules.TacletAttributes attrs, Term find,
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSymbExec,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, surviveSymbExec,
+            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,choices, surviveSymbExec,
             tacletAnnotations);
         this.find = find;
     }
@@ -79,9 +83,11 @@ public abstract class FindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     protected FindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            org.key_project.prover.rules.TacletAttributes attrs, Term find,
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+           ChoiceExpr choices, ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices, false,
             tacletAnnotations);
     }
@@ -106,7 +112,7 @@ public abstract class FindTaclet extends Taclet {
         if (tacletAsString == null) {
             StringBuffer sb = new StringBuffer();
             sb = sb.append(name()).append(" {\n");
-            sb = toStringIf(sb);
+            sb = toStringAssumes(sb);
             sb = toStringFind(sb);
             sb = toStringVarCond(sb);
             sb = toStringGoalTemplates(sb);
@@ -120,12 +126,12 @@ public abstract class FindTaclet extends Taclet {
     /**
      * @return Set of schemavariables of the {@code if} and the (optional) {@code find} part
      */
-    public ImmutableSet<SchemaVariable> getIfFindVariables() {
+    public ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> getAssumesAndFindVariables() {
         if (ifFindVariables == null) {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
             find().execPostOrder(svc);
 
-            ifFindVariables = getIfVariables();
+            ifFindVariables = getAssumesVariables();
 
             for (final SchemaVariable sv : svc.vars()) {
                 ifFindVariables = ifFindVariables.add(sv);

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
@@ -186,7 +187,7 @@ public class TestTriggersSet {
         // functions.add(pi);
 
         proof = new Proof("TestTriggersSet", TacletForTests.initConfig());
-        g = new Goal(new Node(proof, Sequent.EMPTY_SEQUENT),
+        g = new Goal(new Node(proof, JavaDLSequentKit.getInstance().getEmptySequent()),
             TacletIndexKit.getKit().createTacletIndex(),
             new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices());
         proof.setRoot(g.node());
@@ -210,7 +211,7 @@ public class TestTriggersSet {
         TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
         int triggerNum = ts.getAllTriggers().size();
         assertEquals(1, triggerNum);
-        Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
+        var trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
         assertEquals(trigger1, trigger2);
     }
 
@@ -223,7 +224,7 @@ public class TestTriggersSet {
         TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
         int triggerNum = ts.getAllTriggers().size();
         assertEquals(1, triggerNum);
-        Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
+        var trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
         assertEquals(trigger1, trigger2);
     }
 }

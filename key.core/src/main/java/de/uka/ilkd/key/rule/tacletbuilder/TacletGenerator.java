@@ -14,16 +14,19 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -53,9 +56,9 @@ public class TacletGenerator {
 
     private TacletGoalTemplate createAxiomGoalTemplate(Term goalTerm) {
         final SequentFormula axiomSf = new SequentFormula(goalTerm);
-        final Semisequent axiomSemiSeq =
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(axiomSf).semisequent();
-        final Sequent axiomSeq = Sequent.createAnteSequent(axiomSemiSeq);
+        final ImmutableList<SequentFormula> axiomSemiSeq =
+            ImmutableSLList.singleton(axiomSf);
+        final Sequent axiomSeq = JavaDLSequentKit.createAnteSequent(axiomSemiSeq);
         final TacletGoalTemplate axiomTemplate =
             new TacletGoalTemplate(axiomSeq, ImmutableSLList.nil());
         return axiomTemplate;
@@ -148,8 +151,8 @@ public class TacletGenerator {
         // create goal template
         SequentFormula guardedSchemaAxiom = generateGuard(kjt, target, services, selfSV, heapSVs,
             paramSVs, schemaAxiom.term, tacletBuilder, satisfiabilityGuard);
-        final Sequent addedSeq = Sequent.createAnteSequent(
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(guardedSchemaAxiom).semisequent());
+        final Sequent addedSeq = JavaDLSequentKit.createAnteSequent(
+            ImmutableSLList.singleton(guardedSchemaAxiom));
         ImmutableList<Term> vars = ImmutableSLList.nil();
         for (TermSV heapSV : heapSVs) {
             vars = vars.append(tb.var(heapSV));
@@ -252,16 +255,12 @@ public class TacletGenerator {
             // ifSeq = null;
             final Term ifFormula = TB.equals(TB.var(selfSV), TB.NULL());
             final SequentFormula ifCf = new SequentFormula(ifFormula);
-            final Semisequent ifSemiSeq =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
-            ifSeq = Sequent.createSuccSequent(ifSemiSeq);
+            ifSeq = JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(ifCf));
         } else {
             /* \assumes ( Sort.exactInstance(self) ==> ) */
             final Term ifFormula = TB.exactInstance(kjt.getSort(), TB.var(selfSV));
             final SequentFormula ifCf = new SequentFormula(ifFormula);
-            final Semisequent ifSemiSeq =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
-            ifSeq = Sequent.createAnteSequent(ifSemiSeq);
+            ifSeq = JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(ifCf));
         }
 
         Term addForumlaTerm = originalPreTerm;
@@ -303,8 +302,9 @@ public class TacletGenerator {
         // create taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setFind(schemaLhs);
-        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-            ImmutableSLList.nil(), limitedRhs));
+        tacletBuilder.addTacletGoalTemplate(
+            new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
+                ImmutableSLList.nil(), limitedRhs));
 
         // FIXME - there is a chance this will have to go along with all the other associated
         // changes
@@ -354,9 +354,8 @@ public class TacletGenerator {
         final Term axiomSatisfiable = functionalRepresentsSatisfiability(target, services, heapSVs,
             selfSV, paramSVs, schemaRepresents, tacletBuilder);
         SequentFormula addedCf = new SequentFormula(axiomSatisfiable);
-        final Semisequent addedSemiSeq =
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
-        final Sequent addedSeq = Sequent.createSuccSequent(addedSemiSeq);
+        final Sequent addedSeq =
+            JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(addedCf));
         final var skolemSV =
             SchemaVariableFactory.createSkolemTermSV(new Name("sk"), target.sort());
         for (SchemaVariable heapSV : heapSVs) {
@@ -442,13 +441,13 @@ public class TacletGenerator {
             if (target.getStateCount() >= 1) {
                 pvs = pvs.append(heap);
                 var sv = SchemaVariableFactory.createTermSV(
-                    new Name("sv_" + heap.name().toString()), heap.sort(), false, false);
+                    new Name("sv_" + heap.name()), heap.sort(), false, false);
                 svs = svs.append(sv);
                 heapSVs.add(sv);
                 if (target.getStateCount() == 2) {
                     pvs = pvs.append(atPreVars.get(heap));
                     sv = SchemaVariableFactory.createTermSV(
-                        new Name("sv_" + atPreVars.get(heap).name().toString()), heap.sort(), false,
+                        new Name("sv_" + atPreVars.get(heap).name()), heap.sort(), false,
                         false);
                     svs = svs.append(sv);
                     heapSVs.add(sv);
@@ -529,9 +528,8 @@ public class TacletGenerator {
 
         final Term addedFormula = schemaAdd.term;
         final SequentFormula addedCf = new SequentFormula(addedFormula);
-        final Semisequent addedSemiSeq =
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
-        final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
+        final Sequent addedSeq = JavaDLSequentKit.createAnteSequent(
+            ImmutableSLList.singleton(addedCf));
 
         for (VariableSV boundSV : schemaAdd.boundVars) {
             for (SchemaVariable heapSV : heapSVs) {
@@ -665,9 +663,8 @@ public class TacletGenerator {
 
         // create added sequent
         final SequentFormula addedCf = new SequentFormula(limitedAxiom);
-        final Semisequent addedSemiSeq =
-            Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
-        final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
+        final Sequent addedSeq =
+            JavaDLSequentKit.createAnteSequent(ImmutableSLList.singleton(addedCf));
 
         final Term[] hs = new Term[heapSVs.size()];
         i = 0;
@@ -711,19 +708,18 @@ public class TacletGenerator {
             final Term eqNull = TB.equals(TB.var(eqSV), TB.NULL());
             final SequentFormula selfEQSF = new SequentFormula(selfEQ);
             final SequentFormula eqNullSF = new SequentFormula(eqNull);
-            final Semisequent succ =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(selfEQSF).semisequent();
-            final Semisequent ant =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(eqNullSF).semisequent();
-            final Sequent ifSeq = Sequent.createSequent(succ, ant);
+            final var antec =
+                ImmutableSLList.singleton(selfEQSF);
+            final var succ =
+                ImmutableSLList.singleton(eqNullSF);
+            final Sequent ifSeq = JavaDLSequentKit.createSequent(antec, succ);
             tacletBuilder.setIfSequent(ifSeq);
         } else if (!isStatic) {
             // \assumes( ==> self = null )
             final Term selfNull = TB.equals(TB.var(selfSV), TB.NULL());
             final SequentFormula selfNullSF = new SequentFormula(selfNull);
-            final Semisequent succ =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(selfNullSF).semisequent();
-            final Sequent ifSeq = Sequent.createSuccSequent(succ);
+            final Sequent ifSeq =
+                JavaDLSequentKit.createSuccSequent(ImmutableSLList.singleton(selfNullSF));
             tacletBuilder.setIfSequent(ifSeq);
         }
 
@@ -759,7 +755,7 @@ public class TacletGenerator {
         if (programVar == null) {
             return null;
         } else {
-            Name name = new Name("sv_" + programVar.name().toString());
+            Name name = new Name("sv_" + programVar.name());
             var schemaVar =
                 SchemaVariableFactory.createTermSV(name, programVar.getKeYJavaType().getSort());
             return schemaVar;

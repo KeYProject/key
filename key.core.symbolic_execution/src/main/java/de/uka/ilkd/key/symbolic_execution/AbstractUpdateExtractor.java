@@ -27,6 +27,9 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -59,7 +62,8 @@ public abstract class AbstractUpdateExtractor {
      * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
      * @param modalityPio The {@link PosInOccurrence} of the modality or its updates.
      */
-    public AbstractUpdateExtractor(Node node, PosInOccurrence modalityPio) {
+    protected AbstractUpdateExtractor(Node node,
+            PosInOccurrence modalityPio) {
         assert node != null;
         assert modalityPio != null;
         this.node = node;
@@ -153,7 +157,7 @@ public abstract class AbstractUpdateExtractor {
             // are not part of the source code and should be ignored.
             Sequent sequent = getRoot().sequent();
             for (SequentFormula sf : sequent.succedent()) {
-                Term term = sf.formula();
+                Term term = (Term) sf.formula();
                 if (Junctor.IMP.equals(term.op())) {
                     fillInitialObjectsToIgnoreRecursively(term.sub(1), result);
                 }
@@ -212,7 +216,7 @@ public abstract class AbstractUpdateExtractor {
         // Go up in parent hierarchy and collect updates on all update applications
         PosInOccurrence pio = modalityPio;
         while (pio != null) {
-            Term updateApplication = pio.subTerm();
+            Term updateApplication = (Term) pio.subTerm();
             if (updateApplication.op() == UpdateApplication.UPDATE_APPLICATION) {
                 Term topUpdate = UpdateApplication.getUpdate(updateApplication);
                 collectLocationsFromTerm(topUpdate, locationsToFill, updateCreatedObjectsToFill,
@@ -436,7 +440,8 @@ public abstract class AbstractUpdateExtractor {
         Set<ExtractLocationParameter> result = new LinkedHashSet<>();
         for (SequentFormula sf : sequent) {
             result.addAll(extractLocationsFromTerm(
-                OriginTermLabel.removeOriginLabels(sf.formula(), getServices()), objectsToIgnore));
+                OriginTermLabel.removeOriginLabels((Term) sf.formula(), getServices()),
+                objectsToIgnore));
         }
         return result;
     }
@@ -472,8 +477,7 @@ public abstract class AbstractUpdateExtractor {
             Set<Term> objectsToIgnore) throws ProofInputException {
         term = OriginTermLabel.removeOriginLabels(term, getServices());
         final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
-        if (term.op() instanceof ProgramVariable) {
-            ProgramVariable var = (ProgramVariable) term.op();
+        if (term.op() instanceof ProgramVariable var) {
             if (!SymbolicExecutionUtil.isHeap(var, heapLDT) && !isImplicitProgramVariable(var)
                     && !objectsToIgnore.contains(term) && !hasFreeVariables(term)) {
                 toFill.add(new ExtractLocationParameter(var, true));
@@ -1255,7 +1259,8 @@ public abstract class AbstractUpdateExtractor {
      * @param currentLayout Is current layout?
      * @return The original updates.
      */
-    protected ImmutableList<Term> computeOriginalUpdates(PosInOccurrence pio,
+    protected ImmutableList<Term> computeOriginalUpdates(
+            PosInOccurrence pio,
             boolean currentLayout) {
         ImmutableList<Term> originalUpdates;
         if (!currentLayout) {
@@ -1264,7 +1269,7 @@ public abstract class AbstractUpdateExtractor {
             if (node.proof().root() == node) {
                 originalUpdates = SymbolicExecutionUtil.computeRootElementaryUpdates(node);
             } else {
-                Term originalModifiedFormula = pio.subTerm();
+                Term originalModifiedFormula = (Term) pio.subTerm();
                 originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
             }
         }

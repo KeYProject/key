@@ -6,18 +6,20 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.GoalListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -33,10 +35,10 @@ public class NodeChangeJournal implements GoalListener {
     private final Node node;
 
     /**
-     * This is a may storing the leaves that are currently below the original node, and all changes
+     * This is a map storing the leaves that are currently below the original node, and all changes
      * applied to each of them
      */
-    private ImmutableMap<Node, NodeChangesHolder> changes =
+    private ImmutableMap<@NonNull Node, NodeChangesHolder> changes =
         DefaultImmutableMap.nilMap();
 
     /**

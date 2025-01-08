@@ -8,15 +8,16 @@ import java.io.StringReader;
 import java.util.Properties;
 
 import org.key_project.logic.Term;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
-import org.key_project.rusty.logic.Semisequent;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.parser.KeYRustyParser;
 import org.key_project.rusty.parser.ParsingFacade;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.settings.Configuration;
 import org.key_project.rusty.util.parsing.BuildingException;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -95,7 +96,8 @@ public class ProblemFinder extends ExpressionBuilder {
         if (obj instanceof Sequent s)
             return s;
         if (obj instanceof Term t)
-            return Sequent.createSuccSequent(new Semisequent(new SequentFormula(t)));
+            return RustySequentKit
+                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t)));
         return null;
     }
 

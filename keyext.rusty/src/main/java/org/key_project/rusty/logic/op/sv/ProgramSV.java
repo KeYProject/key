@@ -23,7 +23,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.jspecify.annotations.NonNull;
 
 public final class ProgramSV extends OperatorSV
-        implements SyntaxElement, UpdateableOperator, ProgramConstruct {
+        implements UpdateableOperator, ProgramConstruct {
     private final boolean isListSV;
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION =
@@ -97,8 +97,6 @@ public final class ProgramSV extends OperatorSV
         if (src == null) {
             return addProgramInstantiation(EMPTY_LIST_INSTANTIATION, matchCond, services);
         }
-
-        SVInstantiations instantiations = matchCond.getInstantiations();
 
         final java.util.ArrayList<RustyProgramElement> matchedElements =
             new java.util.ArrayList<>();

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
 
+import org.key_project.logic.IntIterator;
 import org.key_project.rusty.ast.RustyProgramElement;
 
 /**

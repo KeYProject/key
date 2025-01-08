@@ -11,7 +11,8 @@ import org.key_project.logic.op.Modifier;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
-public abstract class OperatorSV extends AbstractSortedOperator implements SchemaVariable {
+public abstract class OperatorSV extends AbstractSortedOperator
+        implements SchemaVariable, org.key_project.logic.op.sv.OperatorSV {
     private final boolean isStrict;
 
 

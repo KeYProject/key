@@ -5,9 +5,6 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -19,6 +16,9 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -48,7 +48,8 @@ public class SVInstantiationCP implements Feature {
         this.value = value;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
+            Goal goal,
             MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
         manager.passChoicePoint(new CP(app, pos, goal, mState), this);
@@ -102,7 +103,8 @@ public class SVInstantiationCP implements Feature {
             final Term instTerm = value.toTerm(app, pos, goal, mState);
 
             final RuleApp newApp =
-                tapp.addCheckedInstantiation(sv, instTerm, goal.proof().getServices(), true);
+                tapp.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) instTerm,
+                    goal.proof().getServices(), true);
 
             final CPBranch branch = new CPBranch() {
                 public void choose() {}

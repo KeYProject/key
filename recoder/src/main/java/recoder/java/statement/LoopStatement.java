@@ -45,7 +45,7 @@ public abstract class LoopStatement extends JavaStatement
      * Loop statement.
      */
 
-    public LoopStatement() {
+    protected LoopStatement() {
         // nothing to do
     }
 
@@ -55,7 +55,7 @@ public abstract class LoopStatement extends JavaStatement
      * @param body a statement.
      */
 
-    public LoopStatement(Statement body) {
+    protected LoopStatement(Statement body) {
         setBody(body);
     }
 

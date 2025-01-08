@@ -6,9 +6,10 @@ package org.key_project.rusty.proof;
 import java.util.*;
 
 import org.key_project.logic.op.Function;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.logic.RenamingTable;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -27,7 +28,7 @@ public class Node implements Iterable<Node> {
     /** The parent node. **/
     private @Nullable Node parent = null;
 
-    private Sequent seq = Sequent.EMPTY_SEQUENT;
+    private Sequent seq = RustySequentKit.getInstance().getEmptySequent();
 
     private final ArrayList<Node> children = new ArrayList<>(1);
 
@@ -72,7 +73,7 @@ public class Node implements Iterable<Node> {
     /**
      * creates an empty node that is root and leaf.
      */
-    public Node(Proof proof) {
+    private Node(Proof proof) {
         this.proof = proof;
         serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
     }

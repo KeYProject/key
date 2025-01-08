@@ -26,8 +26,4 @@ public final class UpdateSV extends OperatorSV implements TerminalSyntaxElement 
         return toString("update");
     }
 
-    @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\update ").print(name().toString());
-    }
 }

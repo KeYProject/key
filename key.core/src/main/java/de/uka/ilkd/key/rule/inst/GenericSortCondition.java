@@ -5,7 +5,6 @@ package de.uka.ilkd.key.rule.inst;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.OperatorSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -30,7 +29,8 @@ public abstract class GenericSortCondition {
      *         are either always compatible (no generic sorts) or never compatible (non generic
      *         sorts that don't match)
      */
-    public static GenericSortCondition createCondition(SchemaVariable sv,
+    public static GenericSortCondition createCondition(
+            org.key_project.logic.op.sv.SchemaVariable sv,
             InstantiationEntry<?> p_entry) {
 
         if (!(p_entry instanceof TermInstantiation ti)) {
@@ -62,7 +62,7 @@ public abstract class GenericSortCondition {
      *         with expressions that have a real subtype of the type of <code>p_sv</code>. Otherwise
      *         the sorts have to match exactly
      */
-    static boolean subSortsAllowed(SchemaVariable p_sv) {
+    static boolean subSortsAllowed(org.key_project.logic.op.sv.SchemaVariable p_sv) {
         return p_sv instanceof TermSV && !p_sv.isStrict();
     }
 

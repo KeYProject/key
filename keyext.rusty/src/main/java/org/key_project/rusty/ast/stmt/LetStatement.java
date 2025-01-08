@@ -15,10 +15,14 @@ import org.key_project.util.ExtList;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
+
 public class LetStatement implements Statement, VariableDeclaration {
     private final Pattern pat;
     private final RustType type;
     private final Expr init;
+
+    private int hashCode = -1;
 
     public LetStatement(Pattern pat, @Nullable RustType type, @Nullable Expr init) {
         this.pat = pat;
@@ -92,34 +96,28 @@ public class LetStatement implements Statement, VariableDeclaration {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj == null || obj.getClass() != this.getClass()) {
-            return false;
-        }
-        final var other = (LetStatement) obj;
-        if (init == null && other.init != null || init != null && !init.equals(other.init)) {
-            return false;
-        }
-        if (type == null && other.type != null || type != null && !type.equals(other.type)) {
-            return false;
-        }
-        return pat.equals(other.pat);
+    public void visit(Visitor v) {
+        v.performActionOnLetStatement(this);
     }
 
     @Override
     public int hashCode() {
-        int hashcode = 5;
-        hashcode = 31 * hashcode + pat.hashCode();
-        hashcode = 31 * hashcode + (type == null ? 0 : type.hashCode());
-        hashcode = 31 * hashcode + (init == null ? 0 : init.hashCode());
-        return hashcode;
+        if (hashCode == -1) {
+            return hashCode;
+        }
+        final int hash = computeHashCode();
+        this.hashCode = hash;
+        return hash;
     }
 
     @Override
-    public void visit(Visitor v) {
-        v.performActionOnLetStatement(this);
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        final LetStatement that = (LetStatement) obj;
+        return pat.equals(that.pat) && Objects.equals(type, that.type)
+                && Objects.equals(init, that.init);
     }
 }

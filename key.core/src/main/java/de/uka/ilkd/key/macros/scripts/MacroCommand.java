@@ -9,9 +9,7 @@ import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
@@ -20,6 +18,10 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 
 public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     private static final Map<String, ProofMacro> macroMap = loadMacroMap();
@@ -123,14 +125,15 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
      * @return
      * @throws ScriptException
      */
-    public static PosInOccurrence extractMatchingPio(final Sequent sequent, final String matchRegEx,
+    public static PosInOccurrence extractMatchingPio(
+            final Sequent sequent, final String matchRegEx,
             final Services services) throws ScriptException {
         PosInOccurrence pio = null;
         boolean matched = false;
 
         for (int i = 1; i < sequent.size() + 1; i++) {
             final boolean matchesRegex = formatTermString(
-                LogicPrinter.quickPrintTerm(sequent.getFormulabyNr(i).formula(), services))
+                LogicPrinter.quickPrintTerm((Term) sequent.getFormulabyNr(i).formula(), services))
                         .matches(".*" + matchRegEx + ".*");
             if (matchesRegex) {
                 if (matched) {

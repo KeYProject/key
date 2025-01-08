@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * The default implementation of {@link IExecutionMethodReturnValue}.
@@ -53,7 +54,8 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement
      * @param condition The optional condition or {@code null} if no condition is available.
      */
     public ExecutionMethodReturnValue(ITreeSettings settings, Node proofNode,
-            PosInOccurrence modalityPIO, Term returnValue, Term condition) {
+            PosInOccurrence modalityPIO, Term returnValue,
+            Term condition) {
         super(settings, proofNode);
         assert returnValue != null;
         assert modalityPIO != null;

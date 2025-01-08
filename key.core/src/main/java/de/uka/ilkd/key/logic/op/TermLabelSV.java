@@ -8,20 +8,14 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.TerminalSyntaxElement;
 
 /**
  * A schema variable which matches term labels
  */
-public final class TermLabelSV extends OperatorSV implements TermLabel, TerminalSyntaxElement {
+public final class TermLabelSV extends OperatorSV implements TermLabel {
 
     TermLabelSV(Name name) {
         super(name, JavaDLTheory.TERMLABEL, true, false);
-    }
-
-    @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\termlabel ").print(name().toString());
     }
 
     @Override

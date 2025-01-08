@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -22,7 +22,6 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -30,7 +29,13 @@ import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
-import org.key_project.ncore.proof.ProofGoal;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -48,7 +53,7 @@ import org.jspecify.annotations.NonNull;
  * methods for setting back several proof steps. The sequent has to be changed using the methods of
  * Goal.
  */
-public final class Goal implements ProofGoal {
+public final class Goal implements ProofGoal<@NonNull Goal> {
 
     public static final AtomicLong PERF_APP_EXECUTE = new AtomicLong();
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
@@ -223,7 +228,8 @@ public final class Goal implements ProofGoal {
      * creation the necessary information is passed to the listener as parameters and not through an
      * event object.
      */
-    private void fireSequentChanged(SequentChangeInfo sci) {
+    private void fireSequentChanged(
+            SequentChangeInfo sci) {
         var time = System.nanoTime();
         getFormulaTagManager().sequentChanged(this, sci);
         var time1 = System.nanoTime();
@@ -310,7 +316,7 @@ public final class Goal implements ProofGoal {
      *
      * @return the Sequent to be proved
      */
-    public Sequent sequent() {
+    public @NonNull Sequent sequent() {
         return node().sequent();
     }
 
@@ -396,7 +402,8 @@ public final class Goal implements ProofGoal {
      *        (succedent)
      * @param first boolean true if at the front, if false then cf is added at the back
      */
-    public void addFormula(SequentFormula cf, boolean inAntec, boolean first) {
+    public void addFormula(SequentFormula cf, boolean inAntec,
+            boolean first) {
         setSequent(sequent().addFormula(cf, inAntec, first));
     }
 
@@ -609,14 +616,16 @@ public final class Goal implements ProofGoal {
          */
         final ImmutableList<Goal> goalList;
         var time = System.nanoTime();
+        ruleApp.execute(localNamespaces.functions());
+        addAppliedRuleApp(ruleApp);
         try {
-            goalList = ruleApp.execute(this);
+            goalList = ruleApp.rule().getExecutor().apply(this, ruleApp);
+        } catch (RuleAbortException rae) {
+            removeLastAppliedRuleApp();
+            node().setAppliedRuleApp(null);
+            return null;
         } finally {
             PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
-        }
-        // can be null when the taclet failed to apply (RuleAbortException)
-        if (goalList == null) {
-            return null;
         }
 
         proof.getServices().saveNameRecorder(n);
@@ -626,7 +635,7 @@ public final class Goal implements ProofGoal {
         } else {
             proof.replace(this, goalList);
             if (ruleApp instanceof TacletApp tacletApp && tacletApp.taclet().closeGoal()
-                    || ruleApp instanceof SMTRuleApp) {
+                    || ruleApp instanceof AbstractExternalSolverRuleApp) {
                 // the first new goal is the one to be closed
                 proof.closeGoal(goalList.head());
             }

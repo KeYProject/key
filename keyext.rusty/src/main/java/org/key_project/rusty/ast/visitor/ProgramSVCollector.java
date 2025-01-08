@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.visitor;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;

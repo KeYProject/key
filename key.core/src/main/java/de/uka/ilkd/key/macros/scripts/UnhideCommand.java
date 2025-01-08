@@ -7,9 +7,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.RuleAppIndex;
@@ -17,6 +14,8 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -58,10 +57,10 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
 
         Goal goal = state.getFirstOpenAutomaticGoal();
 
-        Set<Term> antes = new HashSet<>();
+        Set<org.key_project.logic.Term> antes = new HashSet<>();
         args.sequent.antecedent().forEach(sf -> antes.add(sf.formula()));
 
-        Set<Term> succs = new HashSet<>();
+        Set<org.key_project.logic.Term> succs = new HashSet<>();
         args.sequent.succedent().forEach(sf -> succs.add(sf.formula()));
 
         RuleAppIndex index = goal.ruleAppIndex();

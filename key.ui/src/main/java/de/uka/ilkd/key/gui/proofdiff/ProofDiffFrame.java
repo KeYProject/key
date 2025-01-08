@@ -348,7 +348,7 @@ public class ProofDiffFrame extends JFrame {
     // Use this to test the layout of this class.
     public static void main(String[] args) {
         ProofDiffFrame pdf = new ProofDiffFrame(null);
-        pdf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        pdf.setDefaultCloseOperation(EXIT_ON_CLOSE);
         pdf.setSize(500, 500);
         pdf.setVisible(true);
     }

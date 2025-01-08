@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -37,7 +37,8 @@ import org.key_project.util.collection.ImmutableList;
  */
 public abstract class StrategyProofMacro extends AbstractProofMacro {
 
-    protected abstract Strategy createStrategy(Proof proof, PosInOccurrence posInOcc);
+    protected abstract Strategy createStrategy(Proof proof,
+            PosInOccurrence posInOcc);
 
     /**
      * {@inheritDoc}
@@ -48,7 +49,8 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      *
      */
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 

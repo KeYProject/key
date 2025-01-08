@@ -10,7 +10,11 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -93,15 +97,16 @@ public class TestPosInOcc {
         terms2[3] = TB.func(p, new Term[] { terms2[2] });
         SequentFormula cfma2 = new SequentFormula(terms2[3]);
 
-        final PosInOccurrence topPIO = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), true);
+        final PosInOccurrence topPIO =
+            new PosInOccurrence(cfma, PosInTerm.getTopLevel(), true);
 
 
         // Test without metavariables involved
         PosInOccurrence pio = topPIO.down(0);
         assertSame(pio.subTerm(), terms[1]);
-        PosInOccurrence pio2 = pio.replaceConstrainedFormula(cfma);
+        PosInOccurrence pio2 = pio.replaceSequentFormula(cfma);
         assertEquals(pio, pio2);
-        pio = pio.replaceConstrainedFormula(cfma2);
+        pio = pio.replaceSequentFormula(cfma2);
         assertSame(pio.subTerm(), terms2[2]);
     }
 }

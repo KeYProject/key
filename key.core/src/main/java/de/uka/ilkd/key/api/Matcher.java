@@ -6,19 +6,20 @@ package de.uka.ilkd.key.api;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.AssumesMatchResult;
+import org.key_project.prover.rules.inst.SVInstantiations;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.slf4j.Logger;
@@ -71,8 +72,8 @@ public class Matcher {
         VMTacletMatcher tacletMatcher = new VMTacletMatcher(t);
 
         // patternSequent should not be null, as we have created it
-        assert t.ifSequent() != null;
-        Sequent patternSeq = t.ifSequent();
+        assert t.assumesSequent() != null;
+        Sequent patternSeq = t.assumesSequent();
         int asize = patternSeq.antecedent().size();
         int size = asize + patternSeq.succedent().size();
         // Iterator durch die Pattern-Sequent
@@ -80,12 +81,13 @@ public class Matcher {
         List<SearchNode> finalCandidates = new ArrayList<>(100);
         if (size > 0) {
             // Iteratoren durch die Sequent
-            ImmutableArray<IfFormulaInstantiation> antecCand =
-                IfFormulaInstSeq.createList(currentSeq, true, copyServices);
-            ImmutableArray<IfFormulaInstantiation> succCand =
-                IfFormulaInstSeq.createList(currentSeq, false, copyServices);
+            ImmutableArray<AssumesFormulaInstantiation> antecCand =
+                AssumesFormulaInstSeq.createList(currentSeq, true, copyServices);
+            ImmutableArray<AssumesFormulaInstantiation> succCand =
+                AssumesFormulaInstSeq.createList(currentSeq, false, copyServices);
 
-            SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];
+            org.key_project.prover.sequent.SequentFormula[] patternArray =
+                new org.key_project.prover.sequent.SequentFormula[patternSeq.size()];
             int i = 0;
             for (SequentFormula fm : patternSeq) {
                 patternArray[i++] = fm;
@@ -94,7 +96,7 @@ public class Matcher {
 
             Queue<SearchNode> queue = new LinkedList<>();
             // init
-            queue.add(new SearchNode(patternArray, asize));
+            queue.add(new SearchNode(patternArray, asize, MatchConditions.EMPTY_MATCHCONDITIONS));
 
 
             while (!queue.isEmpty()) {
@@ -102,22 +104,21 @@ public class Matcher {
                 boolean inAntecedent = node.isAntecedent();
                 LOGGER.debug(inAntecedent ? "In Antec: " : "In Succ");
 
-                IfMatchResult ma = tacletMatcher.matchIf((inAntecedent ? antecCand : succCand),
-                    node.getPatternTerm(), node.getMatchConditions(), copyServices);
+                AssumesMatchResult ma =
+                    tacletMatcher.matchAssumes((inAntecedent ? antecCand : succCand),
+                        node.getPatternTerm(), node.getMatchConditions(), copyServices);
 
-                if (!ma.getMatchConditions().isEmpty()) {
-                    ImmutableList<MatchConditions> testma = ma.getMatchConditions();
-
-                    for (MatchConditions matchConditions : testma) {
-                        SearchNode sn = new SearchNode(node, matchConditions);
-                        if (sn.isFinished()) {
-                            finalCandidates.add(sn);
-                        } else {
-                            queue.add(sn);
-                        }
-                    }
-                } else {
+                if (ma.matchConditions().isEmpty()) {
                     LOGGER.debug("Pattern Empty");
+                }
+
+                for (final var mc : ma.matchConditions()) {
+                    SearchNode sn = new SearchNode(node, mc);
+                    if (sn.isFinished()) {
+                        finalCandidates.add(sn);
+                    } else {
+                        queue.add(sn);
+                    }
                 }
             }
         }
@@ -142,12 +143,11 @@ public class Matcher {
         SVInstantiations insts = sn.getInstantiations();
         Set<String> varNames = assignments.getTypeMap().keySet();
         for (String varName : varNames) {
-            SchemaVariable sv = insts.lookupVar(new Name(varName));
-            Object value = insts.getInstantiation(sv);
+            final var sv = insts.lookupVar(new Name(varName));
+            final Object value = insts.getInstantiation(sv);
             va.addAssignmentWithType(varName, value, assignments.getTypeMap().get(varName));
         }
         return va;
-
     }
 
     /**

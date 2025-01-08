@@ -14,9 +14,6 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
@@ -30,20 +27,23 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.ArrayUtil;
 
@@ -65,7 +65,8 @@ public final class TruthValueTracingUtil {
      * @param sequentFormula The {@link SequentFormula} to check.
      * @return {@code true} is predicate, {@code false} is something else.
      */
-    public static boolean isPredicate(SequentFormula sequentFormula) {
+    public static boolean isPredicate(
+            SequentFormula sequentFormula) {
         return sequentFormula != null && isPredicate(sequentFormula.formula());
     }
 
@@ -75,7 +76,7 @@ public final class TruthValueTracingUtil {
      * @param term The {@link Term} to check.
      * @return {@code true} is predicate, {@code false} is something else.
      */
-    public static boolean isPredicate(Term term) {
+    public static boolean isPredicate(org.key_project.logic.Term term) {
         return term != null && isPredicate(term.op());
     }
 
@@ -85,7 +86,7 @@ public final class TruthValueTracingUtil {
      * @param operator The {@link Operator} to check.
      * @return {@code true} is predicate, {@code false} is something else.
      */
-    public static boolean isPredicate(Operator operator) {
+    public static boolean isPredicate(org.key_project.logic.op.Operator operator) {
         if (operator == Equality.EQV) {
             return false;
         } else if (operator instanceof Junctor) {
@@ -236,8 +237,7 @@ public final class TruthValueTracingUtil {
         boolean checkPerformed = false;
         if (childIndexOnParent >= 0) {
             Node parent = child.parent();
-            if (parent.getAppliedRuleApp() instanceof TacletApp) {
-                TacletApp tacletApp = (TacletApp) parent.getAppliedRuleApp();
+            if (parent.getAppliedRuleApp() instanceof TacletApp tacletApp) {
                 List<LabelOccurrence> labels =
                     findInvolvedLabels(parent.sequent(), tacletApp, termLabelName);
                 if (!labels.isEmpty()) {
@@ -282,8 +282,9 @@ public final class TruthValueTracingUtil {
                 if (parentPio != null) {
                     assert 1 == parent.childrenCount()
                             : "Implementaton of the OneStepSimplifierRule has changed.";
-                    PosInOccurrence childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(
-                        parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(0));
+                    PosInOccurrence childPio =
+                        SymbolicExecutionUtil.posInOccurrenceToOtherSequent(
+                            parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(0));
                     updatePredicateResultBasedOnNewMinorIdsOSS(childPio, parentPio, termLabelName,
                         services.getTermBuilder(), nodeResult);
                 }
@@ -329,7 +330,7 @@ public final class TruthValueTracingUtil {
         // Search for labels in find part
         PosInOccurrence pio = tacletApp.posInOccurrence();
         if (pio != null) {
-            Term term = pio.subTerm();
+            Term term = (Term) pio.subTerm();
             if (term != null) {
                 // Check for evaluated truth values
                 TermLabel label = term.getLabel(termLabelName);
@@ -339,14 +340,15 @@ public final class TruthValueTracingUtil {
             }
         }
         if (isClosingRule(tacletApp.taclet())) {
-            if (tacletApp.ifInstsComplete() && tacletApp.ifFormulaInstantiations() != null) {
-                for (IfFormulaInstantiation ifInst : tacletApp.ifFormulaInstantiations()) {
-                    assert ifInst instanceof IfFormulaInstSeq;
-                    Term term = ifInst.getConstrainedFormula().formula();
+            if (tacletApp.ifInstsComplete() && tacletApp.assumesFormulaInstantiations() != null) {
+                for (AssumesFormulaInstantiation ifInst : tacletApp
+                        .assumesFormulaInstantiations()) {
+                    assert ifInst instanceof AssumesFormulaInstSeq;
+                    Term term = (Term) ifInst.getSequentFormula().formula();
                     TermLabel label = term.getLabel(termLabelName);
                     if (label instanceof FormulaTermLabel) {
                         result.add(new LabelOccurrence((FormulaTermLabel) label,
-                            ((IfFormulaInstSeq) ifInst).inAntec()));
+                            ((AssumesFormulaInstSeq) ifInst).inAntec()));
                     }
                 }
             }
@@ -444,14 +446,16 @@ public final class TruthValueTracingUtil {
      */
     private static void updatePredicateResultBasedOnNewMinorIdsOSS(
             final PosInOccurrence childPio,
-            final PosInOccurrence parentPio, final Name termLabelName, final TermBuilder tb,
+            final PosInOccurrence parentPio, final Name termLabelName,
+            final TermBuilder tb,
             final Map<String, MultiEvaluationResult> results) {
         if (parentPio != null) {
             // Check application term and all of its children and grand children
             parentPio.subTerm().execPreOrder(new DefaultVisitor() {
                 @Override
                 public void visit(Term visited) {
-                    checkForNewMinorIdsOSS(childPio.sequentFormula(), visited, termLabelName,
+                    checkForNewMinorIdsOSS(childPio.sequentFormula(), visited,
+                        termLabelName,
                         parentPio, tb, results);
                 }
             });
@@ -459,7 +463,8 @@ public final class TruthValueTracingUtil {
             PosInOccurrence currentPio = parentPio;
             while (!currentPio.isTopLevel()) {
                 currentPio = currentPio.up();
-                checkForNewMinorIdsOSS(childPio.sequentFormula(), currentPio.subTerm(),
+                checkForNewMinorIdsOSS(childPio.sequentFormula(),
+                    (Term) currentPio.subTerm(),
                     termLabelName, parentPio, tb, results);
             }
         }
@@ -477,7 +482,8 @@ public final class TruthValueTracingUtil {
      */
     private static void checkForNewMinorIdsOSS(
             SequentFormula onlyChangedChildSF, Term term,
-            Name termLabelName, PosInOccurrence parentPio, TermBuilder tb,
+            Name termLabelName, PosInOccurrence parentPio,
+            TermBuilder tb,
             Map<String, MultiEvaluationResult> results) {
         TermLabel label = term.getLabel(termLabelName);
         if (label instanceof FormulaTermLabel) {
@@ -532,7 +538,8 @@ public final class TruthValueTracingUtil {
         final Node parentNode = childNode.parent();
         if (parentNode != null) {
             final RuleApp parentRuleApp = parentNode.getAppliedRuleApp();
-            final PosInOccurrence parentPio = parentRuleApp.posInOccurrence();
+            final PosInOccurrence parentPio =
+                parentRuleApp.posInOccurrence();
             if (parentPio != null) {
                 // Check application term and all of its children and grand children
                 parentPio.subTerm().execPreOrder(new DefaultVisitor() {
@@ -546,14 +553,17 @@ public final class TruthValueTracingUtil {
                 PosInOccurrence currentPio = parentPio;
                 while (!currentPio.isTopLevel()) {
                     currentPio = currentPio.up();
-                    checkForNewMinorIds(childNode, currentPio.subTerm(), termLabelName, parentPio,
+                    checkForNewMinorIds(childNode, (Term) currentPio.subTerm(), termLabelName,
+                        parentPio,
                         tb, results);
                 }
                 // Check if instantiations
                 if (parentRuleApp instanceof TacletApp ta) {
-                    if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
-                        for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
-                            checkForNewMinorIds(childNode, ifInst.getConstrainedFormula().formula(),
+                    if (ta.ifInstsComplete() && ta.assumesFormulaInstantiations() != null) {
+                        for (AssumesFormulaInstantiation ifInst : ta
+                                .assumesFormulaInstantiations()) {
+                            checkForNewMinorIds(childNode,
+                                (Term) ifInst.getSequentFormula().formula(),
                                 termLabelName, parentPio, tb, results);
                         }
                     }
@@ -574,7 +584,8 @@ public final class TruthValueTracingUtil {
      */
     private static void checkForNewMinorIds(
             Node childNode, Term term, Name termLabelName,
-            PosInOccurrence parentPio, TermBuilder tb, Map<String, MultiEvaluationResult> results) {
+            PosInOccurrence parentPio, TermBuilder tb,
+            Map<String, MultiEvaluationResult> results) {
         TermLabel label = term.getLabel(termLabelName);
         if (label instanceof FormulaTermLabel) {
             Term replacement =

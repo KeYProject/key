@@ -11,16 +11,16 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.sequent.*;
+import org.key_project.util.collection.*;
 
 
 /**
@@ -83,7 +83,7 @@ public final class ProgVarReplacer {
             if (newInsts != insts) {
                 NoPosTacletApp newNoPosTacletApp =
                     NoPosTacletApp.createNoPosTacletApp(noPosTacletApp.taclet(), newInsts,
-                        noPosTacletApp.ifFormulaInstantiations(), services);
+                        noPosTacletApp.assumesFormulaInstantiations(), services);
                 appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
                 appsToBeAdded = appsToBeAdded.add(newNoPosTacletApp);
             }
@@ -101,10 +101,8 @@ public final class ProgVarReplacer {
         SVInstantiations result = insts;
 
         Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it;
-        it = insts.pairIterator();
-        while (it.hasNext()) {
-            ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
-            SchemaVariable sv = e.key();
+        for (var e : insts.getInstantiationMap()) {
+            var sv = e.key();
             InstantiationEntry<?> ie = e.value();
             Object inst = ie.getInstantiation();
 
@@ -140,8 +138,7 @@ public final class ProgVarReplacer {
                 }
 
                 if (changedSomething) {
-                    ImmutableArray<ProgramElement> newA = new ImmutableArray<>(array);
-                    result = result.replace(sv, newA, services);
+                    result = result.replace(sv, new ImmutableArray<>(array), services);
                 }
             } else if (ie instanceof TermInstantiation) {
                 Term t = (Term) inst;
@@ -162,41 +159,29 @@ public final class ProgVarReplacer {
      * replaces in a sequent
      */
     public SequentChangeInfo replace(Sequent s) {
-        SemisequentChangeInfo anteCI = replace(s.antecedent());
-        SemisequentChangeInfo succCI = replace(s.succedent());
-
-        Semisequent newAntecedent = anteCI.semisequent();
-        Semisequent newSuccedent = succCI.semisequent();
-
-        Sequent newSequent = Sequent.createSequent(newAntecedent, newSuccedent);
-
-        SequentChangeInfo result =
-            SequentChangeInfo.createSequentChangeInfo(anteCI, succCI, newSequent, s);
-        return result;
+        return replaceInSemisequent(s.succedent(),
+            replaceInSemisequent(s.antecedent(), SequentChangeInfo.createSequentChangeInfo(s),
+                true),
+            false);
     }
 
-
-    /**
-     * replaces in a semisequent
-     */
-    public SemisequentChangeInfo replace(Semisequent s) {
-        SemisequentChangeInfo result = new SemisequentChangeInfo();
-        result.setFormulaList(s.asList());
-
-        final Iterator<SequentFormula> it = s.iterator();
-
-        for (int formulaNumber = 0; it.hasNext(); formulaNumber++) {
-            final SequentFormula oldcf = it.next();
-            final SequentFormula newcf = replace(oldcf);
-
-            if (newcf != oldcf) {
-                result.combine(result.semisequent().replace(formulaNumber, newcf));
+    private SequentChangeInfo replaceInSemisequent(Semisequent semi,
+            SequentChangeInfo resultInfo,
+            boolean inAntec) {
+        for (var sf : semi) {
+            final SequentFormula newcf = replace(sf);
+            if (newcf != sf) {
+                final PosInOccurrence pos =
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), inAntec);
+                // radical change need to force rebuild of taclet index, hence, we do not replace
+                // but remove and add
+                Sequent sequent = resultInfo.sequent();
+                resultInfo.combine(
+                    sequent.replaceFormula(sequent.formulaNumberInSequent(inAntec, sf), newcf));
             }
         }
-
-        return result;
+        return resultInfo;
     }
-
 
     /**
      * replaces in a constrained formula
@@ -204,7 +189,7 @@ public final class ProgVarReplacer {
     public SequentFormula replace(SequentFormula cf) {
         SequentFormula result = cf;
 
-        final Term newFormula = replace(cf.formula());
+        final Term newFormula = replace((Term) cf.formula());
 
         if (newFormula != cf.formula()) {
             result = new SequentFormula(newFormula);
@@ -232,9 +217,13 @@ public final class ProgVarReplacer {
 
         for (int i = 0, ar = t.arity(); i < ar; i++) {
             final Term subTerm = t.sub(i);
-            newSubTerms[i] = replace(subTerm);
-            if (newSubTerms[i] != subTerm) {
-                changedSubTerm = true;
+            if (subTerm.isRigid()) {
+                newSubTerms[i] = subTerm;
+            } else {
+                newSubTerms[i] = replace(subTerm);
+                if (newSubTerms[i] != subTerm) {
+                    changedSubTerm = true;
+                }
             }
         }
 
@@ -284,7 +273,7 @@ public final class ProgVarReplacer {
      */
     private Term replaceProgramVariableInLHSOfElementaryUpdate(Term t) {
         final Term newTerm = services.getTermBuilder().elementary(
-            (UpdateableOperator) map.get(((ElementaryUpdate) t.op()).lhs()),
+            map.get(((ElementaryUpdate) t.op()).lhs()),
             standardReplace(t.sub(0)));
         return newTerm;
     }

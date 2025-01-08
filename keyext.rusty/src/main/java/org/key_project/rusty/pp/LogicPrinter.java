@@ -8,13 +8,13 @@ import java.util.Set;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ldt.BoolLDT;
 import org.key_project.rusty.logic.RustyBlock;
-import org.key_project.rusty.logic.Semisequent;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.logic.op.*;
 import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -465,7 +465,7 @@ public class LogicPrinter {
      *
      * @param seq The Sequent to be pretty-printed
      */
-    public void printSequent(Sequent seq) {
+    public void printSequent(org.key_project.prover.sequent.Sequent seq) {
         layouter.beginC(0);
         printSequentInExistingBlock(seq);
         layouter.end();
@@ -473,8 +473,8 @@ public class LogicPrinter {
 
     private void printSequentInExistingBlock(Sequent seq) {
         try {
-            Semisequent antec = seq.antecedent();
-            Semisequent succ = seq.succedent();
+            org.key_project.prover.sequent.Semisequent antec = seq.antecedent();
+            org.key_project.prover.sequent.Semisequent succ = seq.succedent();
             layouter.markStartSub();
             layouter.startTerm(antec.size() + succ.size());
 

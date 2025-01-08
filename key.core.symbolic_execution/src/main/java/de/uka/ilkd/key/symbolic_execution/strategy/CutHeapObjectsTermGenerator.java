@@ -10,9 +10,6 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
@@ -20,6 +17,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 
 /**
  * This {@link TermGenerator} is used by the {@link SymbolicExecutionStrategy} to add early alias
@@ -33,18 +33,19 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
      * {@inheritDoc}
      */
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+    public Iterator<org.key_project.logic.Term> generate(RuleApp app, PosInOccurrence pos,
+            Goal goal,
             MutableState mState) {
         // Compute collect terms of sequent formulas
         Sequent sequent = goal.sequent();
-        Set<Term> topTerms = new LinkedHashSet<>();
-        for (SequentFormula sf : sequent) {
+        Set<org.key_project.logic.Term> topTerms = new LinkedHashSet<>();
+        for (final SequentFormula sf : sequent) {
             topTerms.add(sf.formula());
         }
         // Compute equality terms
         HeapLDT heapLDT = goal.node().proof().getServices().getTypeConverter().getHeapLDT();
-        Set<Term> equalityTerms = new LinkedHashSet<>();
-        for (SequentFormula sf : sequent) {
+        Set<org.key_project.logic.Term> equalityTerms = new LinkedHashSet<>();
+        for (final SequentFormula sf : sequent) {
             collectEqualityTerms(sf, equalityTerms, topTerms, heapLDT,
                 goal.node().proof().getServices());
         }
@@ -60,10 +61,11 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
      * @param heapLDT The {@link HeapLDT} to use.
      * @param services TODO
      */
-    protected void collectEqualityTerms(SequentFormula sf, Set<Term> equalityTerms,
-            Set<Term> topTerms, HeapLDT heapLDT, Services services) {
+    protected void collectEqualityTerms(SequentFormula sf,
+            Set<org.key_project.logic.Term> equalityTerms,
+            Set<org.key_project.logic.Term> topTerms, HeapLDT heapLDT, Services services) {
         // Collect objects (target of store operations on heap)
-        Set<Term> storeLocations = new LinkedHashSet<>();
+        Set<org.key_project.logic.Term> storeLocations = new LinkedHashSet<>();
         collectStoreLocations(sf.formula(), storeLocations, heapLDT);
         // Check if equality checks are possible
         if (storeLocations.size() >= 2) {
@@ -96,7 +98,8 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
      * @param heapLDT The {@link HeapLDT} to use (it provides the store and create
      *        {@link JFunction}).
      */
-    protected void collectStoreLocations(Term term, final Set<Term> storeLocations,
+    protected void collectStoreLocations(org.key_project.logic.Term term,
+            final Set<org.key_project.logic.Term> storeLocations,
             final HeapLDT heapLDT) {
         term.execPreOrder(new DefaultVisitor() {
             @Override

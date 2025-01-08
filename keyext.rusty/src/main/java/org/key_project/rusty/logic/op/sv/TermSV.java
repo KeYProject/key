@@ -31,6 +31,11 @@ public class TermSV extends OperatorSV implements TerminalSyntaxElement {
     }
 
     @Override
+    public boolean isTerm() {
+        return true;
+    }
+
+    @Override
     public void layout(Layouter<?> l) {
         l.print("\\schemaVar \\term ").print(sort().name().toString()).print(" ")
                 .print(name().toString());

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -38,6 +39,8 @@ import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -67,7 +70,7 @@ public final class SymbolicExecutionSideProofUtil {
      */
     public static Sequent computeGeneralSequentToProve(Sequent goalSequent,
             SequentFormula currentSF) {
-        Sequent sequentToProve = Sequent.EMPTY_SEQUENT;
+        Sequent sequentToProve = JavaDLSequentKit.getInstance().getEmptySequent();
         for (SequentFormula sf : goalSequent.antecedent()) {
             if (sf != currentSF) {
                 if (!containsModalityOrQuery(sf)) {
@@ -78,7 +81,8 @@ public final class SymbolicExecutionSideProofUtil {
         for (SequentFormula sf : goalSequent.succedent()) {
             if (sf != currentSF) {
                 if (!containsModalityOrQuery(sf)) {
-                    sequentToProve = sequentToProve.addFormula(sf, false, false).sequent();
+                    sequentToProve =
+                        sequentToProve.addFormula(sf, false, false).sequent();
                 }
             }
         }
@@ -123,19 +127,18 @@ public final class SymbolicExecutionSideProofUtil {
                 Sequent sequent = resultGoal.sequent();
                 List<Term> results = new LinkedList<>();
                 for (SequentFormula sf : sequent.antecedent()) {
-                    if (sf.formula().containsLabel(label)) {
-                        Term result = sf.formula();
-                        result = services.getTermBuilder().not(result);
-                        results.add(result);
+                    final Term result = (Term) sf.formula();
+                    if (result.containsLabel(label)) {
+                        results.add(services.getTermBuilder().not(result));
                     }
                 }
                 for (SequentFormula sf : sequent.succedent()) {
-                    if (sf.formula().containsLabel(label)) {
-                        Term result = sf.formula();
+                    final Term result = (Term) sf.formula();
+                    if (result.containsLabel(label)) {
                         results.add(result);
                     }
                 }
-                Term result;
+                final Term result;
                 if (results.isEmpty()) {
                     result = services.getTermBuilder().tt();
                 } else {
@@ -194,8 +197,9 @@ public final class SymbolicExecutionSideProofUtil {
                 Set<Term> resultConditions = new LinkedHashSet<>();
                 Term result = null;
                 for (SequentFormula sf : sequent.antecedent()) {
+                    final Term formula = (Term) sf.formula();
                     if (newPredicateIsSequentFormula) {
-                        if (Operator.opEquals(sf.formula().op(), operator)) {
+                        if (Operator.opEquals(formula.op(), operator)) {
                             throw new IllegalStateException(
                                 "Result predicate found in antecedent.");
                         } else {
@@ -209,19 +213,20 @@ public final class SymbolicExecutionSideProofUtil {
                     }
                     if (!isIrrelevantCondition(services, sequentToProve,
                         relevantThingsInSequentToProve, sf)) {
-                        if (resultConditions.add(sf.formula()) && addNamesToServices) {
-                            addNewNamesToNamespace(services, sf.formula());
+                        if (resultConditions.add(formula) && addNamesToServices) {
+                            addNewNamesToNamespace(services, formula);
                         }
                     }
                 }
                 for (SequentFormula sf : sequent.succedent()) {
+                    final Term formula = (Term) sf.formula();
                     if (newPredicateIsSequentFormula) {
-                        if (Operator.opEquals(sf.formula().op(), operator)) {
+                        if (Operator.opEquals(formula.op(), operator)) {
                             if (result != null) {
                                 throw new IllegalStateException(
                                     "Result predicate found multiple times in succedent.");
                             }
-                            result = sf.formula().sub(0);
+                            result = formula.sub(0);
                         }
                     } else {
                         Term constructedResult = constructResultIfContained(services, sf, operator);
@@ -236,9 +241,9 @@ public final class SymbolicExecutionSideProofUtil {
                     if (result == null) {
                         if (!isIrrelevantCondition(services, sequentToProve,
                             relevantThingsInSequentToProve, sf)) {
-                            if (resultConditions.add(services.getTermBuilder().not(sf.formula()))
+                            if (resultConditions.add(services.getTermBuilder().not(formula))
                                     && addNamesToServices) {
-                                addNewNamesToNamespace(services, sf.formula());
+                                addNewNamesToNamespace(services, formula);
                             }
                         }
                     }
@@ -255,9 +260,10 @@ public final class SymbolicExecutionSideProofUtil {
         }
     }
 
-    private static Term constructResultIfContained(Services services, SequentFormula sf,
+    private static Term constructResultIfContained(Services services,
+            SequentFormula sf,
             Operator operator) {
-        return constructResultIfContained(services, sf.formula(), operator);
+        return constructResultIfContained(services, (Term) sf.formula(), operator);
     }
 
     private static Term constructResultIfContained(Services services, Term term,
@@ -323,7 +329,8 @@ public final class SymbolicExecutionSideProofUtil {
      * @return {@code true} contains at least one modality or query, {@code false} contains no
      *         modalities and no queries.
      */
-    public static boolean containsModalityOrQuery(SequentFormula sf) {
+    public static boolean containsModalityOrQuery(
+            SequentFormula sf) {
         return containsModalityOrQuery(sf.formula());
     }
 
@@ -334,7 +341,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @return {@code true} contains at least one modality or query, {@code false} contains no
      *         modalities and no queries.
      */
-    public static boolean containsModalityOrQuery(Term term) {
+    public static boolean containsModalityOrQuery(org.key_project.logic.Term term) {
         ContainsModalityOrQueryVisitor visitor = new ContainsModalityOrQueryVisitor();
         term.execPostOrder(visitor);
         return visitor.isContainsModalityOrQuery();
@@ -438,7 +445,8 @@ public final class SymbolicExecutionSideProofUtil {
      *         {@link SequentFormula} is not a relevant condition.
      */
     public static boolean isIrrelevantCondition(Services services, Sequent initialSequent,
-            Set<Operator> relevantThingsInSequentToProve, SequentFormula sf) {
+            Set<Operator> relevantThingsInSequentToProve,
+            SequentFormula sf) {
         return initialSequent.antecedent().contains(sf) || initialSequent.succedent().contains(sf)
                 || containsModalityOrQuery(sf) // isInOrOfAntecedent(initialSequent, sf) ||
                 || containsIrrelevantThings(services, sf, relevantThingsInSequentToProve);
@@ -481,7 +489,8 @@ public final class SymbolicExecutionSideProofUtil {
      * @return {@code true} The {@link SequentFormula} contains irrelevant things, {@code false} the
      *         {@link SequentFormula} contains no irrelevant things.
      */
-    public static boolean containsIrrelevantThings(Services services, SequentFormula sf,
+    public static boolean containsIrrelevantThings(Services services,
+            SequentFormula sf,
             Set<Operator> relevantThings) {
         ContainsIrrelevantThingsVisitor visitor =
             new ContainsIrrelevantThingsVisitor(services, relevantThings);
@@ -491,7 +500,7 @@ public final class SymbolicExecutionSideProofUtil {
 
     /**
      * Utility class used by
-     * {@link #containsIrrelevantThings(Services, SequentFormula, Set)}.
+     * {@link #containsIrrelevantThings(Services, org.key_project.prover.sequent.SequentFormula, Set)}.
      *
      * @author Martin Hentschel
      */
@@ -700,13 +709,14 @@ public final class SymbolicExecutionSideProofUtil {
     public static Term extractOperatorTerm(Node node, final Operator operator) {
         assert node != null;
         // Search formula with the given operator in sequent (or in some cases below the updates)
-        SequentFormula sf = CollectionUtil.search(node.sequent(), element -> {
-            Term term = element.formula();
-            term = TermBuilder.goBelowUpdates(term);
-            return Objects.equals(term.op(), operator);
-        });
+        SequentFormula sf =
+            CollectionUtil.search(node.sequent(), element -> {
+                Term term = (Term) element.formula();
+                term = TermBuilder.goBelowUpdates(term);
+                return Objects.equals(term.op(), operator);
+            });
         if (sf != null) {
-            Term term = sf.formula();
+            Term term = (Term) sf.formula();
             term = TermBuilder.goBelowUpdates(term);
             return term;
         } else {

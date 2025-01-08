@@ -5,11 +5,11 @@ package org.key_project.rusty.proof;
 
 import java.util.Iterator;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.PosInOccurrence;
-import org.key_project.rusty.logic.PosInTerm;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
 import org.key_project.rusty.rule.NoPosTacletApp;
 import org.key_project.rusty.rule.TacletApp;
 import org.key_project.util.collection.DefaultImmutableMap;
@@ -17,9 +17,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 
 public class SemisequentTacletAppIndex {
-    private final Sequent seq;
+    private final org.key_project.prover.sequent.Sequent seq;
     private final boolean antec;
-    private ImmutableMap<SequentFormula, TermTacletAppIndex> termIndices =
+    private ImmutableMap<org.key_project.prover.sequent.SequentFormula, TermTacletAppIndex> termIndices =
         DefaultImmutableMap.nilMap();
 
     /**
@@ -46,10 +46,13 @@ public class SemisequentTacletAppIndex {
      * Add indices for the given formulas to the map <code>termIndices</code>. Existing entries are
      * replaced with the new indices. Note: destructive, use only when constructing new index
      */
-    private void addTermIndices(ImmutableList<SequentFormula> cfmas, Services services,
+    private void addTermIndices(
+            ImmutableList<? super org.key_project.prover.sequent.SequentFormula> cfmas,
+            Services services,
             TacletIndex tacletIndex) {
         while (!cfmas.isEmpty()) {
-            final SequentFormula cfma = cfmas.head();
+            final org.key_project.prover.sequent.SequentFormula cfma =
+                (org.key_project.prover.sequent.SequentFormula) cfmas.head();
             cfmas = cfmas.tail();
             addTermIndex(cfma, services, tacletIndex);
         }
@@ -59,7 +62,7 @@ public class SemisequentTacletAppIndex {
      * Add an index for the given formula to the map <code>termIndices</code>. An existing entry is
      * replaced with the new one. Note: destructive, use only when constructing new index
      */
-    private void addTermIndex(SequentFormula cfma, Services services,
+    private void addTermIndex(org.key_project.prover.sequent.SequentFormula cfma, Services services,
             TacletIndex tacletIndex) {
         final PosInOccurrence pos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
         termIndices = termIndices.put(cfma, TermTacletAppIndex.create(pos, services, tacletIndex));
@@ -98,7 +101,8 @@ public class SemisequentTacletAppIndex {
     public SemisequentTacletAppIndex addTaclet(NoPosTacletApp newTaclet, Services services,
             TacletIndex tacletIndex) {
         final SemisequentTacletAppIndex result = copy();
-        final Iterator<SequentFormula> it = termIndices.keyIterator();
+        final Iterator<org.key_project.prover.sequent.SequentFormula> it =
+            termIndices.keyIterator();
 
         while (it.hasNext()) {
             result.addTaclet(newTaclet, it.next(), services, tacletIndex);

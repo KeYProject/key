@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.StrategyProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -101,7 +101,8 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      * @param goal context
      * @return true if rule may be applied
      */
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio,
+    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
+            PosInOccurrence pio,
             Goal goal) {
         return true;
     }
@@ -182,7 +183,8 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+        public RuleAppCost computeCost(RuleApp ruleApp,
+                PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             // first try to apply
             // - impLeft on previous information flow contract application
@@ -211,7 +213,8 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+                Goal goal) {
             // abort if
             // - the parent.parent rule application is an information
             // flow contract rule application,

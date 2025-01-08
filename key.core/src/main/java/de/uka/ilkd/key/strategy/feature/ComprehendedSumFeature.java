@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import java.util.Iterator;
-
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -14,6 +10,9 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
+
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * A feature that computes the sum of the values of a feature term when a given variable ranges over
@@ -46,7 +45,7 @@ public class ComprehendedSumFeature implements Feature {
             MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
 
-        final Iterator<Term> it = generator.generate(app, pos, goal, mState);
+        final var it = generator.generate(app, pos, goal, mState);
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
         while (it.hasNext() && !(res instanceof TopRuleAppCost)) {
             var.setContent(it.next(), mState);

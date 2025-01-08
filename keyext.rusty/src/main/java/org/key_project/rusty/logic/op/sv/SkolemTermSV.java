@@ -30,6 +30,11 @@ public class SkolemTermSV extends OperatorSV implements TerminalSyntaxElement {
     }
 
     @Override
+    public boolean isSkolemTerm() {
+        return true;
+    }
+
+    @Override
     public void layout(Layouter<?> l) {
         l.print("\\schemaVar ");
         if (sort() == RustyDLTheory.FORMULA) {

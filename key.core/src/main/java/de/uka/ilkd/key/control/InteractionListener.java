@@ -5,7 +5,6 @@ package de.uka.ilkd.key.control;
 
 import java.util.List;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Node;
@@ -16,6 +15,8 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
 
+import org.key_project.prover.sequent.PosInOccurrence;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.12.18)
@@ -25,7 +26,8 @@ public interface InteractionListener {
 
     void runPrune(Node node);
 
-    void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc,
+    void runMacro(Node node, ProofMacro macro,
+            PosInOccurrence posInOcc,
             ProofMacroFinishedInfo info);
 
     void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos,

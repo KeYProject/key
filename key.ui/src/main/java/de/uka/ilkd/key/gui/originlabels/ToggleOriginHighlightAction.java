@@ -6,7 +6,6 @@ package de.uka.ilkd.key.gui.originlabels;
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -36,7 +35,7 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
         setName("Highlight Origins");
         setTooltip("When moving the mouse over a term in the sequent view,"
             + "highlight its origin in the source view.");
-        putValue(KeyAction.CHECKBOX, true);
+        putValue(CHECKBOX, true);
 
         ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().addPropertyChangeListener(
             event -> {

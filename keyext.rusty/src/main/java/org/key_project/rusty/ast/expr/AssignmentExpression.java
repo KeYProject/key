@@ -19,6 +19,7 @@ public final class AssignmentExpression implements Expr {
     private final Expr lhs;
     private final Expr rhs;
     private final Type type = TupleType.UNIT;
+    private int hashCode = -1;
 
     public AssignmentExpression(Expr lhs, Expr rhs) {
         this.lhs = lhs;
@@ -79,7 +80,12 @@ public final class AssignmentExpression implements Expr {
 
     @Override
     public int hashCode() {
-        return Objects.hash(lhs, rhs);
+        if (hashCode == -1) {
+            return hashCode;
+        }
+        final int hash = computeHashCode();
+        this.hashCode = hash;
+        return hash;
     }
 
     @Override

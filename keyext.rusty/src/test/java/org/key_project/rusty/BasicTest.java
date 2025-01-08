@@ -7,9 +7,12 @@ import java.io.File;
 import java.io.IOException;
 
 import org.key_project.logic.Name;
-import org.key_project.rusty.logic.*;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.*;
+import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.*;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.proof.init.RustProfile;
 import org.key_project.rusty.proof.io.ProofSaver;
 import org.key_project.rusty.rule.NoPosTacletApp;
@@ -27,12 +30,12 @@ public class BasicTest {
     public static final String STANDARD_RUST_RULES_KEY =
         "src/main/resources/org/key_project/rusty/proof/rules/standardRustRules.key";
 
-    private static Semisequent parseTermForSemisequent(String t) {
+    private static ImmutableList<SequentFormula> parseTermForSemisequent(String t) {
         if ("".equals(t)) {
-            return Semisequent.EMPTY_SEMISEQUENT;
+            return ImmutableSLList.nil();
         }
         SequentFormula cf0 = new SequentFormula(TacletForTests.parseTerm(t));
-        return Semisequent.EMPTY_SEMISEQUENT.insert(0, cf0).semisequent();
+        return ImmutableSLList.singleton(cf0);
     }
 
     private static Goal createGoal(Node n, TacletIndex tacletIndex) {
@@ -77,9 +80,9 @@ public class BasicTest {
     void testSimpleProgram() {
         TacletForTests.clear();
         TacletForTests.parse(new RustProfile());
-        Semisequent antec = parseTermForSemisequent("");
-        Semisequent succ = parseTermForSemisequent("\\<{ i = 2u32; i}\\>(i = 2)");
-        Sequent s = Sequent.createSequent(antec, succ);
+        var antec = parseTermForSemisequent("");
+        var succ = parseTermForSemisequent("\\<{ i = 2u32; i}\\>(i = 2)");
+        Sequent s = RustySequentKit.createSequent(antec, succ);
         var proof = new Proof(new Name("Simple"), s, TacletForTests.initConfig());
         applyRule("assignment",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
@@ -149,10 +152,10 @@ public class BasicTest {
     void testIf() {
         TacletForTests.clear();
         TacletForTests.parse(new RustProfile());
-        Semisequent antec = parseTermForSemisequent("");
-        Semisequent succ =
+        var antec = parseTermForSemisequent("");
+        var succ =
             parseTermForSemisequent("\\<{ b = false; if b {i = 3u32} else {i = 2u32} i}\\>(i = 2)");
-        Sequent s = Sequent.createSequent(antec, succ);
+        Sequent s = RustySequentKit.createSequent(antec, succ);
         var proof = new Proof(new Name("Simple"), s, TacletForTests.initConfig());
         applyRule("assignment",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
@@ -297,9 +300,8 @@ public class BasicTest {
             "i=i_old & j=j_old -> \\<{i = i + j; j = i - j; i = i - j; 1u32}\\>(i = j_old & j = i_old)");
         System.out.println(t);
 
-
-        Semisequent succ = new Semisequent(new SequentFormula(t));
-        Sequent s = Sequent.createSuccSequent(succ);
+        Sequent s =
+            RustySequentKit.createSuccSequent(ImmutableSLList.singleton(new SequentFormula(t)));
         Proof p = new Proof("FirstProof", TacletForTests.initConfig());
         p.setRoot(new Node(p, s));
 

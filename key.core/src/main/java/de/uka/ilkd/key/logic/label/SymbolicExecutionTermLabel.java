@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.Sequent;
 
 /**
  * Label attached to a symbolic execution thread.

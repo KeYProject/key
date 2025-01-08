@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Abstract superclass for features that have either zero cost or top cost.
@@ -22,7 +23,8 @@ public abstract class BinaryFeature implements Feature {
     /** Constant that represents the boolean value false */
     public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
+            Goal goal,
             MutableState mState) {
         return filter(app, pos, goal, mState) ? ZERO_COST : TOP_COST;
     }

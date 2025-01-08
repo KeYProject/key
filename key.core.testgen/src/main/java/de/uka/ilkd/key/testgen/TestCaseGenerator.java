@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
@@ -33,6 +32,7 @@ import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.java.StringUtil;
 
 import org.slf4j.Logger;
@@ -168,7 +168,7 @@ public class TestCaseGenerator {
         junitFormat = settings.useJunit();
         useRFL = settings.useRFL();
         modDir = computeProjectSubPath(services.getJavaModel().getModelDir());
-        dontCopy = modDir + File.separator + TestCaseGenerator.DONT_COPY;
+        dontCopy = modDir + File.separator + DONT_COPY;
         directory = settings.getOutputFolderPath();
         sortDummyClass = new HashMap<>();
         info = new ProofInfo(proof);
@@ -489,12 +489,12 @@ public class TestCaseGenerator {
                 JAVA_FILE_EXTENSION_WITH_DOT);
         }
         createOpenJMLShellScript();
-        TestCaseGenerator.fileCounter++;
+        fileCounter++;
         return testSuite.toString();
     }
 
     public void initFileName() {
-        fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
+        fileName = "TestGeneric" + fileCounter;
         String mut = getMUTCall();
         if (mut == null) {
             mut = "<method under test> //Manually write a call to the method under test, "
@@ -523,7 +523,7 @@ public class TestCaseGenerator {
                 boolean success = false;
                 if (solver.getSocket().getQuery() != null) {
                     final Model m = solver.getSocket().getQuery().getModel();
-                    if (TestCaseGenerator.modelIsOK(m)) {
+                    if (modelIsOK(m)) {
                         logger.writeln("Generate: " + originalNodeName);
                         Map<String, Sort> typeInfMap =
                             generateTypeInferenceMap(solver.getProblem().getGoal().node());
@@ -602,15 +602,15 @@ public class TestCaseGenerator {
 
     protected Map<String, Sort> generateTypeInferenceMap(Node n) {
         HashMap<String, Sort> typeInfMap = new HashMap<>();
-        for (SequentFormula sequentFormula : n.sequent()) {
-            Term t = sequentFormula.formula();
-            generateTypeInferenceMapHelper(t, typeInfMap);
+        for (final SequentFormula sf : n.sequent()) {
+            generateTypeInferenceMapHelper(sf.formula(), typeInfMap);
         }
         return typeInfMap;
     }
 
-    private void generateTypeInferenceMapHelper(Term t, Map<String, Sort> map) {
-        Operator op = t.op();
+    private void generateTypeInferenceMapHelper(org.key_project.logic.Term t,
+            Map<String, Sort> map) {
+        final var op = t.op();
         if (op instanceof ProgramVariable) {
             ProgramVariable pv = (ProgramVariable) t.op();
             final String name = pv.name().toString();
@@ -656,7 +656,7 @@ public class TestCaseGenerator {
         }
     }
 
-    private ProgramVariable getProgramVariable(Term locationTerm) {
+    private ProgramVariable getProgramVariable(org.key_project.logic.Term locationTerm) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         ProgramVariable result = null;
         if (locationTerm.op() instanceof JFunction function) {

@@ -10,8 +10,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -32,7 +32,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  */
 public class MethodBodyStatement extends JavaNonTerminalProgramElement
-        implements Statement, NonTerminalProgramElement {
+        implements Statement {
 
     /**
      * the variable the result of the method execution is assigned to if the method is declared void

@@ -113,7 +113,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param initConfig The {@link InitConfig} to use.
      * @param name The name to use.
      */
-    public AbstractOperationPO(InitConfig initConfig, String name) {
+    protected AbstractOperationPO(InitConfig initConfig, String name) {
         this(initConfig, name, false, false);
     }
 
@@ -127,7 +127,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
      *        to the modality, {@code false} to not label the modality.
      */
-    public AbstractOperationPO(InitConfig initConfig, String name,
+    protected AbstractOperationPO(InitConfig initConfig, String name,
             boolean addUninterpretedPredicate, boolean addSymbolicExecutionLabel) {
         super(initConfig, name);
         this.addUninterpretedPredicate = addUninterpretedPredicate;
@@ -228,8 +228,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return {@code true} is set, {@code false} is not set.
      */
     public static boolean isAddUninterpretedPredicate(Configuration properties) {
-        String value = properties.getString(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE);
-        return value != null && !value.isEmpty() ? Boolean.parseBoolean(value) : false;
+        String value = properties.getString(PROPERTY_ADD_UNINTERPRETED_PREDICATE);
+        return value != null && !value.isEmpty() && Boolean.parseBoolean(value);
     }
 
     /**
@@ -239,8 +239,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return {@code true} is set, {@code false} is not set.
      */
     public static boolean isAddSymbolicExecutionLabel(Configuration properties) {
-        String value = properties.getString(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL);
-        return value != null && !value.isEmpty() ? Boolean.parseBoolean(value) : false;
+        String value = properties.getString(PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL);
+        return value != null && !value.isEmpty() && Boolean.parseBoolean(value);
     }
 
     private static void collectHeapAtPres(final List<LocationVariable> modifiableHeaps,
@@ -498,11 +498,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
     public Configuration createLoaderConfig() {
         final Configuration c = super.createLoaderConfig();
         if (isAddUninterpretedPredicate()) {
-            c.set(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE,
+            c.set(PROPERTY_ADD_UNINTERPRETED_PREDICATE,
                 String.valueOf(isAddUninterpretedPredicate()));
         }
         if (isAddSymbolicExecutionLabel()) {
-            c.set(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL,
+            c.set(PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL,
                 String.valueOf(isAddSymbolicExecutionLabel()));
         }
         return c;

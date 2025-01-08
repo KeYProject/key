@@ -21,7 +21,7 @@ public abstract class AbstractSort implements Sort {
      */
     private @Nullable String documentation;
 
-    public AbstractSort(Name name, boolean isAbstract) {
+    protected AbstractSort(Name name, boolean isAbstract) {
         this.name = name;
         this.isAbstract = isAbstract;
     }

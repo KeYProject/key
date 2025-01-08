@@ -5,7 +5,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -79,7 +79,7 @@ public class QueryExpandCost implements Feature {
             MutableState mState) {
         final Services services = goal.proof().getServices();
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        final Term t = pos.subTerm();
+        final Term t = (Term) pos.subTerm();
 
         long cost = baseCost;
 
@@ -171,15 +171,17 @@ public class QueryExpandCost implements Feature {
      * @param goal The goal.
      * @return The number of repetitive rule applications.
      */
-    protected int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected int queryExpandAlreadyAppliedAtPos(RuleApp app,
+            PosInOccurrence pos, Goal goal) {
         int count = 0;
         ImmutableList<RuleApp> appliedRuleApps = goal.appliedRuleApps();
         if (appliedRuleApps != null && !appliedRuleApps.isEmpty()) {
             for (RuleApp appliedRuleApp : appliedRuleApps) {
-                final PosInOccurrence pio = appliedRuleApp.posInOccurrence();
+                final PosInOccurrence pio =
+                    appliedRuleApp.posInOccurrence();
                 if (pio != null) {
-                    final Term oldterm = pio.subTerm();
-                    final Term curterm = pos.subTerm();
+                    final Term oldterm = (Term) pio.subTerm();
+                    final Term curterm = (Term) pos.subTerm();
                     if (appliedRuleApp.rule().equals(QueryExpand.INSTANCE)
                             && oldterm.equalsModProperty(curterm,
                                 IRRELEVANT_TERM_LABELS_PROPERTY)) {

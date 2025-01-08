@@ -5,8 +5,12 @@ package org.key_project.rusty.rule.executor.rustydl;
 
 import java.util.Iterator;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.FormulaChangeInfo;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.*;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
@@ -14,12 +18,12 @@ import org.key_project.util.collection.ImmutableList;
 
 public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         extends TacletExecutor<TacletKind> {
-    public FindTacletExecutor(TacletKind taclet) {
+    protected FindTacletExecutor(TacletKind taclet) {
         super(taclet);
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, org.key_project.prover.rules.RuleApp ruleApp) {
         final var services = goal.getOverlayServices();
         // Number without the if-goal eventually needed
         final int numberOfNewGoals = taclet.goalTemplates().size();
@@ -28,21 +32,21 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         final MatchConditions mc = tacletApp.matchConditions();
 
         final ImmutableList<SequentChangeInfo> newSequentsForGoals =
-            checkIfGoals(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
+            checkAssumesGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
 
         final ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
-        final Iterator<TacletGoalTemplate> it = taclet.goalTemplates().iterator();
         final Iterator<Goal> goalIt = newGoals.iterator();
-        final Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
+        final Iterator<SequentChangeInfo> newSequentsIt =
+            newSequentsForGoals.iterator();
 
-        while (it.hasNext()) {
-            final TacletGoalTemplate gt = it.next();
+        for (var nextGT : taclet.goalTemplates()) {
+            final var gt = (TacletGoalTemplate) nextGT;
             final Goal currentGoal = goalIt.next();
             final SequentChangeInfo currentSequent = newSequentsIt.next();
 
             applyReplacewith(gt, currentSequent, tacletApp.posInOccurrence(), mc,
-                currentGoal, ruleApp, services);
+                currentGoal, tacletApp, services);
 
             /*
              * update position information, as original formula may no longer be in the current
@@ -52,7 +56,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
                 updatePositionInformation(tacletApp, gt, currentSequent);
 
             applyAdd(gt.sequent(), currentSequent, posWhereToAdd,
-                tacletApp.posInOccurrence(), mc, goal, ruleApp, services);
+                tacletApp.posInOccurrence(), mc, goal, tacletApp, services);
 
             applyAddrule(gt.rules(), currentGoal, services, mc);
 
@@ -98,7 +102,8 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param ruleApp the {@link TacletApp} describing the current ongoing taclet application
      * @param services the {@link Services} encapsulating all Rust model information
      */
-    protected abstract void applyAdd(Sequent add, SequentChangeInfo currentSequent,
+    protected abstract void applyAdd(org.key_project.prover.sequent.Sequent add,
+            SequentChangeInfo currentSequent,
             PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
             MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services);
 

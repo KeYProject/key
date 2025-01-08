@@ -19,9 +19,7 @@ import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -33,7 +31,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 
 import org.key_project.logic.Name;
-import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
@@ -126,7 +126,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             return false;
         }
 
-        final Term progPost = splitUpdates(pio.subTerm(), goal.proof().getServices()).second;
+        final Term progPost = splitUpdates((Term) pio.subTerm(), goal.proof().getServices()).second;
         final var kind = ((Modality) progPost.op()).<Modality.JavaModalityKind>kind();
 
         return !InfFlowCheckInfo.isInfFlow(goal) && !WellDefinednessCheck.isOn() // TODO: Remove
@@ -334,7 +334,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * @param initGoal The goal containing the "initially valid" PO.
      * @return The {@link SequentFormula} for the "initially valid" goal.
      */
-    private SequentFormula initFormula(TermLabelState termLabelState, Instantiation inst,
+    private SequentFormula initFormula(TermLabelState termLabelState,
+            Instantiation inst,
             final Term invTerm, Term reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
 
@@ -422,7 +423,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         if (prefixElems.size() > 0
                 && (prefixElems.last() instanceof LabeledStatement lastLabeledStmt)
-                && ((LabeledStatement) prefixElems.last()).getBody().equals(whileLoop)) {
+                && lastLabeledStmt.getBody().equals(whileLoop)) {
             loopLabel = Optional.of(lastLabeledStmt.getLabel());
             stmtToRepl = lastLabeledStmt.getBody();
         }

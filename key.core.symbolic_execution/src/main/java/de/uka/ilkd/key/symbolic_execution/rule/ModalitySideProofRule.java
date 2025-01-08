@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -27,7 +24,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
-import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
@@ -94,8 +94,8 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             if (Transformer.inTransformer(pio)) {
                 return false;
             }
-            Term term = pio.subTerm();
-            term = TermBuilder.goBelowUpdates(term);
+            var t = pio.subTerm();
+            Term term = TermBuilder.goBelowUpdates(t);
             if (term.op() instanceof Modality
                     && SymbolicExecutionUtil.getSymbolicExecutionLabel(term) == null) {
                 Term equalityTerm = term.sub(0);
@@ -134,7 +134,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
         try {
             // Extract required Terms from goal
             PosInOccurrence pio = ruleApp.posInOccurrence();
-            Term topLevelTerm = pio.subTerm();
+            Term topLevelTerm = (Term) pio.subTerm();
             Pair<ImmutableList<Term>, Term> updatesAndTerm =
                 TermBuilder.goBelowUpdates2(topLevelTerm);
             Term modalityTerm = updatesAndTerm.second;
@@ -169,7 +169,8 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                     .cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true);
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
-                    .computeGeneralSequentToProve(goal.sequent(), pio.sequentFormula());
+                    .computeGeneralSequentToProve(goal.sequent(),
+                        pio.sequentFormula());
             JFunction newPredicate = createResultFunction(sideProofServices, varTerm.sort());
             final TermBuilder tb = sideProofServices.getTermBuilder();
             Term newTerm = tb.func(newPredicate, varTerm);

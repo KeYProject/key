@@ -13,7 +13,6 @@ import java.util.stream.StreamSupport;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * The macro {@link AutoMacro} is a customizable {@link ProofMacro} for use in proof scripts. It is
@@ -229,8 +229,8 @@ public class AutoMacro extends StrategyProofMacro {
             }
 
             if (isJavaPIO(pio)) {
-                final SourceElement activeStmt = //
-                        JavaTools.getActiveStatement(pio.subTerm().javaBlock());
+                var term = (de.uka.ilkd.key.logic.Term) pio.subTerm();final SourceElement activeStmt = //
+                        JavaTools.getActiveStatement(term.javaBlock());
                 final String currStmtString = activeStmt.toString();
 
                 if (currStmtString != null && //
@@ -245,8 +245,7 @@ public class AutoMacro extends StrategyProofMacro {
         }
 
         private boolean isJavaPIO(PosInOccurrence pio) {
-            return pio != null
-                    && pio.subTerm().javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
+            if(pio==null) return false;var term = (de.uka.ilkd.key.logic.Term) pio.subTerm();return term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
         }
 
         @Override

@@ -30,10 +30,7 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -44,6 +41,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
@@ -55,7 +53,11 @@ import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
-import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -185,8 +187,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     private static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
             Services services) throws RuleAbortException {
-        final Term focusTerm = app.posInOccurrence().subTerm();
-
+        final Term focusTerm = (Term) app.posInOccurrence().subTerm();
 
         // leading update?
         final Pair<Term, Term> update = applyUpdates(focusTerm, services);
@@ -438,7 +439,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         infFlowGoal.setBranchLabel("Information Flow Validity");
 
         // clear goal
-        infFlowGoal.node().setSequent(Sequent.EMPTY_SEQUENT);
+        infFlowGoal.node().setSequent(JavaDLSequentKit.getInstance().getEmptySequent());
         infFlowGoal.clearAndDetachRuleAppIndex();
 
         // prepare data
@@ -546,7 +547,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    private SequentFormula initFormula(TermLabelState termLabelState, Instantiation inst,
+    private SequentFormula initFormula(TermLabelState termLabelState,
+            Instantiation inst,
             final Term invTerm, Term reachableState, Services services, Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
         Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
@@ -662,7 +664,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (Transformer.inTransformer(pio)) {
             return false;
         }
-        Pair<Term, Term> up = applyUpdates(pio.subTerm(), g.proof().getServices());
+        Pair<Term, Term> up = applyUpdates((Term) pio.subTerm(), g.proof().getServices());
         final Term progPost = up.second;
         if (!checkFocus(progPost)) {
             return false;
@@ -792,7 +794,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         for (ProgramVariable pv : localOuts) {
-            final String pvBeforeLoopName = tb.newName(pv.name().toString() + "Before_LOOP");
+            final String pvBeforeLoopName = tb.newName(pv.name() + "Before_LOOP");
             final LocationVariable pvBeforeLoop =
                 new LocationVariable(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType());
             services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
@@ -864,9 +866,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         // prepare common assumption
-        final Term[] uAnon = new Term[] { inst.u, anonUpdate };
+        final Term[] uAnon = { inst.u, anonUpdate };
         final Term[] uBeforeLoopDefAnonVariant =
-            new Term[] { inst.u, beforeLoopUpdate, anonUpdate, variantUpdate };
+            { inst.u, beforeLoopUpdate, anonUpdate, variantUpdate };
         final Term uAnonInv =
             tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
 

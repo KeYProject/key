@@ -10,44 +10,30 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleAppUtil;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
@@ -138,7 +124,8 @@ public abstract class AbstractProofReplayer {
         builtinIfInsts = ImmutableSLList.nil();
         for (PosInOccurrence oldFormulaPio : RuleAppUtil
                 .ifInstsOfRuleApp(originalStep.getAppliedRuleApp(), originalStep)) {
-            PosInOccurrence newFormula = findInNewSequent(oldFormulaPio, currGoal.sequent());
+            PosInOccurrence newFormula =
+                findInNewSequent(oldFormulaPio, currGoal.sequent());
             if (newFormula == null) {
                 throw new IllegalStateException(String.format(
                     "did not locate built-in ifInst during slicing @ rule name %s, serial nr %d",
@@ -156,7 +143,8 @@ public abstract class AbstractProofReplayer {
 
         if (originalStep.getAppliedRuleApp().posInOccurrence() != null) { // otherwise we have no
                                                                           // pos
-            PosInOccurrence oldPos = originalStep.getAppliedRuleApp().posInOccurrence();
+            PosInOccurrence oldPos =
+                originalStep.getAppliedRuleApp().posInOccurrence();
             pos = findInNewSequent(oldPos, currGoal.sequent());
             if (pos == null) {
                 throw new IllegalStateException("failed to find new formula");
@@ -174,8 +162,9 @@ public abstract class AbstractProofReplayer {
             } else {
                 useContractRule = UseDependencyContractRule.INSTANCE;
                 // copy over the mysterious "step"
-                PosInOccurrence step = findInNewSequent(((UseDependencyContractApp) ruleApp).step(),
-                    currGoal.sequent());
+                PosInOccurrence step =
+                    findInNewSequent(((UseDependencyContractApp) ruleApp).step(),
+                        currGoal.sequent());
                 contractApp = (((UseDependencyContractRule) useContractRule)
                         .createApp(pos)).setContract(currContract).setStep(step);
             }
@@ -239,7 +228,9 @@ public abstract class AbstractProofReplayer {
             // find the correct taclet
             for (NoPosTacletApp partialApp : currGoal.indexOfTaclets()
                     .getPartialInstantiatedApps()) {
-                if (partialApp.equalsModProofIrrelevancy(originalTacletApp)) {
+                if ((Object) originalTacletApp instanceof TacletApp cmp
+                        && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(partialApp,
+                            cmp)) {
                     ourApp = partialApp;
                     break;
                 }
@@ -256,7 +247,8 @@ public abstract class AbstractProofReplayer {
         }
         Services services = proof.getServices();
 
-        PosInOccurrence oldPos = originalStep.getAppliedRuleApp().posInOccurrence();
+        PosInOccurrence oldPos =
+            originalStep.getAppliedRuleApp().posInOccurrence();
         if (oldPos != null) { // otherwise we have no pos
             pos = findInNewSequent(oldPos, currGoal.sequent());
             if (pos == null) {
@@ -275,7 +267,7 @@ public abstract class AbstractProofReplayer {
         ourApp = IntermediateProofReplayer.constructInsts(ourApp, currGoal,
             getInterestingInstantiations(instantantions), services);
 
-        ImmutableList<IfFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
+        ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
         List<Pair<PosInOccurrence, Boolean>> oldFormulas = RuleAppUtil
                 .ifInstsOfRuleApp(originalStep.getAppliedRuleApp(), originalStep)
                 .stream()
@@ -283,10 +275,10 @@ public abstract class AbstractProofReplayer {
                 .collect(Collectors.toList());
         // add direct instantiations
         if (tacletApp instanceof PosTacletApp posTacletApp) {
-            if (posTacletApp.ifFormulaInstantiations() != null) {
-                for (IfFormulaInstantiation x : posTacletApp.ifFormulaInstantiations()) {
-                    if (x instanceof IfFormulaInstDirect) {
-                        oldFormulas.add(new Pair<>(new PosInOccurrence(x.getConstrainedFormula(),
+            if (posTacletApp.assumesFormulaInstantiations() != null) {
+                for (AssumesFormulaInstantiation x : posTacletApp.assumesFormulaInstantiations()) {
+                    if (x instanceof AssumesFormulaInstDirect) {
+                        oldFormulas.add(new Pair<>(new PosInOccurrence(x.getSequentFormula(),
                             PosInTerm.getTopLevel(), true), false));
                     }
                 }
@@ -294,7 +286,8 @@ public abstract class AbstractProofReplayer {
         }
         for (Pair<PosInOccurrence, Boolean> oldFormulaPioSpec : oldFormulas) {
             PosInOccurrence oldFormulaPio = oldFormulaPioSpec.first;
-            PosInOccurrence newPio = findInNewSequent(oldFormulaPio, currGoal.sequent());
+            PosInOccurrence newPio =
+                findInNewSequent(oldFormulaPio, currGoal.sequent());
             if (newPio == null) {
                 throw new IllegalStateException(String.format(
                     "did not locate ifInst during slicing @ rule name %s, serial nr %d",
@@ -303,11 +296,11 @@ public abstract class AbstractProofReplayer {
             }
             if (oldFormulaPioSpec.second) {
                 ifFormulaList = ifFormulaList.append(
-                    new IfFormulaInstSeq(currGoal.sequent(), oldFormulaPio.isInAntec(),
+                    new AssumesFormulaInstSeq(currGoal.sequent(), oldFormulaPio.isInAntec(),
                         newPio.sequentFormula()));
             } else {
                 ifFormulaList = ifFormulaList.append(
-                    new IfFormulaInstDirect(newPio.sequentFormula()));
+                    new AssumesFormulaInstDirect(newPio.sequentFormula()));
             }
         }
 
@@ -326,19 +319,21 @@ public abstract class AbstractProofReplayer {
 
     /**
      * Try to find the provided formula in the provided sequent,
-     * using {@link org.key_project.util.EqualsModProofIrrelevancy} to check for equality.
+     * using equality modulo proof irrelevancy.
      *
      * @param oldPos formula to look for
      * @param newSequent sequent
      * @return the formula in the sequent, or null if not found
      */
-    private PosInOccurrence findInNewSequent(PosInOccurrence oldPos, Sequent newSequent) {
+    private PosInOccurrence findInNewSequent(PosInOccurrence oldPos,
+            Sequent newSequent) {
         SequentFormula oldFormula = oldPos.sequentFormula();
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()
                 : newSequent.succedent();
         for (SequentFormula newFormula : semiSeq.asList()) {
-            if (newFormula.equalsModProofIrrelevancy(oldFormula)) {
-                return oldPos.replaceConstrainedFormula(newFormula);
+            if ((Object) oldFormula instanceof SequentFormula that
+                    && EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(newFormula, that)) {
+                return oldPos.replaceSequentFormula(newFormula);
             }
         }
         return null;
@@ -353,8 +348,7 @@ public abstract class AbstractProofReplayer {
     public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
         Collection<String> s = new ArrayList<>();
 
-        for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair : inst
-                .interesting()) {
+        for (final var pair : inst.interesting()) {
             final SchemaVariable var = pair.key();
 
             final Object value = pair.value().getInstantiation();

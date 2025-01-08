@@ -173,11 +173,8 @@ public class ProofCollectionSettings {
         String reloadEnabled = get(RELOAD_ENABLED);
         if (reloadEnabled == null || reloadEnabled.equals("true") || reloadEnabled.isEmpty()) {
             return true;
-        } else if (reloadEnabled.equals("false")) {
-            return false;
-        } else {
-            return true;
-        }
+        } else
+            return !reloadEnabled.equals("false");
     }
 
     /**

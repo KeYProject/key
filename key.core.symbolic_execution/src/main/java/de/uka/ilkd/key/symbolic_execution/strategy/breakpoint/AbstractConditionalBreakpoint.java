@@ -33,6 +33,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.SyntaxElement;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -108,7 +110,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param methodEnd the line the containing method of this breakpoint ends at
      * @param containerType the type of the element containing the breakpoint
      */
-    public AbstractConditionalBreakpoint(int hitCount, IProgramMethod pm, Proof proof,
+    protected AbstractConditionalBreakpoint(int hitCount, IProgramMethod pm, Proof proof,
             boolean enabled, boolean conditionEnabled, int methodStart, int methodEnd,
             KeYJavaType containerType) {
         super(hitCount, proof, enabled);
@@ -354,9 +356,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         try {
             // initialize values
             PosInOccurrence pio = ruleApp.posInOccurrence();
-            Term term = pio.subTerm();
+            var t = pio.subTerm();
             getProof().getServices().getTermBuilder();
-            term = TermBuilder.goBelowUpdates(term);
+            Term term = TermBuilder.goBelowUpdates(t);
             IExecutionContext ec =
                 JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
             // put values into map which have to be replaced

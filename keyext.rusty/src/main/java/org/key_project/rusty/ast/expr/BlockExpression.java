@@ -27,6 +27,8 @@ public class BlockExpression implements Expr, PossibleProgramPrefix, ThenBranch,
     protected final Expr value;
     private final int prefixLength;
 
+    private int hashCode = -1;
+
     public BlockExpression(ImmutableList<Statement> statements, Expr value) {
         this.statements = statements;
         this.value = value;
@@ -45,7 +47,7 @@ public class BlockExpression implements Expr, PossibleProgramPrefix, ThenBranch,
     public @NonNull SyntaxElement getChild(int n) {
         if (0 <= n && n < statements.size())
             return Objects.requireNonNull(statements.get(n));
-        if (n == statements.size())
+        if (n == statements.size() && value != null)
             return value;
         throw new IndexOutOfBoundsException("BlockExpression has less than " + n + " children");
     }
@@ -79,30 +81,6 @@ public class BlockExpression implements Expr, PossibleProgramPrefix, ThenBranch,
         }
         sb.append("}");
         return sb.toString();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj == null || obj.getClass() != this.getClass()) {
-            return false;
-        }
-        final var other = (BlockExpression) obj;
-        if (value == null && other.value != null || value != null && !value.equals(other.value)) {
-            return false;
-        }
-        return statements.equals(other.statements) && prefixLength == other.prefixLength;
-    }
-
-    @Override
-    public int hashCode() {
-        int hashcode = 5;
-        hashcode = 31 * hashcode + statements.hashCode();
-        hashcode = 31 * hashcode + (value == null ? 0 : value.hashCode());
-        hashcode = 31 * hashcode + prefixLength;
-        return hashcode;
     }
 
     @Override
@@ -165,5 +143,26 @@ public class BlockExpression implements Expr, PossibleProgramPrefix, ThenBranch,
     @Override
     public Type type(Services services) {
         return value == null ? TupleType.UNIT : value.type(services);
+    }
+
+    @Override
+    public int hashCode() {
+        if (hashCode == -1) {
+            return hashCode;
+        }
+        final int hash = computeHashCode();
+        this.hashCode = hash;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        BlockExpression that = (BlockExpression) o;
+        return prefixLength == that.prefixLength && Objects.equals(statements, that.statements)
+                && Objects.equals(value, that.value);
     }
 }

@@ -4,13 +4,12 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -35,7 +34,8 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
 
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
 
@@ -60,7 +60,7 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
     private class LiteralCollector extends Collector {
 
         protected void collect(Term te) {
-            final Operator op = te.op();
+            final var op = te.op();
             if (op == locSetLDT.getUnion() || op == locSetLDT.getIntersect()
                     || op == locSetLDT.getDisjoint()) {
                 collect(te.sub(0));

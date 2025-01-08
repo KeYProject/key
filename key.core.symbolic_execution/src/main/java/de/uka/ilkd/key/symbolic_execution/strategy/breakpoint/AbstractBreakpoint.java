@@ -28,7 +28,7 @@ public abstract class AbstractBreakpoint implements IBreakpoint {
      * @param proof The {@link Proof} in which this {@link IBreakpoint} is used.
      * @param enabled The enabled state.
      */
-    public AbstractBreakpoint(Proof proof, boolean enabled) {
+    protected AbstractBreakpoint(Proof proof, boolean enabled) {
         this.proof = proof;
         this.enabled = enabled;
     }

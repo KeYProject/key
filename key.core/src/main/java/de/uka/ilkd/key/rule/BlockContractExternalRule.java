@@ -8,7 +8,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -27,7 +26,8 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
@@ -148,7 +148,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate =
             updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiableClauses);
-        final Term[] updates = new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
+        final Term[] updates = { contextUpdate, remembranceUpdate, anonymisationUpdate };
         return updates;
     }
 
@@ -183,7 +183,8 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
+    public boolean isApplicable(final Goal goal,
+            final PosInOccurrence occurrence) {
         return !InfFlowCheckInfo.isInfFlow(goal) && super.isApplicable(goal, occurrence);
     }
 
@@ -200,7 +201,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         }
 
         final Instantiation instantiation =
-            instantiate(application.posInOccurrence().subTerm(), goal);
+            instantiate((Term) application.posInOccurrence().subTerm(), goal);
         final BlockContract contract = application.getContract();
         contract.setInstantiationSelf(instantiation.self());
         assert contract.getBlock().equals(instantiation.statement());

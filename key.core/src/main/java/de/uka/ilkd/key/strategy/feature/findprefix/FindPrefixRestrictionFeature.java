@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 
 /**
@@ -58,7 +59,8 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
             this.modifier = modifier;
         }
 
-        PosInOccurrence modifyPosistion(PosInOccurrence pos) {
+        PosInOccurrence modifyPosistion(
+                PosInOccurrence pos) {
             return modifier.modifyPosistion(pos);
         }
     }
@@ -107,7 +109,8 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         // apply the position modifiers

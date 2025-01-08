@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.label;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -16,6 +15,7 @@ import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -31,7 +31,7 @@ public class LoopInvariantNormalBehaviorTermLabelUpdate implements TermLabelUpda
      */
     @Override
     public ImmutableList<Name> getSupportedRuleNames() {
-        return ImmutableSLList.<Name>nil().append(WhileInvariantRule.INSTANCE.name());
+        return ImmutableSLList.singleton(WhileInvariantRule.INSTANCE.name());
     }
 
     /**

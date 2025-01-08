@@ -34,7 +34,7 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
      * @param root the ProgramElement where to begin
      * @param services the Services object
      */
-    public RustyASTVisitor(RustyProgramElement root, Services services) {
+    protected RustyASTVisitor(RustyProgramElement root, Services services) {
         super(root);
         this.services = services;
     }

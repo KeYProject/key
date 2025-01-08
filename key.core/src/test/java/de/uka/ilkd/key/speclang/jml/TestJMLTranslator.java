@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
@@ -25,7 +24,6 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -185,7 +183,7 @@ public class TestJMLTranslator {
             services.getNamespaces().sorts().lookup(new Name("int")));
         Term expected = TB.all(i, TB.imp(TB.inInt(TB.var(i)),
             TB.and(TB.leq(TB.zTerm("0"), TB.var(i)), TB.leq(TB.var(i), TB.zTerm("2147483647")))));
-        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected),
             "Result was: " + result + "; \nExpected was: " + expected);
         assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -204,7 +202,7 @@ public class TestJMLTranslator {
             services.getNamespaces().sorts().lookup(new Name("int")));
         Term expected = TB.ex(i, TB.and(TB.inInt(TB.var(i)),
             TB.and(TB.leq(TB.zTerm("0"), TB.var(i)), TB.leq(TB.var(i), TB.zTerm("2147483647")))));
-        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected),
             "Result was: " + result + "; \nExpected was: " + expected);
         assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -222,8 +220,8 @@ public class TestJMLTranslator {
         Term expected = TB.func(services.getTypeConverter().getIntegerLDT().getModuloInt(),
             TB.bsum(i, TB.zTerm("0"), TB.zTerm("2147483647"), TB.var(i)));
         assertNotNull(result);
-        Assertions.assertSame(q, result.sub(0).op());
-        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
+        assertSame(q, result.sub(0).op());
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected),
             "Result was: " + result + "; \nExpected was: " + expected);
         assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -239,8 +237,8 @@ public class TestJMLTranslator {
         LogicVariable i = new LogicVariable(new Name("i"), nss.sorts().lookup(new Name("int")));
         Term expected = TB.bsum(i, TB.zTerm("0"), TB.zTerm("2147483647"), TB.var(i));
         assertNotNull(result);
-        Assertions.assertSame(q, result.op());
-        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
+        assertSame(q, result.op());
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected),
             "Result was: " + result + "; \nExpected was: " + expected);
         assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -255,12 +253,12 @@ public class TestJMLTranslator {
         Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
             new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
-        Assertions.assertSame(unionOp, result.op());
+        assertSame(unionOp, result.op());
         Term guard = TB.and(TB.convertToFormula(TB.created(TB.var(o))),
             TB.not(TB.equals(TB.var(o), TB.NULL())));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[] { o },
             TB.ife(guard, TB.empty(), TB.empty()));
-        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected),
             "Result was: " + result + "; \nExpected was: " + expected);
         assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -276,12 +274,12 @@ public class TestJMLTranslator {
         Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
             new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
-        Assertions.assertSame(unionOp, result.op());
+        assertSame(unionOp, result.op());
         Term guard =
             TB.or(TB.convertToFormula(TB.created(TB.var(o))), TB.equals(TB.var(o), TB.NULL()));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[] { o },
             TB.ife(guard, TB.empty(), TB.empty()));
-        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected),
             "Result was: " + result + "; \nExpected was: " + expected);
         assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
             expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
@@ -465,7 +463,7 @@ public class TestJMLTranslator {
                     TB.not(TB.equals(TB.var(qv), TB.NULL()))), // implicit non null
                 TB.equals(TB.var(qv), TB.var(selfVar))));
 
-        final boolean condition = result.equalsModProperty(expected, RENAMING_TERM_PROPERTY);
+        final boolean condition = RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected);
         assertTrue(condition, format("Expected:%s\n Was:%s",
             ProofSaver.printTerm(expected, services), ProofSaver.printTerm(result, services)));
     }
@@ -496,7 +494,7 @@ public class TestJMLTranslator {
             fail("Cannot parse " + expected, e);
         }
 
-        if (!tTrans.equalsModProperty(tExp, TERM_LABELS_PROPERTY)) {
+        if (!TERM_LABELS_PROPERTY.equalsModThisProperty(tTrans, tExp)) {
             // this gives nicer error
             assertEquals(tExp, tTrans);
         }

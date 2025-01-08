@@ -31,12 +31,11 @@ public final class TermSV extends OperatorSV implements TerminalSyntaxElement {
 
     @Override
     public String toString() {
-        return toString(sort().toString() + " term");
+        return toString(sort() + " term");
     }
 
     @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\term ").print(sort().name().toString()).print(" ")
-                .print(name().toString());
+    public boolean isTerm() {
+        return true;
     }
 }

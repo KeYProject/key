@@ -6,7 +6,6 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
@@ -14,6 +13,7 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
 
 /**
  * {@link Strategy} used to simplify {@link Term}s in side proofs.
@@ -53,14 +53,14 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
         Feature labelFeature = (app, pos, goal, mState) -> {
             boolean hasLabel = false;
             if (pos != null && app instanceof TacletApp) {
-                Term findTerm = pos.subTerm();
+                Term findTerm = (Term) pos.subTerm();
                 if (!findTerm.containsLabel(SymbolicExecutionUtil.RESULT_LABEL)) {
                     // Term with result label is not used in find term and thus is not allowed
                     // to be used in an assumes clause
                     TacletApp ta = (TacletApp) app;
-                    if (ta.ifFormulaInstantiations() != null) {
-                        for (IfFormulaInstantiation ifi : ta.ifFormulaInstantiations()) {
-                            if (ifi.getConstrainedFormula().formula()
+                    if (ta.assumesFormulaInstantiations() != null) {
+                        for (AssumesFormulaInstantiation ifi : ta.assumesFormulaInstantiations()) {
+                            if (((Term) ifi.getSequentFormula().formula())
                                     .containsLabel(SymbolicExecutionUtil.RESULT_LABEL)) {
                                 hasLabel = true;
                             }

@@ -9,13 +9,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.VariableCondition;
 
 /**
  * Variable condition that enforces a given generic sort to be instantiated with the type of a field
@@ -44,13 +45,14 @@ public final class FieldTypeToSortCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
-            MatchConditions matchCond, Services services) {
+            MatchConditions matchCond, LogicServices services) {
 
         if (var != exprOrTypeSV) {
             return matchCond;
         }
 
-        final SVInstantiations inst = matchCond.getInstantiations();
+        final de.uka.ilkd.key.rule.inst.SVInstantiations inst =
+            (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
 
         if (svSubst instanceof Term) {
             Operator op = ((Term) svSubst).op();
@@ -61,7 +63,8 @@ public final class FieldTypeToSortCondition implements VariableCondition {
                 }
 
                 ProgramVariable attribute =
-                    services.getJavaInfo().getAttribute(split.attributeName(), split.className());
+                    ((Services) services).getJavaInfo().getAttribute(split.attributeName(),
+                        split.className());
 
                 if (attribute == null) {
                     return null;

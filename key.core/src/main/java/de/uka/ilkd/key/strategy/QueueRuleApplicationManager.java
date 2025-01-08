@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.Feature;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;

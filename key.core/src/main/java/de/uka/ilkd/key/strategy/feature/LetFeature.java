@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 
 /**
@@ -35,7 +35,7 @@ public class LetFeature implements Feature {
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
-        final Term outerVarContent = var.getContent(mState);
+        final var outerVarContent = var.getContent(mState);
 
         var.setContent(value.toTerm(app, pos, goal, mState), mState);
         final RuleAppCost res = body.computeCost(app, pos, goal, mState);

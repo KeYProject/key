@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -205,14 +206,14 @@ public final class ArrayUtil {
      * @return A copy of the array without the element toRemove.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends @Nullable Object> T[] remove(T[] array, T toRemove) {
+    public static <T extends @Nullable Object> T[] remove(@NonNull T[] array, T toRemove) {
         List<T> result = new LinkedList<>();
         for (T element : array) {
             if (!Objects.equals(element, toRemove)) {
                 result.add(element);
             }
         }
-        return (T[]) result.toArray((T[]) java.lang.reflect.Array
+        return result.toArray((T[]) java.lang.reflect.Array
                 .newInstance(getComponentType(array), result.size()));
     }
 

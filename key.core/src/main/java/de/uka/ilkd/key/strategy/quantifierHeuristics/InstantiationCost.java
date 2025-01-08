@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -11,6 +10,8 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Feature that returns the number of branches after instantiated the quantifier formula.
@@ -34,8 +35,8 @@ public class InstantiationCost implements Feature {
             MutableState mState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
-        final Term formula = pos.sequentFormula().formula();
-        final Term instance = varInst.toTerm(app, pos, goal, mState);
+        final Term formula = (Term) pos.sequentFormula().formula();
+        final var instance = varInst.toTerm(app, pos, goal, mState);
 
         return Instantiation.computeCost(instance, formula, goal.sequent(),
             goal.proof().getServices());

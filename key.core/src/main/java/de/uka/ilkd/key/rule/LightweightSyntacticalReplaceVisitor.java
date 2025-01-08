@@ -12,12 +12,12 @@ import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -136,8 +136,8 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
 
     private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
         final UpdateableOperator originalLhs = op.lhs();
-        if (originalLhs instanceof SchemaVariable) {
-            Object lhsInst = svInst.getInstantiation((SchemaVariable) originalLhs);
+        if (originalLhs instanceof SchemaVariable originalLhsAsSV) {
+            Object lhsInst = svInst.getInstantiation(originalLhsAsSV);
             if (lhsInst instanceof Term) {
                 lhsInst = ((Term) lhsInst).op();
             }
@@ -177,13 +177,11 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
                 instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
         } else if (p_operatorToBeInstantiated instanceof Modality mod) {
             instantiatedOp = instantiateModality(mod, jb);
-        } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
-            if (p_operatorToBeInstantiated instanceof ProgramSV
-                    && ((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
+        } else if (p_operatorToBeInstantiated instanceof SchemaVariable sv) {
+            if (sv instanceof ProgramSV opSV && opSV.isListSV()) {
                 instantiatedOp = p_operatorToBeInstantiated;
             } else {
-                instantiatedOp =
-                    (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
+                instantiatedOp = (Operator) svInst.getInstantiation(sv);
             }
         }
         assert instantiatedOp != null;
@@ -227,10 +225,10 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
     public void visit(final Term visited) {
         // Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
-        if (visitedOp instanceof SchemaVariable && visitedOp.arity() == 0
-                && svInst.isInstantiated((SchemaVariable) visitedOp)
-                && (!(visitedOp instanceof ProgramSV && (((ProgramSV) visitedOp).isListSV())))) {
-            final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp,
+        if (visitedOp instanceof SchemaVariable visitedSV && visitedOp.arity() == 0
+                && svInst.isInstantiated(visitedSV)
+                && (!(visitedOp instanceof ProgramSV visitedPSV && visitedPSV.isListSV()))) {
+            final Term newTerm = toTerm(svInst.getTermInstantiation(visitedSV,
                 svInst.getExecutionContext(), services));
             pushNew(newTerm);
         } else {

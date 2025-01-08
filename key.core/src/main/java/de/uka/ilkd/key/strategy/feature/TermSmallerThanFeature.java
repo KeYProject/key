@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * Feature that returns zero iff one term is smaller than another term in the current term ordering

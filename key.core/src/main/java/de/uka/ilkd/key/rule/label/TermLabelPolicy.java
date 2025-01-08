@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -13,6 +11,9 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
+
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 
 
 /**
@@ -55,7 +56,8 @@ public interface TermLabelPolicy {
      *         parameters) or {@code null} if the {@link TermLabel} should be dropped.
      */
     TermLabel keepLabel(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm,
             Term newTerm, TermLabel label);
 }

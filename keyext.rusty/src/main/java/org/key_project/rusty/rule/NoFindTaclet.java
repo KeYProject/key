@@ -7,8 +7,11 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.rules.TacletAttributes;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.rusty.rule.executor.rustydl.NoFindTacletExecutor;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -35,11 +38,13 @@ public class NoFindTaclet extends Taclet {
      *        SchemaVariable in the Taclet
      */
     public NoFindTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs,
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ChoiceExpr choices, ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
-            choices, tacletAnnotations);
+          choices,  tacletAnnotations);
         createTacletServices();
     }
 
@@ -52,8 +57,8 @@ public class NoFindTaclet extends Taclet {
      * @return Set of schemavariables of {@code if} and the (optional) find part
      */
     @Override
-    public ImmutableSet<SchemaVariable> getIfFindVariables() {
-        return getIfVariables();
+    public ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> getAssumesAndFindVariables() {
+        return getAssumesVariables();
     }
 
     /**
@@ -69,11 +74,13 @@ public class NoFindTaclet extends Taclet {
 
     @Override
     public NoFindTaclet setName(String s) {
-        final TacletApplPart applPart = new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(),
-            varsNewDependingOn(), getVariableConditions());
-        final TacletAttributes attrs = new TacletAttributes(displayName(), null);
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
+        final var attrs = new TacletAttributes(displayName(), null);
 
-        return new NoFindTaclet(new Name(s), applPart, goalTemplates(), ruleSets, attrs,
+        return new NoFindTaclet(new Name(s), applPart,
+            goalTemplates(), ruleSets, attrs,
             prefixMap, choices, tacletAnnotations);
     }
 }

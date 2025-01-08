@@ -29,6 +29,11 @@ public class VariableSV extends OperatorSV implements QuantifiableVariable, Term
     }
 
     @Override
+    public boolean isVariable() {
+        return true;
+    }
+
+    @Override
     public void layout(Layouter<?> l) {
         l.print("\\schemaVar \\variables ").print(sort().name().toString()).print(" ")
                 .print(name().toString());

@@ -5,7 +5,8 @@ package org.key_project.rusty.proof.init;
 
 
 import java.io.IOException;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;

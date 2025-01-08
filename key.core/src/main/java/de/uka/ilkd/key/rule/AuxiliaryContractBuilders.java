@@ -42,6 +42,8 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -432,7 +434,7 @@ public final class AuxiliaryContractBuilders {
                 LocationVariable value = entry.getValue();
 
                 String newName =
-                    services.getTermBuilder().newName(value.name().toString() + suffix);
+                    services.getTermBuilder().newName(value.name() + suffix);
                 LocationVariable newValue =
                     new LocationVariable(new ProgramElementName(newName), value.getKeYJavaType());
 
@@ -644,7 +646,7 @@ public final class AuxiliaryContractBuilders {
             return buildAnonOutUpdate(
                 MiscTools.getLocalOuts(el, services).stream()
                         .filter(LocationVariable.class::isInstance)
-                        .map(LocationVariable.class::cast).collect(Collectors.toSet()),
+                        .map(locationVariable -> locationVariable).collect(Collectors.toSet()),
                 anonymisationHeaps, modifiableClauses, prefix);
         }
 
@@ -1164,7 +1166,8 @@ public final class AuxiliaryContractBuilders {
         public GoalsConfigurator(final AbstractAuxiliaryContractBuiltInRuleApp application,
                 final TermLabelState termLabelState, final Instantiation instantiation,
                 final List<Label> labels, final AuxiliaryContract.Variables variables,
-                final PosInOccurrence occurrence, final Services services,
+                final PosInOccurrence occurrence,
+                final Services services,
                 final AbstractAuxiliaryContractRule rule) {
             this.application = application;
             this.termLabelState = termLabelState;
@@ -1206,7 +1209,7 @@ public final class AuxiliaryContractBuilders {
             LocationVariable continuedLoopVariable =
                 AbstractAuxiliaryContractRule.createLocalVariable("continuedLoop",
                     services.getJavaInfo().getKeYJavaType("boolean"), services);
-            final LocationVariable[] loopVariables = new LocationVariable[] { conditionVariable,
+            final LocationVariable[] loopVariables = { conditionVariable,
                 brokeLoopVariable, continuedLoopVariable };
             return loopVariables;
         }
@@ -1367,7 +1370,8 @@ public final class AuxiliaryContractBuilders {
             services.getSpecificationRepository().addWdStatement(bwd);
             final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
             final Term anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
-            final SequentFormula wdBlock = bwd.generateSequent(variables.self, variables.exception,
+            final SequentFormula wdBlock = bwd.generateSequent(
+                variables.self, variables.exception,
                 variables.result, heap, heapAtPre, anon, localIns, update, anonUpdate, services);
 
             if (goal != null) {
@@ -1375,7 +1379,7 @@ public final class AuxiliaryContractBuilders {
                 goal.changeFormula(wdBlock, occurrence);
             }
 
-            return wdBlock.formula();
+            return (Term) wdBlock.formula();
         }
 
         /**
@@ -1727,7 +1731,7 @@ public final class AuxiliaryContractBuilders {
                 terms.exception);
             postNext = TermLabelManager.refactorTerm(termLabelState, services, null, postNext, rule,
                 goal, AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT, null);
-            final Term[] posts = new Term[] { post, postNext };
+            final Term[] posts = { post, postNext };
             return posts;
         }
     }

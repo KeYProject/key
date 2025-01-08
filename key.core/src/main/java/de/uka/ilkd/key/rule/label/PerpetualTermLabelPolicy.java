@@ -4,12 +4,13 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * This policy always maintains a label.

@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -54,7 +53,15 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.AssumesFormulaInstSeq;
+import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -227,9 +234,8 @@ public class IntermediateProofReplayer {
                     proof.getServices().getNameRecorder()
                             .setProposals(currInterm.getIntermediateRuleApp().getNewNames());
 
-                    if (currInterm.getIntermediateRuleApp() instanceof TacletAppIntermediate) {
-                        TacletAppIntermediate appInterm =
-                            (TacletAppIntermediate) currInterm.getIntermediateRuleApp();
+                    if (currInterm
+                            .getIntermediateRuleApp() instanceof TacletAppIntermediate appInterm) {
 
                         try {
                             currGoal.apply(constructTacletApp(appInterm, currGoal));
@@ -260,13 +266,11 @@ public class IntermediateProofReplayer {
                         }
 
                     } else if (currInterm
-                            .getIntermediateRuleApp() instanceof BuiltInAppIntermediate) {
-                        BuiltInAppIntermediate appInterm =
-                            (BuiltInAppIntermediate) currInterm.getIntermediateRuleApp();
+                            .getIntermediateRuleApp() instanceof BuiltInAppIntermediate appInterm) {
 
                         if (appInterm instanceof MergeAppIntermediate joinAppInterm) {
                             HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo =
-                                joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
+                                joinPartnerNodes.get(joinAppInterm.getId());
 
                             if (partnerNodesInfo == null
                                     || partnerNodesInfo.size() < joinAppInterm.getNrPartners()) {
@@ -334,7 +338,8 @@ public class IntermediateProofReplayer {
 
                             partnerNodeInfo.add(new Triple<>(
                                 currNode,
-                                PosInOccurrence.findInSequent(currGoal.sequent(),
+                                PosInOccurrence.findInSequent(
+                                    currGoal.sequent(),
                                     appInterm.getPosInfo().first, appInterm.getPosInfo().second),
                                 currNodeInterm));
                         } else {
@@ -458,7 +463,8 @@ public class IntermediateProofReplayer {
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
-                pos = PosInOccurrence.findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
+                pos = PosInOccurrence
+                        .findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
 
                 /*
                  * part of the fix for #1716: ensure that position of find term
@@ -484,11 +490,11 @@ public class IntermediateProofReplayer {
 
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(), services);
 
-        ImmutableList<IfFormulaInstantiation> ifFormulaList =
-            ImmutableSLList.nil();
+        ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
             ifFormulaList =
-                ifFormulaList.append(new IfFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
+                ifFormulaList
+                        .append(new AssumesFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
         }
         for (String ifFormulaStr : currInterm.getIfDirectFormulaList()) {
             // MU 2019: #1487. We have to use the right namespaces to not
@@ -496,7 +502,8 @@ public class IntermediateProofReplayer {
             NamespaceSet nss = currGoal.getLocalNamespaces();
             Term term = parseTerm(ifFormulaStr, proof, nss.variables(), nss.programVariables(),
                 nss.functions());
-            ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(new SequentFormula(term)));
+            ifFormulaList =
+                ifFormulaList.append(new AssumesFormulaInstDirect(new SequentFormula(term)));
         }
 
         if (!ourApp.ifInstsCorrectSize(ifFormulaList)) {
@@ -512,7 +519,7 @@ public class IntermediateProofReplayer {
             }
 
             TacletApp newApp = instApps.head();
-            ifFormulaList = newApp.ifFormulaInstantiations();
+            ifFormulaList = newApp.assumesFormulaInstantiations();
         }
 
         // TODO: In certain cases, the below method call returns null and
@@ -568,8 +575,10 @@ public class IntermediateProofReplayer {
                 final PosInTerm currIfInstPosInTerm = ifInstP.second;
 
                 try {
-                    final PosInOccurrence ifInst = PosInOccurrence.findInSequent(currGoal.sequent(),
-                        currIfInstFormula, currIfInstPosInTerm);
+                    final PosInOccurrence ifInst =
+                        PosInOccurrence.findInSequent(
+                            currGoal.sequent(),
+                            currIfInstFormula, currIfInstPosInTerm);
                     builtinIfInsts = builtinIfInsts.append(ifInst);
                 } catch (RuntimeException | AssertionError e) {
                     reportError(
@@ -624,7 +633,8 @@ public class IntermediateProofReplayer {
                 throw new SkipSMTRuleException();
             } else {
                 String name = smtProblem.getSuccessfulSolver().name();
-                ImmutableList<PosInOccurrence> unsatCore = SMTFocusResults.getUnsatCore(smtProblem);
+                ImmutableList<PosInOccurrence> unsatCore =
+                    SMTFocusResults.getUnsatCore(smtProblem);
                 if (unsatCore != null) {
                     return SMTRuleApp.RULE.createApp(name, unsatCore);
                 } else {
@@ -638,7 +648,8 @@ public class IntermediateProofReplayer {
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
-                pos = PosInOccurrence.findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
+                pos = PosInOccurrence
+                        .findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
             } catch (RuntimeException e) {
                 throw new BuiltInConstructionException("Wrong position information.", e);
             }

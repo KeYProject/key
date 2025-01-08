@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
  * This feature returns zero if and only if the focus of the given rule application exists, is not
@@ -33,7 +34,7 @@ public abstract class DirectlyBelowFeature extends BinaryFeature {
         if (pos.isTopLevel()) {
             return false;
         }
-        if (!isBadSymbol(pos.up().subTerm().op())) {
+        if (!isBadSymbol((Operator) pos.up().subTerm().op())) {
             return false;
         }
         return index == -1 || index == pos.getIndex();

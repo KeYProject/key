@@ -8,8 +8,6 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -18,11 +16,13 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.op.Modifier;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 
 public abstract class SuperTermGenerator implements TermGenerator {
@@ -36,7 +36,8 @@ public abstract class SuperTermGenerator implements TermGenerator {
     public static TermGenerator upwards(TermFeature cond, final Services services) {
         return new SuperTermGenerator(cond) {
             @Override
-            protected Iterator<Term> createIterator(PosInOccurrence focus, MutableState mState) {
+            protected Iterator<Term> createIterator(
+                    PosInOccurrence focus, MutableState mState) {
                 return new UpwardsIterator(focus, mState, services);
             }
         };
@@ -45,18 +46,21 @@ public abstract class SuperTermGenerator implements TermGenerator {
     public static TermGenerator upwardsWithIndex(TermFeature cond, final Services services) {
         return new SuperTermWithIndexGenerator(cond) {
             @Override
-            protected Iterator<Term> createIterator(PosInOccurrence focus, MutableState mState) {
+            protected Iterator<Term> createIterator(
+                    PosInOccurrence focus, MutableState mState) {
                 return new UpwardsIterator(focus, mState, services);
             }
         };
     }
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos,
+            Goal goal,
             MutableState mState) {
         return createIterator(pos, mState);
     }
 
-    protected abstract Iterator<Term> createIterator(PosInOccurrence focus, MutableState mState);
+    protected abstract Iterator<Term> createIterator(
+            PosInOccurrence focus, MutableState mState);
 
     protected Term generateOneTerm(Term superterm, int child) {
         return superterm;
@@ -75,7 +79,8 @@ public abstract class SuperTermGenerator implements TermGenerator {
         }
 
         @Override
-        public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+        public Iterator<Term> generate(RuleApp app,
+                PosInOccurrence pos, Goal goal,
                 MutableState mState) {
             if (services == null) {
                 services = goal.proof().getServices();
@@ -92,8 +97,9 @@ public abstract class SuperTermGenerator implements TermGenerator {
         }
 
         protected Term generateOneTerm(Term superterm, int child) {
-            final Term index = services.getTermBuilder().zTerm(String.valueOf(child));
-            return services.getTermBuilder().tf().createTerm(binFunc, superterm, index);
+            final var index = services.getTermBuilder().zTerm(String.valueOf(child));
+            return services.getTermBuilder().tf().createTerm(binFunc,
+                (de.uka.ilkd.key.logic.Term) superterm, index);
         }
 
         private static class SuperTermGeneratedOp

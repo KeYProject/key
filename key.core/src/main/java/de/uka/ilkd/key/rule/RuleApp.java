@@ -3,19 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.Goal;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.collection.ImmutableList;
+import org.key_project.prover.sequent.PosInOccurrence;
 
-import org.jspecify.annotations.Nullable;
 
 /**
  * rule application with specific information how and where the rule has to be applied
  */
 public interface RuleApp
-        extends org.key_project.ncore.rules.RuleApp<Goal>, EqualsModProofIrrelevancy {
+        extends org.key_project.prover.rules.RuleApp {
 
     /**
      * returns the rule of this rule application
@@ -27,14 +23,4 @@ public interface RuleApp
      * corresponding formula) of this rule application
      */
     PosInOccurrence posInOccurrence();
-
-    /**
-     * applies the specified rule at the specified position if all schema variables have been
-     * instantiated
-     *
-     * @param goal the Goal where to apply the rule
-     * @return list of new created goals
-     */
-    @Nullable
-    ImmutableList<Goal> execute(Goal goal);
 }

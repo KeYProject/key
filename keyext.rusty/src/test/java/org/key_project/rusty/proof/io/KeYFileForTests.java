@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.parser.KeYIO;
 import org.key_project.rusty.proof.init.Profile;
 import org.key_project.rusty.proof.init.ProofInputException;

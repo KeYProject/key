@@ -11,9 +11,9 @@ import java.util.List;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.parser.builder.*;
 import org.key_project.rusty.proof.init.ProblemInitializer;
 import org.key_project.rusty.rule.Taclet;

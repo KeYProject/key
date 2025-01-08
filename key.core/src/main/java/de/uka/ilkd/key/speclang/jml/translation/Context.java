@@ -31,13 +31,17 @@ public record Context(@NonNull SpecMathMode specMathMode,@NonNull KeYJavaType cl
  */
 private static @Nullable LocationVariable createSelfVar(TermBuilder tb,KeYJavaType classType,boolean isStaticContext){return isStaticContext?null:tb.selfVar(classType,false);}
 
-/**
- * Constructs a new context in the given program method
- *
- * @param pm program method
- * @param tb term builder
- */
-public static Context inMethod(@NonNull IProgramMethod pm,TermBuilder tb){var classType=pm.getContainerType();var selfVar=createSelfVar(tb,classType,pm.isStatic());return Context.inMethodWithSelfVar(pm,selfVar);}
+    /**
+     * Constructs a new context in the given program method
+     *
+     * @param pm program method
+     * @param tb term builder
+     */
+    public static Context inMethod(@NonNull IProgramMethod pm, TermBuilder tb) {
+        var classType = pm.getContainerType();
+        var selfVar = createSelfVar(tb, classType, pm.isStatic());
+        return inMethodWithSelfVar(pm, selfVar);
+    }
 
 /**
  * Constructs a new context in the given program method using the given self var

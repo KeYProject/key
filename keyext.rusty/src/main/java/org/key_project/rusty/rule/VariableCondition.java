@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
@@ -16,7 +17,7 @@ import org.key_project.rusty.logic.op.sv.SchemaVariable;
  * white answers there exists a convenience class
  * .
  */
-public interface VariableCondition {
+public interface VariableCondition extends org.key_project.prover.rules.VariableCondition {
     /**
      * checks if the condition for a correct instantiation is fulfilled
      *
@@ -31,4 +32,12 @@ public interface VariableCondition {
     MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions matchCond,
             Services services);
+
+    @Override
+    default org.key_project.prover.rules.MatchConditions check(
+            org.key_project.logic.op.sv.SchemaVariable var, SyntaxElement instCandidate,
+            org.key_project.prover.rules.MatchConditions matchCond, LogicServices services) {
+        return check((SchemaVariable) var, instCandidate, (MatchConditions) matchCond,
+            (Services) services);
+    }
 }

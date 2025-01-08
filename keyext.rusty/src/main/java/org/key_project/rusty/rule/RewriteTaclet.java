@@ -6,17 +6,20 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.ChoiceExpr;
-import org.key_project.rusty.logic.PIOPathIterator;
-import org.key_project.rusty.logic.PosInOccurrence;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.rules.TacletAttributes;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.PIOPathIterator;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.logic.op.IfThenElse;
 import org.key_project.rusty.logic.op.Junctor;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.UpdateApplication;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.rule.executor.rustydl.RewriteTacletExecutor;
 import org.key_project.rusty.rule.inst.SVInstantiations;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -116,22 +119,23 @@ public class RewriteTaclet extends FindTaclet {
      *        for location check)
      */
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
-            TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs, Term find,
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ApplicationRestriction p_applicationRestriction,
-            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+          ChoiceExpr choices,  ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
             p_applicationRestriction, choices, false, tacletAnnotations);
     }
 
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ApplicationRestriction p_applicationRestriction, ChoiceExpr choices,
-            boolean surviveSymbExec,
-            ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
-            choices, surviveSymbExec, tacletAnnotations);
+            ApplicationRestriction p_applicationRestriction, boolean surviveSymbExec,
+           ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        super(name, applPart, goalTemplates, attrs, find, prefixMap,
+           choices, surviveSymbExec, tacletAnnotations);
         applicationRestriction = p_applicationRestriction;
         createTacletServices();
     }
@@ -198,11 +202,14 @@ public class RewriteTaclet extends FindTaclet {
 
     @Override
     public RewriteTaclet setName(String s) {
-        final TacletApplPart applPart = new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(),
-            varsNewDependingOn(), getVariableConditions());
-        final TacletAttributes attrs = new TacletAttributes(displayName(), null);
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
+        final TacletAttributes attrs =
+            new TacletAttributes(displayName(), null);
 
-        return new RewriteTaclet(new Name(s), applPart, goalTemplates(), ruleSets, attrs, find,
+        return new RewriteTaclet(new Name(s), applPart, goalTemplates(),
+            ruleSets, attrs, find,
             prefixMap, applicationRestriction, choices, tacletAnnotations);
     }
 

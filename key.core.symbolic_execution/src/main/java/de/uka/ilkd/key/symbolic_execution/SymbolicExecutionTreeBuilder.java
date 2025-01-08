@@ -37,6 +37,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
@@ -249,7 +251,8 @@ public class SymbolicExecutionTreeBuilder {
     protected void initMethodCallStack(final Node root, Services services) {
         // Find all modalities in the succedent
         final List<Term> modalityTerms = new LinkedList<>();
-        for (SequentFormula sequentFormula : root.sequent().succedent()) {
+        for (SequentFormula sequentFormula : root.sequent()
+                .succedent()) {
             sequentFormula.formula().execPreOrder(new DefaultVisitor() {
                 @Override
                 public void visit(Term visited) {
@@ -1286,7 +1289,8 @@ public class SymbolicExecutionTreeBuilder {
             if (seNodeFound) {
                 int currentStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
                 SourceElement currentActiveStatement = NodeInfo.computeActiveStatement(ruleApp);
-                JavaBlock currentJavaBlock = ruleApp.posInOccurrence().subTerm().javaBlock();
+                Term term = (Term) ruleApp.posInOccurrence().subTerm();
+                JavaBlock currentJavaBlock = term.javaBlock();
                 MethodFrame currentInnerMostMethodFrame =
                     JavaTools.getInnermostMethodFrame(currentJavaBlock, proof.getServices());
                 return !isAfterBlockReached(currentStackSize, currentInnerMostMethodFrame,
@@ -1371,7 +1375,8 @@ public class SymbolicExecutionTreeBuilder {
                 // Compute stack and active statement
                 int stackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
                 SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
-                JavaBlock javaBlock = ruleApp.posInOccurrence().subTerm().javaBlock();
+                Term term = (Term) ruleApp.posInOccurrence().subTerm();
+                JavaBlock javaBlock = term.javaBlock();
                 MethodFrame innerMostMethodFrame =
                     JavaTools.getInnermostMethodFrame(javaBlock, proof.getServices());
                 // Create copy with values below level
@@ -1529,8 +1534,8 @@ public class SymbolicExecutionTreeBuilder {
      * @return {@code true} is not implicit, {@code false} is implicit
      */
     protected boolean isNotInImplicitMethod(Node node) {
-        Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
-        term = TermBuilder.goBelowUpdates(term);
+        var t = node.getAppliedRuleApp().posInOccurrence().subTerm();
+        Term term = TermBuilder.goBelowUpdates(t);
         Services services = proof.getServices();
         IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), services);
         IProgramMethod pm = ec.getMethodContext();
@@ -1570,7 +1575,8 @@ public class SymbolicExecutionTreeBuilder {
      * @param childPIO The {@link PosInOccurrence} where the modality has a new symbolic execution
      *        label counter.
      */
-    protected void initNewMethodCallStack(Node currentNode, PosInOccurrence childPIO) {
+    protected void initNewMethodCallStack(Node currentNode,
+            PosInOccurrence childPIO) {
         Term newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
         assert newModality != null;
         SymbolicExecutionTermLabel label =
@@ -1580,7 +1586,7 @@ public class SymbolicExecutionTreeBuilder {
         MethodFrameCounterJavaASTVisitor newCounter =
             new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
         int newCount = newCounter.run();
-        Term oldModality = currentNode.getAppliedRuleApp().posInOccurrence().subTerm();
+        var oldModality = currentNode.getAppliedRuleApp().posInOccurrence().subTerm();
         oldModality = TermBuilder.goBelowUpdates(oldModality);
         Map<Node, ImmutableList<Node>> currentMethodCallStackMap =
             getMethodCallStack(currentNode.getAppliedRuleApp());

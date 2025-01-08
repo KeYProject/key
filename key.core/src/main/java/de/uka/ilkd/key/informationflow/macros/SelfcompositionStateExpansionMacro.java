@@ -7,7 +7,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -62,12 +62,14 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof,
+            PosInOccurrence posInOcc) {
         return new SelfCompExpansionStrategy(getAdmittedRuleNames());
     }
 
     @Override
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio,
+    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
+            PosInOccurrence pio,
             Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
         return !"andLeft".equals(ruleName)
@@ -83,7 +85,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
      * no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
+            PosInOccurrence posInOcc) {
 
         if (proof == null) {
             return false;
@@ -124,7 +127,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+        public RuleAppCost computeCost(RuleApp ruleApp,
+                PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
@@ -143,7 +147,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+                Goal goal) {
             return true;
         }
 

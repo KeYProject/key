@@ -5,9 +5,9 @@ package org.key_project.rusty.rule.executor.rustydl;
 
 import java.util.Iterator;
 
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentChangeInfo;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.*;
 import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
@@ -25,32 +25,32 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
      * @param ruleApp the taclet application that is executed
      */
     @Override
-    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, org.key_project.prover.rules.RuleApp ruleApp) {
         // Number without the if-goal eventually needed
         int numberOfNewGoals = taclet.goalTemplates().size();
 
-        var tacletApp = (TacletApp) ruleApp;
+        final var tacletApp = (TacletApp) ruleApp;
         MatchConditions mc = tacletApp.matchConditions();
 
         ImmutableList<SequentChangeInfo> newSequentsForGoals =
-            checkIfGoals(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
+            checkAssumesGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
 
         ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
-        Iterator<TacletGoalTemplate> it = taclet.goalTemplates().iterator();
+        var it = taclet.goalTemplates().iterator();
         Iterator<Goal> goalIt = newGoals.iterator();
         Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
 
         final var services = goal.getOverlayServices();
         while (it.hasNext()) {
-            TacletGoalTemplate gt = it.next();
+            TacletGoalTemplate gt = (TacletGoalTemplate) it.next();
             Goal currentGoal = goalIt.next();
             // add first because we want to use pos information that
             // is lost applying replacewith
 
             SequentChangeInfo currentSequent = newSequentsIt.next();
 
-            applyAdd(gt.sequent(), currentSequent, services, mc, goal, ruleApp);
+            applyAdd(gt.sequent(), currentSequent, services, mc, goal, tacletApp);
 
             applyAddrule(gt.rules(), currentGoal, services, mc);
 

@@ -12,7 +12,6 @@ import de.uka.ilkd.key.settings.Configuration;
 
 import org.jspecify.annotations.NullMarked;
 
-import static de.uka.ilkd.key.proof.init.AbstractPO.getName;
 import static de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO.*;
 
 @NullMarked
@@ -30,7 +29,7 @@ public class ProgramMethodPOLoader implements ProofObligationLoader {
             throws IOException {
         return new IPersistablePO.LoadedPOContainer(new ProgramMethodPO(initConfig,
             getName(properties),
-            ProgramMethodPO.getProgramMethod(initConfig, properties), getPrecondition(properties),
+            getProgramMethod(initConfig, properties), getPrecondition(properties),
             isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
     }
 

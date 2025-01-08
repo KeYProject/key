@@ -8,12 +8,13 @@ import java.util.Iterator;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Term;
-import org.key_project.ncore.proof.ProofObject;
+import org.key_project.prover.proof.ProofObject;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.NamespaceSet;
-import org.key_project.rusty.logic.Semisequent;
-import org.key_project.rusty.logic.Sequent;
-import org.key_project.rusty.logic.SequentFormula;
+import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.proof.init.InitConfig;
 import org.key_project.rusty.proof.mgt.ProofCorrectnessMgt;
 import org.key_project.rusty.settings.ProofSettings;
@@ -93,8 +94,8 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     private Proof(String name, Sequent problem, TacletIndex tacletIndex,
-            BuiltInRuleIndex builtInRules,
-            InitConfig initConfig) {
+                  BuiltInRuleIndex builtInRules,
+                  InitConfig initConfig) {
         this(new Name(name), initConfig);
 
         final var rootNode = new Node(this, problem);
@@ -107,9 +108,9 @@ public class Proof implements ProofObject<Goal>, Named {
 
     public Proof(String name, Term problem, InitConfig initConfig) {
         this(name,
-            Sequent.createSuccSequent(
-                new Semisequent(new SequentFormula(problem))),
-            initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(),
+            RustySequentKit
+                    .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(problem))),
+            initConfig.createTacletIndex(),
             initConfig);
     }
 

@@ -20,10 +20,10 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -448,26 +448,21 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         IForUpdates ifu;
         IGuard iGuard;
         if (f.getInitializers() != null && f.getInitializers()
-                .get(0) instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
-            de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw =
-                (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f.getInitializers().get(0); // brrrr!
+                .get(0) instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw) {
+            // brrrr!
             li = (ProgramSV) esvw.getSV();
         } else {
             li = convertLoopInitializers(f);
         }
 
-        if (f.getGuard() instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
-            de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw =
-                (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f.getGuard();
+        if (f.getGuard() instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw) {
             iGuard = (ProgramSV) esvw.getSV();
         } else {
             iGuard = convertGuard(f);
         }
 
         if (f.getUpdates() != null && f.getUpdates()
-                .get(0) instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
-            de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw =
-                (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f.getUpdates().get(0);
+                .get(0) instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw) {
             ifu = (ProgramSV) esvw.getSV();
         } else {
             ifu = convertUpdates(f);

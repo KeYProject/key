@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -56,7 +56,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      */
     @Override
     public ImmutableList<Name> getSupportedRuleNames() {
-        return ImmutableSLList.<Name>nil().prepend(UseOperationContractRule.INSTANCE.name())
+        return ImmutableSLList.singleton(UseOperationContractRule.INSTANCE.name())
                 .prepend(WhileInvariantRule.INSTANCE.name())
                 .prepend(BlockContractInternalRule.INSTANCE.name())
                 .prepend(BlockContractExternalRule.INSTANCE.name())
@@ -69,7 +69,8 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
      */
     @Override
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            PosInOccurrence applicationPosInOccurrence,
+            Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm) {
         if (goal != null) {
             if (rule instanceof UseOperationContractRule

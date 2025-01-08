@@ -8,11 +8,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 

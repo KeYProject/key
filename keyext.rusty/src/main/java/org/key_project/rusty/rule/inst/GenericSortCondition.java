@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.inst;
 
+import org.key_project.logic.op.sv.OperatorSV;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.logic.RustyDLTheory;
-import org.key_project.rusty.logic.op.sv.OperatorSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.TermSV;
 import org.key_project.rusty.logic.sort.GenericSort;
 

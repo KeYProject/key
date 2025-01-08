@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.logic;
 
-//spotless:off
-public record FormulaChangeInfo(PosInOccurrence positionOfModification, SequentFormula newFormula) {
-    public SequentFormula getOriginalFormula() {
+import org.key_project.prover.sequent.PosInOccurrence;
+
+public record FormulaChangeInfo(PosInOccurrence positionOfModification, org.key_project.prover.sequent.SequentFormula newFormula) {
+
+    public org.key_project.prover.sequent.SequentFormula getOriginalFormula() {
         return positionOfModification().sequentFormula();
     }
 

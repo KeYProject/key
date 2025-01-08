@@ -6,6 +6,7 @@ package org.key_project.rusty.ast.expr;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.key_project.logic.IntIterator;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
@@ -13,7 +14,6 @@ import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.visitor.Visitor;
-import org.key_project.rusty.logic.IntIterator;
 import org.key_project.rusty.logic.PosInProgram;
 import org.key_project.rusty.logic.PossibleProgramPrefix;
 import org.key_project.rusty.rule.MatchConditions;

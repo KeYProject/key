@@ -12,9 +12,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * @author <TT>AutoDoc</TT>
  */
 public class MethodReference extends JavaNonTerminalProgramElement
-        implements MethodOrConstructorReference, MemberReference, ReferencePrefix, ReferenceSuffix,
+        implements MethodOrConstructorReference, ReferenceSuffix,
         ExpressionStatement, TypeReferenceContainer, NameReference {
 
     /**

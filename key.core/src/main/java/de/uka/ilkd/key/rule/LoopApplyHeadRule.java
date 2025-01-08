@@ -7,8 +7,6 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -20,7 +18,9 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
 
 import org.key_project.logic.Name;
-import org.key_project.ncore.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -135,7 +135,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
         }
 
         final AbstractLoopContractRule.Instantiation instantiation =
-            new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal).instantiate();
+            new AbstractLoopContractRule.Instantiator((Term) pio.subTerm(), goal).instantiate();
 
         if (instantiation == null) {
             return false;

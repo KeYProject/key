@@ -7,8 +7,12 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletAnnotation;
+import org.key_project.prover.rules.TacletApplPart;
+import org.key_project.prover.rules.TacletAttributes;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.rusty.rule.executor.rustydl.SuccTacletExecutor;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -37,7 +41,8 @@ public class SuccTaclet extends FindTaclet {
      *        the prefix for each SchemaVariable in the taclet
      */
     public SuccTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
             ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -73,12 +78,14 @@ public class SuccTaclet extends FindTaclet {
 
     @Override
     public SuccTaclet setName(String s) {
-        final TacletApplPart applPart = new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(),
-            varsNewDependingOn(), getVariableConditions());
+        final TacletApplPart applPart =
+            new TacletApplPart(assumesSequent(), varsNew(), varsNotFreeIn(),
+                varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), null);
 
-        return new SuccTaclet(new Name(s), applPart, goalTemplates(), ruleSets, attrs, find,
-            ignoreTopLevelUpdates, prefixMap, choices, tacletAnnotations);
+        return new SuccTaclet(new Name(s), applPart,
+            goalTemplates(), ruleSets, attrs, find,
+            ignoreTopLevelUpdates, prefixMap, choices,tacletAnnotations);
     }
 
 }

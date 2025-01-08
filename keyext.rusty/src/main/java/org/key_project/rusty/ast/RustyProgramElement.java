@@ -7,6 +7,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.rule.MatchConditions;
 
+
 public interface RustyProgramElement extends SyntaxElement {
     default MatchConditions match(SourceData sourceData, MatchConditions mc) {
         final var src = sourceData.getSource();
@@ -77,4 +78,22 @@ public interface RustyProgramElement extends SyntaxElement {
      * @param v the Visitor
      */
     void visit(Visitor v);
+
+    default int computeHashCode() {
+        // Cache for hashcode computation would be of advanatage as it is for instance recomputed
+        // for each modality
+        // creation and can be rather expensive as the whole AST is repeatedly traversed
+        // at the mmoment this has to be cached at each subclass
+        /*
+         * if (hashcode != -1) {
+         * return hashcode;
+         * }
+         */
+        int hash = 7;
+        for (int i = 0; i < this.getChildCount(); i++) {
+            hash = hash * 31 + this.getChild(i).hashCode();
+        }
+        // this.hashcode = hash;
+        return hash;
+    }
 }

@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
@@ -16,6 +14,8 @@ import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     private final Name ruleSetName;

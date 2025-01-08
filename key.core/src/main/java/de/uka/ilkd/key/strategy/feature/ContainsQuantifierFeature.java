@@ -4,9 +4,10 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+
+import org.key_project.prover.sequent.PosInOccurrence;
 
 
 /**
