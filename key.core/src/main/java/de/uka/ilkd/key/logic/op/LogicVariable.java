@@ -23,7 +23,6 @@ public final class LogicVariable extends AbstractSortedOperator
         assert sort != JavaDLTheory.UPDATE;
     }
 
-
     @Override
     public String toString() {
         return name() + ":" + sort();
