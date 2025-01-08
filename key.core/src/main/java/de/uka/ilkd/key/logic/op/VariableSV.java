@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
@@ -29,12 +28,6 @@ public final class VariableSV extends OperatorSV
     @Override
     public String toString() {
         return toString("variable");
-    }
-
-    @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\variables ").print(sort().name().toString()).print(" ")
-                .print(name().toString());
     }
 
     @Override

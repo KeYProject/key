@@ -15,7 +15,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Abstract base class for schema variables.
  */
 public abstract class OperatorSV extends AbstractSortedOperator
-        implements org.key_project.logic.op.sv.OperatorSV, SchemaVariable, ParsableVariable, Layoutable {
+        implements org.key_project.logic.op.sv.OperatorSV, SchemaVariable, ParsableVariable {
 
     private final boolean isStrict;
 
