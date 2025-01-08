@@ -29,11 +29,6 @@ public final class FormulaSV extends OperatorSV implements TerminalSyntaxElement
     }
 
     @Override
-    public void layout(Layouter<?> layouter) {
-        layouter.print("\\schemaVar \\formula ").print(name().toString());
-    }
-
-    @Override
     public boolean isFormula() {
         return true;
     }

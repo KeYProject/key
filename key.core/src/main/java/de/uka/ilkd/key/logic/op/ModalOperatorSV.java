@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableSet;
  * Schema variable matching modal operators.
  */
 public final class ModalOperatorSV extends Modality.JavaModalityKind
-        implements ParsableVariable, Layoutable, SchemaVariable {
+        implements ParsableVariable, SchemaVariable {
 
     /**
      * the set of modalities this sv can match
