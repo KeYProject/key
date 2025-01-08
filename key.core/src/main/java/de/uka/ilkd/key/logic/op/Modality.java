@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -16,7 +17,6 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.Pair;
 
 /**
  * This class is used to represent a dynamic logic modality like diamond and box (but also
@@ -26,8 +26,8 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     /**
      * keeps track of created modalities
      */
-    private static final Map<Pair<JavaModalityKind, JavaProgramElement>, Modality> modalities =
-        new WeakHashMap<>();
+    private static final Map<JavaProgramElement, WeakHashMap<JavaModalityKind, WeakReference<Modality>>> modalities =
+            new WeakHashMap<>();
 
     /**
      * Retrieves the modality of the given kind and program.
@@ -36,12 +36,26 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
      * @param jb the program of this modality
      * @return the modality of the given kind and program.
      */
-    public static Modality getModality(Modality.JavaModalityKind kind, JavaBlock jb) {
-        var pair = new Pair<>(kind, jb.program());
-        Modality mod = modalities.get(pair);
-        if (mod == null) {
+    public static synchronized Modality getModality(JavaModalityKind kind, JavaBlock jb) {
+        var kind2mod = modalities.get(jb.program());
+        final Modality mod;
+        WeakReference<Modality> modRef;
+        if (kind2mod == null) {
+            kind2mod = new WeakHashMap<>();
             mod = new Modality(jb, kind);
-            modalities.put(pair, mod);
+            modRef = new WeakReference<>(mod);
+            kind2mod.put(kind, modRef);
+            modalities.put(jb.program(), kind2mod);
+        } else {
+            modRef = kind2mod.get(kind);
+            if (modRef == null || modRef.get() == null) {
+                mod = new Modality(jb, kind);
+                modRef = new WeakReference<>(mod);
+                kind2mod.put(kind, modRef);
+                modalities.put(jb.program(), kind2mod);
+            } else {
+                mod = modRef.get();
+            }
         }
         return mod;
     }
