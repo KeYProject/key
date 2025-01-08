@@ -27,7 +27,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
      * keeps track of created modalities
      */
     private static final Map<JavaProgramElement, WeakHashMap<JavaModalityKind, WeakReference<Modality>>> modalities =
-            new WeakHashMap<>();
+        new WeakHashMap<>();
 
     /**
      * Retrieves the modality of the given kind and program.
