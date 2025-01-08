@@ -970,7 +970,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @return the goal that belongs to the given node or null if the node is an inner one
      */
-    public Goal getOpenGoal(Node node) {
+    public Goal getOpenGoal(@NonNull Node node) {
         for (final Goal result : openGoals) {
             if (result.node() == node) {
                 return result;

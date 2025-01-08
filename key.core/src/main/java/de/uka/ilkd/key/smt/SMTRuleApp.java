@@ -10,10 +10,10 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.RuleApp;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -89,7 +89,8 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
 
 
         /**
-         * Create a new goal (to be closed in {@link Goal#apply(RuleApp)} directly afterwards)
+         * Create a new goal (to be closed in
+         * {@link Goal#apply(org.key_project.prover.rules.RuleApp)} directly afterwards)
          * with the same sequent as the given one.
          *
          * @param goal the Goal on which to apply <tt>ruleApp</tt>
@@ -127,8 +128,7 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
     }
 
     @Override
-    public SMTRuleApp setIfInsts(
-            ImmutableList<PosInOccurrence> ifInsts) {
+    public SMTRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
@@ -153,6 +153,6 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
         for (SequentFormula succ : seq.succedent()) {
             ifInsts.add(new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
         }
-        return app.setIfInsts(ImmutableList.fromList(ifInsts));
+        return app.setAssumesInsts(ImmutableList.fromList(ifInsts));
     }
 }

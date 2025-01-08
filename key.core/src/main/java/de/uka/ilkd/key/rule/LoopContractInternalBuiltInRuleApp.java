@@ -60,7 +60,7 @@ public class LoopContractInternalBuiltInRuleApp extends AbstractLoopContractBuil
     }
 
     @Override
-    public LoopContractInternalBuiltInRuleApp setIfInsts(
+    public LoopContractInternalBuiltInRuleApp setAssumesInsts(
             final ImmutableList<PosInOccurrence> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;

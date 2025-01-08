@@ -26,7 +26,7 @@ import org.jspecify.annotations.Nullable;
  * {@link RuleApp} corresponds to its {@link RuleAppCost}. A {@link RuleApp} can be equipped with a
  * {@link RuleAppCost} by converting it into a {@link RuleAppContainer}. The cost of a
  * {@link RuleApp} is computed according to a given {@link Strategy} (see
- * {@link Feature#computeCost(RuleApp, PosInOccurrence, Goal, de.uka.ilkd.key.strategy.feature.MutableState)}).
+ * {@link Feature#computeCost(org.key_project.prover.rules.RuleApp, PosInOccurrence, Goal, de.uka.ilkd.key.strategy.feature.MutableState)}).
  */
 public class QueueRuleApplicationManager implements AutomatedRuleApplicationManager {
     public static final AtomicLong PERF_QUEUE_OPS = new AtomicLong();
@@ -55,7 +55,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * The next automatic {@link RuleApp} determined by the strategy. Aka result of methods
      * {@link #next()} and {@link #peekNext()}.
      */
-    private RuleApp nextRuleApp = null;
+    private org.key_project.prover.rules.RuleApp nextRuleApp = null;
 
     private long nextRuleTime;
 
@@ -110,7 +110,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * the heap
      */
     @Override
-    public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
+    public void ruleAdded(org.key_project.prover.rules.RuleApp rule, PosInOccurrence pos) {
         if (queue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
@@ -130,7 +130,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * the heap
      */
     @Override
-    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
+    public void rulesAdded(ImmutableList<? extends org.key_project.prover.rules.RuleApp> rules,
+            PosInOccurrence pos) {
         if (queue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
@@ -211,7 +212,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      *         again.
      */
     @Override
-    public RuleApp peekNext() {
+    public org.key_project.prover.rules.RuleApp peekNext() {
         var otime = System.nanoTime();
         try {
             ensureQueueExists();
@@ -248,8 +249,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      *         not obsolete
      */
     @Override
-    public RuleApp next() {
-        final RuleApp res = peekNext();
+    public org.key_project.prover.rules.RuleApp next() {
+        final org.key_project.prover.rules.RuleApp res = peekNext();
         clearNextRuleApp();
         return res;
     }

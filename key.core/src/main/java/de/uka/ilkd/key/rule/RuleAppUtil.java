@@ -14,6 +14,7 @@ import de.uka.ilkd.key.smt.SMTRuleApp;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.rules.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
@@ -54,7 +55,7 @@ public final class RuleAppUtil {
         // built-ins need special treatment:
         // record if instantiations
         if (ruleApp instanceof AbstractBuiltInRuleApp builtIn) {
-            builtIn.ifInsts().forEach(inputs::add);
+            builtIn.assumesInsts().forEach(inputs::add);
         }
 
         // State Merging: add all formulas as inputs

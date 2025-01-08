@@ -11,10 +11,10 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.rulefilter.AndRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.*;
@@ -470,7 +470,8 @@ public class TermTacletAppIndex {
         return descend(pos).collectTacletApps(pos, filter, services);
     }
 
-    private ImmutableList<TacletApp> convert(ImmutableList<? extends RuleApp> rules,
+    private ImmutableList<TacletApp> convert(
+            ImmutableList<? extends org.key_project.prover.rules.RuleApp> rules,
             PosInOccurrence pos, RuleFilter filter,
             ImmutableList<TacletApp> convertedApps,
             Services services) {

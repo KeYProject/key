@@ -52,6 +52,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -547,7 +548,7 @@ public class OutputStreamProofSaver {
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
 
         output.append(newNames2Proof(node));
-        output.append(builtinRuleIfInsts(node, appliedRuleApp.ifInsts()));
+        output.append(builtinRuleIfInsts(node, appliedRuleApp.assumesInsts()));
 
         if (appliedRuleApp.rule() instanceof UseOperationContractRule
                 || appliedRuleApp.rule() instanceof UseDependencyContractRule) {

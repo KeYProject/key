@@ -29,7 +29,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -40,6 +39,7 @@ import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -260,7 +260,7 @@ public final class TruthValueTracingUtil {
                 }
             } else if (parent.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp app) {
                 PosInOccurrence parentPio = null;
-                for (RuleApp protocolApp : app.getProtocol()) {
+                for (org.key_project.prover.rules.RuleApp protocolApp : app.getProtocol()) {
                     if (parentPio != null) {
                         updatePredicateResultBasedOnNewMinorIdsOSS(protocolApp.posInOccurrence(),
                             parentPio, termLabelName, services.getTermBuilder(), nodeResult);

@@ -9,8 +9,8 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.Rule;
 
+import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 /**

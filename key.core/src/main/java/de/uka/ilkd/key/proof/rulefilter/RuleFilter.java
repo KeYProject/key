@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.rulefilter;
 
-import de.uka.ilkd.key.rule.Rule;
+import org.key_project.prover.rules.Rule;
 
 /**
  * Interface for objects that represent sets of rules, and which can be used to distinguish

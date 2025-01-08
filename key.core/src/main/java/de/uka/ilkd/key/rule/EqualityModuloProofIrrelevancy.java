@@ -204,7 +204,8 @@ public class EqualityModuloProofIrrelevancy {
      * @param that the second RuleApp
      * @return true if both arguments are equal modulo proof irrelevancy
      */
-    public static boolean equalsModProofIrrelevancy(RuleApp _this, RuleApp that) {
+    public static boolean equalsModProofIrrelevancy(org.key_project.prover.rules.RuleApp _this,
+            org.key_project.prover.rules.RuleApp that) {
         if (_this == that) {
             return true;
         } else if (_this == null || that == null) {
@@ -227,7 +228,7 @@ public class EqualityModuloProofIrrelevancy {
      * @param app the {@link RuleApp} for which to compute the hash
      * @return the hash code modulo proof irrelevancy for the given argument
      */
-    public static int hashCodeModProofIrrelevancy(RuleApp app) {
+    public static int hashCodeModProofIrrelevancy(org.key_project.prover.rules.RuleApp app) {
         if (app == null) {
             return 0;
         } else if (app instanceof TacletApp tApp) {
@@ -258,8 +259,8 @@ public class EqualityModuloProofIrrelevancy {
                 && Objects.equals(_this.getHeapContext(), that.getHeapContext()))) {
             return false;
         }
-        ImmutableList<PosInOccurrence> ifInsts1 = _this.ifInsts();
-        ImmutableList<PosInOccurrence> ifInsts2 = that.ifInsts();
+        ImmutableList<PosInOccurrence> ifInsts1 = _this.assumesInsts();
+        ImmutableList<PosInOccurrence> ifInsts2 = that.assumesInsts();
         if (ifInsts1.size() != ifInsts2.size()) {
             return false;
         }

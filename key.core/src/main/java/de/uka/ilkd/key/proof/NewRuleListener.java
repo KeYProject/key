@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.rule.RuleApp;
-
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
@@ -16,7 +15,7 @@ public interface NewRuleListener {
     /**
      * Called when a new RuleApp is added
      */
-    void ruleAdded(RuleApp rule, PosInOccurrence pos);
+    void ruleAdded(org.key_project.prover.rules.RuleApp rule, PosInOccurrence pos);
 
     /**
      * Called when a collection of new RuleApps is added

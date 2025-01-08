@@ -8,8 +8,8 @@ import java.util.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class KeYSelectionModel {
      * The currently displayed rule application. Equal to the rule app of {@link #selectedNode}
      * unless we are displaying an OSS node.
      */
-    private RuleApp selectedRuleApp;
+    private org.key_project.prover.rules.RuleApp selectedRuleApp;
     /** the listeners to this model */
     private final List<KeYSelectionListener> listenerList;
 
@@ -119,7 +119,7 @@ public class KeYSelectionModel {
      * @param sequent selected sequent
      */
     public synchronized void setSelectedSequentAndRuleApp(Node node, Sequent sequent,
-            RuleApp ruleApp) {
+            org.key_project.prover.rules.RuleApp ruleApp) {
         final Node previousNode = selectedNode;
         // switch proof if needed
         if (node.proof() != getSelectedProof()) {

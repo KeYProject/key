@@ -10,10 +10,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -23,12 +23,12 @@ public final class DependencyContractFeature extends BinaryFeature {
 
     private void removePreviouslyUsedSteps(Term focus, Goal goal,
             List<PosInOccurrence> steps) {
-        for (RuleApp app : goal.appliedRuleApps()) {
+        for (org.key_project.prover.rules.RuleApp app : goal.appliedRuleApps()) {
             Term term = (Term) app.posInOccurrence().subTerm();
             if (app.rule() instanceof UseDependencyContractRule
                     && RENAMING_TERM_PROPERTY.equalsModThisProperty(term, focus)) {
                 final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
-                for (PosInOccurrence ifInst : bapp.ifInsts()) {
+                for (PosInOccurrence ifInst : bapp.assumesInsts()) {
                     steps.remove(ifInst);
                 }
             }
@@ -66,7 +66,7 @@ public final class DependencyContractFeature extends BinaryFeature {
         }
 
         // instantiate with arbitrary remaining step
-        bapp = bapp.setIfInsts(ImmutableSLList.<PosInOccurrence>nil().prepend(steps.get(0)));
+        bapp = bapp.setAssumesInsts(ImmutableSLList.<PosInOccurrence>nil().prepend(steps.get(0)));
         return true;
     }
 }

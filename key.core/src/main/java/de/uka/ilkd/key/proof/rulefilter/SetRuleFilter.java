@@ -6,7 +6,7 @@ package de.uka.ilkd.key.proof.rulefilter;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-import de.uka.ilkd.key.rule.Rule;
+import org.key_project.prover.rules.Rule;
 
 /**
  * Rule filter that selects taclets which are members of a given explicit set

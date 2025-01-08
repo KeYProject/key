@@ -22,7 +22,7 @@ public interface RuleApp {
      *
      * @TODO: better name
      */
-    <F extends Function> void execute(Namespace<@NonNull F> fns);
+    void execute(Namespace<@NonNull Function> fns);
 
     /**
      * returns true if all variables are instantiated

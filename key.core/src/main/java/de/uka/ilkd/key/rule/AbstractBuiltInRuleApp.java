@@ -68,21 +68,19 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
      *
-     * @return list of new created goals
      */
     @Override
-    public <F extends Function> void execute(Namespace<@NonNull F> fns) {
+    public void execute(Namespace<@NonNull Function> fns) {
 
     }
 
     public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos);
 
     @Override
-    public abstract IBuiltInRuleApp setIfInsts(
-            ImmutableList<PosInOccurrence> ifInsts);
+    public abstract IBuiltInRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts);
 
     @Override
-    public ImmutableList<PosInOccurrence> ifInsts() {
+    public ImmutableList<PosInOccurrence> assumesInsts() {
         return ifInsts;
     }
 

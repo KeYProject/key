@@ -6,12 +6,12 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
@@ -45,7 +45,7 @@ public class SimpleFilteredStrategy implements Strategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
+    public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) {
@@ -71,7 +71,7 @@ public class SimpleFilteredStrategy implements Strategy {
      *
      * @return true iff the rule should be applied, false otherwise
      */
-    public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+    public boolean isApprovedApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
             Goal goal) {
         // do not apply a rule twice
         return !(app instanceof TacletApp) || NonDuplicateAppFeature.INSTANCE.computeCost(app, pio,

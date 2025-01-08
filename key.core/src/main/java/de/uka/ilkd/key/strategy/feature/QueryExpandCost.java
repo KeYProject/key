@@ -11,13 +11,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
@@ -75,7 +75,8 @@ public class QueryExpandCost implements Feature {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
+            Goal goal,
             MutableState mState) {
         final Services services = goal.proof().getServices();
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
@@ -171,10 +172,11 @@ public class QueryExpandCost implements Feature {
      * @param goal The goal.
      * @return The number of repetitive rule applications.
      */
-    protected int queryExpandAlreadyAppliedAtPos(RuleApp app,
+    protected int queryExpandAlreadyAppliedAtPos(org.key_project.prover.rules.RuleApp app,
             PosInOccurrence pos, Goal goal) {
         int count = 0;
-        ImmutableList<RuleApp> appliedRuleApps = goal.appliedRuleApps();
+        ImmutableList<org.key_project.prover.rules.RuleApp> appliedRuleApps =
+            goal.appliedRuleApps();
         if (appliedRuleApps != null && !appliedRuleApps.isEmpty()) {
             for (RuleApp appliedRuleApp : appliedRuleApps) {
                 final PosInOccurrence pio =

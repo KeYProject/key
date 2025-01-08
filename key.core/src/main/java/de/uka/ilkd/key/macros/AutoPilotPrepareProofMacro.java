@@ -9,12 +9,14 @@ import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
@@ -79,7 +81,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+        public boolean isApprovedApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
                 Goal goal) {
             return computeCost(app, pio, goal, new MutableState()) != TopRuleAppCost.INSTANCE &&
             // Assumptions are normally not considered by the cost
@@ -96,7 +98,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app,
+        public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app,
                 PosInOccurrence pio, Goal goal,
                 MutableState mState) {
 
@@ -128,7 +130,8 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+        public void instantiateApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
+                Goal goal,
                 RuleAppCostCollector collector) {
             delegate.instantiateApp(app, pio, goal, collector);
         }

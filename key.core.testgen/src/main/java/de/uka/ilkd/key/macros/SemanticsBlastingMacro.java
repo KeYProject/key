@@ -7,7 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
-import de.uka.ilkd.key.rule.Rule;
+
+import org.key_project.prover.rules.Rule;
 
 /**
  * @author mihai

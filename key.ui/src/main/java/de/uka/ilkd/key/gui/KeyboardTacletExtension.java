@@ -29,11 +29,11 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -163,7 +163,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         if (model != null) {
             model.setCurrentPrefix(txtInput.getText());
             if (isDirectMode()) {
-                Optional<RuleApp> app = model.getSelectedTacletsApp();
+                Optional<org.key_project.prover.rules.RuleApp> app = model.getSelectedTacletsApp();
                 app.ifPresent(this::applyRule);
             }
         }
@@ -171,13 +171,13 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 
     private void applyCurrentTaclet() {
         if (model != null) {
-            Optional<RuleApp> app = model.getFirstMatchingTacletApp();
+            Optional<org.key_project.prover.rules.RuleApp> app = model.getFirstMatchingTacletApp();
             app.ifPresent(this::applyRule);
             LOGGER.debug("selected taclet applied");
         }
     }
 
-    private void applyRule(RuleApp ruleApp) {
+    private void applyRule(org.key_project.prover.rules.RuleApp ruleApp) {
         MediatorProofControl pc = mainWindow.getMediator().getUI().getProofControl();
         if (!ruleApp.complete()) {
             try {
@@ -232,7 +232,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             box.add(lblName);
 
             int i = 0;
-            for (RuleApp tacletApp : model.getTaclets().get(name)) {
+            for (org.key_project.prover.rules.RuleApp tacletApp : model.getTaclets().get(name)) {
                 box.add(new JLabel(String.valueOf(++i)));// new JLabel(tacletApp.toString()));
             }
             pCenter.add(box);
@@ -286,7 +286,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         }
 
         long time = System.currentTimeMillis();
-        List<RuleApp> taclets = new LinkedList<>();
+        List<org.key_project.prover.rules.RuleApp> taclets = new LinkedList<>();
         PosInSequent pos = mainWindow.getCurrentGoalView().getLastPosInSequent();
 
         if (actionFilterUsingMouse.isSelected() && pos == null) {
@@ -315,7 +315,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         LOGGER.debug("Found {} taclets\n", taclets.size());
 
         if (actionOnlyCompleteTaclets.isSelected()) {
-            taclets = taclets.stream().filter(RuleApp::complete).collect(Collectors.toList());
+            taclets = taclets.stream().filter(org.key_project.prover.rules.RuleApp::complete)
+                    .collect(Collectors.toList());
         }
 
         KeyboardTacletModel newModel = new KeyboardTacletModel(taclets);
@@ -389,21 +390,22 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 class KeyboardTacletModel {
     public static final String PROP_CURRENT_PREFIX = "currentPrefix";
     public static final String PROP_CURRENT_POS = "currentPos";
-    private final Map<String, List<RuleApp>> taclets;
+    private final Map<String, List<org.key_project.prover.rules.RuleApp>> taclets;
     private final Map<String, String> prefixTable;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     private String currentPrefix;
     private int currentPos;
 
-    KeyboardTacletModel(List<RuleApp> taclets) {
+    KeyboardTacletModel(List<org.key_project.prover.rules.RuleApp> taclets) {
         reset();
         this.taclets = new HashMap<>();
         List<String> seq = new ArrayList<>(taclets.size());
-        for (RuleApp t : taclets) {
+        for (org.key_project.prover.rules.RuleApp t : taclets) {
             String n = t.rule().name().toString();
             seq.add(n);
-            List<RuleApp> appSeq = this.taclets.computeIfAbsent(n, it -> (new ArrayList<>(5)));
+            List<org.key_project.prover.rules.RuleApp> appSeq =
+                this.taclets.computeIfAbsent(n, it -> (new ArrayList<>(5)));
             appSeq.add(t);
         }
 
@@ -486,8 +488,8 @@ class KeyboardTacletModel {
         setCurrentPos(-1);
     }
 
-    public Optional<RuleApp> getSelectedTacletsApp() {
-        List<RuleApp> t = taclets.get(prefixTable.get(currentPrefix));
+    public Optional<org.key_project.prover.rules.RuleApp> getSelectedTacletsApp() {
+        List<org.key_project.prover.rules.RuleApp> t = taclets.get(prefixTable.get(currentPrefix));
         if (t != null && t.size() == 1 || (currentPos >= 0 && currentPos <= taclets.size())) {
             assert t != null;
             return Optional.of(t.get(Math.max(0, currentPos)));
@@ -495,11 +497,11 @@ class KeyboardTacletModel {
         return Optional.empty();
     }
 
-    public Optional<RuleApp> getFirstMatchingTacletApp() {
+    public Optional<org.key_project.prover.rules.RuleApp> getFirstMatchingTacletApp() {
         for (String prefix : getPrefixTable().keySet()) {
             if (prefix.startsWith(currentPrefix)) {
                 String tacletName = prefixTable.get(prefix);
-                List<RuleApp> apps = taclets.get(tacletName);
+                List<org.key_project.prover.rules.RuleApp> apps = taclets.get(tacletName);
                 return Optional.of(apps.get(0));
             }
         }

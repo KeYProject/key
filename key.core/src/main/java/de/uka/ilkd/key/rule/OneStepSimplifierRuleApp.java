@@ -49,6 +49,6 @@ public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
     public void restrictAssumeInsts(
             ImmutableList<PosInOccurrence> assumeInsts) {
         this.restrictedIfInsts = true;
-        setIfInsts(assumeInsts);
+        setAssumesInsts(assumeInsts);
     }
 }

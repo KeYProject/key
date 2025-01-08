@@ -47,7 +47,7 @@ public class JmlAssertBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public IBuiltInRuleApp setIfInsts(
+    public IBuiltInRuleApp setAssumesInsts(
             ImmutableList<PosInOccurrence> ifInsts) {
         // XXX: This is overridden in all subclasses to allow making ifInsts final
         // when all usages of setIfInsts are corrected to use the result.

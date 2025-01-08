@@ -12,15 +12,12 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
-import org.key_project.prover.sequent.FormulaChangeInfo;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.sequent.Sequent;
-import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 
 public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
@@ -51,7 +48,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
     protected abstract void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
             PosInOccurrence posOfFind, MatchConditions matchCond,
-            Goal goal, RuleApp ruleApp, Services services);
+            Goal goal, org.key_project.prover.rules.RuleApp ruleApp, Services services);
 
 
     /**

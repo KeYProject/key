@@ -71,11 +71,11 @@ public class TestTermParser extends AbstractTestTermParser {
 
         elem = lookup_sort("elem");
         list = lookup_sort("list");
-        head = lookup_func("head");
-        tail = lookup_func("tail");
-        nil = lookup_func("nil");
-        cons = lookup_func("cons");
-        isempty = lookup_func("isempty");
+        head = (JFunction) lookup_func("head");
+        tail = (JFunction) lookup_func("tail");
+        nil = (JFunction) lookup_func("nil");
+        cons = (JFunction) lookup_func("cons");
+        isempty = (JFunction) lookup_func("isempty");
 
         // The declaration parser cannot parse LogicVariables; these
         // are normally declared in quantifiers, so we introduce them

@@ -28,5 +28,6 @@ public interface Feature {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState);
+    RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState);
 }

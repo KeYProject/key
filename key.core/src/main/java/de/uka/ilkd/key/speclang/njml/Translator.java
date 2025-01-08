@@ -39,6 +39,7 @@ import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -1158,7 +1159,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         Token l = ctx.STRING_LITERAL().getSymbol();
         Term charListTerm =
             services.getTypeConverter().convertToLogicElement(new StringLiteral(l.getText()));
-        JFunction strPool =
+        Function strPool =
             services.getNamespaces().functions().lookup(CharListLDT.STRINGPOOL_NAME);
         if (strPool == null) {
             raiseError("String literals used in specification, but string pool function not found",
@@ -1326,7 +1327,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         String opName = ctx.getStart().getText();
         assert opName.startsWith("\\fp_");
-        JFunction op = ldt.getFunctionFor(opName.substring(4), services);
+        Function op = ldt.getFunctionFor(opName.substring(4), services);
         if (op == null) {
             raiseError(ctx, "The operation %s has no function in %s.", opName, ldt.name());
         }
@@ -1502,7 +1503,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitPrimaryStringEq(JmlParser.PrimaryStringEqContext ctx) {
         SLExpression e1 = accept(ctx.expression(0));
         SLExpression e2 = accept(ctx.expression(1));
-        JFunction strContent =
+        Function strContent =
             services.getNamespaces().functions().lookup(CharListLDT.STRINGCONTENT_NAME);
         if (strContent == null) {
             raiseError("strings used in spec, but string content function not found", ctx);

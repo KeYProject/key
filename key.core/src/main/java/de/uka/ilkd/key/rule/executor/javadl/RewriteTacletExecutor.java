@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.IntIterator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -39,7 +39,8 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
     private Term replace(Term term, Term with, TermLabelState termLabelState,
             TacletLabelHint labelHint, PosInOccurrence posOfFind,
             org.key_project.logic.IntIterator it,
-            MatchConditions mc, Sort maxSort, Goal goal, Services services, RuleApp ruleApp) {
+            MatchConditions mc, Sort maxSort, Goal goal, Services services,
+            org.key_project.prover.rules.RuleApp ruleApp) {
         if (it.hasNext()) {
             final int indexOfNextSubTerm = it.next();
 
@@ -69,7 +70,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             TermLabelState termLabelState,
             RewriteTacletGoalTemplate gt, PosInOccurrence posOfFind,
             Services services,
-            MatchConditions matchCond, RuleApp ruleApp) {
+            MatchConditions matchCond, org.key_project.prover.rules.RuleApp ruleApp) {
         final Term term = (Term) posOfFind.sequentFormula().formula();
         final IntIterator it = posOfFind.posInTerm().iterator();
         final Term rwTemplate = gt.replaceWith();
@@ -107,7 +108,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
             PosInOccurrence posOfFind, MatchConditions matchCond,
-            Goal goal, RuleApp ruleApp, Services services) {
+            Goal goal, org.key_project.prover.rules.RuleApp ruleApp, Services services) {
         if (gt instanceof RewriteTacletGoalTemplate) {
             final SequentFormula cf =
                 applyReplacewithHelper(goal, termLabelState,

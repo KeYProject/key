@@ -94,7 +94,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet>
             new SyntacticalReplaceVisitor((TermLabelState) instantiationInfo[0],
                 (TacletLabelHint) instantiationInfo[1], applicationPosInOccurrence,
                 (SVInstantiations) mc.getInstantiations(), goal, taclet,
-                (de.uka.ilkd.key.rule.RuleApp) ruleApp);
+                ruleApp);
         term.execPostOrder(srVisitor);
         return srVisitor.getTerm();
     }

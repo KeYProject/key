@@ -363,7 +363,7 @@ public abstract class StaticFeatureCollection {
         return TriggerVarInstantiatedFeature.INSTANCE;
     }
 
-    protected static TermFeature op(Operator op) {
+    protected static TermFeature op(org.key_project.logic.op.Operator op) {
         return OperatorTF.create(op);
     }
 

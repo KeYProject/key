@@ -246,7 +246,7 @@ public class JavaProfile extends AbstractProfile {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSpecificationInvolvedInRuleApp(RuleApp app) {
+    public boolean isSpecificationInvolvedInRuleApp(org.key_project.prover.rules.RuleApp app) {
         return app instanceof LoopInvariantBuiltInRuleApp || app instanceof AbstractContractRuleApp
                 || app instanceof AbstractAuxiliaryContractBuiltInRuleApp;
     }

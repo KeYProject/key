@@ -42,7 +42,7 @@ class TestUnsatCore {
         Node n = p.findAny(node -> node.getAppliedRuleApp() instanceof SMTRuleApp);
         SMTRuleApp app = ((SMTRuleApp) n.getAppliedRuleApp());
         Assertions.assertEquals("Z3", app.getSuccessfulSolverName());
-        ImmutableList<PosInOccurrence> ifs = app.ifInsts();
+        ImmutableList<PosInOccurrence> ifs = app.assumesInsts();
         Assertions.assertTrue(
             ifs.contains(PosInOccurrence.findInSequent(n.sequent(), 1,
                 PosInTerm.getTopLevel())));

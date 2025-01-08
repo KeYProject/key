@@ -16,11 +16,11 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
+import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -149,7 +149,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
 
         /**
          * Refactor the child below the updates computed via
-         * {@link TermBuilder#goBelowUpdates(Term)}.
+         * {@link TermBuilder#goBelowUpdates(org.key_project.logic.Term)}.
          */
         APPLICATION_BELOW_UPDATES,
 

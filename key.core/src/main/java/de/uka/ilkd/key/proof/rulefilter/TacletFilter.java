@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.rulefilter;
 
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.Taclet;
 
 /**
  * Interface for filtering a list of TacletApps, for example to choose only taclets for interactive
@@ -16,9 +17,10 @@ public abstract class TacletFilter implements RuleFilter {
      */
     public static final TacletFilter TRUE = new TacletFilterTrue();
 
+    @Override
     public boolean filter(Rule rule) {
-        if (rule instanceof Taclet) {
-            return filter((Taclet) rule);
+        if (rule instanceof Taclet taclet) {
+            return filter(taclet);
         }
         return false;
     }

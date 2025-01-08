@@ -5,13 +5,13 @@ package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
@@ -75,7 +75,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
          * can be applied.
          */
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+        public boolean isApprovedApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
                 Goal goal) {
             if (counter == 0 && delegate.isApprovedApp(app, pio, goal)) {
                 counter++;
@@ -86,7 +86,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app,
+        public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app,
                 PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             return delegate.computeCost(app, pio, goal, mState);

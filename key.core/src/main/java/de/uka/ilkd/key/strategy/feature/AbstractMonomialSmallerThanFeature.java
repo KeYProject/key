@@ -6,13 +6,13 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
@@ -53,7 +53,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
     }
 
     private int introductionTimeHelp(Operator op, Goal goal) {
-        ImmutableList<RuleApp> appliedRules = goal.appliedRuleApps();
+        ImmutableList<org.key_project.prover.rules.RuleApp> appliedRules = goal.appliedRuleApps();
         while (!appliedRules.isEmpty()) {
             final RuleApp app = appliedRules.head();
             appliedRules = appliedRules.tail();

@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.rulefilter;
 
-
-import de.uka.ilkd.key.rule.Rule;
+import org.key_project.prover.rules.Rule;
 
 /**
  * Rule filter that selects taclets which are of a specific class

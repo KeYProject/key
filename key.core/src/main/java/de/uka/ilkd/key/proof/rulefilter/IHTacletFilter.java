@@ -6,9 +6,8 @@ package de.uka.ilkd.key.proof.rulefilter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import de.uka.ilkd.key.rule.Taclet;
-
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -36,7 +35,8 @@ public class IHTacletFilter extends TacletFilter {
     /**
      * @return true iff <code>taclet</code> should be included in the result
      */
-    public boolean filter(Taclet taclet) {
+    public boolean filter(Taclet p_taclet) {
+        var taclet = (de.uka.ilkd.key.rule.Taclet) p_taclet;
         if (!interactive) {
             Boolean b = filterCache.get(taclet);
             if (b == null) {

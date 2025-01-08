@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
-import de.uka.ilkd.key.rule.RuleApp;
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * One branch of a <code>ChoicePoint</code>. An object of this interface will be notified each time

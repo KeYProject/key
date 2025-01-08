@@ -77,7 +77,7 @@ public abstract class AbstractProofReplayer {
      */
     protected ImmutableList<Goal> reApplyRuleApp(Node node, Goal openGoal)
             throws IntermediateProofReplayer.BuiltInConstructionException {
-        RuleApp ruleApp = node.getAppliedRuleApp();
+        org.key_project.prover.rules.RuleApp ruleApp = node.getAppliedRuleApp();
         ImmutableList<Goal> nextGoals;
         if (ruleApp.rule() instanceof BuiltInRule) {
             IBuiltInRuleApp builtInRuleApp = constructBuiltinApp(node, openGoal);
@@ -104,7 +104,7 @@ public abstract class AbstractProofReplayer {
      */
     private IBuiltInRuleApp constructBuiltinApp(Node originalStep, Goal currGoal)
             throws IntermediateProofReplayer.BuiltInConstructionException {
-        final RuleApp ruleApp = originalStep.getAppliedRuleApp();
+        final org.key_project.prover.rules.RuleApp ruleApp = originalStep.getAppliedRuleApp();
         final String ruleName = ruleApp.rule().displayName();
 
         Contract currContract = null;
@@ -177,7 +177,7 @@ public abstract class AbstractProofReplayer {
             }
 
             if (builtinIfInsts != null) {
-                ourApp = ourApp.setIfInsts(builtinIfInsts);
+                ourApp = ourApp.setAssumesInsts(builtinIfInsts);
             }
             return ourApp;
         }
@@ -260,7 +260,7 @@ public abstract class AbstractProofReplayer {
             ourApp = ourApp.setPosInOccurrence(pos, services);
         }
 
-        RuleApp app = originalStep.getAppliedRuleApp();
+        org.key_project.prover.rules.RuleApp app = originalStep.getAppliedRuleApp();
         assert app instanceof TacletApp;
         TacletApp tacletApp = (TacletApp) app;
         SVInstantiations instantantions = tacletApp.instantiations();

@@ -34,6 +34,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
 import de.uka.ilkd.key.util.Union;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
@@ -149,7 +150,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal,
+            org.key_project.prover.rules.RuleApp ruleApp) {
         final var services = goal.getOverlayServices();
         Union<Instantiation, ModelFieldInstantiation> inst =
             instantiate((Term) ruleApp.posInOccurrence().subTerm(), services);
@@ -170,7 +172,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
      * {U}{ x := modelField(heap, obj) }[...]post.
      */
     private ImmutableList<Goal> applyForModelFields(Goal goal, ModelFieldInstantiation inst,
-            Services services, RuleApp ruleApp) {
+            Services services, org.key_project.prover.rules.RuleApp ruleApp) {
         final TermBuilder tb = services.getTermBuilder();
         final TermLabelState termLabelState = new TermLabelState();
         // split goal into branches

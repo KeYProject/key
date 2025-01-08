@@ -57,7 +57,7 @@ public final class HeapLDT extends LDT {
     private final JFunction store;
     private final JFunction create;
     private final JFunction anon;
-    private final Function memset;
+    private final JFunction memset;
 
     // fields
     private final JFunction arr;
@@ -78,7 +78,7 @@ public final class HeapLDT extends LDT {
     private final JFunction wellFormed;
     private final JFunction acc;
     private final JFunction reach;
-    private final Function prec;
+    private final JFunction prec;
 
     // heap pv
     private ImmutableList<LocationVariable> heaps;
@@ -96,23 +96,23 @@ public final class HeapLDT extends LDT {
 
         fieldSort = sorts.lookup(new Name("Field"));
         select = addSortDependingFunction(services, SELECT_NAME.toString());
-        store = addFunction(services, "store");
-        create = addFunction(services, "create");
-        anon = addFunction(services, "anon");
-        memset = addFunction(services, "memset");
-        arr = addFunction(services, "arr");
-        created = addFunction(services, "java.lang.Object::<created>");
-        initialized = addFunction(services, "java.lang.Object::<initialized>");
+        store = (JFunction) addFunction(services, "store");
+        create = (JFunction) addFunction(services, "create");
+        anon = (JFunction) addFunction(services, "anon");
+        memset = (JFunction) addFunction(services, "memset");
+        arr = (JFunction) addFunction(services, "arr");
+        created = (JFunction) addFunction(services, "java.lang.Object::<created>");
+        initialized = (JFunction) addFunction(services, "java.lang.Object::<initialized>");
         classPrepared = addSortDependingFunction(services, "<classPrepared>");
         classInitialized = addSortDependingFunction(services, "<classInitialized>");
         classInitializationInProgress =
             addSortDependingFunction(services, "<classInitializationInProgress>");
         classErroneous = addSortDependingFunction(services, "<classErroneous>");
-        length = addFunction(services, "length");
-        nullFunc = addFunction(services, "null");
-        acc = addFunction(services, "acc");
-        reach = addFunction(services, "reach");
-        prec = addFunction(services, "prec");
+        length = (JFunction) addFunction(services, "length");
+        nullFunc = (JFunction) addFunction(services, "null");
+        acc = (JFunction) addFunction(services, "acc");
+        reach = (JFunction) addFunction(services, "reach");
+        prec = (JFunction) addFunction(services, "prec");
         heaps = ImmutableSLList.<LocationVariable>nil()
                 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
                 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
@@ -123,7 +123,7 @@ public final class HeapLDT extends LDT {
                 }
             }
         }
-        wellFormed = addFunction(services, "wellFormed");
+        wellFormed = (JFunction) addFunction(services, "wellFormed");
     }
 
     // -------------------------------------------------------------------------
@@ -375,7 +375,7 @@ public final class HeapLDT extends LDT {
         assert fieldPV != services.getJavaInfo().getArrayLength();
 
         final Name name = new Name(getFieldSymbolName(fieldPV));
-        JFunction result = services.getNamespaces().functions().lookup(name);
+        JFunction result = (JFunction) services.getNamespaces().functions().lookup(name);
         if (result == null) {
             int index = name.toString().indexOf("::");
             assert index > 0;

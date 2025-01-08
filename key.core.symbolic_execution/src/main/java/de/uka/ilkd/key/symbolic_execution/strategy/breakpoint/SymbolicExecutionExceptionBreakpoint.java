@@ -15,9 +15,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -89,7 +89,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
-            RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+            org.key_project.prover.rules.RuleApp ruleApp = goal.getRuleAppManager().peekNext();
             SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
             Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
             if (activeStatement instanceof Throw throwStatement && isEnabled()) {

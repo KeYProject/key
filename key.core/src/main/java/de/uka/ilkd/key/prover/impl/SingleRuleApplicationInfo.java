@@ -4,7 +4,8 @@
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * Instances of this class are used to store if a rule could be applied automatically and if not to
@@ -15,16 +16,18 @@ public class SingleRuleApplicationInfo {
     private final boolean success;
     private final String message;
     private final Goal goal;
-    private final RuleApp appliedRuleApp;
+    private final org.key_project.prover.rules.RuleApp appliedRuleApp;
 
-    SingleRuleApplicationInfo(Goal mayCloseableGoal, RuleApp appliedRuleApp) {
+    SingleRuleApplicationInfo(Goal mayCloseableGoal,
+            org.key_project.prover.rules.RuleApp appliedRuleApp) {
         this.message = "Rule applied successful";
         this.goal = mayCloseableGoal;
         this.appliedRuleApp = appliedRuleApp;
         this.success = true;
     }
 
-    SingleRuleApplicationInfo(String message, Goal nonCloseableGoal, RuleApp appliedRuleApp) {
+    SingleRuleApplicationInfo(String message, Goal nonCloseableGoal,
+            org.key_project.prover.rules.RuleApp appliedRuleApp) {
         this.message = message;
         this.goal = nonCloseableGoal;
         this.appliedRuleApp = appliedRuleApp;

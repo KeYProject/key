@@ -19,5 +19,5 @@ public interface RuleExecutor<Goal extends @NonNull ProofGoal<Goal>> {
      *         close-goal-taclet ( this.closeGoal () ), the first goal of the return list is the
      *         goal that should be closed (with the constraint this taclet is applied under).
      */
-    ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp);
+    ImmutableList<@NonNull Goal> apply(@NonNull Goal goal, @NonNull RuleApp ruleApp);
 }

@@ -12,8 +12,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * Provides the basic functionality for {@link StopCondition}s which stops the auto mode when the

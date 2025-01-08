@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -118,7 +119,7 @@ public final class SortDependingFunction extends JFunction {
         }
 
         final NamespaceSet namespaces = services.getNamespaces();
-        Namespace<JFunction> functions = namespaces.functions();
+        Namespace<Function> functions = namespaces.functions();
 
         SortDependingFunction result;
         synchronized (namespaces) {

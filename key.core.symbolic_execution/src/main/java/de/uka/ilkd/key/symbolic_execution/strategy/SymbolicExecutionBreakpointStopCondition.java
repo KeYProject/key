@@ -67,7 +67,8 @@ public class SymbolicExecutionBreakpointStopCondition extends
      */
     @Override
     protected void handleNodeLimitNotExceeded(int maxApplications, long timeout, Proof proof,
-            long startTime, int countApplied, Goal goal, Node node, RuleApp ruleApp,
+            long startTime, int countApplied, Goal goal, Node node,
+            org.key_project.prover.rules.RuleApp ruleApp,
             Integer executedNumberOfSetNodes) {
         super.handleNodeLimitNotExceeded(maxApplications, timeout, proof, startTime, countApplied,
             goal, node, ruleApp, executedNumberOfSetNodes);
@@ -87,7 +88,8 @@ public class SymbolicExecutionBreakpointStopCondition extends
      * @return {@code true} at least one breakpoint is hit, {@code false} all breakpoints are not
      *         hit.
      */
-    protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
+    protected boolean isBreakpointHit(SourceElement activeStatement,
+            org.key_project.prover.rules.RuleApp ruleApp, Proof proof,
             Node node) {
         boolean result = false;
         Iterator<IBreakpoint> iter = breakpoints.iterator();

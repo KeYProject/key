@@ -54,6 +54,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.AssumesFormulaInstDirect;
@@ -691,7 +692,7 @@ public class IntermediateProofReplayer {
 
             currContract = null;
             if (builtinIfInsts != null) {
-                ourApp = ourApp.setIfInsts(builtinIfInsts);
+                ourApp = ourApp.setAssumesInsts(builtinIfInsts);
                 builtinIfInsts = null;
             }
             return ourApp;
@@ -957,7 +958,7 @@ public class IntermediateProofReplayer {
      * @throws ParserException In case of an error.
      */
     public static Term parseTerm(String value, Proof proof, Namespace<QuantifiableVariable> varNS,
-            Namespace<IProgramVariable> progVarNS, Namespace<JFunction> functNS) {
+            Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
                 varNS, functNS, proof.getNamespaces().sorts(),
@@ -1031,7 +1032,7 @@ public class IntermediateProofReplayer {
             Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
             Namespace<IProgramVariable> prgVarNS =
                 targetGoal.getLocalNamespaces().programVariables();
-            Namespace<JFunction> funcNS = targetGoal.getLocalNamespaces().functions();
+            Namespace<Function> funcNS = targetGoal.getLocalNamespaces().functions();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
             Term instance = parseTerm(value, p, varNS, prgVarNS, funcNS);
             result = app.addCheckedInstantiation(sv, instance, services, true);

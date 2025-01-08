@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.label.*;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
@@ -20,6 +19,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
@@ -45,7 +45,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * {@link #getSupportedTermLabelNames()}.</li>
  * <li>To instantiate a {@link TermLabel} via {@link #parseLabel(String, List, TermServices)}.</li>
  * <li>To compute the {@link TermLabel}s of a {@link Term} to be created via
- * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+ * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, org.key_project.prover.rules.RuleApp, Goal, Object, Term, Term)}
  * during rule application.</li>
  * <li>To refactor existing {@link Term}s during rule application via:
  * <ul>
@@ -382,7 +382,7 @@ public class TermLabelManager {
 
     /**
      * Computes the {@link TermLabel}s for the new {@link Term} via
-     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, org.key_project.prover.rules.RuleApp, Goal, Object, Term, Term)}
      * and refactors the labels below the new {@link Term} in addition via
      * {@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Goal, Object, Rule, Term)}.
      *
@@ -403,7 +403,7 @@ public class TermLabelManager {
      */
     public static Term label(Services services, TermLabelState state,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
-            RuleApp ruleApp, Goal goal,
+            org.key_project.prover.rules.RuleApp ruleApp, Goal goal,
             Object hint, Term tacletTerm, Term newTerm) {
         Term applicationTerm =
             applicationPosInOccurrence != null ? (Term) applicationPosInOccurrence.subTerm() : null;
@@ -413,7 +413,7 @@ public class TermLabelManager {
 
     /**
      * Computes the {@link TermLabel}s for the new {@link Term} via
-     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, org.key_project.prover.rules.RuleApp, Goal, Object, Term, Term)}
      * and refactors the labels below the new {@link Term} in addition via
      * {@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Goal, Object, Rule, Term)}.
      *
@@ -436,7 +436,7 @@ public class TermLabelManager {
      */
     public static Term label(Services services, TermLabelState state, Term applicationTerm,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
-            RuleApp ruleApp, Goal goal,
+            org.key_project.prover.rules.RuleApp ruleApp, Goal goal,
             Object hint, Term tacletTerm, Term newTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
@@ -449,7 +449,7 @@ public class TermLabelManager {
 
     /**
      * Computes the {@link TermLabel}s for the new {@link Term} via
-     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Term, Rule, org.key_project.prover.rules.RuleApp, Goal, Object, Term, Term)}
      * and refactors the labels below the new {@link Term} in addition via
      * {@link #refactorTerm(TermLabelState, Services, PosInOccurrence, Term, Goal, Object, Rule, Term)}.
      *
@@ -472,7 +472,7 @@ public class TermLabelManager {
      */
     public Term label(TermLabelState state, Services services, Term applicationTerm,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
-            RuleApp ruleApp, Goal goal,
+            org.key_project.prover.rules.RuleApp ruleApp, Goal goal,
             Object hint, Term tacletTerm, Term newTerm) {
         ImmutableArray<TermLabel> newLabels = instantiateLabels(state, services, applicationTerm,
             applicationPosInOccurrence, rule, ruleApp, goal, hint, tacletTerm, newTerm);
@@ -509,7 +509,8 @@ public class TermLabelManager {
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
             Services services,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
-            RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Term newTerm) {
+            org.key_project.prover.rules.RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm,
+            Term newTerm) {
         Term applicationTerm =
             applicationPosInOccurrence != null ? (Term) applicationPosInOccurrence.subTerm() : null;
         return instantiateLabels(state, services, applicationTerm, applicationPosInOccurrence, rule,
@@ -546,7 +547,8 @@ public class TermLabelManager {
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
             Services services, Term applicationTerm,
             PosInOccurrence applicationPosInOccurrence,
-            Rule rule, RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Term newTerm) {
+            Rule rule, org.key_project.prover.rules.RuleApp ruleApp, Goal goal, Object hint,
+            Term tacletTerm, Term newTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
             return manager.instantiateLabels(state, services, applicationPosInOccurrence,
@@ -644,7 +646,8 @@ public class TermLabelManager {
     public ImmutableArray<TermLabel> instantiateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule,
-            RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm, Term newTerm) {
+            org.key_project.prover.rules.RuleApp ruleApp, Goal goal, Object hint, Term tacletTerm,
+            Term newTerm) {
         // Compute current rule specific updates
         ImmutableList<TermLabelUpdate> currentRuleSpecificUpdates =
             rule != null ? ruleSpecificUpdates.get(rule.name()) : null;
@@ -687,7 +690,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, org.key_project.prover.rules.RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
      * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate
@@ -706,7 +709,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper method of
-     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, org.key_project.prover.rules.RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
      * @param state The {@link TermLabelState} of the current rule application.
@@ -789,7 +792,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, org.key_project.prover.rules.RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
@@ -847,7 +850,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, org.key_project.prover.rules.RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
@@ -888,7 +891,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, org.key_project.prover.rules.RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
      * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is
@@ -936,7 +939,7 @@ public class TermLabelManager {
      * </p>
      * <p>
      * This is a helper {@link Map} of
-     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, RuleApp, Goal, Object, Term, Term)}
+     * {@link #instantiateLabels(TermLabelState, Services, PosInOccurrence, Rule, org.key_project.prover.rules.RuleApp, Goal, Object, Term, Term)}
      * </p>
      *
      * @param state The {@link TermLabelState} of the current rule application.
@@ -959,7 +962,8 @@ public class TermLabelManager {
     protected void performUpdater(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Term modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
+            Rule rule, org.key_project.prover.rules.RuleApp ruleApp, Object hint, Term tacletTerm,
+            Term newTerm,
             ImmutableList<TermLabelUpdate> updater,
             Set<TermLabel> newLabels) {
         for (TermLabelUpdate update : updater) {
