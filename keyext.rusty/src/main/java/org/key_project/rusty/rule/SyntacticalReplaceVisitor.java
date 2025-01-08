@@ -12,6 +12,7 @@ import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.UpdateableOperator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
@@ -26,7 +27,6 @@ import org.key_project.rusty.logic.op.SubstOp;
 import org.key_project.rusty.logic.op.TermTransformer;
 import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.rule.inst.ContextInstantiationEntry;
 import org.key_project.rusty.rule.inst.SVInstantiations;
@@ -117,7 +117,8 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
     public void visit(final Term visited) {
         // Sort equality has to be ensured before calling this method
         Operator visitedOp = visited.op();
-        if (visitedOp instanceof SchemaVariable sv && visitedOp.arity() == 0
+        if (visitedOp instanceof org.key_project.logic.op.sv.SchemaVariable sv
+                && visitedOp.arity() == 0
                 && svInst.isInstantiated(sv)
                 && (!(visitedOp instanceof ProgramSV psv && psv.isListSV()))) {
             final Term newTerm = toTerm(svInst.getTermInstantiation(sv,
@@ -250,7 +251,7 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
 
             for (int j = 0, size = vBoundVars.size(); j < size; j++) {
                 QuantifiableVariable boundVar = vBoundVars.get(j);
-                if (boundVar instanceof SchemaVariable boundSchemaVariable) {
+                if (boundVar instanceof org.key_project.logic.op.sv.SchemaVariable boundSchemaVariable) {
                     final Term instantiationForBoundSchemaVariable =
                         (Term) svInst.getInstantiation(boundSchemaVariable);
                     if (instantiationForBoundSchemaVariable != null) {
@@ -285,7 +286,8 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
             if (!(p_operatorToBeInstantiated instanceof ProgramSV)
                     || !((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
                 instantiatedOp =
-                    (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
+                    (Operator) svInst.getInstantiation(
+                        (org.key_project.logic.op.sv.SchemaVariable) p_operatorToBeInstantiated);
             }
         }
         assert instantiatedOp != null;
@@ -296,7 +298,8 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
     private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
         final UpdateableOperator originalLhs = op.lhs();
         if (originalLhs instanceof SchemaVariable) {
-            Object lhsInst = svInst.getInstantiation((SchemaVariable) originalLhs);
+            Object lhsInst =
+                svInst.getInstantiation((org.key_project.logic.op.sv.SchemaVariable) originalLhs);
             if (lhsInst instanceof Term) {
                 lhsInst = ((Term) lhsInst).op();
             }

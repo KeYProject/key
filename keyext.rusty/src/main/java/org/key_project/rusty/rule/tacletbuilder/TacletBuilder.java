@@ -11,13 +11,13 @@ import java.util.Set;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.Choice;
 import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.VariableSV;
 import org.key_project.rusty.proof.calculus.RustySequentKit;
 import org.key_project.rusty.rule.NewVarcond;
@@ -40,7 +40,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected ImmutableList<NewDependingOn> varsNewDependingOn =
         ImmutableSLList.nil();
     protected ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goals =
-            ImmutableSLList.nil();    protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
+        ImmutableSLList.nil();
     protected TacletAttributes attrs = new TacletAttributes(null, null);
 
     /**
@@ -133,7 +133,8 @@ public abstract class TacletBuilder<T extends Taclet> {
      * adds a new <I>new</I> variable to the variable conditions of the Taclet: v is new and has the
      * same type as peerSV
      */
-    public void addVarsNew(SchemaVariable v, SchemaVariable peerSV) {
+    public void addVarsNew(org.key_project.logic.op.sv.SchemaVariable v,
+            org.key_project.logic.op.sv.SchemaVariable peerSV) {
         addVarsNew(new NewVarcond(v, peerSV));
     }
 
@@ -141,7 +142,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      * adds a new <I>new</I> variable to the variable conditions of the Taclet: v is new and has the
      * given type
      */
-    public void addVarsNew(SchemaVariable v, KeYRustyType type) {
+    public void addVarsNew(org.key_project.logic.op.sv.SchemaVariable v, KeYRustyType type) {
         if (type == null) {
             throw new NullPointerException("given type is null");
         }
@@ -163,24 +164,26 @@ public abstract class TacletBuilder<T extends Taclet> {
      * adds a new <I>NotFreeIn</I> variable pair to the variable conditions of the Taclet: v0 is not
      * free in v1.
      */
-    public void addVarsNotFreeIn(SchemaVariable v0, SchemaVariable v1) {
+    public void addVarsNotFreeIn(org.key_project.logic.op.sv.SchemaVariable v0,
+            org.key_project.logic.op.sv.SchemaVariable v1) {
         varsNotFreeIn = varsNotFreeIn.prepend(new NotFreeIn(v0, v1));
     }
 
 
-    public void addVarsNotFreeIn(Iterable<? extends SchemaVariable> v0,
-            Iterable<? extends SchemaVariable> v1) {
-        for (SchemaVariable boundSV : v0) {
-            for (SchemaVariable schemaVar : v1) {
+    public void addVarsNotFreeIn(Iterable<? extends org.key_project.logic.op.sv.SchemaVariable> v0,
+            Iterable<? extends org.key_project.logic.op.sv.SchemaVariable> v1) {
+        for (org.key_project.logic.op.sv.SchemaVariable boundSV : v0) {
+            for (org.key_project.logic.op.sv.SchemaVariable schemaVar : v1) {
                 addVarsNotFreeIn(boundSV, schemaVar);
             }
         }
     }
 
 
-    public void addVarsNotFreeIn(Iterable<? extends SchemaVariable> v0, SchemaVariable... v1) {
-        for (SchemaVariable boundSV : v0) {
-            for (SchemaVariable schemaVar : v1) {
+    public void addVarsNotFreeIn(Iterable<? extends org.key_project.logic.op.sv.SchemaVariable> v0,
+            org.key_project.logic.op.sv.SchemaVariable... v1) {
+        for (org.key_project.logic.op.sv.SchemaVariable boundSV : v0) {
+            for (org.key_project.logic.op.sv.SchemaVariable schemaVar : v1) {
                 addVarsNotFreeIn(boundSV, schemaVar);
             }
         }
@@ -191,7 +194,8 @@ public abstract class TacletBuilder<T extends Taclet> {
      * {@code find}
      * formula/term, however, this is not checked
      */
-    public void addVarsNewDependingOn(SchemaVariable v0, SchemaVariable v1) {
+    public void addVarsNewDependingOn(org.key_project.logic.op.sv.SchemaVariable v0,
+            SchemaVariable v1) {
         varsNewDependingOn = varsNewDependingOn.prepend(new NewDependingOn(v0, v1));
     }
 
@@ -260,11 +264,12 @@ public abstract class TacletBuilder<T extends Taclet> {
         if (goal2Choices == null || goals.isEmpty()) {
             return getTaclet();
         }
-        ImmutableList<TacletGoalTemplate> oldGoals = goals;
-        Iterator<TacletGoalTemplate> it = oldGoals.iterator();
+        ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> oldGoals =
+            goals;
         T result;
+        var it = oldGoals.iterator();
         while (it.hasNext()) {
-            TacletGoalTemplate gt = it.next();
+            var gt = it.next();
             if (goal2Choices.get(gt) != null && !goal2Choices.get(gt).eval(active)) {
                 goals = goals.removeAll(gt);
             }

@@ -5,10 +5,10 @@ package org.key_project.rusty.rule;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
@@ -16,9 +16,7 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.pat.BindingPattern;
 import org.key_project.rusty.logic.*;
-import org.key_project.rusty.logic.op.Junctor;
 import org.key_project.rusty.logic.op.ProgramVariable;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.Node;
 import org.key_project.rusty.proof.ProgVarReplacer;
@@ -133,7 +131,7 @@ public abstract class TacletExecutor<T extends Taclet> extends
         }
     }
 
-    protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
+    protected void applyAddProgVars(ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> pvs,
             SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,
             Services services, MatchConditions matchCond) {
         ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
@@ -197,11 +195,11 @@ public abstract class TacletExecutor<T extends Taclet> extends
      * @param services the Services encapsulating all Rust information
      */
     protected void addToAntec(Semisequent semi, SequentChangeInfo currentSequent,
-                              PosInOccurrence pos,
-                              PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
-                              RuleApp tacletApp, Services services) {
+            PosInOccurrence pos,
+            PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
+            RuleApp tacletApp, Services services) {
         addToPos(semi, currentSequent, pos, applicationPosInOccurrence, true,
-            matchCond, goal, services, tacletApp);
+            matchCond, goal, tacletApp, services);
     }
 
 

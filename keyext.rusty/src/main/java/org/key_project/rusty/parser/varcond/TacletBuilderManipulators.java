@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.parser.builder.TacletPBuilder;
 import org.key_project.rusty.rule.VariableCondition;
 import org.key_project.rusty.rule.tacletbuilder.TacletBuilder;
@@ -47,8 +47,8 @@ public class TacletBuilderManipulators {
                 if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
                 }
-                tb.addVarsNewDependingOn((SchemaVariable) arguments[0],
-                    (SchemaVariable) arguments[1]);
+                tb.addVarsNewDependingOn((org.key_project.logic.op.sv.SchemaVariable) arguments[0],
+                    (org.key_project.logic.op.sv.SchemaVariable) arguments[1]);
             }
         };
     public static final AbstractConditionBuilder DROP_EFFECTLESS_ELEMENTARIES =
@@ -67,8 +67,8 @@ public class TacletBuilderManipulators {
                 if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
                 }
-                tacletBuilder.addVarsNew((SchemaVariable) arguments[0],
-                    (SchemaVariable) arguments[1]);
+                tacletBuilder.addVarsNew((org.key_project.logic.op.sv.SchemaVariable) arguments[0],
+                    (org.key_project.logic.op.sv.SchemaVariable) arguments[1]);
 
             }
         };

@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -18,7 +17,6 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
 import org.key_project.logic.PosInTerm;
-import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
@@ -100,7 +98,6 @@ public final class ProgVarReplacer {
     public SVInstantiations replace(SVInstantiations insts) {
         SVInstantiations result = insts;
 
-        Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it;
         for (var e : insts.getInstantiationMap()) {
             var sv = e.key();
             InstantiationEntry<?> ie = e.value();

@@ -9,7 +9,6 @@ import java.io.IOException;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.*;
-import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.*;
 import org.key_project.rusty.proof.calculus.RustySequentKit;
@@ -269,10 +268,10 @@ public class BasicTest {
     public void testLet() {
         TacletForTests.clear();
         TacletForTests.parse(new RustProfile());
-        Semisequent antec = parseTermForSemisequent("");
-        Semisequent succ =
+        var antec = parseTermForSemisequent("");
+        var succ =
             parseTermForSemisequent("\\<{ let n: u32 = 2u32; n }\\>(i = 2)");
-        Sequent s = Sequent.createSequent(antec, succ);
+        Sequent s = RustySequentKit.createSequent(antec, succ);
         var proof = new Proof(new Name("Let"), s, TacletForTests.initConfig());
         applyRule("letIdentPatAssign",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
@@ -313,11 +312,11 @@ public class BasicTest {
     public void testIfLet() {
         TacletForTests.clear();
         TacletForTests.parse(new RustProfile());
-        Semisequent antec = parseTermForSemisequent("");
-        Semisequent succ =
+        var antec = parseTermForSemisequent("");
+        var succ =
             parseTermForSemisequent(
                 "\\<{ let n: u32 = 1u32; if let 1u32..10u32 = n { n } else { 1 }; }\\>true");
-        Sequent s = Sequent.createSequent(antec, succ);
+        Sequent s = RustySequentKit.createSequent(antec, succ);
         var proof = new Proof(new Name("IfLet"), s, TacletForTests.initConfig());
         applyRule("letIdentPatAssign",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),
@@ -366,11 +365,11 @@ public class BasicTest {
     public void testIfUnfold() {
         TacletForTests.clear();
         TacletForTests.parse(new RustProfile());
-        Semisequent antec = parseTermForSemisequent("");
-        Semisequent succ =
+        var antec = parseTermForSemisequent("");
+        var succ =
             parseTermForSemisequent(
                 "\\<{ if 1u32 < 3u32 { 1u32; } }\\>true");
-        Sequent s = Sequent.createSequent(antec, succ);
+        Sequent s = RustySequentKit.createSequent(antec, succ);
         var proof = new Proof(new Name("Test children"), s, TacletForTests.initConfig());
         applyRule("ifUnfold",
             new PosInOccurrence(proof.openGoals().head().sequent().succedent().getFirst(),

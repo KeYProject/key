@@ -11,7 +11,6 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.rusty.logic.BoundVarsVisitor;
 import org.key_project.rusty.logic.ChoiceExpr;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -61,7 +60,7 @@ public abstract class FindTaclet extends Taclet {
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSymbExec,
             ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,choices, surviveSymbExec,
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, surviveSymbExec,
             tacletAnnotations);
         this.find = find;
     }
@@ -87,7 +86,8 @@ public abstract class FindTaclet extends Taclet {
             ImmutableList<RuleSet> ruleSets,
             org.key_project.prover.rules.TacletAttributes attrs, Term find,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-           ChoiceExpr choices, ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
+            ChoiceExpr choices,
+            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices, false,
             tacletAnnotations);
     }

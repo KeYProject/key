@@ -5,12 +5,11 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.rusty.logic.ChoiceExpr;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.rules.TacletAttributes;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.rule.executor.rustydl.NoFindTacletExecutor;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -42,9 +41,10 @@ public class NoFindTaclet extends Taclet {
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-            ChoiceExpr choices, ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
+            ChoiceExpr choices,
+            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
-          choices,  tacletAnnotations);
+            choices, tacletAnnotations);
         createTacletServices();
     }
 

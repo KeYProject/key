@@ -7,7 +7,11 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.*;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -18,12 +22,13 @@ import org.key_project.rusty.logic.RustyBlock;
 import org.key_project.rusty.logic.op.*;
 import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.rule.*;
+import org.key_project.rusty.rule.AntecTaclet;
+import org.key_project.rusty.rule.FindTaclet;
+import org.key_project.rusty.rule.RewriteTaclet;
+import org.key_project.rusty.rule.SuccTaclet;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import org.key_project.rusty.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import org.key_project.rusty.rule.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -166,16 +171,23 @@ public class LogicPrinter {
             layouter.print(taclet.name().toString()).print(" {");
         }
         if (declareSchemaVars) {
-            Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
+            Set<SchemaVariable> schemaVars =
+                ((org.key_project.rusty.rule.Taclet) taclet).collectSchemaVars();
             for (SchemaVariable schemaVar : schemaVars) {
                 layouter.nl();
-                schemaVar.layout(layouter);
+                final Notation notation;
+                if (schemaVar instanceof Operator opSV) {
+                    notation = notationInfo.getNotation(opSV);
+                } else {
+                    notation = notationInfo.getNotation(schemaVar.getClass());
+                }
+                ((Notation.SchemaVariableNotation) notation).printDeclaration(schemaVar, this);
                 layouter.print(";");
             }
             layouter.nl();
         }
-        if (!(taclet.ifSequent().isEmpty())) {
-            printTextSequent(taclet.ifSequent(), "\\assumes");
+        if (!(taclet.assumesSequent().isEmpty())) {
+            printTextSequent(taclet.assumesSequent(), "\\assumes");
         }
         if (showWholeTaclet) {
             printFind(taclet);
@@ -233,10 +245,12 @@ public class LogicPrinter {
     }
 
     protected void printVarCond(Taclet taclet) {
-        final ImmutableList<NewVarcond> varsNew = taclet.varsNew();
-        final ImmutableList<NewDependingOn> varsNewDependingOn = taclet.varsNewDependingOn();
-        final ImmutableList<NotFreeIn> varsNotFreeIn = taclet.varsNotFreeIn();
-        final ImmutableList<VariableCondition> variableConditions = taclet.getVariableConditions();
+        final ImmutableList<? extends NewVarcond> varsNew = taclet.varsNew();
+        final ImmutableList<? extends NewDependingOn> varsNewDependingOn =
+            taclet.varsNewDependingOn();
+        final ImmutableList<? extends NotFreeIn> varsNotFreeIn = taclet.varsNotFreeIn();
+        final ImmutableList<? extends VariableCondition> variableConditions =
+            taclet.getVariableConditions();
 
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()
                 || !varsNewDependingOn.isEmpty()) {
@@ -350,12 +364,14 @@ public class LogicPrinter {
             layouter.nl().print("\\closegoal").brk();
         }
 
-        for (final Iterator<TacletGoalTemplate> it = taclet.goalTemplates().reverse().iterator(); it
-                .hasNext();) {
-            printGoalTemplate(it.next());
-            if (it.hasNext()) {
+        boolean notFirst = false;
+        for (final var goalTemplate : taclet.goalTemplates().reverse()) {
+            if (notFirst) {
                 layouter.print(";");
+            } else {
+                notFirst = true;
             }
+            printGoalTemplate(goalTemplate);
         }
     }
 
@@ -398,7 +414,7 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printRules(ImmutableList<Taclet> rules) {
+    protected void printRules(ImmutableList<? extends Taclet> rules) {
         layouter.nl().beginC().print("\\addrules(");
         SVInstantiations svi = instantiations;
         for (Taclet rule : rules) {

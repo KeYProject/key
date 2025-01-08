@@ -9,7 +9,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofObject;
-import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
@@ -94,8 +93,8 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     private Proof(String name, Sequent problem, TacletIndex tacletIndex,
-                  BuiltInRuleIndex builtInRules,
-                  InitConfig initConfig) {
+            BuiltInRuleIndex builtInRules,
+            InitConfig initConfig) {
         this(new Name(name), initConfig);
 
         final var rootNode = new Node(this, problem);
@@ -111,6 +110,7 @@ public class Proof implements ProofObject<Goal>, Named {
             RustySequentKit
                     .createSuccSequent(ImmutableSLList.singleton(new SequentFormula(problem))),
             initConfig.createTacletIndex(),
+            initConfig.createBuiltInRuleIndex(),
             initConfig);
     }
 

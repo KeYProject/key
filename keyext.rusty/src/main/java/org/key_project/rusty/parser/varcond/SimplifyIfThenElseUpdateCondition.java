@@ -12,11 +12,11 @@ import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.UpdateableOperator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.UpdateJunctor;
 import org.key_project.rusty.logic.op.sv.FormulaSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.UpdateSV;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.VariableCondition;
@@ -28,12 +28,12 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     private final UpdateSV u1;
     private final UpdateSV u2;
     private final FormulaSV commonFormula;
-    private final SchemaVariable result;
+    private final org.key_project.logic.op.sv.SchemaVariable result;
 
 
 
     public SimplifyIfThenElseUpdateCondition(FormulaSV phi, UpdateSV u1, UpdateSV u2,
-            FormulaSV commonFormula, SchemaVariable result) {
+            FormulaSV commonFormula, org.key_project.logic.op.sv.SchemaVariable result) {
         super();
         this.phi = phi;
         this.u1 = u1;

@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import java.util.Objects;
 
-import org.key_project.ncore.rules.RuleAbortException;
-import org.key_project.rusty.logic.PosInOccurrence;
+import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+
 
 public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     protected final BuiltInRule builtInRule;
@@ -56,33 +57,19 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
         return pio;
     }
 
-    /**
-     * applies the specified rule at the specified position if all schema variables have been
-     * instantiated
-     *
-     * @param goal the Goal where to apply the rule
-     * @return list of new created goals
-     */
-    @Override
-    public @Nullable ImmutableList<Goal> execute(Goal goal) {
-        goal.addAppliedRuleApp(this);
-        try {
-            return Objects.requireNonNull(builtInRule.apply(goal, this));
-        } catch (RuleAbortException rae) {
-            // goal.removeLastAppliedRuleApp();
-            goal.getNode().setAppliedRuleApp(null);
-            return null;
-        }
-    }
-
     public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos);
 
     @Override
-    public abstract IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts);
+    public abstract IBuiltInRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts);
 
     @Override
-    public ImmutableList<PosInOccurrence> ifInsts() {
+    public ImmutableList<PosInOccurrence> assumesInsts() {
         return ifInsts;
+    }
+
+    @Override
+    public <F extends Function> void execute(Namespace<@NonNull F> fns) {
+
     }
 
     /*

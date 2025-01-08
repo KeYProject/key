@@ -7,12 +7,12 @@ import java.util.Set;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.UpdateApplication;
 import org.key_project.rusty.logic.op.UpdateJunctor;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.UpdateSV;
 import org.key_project.rusty.proof.TermProgramVariableCollector;
 import org.key_project.rusty.rule.MatchConditions;
@@ -21,10 +21,12 @@ import org.key_project.rusty.rule.inst.SVInstantiations;
 
 public final class DropEffectlessElementariesCondition implements VariableCondition {
     private final UpdateSV u;
-    private final SchemaVariable x;
-    private final SchemaVariable result;
+    private final org.key_project.logic.op.sv.SchemaVariable x;
+    private final org.key_project.logic.op.sv.SchemaVariable result;
 
-    public DropEffectlessElementariesCondition(UpdateSV u, SchemaVariable x, SchemaVariable x2) {
+    public DropEffectlessElementariesCondition(UpdateSV u,
+            org.key_project.logic.op.sv.SchemaVariable x,
+            org.key_project.logic.op.sv.SchemaVariable x2) {
         this.u = u;
         this.x = x;
         this.result = x2;

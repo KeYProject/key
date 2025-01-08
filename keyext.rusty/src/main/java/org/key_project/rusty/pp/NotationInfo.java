@@ -8,10 +8,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.op.*;
 import org.key_project.rusty.logic.op.sv.ModalOperatorSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
 public class NotationInfo {
     // Priorities of operators (roughly corresponding to the grammatical structure in the parser.

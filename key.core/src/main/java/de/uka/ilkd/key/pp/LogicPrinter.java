@@ -272,7 +272,7 @@ public class LogicPrinter {
                 } else {
                     notation = notationInfo.getNotation(schemaVar.getClass());
                 }
-                ((Notation.SchemaVariableNotation)notation).printDeclaration(schemaVar, this);
+                ((Notation.SchemaVariableNotation) notation).printDeclaration(schemaVar, this);
                 layouter.print(";");
             }
             layouter.nl();

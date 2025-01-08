@@ -5,13 +5,13 @@ package org.key_project.rusty.rule;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
-import org.key_project.rusty.logic.ChoiceExpr;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.rules.TacletAttributes;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.rule.executor.rustydl.SuccTacletExecutor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -44,7 +44,7 @@ public class SuccTaclet extends FindTaclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices,
             tacletAnnotations);
@@ -85,7 +85,7 @@ public class SuccTaclet extends FindTaclet {
 
         return new SuccTaclet(new Name(s), applPart,
             goalTemplates(), ruleSets, attrs, find,
-            ignoreTopLevelUpdates, prefixMap, choices,tacletAnnotations);
+            ignoreTopLevelUpdates, prefixMap, choices, tacletAnnotations);
     }
 
 }

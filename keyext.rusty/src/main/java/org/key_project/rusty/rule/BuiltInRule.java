@@ -6,6 +6,7 @@ package org.key_project.rusty.rule;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleExecutor;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.rusty.Services;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 
@@ -15,7 +16,7 @@ import org.jspecify.annotations.NonNull;
  * Built-in rule interface. As applications of this rule kind may not be successful in each case one
  * has to ensure that the goal split is done only iff the application was successful.
  */
-public interface BuiltInRule extends Rule, RuleExecutor {
+public interface BuiltInRule extends Rule, RuleExecutor<Goal> {
     /**
      * the rule is applied on the given goal using the information of rule application.
      *
@@ -28,6 +29,11 @@ public interface BuiltInRule extends Rule, RuleExecutor {
     @NonNull
     ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException;
+
+    @Override
+    default ImmutableList<Goal> apply(Goal goal, org.key_project.prover.rules.RuleApp ruleApp) {
+        return apply(goal, (RuleApp) ruleApp);
+    }
 
     @Override
     default RuleExecutor getExecutor() {

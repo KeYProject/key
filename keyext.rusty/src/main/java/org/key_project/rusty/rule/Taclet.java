@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -15,12 +14,17 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.logic.BoundVarsVisitor;
 import org.key_project.rusty.logic.ChoiceExpr;
+import org.key_project.rusty.logic.OpCollector;
 import org.key_project.rusty.proof.mgt.AxiomJustification;
 import org.key_project.rusty.proof.mgt.LemmaJustification;
 import org.key_project.rusty.proof.mgt.RuleJustification;
 import org.key_project.rusty.rule.match.VMTacletMatcher;
+import org.key_project.rusty.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import org.key_project.rusty.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -44,12 +48,12 @@ public abstract class Taclet extends
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, org.key_project.prover.rules.TacletApplPart applPart,
-                     ImmutableList<TacletGoalTemplate> goalTemplates,
-                     ImmutableList<RuleSet> ruleSets,
-                     org.key_project.prover.rules.TacletAttributes attrs,
-                     ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-                     ChoiceExpr choices, boolean surviveSmbExec,
-                     ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
+            ImmutableList<TacletGoalTemplate> goalTemplates,
+            ImmutableList<RuleSet> ruleSets,
+            org.key_project.prover.rules.TacletAttributes attrs,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ChoiceExpr choices, boolean surviveSmbExec,
+            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, surviveSmbExec,
             tacletAnnotations);
         this.choices = choices;
@@ -71,8 +75,9 @@ public abstract class Taclet extends
             ImmutableList<RuleSet> ruleSets,
             org.key_project.prover.rules.TacletAttributes attrs,
             ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
-           ChoiceExpr choices, ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
-        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,false,
+            ChoiceExpr choices,
+            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
+        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
             tacletAnnotations);
     }
 
@@ -172,6 +177,40 @@ public abstract class Taclet extends
             return LemmaJustification.INSTANCE;
         } else {
             return AxiomJustification.INSTANCE;
+        }
+    }
+
+    public Set<SchemaVariable> collectSchemaVars() {
+        Set<SchemaVariable> result = new LinkedHashSet<>();
+        OpCollector oc = new OpCollector();
+
+        // find, assumes
+        for (var sv : this.getAssumesAndFindVariables()) {
+            result.add(sv);
+        }
+
+        // add, replacewith
+        for (var tgt : this.goalTemplates()) {
+            collectSchemaVarsHelper(tgt.sequent(), oc);
+            if (tgt instanceof AntecSuccTacletGoalTemplate temp) {
+                collectSchemaVarsHelper(temp.replaceWith(), oc);
+            } else if (tgt instanceof RewriteTacletGoalTemplate temp) {
+                temp.replaceWith().execPostOrder(oc);
+            }
+        }
+
+        for (Operator op : oc.ops()) {
+            if (op instanceof SchemaVariable) {
+                result.add((SchemaVariable) op);
+            }
+        }
+
+        return result;
+    }
+
+    private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
+        for (SequentFormula cf : s) {
+            cf.formula().execPostOrder(oc);
         }
     }
 }

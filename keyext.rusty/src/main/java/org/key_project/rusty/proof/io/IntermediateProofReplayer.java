@@ -447,7 +447,7 @@ public class IntermediateProofReplayer {
 
             currContract = null;
             if (builtinIfInsts != null) {
-                ourApp = ourApp.setIfInsts(builtinIfInsts);
+                ourApp = ourApp.setAssumesInsts(builtinIfInsts);
                 builtinIfInsts = null;
             }
             return ourApp;

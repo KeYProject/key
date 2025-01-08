@@ -8,7 +8,6 @@ import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.logic.RustyBlock;
-import org.key_project.rusty.logic.Sequent;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;

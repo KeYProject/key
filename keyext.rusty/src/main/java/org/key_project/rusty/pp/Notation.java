@@ -8,10 +8,11 @@ import java.util.Iterator;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.op.*;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.rusty.logic.op.sv.*;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
@@ -245,8 +246,8 @@ public abstract class Notation {
         private QuantifiableVariable instQV(Term t, LogicPrinter sp, int subTerm) {
             QuantifiableVariable v = t.varsBoundHere(subTerm).get(0);
 
-            if (v instanceof SchemaVariable) {
-                Object object = (sp.getInstantiations().getInstantiation((SchemaVariable) v));
+            if (v instanceof SchemaVariable sv) {
+                Object object = sp.getInstantiations().getInstantiation(sv);
                 if (object != null) {
                     v = (QuantifiableVariable) (((Term) object).op());
                 }
@@ -305,10 +306,62 @@ public abstract class Notation {
     }
 
     public static final class SchemaVariableNotation extends VariableNotation {
+        public void printDeclaration(org.key_project.logic.op.sv.SchemaVariable v, LogicPrinter sp) {
+            String svType;
+            String specificSort = "";
+            if (v instanceof OperatorSV) {
+                switch (v) {
+                    case ProgramSV psv -> {
+                        svType = "\\program";
+                        specificSort = psv.sort().declarationString();
+                    }
+                    case TermSV tsv -> {
+                        svType = "\\term";
+                        specificSort = tsv.sort().name().toString();
+                    }
+                    case FormulaSV fsv -> {
+                        svType = "\\formula";
+                        specificSort = fsv.sort().name().toString();
+                    }
+                    case VariableSV varSV -> {
+                        svType = "\\variables";
+                        specificSort = varSV.sort().name().toString();
+                    }
+                    case UpdateSV ignored -> svType = "\\update";
+                    case SkolemTermSV skolemTermSV -> {
+                        if (skolemTermSV.sort() == RustyDLTheory.FORMULA) {
+                            svType = "\\skolemFormula";
+                        } else {
+                            svType = "\\skolemTerm";
+                            specificSort = skolemTermSV.sort().name().toString();
+                        }
+                    }
+                    default -> throw new RuntimeException("Unknown variable type: " + v.getClass());
+                }
+                sp.layouter().print("\\schemaVar ").print(svType + " ").
+                        print(specificSort).print(" ").print(v.name().toString());
+            } else if (v instanceof ModalOperatorSV modalOperatorSV) {
+                sp.layouter().beginC(0).beginC().print("\\schemaVar \\modalOperator {").brk(0);
+                boolean first = true;
+                for (Modality.RustyModalityKind modality : modalOperatorSV.getModalities()) {
+                    if (!first) {
+                        sp.layouter().print(",").brk();
+                    } else {
+                        first = false;
+                    }
+                    sp.layouter().print(modality.name().toString());
+                }
+                sp.layouter().end().brk(0).print("}").end().print(" ").print(modalOperatorSV.name().toString());
+            } else {
+                throw new RuntimeException("Unknown variable type: " + v.getClass());
+            }
+        }
+
         @SuppressWarnings("unchecked")
         public void print(Term t, LogicPrinter sp) {
             // logger.debug("SSV: " + t+ " [" + t.op() + "]");
-            Object o = sp.getInstantiations().getInstantiation((SchemaVariable) (t.op()));
+            Object o = sp.getInstantiations()
+                    .getInstantiation((org.key_project.logic.op.sv.SchemaVariable) (t.op()));
             if (o == null) {
                 // logger.debug("Instantiation of " + t+ " [" + t.op() + "]" + "
                 // not known.");

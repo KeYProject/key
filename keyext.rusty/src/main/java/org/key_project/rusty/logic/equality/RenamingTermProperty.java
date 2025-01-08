@@ -7,12 +7,12 @@ import org.key_project.logic.Property;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.NameAbstractionTable;
 import org.key_project.rusty.logic.RustyBlock;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.ProgramVariable;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

@@ -6,7 +6,6 @@ package org.key_project.rusty.rule;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
 /**
  * The instantiations of a schemavariable can be restricted on rule scope by attaching conditions on
@@ -29,7 +28,8 @@ public interface VariableCondition extends org.key_project.prover.rules.Variable
      * @return modified match results if the condition can be satisfied, or <code>null</code>
      *         otherwise
      */
-    MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+    MatchConditions check(org.key_project.logic.op.sv.SchemaVariable var,
+            SyntaxElement instCandidate,
             MatchConditions matchCond,
             Services services);
 
@@ -37,7 +37,7 @@ public interface VariableCondition extends org.key_project.prover.rules.Variable
     default org.key_project.prover.rules.MatchConditions check(
             org.key_project.logic.op.sv.SchemaVariable var, SyntaxElement instCandidate,
             org.key_project.prover.rules.MatchConditions matchCond, LogicServices services) {
-        return check((SchemaVariable) var, instCandidate, (MatchConditions) matchCond,
+        return check(var, instCandidate, (MatchConditions) matchCond,
             (Services) services);
     }
 }

@@ -7,13 +7,14 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.TacletAnnotation;
 import org.key_project.prover.rules.TacletApplPart;
 import org.key_project.prover.rules.TacletAttributes;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.rusty.logic.ChoiceExpr;
 import org.key_project.rusty.logic.op.IfThenElse;
 import org.key_project.rusty.logic.op.Junctor;
 import org.key_project.rusty.logic.op.Modality;
@@ -124,18 +125,20 @@ public class RewriteTaclet extends FindTaclet {
             TacletAttributes attrs, Term find,
             ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ApplicationRestriction p_applicationRestriction,
-          ChoiceExpr choices,  ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
+            ChoiceExpr choices,
+            ImmutableSet<org.key_project.prover.rules.TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
             p_applicationRestriction, choices, false, tacletAnnotations);
     }
 
     public RewriteTaclet(Name name, TacletApplPart applPart,
-            ImmutableList<TacletGoalTemplate> goalTemplates,
-            TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ApplicationRestriction p_applicationRestriction, boolean surviveSymbExec,
-           ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
-        super(name, applPart, goalTemplates, attrs, find, prefixMap,
-           choices, surviveSymbExec, tacletAnnotations);
+            ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
+            TacletAttributes attrs, Term find,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ApplicationRestriction p_applicationRestriction, ChoiceExpr choices,
+            boolean surviveSymbExec, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+        super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
+            choices, surviveSymbExec, tacletAnnotations);
         applicationRestriction = p_applicationRestriction;
         createTacletServices();
     }

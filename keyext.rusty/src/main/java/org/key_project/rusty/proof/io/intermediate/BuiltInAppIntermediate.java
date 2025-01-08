@@ -4,7 +4,7 @@
 package org.key_project.rusty.proof.io.intermediate;
 
 import org.key_project.logic.Name;
-import org.key_project.rusty.logic.PosInTerm;
+import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 

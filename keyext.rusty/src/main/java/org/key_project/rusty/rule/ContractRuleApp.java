@@ -4,8 +4,8 @@
 package org.key_project.rusty.rule;
 
 import org.key_project.logic.Term;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.logic.PosInOccurrence;
 import org.key_project.rusty.logic.TermBuilder;
 import org.key_project.rusty.logic.op.IObserverFunction;
 import org.key_project.rusty.logic.op.Modality;
@@ -80,7 +80,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     }
 
     @Override
-    public ContractRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public ContractRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts) {
         super.setMutable(ifInsts);
         return this;
     }

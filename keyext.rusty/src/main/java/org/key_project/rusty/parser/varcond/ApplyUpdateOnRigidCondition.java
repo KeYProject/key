@@ -10,10 +10,10 @@ import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.TermBuilder;
 import org.key_project.rusty.logic.op.LogicVariable;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.op.sv.UpdateSV;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.VariableCondition;
@@ -42,13 +42,13 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     /**
      * The schema variable matched against a formula or term
      */
-    private final SchemaVariable phi;
+    private final org.key_project.logic.op.sv.SchemaVariable phi;
 
     /**
      * The schema variable containing the result of applying the update <code>u</code> on the
      * formula or term <code>phi</code>
      */
-    private final SchemaVariable result;
+    private final org.key_project.logic.op.sv.SchemaVariable result;
 
     /**
      * Creates an instance of the variable condition.
@@ -58,7 +58,8 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
      * @param result the schema variable containing the result of applying <code>u</code> on
      *        <code>phi</code>
      */
-    public ApplyUpdateOnRigidCondition(UpdateSV u, SchemaVariable phi, SchemaVariable result) {
+    public ApplyUpdateOnRigidCondition(UpdateSV u, org.key_project.logic.op.sv.SchemaVariable phi,
+            org.key_project.logic.op.sv.SchemaVariable result) {
         this.u = u;
         this.phi = phi;
         this.result = result;

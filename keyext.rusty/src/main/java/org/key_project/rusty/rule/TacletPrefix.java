@@ -4,7 +4,7 @@
 package org.key_project.rusty.rule;
 
 
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
  * @param prefixLength the prefix of the taclet

@@ -62,7 +62,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
             new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
                 variableConditions),
             goals, ruleSets, attrs, find, ignoreTopLevelUpdates, prefixBuilder.getPrefixMap(),
-           choices, tacletAnnotations);
+            choices, tacletAnnotations);
         // t.setOrigin(origin);
         return t;
     }

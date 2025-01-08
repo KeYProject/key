@@ -7,7 +7,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.rusty.pp.Layouter;
 
 import org.jspecify.annotations.NonNull;
 
@@ -31,11 +30,5 @@ public class VariableSV extends OperatorSV implements QuantifiableVariable, Term
     @Override
     public boolean isVariable() {
         return true;
-    }
-
-    @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\variables ").print(sort().name().toString()).print(" ")
-                .print(name().toString());
     }
 }

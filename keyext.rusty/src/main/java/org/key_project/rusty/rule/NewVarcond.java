@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
 public class NewVarcond implements org.key_project.prover.rules.NewVarcond {
-    private final SchemaVariable sv;
-    private final SchemaVariable peerSV;
+    private final org.key_project.logic.op.sv.SchemaVariable sv;
+    private final org.key_project.logic.op.sv.SchemaVariable peerSV;
     private final KeYRustyType type;
 
-    public NewVarcond(SchemaVariable sv, SchemaVariable peerSV) {
+    public NewVarcond(org.key_project.logic.op.sv.SchemaVariable sv,
+            org.key_project.logic.op.sv.SchemaVariable peerSV) {
         assert sv != null;
         assert peerSV != null;
         this.sv = sv;
@@ -19,7 +20,7 @@ public class NewVarcond implements org.key_project.prover.rules.NewVarcond {
         type = null;
     }
 
-    public NewVarcond(SchemaVariable sv, KeYRustyType type) {
+    public NewVarcond(org.key_project.logic.op.sv.SchemaVariable sv, KeYRustyType type) {
         assert sv != null;
         assert type != null;
         this.sv = sv;
@@ -27,7 +28,7 @@ public class NewVarcond implements org.key_project.prover.rules.NewVarcond {
         this.type = type;
     }
 
-    public SchemaVariable getSchemaVariable() {
+    public org.key_project.logic.op.sv.SchemaVariable getSchemaVariable() {
         return sv;
     }
 

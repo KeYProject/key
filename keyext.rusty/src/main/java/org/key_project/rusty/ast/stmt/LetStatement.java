@@ -4,6 +4,8 @@
 package org.key_project.rusty.ast.stmt;
 
 
+import java.util.Objects;
+
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.VariableDeclaration;
 import org.key_project.rusty.ast.expr.Expr;
@@ -14,8 +16,6 @@ import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.util.Objects;
 
 public class LetStatement implements Statement, VariableDeclaration {
     private final Pattern pat;

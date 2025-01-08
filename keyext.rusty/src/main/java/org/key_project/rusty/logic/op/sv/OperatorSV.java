@@ -8,6 +8,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.AbstractSortedOperator;
 import org.key_project.logic.op.Modifier;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -58,6 +59,25 @@ public abstract class OperatorSV extends AbstractSortedOperator
                 throw new TermCreationException(this, term);
             }
         }
+    }
 
+    @Override
+    public boolean isFormula() {
+        return false;
+    }
+
+    @Override
+    public boolean isSkolemTerm() {
+        return false;
+    }
+
+    @Override
+    public boolean isTerm() {
+        return false;
+    }
+
+    @Override
+    public boolean isVariable() {
+        return false;
     }
 }

@@ -6,7 +6,6 @@ package org.key_project.rusty.logic.op.sv;
 import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.rusty.logic.RustyDLTheory;
-import org.key_project.rusty.pp.Layouter;
 
 import org.jspecify.annotations.NonNull;
 
@@ -27,10 +26,5 @@ public class FormulaSV extends OperatorSV implements TerminalSyntaxElement {
     @Override
     public boolean isFormula() {
         return true;
-    }
-
-    @Override
-    public void layout(Layouter<?> layouter) {
-        layouter.print("\\schemaVar \\formula ").print(name().toString());
     }
 }

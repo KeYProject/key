@@ -11,7 +11,9 @@ import java.util.List;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.abstraction.Type;
@@ -22,7 +24,6 @@ import org.key_project.rusty.ast.visitor.RustyASTVisitor;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.InstantiationProposer;
@@ -81,12 +82,13 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @param previousProposals list of names which should be considered taken, or null
      * @return the name proposal, or null if no proposal is available
      */
-    public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
+    public String getProposal(TacletApp app, org.key_project.logic.op.sv.SchemaVariable var,
+            Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
         ContextInstantiationEntry cie = app.instantiations().getContextInstantiation();
         PosInProgram posOfDeclaration = (cie == null ? null : cie.prefix());
 
-        NewVarcond nv = app.taclet().varDeclaredNew(var);
+        NewVarcond nv = (NewVarcond) app.taclet().varDeclaredNew(var);
         // determine a suitable base name
         String basename = null;
         if (nv != null) {
@@ -94,7 +96,7 @@ public abstract class VariableNamer implements InstantiationProposer {
             if (type != null) {
                 basename = getBaseNameProposal(type);
             } else {
-                SchemaVariable psv = nv.getPeerSchemaVariable();
+                org.key_project.logic.op.sv.SchemaVariable psv = nv.getPeerSchemaVariable();
                 Object inst = app.instantiations().getInstantiation(psv);
                 if (inst instanceof Expr e) {
                     Type ty = e.type(services);
@@ -113,7 +115,8 @@ public abstract class VariableNamer implements InstantiationProposer {
     }
 
     // precondition: sv.sort()==ProgramSVSort.VARIABLE
-    public String getSuggestiveNameProposalForProgramVariable(SchemaVariable sv, TacletApp app,
+    public String getSuggestiveNameProposalForProgramVariable(
+            org.key_project.logic.op.sv.SchemaVariable sv, TacletApp app,
             Services services, ImmutableList<String> previousProposals) {
         if (suggestiveOff) {
             return getProposal(app, sv, services, null, previousProposals);

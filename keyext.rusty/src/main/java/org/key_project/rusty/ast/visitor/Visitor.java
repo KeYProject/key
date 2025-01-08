@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.visitor;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.ast.PathInExpression;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.pat.*;
@@ -15,7 +16,6 @@ import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.ast.ty.TypeOf;
 import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
-import org.key_project.rusty.logic.op.sv.SchemaVariable;
 
 /**
  * This class is implemented by visitors/walkers. Each AST node implements a visit(Visitor) method

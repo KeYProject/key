@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule.match.instructions;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElementCursor;
 import org.key_project.logic.Term;
+import org.key_project.prover.rules.MatchConditions;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.logic.PVPlace;
 import org.key_project.rusty.logic.SVPlace;
 import org.key_project.rusty.logic.op.MutRef;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
-import org.key_project.rusty.rule.MatchConditions;
 
 import org.jspecify.annotations.NonNull;
 
@@ -19,10 +20,11 @@ public class MatchPlaceSVInstruction extends MatchSchemaVariableInstruction<@Non
         super(place.getSchemaVariable());
     }
 
-    public MatchConditions match(MutRef mr, MatchConditions mc, Services services) {
+    public MatchConditions match(MutRef mr, MatchConditions mc, LogicServices services) {
         var place = mr.getPlace();
         if (place instanceof PVPlace pvp) {
-            return addInstantiation(services.getTermBuilder().var(pvp.getProgramVariable()), mc,
+            return addInstantiation(
+                ((Services) services).getTermBuilder().var(pvp.getProgramVariable()), mc,
                 services);
         }
         return null;
@@ -30,7 +32,7 @@ public class MatchPlaceSVInstruction extends MatchSchemaVariableInstruction<@Non
 
     @Override
     public MatchConditions match(SyntaxElementCursor cursor, MatchConditions matchConditions,
-            Services services) {
+            LogicServices services) {
         cursor.goToNext();
         var node = cursor.getCurrentNode();
         if (!(node instanceof MutRef mr))
@@ -45,7 +47,7 @@ public class MatchPlaceSVInstruction extends MatchSchemaVariableInstruction<@Non
 
     @Override
     public MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
-            Services services) {
+            LogicServices services) {
         return match((MutRef) instantiationCandidate.op(), matchCond, services);
     }
 }

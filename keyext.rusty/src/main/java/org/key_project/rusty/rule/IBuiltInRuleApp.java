@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.rule;
 
-import org.key_project.rusty.logic.PosInOccurrence;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 
@@ -25,9 +25,9 @@ public interface IBuiltInRuleApp extends RuleApp {
      */
     boolean isSufficientlyComplete();
 
-    ImmutableList<PosInOccurrence> ifInsts();
+    ImmutableList<PosInOccurrence> assumesInsts();
 
-    IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts);
+    IBuiltInRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts);
 
     IBuiltInRuleApp replacePos(PosInOccurrence newPos);
 }

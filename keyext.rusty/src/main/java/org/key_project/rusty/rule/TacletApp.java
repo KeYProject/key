@@ -842,7 +842,7 @@ public abstract class TacletApp implements RuleApp {
         // Currently a simplified version is used
         Sort svSort = sv.sort();
         if (svSort == ProgramSVSort.VARIABLE) {
-            NewVarcond nvc = taclet.varDeclaredNew(sv);
+            NewVarcond nvc = (NewVarcond) taclet.varDeclaredNew(sv);
             if (nvc != null) {
                 KeYRustyType krt;
                 Object o = nvc.getTypeDefiningObject();

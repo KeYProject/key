@@ -6,7 +6,6 @@ package org.key_project.rusty.logic.op.sv;
 import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.rusty.logic.RustyDLTheory;
-import org.key_project.rusty.pp.Layouter;
 
 import org.jspecify.annotations.NonNull;
 
@@ -19,10 +18,5 @@ public class UpdateSV extends OperatorSV implements TerminalSyntaxElement {
     @Override
     public @NonNull String toString() {
         return toString("update");
-    }
-
-    @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\update ").print(name().toString());
     }
 }

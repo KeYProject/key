@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.*;
 import org.key_project.rusty.logic.*;
 import org.key_project.rusty.rule.BuiltInRule;
 import org.key_project.rusty.rule.IBuiltInRuleApp;

@@ -7,6 +7,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.MatchConditions;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
@@ -36,27 +37,27 @@ public abstract class Instruction<Op extends Operator> implements MatchInstructi
         return new MatchModalityInstruction(mod);
     }
 
-    public static MatchSchemaVariableInstruction<? extends @NonNull SchemaVariable> matchFormulaSV(
+    public static MatchSchemaVariableInstruction<? extends org.key_project.logic.op.sv.SchemaVariable> matchFormulaSV(
             FormulaSV sv) {
         return new MatchFormulaSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends @NonNull SchemaVariable> matchTermSV(
+    public static MatchSchemaVariableInstruction<? extends org.key_project.logic.op.sv.SchemaVariable> matchTermSV(
             TermSV sv) {
         return new MatchTermSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends @NonNull SchemaVariable> matchVariableSV(
+    public static MatchSchemaVariableInstruction<? extends org.key_project.logic.op.sv.SchemaVariable> matchVariableSV(
             VariableSV sv) {
         return new MatchVariableSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends @NonNull SchemaVariable> matchProgramSV(
+    public static MatchSchemaVariableInstruction<? extends org.key_project.logic.op.sv.SchemaVariable> matchProgramSV(
             ProgramSV sv) {
         return new MatchProgramSVInstruction(sv);
     }
 
-    public static MatchSchemaVariableInstruction<? extends @NonNull SchemaVariable> matchUpdateSV(
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchUpdateSV(
             UpdateSV sv) {
         return new MatchUpdateSVInstruction(sv);
     }

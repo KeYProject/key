@@ -6,7 +6,7 @@ package org.key_project.rusty.proof.init;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.key_project.rusty.logic.Sequent;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.rusty.proof.io.AbstractProblemLoader;
 import org.key_project.rusty.proof.io.ProofSaver;
 import org.key_project.rusty.settings.Configuration;
