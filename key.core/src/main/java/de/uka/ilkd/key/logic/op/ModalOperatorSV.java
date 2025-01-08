@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.ParsableVariable;
@@ -14,7 +13,7 @@ import org.key_project.util.collection.ImmutableSet;
  * Schema variable matching modal operators.
  */
 public final class ModalOperatorSV extends Modality.JavaModalityKind
-        implements ParsableVariable, Layoutable, SchemaVariable {
+        implements ParsableVariable, SchemaVariable {
 
     /**
      * the set of modalities this sv can match
@@ -73,18 +72,5 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind
         return false;
     }
 
-    @Override
-    public void layout(Layouter<?> l) {
-        l.beginC(0).beginC().print("\\schemaVar \\modalOperator {").brk(0);
-        boolean first = true;
-        for (Modality.JavaModalityKind modality : modalities) {
-            if (!first) {
-                l.print(",").brk();
-            } else {
-                first = false;
-            }
-            l.print(modality.name().toString());
-        }
-        l.end().brk(0).print("}").end().print(" ").print(name().toString());
-    }
+
 }

@@ -492,6 +492,59 @@ public abstract class Notation {
 
     public static final class SchemaVariableNotation extends VariableNotation {
 
+        public void printDeclaration(SchemaVariable v, LogicPrinter sp) {
+
+            String svType;
+            String specificSort = "";
+            if (v instanceof OperatorSV) {
+                switch (v) {
+                    case ProgramSV psv -> {
+                        svType = "\\program";
+                        specificSort = psv.sort().declarationString();
+                    }
+                    case TermSV tsv -> {
+                        svType = "\\term";
+                        specificSort = tsv.sort().name().toString();
+                    }
+                    case FormulaSV fsv -> {
+                        svType = "\\formula";
+                        specificSort = fsv.sort().name().toString();
+                    }
+                    case VariableSV varSV -> {
+                        svType = "\\variables";
+                        specificSort = varSV.sort().name().toString();
+                    }
+                    case UpdateSV ignored -> svType = "\\update";
+                    case SkolemTermSV skolemTermSV -> {
+                        if (skolemTermSV.sort() == JavaDLTheory.FORMULA) {
+                            svType = "\\skolemFormula";
+                        } else {
+                            svType = "\\skolemTerm";
+                            specificSort = skolemTermSV.sort().name().toString();
+                        }
+                    }
+                    case TermLabelSV ignored -> svType = "\\termlabel";
+                    default -> throw new RuntimeException("Unknown variable type: " + v.getClass());
+                }
+                sp.layouter().print("\\schemaVar ").print(svType + " ").
+                        print(specificSort).print(" ").print(v.name().toString());
+            } else if (v instanceof ModalOperatorSV modalOperatorSV) {
+                sp.layouter().beginC(0).beginC().print("\\schemaVar \\modalOperator {").brk(0);
+                boolean first = true;
+                for (Modality.JavaModalityKind modality : modalOperatorSV.getModalities()) {
+                    if (!first) {
+                        sp.layouter().print(",").brk();
+                    } else {
+                        first = false;
+                    }
+                    sp.layouter().print(modality.name().toString());
+                }
+                sp.layouter().end().brk(0).print("}").end().print(" ").print(modalOperatorSV.name().toString());
+            } else{
+                throw new RuntimeException("Unknown variable type: " + v.getClass());
+            }
+        }
+
         @SuppressWarnings("unchecked")
         public void print(Term t, LogicPrinter sp) {
             // logger.debug("SSV: " + t+ " [" + t.op() + "]");

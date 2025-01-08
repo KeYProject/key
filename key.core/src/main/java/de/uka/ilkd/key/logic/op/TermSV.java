@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
@@ -32,12 +31,6 @@ public final class TermSV extends OperatorSV implements TerminalSyntaxElement {
     @Override
     public String toString() {
         return toString(sort() + " term");
-    }
-
-    @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\term ").print(sort().name().toString()).print(" ")
-                .print(name().toString());
     }
 
     @Override

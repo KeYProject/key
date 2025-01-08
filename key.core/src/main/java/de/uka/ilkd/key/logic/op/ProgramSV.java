@@ -19,7 +19,6 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
@@ -361,12 +360,6 @@ public final class ProgramSV extends OperatorSV
     @Override
     public String toString() {
         return toString("program " + sort().name());
-    }
-
-    @Override
-    public void layout(Layouter<?> layouter) {
-        layouter.print("\\schemaVar \\program ").print(sort().declarationString()).print(" ")
-                .print(name().toString());
     }
 
     @Override

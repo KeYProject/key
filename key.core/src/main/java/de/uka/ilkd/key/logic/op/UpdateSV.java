@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
@@ -26,8 +25,4 @@ public final class UpdateSV extends OperatorSV implements TerminalSyntaxElement 
         return toString("update");
     }
 
-    @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\update ").print(name().toString());
-    }
 }
