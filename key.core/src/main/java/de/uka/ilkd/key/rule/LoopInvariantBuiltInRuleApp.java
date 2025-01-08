@@ -291,7 +291,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     @Override
-    public LoopInvariantBuiltInRuleApp setIfInsts(
+    public LoopInvariantBuiltInRuleApp setAssumesInsts(
             ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;

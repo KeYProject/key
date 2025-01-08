@@ -90,7 +90,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     }
 
     @Override
-    public ContractRuleApp setIfInsts(
+    public ContractRuleApp setAssumesInsts(
             ImmutableList<PosInOccurrence> ifInsts) {
         super.setMutable(ifInsts);
         return this;

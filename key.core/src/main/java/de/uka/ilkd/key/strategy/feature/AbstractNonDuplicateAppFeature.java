@@ -10,13 +10,13 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
@@ -40,7 +40,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * application <code>newApp</code> at position <code>newPio</code>.<code>newPio</code> can be
      * <code>null</code>
      */
-    protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp,
+    protected boolean sameApplication(org.key_project.prover.rules.RuleApp ruleCmp,
+            TacletApp newApp,
             PosInOccurrence newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
@@ -126,7 +127,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         final Node node = goal.node();
         final AppliedRuleAppsNameCache cache =
             node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();
-        List<RuleApp> apps = cache.get(node, app.rule().name());
+        List<org.key_project.prover.rules.RuleApp> apps = cache.get(node, app.rule().name());
 
         // Check all rules with this name
         for (RuleApp a : apps) {

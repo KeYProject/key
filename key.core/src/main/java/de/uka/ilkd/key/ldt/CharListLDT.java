@@ -35,11 +35,11 @@ public final class CharListLDT extends LDT {
     // LexPathOrdering and into CharListNotation!
 
     // functions
-    private final JFunction clIndexOfChar;
+    private final Function clIndexOfChar;
     private final Function clIndexOfCl;
-    private final JFunction clLastIndexOfChar;
+    private final Function clLastIndexOfChar;
     private final Function clLastIndexOfCl;
-    private final JFunction clReplace;
+    private final Function clReplace;
     private final Function clTranslateInt;
     private final Function clRemoveZeros;
     private final Function clHashCode;
@@ -109,7 +109,7 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
 
-    public JFunction getClIndexOfChar() {
+    public Function getClIndexOfChar() {
         return clIndexOfChar;
     }
 
@@ -119,7 +119,7 @@ public final class CharListLDT extends LDT {
     }
 
 
-    public JFunction getClLastIndexOfChar() {
+    public Function getClLastIndexOfChar() {
         return clLastIndexOfChar;
     }
 
@@ -129,7 +129,7 @@ public final class CharListLDT extends LDT {
     }
 
 
-    public JFunction getClReplace() {
+    public Function getClReplace() {
         return clReplace;
     }
 
@@ -249,7 +249,7 @@ public final class CharListLDT extends LDT {
     }
 
     @Override
-    public @Nullable JFunction getFunctionFor(String operationName, Services services) {
+    public @Nullable Function getFunctionFor(String operationName, Services services) {
         // This is not very elegant; but seqConcat is actually in the SeqLDT.
         if (operationName.equals("add")) {
             return services.getNamespaces().functions().lookup("seqConcat");

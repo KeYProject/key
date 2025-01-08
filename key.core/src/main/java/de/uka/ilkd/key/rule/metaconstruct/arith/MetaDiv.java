@@ -13,9 +13,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-
-
 
 public final class MetaDiv extends AbstractTermTransformer {
 
@@ -56,13 +55,13 @@ public final class MetaDiv extends AbstractTermTransformer {
         bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
         if (bigIntArg2.compareTo(new BigInteger("0")) == 0) {
             Name undefName = new Name("undef(" + term + ")");
-            JFunction undef = services.getNamespaces().functions().lookup(undefName);
+            Function undef = services.getNamespaces().functions().lookup(undefName);
             if (undef == null) {
                 undef = new JFunction(undefName,
                     services.getTypeConverter().getIntegerLDT().targetSort(), new Sort[0]);
                 services.getNamespaces().functions().add(undef);
             }
-            return services.getTermFactory().createTerm(undef);
+            return services.getTermBuilder().func(undef);
         }
         BigInteger remainder = bigIntArg1.remainder(bigIntArg2);
         BigInteger bigIntResult = bigIntArg1.divide(bigIntArg2);

@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
@@ -60,6 +59,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
@@ -1442,7 +1442,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 return tOne;
             }
 
-            public Term toTerm(RuleApp app, PosInOccurrence pos,
+            public Term toTerm(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tOne;
             }
@@ -1456,7 +1456,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 return tTwo;
             }
 
-            public Term toTerm(RuleApp app, PosInOccurrence pos,
+            public Term toTerm(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tTwo;
             }
@@ -2054,7 +2054,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         all (it is discarded by the strategy).
      */
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
+    public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         var time = System.nanoTime();
@@ -2075,7 +2075,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      * @return true iff the rule should be applied, false otherwise
      */
     @Override
-    public final boolean isApprovedApp(RuleApp app,
+    public final boolean isApprovedApp(org.key_project.prover.rules.RuleApp app,
             PosInOccurrence pio, Goal goal) {
         var time = System.nanoTime();
         try {

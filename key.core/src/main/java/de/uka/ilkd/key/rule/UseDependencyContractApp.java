@@ -75,7 +75,8 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp setStep(PosInOccurrence p_step) {
         assert this.step == null;
-        return new UseDependencyContractApp(rule(), posInOccurrence(), ifInsts(), instantiation,
+        return new UseDependencyContractApp(rule(), posInOccurrence(), assumesInsts(),
+            instantiation,
             p_step);
     }
 
@@ -157,7 +158,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
 
     @Override
-    public UseDependencyContractApp setIfInsts(
+    public UseDependencyContractApp setAssumesInsts(
             ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;

@@ -26,7 +26,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -39,6 +38,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
@@ -1134,7 +1134,7 @@ public class MergeRuleUtils {
         final Proof proof = services.getProof();
 
         // This goal
-        final Collection<Operator> thisGoalSymbols = new ArrayList<>();
+        final Collection<org.key_project.logic.op.Operator> thisGoalSymbols = new ArrayList<>();
         final Goal thisGoal = proof.getOpenGoal(mergeState.getCorrespondingNode());
         final NamespaceSet thisGoalNamespaces = thisGoal.getLocalNamespaces();
         thisGoalSymbols.addAll(thisGoalNamespaces.programVariables().allElements());
@@ -1143,7 +1143,7 @@ public class MergeRuleUtils {
             thisGoalSymbols.parallelStream().map(Named::name).collect(Collectors.toList());
 
         // Partner goal
-        final Collection<Operator> partnerGoalSymbols = new ArrayList<>();
+        final Collection<org.key_project.logic.op.Operator> partnerGoalSymbols = new ArrayList<>();
         final Goal partnerGoal = proof.getOpenGoal(mergePartnerState.getCorrespondingNode());
         final NamespaceSet partnerGoalNamespaces = partnerGoal.getLocalNamespaces();
         partnerGoalSymbols.addAll(partnerGoalNamespaces.programVariables().allElements());
@@ -1157,16 +1157,17 @@ public class MergeRuleUtils {
         if (!thisGoalNames.isEmpty()) {
             // There are conflicts... So let's do something
 
-            final List<Operator> problematicOps =
+            final List<org.key_project.logic.op.Operator> problematicOps =
                 partnerGoalSymbols.parallelStream().filter(pv -> thisGoalNames.contains(pv.name()))
                         .filter(pv -> !thisGoalSymbols.contains(pv)).toList();
 
             // Loop over all problematic operators and rename them in the
             // partner state.
-            for (Operator partnerStateOp : problematicOps) {
-                final Operator mergeStateOp = thisGoalSymbols.parallelStream()
-                        .filter(s -> s.name().equals(partnerStateOp.name()))
-                        .toList().get(0);
+            for (org.key_project.logic.op.Operator partnerStateOp : problematicOps) {
+                final org.key_project.logic.op.Operator mergeStateOp =
+                    thisGoalSymbols.parallelStream()
+                            .filter(s -> s.name().equals(partnerStateOp.name()))
+                            .toList().get(0);
 
                 Operator newOp1;
                 Operator newOp2;

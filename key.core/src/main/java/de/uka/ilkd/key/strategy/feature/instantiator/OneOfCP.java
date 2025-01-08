@@ -6,11 +6,11 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 public class OneOfCP implements Feature {
@@ -28,7 +28,8 @@ public class OneOfCP implements Feature {
         return new OneOfCP(features);
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
+            Goal goal,
             MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
         manager.passChoicePoint(cp, this);
@@ -38,9 +39,9 @@ public class OneOfCP implements Feature {
     private final class CP implements ChoicePoint {
         private final class BranchIterator implements Iterator<CPBranch> {
             private int num = 0;
-            private final RuleApp oldApp;
+            private final org.key_project.prover.rules.RuleApp oldApp;
 
-            public BranchIterator(RuleApp oldApp) {
+            public BranchIterator(org.key_project.prover.rules.RuleApp oldApp) {
                 this.oldApp = oldApp;
             }
 
@@ -55,7 +56,7 @@ public class OneOfCP implements Feature {
                         theChosenOne = chosen;
                     }
 
-                    public RuleApp getRuleAppForBranch() {
+                    public org.key_project.prover.rules.RuleApp getRuleAppForBranch() {
                         return oldApp;
                     }
                 };

@@ -716,7 +716,7 @@ public final class IntegerLDT extends LDT {
     }
 
     @Override
-    public @Nullable JFunction getFunctionFor(String op, Services services) {
+    public @Nullable Function getFunctionFor(String op, Services services) {
         return switch (op) {
         case "gt" -> getGreaterThan();
         case "geq" -> getGreaterOrEquals();

@@ -10,7 +10,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
@@ -22,6 +21,7 @@ import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.op.Modifier;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -53,7 +53,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
         };
     }
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos,
+    public Iterator<Term> generate(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
             Goal goal,
             MutableState mState) {
         return createIterator(pos, mState);

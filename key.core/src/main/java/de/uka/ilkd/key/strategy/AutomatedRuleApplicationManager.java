@@ -5,7 +5,8 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.NewRuleListener;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
 
 
 /**
@@ -24,7 +25,7 @@ public interface AutomatedRuleApplicationManager extends NewRuleListener {
      *         the method nextAndCache() or next() is called. A call of next() empties the cache
      *         again.
      */
-    RuleApp peekNext();
+    org.key_project.prover.rules.RuleApp peekNext();
 
     /**
      * @return the next rule that is supposed to be applied

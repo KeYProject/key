@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 public abstract class FilterStrategy implements Strategy {
@@ -22,13 +22,13 @@ public abstract class FilterStrategy implements Strategy {
     }
 
     @Override
-    public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+    public boolean isApprovedApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return delegate.isApprovedApp(app, pio, goal);
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
+    public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         if (!isApprovedApp(app, pio, goal)) {

@@ -8,12 +8,12 @@ import java.util.Map;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves the

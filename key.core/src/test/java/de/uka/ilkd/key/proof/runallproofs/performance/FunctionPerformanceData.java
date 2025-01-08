@@ -11,7 +11,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
 
 public class FunctionPerformanceData {
 

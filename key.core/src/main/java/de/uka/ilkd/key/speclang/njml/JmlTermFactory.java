@@ -31,6 +31,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -1137,7 +1138,7 @@ public final class JmlTermFactory {
 
     public @NonNull SLExpression createSkolemExprBool(String jmlKeyWord) {
         exc.addUnderspecifiedWarning(jmlKeyWord);
-        final Namespace<JFunction> fns = services.getNamespaces().functions();
+        final Namespace<Function> fns = services.getNamespaces().functions();
         final String shortName = jmlKeyWord.replace("\\", "");
         int x = -1;
         Name name;
@@ -1198,7 +1199,7 @@ public final class JmlTermFactory {
             @NonNull TermServices services,
             @NonNull String shortName) {
         shortName = shortName.replace("\\", "");
-        final Namespace<JFunction> fns = services.getNamespaces().functions();
+        final Namespace<Function> fns = services.getNamespaces().functions();
         final Sort sort = type.getSort();
         int x = -1;
         Name name;
@@ -1215,7 +1216,7 @@ public final class JmlTermFactory {
 
     public SLExpression translateToJDLTerm(final String functName,
             ImmutableList<SLExpression> list) {
-        Namespace<JFunction> funcs = services.getNamespaces().functions();
+        Namespace<Function> funcs = services.getNamespaces().functions();
         Named symbol = funcs.lookup(new Name(functName));
 
         // weigl 2021-07-20: Handling of typed parameter in functions,

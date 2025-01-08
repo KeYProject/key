@@ -4,7 +4,8 @@
 package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * An annotated edge representing a chain of real proof nodes.
@@ -42,7 +43,7 @@ public class AnnotatedShortenedEdge extends AnnotatedEdge {
      */
     public String getEdgeLabel() {
         var sb = new StringBuilder();
-        RuleApp ruleApp1 = initial.getAppliedRuleApp();
+        org.key_project.prover.rules.RuleApp ruleApp1 = initial.getAppliedRuleApp();
         if (ruleApp1 != null) {
             sb.append(ruleApp1.rule().displayName()).append("_").append(initial.serialNr());
             sb.append(" ... ");

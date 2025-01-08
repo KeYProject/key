@@ -5,12 +5,12 @@ package de.uka.ilkd.key.logic;
 
 
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 
@@ -21,7 +21,7 @@ public class NamespaceSet {
     private Namespace<@NonNull QuantifiableVariable> varNS = new Namespace<>();
     private Namespace<@NonNull IProgramVariable> progVarNS = new Namespace<>();
     // TODO: Operators should not be local to goals
-    private Namespace<@NonNull JFunction> funcNS = new Namespace<>();
+    private Namespace<@NonNull Function> funcNS = new Namespace<>();
     private Namespace<@NonNull RuleSet> ruleSetNS = new Namespace<>();
     private Namespace<@NonNull Sort> sortNS = new Namespace<>();
     private Namespace<@NonNull Choice> choiceNS = new Namespace<>();
@@ -30,7 +30,7 @@ public class NamespaceSet {
     }
 
     public NamespaceSet(Namespace<@NonNull QuantifiableVariable> varNS,
-            Namespace<@NonNull JFunction> funcNS,
+            Namespace<@NonNull Function> funcNS,
             Namespace<@NonNull Sort> sortNS, Namespace<@NonNull RuleSet> ruleSetNS,
             Namespace<@NonNull Choice> choiceNS,
             Namespace<@NonNull IProgramVariable> programVarNS) {
@@ -78,11 +78,11 @@ public class NamespaceSet {
         this.progVarNS = progVarNS;
     }
 
-    public Namespace<@NonNull JFunction> functions() {
+    public Namespace<@NonNull Function> functions() {
         return funcNS;
     }
 
-    public void setFunctions(Namespace<@NonNull JFunction> funcNS) {
+    public void setFunctions(Namespace<@NonNull Function> funcNS) {
         this.funcNS = funcNS;
     }
 
@@ -155,9 +155,13 @@ public class NamespaceSet {
     }
 
     /**
-     * @param name
-     * @param spaces
-     * @return the element with the given name if found in the given namespaces, otherwise
+     * retrieves an object of the given name from the namespaces; the first object found in order of
+     * the
+     * specified namespaces
+     *
+     * @param name the Name to look up
+     * @param spaces the Namespaces where to look for an object of the given name
+     * @return the first element with the given name if found in the given namespaces, otherwise
      *         <tt>null</tt>
      */
     private Named lookup(Name name, final Namespace<?>[] spaces) {

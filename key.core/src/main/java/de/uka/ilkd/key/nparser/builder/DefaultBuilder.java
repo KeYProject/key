@@ -26,6 +26,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
@@ -147,7 +148,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         Operator[] operators =
             { (OperatorSV) schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
-                functions().lookup(name), AbstractTermTransformer.name2metaop(varfuncName),
+                (JFunction) functions().lookup(name),
+                AbstractTermTransformer.name2metaop(varfuncName),
 
             };
 
@@ -164,7 +166,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 new Operator[] { (OperatorSV) schemaVariables().lookup(fqName),
                     variables().lookup(fqName),
                     programVariables().lookup(new ProgramElementName(fqName.toString())),
-                    functions().lookup(fqName),
+                    (JFunction) functions().lookup(fqName),
                     AbstractTermTransformer.name2metaop(fqName.toString()) };
 
             for (Operator op : operators) {
@@ -236,7 +238,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().sorts();
     }
 
-    protected Namespace<JFunction> functions() {
+    protected Namespace<Function> functions() {
         return namespaces().functions();
     }
 

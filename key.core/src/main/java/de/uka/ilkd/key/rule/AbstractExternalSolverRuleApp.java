@@ -105,7 +105,7 @@ public abstract class AbstractExternalSolverRuleApp extends AbstractBuiltInRuleA
     public abstract AbstractExternalSolverRuleApp setTitle(String title);
 
     @Override
-    public AbstractExternalSolverRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public AbstractExternalSolverRuleApp setAssumesInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }

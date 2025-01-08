@@ -66,7 +66,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
-            RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+            org.key_project.prover.rules.RuleApp ruleApp = goal.getRuleAppManager().peekNext();
             SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
             breakpointHit = isBreakpointHit(activeStatement, ruleApp, proof, node);
         }
@@ -101,7 +101,8 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      * @return {@code true} at least one breakpoint is hit, {@code false} all breakpoints are not
      *         hit.
      */
-    protected boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
+    protected boolean isBreakpointHit(SourceElement activeStatement,
+            org.key_project.prover.rules.RuleApp ruleApp, Proof proof,
             Node node) {
         boolean result = false;
         Iterator<IBreakpoint> iter = breakpoints.iterator();

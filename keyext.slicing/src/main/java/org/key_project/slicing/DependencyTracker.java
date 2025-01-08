@@ -25,12 +25,12 @@ import de.uka.ilkd.key.proof.proofevent.NodeChangeRemoveFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleAppUtil;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.slicing.analysis.AnalysisResults;
@@ -104,7 +104,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @return all formulas used by the rule application
      */
     private static Set<PosInOccurrence> inputsOfRuleApp(
-            RuleApp ruleApp, Node node) {
+            org.key_project.prover.rules.RuleApp ruleApp, Node node) {
         Set<PosInOccurrence> inputs = new HashSet<>();
         if (ruleApp.posInOccurrence() != null) {
             inputs.add(ruleApp.posInOccurrence().topLevel());
@@ -124,7 +124,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      */
     private List<Pair<GraphNode, Boolean>> inputsOfNode(Node n,
             Set<PosInOccurrence> removed) {
-        RuleApp ruleApp = n.getAppliedRuleApp();
+        org.key_project.prover.rules.RuleApp ruleApp = n.getAppliedRuleApp();
         List<Pair<GraphNode, Boolean>> input = new ArrayList<>();
 
         // check whether the rule of this proof step was added by another proof step
@@ -269,7 +269,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 "dependency tracker received rule application on wrong proof");
         }
         RuleAppInfo ruleAppInfo = e.getRuleAppInfo();
-        RuleApp ruleApp = ruleAppInfo.getRuleApp();
+        org.key_project.prover.rules.RuleApp ruleApp = ruleAppInfo.getRuleApp();
         ImmutableList<Goal> goalList = e.getNewGoals();
         Node n = ruleAppInfo.getOriginalNode();
 

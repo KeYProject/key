@@ -11,11 +11,11 @@ import java.util.Set;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 /**
@@ -69,7 +69,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * @param goal context
      * @return true if rule may be applied
      */
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
+    protected boolean ruleApplicationInContextAllowed(org.key_project.prover.rules.RuleApp ruleApp,
             PosInOccurrence pio,
             Goal goal) {
         return true;
@@ -100,7 +100,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp,
+        public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp ruleApp,
                 PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();
@@ -121,7 +121,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+        public boolean isApprovedApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
                 Goal goal) {
             return delegate.isApprovedApp(app, pio, goal);
         }

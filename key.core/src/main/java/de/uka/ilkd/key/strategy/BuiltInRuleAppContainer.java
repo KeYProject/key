@@ -7,8 +7,8 @@ import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -154,7 +154,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         IBuiltInRuleApp app = rule.createApp(pio, goal.proof().getServices());
 
         if (!app.complete()) {
-            app = app.setIfInsts(bir.ifInsts());
+            app = app.setAssumesInsts(bir.assumesInsts());
             // TODO: check for force ?
             final boolean force = true;
             app = force ? app.forceInstantiate(goal) : app.tryToInstantiate(goal);

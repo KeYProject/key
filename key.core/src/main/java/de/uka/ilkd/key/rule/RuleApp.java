@@ -16,7 +16,7 @@ public interface RuleApp
     /**
      * returns the rule of this rule application
      */
-    Rule rule();
+    org.key_project.prover.rules.Rule rule();
 
     /**
      * returns the PositionInOccurrence (representing a SequentFormula and a position in the

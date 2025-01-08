@@ -5,11 +5,11 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
@@ -78,13 +78,13 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public RuleApp peekNext() {
+    public org.key_project.prover.rules.RuleApp peekNext() {
         return delegate.peekNext();
     }
 
     @Override
-    public RuleApp next() {
-        final RuleApp app = delegate.next();
+    public org.key_project.prover.rules.RuleApp next() {
+        final org.key_project.prover.rules.RuleApp app = delegate.next();
         onlyModifyFocussedFormula = false;
         return app;
     }
@@ -96,13 +96,13 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
+    public void ruleAdded(org.key_project.prover.rules.RuleApp rule, PosInOccurrence pos) {
         if (isRuleApplicationForFocussedFormula(rule, pos)) {
             delegate.ruleAdded(rule, pos);
         }
     }
 
-    protected boolean isRuleApplicationForFocussedFormula(RuleApp rule,
+    protected boolean isRuleApplicationForFocussedFormula(org.key_project.prover.rules.RuleApp rule,
             PosInOccurrence pos) {
         /*
          * filter the rule applications, only allow applications within the focussed subterm or to
@@ -129,8 +129,9 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
-        ImmutableList<RuleApp> applicableRules = ImmutableSLList.nil();
+    public void rulesAdded(ImmutableList<? extends org.key_project.prover.rules.RuleApp> rules,
+            PosInOccurrence pos) {
+        ImmutableList<org.key_project.prover.rules.RuleApp> applicableRules = ImmutableSLList.nil();
         for (RuleApp r : rules) {
             if (isRuleApplicationForFocussedFormula(r, pos)) {
                 applicableRules = applicableRules.prepend(r);

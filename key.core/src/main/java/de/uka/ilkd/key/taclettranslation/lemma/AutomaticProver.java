@@ -10,8 +10,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.RuleApp;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -99,7 +99,7 @@ public class AutomaticProver {
                 int ruleCounter = 0;
                 while (!openGoals.isEmpty() && ruleCounter < maxNumberOfRules) {
                     Goal goal = openGoals.getFirst();
-                    RuleApp app = getNextApp(goal);
+                    org.key_project.prover.rules.RuleApp app = getNextApp(goal);
                     if (app == null) {
                         openGoals.removeFirst();
                     } else {
@@ -128,7 +128,7 @@ public class AutomaticProver {
             }
         }
 
-        private RuleApp getNextApp(Goal goal) {
+        private org.key_project.prover.rules.RuleApp getNextApp(Goal goal) {
             RuleApp app = goal.getRuleAppManager().next();
             if (app == null) {
                 goal.ruleAppIndex().scanBuiltInRules(goal);

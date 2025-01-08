@@ -25,6 +25,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -311,7 +312,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public static PosInOccurrence findStepInIfInsts(
             List<PosInOccurrence> steps,
             UseDependencyContractApp app, TermServices services) {
-        for (PosInOccurrence pio : app.ifInsts()) {
+        for (PosInOccurrence pio : app.assumesInsts()) {
             if (steps.contains(pio)) {
                 return pio;
             }
@@ -530,7 +531,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         }
 
         // store insts in rule app
-        ruleApp = ((IBuiltInRuleApp) ruleApp).setIfInsts(ifInsts);
+        ruleApp = ((IBuiltInRuleApp) ruleApp).setAssumesInsts(ifInsts);
 
         // create justification
         final RuleJustificationBySpec just = new RuleJustificationBySpec(contract);

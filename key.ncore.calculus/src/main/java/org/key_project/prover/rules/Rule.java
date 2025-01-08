@@ -5,6 +5,7 @@ package org.key_project.prover.rules;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
+import org.key_project.prover.proof.ProofGoal;
 
 import org.jspecify.annotations.NonNull;
 
@@ -22,5 +23,5 @@ public interface Rule extends Named {
         return name().toString();
     }
 
-    RuleExecutor getExecutor();
+    <G extends ProofGoal<G>> RuleExecutor<G> getExecutor();
 }

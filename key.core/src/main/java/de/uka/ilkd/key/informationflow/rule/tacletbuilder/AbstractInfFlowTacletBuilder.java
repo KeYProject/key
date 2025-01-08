@@ -24,6 +24,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Builds the rule which inserts information flow contract applications.
@@ -150,7 +152,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
                     heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
     }
 
-    static class QuantifiableVariableVisitor implements Visitor<Term> {
+    static class QuantifiableVariableVisitor implements Visitor<@NonNull Term> {
 
         private final LinkedList<QuantifiableVariable> vars = new LinkedList<>();
 

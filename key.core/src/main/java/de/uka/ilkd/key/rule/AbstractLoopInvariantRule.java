@@ -36,8 +36,9 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
 
 /**
  * An abstract super class for loop invariant rules. Extending rules should usually call
- * {@link #doPreparations(Goal, RuleApp)} directly at the beginning of the
- * {@link Rule#apply(Goal, RuleApp)} method.
+ * {@link #doPreparations(Goal, org.key_project.prover.rules.RuleApp)} directly at the beginning of
+ * the
+ * {@link Rule#apply(Goal, org.key_project.prover.rules.RuleApp)} method.
  *
  * @see LoopScopeInvariantRule
  * @see WhileInvariantRule
@@ -72,7 +73,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @return The {@link LoopInvariantInformation} object containing the data for the application
      *         of loop invariant rules.
      */
-    public LoopInvariantInformation doPreparations(Goal goal, RuleApp ruleApp)
+    public LoopInvariantInformation doPreparations(Goal goal,
+            org.key_project.prover.rules.RuleApp ruleApp)
             throws RuleAbortException {
         final var services = goal.getOverlayServices();
         // Basic objects needed for rule application

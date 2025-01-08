@@ -16,11 +16,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
@@ -39,7 +39,8 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
             if (poForProof instanceof BlockExecutionPO) {
                 final Goal initiatingGoal = ((BlockExecutionPO) poForProof).getInitiatingGoal();
                 if (initiatingGoal.node().parent() != null) {
-                    final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
+                    final org.key_project.prover.rules.RuleApp app =
+                        initiatingGoal.node().parent().getAppliedRuleApp();
                     return app instanceof BlockContractInternalBuiltInRuleApp;
                 }
             }

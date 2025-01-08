@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -48,7 +48,7 @@ public class SVInstantiationCP implements Feature {
         this.value = value;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
+    public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
             Goal goal,
             MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
@@ -80,18 +80,19 @@ public class SVInstantiationCP implements Feature {
     private class CP implements ChoicePoint {
 
         private final PosInOccurrence pos;
-        private final RuleApp app;
+        private final org.key_project.prover.rules.RuleApp app;
         private final Goal goal;
         private final MutableState mState;
 
-        private CP(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        private CP(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos, Goal goal,
+                MutableState mState) {
             this.pos = pos;
             this.app = app;
             this.goal = goal;
             this.mState = mState;
         }
 
-        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
+        public Iterator<CPBranch> getBranches(org.key_project.prover.rules.RuleApp oldApp) {
             if (!(oldApp instanceof final TacletApp tapp)) {
                 Debug.fail("Instantiation feature is only applicable to " + "taclet apps, but got ",
                     oldApp);
@@ -102,7 +103,7 @@ public class SVInstantiationCP implements Feature {
             final SchemaVariable sv = findSVWithName(tapp);
             final Term instTerm = value.toTerm(app, pos, goal, mState);
 
-            final RuleApp newApp =
+            final org.key_project.prover.rules.RuleApp newApp =
                 tapp.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) instTerm,
                     goal.proof().getServices(), true);
 

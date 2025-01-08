@@ -16,6 +16,7 @@ import de.uka.ilkd.key.nparser.KeYParser;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -54,7 +55,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         // weigl: all datatypes are free ==> functions are unique!
         // boolean freeAdt = ctx.FREE() != null;
         var sort = sorts().lookup(ctx.name.getText());
-        var dtNamespace = new Namespace<JFunction>();
+        var dtNamespace = new Namespace<Function>();
         for (KeYParser.Datatype_constructorContext constructorContext : ctx
                 .datatype_constructor()) {
             Name name = new Name(constructorContext.name.getText());

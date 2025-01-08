@@ -39,6 +39,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
@@ -307,7 +308,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @param term The {@link Term} to check its {@link Name}s.
      */
     public static void addNewNamesToNamespace(Services services, Term term) {
-        final Namespace<JFunction> functions = services.getNamespaces().functions();
+        final Namespace<Function> functions = services.getNamespaces().functions();
         final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
         // LogicVariables are always local bound
         term.execPreOrder((DefaultVisitor) visited -> {
@@ -345,7 +346,7 @@ public final class SymbolicExecutionSideProofUtil {
     }
 
     /**
-     * Utility method used by {@link #containsModalityOrQuery(Term)}.
+     * Utility method used by {@link #containsModalityOrQuery(org.key_project.logic.Term)}
      *
      * @author Martin Hentschel
      */

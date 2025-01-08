@@ -12,7 +12,6 @@ import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
@@ -68,7 +68,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     @Override
-    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
+    protected boolean ruleApplicationInContextAllowed(org.key_project.prover.rules.RuleApp ruleApp,
             PosInOccurrence pio,
             Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
@@ -127,7 +127,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp,
+        public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp ruleApp,
                 PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();
@@ -147,7 +147,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+        public boolean isApprovedApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
                 Goal goal) {
             return true;
         }

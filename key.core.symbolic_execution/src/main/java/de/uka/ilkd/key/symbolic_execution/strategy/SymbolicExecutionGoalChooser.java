@@ -12,9 +12,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooser;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
 /**

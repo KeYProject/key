@@ -105,7 +105,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
-            RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+            org.key_project.prover.rules.RuleApp ruleApp = goal.getRuleAppManager().peekNext();
             if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
                 // Check if the result for the current node was already computed.
                 Boolean value = goalAllowedResultPerSetNode.get(node);
@@ -159,7 +159,8 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * @param executedNumberOfSetNodes The executed number of SET nodes.
      */
     protected void handleNodeLimitExceeded(int maxApplications, long timeout, Proof proof,
-            long startTime, int countApplied, Goal goal, Node node, RuleApp ruleApp,
+            long startTime, int countApplied, Goal goal, Node node,
+            org.key_project.prover.rules.RuleApp ruleApp,
             Integer executedNumberOfSetNodes) {
         goalAllowedResultPerSetNode.put(node, Boolean.FALSE);
     }
@@ -181,7 +182,8 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * @param executedNumberOfSetNodes The executed number of SET nodes.
      */
     protected void handleNodeLimitNotExceeded(int maxApplications, long timeout, Proof proof,
-            long startTime, int countApplied, Goal goal, Node node, RuleApp ruleApp,
+            long startTime, int countApplied, Goal goal, Node node,
+            org.key_project.prover.rules.RuleApp ruleApp,
             Integer executedNumberOfSetNodes) {
         goalAllowedResultPerSetNode.put(node, Boolean.TRUE);
     }

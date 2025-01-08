@@ -5,7 +5,7 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.rule.RuleApp;
+import org.key_project.prover.rules.RuleApp;
 
 /**
  * Interface encapsulating points during the evaluation of a feature term where it is either

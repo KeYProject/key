@@ -128,9 +128,9 @@ public class TestApplyTaclet {
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
-        RuleApp rApp = rApplist.head();
+        TacletApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
+        ImmutableList<Goal> goals = rApp.taclet().getExecutor().apply(goal, rApp);
         assertEquals(1, goals.size(), "Too many or zero goals for imp-right.");
         Sequent seq = goals.head().sequent();
         assertEquals(seq.antecedent().getFirst().formula(), fma.sub(0),
@@ -154,9 +154,9 @@ public class TestApplyTaclet {
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
-        RuleApp rApp = rApplist.head();
+        TacletApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
+        ImmutableList<Goal> goals = rApp.taclet().getExecutor().apply(goal, rApp);
         assertEquals(1, goals.size(), "Too many or zero goals for imp_right_add.");
         Sequent seq = goals.head().sequent();
         assertEquals(seq.antecedent().getFirst().formula(), fma.sub(0),
@@ -262,7 +262,7 @@ public class TestApplyTaclet {
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
-        RuleApp rApp = rApplist.head();
+        TacletApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
         ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
         assertEquals(2, goals.size(), "Too many or zero goals for imp-left.");
@@ -300,7 +300,7 @@ public class TestApplyTaclet {
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pos, null);
 
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
-        RuleApp rApp = rApplist.head();
+        TacletApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
         ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
         assertEquals(1, goals.size(), "Too many or zero goals for contradiction.");
@@ -1294,7 +1294,7 @@ public class TestApplyTaclet {
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pos, services);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
-        RuleApp rApp = rApplist.head();
+        TacletApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
         ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
         assertEquals(1, goals.size());

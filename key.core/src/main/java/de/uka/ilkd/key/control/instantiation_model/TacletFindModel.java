@@ -30,6 +30,7 @@ import de.uka.ilkd.key.rule.inst.*;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
@@ -37,6 +38,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
 
 public class TacletFindModel extends AbstractTableModel {
 
@@ -175,8 +177,8 @@ public class TacletFindModel extends AbstractTableModel {
      * @param varNS the variable namespace
      * @param functNS the function namespace
      */
-    private Term parseTerm(String s, Namespace<QuantifiableVariable> varNS,
-            Namespace<JFunction> functNS) throws ParserException {
+    private Term parseTerm(String s, Namespace<@NonNull QuantifiableVariable> varNS,
+            Namespace<@NonNull Function> functNS) throws ParserException {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
@@ -231,8 +233,8 @@ public class TacletFindModel extends AbstractTableModel {
      * @param functNS the function namespace that will be passed to parseTerm
      * @return the parsed term
      */
-    private Term parseRow(int irow, Namespace<QuantifiableVariable> varNS,
-            Namespace<JFunction> functNS)
+    private Term parseRow(int irow, Namespace<@NonNull QuantifiableVariable> varNS,
+            Namespace<@NonNull Function> functNS)
             throws SVInstantiationParserException, MissingInstantiationException {
 
         String instantiation = (String) getValueAt(irow, 1);
@@ -256,7 +258,7 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     /**
-     * parses the indicated row and returns a identifier declaration corresponding to the entry in
+     * parses the indicated row and returns an identifier declaration corresponding to the entry in
      * the row
      *
      * @param irow the row to be parsed
@@ -407,10 +409,10 @@ public class TacletFindModel extends AbstractTableModel {
                     result = result.addCheckedInstantiation(sv, pe, services, true);
                 } else {
                     if (isInputAvailable(irow)) {
-                        final Namespace<QuantifiableVariable> extVarNS =
+                        final Namespace<@NonNull QuantifiableVariable> extVarNS =
                             result.extendVarNamespaceForSV(nss.variables(), sv);
 
-                        Namespace<JFunction> functNS =
+                        Namespace<@NonNull Function> functNS =
                             result.extendedFunctionNameSpace(nss.functions());
 
                         final Term instance = parseRow(irow, extVarNS, functNS);

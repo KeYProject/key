@@ -18,6 +18,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.Nullable;
+
 public final class FloatLDT extends LDT implements FloatingPointLDT {
 
     public static final Name NAME = new Name("float");
@@ -157,7 +159,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public JFunction getFunctionFor(String op, Services services) {
+    public @Nullable Function getFunctionFor(String op, Services services) {
         return switch (op) {
         case "gt" -> getGreaterThan();
         case "geq" -> getGreaterOrEquals();

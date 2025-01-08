@@ -6,9 +6,9 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -22,14 +22,14 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     /**
      * The stored rule app
      */
-    private final RuleApp ruleApp;
+    private final org.key_project.prover.rules.RuleApp ruleApp;
 
     /**
      * The costs of the stored rule app
      */
     private final RuleAppCost cost;
 
-    protected RuleAppContainer(RuleApp p_app, RuleAppCost p_cost) {
+    protected RuleAppContainer(org.key_project.prover.rules.RuleApp p_app, RuleAppCost p_cost) {
         ruleApp = p_app;
         cost = p_cost;
     }
@@ -47,9 +47,9 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     /**
      * Create a <code>RuleApp</code> that is suitable to be applied or <code>null</code>.
      */
-    public abstract RuleApp completeRuleApp(Goal p_goal);
+    public abstract org.key_project.prover.rules.RuleApp completeRuleApp(Goal p_goal);
 
-    protected final RuleApp getRuleApp() {
+    protected final org.key_project.prover.rules.RuleApp getRuleApp() {
         return ruleApp;
     }
 
@@ -64,7 +64,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return container for the currently applicable RuleApp, the cost may be an instance of
      *         <code>TopRuleAppCost</code>.
      */
-    public static RuleAppContainer createAppContainer(RuleApp p_app,
+    public static RuleAppContainer createAppContainer(org.key_project.prover.rules.RuleApp p_app,
             PosInOccurrence p_pio,
             Goal p_goal) {
 
@@ -89,7 +89,8 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      *         of <code>TopRuleAppCost</code>.
      */
     public static ImmutableList<RuleAppContainer> createAppContainers(
-            ImmutableList<? extends RuleApp> rules, PosInOccurrence pos, Goal goal) {
+            ImmutableList<? extends org.key_project.prover.rules.RuleApp> rules,
+            PosInOccurrence pos, Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
         if (rules.size() == 1) {

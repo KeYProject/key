@@ -6,10 +6,10 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.LRUCache;

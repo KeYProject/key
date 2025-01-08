@@ -61,7 +61,7 @@ public interface IExecutionElement {
      *
      * @return The applied {@link RuleApp}.
      */
-    RuleApp getAppliedRuleApp();
+    org.key_project.prover.rules.RuleApp getAppliedRuleApp();
 
     /**
      * Returns the {@link PosInOccurrence} of the modality of interest including updates.

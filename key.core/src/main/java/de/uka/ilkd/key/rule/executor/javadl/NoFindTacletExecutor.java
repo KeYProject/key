@@ -38,7 +38,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
     protected void applyAdd(TermLabelState termLabelState, Sequent add,
             SequentChangeInfo currentSequent,
             MatchConditions matchCond,
-            Goal goal, RuleApp ruleApp) {
+            Goal goal, org.key_project.prover.rules.RuleApp ruleApp) {
         addToAntec(add.antecedent(), currentSequent, null, null, matchCond, goal, ruleApp,
             goal.getOverlayServices(), termLabelState,
             new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));

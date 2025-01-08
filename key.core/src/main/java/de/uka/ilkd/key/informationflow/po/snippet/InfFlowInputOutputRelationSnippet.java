@@ -9,10 +9,10 @@ import java.util.Iterator;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -135,7 +135,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         // build isomorphism term for newObjects
         final Term newObjsSeq1 = d.tb.seq(infFlowSpec1.newObjects);
         final Term newObjsSeq2 = d.tb.seq(infFlowSpec2.newObjects);
-        final JFunction newObjectsIso =
+        final Function newObjectsIso =
             d.services.getNamespaces().functions().lookup("newObjectsIsomorphic");
         final Term isoTerm =
             d.tb.func(newObjectsIso, newObjsSeq1, vs1.pre.heap, newObjsSeq2, vs2.pre.heap);

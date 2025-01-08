@@ -8,7 +8,8 @@ import javax.swing.tree.TreeNode;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.prover.rules.RuleApp;
 
 import org.jspecify.annotations.NonNull;
 
@@ -20,12 +21,12 @@ import org.jspecify.annotations.NonNull;
  */
 public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
 
-    private final RuleApp app;
+    private final org.key_project.prover.rules.RuleApp app;
     private final int formulaNr;
     private final GUIAbstractTreeNode parent;
 
     public GUIOneStepChildTreeNode(GUIProofTreeModel tree, GUIAbstractTreeNode parent,
-            RuleApp app, int formulaNr) {
+            org.key_project.prover.rules.RuleApp app, int formulaNr) {
         super(tree, parent.getNode());
         this.parent = parent;
         this.app = app;

@@ -9,8 +9,6 @@ import java.util.Set;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -18,6 +16,8 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 public class TestGenMacro extends StrategyProofMacro {
@@ -81,7 +81,7 @@ class TestGenStrategy extends FilterStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
+    public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         if (isUnwindRule(app.rule())) {
@@ -94,7 +94,7 @@ class TestGenStrategy extends FilterStrategy {
         int totalUnwinds = 0;
         Node node = goal.node();
         while (!node.root()) {
-            final RuleApp app = node.getAppliedRuleApp();
+            final org.key_project.prover.rules.RuleApp app = node.getAppliedRuleApp();
             if (app != null) {
                 final Rule rule = app.rule();
                 if (isUnwindRule(rule)) {

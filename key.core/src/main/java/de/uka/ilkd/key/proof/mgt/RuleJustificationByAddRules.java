@@ -7,8 +7,9 @@ package de.uka.ilkd.key.proof.mgt;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.prover.rules.RuleApp;
 
 
 public record RuleJustificationByAddRules(Node node, boolean isAxiom) implements RuleJustification {

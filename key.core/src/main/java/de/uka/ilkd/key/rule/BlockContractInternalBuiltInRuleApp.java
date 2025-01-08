@@ -60,7 +60,7 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
     }
 
     @Override
-    public BlockContractInternalBuiltInRuleApp setIfInsts(
+    public BlockContractInternalBuiltInRuleApp setAssumesInsts(
             final ImmutableList<PosInOccurrence> ifInstantiations) {
         setMutable(ifInstantiations);
         return this;

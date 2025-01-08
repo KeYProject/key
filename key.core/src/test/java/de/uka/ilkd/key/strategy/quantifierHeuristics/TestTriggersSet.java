@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,7 @@ public class TestTriggersSet {
 
     private final Namespace<QuantifiableVariable> variables = new Namespace<>();
 
-    private final Namespace<JFunction> functions = new Namespace<>();
+    private final Namespace<Function> functions = new Namespace<>();
 
     private final Namespace<Sort> sorts = new Namespace<>();
 

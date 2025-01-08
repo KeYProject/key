@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -375,15 +376,11 @@ public class StateVars {
     }
 
 
-    static void register(JFunction f, Services services) {
-        Namespace<JFunction> functionNames = services.getNamespaces().functions();
+    static void register(Function f, Services services) {
+        Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
-            if (f.sort() == JavaDLTheory.FORMULA) {
-                functionNames.addSafely(f);
-            } else {
-                functionNames.addSafely(f);
-            }
+            functionNames.addSafely(f);
         }
     }
 

@@ -12,14 +12,16 @@ import java.util.concurrent.atomic.AtomicLong;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
@@ -30,8 +32,10 @@ import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
@@ -74,7 +78,8 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
     /**
      * list of all applied rule applications at this branch
      */
-    private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.nil();
+    private ImmutableList<org.key_project.prover.rules.RuleApp> appliedRuleApps =
+        ImmutableSLList.nil();
     /**
      * this object manages the tags for all formulas of the sequent
      */
@@ -107,7 +112,8 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
     /**
      * copy constructor
      */
-    private Goal(Node node, RuleAppIndex ruleAppIndex, ImmutableList<RuleApp> appliedRuleApps,
+    private Goal(Node node, RuleAppIndex ruleAppIndex,
+            ImmutableList<org.key_project.prover.rules.RuleApp> appliedRuleApps,
             FormulaTagManager tagManager, AutomatedRuleApplicationManager ruleAppManager,
             Properties strategyInfos, NamespaceSet localNamespace) {
         this.node = node;
@@ -291,7 +297,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      *
      * @return IList<RuleApp> applied rule applications
      */
-    public ImmutableList<RuleApp> appliedRuleApps() {
+    public ImmutableList<org.key_project.prover.rules.RuleApp> appliedRuleApps() {
         return appliedRuleApps;
     }
 
@@ -511,7 +517,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      *
      * @param app the applied rule app
      */
-    public void addAppliedRuleApp(RuleApp app) {
+    public void addAppliedRuleApp(org.key_project.prover.rules.RuleApp app) {
         // Last app first makes inserting and searching faster
         appliedRuleApps = appliedRuleApps.prepend(app);
         node().setAppliedRuleApp(app);
@@ -586,7 +592,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
         for (IProgramVariable pv : node.getLocalProgVars()) {
             newNS.programVariables().add(pv);
         }
-        for (JFunction op : node.getLocalFunctions()) {
+        for (Function op : node.getLocalFunctions()) {
             newNS.functions().add(op);
         }
 
@@ -602,7 +608,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      * @param ruleApp the rule app
      * @return new goal(s)
      */
-    public ImmutableList<Goal> apply(final RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(final org.key_project.prover.rules.RuleApp ruleApp) {
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
@@ -619,7 +625,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
         ruleApp.execute(localNamespaces.functions());
         addAppliedRuleApp(ruleApp);
         try {
-            goalList = ruleApp.rule().getExecutor().apply(this, ruleApp);
+            goalList = ruleApp.rule().<Goal>getExecutor().apply(this, ruleApp);
         } catch (RuleAbortException rae) {
             removeLastAppliedRuleApp();
             node().setAppliedRuleApp(null);
@@ -661,7 +667,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      */
     private void adaptNamespacesNewGoals(final ImmutableList<Goal> goalList) {
         Collection<IProgramVariable> newProgVars = localNamespaces.programVariables().elements();
-        Collection<JFunction> newFunctions = localNamespaces.functions().elements();
+        Collection<Function> newFunctions = localNamespaces.functions().elements();
 
         localNamespaces.flushToParent();
 
@@ -711,9 +717,9 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
         this.localNamespaces = ns.copyWithParent().copyWithParent();
     }
 
-    public List<RuleApp> getAllBuiltInRuleApps() {
+    public List<org.key_project.prover.rules.RuleApp> getAllBuiltInRuleApps() {
         final BuiltInRuleAppIndex index = ruleAppIndex().builtInRuleAppIndex();
-        LinkedList<RuleApp> ruleApps = new LinkedList<>();
+        LinkedList<org.key_project.prover.rules.RuleApp> ruleApps = new LinkedList<>();
         for (SequentFormula sf : node().sequent().antecedent()) {
             ImmutableList<IBuiltInRuleApp> t =
                 index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));

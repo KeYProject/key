@@ -19,8 +19,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
@@ -30,7 +28,9 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleAbortException;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleExecutor;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -773,7 +773,8 @@ public class TestTermLabelManager {
         public void updateLabels(TermLabelState state, Services services,
                 PosInOccurrence applicationPosInOccurrence,
                 Term applicationTerm, Term modalityTerm,
-                Rule rule, RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
+                org.key_project.prover.rules.Rule rule,
+                RuleApp ruleApp, Object hint, Term tacletTerm, Term newTerm,
                 Set<TermLabel> labels) {
             labels.add(toAdd);
         }

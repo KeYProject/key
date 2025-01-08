@@ -26,6 +26,7 @@ import de.uka.ilkd.key.smt.SMTRuleApp;
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.rules.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
@@ -58,13 +59,14 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     public final JTextArea tacletInfo;
 
     private Node node;
-    private final RuleApp ruleApp;
+    private final org.key_project.prover.rules.RuleApp ruleApp;
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
         this(node.proof(), node, node.getAppliedRuleApp(), node.sequent(), mainWindow);
     }
 
-    public InnerNodeView(Proof proof, Node node, RuleApp ruleApp, Sequent sequent,
+    public InnerNodeView(Proof proof, Node node, org.key_project.prover.rules.RuleApp ruleApp,
+            Sequent sequent,
             MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
@@ -138,7 +140,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     }
 
     private void highlightIfInsts(IBuiltInRuleApp bapp) throws BadLocationException {
-        final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
+        final ImmutableList<PosInOccurrence> ifs = bapp.assumesInsts();
         if (bapp instanceof SMTRuleApp && ifs.isEmpty()) {
             /*
              * Special case for SMTRuleApp: If no unsat core is used, we highlight all formulas.
