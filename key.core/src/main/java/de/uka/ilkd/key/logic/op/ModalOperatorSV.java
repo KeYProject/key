@@ -73,18 +73,5 @@ public final class ModalOperatorSV extends Modality.JavaModalityKind
         return false;
     }
 
-    @Override
-    public void layout(Layouter<?> l) {
-        l.beginC(0).beginC().print("\\schemaVar \\modalOperator {").brk(0);
-        boolean first = true;
-        for (Modality.JavaModalityKind modality : modalities) {
-            if (!first) {
-                l.print(",").brk();
-            } else {
-                first = false;
-            }
-            l.print(modality.name().toString());
-        }
-        l.end().brk(0).print("}").end().print(" ").print(name().toString());
-    }
+
 }

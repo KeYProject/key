@@ -19,11 +19,6 @@ public final class TermLabelSV extends OperatorSV implements TermLabel {
     }
 
     @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar \\termlabel ").print(name().toString());
-    }
-
-    @Override
     public String toString() {
         return toString("termLabel");
     }

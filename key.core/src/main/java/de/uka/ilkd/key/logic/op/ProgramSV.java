@@ -364,12 +364,6 @@ public final class ProgramSV extends OperatorSV
     }
 
     @Override
-    public void layout(Layouter<?> layouter) {
-        layouter.print("\\schemaVar \\program ").print(sort().declarationString()).print(" ")
-                .print(name().toString());
-    }
-
-    @Override
     public MethodDeclaration getMethodDeclaration() {
         return null;
     }

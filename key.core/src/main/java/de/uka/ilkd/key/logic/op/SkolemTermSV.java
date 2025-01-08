@@ -30,17 +30,6 @@ public final class SkolemTermSV extends OperatorSV implements TerminalSyntaxElem
     }
 
     @Override
-    public void layout(Layouter<?> l) {
-        l.print("\\schemaVar ");
-        if (sort() == JavaDLTheory.FORMULA) {
-            l.print("\\skolemFormula");
-        } else {
-            l.print("\\skolemTerm ").print(sort().name().toString());
-        }
-        l.print(" ").print(name().toString());
-    }
-
-    @Override
     public boolean isSkolemTerm() {
         return true;
     }
