@@ -16,13 +16,13 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.inst.InstantiationEntry;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
 
 /**
  * This class handles the instantiation of generic sorts (used for generic taclets), i.e. the class
@@ -31,7 +31,6 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * this class is immutable
  */
-
 public final class GenericSortInstantiations {
 
     public static final GenericSortInstantiations EMPTY_INSTANTIATIONS =
@@ -108,7 +107,7 @@ public final class GenericSortInstantiations {
      *         choosing the right generic sort instantiations
      */
     public Boolean checkSorts(OperatorSV sv, InstantiationEntry<?> p_entry) {
-        if (!(p_entry instanceof TermInstantiation) || sv instanceof ProgramSV) {
+        if (sv instanceof ProgramSV || !(p_entry.getInstantiation() instanceof Term term)) {
             return Boolean.TRUE;
         }
 
@@ -116,8 +115,6 @@ public final class GenericSortInstantiations {
         if (c != null) {
             return checkCondition(c);
         }
-
-        final Term term = ((TermInstantiation) p_entry).getInstantiation();
 
         if (GenericSortCondition.subSortsAllowed(sv)) {
             return term.sort().extendsTrans(sv.sort());

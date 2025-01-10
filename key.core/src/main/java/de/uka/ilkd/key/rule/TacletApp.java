@@ -726,9 +726,6 @@ public abstract class TacletApp implements RuleApp {
     public abstract TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
             Services services);
 
-    public abstract TacletApp addInstantiation(SchemaVariable sv, Object[] list,
-            boolean interesting, Services services);
-
     /**
      * adds a new instantiation to this TacletApp. This method does not check (beside some very
      * rudimentary tests) if the instantiation is possible. If you cannot guarantee that adding the

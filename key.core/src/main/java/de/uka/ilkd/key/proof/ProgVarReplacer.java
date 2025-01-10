@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -18,7 +17,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
 import org.key_project.logic.PosInTerm;
-import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.inst.InstantiationEntry;
+import org.key_project.prover.rules.inst.ListInstantiation;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
@@ -100,29 +100,26 @@ public final class ProgVarReplacer {
     public SVInstantiations replace(SVInstantiations insts) {
         SVInstantiations result = insts;
 
-        Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it;
         for (var e : insts.getInstantiationMap()) {
             var sv = e.key();
             InstantiationEntry<?> ie = e.value();
             Object inst = ie.getInstantiation();
 
-            if (ie instanceof ContextInstantiationEntry) {
+            if (inst instanceof ContextStatementBlockInstantiation cie) {
                 ProgramElement pe = (ProgramElement) inst;
                 ProgramElement newPe = replace(pe);
                 if (newPe != pe) {
-                    ContextInstantiationEntry cie = (ContextInstantiationEntry) ie;
                     result = result.replace(cie.prefix(), cie.suffix(),
                         cie.activeStatementContext(), newPe, services);
                 }
-            } else if (ie instanceof OperatorInstantiation) {
+            } else if (ie instanceof org.key_project.logic.op.Operator) {
                 /* nothing to be done (currently) */
-            } else if (ie instanceof ProgramInstantiation) {
-                ProgramElement pe = (ProgramElement) inst;
+            } else if (ie instanceof ProgramElement pe) {
                 ProgramElement newPe = replace(pe);
                 if (newPe != pe) {
                     result = result.replace(sv, newPe, services);
                 }
-            } else if (ie instanceof ProgramListInstantiation) {
+            } else if (ie instanceof ListInstantiation) {
                 @SuppressWarnings("unchecked")
                 ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
                 int size = a.size();
@@ -140,9 +137,8 @@ public final class ProgVarReplacer {
                 if (changedSomething) {
                     result = result.replace(sv, new ImmutableArray<>(array), services);
                 }
-            } else if (ie instanceof TermInstantiation) {
-                Term t = (Term) inst;
-                Term newT = replace(t);
+            } else if (inst instanceof Term t) {
+                final Term newT = replace(t);
                 if (newT != t) {
                     result = result.replace(sv, newT, services);
                 }

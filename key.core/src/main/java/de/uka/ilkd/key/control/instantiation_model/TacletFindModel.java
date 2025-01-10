@@ -210,7 +210,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         final int icol = 1;
 
-        if ((getValueAt(irow, icol) == null || ((String) getValueAt(irow, icol)).length() == 0)
+        if ((getValueAt(irow, icol) == null || ((String) getValueAt(irow, icol)).isEmpty())
                 && !originalApp.complete()) {
             throw new MissingInstantiationException(String.valueOf(getValueAt(irow, 0)),
                 createPosition(irow),
@@ -222,7 +222,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @return true iff this row is not empty (i.e. a string of data is available)
      */
     private boolean isInputAvailable(int irow) {
-        return getValueAt(irow, 1) != null && ((String) getValueAt(irow, 1)).length() != 0;
+        return getValueAt(irow, 1) != null && !((String) getValueAt(irow, 1)).isEmpty();
     }
 
     /**
@@ -305,7 +305,7 @@ public class TacletFindModel extends AbstractTableModel {
         String instantiation = (String) getValueAt(irow, 1);
         ProgramSV sv = (ProgramSV) getValueAt(irow, 0);
 
-        ContextInstantiationEntry contextInstantiation =
+        final ContextStatementBlockInstantiation contextInstantiation =
             originalApp.instantiations().getContextInstantiation();
 
         final PosInProgram prefix;

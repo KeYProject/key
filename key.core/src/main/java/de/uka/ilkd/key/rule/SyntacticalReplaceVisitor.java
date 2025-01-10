@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
+import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
@@ -170,14 +170,14 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     }
 
     private JavaProgramElement addContext(StatementBlock pe) {
-        final ContextInstantiationEntry cie = svInst.getContextInstantiation();
+        final ContextStatementBlockInstantiation cie = svInst.getContextInstantiation();
         if (cie == null) {
             throw new IllegalStateException("Context should also be instantiated");
         }
 
         if (cie.prefix() != null) {
             return ProgramContextAdder.INSTANCE.start(
-                (JavaNonTerminalProgramElement) cie.contextProgram(), pe, cie.getInstantiation());
+                (JavaNonTerminalProgramElement) cie.program(), pe, cie);
         }
 
         return pe;

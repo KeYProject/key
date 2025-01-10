@@ -199,7 +199,7 @@ public class VariableNameProposer implements InstantiationProposer {
             Node undoAnchor, ImmutableList<String> previousProposals) {
 
         ProgramElement contextProgram =
-            app.matchConditions().getInstantiations().getContextInstantiation().contextProgram();
+            app.matchConditions().getInstantiations().getContextInstantiation().program();
 
         if (contextProgram == null) {
             contextProgram = new StatementBlock();

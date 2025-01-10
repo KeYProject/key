@@ -20,5 +20,5 @@ public interface SVInstantiations {
 
     SVInstantiations union(SVInstantiations instantiations, LogicServices services);
 
-    ImmutableMap<SchemaVariable,InstantiationEntry<?>> getInstantiationMap();
+    ImmutableMap<SchemaVariable, InstantiationEntry<?>> getInstantiationMap();
 }

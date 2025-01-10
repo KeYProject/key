@@ -63,7 +63,7 @@ public class LoopInvariantCondition implements VariableCondition {
         }
 
         final JavaBlock javaBlock = JavaBlock.createJavaBlock(
-            (StatementBlock) svInst.getContextInstantiation().contextProgram());
+            (StatementBlock) svInst.getContextInstantiation().program());
 
         final MethodFrame mf = //
             JavaTools.getInnermostMethodFrame(javaBlock, services);

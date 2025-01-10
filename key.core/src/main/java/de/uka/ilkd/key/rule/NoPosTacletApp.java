@@ -54,7 +54,7 @@ public class NoPosTacletApp extends TacletApp {
     /**
      * creates a NoPosTacletApp for the given taclet with some known instantiations and CHECKS
      * variable conditions as well as it resolves collisions The ifInstantiations parameter is not
-     * matched against the if sequence, but only stored. For matching use the method
+     * matched against the assumes-sequence, but only stored. For matching use the method
      * "setIfFormulaInstantiations".
      *
      * @param taclet the Taclet
@@ -136,8 +136,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     protected static boolean checkVarCondNotFreeIn(org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations) {
-        for (var pair : ((de.uka.ilkd.key.rule.inst.SVInstantiations) instantiations)
-                .getInstantiationMap()) {
+        for (var pair : instantiations.getInstantiationMap()) {
             final var sv = pair.key();
 
             if (sv instanceof ModalOperatorSV || sv instanceof ProgramSV || sv instanceof VariableSV
@@ -182,29 +181,11 @@ public class NoPosTacletApp extends TacletApp {
         }
     }
 
-
-
-    @Override
-    public TacletApp addInstantiation(SchemaVariable sv, Object[] list, boolean interesting,
-            Services services) {
-        if (interesting) {
-            return createNoPosTacletApp(taclet(),
-                instantiations().addInterestingList(sv, list, services),
-                assumesFormulaInstantiations(),
-                services);
-        } else {
-            return createNoPosTacletApp(taclet(), instantiations().addList(sv, list, services),
-                assumesFormulaInstantiations(), services);
-        }
-    }
-
-
-
     /**
      * adds a new instantiation to this TacletApp
      *
      * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SV is instantiated with
+     * @param pe the ProgramElement with which the SV is instantiated
      * @return the new TacletApp
      */
     @Override
@@ -272,9 +253,9 @@ public class NoPosTacletApp extends TacletApp {
 
 
     /**
-     * returns true iff all necessary informations are collected, so that the Taclet can be applied.
+     * returns true iff all necessary information is collected, so that the Taclet can be applied.
      *
-     * @return true iff all necessary informations are collected, so that the Taclet can be applied.
+     * @return true iff all necessary information is collected, so that the Taclet can be applied.
      */
     @Override
     public boolean complete() {

@@ -26,7 +26,6 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
 import org.key_project.logic.Name;
 import org.key_project.proof.LocationVariableTracker;
@@ -241,8 +240,7 @@ public class NodeInfo {
         RuleSet rs;
         while (!list.isEmpty()) {
             rs = list.head();
-            Name name = rs.name();
-            if (symbolicExecNames.contains(name)) {
+            if (symbolicExecNames.contains(rs.name())) {
                 return true;
             }
             list = list.tail();
@@ -334,10 +332,6 @@ public class NodeInfo {
                 } else {
                     if (val instanceof Term) {
                         val = TermLabelManager.removeIrrelevantLabels((Term) val,
-                            node.proof().getServices());
-                    } else if (val instanceof TermInstantiation) {
-                        val = TermLabelManager.removeIrrelevantLabels(
-                            ((TermInstantiation) val).getInstantiation(),
                             node.proof().getServices());
                     } else if (val instanceof LocationVariable locVar) {
                         var originTracker = node.proof().lookup(LocationVariableTracker.class);
