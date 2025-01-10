@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermLabelInstantiationEntry;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 import org.key_project.logic.LogicServices;
@@ -29,14 +28,14 @@ public class MatchTermLabelInstruction implements MatchInstruction {
             MatchConditions matchCond, LogicServices services) {
 
         final SVInstantiations svInsts = matchCond.getInstantiations();
-        final TermLabelInstantiationEntry inst =
-            (TermLabelInstantiationEntry) svInsts.getInstantiation(sv);
+        final ImmutableArray<TermLabel> inst =
+            (ImmutableArray<TermLabel>) svInsts.getInstantiation(sv);
 
         if (inst == null) {
             return matchCond.setInstantiations(
-                svInsts.add(sv, instantiationCandidate.getLabels(), services));
+                svInsts.add(sv, instantiationCandidate.getLabels(), TermLabel.class, services));
         } else {
-            for (TermLabel o : inst.getInstantiation()) {
+            for (TermLabel o : inst) {
                 if (!instantiationCandidate.containsLabel(o)) {
                     return null;
                 }

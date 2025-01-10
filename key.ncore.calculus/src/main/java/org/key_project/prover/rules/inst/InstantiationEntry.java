@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.rule.inst;
+package org.key_project.prover.rules.inst;
 
 
 import org.jspecify.annotations.NonNull;
@@ -13,7 +13,7 @@ import org.jspecify.annotations.NonNull;
  * map from SchemaVariable to InstantiationEntry is used TODO: Simplify subclasses further or remove
  * them completely as possible.
  */
-public abstract class InstantiationEntry<E> {
+public class InstantiationEntry<E> {
 
     private final @NonNull E instantiation;
 
@@ -22,7 +22,7 @@ public abstract class InstantiationEntry<E> {
      *
      * @param instantiation the instantiation to be stored
      */
-    InstantiationEntry(@NonNull E instantiation) {
+    public InstantiationEntry(@NonNull E instantiation) {
         assert instantiation != null : "An instantiation for a schemavariable cannot be null.";
         this.instantiation = instantiation;
     }

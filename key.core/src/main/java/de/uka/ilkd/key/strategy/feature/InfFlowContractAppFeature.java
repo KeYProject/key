@@ -18,14 +18,15 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.inst.InstantiationEntry;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
@@ -129,10 +130,10 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     private boolean subset(
-            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> insts0,
-            ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> insts1) {
+            ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
+            ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
 
-        for (final ImmutableMapEntry<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
+        for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
             if (entry0.key() instanceof SkolemTermSV || entry0.key() instanceof VariableSV) {
                 continue;
             }

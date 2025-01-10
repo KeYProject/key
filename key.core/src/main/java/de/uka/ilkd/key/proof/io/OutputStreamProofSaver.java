@@ -32,7 +32,6 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -53,6 +52,7 @@ import org.key_project.prover.rules.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.inst.InstantiationEntry;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -848,8 +848,8 @@ public class OutputStreamProofSaver {
             return printSequent((Sequent) val, services);
         } else if (val instanceof Name) {
             return val.toString();
-        } else if (val instanceof TermInstantiation) {
-            return printTerm(((TermInstantiation) val).getInstantiation(), services);
+        } else if (val instanceof InstantiationEntry<?> entry) {
+            return printAnything(entry.getInstantiation(), services);
         } else if (val == null) {
             return null;
         } else {

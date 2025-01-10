@@ -53,7 +53,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
                 return null;
             }
             final List<ProgramElement> programs = collect(instantiations);
-            programs.add(instantiations.getContextInstantiation().contextProgram());
+            programs.add(instantiations.getContextInstantiation().program());
             if (!isUnique((Label) instCandidate, programs, services)) {
                 return null;
             }

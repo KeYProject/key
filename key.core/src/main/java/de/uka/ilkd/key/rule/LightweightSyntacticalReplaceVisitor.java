@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
+import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
@@ -22,13 +22,18 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
+ * <p>
  * A lightweight version of {@link SyntacticalReplaceVisitor} which does not replace labels. This
- * saves a lot of dependencies to {@link Goal}, {@link RuleApp}, {@link PosInOccurrence} etc. and is
- * therefore useful for internal computations not having access to all these objects. Since labels
+ * saves a lot of dependencies to {@link Goal}, {@link RuleApp},
+ * {@link org.key_project.prover.sequent.PosInOccurrence}
+ * etc. and is therefore useful for internal computations not having access to all these objects.
+ * Since labels
  * are not refactored, this class is *not* useful for rule applications etc.
- *
+ * </p>
+ * <p>
  * Note that this class is basically a stripped-down copy of {@link SyntacticalReplaceVisitor}, so
  * problems in that class would carry over to this one...
+ * </p>
  *
  * @author Dominic Steinhoefel
  */
@@ -67,14 +72,14 @@ public class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
     }
 
     private JavaProgramElement addContext(StatementBlock pe) {
-        final ContextInstantiationEntry cie = svInst.getContextInstantiation();
+        final ContextStatementBlockInstantiation cie = svInst.getContextInstantiation();
         if (cie == null) {
             throw new IllegalStateException("Context should also be instantiated");
         }
 
         if (cie.prefix() != null) {
             return ProgramContextAdder.INSTANCE.start(
-                (JavaNonTerminalProgramElement) cie.contextProgram(), pe, cie.getInstantiation());
+                (JavaNonTerminalProgramElement) cie.program(), pe, cie);
         }
 
         return pe;
