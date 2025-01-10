@@ -8,12 +8,14 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
@@ -22,8 +24,13 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 
     public LIGNestedMDarr(Sequent sequent, Services services) {
         super(sequent, services);
+        getIndexes(sequent);
 //		depLDT = services.getTypeConverter().getDependenciesLDT();
 //		heapLDT = services.getTypeConverter().getHeapLDT();
+    }
+
+    public LIGNestedMDarr(Sequent sequent, Services services, List<ProgramVariable> indexes) {
+        super(sequent, services, indexes);
     }
 
     public LoopInvariantGenerationResult generate() {
@@ -226,7 +233,7 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 
     private void initialization() {
         getLows(seq);
-        getIndexesAndHighs(seq);
+        getHighs(seq);
         getLocSet(seq);
 
         for (SequentFormula sf : seq.antecedent()) {

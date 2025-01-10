@@ -5,7 +5,9 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.loopinvgen.analyzer.WhileStatementAnalyzer;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 
@@ -32,7 +34,9 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
     @Override
     public LoopInvariantGenerationResult generate() {
 
-        getLow(seq);
+        System.out.println(ProofSaver.printAnything(WhileStatementAnalyzer.determineInitialIndex(seq, index, services), services));
+        //getLow(seq);
+        setInitialIndexValue();
         getHigh(seq);
         getLocSet(seq);
 
@@ -139,6 +143,10 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
         LoopInvariantGenerationResult result = new LoopInvariantGenerationResult(allDepPreds, itrNumber, services);
         System.out.println("Loop Invariant is: " + result);
         return result;
+    }
+
+    private void setInitialIndexValue() {
+        this.low = WhileStatementAnalyzer.determineInitialIndex(seq, index, services);
     }
 
 }

@@ -5,13 +5,20 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.loopinvgen.LIGNestedMDarr;
+import de.uka.ilkd.key.loopinvgen.LIGNew;
+import de.uka.ilkd.key.loopinvgen.LoopInvariantGenerationResult;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -31,6 +38,8 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.*;
 
+import static de.uka.ilkd.key.gui.nodeviews.LoopInvGenMenuItem.findIndexes;
+import static de.uka.ilkd.key.loopinvgen.analyzer.WhileStatementAnalyzer.findPossibleIndexes;
 import static java.lang.String.format;
 
 /**
@@ -85,7 +94,8 @@ public class InvariantConfigurator {
      */
     public LoopSpecification getLoopInvariant(final LoopSpecification loopInv,
                                               final Services services, final boolean requiresVariant,
-                                              final List<LocationVariable> heapContext)
+                                              final List<LocationVariable> heapContext, final Goal goal,
+                                              final PosInOccurrence posInOccurrence)
             throws RuleAbortException {
         // Check if there is a LoopInvariant
         if (loopInv == null) {
@@ -121,6 +131,7 @@ public class InvariantConfigurator {
             private final Map<LocationVariable, Term> freeInvariantTerm = new LinkedHashMap<>();
 
 
+            private final JButton generateButton = new JButton("Generate");
             private final JButton applyButton = new JButton("Apply");
             private final JButton cancelButton = new JButton("Cancel");
             private final JButton storeButton = new JButton("Store");
@@ -178,7 +189,8 @@ public class InvariantConfigurator {
 
                 final NamespaceSet nss = services.getNamespaces().copyWithParent();
                 Term self = loopInv.getInternalSelfTerm();
-                if (self != null) nss.programVariables().add(new LocationVariable(new ProgramElementName("self"), self.sort()));
+                if (self != null)
+                    nss.programVariables().add(new LocationVariable(new ProgramElementName("self"), self.sort()));
                 parser = new KeyIO(services, nss);
                 parser.setAbbrevMap(getAbbrevMap());
 
@@ -197,10 +209,12 @@ public class InvariantConfigurator {
             private void initButtonPanel(JPanel buttonPanel) {
                 buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
+                generateButton.addActionListener(this::generateActionPerformed);
                 applyButton.addActionListener(this::applyActionPerformed);
                 cancelButton.addActionListener(this::cancelActionPerformed);
                 storeButton.addActionListener(this::storeActionPerformed);
 
+                buttonPanel.add(generateButton);
                 buttonPanel.add(applyButton);
                 buttonPanel.add(storeButton);
                 buttonPanel.add(cancelButton);
@@ -694,6 +708,40 @@ public class InvariantConfigurator {
                     this.dispose();
                 }
 
+            }
+
+            public void generateActionPerformed(ActionEvent ae) {
+                List<Set<ProgramVariable>> possibleIndexes = findPossibleIndexes(PosInSequent.createCfmaPos(posInOccurrence), services);
+                List<ProgramVariable> indexes = findIndexes(possibleIndexes);
+
+                if (indexes.size() == 1) {
+                    final LIGNew loopInvGenerator = new LIGNew(goal.sequent(), services, indexes.get(0));
+                    LoopInvariantGenerationResult result = loopInvGenerator.generate();
+                    getTextAreaInInvariantTab().setText(result.conjunctsToString());
+                } else if (indexes.size() == 2) {
+                    final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(goal.sequent(), services, indexes);
+                    LoopInvariantGenerationResult result = loopInvGenerator.generate();
+                    getTextAreaInInvariantTab().setText(result.conjunctsToString());
+                } else {
+                    System.out.println("Generation of loop invariants not implemented for more than two nested loops yet");
+                }
+            }
+
+            private JTextArea getTextAreaInInvariantTab() {
+                JScrollPane jScrollPane = (JScrollPane) inputPane.getSelectedComponent();
+                JViewport jviewport = jScrollPane.getViewport();
+                JPanel jPanel = (JPanel) jviewport.getView();
+                JTabbedPane jTabbedPane = (JTabbedPane) jPanel.getComponents()[0];
+                return findFirstJTextArea(jTabbedPane);
+            }
+
+            private JTextArea findFirstJTextArea(JTabbedPane jTabbedPane) {
+                for (Component subcomponent : jTabbedPane.getComponents()) {
+                    if (subcomponent instanceof JTextArea) {
+                        return (JTextArea) subcomponent;
+                    }
+                }
+                return null;
             }
 
             /**

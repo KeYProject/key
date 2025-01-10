@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.proof.Goal;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractLoopInvariantGenerator {
@@ -54,6 +55,25 @@ public abstract class AbstractLoopInvariantGenerator {
         tb = services.getTermBuilder();
         intLDT = services.getTypeConverter().getIntegerLDT();
         this.index = expr2term(index);
+    }
+
+    public AbstractLoopInvariantGenerator(Sequent sequent, Services s, Term index) {
+        seq = sequent;
+        ruleApp = new RuleApplication(s, seq);
+        services = ruleApp.services;
+        tb = services.getTermBuilder();
+        intLDT = services.getTypeConverter().getIntegerLDT();
+        this.index = index;
+    }
+
+    public AbstractLoopInvariantGenerator(Sequent sequent, Services s, List<ProgramVariable> indexes) {
+        seq = sequent;
+        ruleApp = new RuleApplication(s, seq);
+        services = ruleApp.services;
+        tb = services.getTermBuilder();
+        intLDT = services.getTypeConverter().getIntegerLDT();
+        this.indexOuter = expr2term(indexes.get(0));
+        this.indexInner = expr2term(indexes.get(1));
     }
 
     public AbstractLoopInvariantGenerator(Sequent sequent, Services s) {
@@ -156,7 +176,7 @@ public abstract class AbstractLoopInvariantGenerator {
         Expression index = null;
         for (final SequentFormula sf : seq.succedent()) {
             final Term formula = tb.goBelowUpdates(sf.formula());
-            if (formula.op() == Modality.DIA) {
+            if (formula.op() instanceof Modality) {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
                 if (pe instanceof ProgramPrefix) {
@@ -182,7 +202,7 @@ public abstract class AbstractLoopInvariantGenerator {
         Expression high = null;
         for (final SequentFormula sf : seq.succedent()) {
             final Term formula = tb.goBelowUpdates(sf.formula());
-            if (formula.op() == Modality.DIA) {
+            if (formula.op() instanceof Modality) {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
                 if (pe instanceof ProgramPrefix) {
@@ -205,12 +225,86 @@ public abstract class AbstractLoopInvariantGenerator {
         //this.index = expr2term(index);
     }
 
+    protected void getIndexes(Sequent seq) {
+        Expression indexInner = null;
+        Expression indexOuter = null;
+        for (final SequentFormula sf : seq.succedent()) {
+            final Term formula = tb.goBelowUpdates(sf.formula());
+            if (formula.op() instanceof Modality) {
+                ProgramElement pe = formula.javaBlock().program();
+                Statement activePE;
+                if (pe instanceof ProgramPrefix) {
+                    activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+                } else {
+                    activePE = (Statement) pe.getFirstElement();
+                }
+                if (activePE instanceof While) {
+                    final Expression expr = ((While) activePE).getGuardExpression();
+                    if (expr instanceof GreaterOrEquals || expr instanceof GreaterThan) {
+                        indexOuter = ((ComparativeOperator) expr).getExpressionAt(1);
+                    } else if (expr instanceof LessOrEquals || expr instanceof LessThan) {
+                        indexOuter = ((ComparativeOperator) expr).getExpressionAt(0);
+                    }
+                    final Statement stmtInner = ((While) activePE).getBody();
+                    if (stmtInner.getFirstElement() instanceof While) {
+                        final Expression exprInner = ((While) stmtInner.getFirstElement()).getGuardExpression();
+                        if (exprInner instanceof GreaterOrEquals || exprInner instanceof GreaterThan) {
+                            indexInner = ((ComparativeOperator) exprInner).getExpressionAt(1);
+                        } else if (exprInner instanceof LessOrEquals || exprInner instanceof LessThan) {
+                            indexInner = ((ComparativeOperator) exprInner).getExpressionAt(0);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        this.indexOuter = expr2term(indexOuter);
+        this.indexInner = expr2term(indexInner);
+    }
+
+    protected void getHighs(Sequent seq) {
+        Expression highInner = null;
+        Expression highOuter = null;
+        for (final SequentFormula sf : seq.succedent()) {
+            final Term formula = tb.goBelowUpdates(sf.formula());
+            if (formula.op() instanceof Modality) {
+                ProgramElement pe = formula.javaBlock().program();
+                Statement activePE;
+                if (pe instanceof ProgramPrefix) {
+                    activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+                } else {
+                    activePE = (Statement) pe.getFirstElement();
+                }
+                if (activePE instanceof While) {
+                    final Expression expr = ((While) activePE).getGuardExpression();
+                    if (expr instanceof GreaterOrEquals || expr instanceof GreaterThan) {
+                        highOuter = ((ComparativeOperator) expr).getExpressionAt(0);
+                    } else if (expr instanceof LessOrEquals || expr instanceof LessThan) {
+                        highOuter = ((ComparativeOperator) expr).getExpressionAt(1);
+                    }
+                    final Statement stmtInner = ((While) activePE).getBody();
+                    if (stmtInner.getFirstElement() instanceof While) {
+                        final Expression exprInner = ((While) stmtInner.getFirstElement()).getGuardExpression();
+                        if (exprInner instanceof GreaterOrEquals || exprInner instanceof GreaterThan) {
+                            highInner = ((ComparativeOperator) exprInner).getExpressionAt(0);
+                        } else if (exprInner instanceof LessOrEquals || exprInner instanceof LessThan) {
+                            highInner = ((ComparativeOperator) exprInner).getExpressionAt(1);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        this.highOuter = expr2term(highOuter);
+        this.highInner = expr2term(highInner);
+    }
+
     protected void getIndexesAndHighs(Sequent seq) {
         Expression highInner = null, indexInner = null;
         Expression highOuter = null, indexOuter = null;
         for (final SequentFormula sf : seq.succedent()) {
             final Term formula = tb.goBelowUpdates(sf.formula());
-            if (formula.op() == Modality.DIA) {
+            if (formula.op() instanceof Modality) {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
                 if (pe instanceof ProgramPrefix) {
@@ -272,7 +366,7 @@ public abstract class AbstractLoopInvariantGenerator {
         Term guard = null;
         for (SequentFormula sf : seq.succedent()) {
             final Term formula = tb.goBelowUpdates(sf.formula());
-            if (formula.op() == Modality.DIA) {
+            if (formula.op() instanceof Modality) {
                 ProgramElement pe = formula.javaBlock().program();
                 Statement activePE;
                 if (pe instanceof ProgramPrefix) {
@@ -322,7 +416,7 @@ public abstract class AbstractLoopInvariantGenerator {
         // How to find the targeted location set (the array)?
         for (SequentFormula sf : seq.succedent()) {
             Term formula = tb.goBelowUpdates(sf.formula());
-            if (formula.op() == Modality.DIA) {
+            if (formula.op() instanceof Modality) {
                 Statement activePE = (Statement) formula.javaBlock().program();
                 Set<LocationVariable> lvs = extractProgramVariable(activePE);
                 findArray(lvs);

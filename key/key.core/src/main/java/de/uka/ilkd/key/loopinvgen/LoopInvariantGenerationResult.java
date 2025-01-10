@@ -32,10 +32,11 @@ public class LoopInvariantGenerationResult {
         result.append("=========================").append('\n');
         result.append("Number of the LAST Iteration: " + numberOfLASTIteration).append('\n');
         result.append("Conjuncts:\n");
-        for (Term term : conjuncts) {
-            result.append(ProofSaver.printTerm(term, services, true)).append('\n');
-            System.out.println(term);
-        }
-        return result.toString();
+        return result + ProofSaver.printTerm(services.getTermBuilder().and(conjuncts), services, true).toString();
+    }
+
+
+    public String conjunctsToString() {
+        return ProofSaver.printTerm(services.getTermBuilder().and(conjuncts), services, true).toString();
     }
 }

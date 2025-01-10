@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.loopinvgen.LIGNestedMDarr;
 import de.uka.ilkd.key.loopinvgen.LIGNew;
 import de.uka.ilkd.key.loopinvgen.LoopInvariantGenerationResult;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -19,30 +21,39 @@ import static de.uka.ilkd.key.loopinvgen.analyzer.WhileStatementAnalyzer.isWhile
 
 public class LoopInvGenMenuItem extends JMenuItem {
     private final KeYMediator mediator;
+    private final Services services;
     private final PosInSequent posInSequent;
 
     public LoopInvGenMenuItem(KeYMediator mediator, PosInSequent posInSequent) {
         super("LoopInvGeneration");
         this.mediator = mediator;
+        this.services = mediator.getServices();
         this.posInSequent = posInSequent;
         addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                List<Set<ProgramVariable>> possibleIndexes = findPossibleIndexes(posInSequent, mediator.getServices());
+                List<Set<ProgramVariable>> possibleIndexes = findPossibleIndexes(posInSequent, services);
                 List<ProgramVariable> indexes = findIndexes(possibleIndexes);
-                ProgramVariable index = indexes.get(0);
 
-                //System.out.println(indexes);
-
-                final LIGNew loopInvGenerator = new LIGNew(mediator.getSelectedGoal().sequent(), mediator.getServices(), index);
-                LoopInvariantGenerationResult result = loopInvGenerator.generate();
-                showResultInWindow(result.toString());
+                if (indexes.size() == 1) {
+                    final LIGNew loopInvGenerator = new LIGNew(mediator.getSelectedGoal().sequent(), services, indexes.get(0));
+                    LoopInvariantGenerationResult result = loopInvGenerator.generate();
+                    showResultInWindow(result);
+                    //var specRepo = services.getSpecificationRepository();
+                    //specRepo.addLoopInvariant(new LoopSpecificationImpl(null, services.getTermBuilder().and(result.getConjuncts())));
+                } else if (indexes.size() == 2) {
+                    final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(mediator.getSelectedGoal().sequent(), services, indexes);
+                    LoopInvariantGenerationResult result = loopInvGenerator.generate();
+                    showResultInWindow(result);
+                } else {
+                    System.out.println("Generation of loop invariants not implemented for more than two nested loops yet");
+                }
             }
         });
         setEnabled(isWhileStatement(posInSequent));
     }
 
-    private static List<ProgramVariable> findIndexes(List<Set<ProgramVariable>> possibleIndexes) {
+    public static List<ProgramVariable> findIndexes(List<Set<ProgramVariable>> possibleIndexes) {
         List<ProgramVariable> result = new LinkedList<ProgramVariable>();
         for (int i = 0; i < possibleIndexes.size(); i++) {
             if (possibleIndexes.get(i).isEmpty()) {
@@ -64,13 +75,17 @@ public class LoopInvGenMenuItem extends JMenuItem {
         return result;
     }
 
-    private static void showResultInWindow(String text) {
+    private void showResultInWindow(LoopInvariantGenerationResult result) {
         JFrame frame = new JFrame("Loop Invariant Generation Result");
         JTextArea textArea = new JTextArea(20, 40);
-        textArea.setText(text);
+        textArea.setText(result.toString());
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
+        JPanel panel = new JPanel();
 
+        frame.setLayout(new BorderLayout());
+        frame.add(scrollPane, BorderLayout.CENTER);
+        frame.add(panel, BorderLayout.SOUTH);
         frame.add(scrollPane);
         frame.pack();
         frame.setLocationRelativeTo(null);

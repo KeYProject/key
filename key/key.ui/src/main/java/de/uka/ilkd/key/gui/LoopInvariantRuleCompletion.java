@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.loopinvgen.LoopSpecificationImpl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.LoopSpecImpl;
@@ -14,7 +15,7 @@ import de.uka.ilkd.key.util.MiscTools;
 /**
  * This class completes the instantiations of the loop invariant rule
  * applications.
- * 
+ * <p>
  * If in forced mode then the loop invariant dialog will not be shown if the
  * supplied invariant is complete.
  */
@@ -35,22 +36,23 @@ public class LoopInvariantRuleCompletion implements
         final While loop = loopApp.getLoopStatement();
 
         LoopSpecification inv = loopApp.getSpec();
+        boolean isDependencyInv = inv instanceof LoopSpecificationImpl;
         if (inv == null) { // no invariant present, get it interactively
             MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
-                                                               services);
+                    services);
             inv = new LoopSpecImpl(loop,
-                                        mf == null ?
-                                                null : mf.getProgramMethod(),
-                                        mf == null || mf.getProgramMethod() == null ?
-                                                null : mf.getProgramMethod().getContainerType(),
-                                        mf == null ? null : MiscTools
-                                                .getSelfTerm(JavaTools.getInnermostMethodFrame(
-                                                                progPost.javaBlock(), services),
-                                                             services),
-                                        null);
+                    mf == null ?
+                            null : mf.getProgramMethod(),
+                    mf == null || mf.getProgramMethod() == null ?
+                            null : mf.getProgramMethod().getContainerType(),
+                    mf == null ? null : MiscTools
+                            .getSelfTerm(JavaTools.getInnermostMethodFrame(
+                                            progPost.javaBlock(), services),
+                                    services),
+                    null);
             try {
                 inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
-                        services, false, loopApp.getHeapContext());
+                        services, false, loopApp.getHeapContext(), goal, app.posInOccurrence());
             } catch (RuleAbortException e) {
                 return null;
             }
@@ -63,14 +65,14 @@ public class LoopInvariantRuleCompletion implements
                 // get invariant or variant interactively
                 try {
                     inv = InvariantConfigurator.getInstance().getLoopInvariant(
-                            inv, services, requiresVariant, loopApp.getHeapContext());
+                            inv, services, requiresVariant, loopApp.getHeapContext(), goal, app.posInOccurrence());
                 } catch (RuleAbortException e) {
                     return null;
                 }
             }
         }
 
-        if (inv != null && forced) {
+        if (inv != null && (forced || isDependencyInv)) {
             // overwrite old loop invariant in spec repo
             services.getSpecificationRepository().addLoopInvariant(inv);
         }

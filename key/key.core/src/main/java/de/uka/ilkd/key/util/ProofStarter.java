@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.util;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -26,11 +24,12 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This class encapsulates the registration of a proof for a given problem.
  * It then starts a proof attempt.
- *
+ * <p>
  * After the proof attempt stops (successfully or not) the side proof is by default
  * unregistered, but can be accessed via this class.
  *
@@ -53,8 +52,8 @@ public class ProofStarter {
         }
 
         public UserProvidedInput(Sequent seq, ProofEnvironment env, String proofName) {
-            this.seq       = seq;
-            this.env       = env;
+            this.seq = seq;
+            this.env = env;
             this.proofName = proofName;
         }
 
@@ -65,9 +64,9 @@ public class ProofStarter {
 
         @Override
         public String name() {
-            return proofName != null ? 
-                   proofName : 
-                   "ProofObligation for " + ProofSaver.printAnything(seq, null);
+            return proofName != null ?
+                    proofName :
+                    "ProofObligation for " + ProofSaver.printAnything(seq, null);
         }
 
         @Override
@@ -84,16 +83,16 @@ public class ProofStarter {
                     EMPTY_PROOF_HEADER,
                     initConfig.createTacletIndex(),
                     initConfig.createBuiltInRuleIndex(),
-                    initConfig );
+                    initConfig);
         }
 
 
         @Override
         public ProofAggregate getPO() throws ProofInputException {
-            final Proof proof = createProof(proofName != null ? proofName : "Proof object for "+ ProofSaver.printAnything(seq, null));
+            final Proof proof = createProof(proofName != null ? proofName : "Proof object for " + ProofSaver.printAnything(seq, null));
 
             return ProofAggregate.createProofAggregate(proof,
-                                                       "ProofAggregate for claim: "+proof.name());
+                    "ProofAggregate for claim: " + proof.name());
         }
 
         @Override
@@ -106,10 +105,10 @@ public class ProofStarter {
          */
         @Override
         public KeYJavaType getContainerType() {
-           return null;
+            return null;
         }
     }
-    
+
     private Proof proof;
 
     private int maxSteps = 2000;
@@ -117,28 +116,30 @@ public class ProofStarter {
     private long timeout = -1L;
 
     private ProverTaskListener ptl;
-    
+
     private AutoSaver autoSaver;
-    
+
     private Strategy strategy;
-    
+
     /**
      * creates an instance of the ProofStarter
+     *
      * @param the ProofEnvironment in which the proof shall be performed
      */
     public ProofStarter(boolean useAutoSaver) {
-       this(null, useAutoSaver);
+        this(null, useAutoSaver);
     }
 
     /**
      * creates an instance of the ProofStarter
+     *
      * @param the ProofEnvironment in which the proof shall be performed
      */
     public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
-    	this.ptl = ptl;
-      if (useAutoSaver) {
-         autoSaver = AutoSaver.getDefaultInstance();
-      }
+        this.ptl = ptl;
+        if (useAutoSaver) {
+            autoSaver = AutoSaver.getDefaultInstance();
+        }
     }
 
     /**
@@ -158,29 +159,32 @@ public class ProofStarter {
      * @throws ProofInputException
      */
     public void init(Sequent sequentToProve, ProofEnvironment env, String proofName) throws ProofInputException {
-       final ProofOblInput input = new UserProvidedInput(sequentToProve, env, proofName);
-       proof = input.getPO().getFirstProof();
-       proof.setEnv(env);
+        final ProofOblInput input = new UserProvidedInput(sequentToProve, env, proofName);
+        proof = input.getPO().getFirstProof();
+        proof.setEnv(env);
     }
 
     /**
      * set timeout
+     *
      * @param timeout
      */
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }
-    
+
     /**
      * Returns the maximal steps to be performed.
+     *
      * @return The maximal steps to be performed.
      */
     public int getMaxRuleApplications() {
-       return this.maxSteps;
+        return this.maxSteps;
     }
 
     /**
      * set maximal steps to be performed
+     *
      * @param maxSteps
      */
     public void setMaxRuleApplications(int maxSteps) {
@@ -192,65 +196,67 @@ public class ProofStarter {
     }
 
     public void setStrategyProperties(StrategyProperties sp) {
-       final Profile profile = proof.getInitConfig().getProfile();
-       StrategyFactory factory = strategy != null ?
-                                 profile.getStrategyFactory(strategy.name()) :
-                                 profile.getDefaultStrategyFactory();
-       setStrategy(factory.create(proof, sp));
+        final Profile profile = proof.getInitConfig().getProfile();
+        StrategyFactory factory = strategy != null ?
+                profile.getStrategyFactory(strategy.name()) :
+                profile.getDefaultStrategyFactory();
+        setStrategy(factory.create(proof, sp));
     }
 
     /**
      * starts proof attempt
+     *
      * @return the proof after the attempt terminated
      */
-     public ApplyStrategyInfo start() {
+    public ApplyStrategyInfo start() {
         return start(proof.openGoals());
-     }
+    }
 
-   /**
-    * starts proof attempt
-    * @return the proof after the attempt terminated
-    */
+    /**
+     * starts proof attempt
+     *
+     * @return the proof after the attempt terminated
+     */
     public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
         try {
-           final Profile profile = proof.getInitConfig().getProfile();
-           
-           if (strategy == null) {
-              StrategyFactory factory = profile.getDefaultStrategyFactory();
-              StrategyProperties sp = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();;
-              strategy = factory.create(proof, sp);
-              System.out.println("STRANGE");
-           }
+            final Profile profile = proof.getInitConfig().getProfile();
 
-           proof.setActiveStrategy(strategy);
-           
+            if (strategy == null) {
+                StrategyFactory factory = profile.getDefaultStrategyFactory();
+                StrategyProperties sp = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();
+                ;
+                strategy = factory.create(proof, sp);
+            }
+
+            proof.setActiveStrategy(strategy);
+
             // It is important that OSS is refreshed AFTER the strategy has been
             // set!
-           OneStepSimplifier.refreshOSS(proof);
+            OneStepSimplifier.refreshOSS(proof);
 
-           GoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
-           ProverCore prover = new ApplyStrategy(goalChooser);
-           if (ptl != null) {
-              prover.addProverTaskObserver(ptl);
-           }
-           if (autoSaver != null) {
-              autoSaver.setProof(proof);
-              prover.addProverTaskObserver(autoSaver);
-           }
+            GoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
+            ProverCore prover = new ApplyStrategy(goalChooser);
+            if (ptl != null) {
+                prover.addProverTaskObserver(ptl);
+            }
+            if (autoSaver != null) {
+                autoSaver.setProof(proof);
+                prover.addProverTaskObserver(autoSaver);
+            }
 
-           ApplyStrategyInfo result;
-           proof.setRuleAppIndexToAutoMode();
-           
-           result = prover.start(proof, goals, maxSteps, timeout, strategy.isStopAtFirstNonCloseableGoal());
+            ApplyStrategyInfo result;
+            proof.setRuleAppIndexToAutoMode();
 
-           if (ptl != null) {
-              prover.removeProverTaskObserver(ptl);
-           }
+            result = prover.start(proof, goals, maxSteps, timeout, strategy.isStopAtFirstNonCloseableGoal());
 
-           if (autoSaver != null) {
-              prover.removeProverTaskObserver(autoSaver);
-              autoSaver.setProof(null);
-           }
+            if (ptl != null) {
+                prover.removeProverTaskObserver(ptl);
+            }
+
+            if (autoSaver != null) {
+                prover.removeProverTaskObserver(autoSaver);
+                autoSaver.setProof(null);
+            }
 
             if (result.isError()) {
                 throw new RuntimeException("Proof attempt failed due to exception:"
@@ -258,25 +264,25 @@ public class ProofStarter {
                         result.getException());
             }
 
-           return result;
-        } 
-        finally {         
-           proof.setRuleAppIndexToInteractiveMode();
+            return result;
+        } finally {
+            proof.setRuleAppIndexToInteractiveMode();
         }
     }
 
     public void init(Proof proof) {
-       this.proof = proof;
-       this.setMaxRuleApplications(proof.getSettings().getStrategySettings().getMaxSteps());
-       this.setTimeout(proof.getSettings().getStrategySettings().getTimeout());
-       this.setStrategy(proof.getActiveStrategy());
+        this.proof = proof;
+        this.setMaxRuleApplications(proof.getSettings().getStrategySettings().getMaxSteps());
+        this.setTimeout(proof.getSettings().getStrategySettings().getTimeout());
+        this.setStrategy(proof.getActiveStrategy());
     }
-    
+
     /**
      * Returns the managed side {@link Proof}.
+     *
      * @return The managed side {@link Proof}.
      */
     public Proof getProof() {
-      return proof;
+        return proof;
     }
 }
