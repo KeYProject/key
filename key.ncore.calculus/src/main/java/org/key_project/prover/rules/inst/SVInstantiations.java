@@ -6,16 +6,19 @@ package org.key_project.prover.rules.inst;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.util.collection.ImmutableMap;
 
 public interface SVInstantiations {
 
-    public SchemaVariable lookupVar(Name name);
+    SchemaVariable lookupVar(Name name);
 
-    public Object lookupValue(Name name);
+    Object lookupValue(Name name);
 
-    public Object getInstantiation(SchemaVariable sv);
+    Object getInstantiation(SchemaVariable sv);
 
     boolean isInstantiated(SchemaVariable sv);
 
     SVInstantiations union(SVInstantiations instantiations, LogicServices services);
+
+    ImmutableMap<SchemaVariable,InstantiationEntry<?>> getInstantiationMap();
 }

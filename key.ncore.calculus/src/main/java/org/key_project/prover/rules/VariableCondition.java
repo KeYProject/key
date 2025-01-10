@@ -29,6 +29,5 @@ public interface VariableCondition {
      *         otherwise
      */
     MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond,
-            LogicServices services);
+            MatchConditions matchCond, LogicServices services);
 }

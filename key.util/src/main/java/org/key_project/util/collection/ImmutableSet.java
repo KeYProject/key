@@ -92,7 +92,7 @@ public interface ImmutableSet<T extends @Nullable Object>
     ImmutableSet<T> remove(T element);
 
     /**
-     * @return true iff the this set is subset of o and vice versa.
+     * @return true iff this set is subset of o and vice versa.
      */
     @Override
     boolean equals(@Nullable Object o);
