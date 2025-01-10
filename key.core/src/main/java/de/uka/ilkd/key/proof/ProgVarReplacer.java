@@ -33,12 +33,10 @@ public final class ProgVarReplacer {
      */
     private final Map<LocationVariable, LocationVariable> map;
 
-
     /**
      * The services object
      */
     private final Services services;
-
 
     /**
      * creates a ProgVarReplacer that replaces program variables as specified by the map parameter
@@ -105,24 +103,30 @@ public final class ProgVarReplacer {
             InstantiationEntry<?> ie = e.value();
             Object inst = ie.getInstantiation();
 
-            if (inst instanceof ContextStatementBlockInstantiation cie) {
-                ProgramElement pe = (ProgramElement) inst;
-                ProgramElement newPe = replace(pe);
-                if (newPe != pe) {
-                    result = result.replace(cie.prefix(), cie.suffix(),
-                        cie.activeStatementContext(), newPe, services);
+            if (inst instanceof Term t) {
+                final Term newT = replace(t);
+                if (newT != t) {
+                    result = result.replace(sv, newT, services);
                 }
-            } else if (ie instanceof org.key_project.logic.op.Operator) {
+            } else if (inst instanceof ContextStatementBlockInstantiation cie) {
+                final ProgramElement pe = cie.program();
+                final ProgramElement newPe = replace(pe);
+                if (newPe != pe) {
+                    result = result.replace(cie.prefix(), cie.suffix(), cie.activeStatementContext(), newPe, services);
+                }
+            } else if (inst instanceof Operator) {
                 /* nothing to be done (currently) */
-            } else if (ie instanceof ProgramElement pe) {
-                ProgramElement newPe = replace(pe);
+            } else if (inst instanceof ProgramElement pe) {
+                final ProgramElement newPe = replace(pe);
                 if (newPe != pe) {
                     result = result.replace(sv, newPe, services);
                 }
-            } else if (ie instanceof ListInstantiation) {
-                @SuppressWarnings("unchecked")
-                ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
-                int size = a.size();
+            } else if (ie instanceof ListInstantiation list) {
+                if (list.getType() != ProgramElement.class) {
+                    throw new RuntimeException("Unexpected list instantiation: " + ie);
+                }
+                final ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
+                final int size = a.size();
                 ProgramElement[] array = new ProgramElement[size];
 
                 boolean changedSomething = false;
@@ -137,19 +141,13 @@ public final class ProgVarReplacer {
                 if (changedSomething) {
                     result = result.replace(sv, new ImmutableArray<>(array), services);
                 }
-            } else if (inst instanceof Term t) {
-                final Term newT = replace(t);
-                if (newT != t) {
-                    result = result.replace(sv, newT, services);
-                }
-            } else {
+            }  else {
                 assert false : "unexpected subtype of InstantiationEntry<?>";
             }
         }
 
         return result;
     }
-
 
     /**
      * replaces in a sequent
@@ -193,7 +191,6 @@ public final class ProgVarReplacer {
         return result;
     }
 
-
     private Term replaceProgramVariable(Term t) {
         final ProgramVariable pv = (ProgramVariable) t.op();
         ProgramVariable o = map.get(pv);
@@ -202,7 +199,6 @@ public final class ProgVarReplacer {
         }
         return t;
     }
-
 
     private Term standardReplace(Term t) {
         Term result = t;
@@ -243,7 +239,6 @@ public final class ProgVarReplacer {
         }
         return result;
     }
-
 
     /**
      * replaces in a term

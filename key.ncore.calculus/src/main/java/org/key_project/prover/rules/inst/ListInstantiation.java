@@ -24,6 +24,12 @@ public class ListInstantiation<T> extends InstantiationEntry<ImmutableArray<T>> 
         this.type = type;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public ImmutableArray<T> getInstantiation() {
+        return super.getInstantiation();
+    }
+
     /**
      * returns the element type of the contained instantiations
      */
