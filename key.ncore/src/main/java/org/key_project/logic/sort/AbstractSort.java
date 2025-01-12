@@ -26,15 +26,6 @@ public abstract class AbstractSort implements Sort {
         this.isAbstract = isAbstract;
     }
 
-    public boolean equals(@Nullable Object o) {
-        if (o instanceof AbstractSort sort) {
-            // TODO: Potential bug should check for sort identity not name equality
-            return sort.name().equals(name());
-        } else {
-            return false;
-        }
-    }
-
     @Override
     public final Name name() {
         return name;

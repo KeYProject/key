@@ -96,13 +96,4 @@ public class SortImpl extends org.key_project.logic.sort.AbstractSort {
     public @Nullable String getOrigin() {
         return origin;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof SortImpl) {
-            return ((SortImpl) o).name().equals(name());
-        } else {
-            return false;
-        }
-    }
 }

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.reference;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
@@ -43,6 +45,15 @@ public class TypeRef extends TypeReferenceImp {
             KeYJavaType kjt) {
         super(name, dimension, prefix);
         this.kjt = kjt;
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj instanceof TypeRef tr) {
+            return Objects.equals(kjt, tr.kjt) && super.equals(obj);
+        }
+        return false;
     }
 
     public KeYJavaType getKeYJavaType() {

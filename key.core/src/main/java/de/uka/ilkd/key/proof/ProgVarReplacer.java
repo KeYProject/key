@@ -112,7 +112,8 @@ public final class ProgVarReplacer {
                 final ProgramElement pe = cie.program();
                 final ProgramElement newPe = replace(pe);
                 if (newPe != pe) {
-                    result = result.replace(cie.prefix(), cie.suffix(), cie.activeStatementContext(), newPe, services);
+                    result = result.replace(cie.prefix(), cie.suffix(),
+                        cie.activeStatementContext(), newPe, services);
                 }
             } else if (inst instanceof Operator) {
                 /* nothing to be done (currently) */
@@ -141,7 +142,7 @@ public final class ProgVarReplacer {
                 if (changedSomething) {
                     result = result.replace(sv, new ImmutableArray<>(array), services);
                 }
-            }  else {
+            } else {
                 assert false : "unexpected subtype of InstantiationEntry<?>";
             }
         }
