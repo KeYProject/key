@@ -5,24 +5,32 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Objects;
 
+import de.uka.ilkd.key.java.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
+import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
 
 /**
  * Implements {@link de.uka.ilkd.key.logic.equality.EqualsModProperty} comparisons for
- * non term classes.
+ * non term classes. This class can be used to make comparisons between different proofs.
+ * This class is used by the Copying and Slicing proof replayer as they need to relate
+ * different proofs and have therefore to rely on sort and type names instead of object
+ * identity. Further more than just terms and programs must be compared.
  */
 public class EqualityModuloProofIrrelevancy {
     // Operator
@@ -46,6 +54,10 @@ public class EqualityModuloProofIrrelevancy {
             return equalsModProofIrrelevancy(_thisLV, (LogicVariable) that);
         } else if (_this instanceof LocationVariable _thisLoc) {
             return equalsModProofIrrelevancy(_thisLoc, (LocationVariable) that);
+        } else if (_this instanceof Modality _thisMod) {
+            return _thisMod.kind().equals(((Modality) that).kind()) &&
+                    equalsModProofIrrelevancy(_thisMod.program(),
+                        ((Modality) that).program());
         }
 
         // assume name and arity uniquely identifies operator
@@ -76,18 +88,78 @@ public class EqualityModuloProofIrrelevancy {
         } else if (that == null || _this == null) {
             return false;
         }
-        return Objects.equals(_this.getKeYJavaType(), that.getKeYJavaType())
-                && _this.isStatic() == that.isStatic()
+        return _this.isStatic() == that.isStatic()
                 && _this.isModel() == that.isModel()
                 && _this.isGhost() == that.isGhost()
                 && _this.isFinal() == that.isFinal()
-                && _this.sort().equals(that.sort())
-                && Objects.equals(_this.argSorts(), that.argSorts())
+                && equalsModProofIrrelevancy(_this.getKeYJavaType(), that.getKeYJavaType())
+                && equalsModProofIrrelevancy(_this.argSorts(), that.argSorts())
                 && _this.name().toString().equals(that.name().toString())
                 && _this.arity() == that.arity()
                 && Objects.equals(_this.whereToBind(), that.whereToBind())
                 && _this.isRigid() == that.isRigid();
     }
+
+    /**
+     * Compares two {@link KeYJavaType} objects for equality based on their name
+     *
+     * @param thisKJT The first {@code KeYJavaType} object to compare.
+     * @param thatKJT The second {@code KeYJavaType} object to compare.
+     * @return {@code true} if the two {@code KeYJavaType} objects are considered equal;
+     *         {@code false} otherwise.
+     */
+    public static boolean equalsModProofIrrelevancy(KeYJavaType thisKJT, KeYJavaType thatKJT) {
+        if (thisKJT == thatKJT)
+            return true;
+        if (thisKJT != null && thatKJT != null) {
+            if (thisKJT.getJavaType() != null &&
+                    thatKJT.getJavaType() != null &&
+                    thisKJT.getJavaType() instanceof SuperArrayDeclaration) {
+                return thatKJT.getJavaType() instanceof SuperArrayDeclaration;
+            }
+            return thisKJT.getFullName().equals(thatKJT.getFullName());
+        }
+        return false;
+    }
+
+    /**
+     * Compares two {@link Sort} objects for equality based on their name
+     *
+     * @param thisSort The first {@code Sort} object to compare.
+     * @param thatSort The second {@code Sort} object to compare.
+     * @return {@code true} if the two {@code Sort} objects are considered equal; {@code false}
+     *         otherwise.
+     */
+    public static boolean equalsModProofIrrelevancy(Sort thisSort, Sort thatSort) {
+        if (thisSort == thatSort)
+            return true;
+        if (thisSort != null && thatSort != null) {
+            return thisSort.name().equals(thatSort.name());
+        }
+        return false;
+    }
+
+    /**
+     * Compares two arrays of {@link Sort}s for equality based on their name
+     *
+     * @param thisSorts The first {@code ImmutableArray<Sort>} object to compare.
+     * @param thatSorts The second {@code ImmutableArray<Sort>} object to compare.
+     * @return {@code true} if the two {@code ImmutableArray<Sort>} objects are considered equal;
+     *         {@code false} otherwise.
+     */
+    public static boolean equalsModProofIrrelevancy(ImmutableArray<Sort> thisSorts,
+            ImmutableArray<Sort> thatSorts) {
+        if (thisSorts == thatSorts)
+            return true;
+        if (thisSorts.size() != thatSorts.size())
+            return false;
+        for (int i = 0; i < thisSorts.size(); i++) {
+            if (!thisSorts.get(i).equals(thatSorts.get(i)))
+                return false;
+        }
+        return true;
+    }
+
 
     /**
      * computes the hash code modulo proof irrelevancy for the given argument
@@ -101,8 +173,6 @@ public class EqualityModuloProofIrrelevancy {
             loc.argSorts(), loc.name().toString(), loc.arity(),
             loc.whereToBind(), loc.isRigid());
     }
-
-
 
     // LogicVariable
     /**
@@ -118,7 +188,8 @@ public class EqualityModuloProofIrrelevancy {
         } else if (that == null || _this == null) {
             return false;
         }
-        return _this.name().equals(that.name()) && _this.sort().equals(that.sort());
+        return _this.name().equals(that.name()) &&
+                equalsModProofIrrelevancy(_this.sort(), that.sort());
     }
 
     /**
@@ -147,7 +218,49 @@ public class EqualityModuloProofIrrelevancy {
             return false;
         }
         // quite inefficient, but sufficient
+
         // TODO: real comparison
+        return equalsModProofIrrelevancy(_this.program(), that.program());
+    }
+
+    public static boolean equalsModProofIrrelevancy(ProgramElement _this, ProgramElement that) {
+        if (_this == that)
+            return true;
+        if (that == null || _this == null)
+            return false;
+
+        if (_this.getClass() != that.getClass()) {
+            return false;
+        }
+        if (_this instanceof TypeRef thisRef) {
+            final TypeRef thatRef = (TypeRef) that;
+            return thisRef.getDimensions() == thatRef.getDimensions() &&
+                    equalsModProofIrrelevancy(thisRef.getProgramElementName(),
+                        thatRef.getProgramElementName())
+                    &&
+                    equalsModProofIrrelevancy(thisRef.getReferencePrefix(),
+                        thatRef.getReferencePrefix());
+        } else if (_this instanceof ProgramVariable thisPV) {
+            ProgramVariable thatPV = (ProgramVariable) that;
+            //
+            boolean sameContainerTypeName =
+                equalsModProofIrrelevancy(thisPV.getContainerType(), thatPV.getContainerType());
+            boolean sameTypeName =
+                equalsModProofIrrelevancy(thisPV.getKeYJavaType(), thatPV.getKeYJavaType());
+            return thisPV.getProgramElementName().equals(thatPV.getProgramElementName()) &&
+                    sameTypeName && sameContainerTypeName;
+        } else if (_this instanceof NonTerminalProgramElement thisNPE) {
+            NonTerminalProgramElement thatNPE = (NonTerminalProgramElement) that;
+            if (_this.getChildCount() != that.getChildCount())
+                return false;
+            for (int i = 0; i < _this.getChildCount(); i++) {
+                if (!equalsModProofIrrelevancy(thisNPE.getChildAt(i), thatNPE.getChildAt(i))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        // HACK: Proper comparison needed
         return _this.toString().equals(that.toString());
     }
 
@@ -177,9 +290,9 @@ public class EqualityModuloProofIrrelevancy {
             return true;
         }
         if (_this != null && that != null) {
-            Term term = (Term) _this.formula();
-            Term formula = (Term) that.formula();
-            return (PROOF_IRRELEVANCY_PROPERTY).equalsModThisProperty(term, formula);
+            Term thisFormula = (Term) _this.formula();
+            Term thatFormula = (Term) that.formula();
+            return PROOF_IRRELEVANCY_PROPERTY.equalsModThisProperty(thisFormula, thatFormula);
         }
         return false;
     }
@@ -454,12 +567,16 @@ public class EqualityModuloProofIrrelevancy {
                     that.getInstantiation(e.key()), PROOF_IRRELEVANCY_PROPERTY)) {
                     return false;
                 }
+            } else if (inst instanceof ProgramElement instAsProgramElement) {
+                if (!equalsModProofIrrelevancy(instAsProgramElement,
+                    (ProgramElement) that.getInstantiation(e.key()))) {
+                    return false;
+                }
             } else if (!inst.equals(that.getInstantiation(e.key()))) {
                 return false;
             }
         }
         return true;
-
     }
 
     /**
