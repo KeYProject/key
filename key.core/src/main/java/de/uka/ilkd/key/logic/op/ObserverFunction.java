@@ -11,6 +11,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import java.util.Objects;
+
 
 /**
  * Objects of this class represent "observer" function or predicate symbols. An observer symbol is a
@@ -38,7 +40,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     public ObserverFunction(String baseName, Sort sort, KeYJavaType type, Sort heapSort,
             KeYJavaType container, boolean isStatic, ImmutableArray<KeYJavaType> paramTypes,
             int heapCount, int stateCount) {
-        super(createName(baseName, container), sort,
+        super(createName(baseName, Objects.requireNonNull(container)), sort,
             getArgSorts(heapSort, container, isStatic, paramTypes, heapCount, stateCount));
         assert type == null || type.getSort() == sort;
         assert container != null;

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.java.ast.reference;
 
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -24,7 +25,7 @@ public class FieldReference extends VariableReference
     protected final ReferencePrefix prefix;
 
     public FieldReference(@NonNull ProgramVariable pv, ReferencePrefix prefix) {
-        super(pv);
+        super(Objects.requireNonNull(pv));
         this.prefix = constructPrefix(prefix, pv);
     }
 
