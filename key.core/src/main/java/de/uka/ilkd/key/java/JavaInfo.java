@@ -1168,8 +1168,10 @@ public final class JavaInfo {
      */
     public ExecutionContext getDefaultExecutionContext() {
         if (defaultExecutionContext == null) {
-            var cu = services.getJavaService().readCompilationUnit("public class %s { void %s() {} }"
-                    .formatted(DEFAULT_EXECUTION_CONTEXT_CLASS, DEFAULT_EXECUTION_CONTEXT_METHOD));
+            var cu = services.getJavaService()
+                    .readCompilationUnit("public class %s { void %s() {} }"
+                            .formatted(DEFAULT_EXECUTION_CONTEXT_CLASS,
+                                DEFAULT_EXECUTION_CONTEXT_METHOD));
             final KeYJavaType kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
             defaultExecutionContext = new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt,
                 DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.nil()), null);
@@ -1282,7 +1284,7 @@ public final class JavaInfo {
     public LocationVariable getArrayLength() {
         if (length == null) {
             final SuperArrayDeclaration sad =
-                    (SuperArrayDeclaration) rec2key().getSuperArrayType().getJavaType();
+                (SuperArrayDeclaration) rec2key().getSuperArrayType().getJavaType();
             length = (LocationVariable) sad.length().getVariables().get(0).getProgramVariable();
             assert "length".equals(length.name().toString()) : "Wrong array length";
         }

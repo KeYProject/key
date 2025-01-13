@@ -122,8 +122,8 @@ public final class ExceptionTools {
             return ((HasLocation) exc).getLocation();
         }
 
-        if(exc instanceof InputMismatchException ime) {
-            return  Location.fromToken(ime.getOffendingToken());
+        if (exc instanceof InputMismatchException ime) {
+            return Location.fromToken(ime.getOffendingToken());
         }
 
         if (exc.getCause() != null) {

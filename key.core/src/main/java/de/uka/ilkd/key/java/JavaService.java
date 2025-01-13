@@ -123,7 +123,7 @@ public class JavaService {
     private final Collection<Path> libraryPath;
 
     public JavaService(Services services, @NonNull Path bootClassPath,
-                       @NonNull Collection<Path> libraryPath) {
+            @NonNull Collection<Path> libraryPath) {
         this.services = services;
         this.mapping = new KeYJPMapping();
         this.bootClassPath = bootClassPath;
@@ -187,8 +187,8 @@ public class JavaService {
                 .map(b -> b.begin)
                 .orElse(new Position(-1, -1));
         return new BuildingIssue(problem.getVerboseMessage(),
-                problem.getCause().orElse(null), false,
-                de.uka.ilkd.key.java.Position.fromJPPosition(loc), source);
+            problem.getCause().orElse(null), false,
+            de.uka.ilkd.key.java.Position.fromJPPosition(loc), source);
     }
 
     // region parsing of compilation units
@@ -210,7 +210,7 @@ public class JavaService {
     }
 
     private ParseResult<CompilationUnit> parseCompilationUnit(Path filename,
-                                                              @Nullable FileRepo fileRepo) throws IOException {
+            @Nullable FileRepo fileRepo) throws IOException {
         Reader is;
         if (fileRepo != null) {
             is = new InputStreamReader(fileRepo.getInputStream(filename));
@@ -230,7 +230,7 @@ public class JavaService {
      * read a compilation unit, given as a string.
      *
      * @param files where to read from
-     * @param repo  the repo to use for reading
+     * @param repo the repo to use for reading
      * @return a KeY structured compilation unit.
      */
     public <E extends Throwable> List<de.uka.ilkd.key.java.ast.CompilationUnit> readCompilationUnits(
@@ -302,8 +302,8 @@ public class JavaService {
             cu.setPackageDeclaration(pkg);
         } catch (ParseProblemException ignored) {
             LOGGER.warn("Failed to construct a package name for the java file " + relativePath
-                    + ", it might contain invalid characters. "
-                    + "Add a package declaration to the file or rename its folder");
+                + ", it might contain invalid characters. "
+                + "Add a package declaration to the file or rename its folder");
         }
     }
 
@@ -352,7 +352,7 @@ public class JavaService {
         }
 
         var errors = compilationUnits.stream()
-                .filter(c -> c.second.isSuccessful()) //FIXME weigl: should be negated
+                .filter(c -> c.second.isSuccessful()) // FIXME weigl: should be negated
                 .flatMap(c -> c.second.getProblems().stream()
                         .map(problem -> buildingIssueFromProblem(c.first.toString(), problem)))
                 .collect(Collectors.toList());
@@ -393,13 +393,13 @@ public class JavaService {
 
         // -- read files --
         for (FileCollection fc : sources) {
-            FileCollection.Walker walker = fc.createWalker(new String[]{".jml", ".java"});
+            FileCollection.Walker walker = fc.createWalker(new String[] { ".jml", ".java" });
             while (walker.step()) {
                 var currentDataLocation = walker.getCurrentLocation();
                 var name = walker.getCurrentLocation().toString();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                     Reader isr = new InputStreamReader(is);
-                     Reader f = new BufferedReader(isr)) {
+                        Reader isr = new InputStreamReader(is);
+                        Reader f = new BufferedReader(isr)) {
                     var cu = unwrapParseResult(name, programFactory.parseCompilationUnit(f));
                     fixupPackageDeclaration(cu, walker.getRelativeLocation());
                     cu.setStorage(currentDataLocation);
@@ -452,8 +452,8 @@ public class JavaService {
             public void visit(MethodDeclaration n, Void arg) {
                 if (!allowed && n.getBody().isPresent()) {
                     LOGGER.warn("Method body of method {} should not be allowed: {}",
-                            n.getNameAsString(),
-                            rcu.getStorage().get().getPath());
+                        n.getNameAsString(),
+                        rcu.getStorage().get().getPath());
                 }
                 n.setBody(null);
             }
@@ -575,7 +575,7 @@ public class JavaService {
         // These fragments are boring: No JML, no constructors, no initializer. And therefore
         // no need for pre-transformation.
         cUnits = cUnits.stream().filter(
-                        it -> !it.getType(0).getNameAsString().equals(JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS))
+            it -> !it.getType(0).getNameAsString().equals(JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS))
                 .collect(Collectors.toList());
         KeYJavaPipeline pipeline = KeYJavaPipeline.createDefault(createPipelineServices(cUnits));
         pipeline.apply();
@@ -595,7 +595,7 @@ public class JavaService {
      */
     protected MethodDeclaration embedBlock(BlockStmt block) {
         MethodDeclaration mdecl = new MethodDeclaration(new NodeList<>(), new VoidType(),
-                "$virtual_method_for_parsing");
+            "$virtual_method_for_parsing");
         mdecl.setBody(block);
         return mdecl;
     }
@@ -603,13 +603,13 @@ public class JavaService {
     /**
      * wraps a RECODER MethodDeclaration in a class
      *
-     * @param mdecl   the declaration.MethodDeclaration to wrap
+     * @param mdecl the declaration.MethodDeclaration to wrap
      * @param context the declaration.ClassDeclaration where the method
-     *                has to be embedded
+     *        has to be embedded
      * @return the enclosing declaration.ClassDeclaration
      */
     protected ClassOrInterfaceDeclaration embedMethod(MethodDeclaration mdecl,
-                                                      JPContext context) {
+            JPContext context) {
         ClassOrInterfaceDeclaration classContext = context.classContext();
         classContext.addMember(mdecl);
         /*
@@ -657,10 +657,10 @@ public class JavaService {
      * add a list of variables to a context
      *
      * @param classContext context to add to
-     * @param vars         vars to add
+     * @param vars vars to add
      */
     private void addProgramVariablesToClassContext(ClassOrInterfaceDeclaration classContext,
-                                                   Iterable<IProgramVariable> vars) {
+            Iterable<IProgramVariable> vars) {
         Set<String> names = new HashSet<>();
 
         for (IProgramVariable var : vars) {
@@ -693,7 +693,7 @@ public class JavaService {
             } else {
                 keySpec = new FieldSpecification(var);
                 spec = new VariableDeclarator(name2typeReference(javaType.getFullName()),
-                        var.name().toString());
+                    var.name().toString());
                 mapping.put(spec, keySpec);
             }
 
@@ -701,10 +701,10 @@ public class JavaService {
             classContext.addMember(field);
 
             var keyField = new de.uka.ilkd.key.java.ast.declaration.FieldDeclaration(
-                    new Modifier[0],
-                    new TypeRef(var.getKeYJavaType()),
-                    new FieldSpecification[]{keySpec},
-                    false);
+                new Modifier[0],
+                new TypeRef(var.getKeYJavaType()),
+                new FieldSpecification[] { keySpec },
+                false);
 
             mapping.put(field, keyField);
         }
@@ -745,9 +745,9 @@ public class JavaService {
      * parses a given JavaBlock using the context to determine the right
      * references and returns a statement block of recoder.
      *
-     * @param input   a String describing a java block
+     * @param input a String describing a java block
      * @param context CompilationUnit in which the block has to be
-     *                interpreted
+     *        interpreted
      * @return the parsed and resolved recoder statement block
      */
     Node parseBlock(String input, JPContext context) {
@@ -783,7 +783,7 @@ public class JavaService {
 
     private TransformationPipelineServices createPipelineServices(List<CompilationUnit> cUnits) {
         TransformationPipelineServices.TransformerCache cache =
-                new TransformationPipelineServices.TransformerCache(cUnits);
+            new TransformationPipelineServices.TransformerCache(cUnits);
         return new TransformationPipelineServices(programFactory, cache);
     }
 
@@ -792,15 +792,15 @@ public class JavaService {
      * parses a given JavaBlock using the context to determine the right
      * references
      *
-     * @param block           a String describing a java block
-     * @param context         CompilationUnit in which the block has to be
-     *                        interprested
+     * @param block a String describing a java block
+     * @param context CompilationUnit in which the block has to be
+     *        interprested
      * @param allowSchemaJava if parameter is non-null SchemaJava is allowed and the namespace is
-     *                        used to resolve symbols
+     *        used to resolve symbols
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlock(String block, JPContext context,
-                               Namespace<SchemaVariable> allowSchemaJava) {
+            Namespace<SchemaVariable> allowSchemaJava) {
         var sb = parseBlock(block, context);
         if (allowSchemaJava == null && containsSchemaJava(sb)) {
             throw new RuntimeException("SchemaJava unexpected in the given block");
@@ -831,13 +831,13 @@ public class JavaService {
      * parses a given JavaBlock using the context to determine the right
      * references using an empty context
      *
-     * @param block           a String describing a java block
+     * @param block a String describing a java block
      * @param allowSchemaJava if parameter is non-null SchemaJava is allowed and the namespace is
-     *                        used to resolve symbols
+     *        used to resolve symbols
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlockWithEmptyContext(String block,
-                                               @Nullable Namespace<SchemaVariable> allowSchemaJava) {
+            @Nullable Namespace<SchemaVariable> allowSchemaJava) {
         return readBlock(block, createEmptyContext(), allowSchemaJava);
     }
 
@@ -847,12 +847,12 @@ public class JavaService {
      * used to create a new class context
      *
      * @param allowSchemaJava if parameter is non-null SchemaJava is allowed and the namespace is
-     *                        used to resolve symbols
-     * @param s               a String describing a java block
+     *        used to resolve symbols
+     * @param s a String describing a java block
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> variables, String s,
-                                                   Namespace<SchemaVariable> allowSchemaJava) {
+            Namespace<SchemaVariable> allowSchemaJava) {
         ImmutableList<IProgramVariable> pvs = ImmutableSLList.nil();
         for (IProgramVariable n : variables.allElements()) {
             if (n instanceof ProgramVariable) {
@@ -863,7 +863,8 @@ public class JavaService {
     }
 
     public JavaBlock readBlockWithProgramVariables(String java) {
-        JPContext context = createContext(services.getNamespaces().programVariables().allElements());
+        JPContext context =
+            createContext(services.getNamespaces().programVariables().allElements());
         return readBlock(java, context, null);
     }
 

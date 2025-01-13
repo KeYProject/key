@@ -299,7 +299,7 @@ public abstract class AbstractFileRepo implements FileRepo {
     @Override
     public InputStream getInputStream(Path path) throws IOException {
         // wrap path into URL for uniform treatment
-        //return getInputStream(path.toUri().toURL());
+        // return getInputStream(path.toUri().toURL());
         return Files.newInputStream(path);
     }
 

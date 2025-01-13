@@ -4,8 +4,6 @@
 package de.uka.ilkd.key.java.ast;
 
 
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
 /**
  * The property of a non terminal program element to define a scope for types. taken from COMPOST

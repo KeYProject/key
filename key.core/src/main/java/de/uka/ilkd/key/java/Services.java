@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
@@ -12,20 +18,16 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.KeYResourceManager;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.lookup.Lookup;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * This is a collection of common services to the KeY prover. Services include information on the
@@ -85,7 +87,7 @@ public class Services implements TermServices, LogicServices {
     private NameRecorder nameRecorder;
 
     private ITermProgramVariableCollectorFactory factory =
-            TermProgramVariableCollector::new;
+        TermProgramVariableCollector::new;
 
     private OriginTermLabelFactory originFactory;
 
@@ -109,8 +111,8 @@ public class Services implements TermServices, LogicServices {
     }
 
     private Services(Profile profile, @Nullable JavaService javaService,
-                     HashMap<String, Counter> counters,
-                     ServiceCaches caches) {
+            HashMap<String, Counter> counters,
+            ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
         assert caches != null;
@@ -226,8 +228,8 @@ public class Services implements TermServices, LogicServices {
      * be used for a new proof.
      *
      * @param shareCaches {@code true} The created {@link Services} will use the same
-     *                    {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
-     *                    will use a new empty {@link ServiceCaches} instance.
+     *        {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
+     *        will use a new empty {@link ServiceCaches} instance.
      * @return the copy
      */
     public Services copy(boolean shareCaches) {
@@ -238,10 +240,10 @@ public class Services implements TermServices, LogicServices {
      * Creates a copy of this {@link Services} in which the {@link Profile} is replaced. The copy
      * does not belong to a {@link Proof} object and can hence be used for a new proof.
      *
-     * @param profile     The new {@link Profile} to use in the copy of this {@link Services}.
+     * @param profile The new {@link Profile} to use in the copy of this {@link Services}.
      * @param shareCaches {@code true} The created {@link Services} will use the same
-     *                    {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
-     *                    will use a new empty {@link ServiceCaches} instance.
+     *        {@link ServiceCaches} like this instance; {@code false} the created {@link Services}
+     *        will use a new empty {@link ServiceCaches} instance.
      * @return The created copy.
      */
     public Services copy(Profile profile, boolean shareCaches) {
@@ -275,7 +277,7 @@ public class Services implements TermServices, LogicServices {
      */
     public Services copyPreservesLDTInformation() {
         Services s =
-                new Services(getProfile(), javaService, new LinkedHashMap<>(), new ServiceCaches());
+            new Services(getProfile(), javaService, new LinkedHashMap<>(), new ServiceCaches());
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
         s.nameRecorder = nameRecorder.copy();
@@ -296,7 +298,7 @@ public class Services implements TermServices, LogicServices {
     public void setProof(Proof p_proof) {
         if (this.proof != null) {
             throw new IllegalStateException(
-                    "Services are already owned by another proof:" + proof.name());
+                "Services are already owned by another proof:" + proof.name());
         }
         proof = p_proof;
     }
@@ -444,7 +446,7 @@ public class Services implements TermServices, LogicServices {
      * sets the factory for origin term labels
      *
      * @param originFactory the {@OriginTermLabelFactory} to use, if null is passed, origin labels
-     *                      should not be created
+     *        should not be created
      */
     public void setOriginFactory(OriginTermLabelFactory originFactory) {
         this.originFactory = originFactory;
@@ -482,7 +484,7 @@ public class Services implements TermServices, LogicServices {
     }
 
     private JavaService activateJavaPath(@NonNull Path bootClassPath,
-                                         @NonNull Collection<Path> libraryPaths) {
+            @NonNull Collection<Path> libraryPaths) {
         if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
                 && CollectionUtil.containsSame(javaService.getLibraryPath(), libraryPaths)) {
             return javaService;
@@ -494,7 +496,7 @@ public class Services implements TermServices, LogicServices {
     }
 
     public JavaService activateJava(@Nullable Path bootClassPath,
-                                    @Nullable Collection<Path> libraryPaths) {
+            @Nullable Collection<Path> libraryPaths) {
         Path path;
         if (bootClassPath != null) {
             path = bootClassPath;

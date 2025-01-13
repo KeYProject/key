@@ -14,28 +14,32 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The KeY java type realises a tuple (sort, type) of a logic sort and the java type (for example a
  * class declaration). In contrast to other classes the KeYJavaType is <emph>not</emph> immutable,
  * so use it with care.
  */
+@NullMarked
 public class KeYJavaType implements Type {
 
     /** Special return "type" for void methods. */
-    public static final KeYJavaType VOID_TYPE = new KeYJavaType(null, JavaDLTheory.ANY);
+    public static final KeYJavaType VOID_TYPE = new KeYJavaType(JavaDLTheory.ANY);
 
     /** the AST type */
-    private Type javaType = null;
+    private @Nullable Type javaType = null;
     /** the logic sort */
-    private Sort sort = null;
+    private @Nullable Sort sort = null;
 
     /** creates a new KeYJavaType */
     public KeYJavaType() {}
 
     /** creates a new KeYJavaType */
     public KeYJavaType(Type javaType, Sort sort) {
-        this.javaType = javaType;
-        this.sort = sort;
+        this.javaType = Objects.requireNonNull(javaType);
+        this.sort = Objects.requireNonNull(sort);
     }
 
     /** creates a new KeYJavaType */

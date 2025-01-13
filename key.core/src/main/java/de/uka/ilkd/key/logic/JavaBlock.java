@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.pp.PrettyPrinter;
@@ -13,8 +15,6 @@ import org.key_project.util.EqualsModProofIrrelevancy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Objects;
 
 public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
@@ -46,7 +46,7 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
      * create a new JavaBlock
      *
      * @param prg the root StatementBlock for this JavaBlock. TacletIndex relies on <code>prg</code>
-     *            being indeed a StatementBlock.
+     *        being indeed a StatementBlock.
      */
     public static JavaBlock createJavaBlock(StatementBlock prg) {
         return new JavaBlock(Objects.requireNonNull(prg));

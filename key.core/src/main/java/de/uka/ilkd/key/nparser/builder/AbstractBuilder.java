@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -44,18 +43,7 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         if (ctx == null) {
             return null;
         }
-        try {
-            return (U) ctx.accept(this);
-        } catch (BuildingExceptions | BuildingException e) {
-            throw e;
-        } catch (Exception e) {
-            LOGGER.error("", e);
-            if (ctx instanceof ParserRuleContext) {
-                throw new BuildingException((ParserRuleContext) ctx, e);
-            }
-            // otherwise we rethrow
-            throw e;
-        }
+        return (U) ctx.accept(this);
     }
 
     @Override

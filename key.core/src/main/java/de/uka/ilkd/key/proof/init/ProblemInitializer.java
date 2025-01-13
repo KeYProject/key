@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
@@ -39,19 +45,15 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
 
 
 public final class ProblemInitializer {
@@ -73,7 +75,7 @@ public final class ProblemInitializer {
     // -------------------------------------------------------------------------
 
     public ProblemInitializer(ProgressMonitor mon, Services services,
-                              ProblemInitializerListener listener) {
+            ProblemInitializerListener listener) {
         this.services = services;
         this.progMon = mon;
         this.listener = listener;
@@ -126,7 +128,7 @@ public final class ProblemInitializer {
     /**
      * displays the status report in the status line and the maximum used by a progress bar
      *
-     * @param status      the String to be displayed in the status line
+     * @param status the String to be displayed in the status line
      * @param progressMax an int describing what is 100 per cent
      */
     private void reportStatus(String status, int progressMax) {
@@ -165,7 +167,7 @@ public final class ProblemInitializer {
 
         for (String name : in.getLDTIncludes()) {
             keyFile[i] =
-                    new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
+                new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
             i++;
             setProgress(i);
         }
@@ -196,7 +198,7 @@ public final class ProblemInitializer {
         int i = 0;
         for (String fileName : in.getIncludes()) {
             KeYFile keyFile =
-                    new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile(), fileRepo);
+                new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
             setProgress(++i);
         }
@@ -240,8 +242,8 @@ public final class ProblemInitializer {
         final Includes includes = envInput.readIncludes();
         for (var fileName : includes.getRuleSets()) {
             KeYFile keyFile =
-                    new KeYFile(fileName.file().getFileName().toString(), fileName, progMon,
-                            envInput.getProfile(), fileRepo);
+                new KeYFile(fileName.file().getFileName().toString(), fileName, progMon,
+                    envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
         }
 
@@ -260,15 +262,15 @@ public final class ProblemInitializer {
             }
             try {
                 javaService.readCompilationUnits(javaPath, classes, fileRepo,
-                        (ex, p) -> new ProofInputException("Failed to parse file " + p, ex));
+                    (ex, p) -> new ProofInputException("Failed to parse file " + p, ex));
             } catch (IOException e) {
                 throw new ProofInputException("Failed to read file", e);
             }
         }
         Path initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(
-                JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes,
-                        initialFile));
+            JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes,
+                initialFile));
     }
 
     /**
@@ -337,7 +339,7 @@ public final class ProblemInitializer {
             final ProgramElement pe = term.javaBlock().program();
             final Services serv = rootGoal.proof().getServices();
             final ImmutableSet<LocationVariable> freeProgVars =
-                    MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
+                MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
             for (ProgramVariable pv : freeProgVars) {
                 if (namespaces.programVariables().lookup(pv.name()) == null) {
                     rootGoal.addProgramVariable(pv);
@@ -362,7 +364,7 @@ public final class ProblemInitializer {
     private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig) {
         // TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(),
-                false);
+            false);
         return initConfig;
     }
 
@@ -377,12 +379,12 @@ public final class ProblemInitializer {
         reportStatus("Registering rules", proofs.length * 10);
         for (int i = 0; i < proofs.length; i++) {
             proofs[i].getInitConfig().registerRules(proofs[i].getInitConfig().getTaclets(),
-                    AxiomJustification.INSTANCE);
+                AxiomJustification.INSTANCE);
             setProgress(3 + i * proofs.length);
             // register built in rules
             Profile profile = proofs[i].getInitConfig().getProfile();
             final ImmutableList<BuiltInRule> rules =
-                    profile.getStandardRules().standardBuiltInRules();
+                profile.getStandardRules().standardBuiltInRules();
             int j = 0;
             final int step = !rules.isEmpty() ? (7 / rules.size()) : 0;
             for (Rule r : rules) {
@@ -424,7 +426,7 @@ public final class ProblemInitializer {
         RuleSource tacletBase = profile.getStandardRules().getTacletBase();
         if (tacletBase != null) {
             KeYFile tacletBaseFile = new KeYFile("taclet base",
-                    profile.getStandardRules().getTacletBase(), progMon, profile);
+                profile.getStandardRules().getTacletBase(), progMon, profile);
             readEnvInput(tacletBaseFile, config);
         }
 
@@ -459,7 +461,7 @@ public final class ProblemInitializer {
         }
         LOGGER.debug("Taclets under: {}", taclets1);
         try (PrintWriter out =
-                     new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
+            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.print(firstProof.toString());
         } catch (IOException e) {
             LOGGER.warn("Failed write proof", e);
@@ -481,8 +483,8 @@ public final class ProblemInitializer {
                         var jb = s.javaBlock();
                         if (!jb.toString().equals("{}")) {
                             out.format(
-                                    "\n===  %s ======================================================\n",
-                                    taclet.name());
+                                "\n===  %s ======================================================\n",
+                                taclet.name());
                             toSexpr((NonTerminalProgramElement) jb.program(), 0, out);
                             out.println();
                         }
@@ -520,7 +522,7 @@ public final class ProblemInitializer {
         }
         LOGGER.debug("Taclets under: {}", taclets1);
         try (PrintWriter out =
-                     new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
+            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.format("Date: %s%n", new Date());
 
             out.format("Choices: %n");
@@ -531,7 +533,7 @@ public final class ProblemInitializer {
             taclets.sort(Comparator.comparing(a -> a.name().toString()));
             for (Taclet taclet : taclets) {
                 out.format("== %s (%s) =========================================%n", taclet.name(),
-                        taclet.displayName());
+                    taclet.displayName());
                 out.println(taclet);
                 out.format("-----------------------------------------------------%n");
             }
@@ -546,10 +548,10 @@ public final class ProblemInitializer {
 
     private void configureTermLabelSupport(InitConfig initConfig) {
         initConfig.getServices().setOriginFactory(
-                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
-                        .getUseOriginLabels()
-                        ? new OriginTermLabelFactory()
-                        : null);
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                    .getUseOriginLabels()
+                            ? new OriginTermLabelFactory()
+                            : null);
     }
 
     private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)
@@ -567,7 +569,7 @@ public final class ProblemInitializer {
         final JavaInfo javaInfo = services.getJavaInfo();
         assert javaInfo != null;
         final Namespace<JFunction> functions =
-                services.getNamespaces().functions();
+            services.getNamespaces().functions();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         assert heapLDT != null;
         for (KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
@@ -577,7 +579,7 @@ public final class ProblemInitializer {
                     final ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
                     if (pv instanceof LocationVariable) {
                         heapLDT.getFieldSymbolForPV((LocationVariable) pv,
-                                services);
+                            services);
                     }
                 }
             }

@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -32,12 +36,11 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
-import org.antlr.v4.runtime.ParserRuleContext;
+
 import org.key_project.util.collection.*;
 import org.key_project.util.java.StringUtil;
 
-import java.net.URI;
-import java.util.*;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS_ONLY;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
@@ -57,14 +60,14 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * The default signals only clause for errors and runtime exceptions.
      **/
     private static final String DEFAULT_SIGNALS_ONLY =
-            format("signals_only %s, %s;", ERROR, RUNTIME_EXCEPTION);
+        format("signals_only %s, %s;", ERROR, RUNTIME_EXCEPTION);
     /**
      * This is the term label for implicit specification clauses. This is important for
      * well-definedness checks. Hence, do not change its usages unless you understand and have
      * thought about the semantics of the corresponding well-definedness checks.
      **/
     private static final TermLabel IMPL_TERM_LABEL =
-            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL;
+        ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL;
     private final Services services;
     private final JMLSpecFactory jsf;
     private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
@@ -146,7 +149,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         for (int i = 0; i < exceptions.size(); i++) {
             if (services.getJavaInfo().isSubtype(exceptions.get(i).getKeYJavaType(),
-                    services.getJavaInfo().getKeYJavaType(THROWABLE))) {
+                services.getJavaInfo().getKeYJavaType(THROWABLE))) {
                 b.append(", ").append(exceptions.get(i).getKeYJavaType().getFullName());
             }
         }
@@ -162,11 +165,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * of a reference array type that also its elements are non-null In case of implicit fields or
      * primitive typed fields/variables the empty set is returned
      *
-     * @param varName       the String specifying the variable/field name
-     * @param kjt           the KeYJavaType representing the variables/field declared type
+     * @param varName the String specifying the variable/field name
+     * @param kjt the KeYJavaType representing the variables/field declared type
      * @param isImplicitVar a boolean indicating if the field is an implicit one (in which case
-     *                      no
-     * @param services      the services object
+     *        no
+     * @param services the services object
      * @return set of formulas specifying non-nullity for field/variables
      */
     public static ImmutableSet<LabeledParserRuleContext> createNonNullPositionedString(
@@ -182,10 +185,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
             // use special "deep" non null predicate (see bug #1392)
             // ... looks a bit like a hack with those DL escapes ...
             final String nonNullString =
-                    arrayDepth > 0 ? format("\\dl_nonNull(\\dl_heap(),%s,%d)", varName, arrayDepth)
-                            : format("%s != null", varName);
+                arrayDepth > 0 ? format("\\dl_nonNull(\\dl_heap(),%s,%d)", varName, arrayDepth)
+                        : format("%s != null", varName);
             final ParserRuleContext ps =
-                    JmlFacade.parseExpr(new PositionedString(nonNullString, location));
+                JmlFacade.parseExpr(new PositionedString(nonNullString, location));
             result = result.add(new LabeledParserRuleContext(ps, IMPL_TERM_LABEL));
         }
         return result;
@@ -241,7 +244,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member, "spec_public")) {
                     visibility = new Public();
                 } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member,
-                        "spec_protected")) {
+                    "spec_protected")) {
                     visibility = new Protected();
                 }
 
@@ -254,13 +257,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     // and not for implicit fields.
                     if (!JMLInfoExtractor.isNullable(field.getProgramName(), td)) {
                         ImmutableSet<LabeledParserRuleContext> nonNullInvs =
-                                createNonNullPositionedString(field.getProgramName(),
-                                        field.getProgramVariable().getKeYJavaType(),
-                                        field.isImplicit(),
-                                        new Location(fileName, member.getEndPosition()), services);
+                            createNonNullPositionedString(field.getProgramName(),
+                                field.getProgramVariable().getKeYJavaType(),
+                                field.isImplicit(),
+                                new Location(fileName, member.getEndPosition()), services);
                         for (LabeledParserRuleContext classInv : nonNullInvs) {
                             final ClassInvariant jmlClassInvariant =
-                                    jsf.createJMLClassInvariant(kjt, visibility, isStatic, classInv);
+                                jsf.createJMLClassInvariant(kjt, visibility, isStatic, classInv);
                             result = result.add(jmlClassInvariant);
                         }
                     }
@@ -281,7 +284,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 if ((child instanceof FieldDeclaration && (((FieldDeclaration) child).isGhost()
                         || ((FieldDeclaration) child).isModel()))
                         || (child instanceof IProgramMethod
-                        && ((IProgramMethod) child).isModel())) {
+                                && ((IProgramMethod) child).isModel())) {
                     continue;
                 }
             } else if (td.getComments() != null) {
@@ -298,7 +301,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             // call preparser
             var parser = new PreParser(services.getOriginFactory() != null);
             ImmutableList<TextualJMLConstruct> constructs =
-                    parser.parseClassLevel(concatenatedComment, fileName, pos);
+                parser.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(parser.getWarnings());
 
             // create class invs out of textual constructs, add them to result
@@ -344,12 +347,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
     /**
      * Extracts method specifications (i.e., contracts) from Java+JML input.
      *
-     * @param pm           method to extract for
+     * @param pm method to extract for
      * @param addInvariant whether to add <i>static</i> invariants to pre- and post-conditions
      */
     @Override
     public List<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
-                                                         boolean addInvariant) throws SLTranslationException {
+            boolean addInvariant) throws SLTranslationException {
         List<SpecificationElement> result = new ArrayList<>();
 
         // get type declaration, file name
@@ -379,7 +382,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         // create JML contracts out of constructs, add them to result
         TextualJMLConstruct[] constructsArray =
-                constructs.toArray(new TextualJMLConstruct[constructs.size()]);
+            constructs.toArray(new TextualJMLConstruct[constructs.size()]);
 
         int startPos;
         TextualJMLMethodDecl modelMethodDecl = null;
@@ -391,12 +394,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // specification
                 // create an empty one and insert it:
                 TextualJMLSpecCase modelSpec =
-                        new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NORMAL_BEHAVIOR);
+                    new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NORMAL_BEHAVIOR);
                 TextualJMLConstruct[] t = new TextualJMLConstruct[constructsArray.length + 1];
                 startPos++;
                 System.arraycopy(constructsArray, 0, t, 0, startPos);
                 System.arraycopy(constructsArray, startPos, t, startPos + 1,
-                        constructsArray.length - startPos);
+                    constructsArray.length - startPos);
                 t[startPos] = modelSpec;
                 constructsArray = t;
             }
@@ -413,7 +416,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             if (isStrictlyPure || pm.isModel()) {
                 for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
                     specCase.addClause(ASSIGNABLE, heap.name(),
-                            JmlFacade.parseExpr("\\strictly_nothing"));
+                        JmlFacade.parseExpr("\\strictly_nothing"));
                 }
             } else if (isPure) {
                 for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
@@ -434,36 +437,36 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
                 if (!pm.isConstructor()) {
                     specCase.addClause(REQUIRES, new LabeledParserRuleContext(
-                            JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
+                        JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
                     if (hasFreeInvariant) {
                         specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
-                                JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                            JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
                     }
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
                     specCase.addClause(REQUIRES, new LabeledParserRuleContext(
-                            JmlFacade.parseExpr(format("%s.\\inv", pm.getName())),
-                            IMPL_TERM_LABEL));
+                        JmlFacade.parseExpr(format("%s.\\inv", pm.getName())),
+                        IMPL_TERM_LABEL));
                     if (hasFreeInvariant) {
                         specCase.addClause(REQUIRES_FREE, new LabeledParserRuleContext(
-                                JmlFacade.parseExpr(format("%s.\\inv_free", pm.getName())),
-                                IMPL_TERM_LABEL));
+                            JmlFacade.parseExpr(format("%s.\\inv_free", pm.getName())),
+                            IMPL_TERM_LABEL));
                     }
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addClause(ENSURES, new LabeledParserRuleContext(
-                            JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
+                        JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
                     if (hasFreeInvariant) {
                         specCase.addClause(ENSURES_FREE, new LabeledParserRuleContext(
-                                JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                            JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
                     }
 
                 }
                 if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
                     specCase.addClause(TextualJMLSpecCase.Clause.SIGNALS,
-                            new LabeledParserRuleContext(
-                                    JmlFacade.parseClause(format("signals (Throwable e) %s;", invString)),
-                                    IMPL_TERM_LABEL));
+                        new LabeledParserRuleContext(
+                            JmlFacade.parseClause(format("signals (Throwable e) %s;", invString)),
+                            IMPL_TERM_LABEL));
 
                 }
             }
@@ -471,16 +474,16 @@ public final class JMLSpecExtractor implements SpecExtractor {
             // add non-null preconditions
             for (int j = 0, n = pm.getParameterDeclarationCount(); j < n; j++) {
                 final VariableSpecification paramDecl =
-                        pm.getParameterDeclarationAt(j).getVariableSpecification();
+                    pm.getParameterDeclarationAt(j).getVariableSpecification();
                 if (!JMLInfoExtractor.parameterIsNullable(pm, j)) {
                     // no additional precondition for primitive types!
                     // createNonNullPos... takes care of that
                     final ImmutableSet<LabeledParserRuleContext> nonNullParams =
-                            createNonNullPositionedString(paramDecl.getName(),
-                                    paramDecl.getProgramVariable().getKeYJavaType(), false,
-                                    new Location(fileName,
-                                            pm.getStartPosition()),
-                                    services);
+                        createNonNullPositionedString(paramDecl.getName(),
+                            paramDecl.getProgramVariable().getKeYJavaType(), false,
+                            new Location(fileName,
+                                pm.getStartPosition()),
+                            services);
                     for (LabeledParserRuleContext nonNull : nonNullParams) {
                         specCase.addClause(REQUIRES, nonNull);
                     }
@@ -493,10 +496,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
             if (!pm.isVoid() && !pm.isConstructor() && !JMLInfoExtractor.resultIsNullable(pm)
                     && specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                 final ImmutableSet<LabeledParserRuleContext> resultNonNull =
-                        createNonNullPositionedString("\\result", resultType, false,
-                                new Location(fileName,
-                                        pm.getStartPosition()),
-                                services);
+                    createNonNullPositionedString("\\result", resultType, false,
+                        new Location(fileName,
+                            pm.getStartPosition()),
+                        services);
                 for (LabeledParserRuleContext nonNull : resultNonNull) {
                     specCase.addClause(ENSURES, nonNull);
                 }
@@ -524,13 +527,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     @Override
     public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method,
-                                                             final StatementBlock block) throws SLTranslationException {
+            final StatementBlock block) throws SLTranslationException {
         return createBlockContracts(method, new LinkedList<>(), block, block.getComments());
     }
 
     @Override
     public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method,
-                                                             final LabeledStatement labeled) throws SLTranslationException {
+            final LabeledStatement labeled) throws SLTranslationException {
         final List<Label> labels = new LinkedList<>();
         labels.add(labeled.getLabel());
         Statement nextNonLabeled = labeled.getBody();
@@ -540,7 +543,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         }
         if (nextNonLabeled instanceof StatementBlock) {
             return createBlockContracts(method, labels, (StatementBlock) nextNonLabeled,
-                    labeled.getComments());
+                labeled.getComments());
         } else {
             return DefaultImmutableSet.nil();
         }
@@ -548,19 +551,19 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     @Override
     public ImmutableSet<LoopContract> extractLoopContracts(final IProgramMethod method,
-                                                           final LoopStatement loop) throws SLTranslationException {
+            final LoopStatement loop) throws SLTranslationException {
         return createLoopContracts(method, new LinkedList<>(), loop, loop.getComments());
     }
 
     @Override
     public ImmutableSet<LoopContract> extractLoopContracts(final IProgramMethod method,
-                                                           final StatementBlock block) throws SLTranslationException {
+            final StatementBlock block) throws SLTranslationException {
         return createLoopContracts(method, new LinkedList<>(), block, block.getComments());
     }
 
     @Override
     public ImmutableSet<LoopContract> extractLoopContracts(final IProgramMethod method,
-                                                           final LabeledStatement labeled) throws SLTranslationException {
+            final LabeledStatement labeled) throws SLTranslationException {
         final List<Label> labels = new LinkedList<>();
         labels.add(labeled.getLabel());
         Statement nextNonLabeled = labeled.getBody();
@@ -570,10 +573,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         }
         if (nextNonLabeled instanceof StatementBlock) {
             return createLoopContracts(method, labels, (StatementBlock) nextNonLabeled,
-                    labeled.getComments());
+                labeled.getComments());
         } else if (nextNonLabeled instanceof LoopStatement) {
             return createLoopContracts(method, labels, (LoopStatement) nextNonLabeled,
-                    labeled.getComments());
+                labeled.getComments());
         } else {
             return DefaultImmutableSet.nil();
         }
@@ -581,33 +584,33 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     @Override
     public ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
-                                                             MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
+            MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException {
         // In cases of specifications immediately following each other (like a
         // merge_point and a block contract / loop invariant), it might happen
         // that we're passed multiple constructs here. Therefore, we filter the
         // merge point specific parts here
         final TextualJMLConstruct[] constructs =
-                Arrays.stream(parseMethodLevelComments(mps.getComments(), getFileName(method)))
-                        .filter(c -> c instanceof TextualJMLMergePointDecl)
-                        .toArray(TextualJMLConstruct[]::new);
+            Arrays.stream(parseMethodLevelComments(mps.getComments(), getFileName(method)))
+                    .filter(c -> c instanceof TextualJMLMergePointDecl)
+                    .toArray(TextualJMLConstruct[]::new);
 
         return jsf.createJMLMergeContracts(method, mps, (TextualJMLMergePointDecl) constructs[0]);
     }
 
     private ImmutableSet<BlockContract> createBlockContracts(final IProgramMethod method,
-                                                             final List<Label> labels, final StatementBlock block, final Comment[] comments)
+            final List<Label> labels, final StatementBlock block, final Comment[] comments)
             throws SLTranslationException {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
         // For some odd reason every comment block appears twice; thus we remove
         // duplicates.
         final TextualJMLConstruct[] constructs =
-                parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
+            parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
         for (int i = constructs.length - 1; i >= 0
                 && constructs[i] instanceof TextualJMLSpecCase specificationCase; i--) {
             try {
                 result = result.union(
-                        jsf.createJMLBlockContracts(method, labels, block, specificationCase));
+                    jsf.createJMLBlockContracts(method, labels, block, specificationCase));
             } catch (final SLWarningException exception) {
                 warnings = warnings.append(exception.getWarning());
             }
@@ -616,13 +619,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     private ImmutableSet<LoopContract> createLoopContracts(final IProgramMethod method,
-                                                           final List<Label> labels, final LoopStatement loop, final Comment[] comments)
+            final List<Label> labels, final LoopStatement loop, final Comment[] comments)
             throws SLTranslationException {
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
         // For some odd reason every comment block appears twice; thus we remove
         // duplicates.
         final TextualJMLConstruct[] constructs =
-                parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
+            parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
         for (int i = constructs.length - 1; i >= 0
                 && constructs[i] instanceof TextualJMLSpecCase specificationCase; i--) {
             try {
@@ -636,18 +639,18 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     private ImmutableSet<LoopContract> createLoopContracts(final IProgramMethod method,
-                                                           final List<Label> labels, final StatementBlock block, final Comment[] comments)
+            final List<Label> labels, final StatementBlock block, final Comment[] comments)
             throws SLTranslationException {
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
         // For some odd reason every comment block appears twice; thus we remove
         // duplicates.
         final TextualJMLConstruct[] constructs =
-                parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
+            parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
         for (int i = constructs.length - 1; i >= 0
                 && constructs[i] instanceof TextualJMLSpecCase specificationCase; i--) {
             try {
                 result = result.union(
-                        jsf.createJMLLoopContracts(method, labels, block, specificationCase));
+                    jsf.createJMLLoopContracts(method, labels, block, specificationCase));
             } catch (final SLWarningException exception) {
                 warnings = warnings.append(exception.getWarning());
             }
@@ -657,11 +660,19 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     private URI getFileName(final IProgramMethod method) {
         final TypeDeclaration type = (TypeDeclaration) method.getContainerType().getJavaType();
-        return type.getPositionInfo().getURI().orElse(null);
+        if (type != null) {
+            return type.getPositionInfo().getURI().orElse(null);
+        } else {
+            try {
+                return new URI(null, null, null);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments,
-                                                           final URI fileName) {
+            final URI fileName) {
         if (comments.length == 0) {
             return new TextualJMLConstruct[0];
         }
@@ -669,7 +680,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final Position position = comments[0].getStartPosition();
         final var parser = new PreParser(services.getOriginFactory() != null);
         final ImmutableList<TextualJMLConstruct> constructs =
-                parser.parseMethodLevel(concatenatedComment, fileName, position);
+            parser.parseMethodLevel(concatenatedComment, fileName, position);
         warnings = warnings.append(parser.getWarnings());
         return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
     }
@@ -700,11 +711,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
         // call preparser
         var parser = new PreParser(services.getOriginFactory() != null);
         ImmutableList<TextualJMLConstruct> constructs =
-                parser.parseMethodLevel(concatenatedComment, fileName, pos);
+            parser.parseMethodLevel(concatenatedComment, fileName, pos);
         warnings = warnings.append(parser.getWarnings());
 
         // create JML loop invariant out of last construct
-        if (constructs.size() == 0) {
+        if (constructs.isEmpty()) {
             return result;
         }
         TextualJMLConstruct c = constructs.take(constructs.size() - 1).head();
@@ -715,10 +726,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
             if (result.getInternalVariant() == null) {
                 PositionInfo info = loop.getPositionInfo();
                 warnings = warnings.append(
-                        new PositionedString(
-                                "Missing \"decreases\" for loop invariant. " +
-                                        "Termination of this loop will not be provable.",
-                                new Location(info.getURI().orElse(null), info.getStartPosition())));
+                    new PositionedString(
+                        "Missing \"decreases\" for loop invariant. " +
+                            "Termination of this loop will not be provable.",
+                        new Location(info.getURI().orElse(null), info.getStartPosition())));
             }
         }
         return result;

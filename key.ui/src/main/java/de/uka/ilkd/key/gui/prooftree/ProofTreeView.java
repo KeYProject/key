@@ -39,8 +39,8 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.ThreadUtilities;
-
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+
 import org.key_project.util.collection.ImmutableList;
 
 import bibliothek.gui.dock.common.action.CAction;
@@ -1179,11 +1179,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
             PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
             if (pio != null) {
                 try {
-                  //  String on = LogicPrinter.quickPrintTerm(
-                  //          pio.subTerm(), node.proof().getServices());
-                  //  style.tooltip.addAppliedOn(cutIfTooLong(on));
-                }catch (UnbalancedBlocksException e) {
-                    //ignore
+                    // String on = LogicPrinter.quickPrintTerm(
+                    // pio.subTerm(), node.proof().getServices());
+                    // style.tooltip.addAppliedOn(cutIfTooLong(on));
+                } catch (UnbalancedBlocksException e) {
+                    // ignore
                 }
             }
 

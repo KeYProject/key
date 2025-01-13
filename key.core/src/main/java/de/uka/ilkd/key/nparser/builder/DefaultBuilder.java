@@ -394,11 +394,11 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             }
         }
 
-        // try as sort without Java type (neede e.g. for "Heap")
+        // try as sort without Java type (need e.g. for "Heap")
         if (kjt == null) {
             Sort sort = lookupSort(type.toString());
             if (sort != null) {
-                kjt = new KeYJavaType(null, sort);
+                kjt = new KeYJavaType(sort);
             }
         }
 

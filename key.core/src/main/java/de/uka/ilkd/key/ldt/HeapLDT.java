@@ -131,10 +131,11 @@ public final class HeapLDT extends LDT {
         if (fieldPV.isImplicit()) {
             return fieldPV.name().toString();
         } else {
-            //FIXME weigl: error substring range check breaks
+            // FIXME weigl: error substring range check breaks
             String fieldPVName = fieldPV.name().toString();
             int index = fieldPV.toString().indexOf("::");
-            if (index <= 0) return fieldPVName;
+            if (index <= 0)
+                return fieldPVName;
             return fieldPVName.substring(0, index) + "::$" + fieldPVName.substring(index + 2);
         }
     }
@@ -372,7 +373,8 @@ public final class HeapLDT extends LDT {
      * to the namespace as a side effect.
      */
     public JFunction getFieldSymbolForPV(LocationVariable fieldPV, Services services) {
-        assert fieldPV.isMember() : "Given LocationVariable is not marked as a member variable of a class";
+        assert fieldPV.isMember()
+                : "Given LocationVariable is not marked as a member variable of a class";
 
         assert fieldPV != services.getJavaInfo().getArrayLength()
                 : "Given LocationVariable is the length field of an array.";

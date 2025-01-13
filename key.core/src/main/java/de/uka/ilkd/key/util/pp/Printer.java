@@ -144,7 +144,7 @@ class Printer<M> {
         try {
             marginStack.remove(marginStack.size() - 1);
         } catch (IndexOutOfBoundsException e) {
-            //FIXME weigl: ignore this exception.
+            // FIXME weigl: ignore this exception.
             throw new UnbalancedBlocksException();
         }
     }
