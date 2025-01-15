@@ -10,7 +10,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 /**
  * variable condition used if a new variable is introduced
  */
-public class NewVarcond implements org.key_project.prover.rules.NewVarcond {
+public class NewVarcond implements org.key_project.prover.rules.conditions.NewVarcond {
 
     private final SchemaVariable sv;
     private final SchemaVariable peerSV;

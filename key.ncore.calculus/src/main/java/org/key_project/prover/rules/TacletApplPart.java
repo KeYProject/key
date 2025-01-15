@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules;
 
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NewVarcond;
+import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 

@@ -31,6 +31,9 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.*;
 import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NewVarcond;
+import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
@@ -350,11 +353,11 @@ public class LogicPrinter {
     }
 
     protected void printVarCond(Taclet taclet) {
-        final ImmutableList<? extends org.key_project.prover.rules.NewVarcond> varsNew =
+        final ImmutableList<? extends NewVarcond> varsNew =
             taclet.varsNew();
-        final ImmutableList<? extends org.key_project.prover.rules.NewDependingOn> varsNewDependingOn =
+        final ImmutableList<? extends NewDependingOn> varsNewDependingOn =
             taclet.varsNewDependingOn();
-        final ImmutableList<? extends org.key_project.prover.rules.NotFreeIn> varsNotFreeIn =
+        final ImmutableList<? extends NotFreeIn> varsNotFreeIn =
             taclet.varsNotFreeIn();
         final ImmutableList<? extends VariableCondition> variableConditions =
             taclet.getVariableConditions();
@@ -364,7 +367,7 @@ public class LogicPrinter {
             layouter.nl().beginC().print("\\varcond(").brk(0);
             boolean first = true;
 
-            for (org.key_project.prover.rules.NewDependingOn ndo : varsNewDependingOn) {
+            for (NewDependingOn ndo : varsNewDependingOn) {
                 if (first) {
                     first = false;
                 } else {
@@ -403,7 +406,7 @@ public class LogicPrinter {
         }
     }
 
-    private void printNewVarDepOnCond(org.key_project.prover.rules.NewDependingOn on) {
+    private void printNewVarDepOnCond(NewDependingOn on) {
         layouter.beginC(0);
         layouter.print("\\new(");
         printSchemaVariable(on.first());
@@ -414,7 +417,7 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printNewVarcond(org.key_project.prover.rules.NewVarcond p_sv) {
+    protected void printNewVarcond(NewVarcond p_sv) {
         de.uka.ilkd.key.rule.NewVarcond sv = (de.uka.ilkd.key.rule.NewVarcond) p_sv;
         layouter.beginC();
         layouter.print("\\new(");
@@ -434,7 +437,7 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printNotFreeIn(org.key_project.prover.rules.NotFreeIn sv) {
+    protected void printNotFreeIn(NotFreeIn sv) {
         layouter.beginI(0).print("\\notFreeIn(").brk(0);
         printSchemaVariable(sv.first());
         layouter.print(",").brk();
