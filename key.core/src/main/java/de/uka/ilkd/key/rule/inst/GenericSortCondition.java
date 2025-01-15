@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.rules.inst.InstantiationEntry;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
 
 
 /**

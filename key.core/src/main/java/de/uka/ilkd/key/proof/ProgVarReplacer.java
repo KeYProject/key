@@ -17,8 +17,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
 import org.key_project.logic.PosInTerm;
-import org.key_project.prover.rules.inst.InstantiationEntry;
-import org.key_project.prover.rules.inst.ListInstantiation;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
+import org.key_project.prover.rules.instantiation.ListInstantiation;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 

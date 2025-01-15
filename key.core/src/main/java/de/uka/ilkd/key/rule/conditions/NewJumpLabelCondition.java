@@ -41,7 +41,8 @@ public final class NewJumpLabelCondition implements VariableCondition {
     @Override
     public MatchConditions check(SchemaVariable var,
             SyntaxElement instCandidate,
-            org.key_project.prover.rules.MatchConditions matchCond, LogicServices services) {
+            org.key_project.prover.rules.instantiation.MatchConditions matchCond,
+            LogicServices services) {
         SVInstantiations instantiations = (SVInstantiations) matchCond.getInstantiations();
         if (var != labelSV && instantiations.isInstantiated(labelSV)) {
             var = labelSV;

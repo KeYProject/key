@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import de.uka.ilkd.key.proof.Node;
 
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 
