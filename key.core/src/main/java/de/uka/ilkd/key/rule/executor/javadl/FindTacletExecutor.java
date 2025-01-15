@@ -11,11 +11,11 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
@@ -48,7 +48,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
     protected abstract void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
             PosInOccurrence posOfFind, MatchConditions matchCond,
-            Goal goal, org.key_project.prover.rules.RuleApp ruleApp, Services services);
+            Goal goal, RuleApp ruleApp, Services services);
 
 
     /**
@@ -85,7 +85,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      */
     @Override
     public final ImmutableList<Goal> apply(Goal goal,
-            org.key_project.prover.rules.RuleApp ruleApp) {
+            RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
         var services = goal.getOverlayServices();
         // Number without the if-goal eventually needed
