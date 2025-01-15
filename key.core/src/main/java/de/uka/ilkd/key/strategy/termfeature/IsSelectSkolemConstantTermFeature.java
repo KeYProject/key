@@ -5,10 +5,10 @@ package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 
 
 /**
@@ -28,6 +28,6 @@ public final class IsSelectSkolemConstantTermFeature extends BinaryTermFeature {
     protected boolean filter(Term term, MutableState mState, Services services) {
         var t = (de.uka.ilkd.key.logic.Term) term;
         return t.hasLabels() && t.containsLabel(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)
-                && t.op().arity() == 0 && t.op() instanceof JFunction;
+                && t.op().arity() == 0 && t.op() instanceof Function;
     }
 }

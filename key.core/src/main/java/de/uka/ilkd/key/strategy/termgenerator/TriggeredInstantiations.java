@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
@@ -29,6 +28,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.PredictCostProver;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.*;
@@ -158,7 +158,7 @@ public class TriggeredInstantiations implements TermGenerator {
         for (SequentFormula sf : antecedent) {
             Term formula = (Term) sf.formula();
             collectTerms(formula, terms, integerLDT);
-            if (formula.op() instanceof JFunction
+            if (formula.op() instanceof Function
                     || formula.op() == Equality.EQUALS) {
                 axioms.add(
                     inAntecedent ? formula : services.getTermBuilder().not(formula));

@@ -692,7 +692,7 @@ public abstract class TacletApp implements RuleApp {
 
     public TacletApp createSkolemConstant(String instantiation, SchemaVariable sv, Sort sort,
             boolean interesting, Services services) {
-        final JFunction c =
+        final Function c =
             new JFunction(new Name(instantiation), sort, true, new Sort[0]);
         return addInstantiation(sv, services.getTermBuilder().func(c), interesting, services);
     }
@@ -1072,10 +1072,10 @@ public abstract class TacletApp implements RuleApp {
             if (pair.key() instanceof SkolemTermSV skolemSV) {
                 Term inst = instantiations.getInstantiation(skolemSV);
                 Operator op = inst.op();
-                assert op instanceof JFunction
+                assert op instanceof Function
                         : "At this point the skolem instantiation is expected to "
                             + "be a function symbol, not " + inst;
-                ns.addSafely((JFunction) op);
+                ns.addSafely((Function) op);
             }
         }
         return ns;

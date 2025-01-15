@@ -37,18 +37,18 @@ public final class SeqLDT extends LDT {
 
     // getters
     private final SortDependingFunction seqGet;
-    private final JFunction seqLen;
-    private final JFunction seqIndexOf;
+    private final Function seqLen;
+    private final Function seqIndexOf;
 
     // constructors
-    private final JFunction seqEmpty;
-    private final JFunction seqSingleton;
-    private final JFunction seqConcat;
-    private final JFunction seqSub;
-    private final JFunction seqReverse;
-    private final JFunction seqUpd;
-    private final JFunction seqDef;
-    private final JFunction values;
+    private final Function seqEmpty;
+    private final Function seqSingleton;
+    private final Function seqConcat;
+    private final Function seqSub;
+    private final Function seqReverse;
+    private final Function seqUpd;
+    private final Function seqDef;
+    private final Function values;
 
     public SeqLDT(TermServices services) {
         super(NAME, services);
@@ -71,40 +71,40 @@ public final class SeqLDT extends LDT {
     }
 
 
-    public JFunction getSeqLen() {
+    public Function getSeqLen() {
         return seqLen;
     }
 
 
-    public JFunction getSeqEmpty() {
+    public Function getSeqEmpty() {
         return seqEmpty;
     }
 
 
-    public JFunction getSeqSingleton() {
+    public Function getSeqSingleton() {
         return seqSingleton;
     }
 
 
-    public JFunction getSeqConcat() {
+    public Function getSeqConcat() {
         return seqConcat;
     }
 
 
-    public JFunction getSeqSub() {
+    public Function getSeqSub() {
         return seqSub;
     }
 
-    public JFunction getSeqUpd() {
+    public Function getSeqUpd() {
         return seqUpd;
     }
 
-    public JFunction getSeqReverse() {
+    public Function getSeqReverse() {
         return seqReverse;
     }
 
 
-    public JFunction getSeqDef() {
+    public Function getSeqDef() {
         return seqDef;
     }
 
@@ -112,7 +112,7 @@ public final class SeqLDT extends LDT {
      * Placeholder for the sequence of values observed through the execution of an enhanced for
      * loop. Follows David Cok's proposal to adapt JML to Java5.
      */
-    public JFunction getValues() {
+    public Function getValues() {
         return values;
     }
 
@@ -148,7 +148,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
             ExecutionContext ec) {
         if (op instanceof SeqSingleton) {
             return seqSingleton;
@@ -203,7 +203,7 @@ public final class SeqLDT extends LDT {
     }
 
 
-    public JFunction getSeqIndexOf() {
+    public Function getSeqIndexOf() {
         return seqIndexOf;
     }
 }

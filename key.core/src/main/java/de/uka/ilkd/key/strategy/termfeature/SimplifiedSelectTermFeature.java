@@ -6,10 +6,10 @@ package de.uka.ilkd.key.strategy.termfeature;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 
 
 public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
@@ -37,7 +37,7 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
                 primitiveHeapTermFeature.filter(t.sub(0), mState, services) ||
                 // or the heap term of the select operator is an anon heap symbol
                 // (for instance an anonHeap function)
-                (t.sub(0).op() instanceof JFunction && t.sub(0).op().arity() == 0
+                (t.sub(0).op() instanceof Function && t.sub(0).op().arity() == 0
                         && t.sub(0).hasLabels()
                         && t.sub(0).containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL));
 

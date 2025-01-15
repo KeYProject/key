@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -175,7 +175,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      * @return preconditions for the usage branch.
      */
     private static Term[] createUsageAssumptions(final Term[] postconditions,
-            final Map<LocationVariable, JFunction> anonOutHeaps,
+            final Map<LocationVariable, Function> anonOutHeaps,
             final ImmutableSet<LocationVariable> localOutVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term wellFormedAnonymisationHeapsCondition =
@@ -199,7 +199,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      */
     private static Term[] createUpdates(final Instantiation instantiation,
             final List<LocationVariable> heaps,
-            final Map<LocationVariable, JFunction> anonOutHeaps,
+            final Map<LocationVariable, Function> anonOutHeaps,
             final Map<LocationVariable, Term> modifiableClauses,
             final UpdatesBuilder updatesBuilder) {
         final Term contextUpdate = instantiation.update();
@@ -281,7 +281,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(instantiation.statement(), services);
-        final Map<LocationVariable, JFunction> anonOutHeaps =
+        final Map<LocationVariable, Function> anonOutHeaps =
             createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables[] vars =
             createVars(goal, instantiation.self(), contract);

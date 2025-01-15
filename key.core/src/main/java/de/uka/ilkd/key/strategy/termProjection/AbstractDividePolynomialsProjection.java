@@ -7,12 +7,12 @@ import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
@@ -41,7 +41,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
 
     private de.uka.ilkd.key.logic.Term quotient(BigInteger monoCoeff, Term rightPoly,
             Services services) {
-        final JFunction add = services.getTypeConverter().getIntegerLDT().getAdd();
+        final Function add = services.getTypeConverter().getIntegerLDT().getAdd();
         if (rightPoly.op() == add) {
             final var left = quotient(monoCoeff, rightPoly.sub(0), services);
             final var right = quotient(monoCoeff, rightPoly.sub(1), services);

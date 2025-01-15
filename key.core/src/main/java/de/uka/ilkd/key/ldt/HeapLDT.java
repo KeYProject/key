@@ -21,12 +21,14 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 
@@ -54,31 +56,31 @@ public final class HeapLDT extends LDT {
 
     // select/store
     private final SortDependingFunction select;
-    private final JFunction store;
-    private final JFunction create;
-    private final JFunction anon;
-    private final JFunction memset;
+    private final Function store;
+    private final Function create;
+    private final Function anon;
+    private final Function memset;
 
     // fields
-    private final JFunction arr;
-    private final JFunction created;
-    private final JFunction initialized;
+    private final Function arr;
+    private final Function created;
+    private final Function initialized;
     private final SortDependingFunction classPrepared;
     private final SortDependingFunction classInitialized;
     private final SortDependingFunction classInitializationInProgress;
     private final SortDependingFunction classErroneous;
 
     // length
-    private final JFunction length;
+    private final Function length;
 
     // null
     private final JFunction nullFunc;
 
     // predicates
-    private final JFunction wellFormed;
-    private final JFunction acc;
-    private final JFunction reach;
-    private final JFunction prec;
+    private final Function wellFormed;
+    private final Function acc;
+    private final Function reach;
+    private final Function prec;
 
     // heap pv
     private ImmutableList<LocationVariable> heaps;
@@ -91,28 +93,29 @@ public final class HeapLDT extends LDT {
 
     public HeapLDT(TermServices services) {
         super(NAME, services);
-        final Namespace<Sort> sorts = services.getNamespaces().sorts();
-        final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
+        final Namespace<@NonNull Sort> sorts = services.getNamespaces().sorts();
+        final Namespace<@NonNull IProgramVariable> progVars =
+            services.getNamespaces().programVariables();
 
         fieldSort = sorts.lookup(new Name("Field"));
         select = addSortDependingFunction(services, SELECT_NAME.toString());
-        store = (JFunction) addFunction(services, "store");
-        create = (JFunction) addFunction(services, "create");
-        anon = (JFunction) addFunction(services, "anon");
-        memset = (JFunction) addFunction(services, "memset");
-        arr = (JFunction) addFunction(services, "arr");
-        created = (JFunction) addFunction(services, "java.lang.Object::<created>");
-        initialized = (JFunction) addFunction(services, "java.lang.Object::<initialized>");
+        store = addFunction(services, "store");
+        create = addFunction(services, "create");
+        anon = addFunction(services, "anon");
+        memset = addFunction(services, "memset");
+        arr = addFunction(services, "arr");
+        created = addFunction(services, "java.lang.Object::<created>");
+        initialized = addFunction(services, "java.lang.Object::<initialized>");
         classPrepared = addSortDependingFunction(services, "<classPrepared>");
         classInitialized = addSortDependingFunction(services, "<classInitialized>");
         classInitializationInProgress =
             addSortDependingFunction(services, "<classInitializationInProgress>");
         classErroneous = addSortDependingFunction(services, "<classErroneous>");
-        length = (JFunction) addFunction(services, "length");
-        nullFunc = (JFunction) addFunction(services, "null");
-        acc = (JFunction) addFunction(services, "acc");
-        reach = (JFunction) addFunction(services, "reach");
-        prec = (JFunction) addFunction(services, "prec");
+        length = addFunction(services, "length");
+        nullFunc = addFunction(services, "null");
+        acc = addFunction(services, "acc");
+        reach = addFunction(services, "reach");
+        prec = addFunction(services, "prec");
         heaps = ImmutableSLList.<LocationVariable>nil()
                 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
                 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
@@ -123,7 +126,7 @@ public final class HeapLDT extends LDT {
                 }
             }
         }
-        wellFormed = (JFunction) addFunction(services, "wellFormed");
+        wellFormed = addFunction(services, "wellFormed");
     }
 
     // -------------------------------------------------------------------------
@@ -252,17 +255,17 @@ public final class HeapLDT extends LDT {
     }
 
 
-    public JFunction getStore() {
+    public Function getStore() {
         return store;
     }
 
 
-    public JFunction getCreate() {
+    public Function getCreate() {
         return create;
     }
 
 
-    public JFunction getAnon() {
+    public Function getAnon() {
         return anon;
     }
 
@@ -272,43 +275,43 @@ public final class HeapLDT extends LDT {
     }
 
 
-    public JFunction getArr() {
+    public Function getArr() {
         return arr;
     }
 
 
-    public JFunction getCreated() {
+    public Function getCreated() {
         return created;
     }
 
 
-    public JFunction getInitialized() {
+    public Function getInitialized() {
         return initialized;
     }
 
 
-    public JFunction getClassPrepared(Sort instanceSort, TermServices services) {
+    public Function getClassPrepared(Sort instanceSort, TermServices services) {
         return classPrepared.getInstanceFor(instanceSort, services);
     }
 
 
-    public JFunction getClassInitialized(Sort instanceSort, TermServices services) {
+    public Function getClassInitialized(Sort instanceSort, TermServices services) {
         return classInitialized.getInstanceFor(instanceSort, services);
     }
 
 
-    public JFunction getClassInitializationInProgress(Sort instanceSort,
+    public Function getClassInitializationInProgress(Sort instanceSort,
             TermServices services) {
         return classInitializationInProgress.getInstanceFor(instanceSort, services);
     }
 
 
-    public JFunction getClassErroneous(Sort instanceSort, TermServices services) {
+    public Function getClassErroneous(Sort instanceSort, TermServices services) {
         return classErroneous.getInstanceFor(instanceSort, services);
     }
 
 
-    public JFunction getLength() {
+    public Function getLength() {
         return length;
     }
 
@@ -318,17 +321,17 @@ public final class HeapLDT extends LDT {
     }
 
 
-    public JFunction getWellFormed() {
+    public Function getWellFormed() {
         return wellFormed;
     }
 
 
-    public JFunction getAcc() {
+    public Function getAcc() {
         return acc;
     }
 
 
-    public JFunction getReach() {
+    public Function getReach() {
         return reach;
     }
 
@@ -370,12 +373,12 @@ public final class HeapLDT extends LDT {
      * the appropriate symbol does not yet exist in the namespace, this method creates and adds it
      * to the namespace as a side effect.
      */
-    public JFunction getFieldSymbolForPV(LocationVariable fieldPV, Services services) {
+    public Function getFieldSymbolForPV(LocationVariable fieldPV, Services services) {
         assert fieldPV.isMember();
         assert fieldPV != services.getJavaInfo().getArrayLength();
 
         final Name name = new Name(getFieldSymbolName(fieldPV));
-        JFunction result = (JFunction) services.getNamespaces().functions().lookup(name);
+        Function result = services.getNamespaces().functions().lookup(name);
         if (result == null) {
             int index = name.toString().indexOf("::");
             assert index > 0;
@@ -456,7 +459,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
             ExecutionContext ec) {
         assert false;
         return null;
@@ -473,18 +476,18 @@ public final class HeapLDT extends LDT {
     public Expression translateTerm(Term t, ExtList children, Services services) {
         if (t.op() instanceof SortDependingFunction
                 && ((SortDependingFunction) t.op()).isSimilar(select)) {
-            ProgramVariable heap = (ProgramVariable) children.remove(0);
+            ProgramVariable heap = (ProgramVariable) children.removeFirst();
             if (heap != getHeap()) {
                 throw new IllegalArgumentException("Can only translate field access to base heap.");
             }
-            ReferencePrefix prefix = (ReferencePrefix) children.remove(0);
-            ProgramVariable field = (ProgramVariable) children.remove(0);
+            ReferencePrefix prefix = (ReferencePrefix) children.removeFirst();
+            ProgramVariable field = (ProgramVariable) children.removeFirst();
 
             if (prefix instanceof NullLiteral) {
                 return new FieldReference(field, null);
             }
             return new FieldReference(field, prefix);
-        } else if (t.sort() == getFieldSort() && t.op() instanceof JFunction
+        } else if (t.sort() == getFieldSort() && t.op() instanceof Function
                 && ((Function) t.op()).isUnique()) {
             return services.getJavaInfo().getAttribute(getPrettyFieldName(t.op()),
                 getClassName((Function) t.op()));

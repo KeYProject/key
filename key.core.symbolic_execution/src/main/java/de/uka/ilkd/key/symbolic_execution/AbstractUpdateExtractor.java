@@ -26,6 +26,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -573,7 +574,7 @@ public abstract class AbstractUpdateExtractor {
             sorts[i] = arguments[i].sort();
         }
         // Create predicate which will be used in formulas to store the value interested in.
-        JFunction newPredicate =
+        Function newPredicate =
             new JFunction(new Name(getServices().getTermBuilder().newName("LayoutPredicate")),
                 JavaDLTheory.FORMULA, sorts);
         // Create formula which contains the value interested in.
@@ -794,11 +795,11 @@ public abstract class AbstractUpdateExtractor {
                 OriginTermLabel.removeOriginLabels(arrayStartIndex, getServices());
             this.arrayEndIndex = OriginTermLabel.removeOriginLabels(arrayEndIndex, getServices());
             TermBuilder tb = getServices().getTermBuilder();
-            JFunction constantFunction = new JFunction(
+            Function constantFunction = new JFunction(
                 new Name(tb.newName(ExecutionAllArrayIndicesVariable.ARRAY_INDEX_CONSTANT_NAME)),
                 getServices().getTypeConverter().getIntegerLDT().targetSort());
             this.arrayRangeConstant = tb.func(constantFunction);
-            JFunction notAValueFunction = new JFunction(
+            Function notAValueFunction = new JFunction(
                 new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)),
                 JavaDLTheory.ANY);
             this.notAValue = tb.func(notAValueFunction);
@@ -946,11 +947,11 @@ public abstract class AbstractUpdateExtractor {
                 } else {
                     if (getServices().getJavaInfo().getArrayLength() == programVariable) {
                         // Special handling for length attribute of arrays
-                        JFunction function =
+                        Function function =
                             getServices().getTypeConverter().getHeapLDT().getLength();
                         return tb.func(function, createPreParentTerm());
                     } else {
-                        JFunction function =
+                        Function function =
                             getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV(
                                 (LocationVariable) programVariable, getServices());
                         return tb.dot(programVariable.sort(), createPreParentTerm(), function);
@@ -958,7 +959,7 @@ public abstract class AbstractUpdateExtractor {
                 }
             } else {
                 if (programVariable.isStatic()) {
-                    JFunction function = getServices().getTypeConverter().getHeapLDT()
+                    Function function = getServices().getTypeConverter().getHeapLDT()
                             .getFieldSymbolForPV((LocationVariable) programVariable, getServices());
                     return tb.staticDot(programVariable.sort(), function);
                 } else {

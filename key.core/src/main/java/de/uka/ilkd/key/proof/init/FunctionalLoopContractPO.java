@@ -30,6 +30,7 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
@@ -135,7 +136,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Term selfTerm = selfVar == null ? null : tb.var(selfVar);
 
         final List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
-        final Map<LocationVariable, JFunction> anonOutHeaps =
+        final Map<LocationVariable, Function> anonOutHeaps =
             createAnonOutHeaps(heaps, services, tb);
 
         final BlockContract.Variables variables =
@@ -312,15 +313,15 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @param tb a term builder.
      * @return a map from every heap to an anonymization heap.
      */
-    private static Map<LocationVariable, JFunction> createAnonInHeaps(
+    private static Map<LocationVariable, Function> createAnonInHeaps(
             final List<LocationVariable> heaps, final Services services, final TermBuilder tb) {
-        Map<LocationVariable, JFunction> anonInHeaps =
+        Map<LocationVariable, Function> anonInHeaps =
             new LinkedHashMap<>(40);
 
         for (LocationVariable heap : heaps) {
             final String anonymisationName =
                 tb.newName(AuxiliaryContractBuilders.ANON_IN_PREFIX + heap.name());
-            final JFunction anonymisationFunction =
+            final Function anonymisationFunction =
                 new JFunction(new Name(anonymisationName), heap.sort(), true);
             services.getNamespaces().functions().addSafely(anonymisationFunction);
             anonInHeaps.put(heap, anonymisationFunction);
@@ -335,16 +336,16 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @param tb a term builder.
      * @return a map from every heap to an anonymization heap.
      */
-    private Map<LocationVariable, JFunction> createAnonOutHeaps(
+    private Map<LocationVariable, Function> createAnonOutHeaps(
             final List<LocationVariable> heaps,
             final Services services, final TermBuilder tb) {
-        Map<LocationVariable, JFunction> anonOutHeaps =
+        Map<LocationVariable, Function> anonOutHeaps =
             new LinkedHashMap<>(40);
         for (LocationVariable heap : heaps) {
             if (contract.hasModifiableClause(heap)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + heap.name());
-                final JFunction anonymisationFunction =
+                final Function anonymisationFunction =
                     new JFunction(new Name(anonymisationName), heap.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 anonOutHeaps.put(heap, anonymisationFunction);
@@ -401,7 +402,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @return the validity formula for the contract.
      */
     private Term setUpValidityGoal(final Term selfTerm, final List<LocationVariable> heaps,
-            final Map<LocationVariable, JFunction> anonOutHeaps,
+            final Map<LocationVariable, Function> anonOutHeaps,
             final BlockContract.Variables variables, final LoopContract.Variables nextVariables,
             final Map<LocationVariable, Term> modifiableClauses,
             final Map<LocationVariable, Term> freeModifiableClauses, final Term[] assumptions,
@@ -419,7 +420,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Term nextRemembranceUpdate =
             new UpdatesBuilder(nextVariables, services).buildRemembranceUpdate(heaps);
 
-        Map<LocationVariable, JFunction> anonInHeaps = createAnonInHeaps(heaps, services, tb);
+        Map<LocationVariable, Function> anonInHeaps = createAnonInHeaps(heaps, services, tb);
 
         final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonInHeaps);
         final Term context = tb.sequential(outerRemembranceUpdate, anonInUpdate);

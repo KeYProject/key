@@ -4,10 +4,10 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 
 public class ConstantTermFeature extends BinaryTermFeature {
 
@@ -18,7 +18,7 @@ public class ConstantTermFeature extends BinaryTermFeature {
 
     @Override
     protected boolean filter(Term term, MutableState mState, Services services) {
-        return term.op() instanceof JFunction && term.arity() == 0;
+        return term.op() instanceof Function && term.arity() == 0;
     }
 
 }

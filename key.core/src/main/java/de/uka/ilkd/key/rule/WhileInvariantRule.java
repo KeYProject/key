@@ -52,6 +52,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
@@ -104,7 +105,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         // create heap_Before_LOOP
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         Name heapAtPreName = new Name(tb.newName(baseHeap + "_Before_LOOP"));
-        final JFunction heapAtPreFunc =
+        final Function heapAtPreFunc =
             new JFunction(heapAtPreName, heapLDT.targetSort(), true);
         services.getNamespaces().functions().addSafely(heapAtPreFunc);
         final Term heapAtPre = tb.func(heapAtPreFunc);
@@ -231,7 +232,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable pv : localOuts) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-            final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
+            final Function anonFunc = new JFunction(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
             final Term elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (anonUpdate == null) {
@@ -251,13 +252,13 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
-        final JFunction loopHeapFunc =
+        final Function loopHeapFunc =
             new JFunction(loopHeapName, heapLDT.targetSort(), true);
         services.getNamespaces().functions().addSafely(loopHeapFunc);
 
         final Term loopHeap = tb.func(loopHeapFunc);
         final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_LOOP"));
-        final JFunction anonHeapFunc = new JFunction(anonHeapName, heap.sort());
+        final Function anonHeapFunc = new JFunction(anonHeapName, heap.sort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeapTerm =
             tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);

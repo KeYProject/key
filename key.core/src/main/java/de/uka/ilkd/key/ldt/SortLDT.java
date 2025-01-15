@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
@@ -26,7 +27,7 @@ public final class SortLDT extends LDT {
     public static final Name NAME = new Name("SORT");
 
     private final SortDependingFunction ssort;
-    private final JFunction ssubsort;
+    private final Function ssubsort;
 
     public SortLDT(TermServices services) {
         super(NAME, services);
@@ -38,7 +39,7 @@ public final class SortLDT extends LDT {
         return ssort.getInstanceFor(instanceSort, services);
     }
 
-    public JFunction getSsubsort() {
+    public Function getSsubsort() {
         return ssubsort;
     }
 
@@ -66,7 +67,7 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         if (op instanceof Subtype) {
             return ssubsort;
         }

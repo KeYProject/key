@@ -477,7 +477,7 @@ public class MergeRule implements BuiltInRule {
             return new ValuesMergeResult(newConstraints, heap1, newNames, sideConditionsToProve);
         }
 
-        if (!(heap1.op() instanceof JFunction) || !(heap2.op() instanceof JFunction)) {
+        if (!(heap1.op() instanceof Function) || !(heap2.op() instanceof Function)) {
             // Covers the case of two different symbolic heaps
             return new ValuesMergeResult(newConstraints,
                 MergeByIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2,
@@ -534,7 +534,7 @@ public class MergeRule implements BuiltInRule {
 
                 }
 
-                return new ValuesMergeResult(newConstraints, tb.func((JFunction) heap1.op(),
+                return new ValuesMergeResult(newConstraints, tb.func((Function) heap1.op(),
                     mergedSubHeap.mergeVal(), heap1.sub(1), field1, mergedVal), newNames,
                     sideConditionsToProve);
 
@@ -562,7 +562,7 @@ public class MergeRule implements BuiltInRule {
                 sideConditionsToProve.addAll(mergedSubHeap.sideConditions());
 
                 return new ValuesMergeResult(newConstraints,
-                    tb.func((JFunction) heap1.op(), mergedSubHeap.mergeVal(), pointer1),
+                    tb.func((Function) heap1.op(), mergedSubHeap.mergeVal(), pointer1),
                     newNames,
                     sideConditionsToProve);
             }

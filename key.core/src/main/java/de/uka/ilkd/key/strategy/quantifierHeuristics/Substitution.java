@@ -8,10 +8,10 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableMap;
@@ -74,7 +74,7 @@ public class Substitution {
         while (it.hasNext()) {
             final QuantifiableVariable var = it.next();
             final Sort quantifiedVarSort = var.sort();
-            final JFunction quantifiedVarSortCast =
+            final Function quantifiedVarSortCast =
                 services.getJavaDLTheory().getCastSymbol(quantifiedVarSort, services);
             Term instance = getSubstitutedTerm(var);
             if (!instance.sort().extendsTrans(quantifiedVarSort)) {
@@ -108,7 +108,7 @@ public class Substitution {
             } catch (TermCreationException e) {
                 final Sort quantifiedVarSort = var.sort();
                 if (!instance.sort().extendsTrans(quantifiedVarSort)) {
-                    final JFunction quantifiedVarSortCast =
+                    final Function quantifiedVarSortCast =
                         services.getJavaDLTheory().getCastSymbol(quantifiedVarSort, services);
                     instance =
                         tb.func(quantifiedVarSortCast, (de.uka.ilkd.key.logic.Term) instance);

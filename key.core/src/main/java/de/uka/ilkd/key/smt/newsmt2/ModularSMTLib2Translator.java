@@ -12,12 +12,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
@@ -228,10 +228,10 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         TermBuilder tb = serv.getTermBuilder();
         List<Term> res = new LinkedList<>();
         for (SequentFormula sf : seq.antecedent()) {
-            res.add((Term) sf.formula());
+            res.add(sf.formula());
         }
         for (SequentFormula sf : seq.succedent()) {
-            res.add(tb.not((Term) sf.formula()));
+            res.add(tb.not((de.uka.ilkd.key.logic.Term) sf.formula()));
         }
         return res;
     }

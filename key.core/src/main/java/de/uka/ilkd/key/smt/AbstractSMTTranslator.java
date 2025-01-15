@@ -165,7 +165,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * If the solver supports only simple multiplications, complex multiplications are translated
      * into a uninterpreted function. The name of the function is stored here.
      */
-    private JFunction multiplicationFunction = null;
+    private Function multiplicationFunction = null;
 
     private static final String BSUM_STRING = "bsum";
 
@@ -204,7 +204,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         return smtSettings;
     }
 
-    private JFunction getMultiplicationFunction(Services services) {
+    private Function getMultiplicationFunction(Services services) {
         if (multiplicationFunction == null) {
             Function reference = services.getTypeConverter().getIntegerLDT().getMul();
 
@@ -797,7 +797,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             Services services) throws IllegalFormulaException {
         ArrayList<StringBuilder> result = new ArrayList<>();
         Sort sort = services.getTypeConverter().getIntegerLDT().getMul().sort();
-        JFunction mult = getMultiplicationFunction(services);
+        Function mult = getMultiplicationFunction(services);
         TermBuilder tb = services.getTermBuilder();
         Term zero = tb.zero();
         Term one = tb.one();
@@ -2133,7 +2133,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             }
         }
         // invent a new predicate
-        JFunction fun = new JFunction(new Name("modConst"), t.sort(), argsorts);
+        Function fun = new JFunction(new Name("modConst"), t.sort(), argsorts);
 
         // Build the final predicate
         Term temp = tb.func(fun, subs);
@@ -2242,7 +2242,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         } else {
             name = translateFunctionName(new StringBuilder(o.name().toString()));
             usedFunctionNames.put(o, name);
-            if (o instanceof JFunction) {
+            if (o instanceof Function) {
                 usedFunctions.add(new FunctionWrapper(name, (Function) o));
             }
         }

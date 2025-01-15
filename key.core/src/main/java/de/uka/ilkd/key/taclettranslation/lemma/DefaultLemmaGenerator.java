@@ -21,6 +21,7 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
@@ -222,7 +223,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         Term[] args = computeArgs(owner, prefix, services);
         Name name = createUniqueName(services, "f_" + sv.name());
 
-        JFunction function =
+        Function function =
             new JFunction(name, replaceSort(sv.sort(), services), argSorts);
         return services.getTermBuilder().func(function, args);
     }

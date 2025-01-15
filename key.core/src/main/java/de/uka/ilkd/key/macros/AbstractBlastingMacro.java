@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.SortCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -36,6 +35,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
@@ -226,7 +226,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 return NumberRuleAppCost.create(10);
             } else if (app.rule().name().toString().equals("pullOut")) {
                 var t = pio.subTerm();
-                if (t.op() instanceof JFunction) {
+                if (t.op() instanceof Function) {
                     if (getAllowedPullOut().contains(t.op().name().toString())) {
                         return NumberRuleAppCost.create(1000);
                     }

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
 
@@ -28,9 +29,9 @@ public final class BooleanLDT extends LDT {
     public static final Name NAME = new Name("boolean");
 
     /** the boolean literals as function symbols and terms */
-    private final JFunction bool_true;
+    private final Function bool_true;
     private final Term term_bool_true;
-    private final JFunction bool_false;
+    private final Function bool_false;
     private final Term term_bool_false;
 
 
@@ -65,7 +66,7 @@ public final class BooleanLDT extends LDT {
     /**
      * returns the function representing the boolean value <tt>FALSE</tt>
      */
-    public JFunction getFalseConst() {
+    public Function getFalseConst() {
         return bool_false;
     }
 
@@ -73,7 +74,7 @@ public final class BooleanLDT extends LDT {
     /**
      * returns the function representing the boolean value <tt>TRUE</tt>
      */
-    public JFunction getTrueConst() {
+    public Function getTrueConst() {
         return bool_true;
     }
 
@@ -116,7 +117,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
             Services services,
             ExecutionContext ec) {
         assert false;

@@ -32,6 +32,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -784,7 +785,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // Create non-rigid predicate with signature:
         // SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
         ImmutableList<Sort> argumentSorts = tb.getSorts(arguments);
-        JFunction f = new JFunction(new Name(tb.newName(name)), JavaDLTheory.FORMULA,
+        Function f = new JFunction(new Name(tb.newName(name)), JavaDLTheory.FORMULA,
             argumentSorts.toArray(new Sort[argumentSorts.size()]));
         services.getNamespaces().functions().addSafely(f);
         // Create term that uses the new predicate

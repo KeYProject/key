@@ -548,7 +548,7 @@ public class TermBuilder {
     }
 
     public Term bsum(QuantifiableVariable qv, Term a, Term b, Term t) {
-        JFunction bsum = services.getTypeConverter().getIntegerLDT().getBsum();
+        Function bsum = services.getTypeConverter().getIntegerLDT().getBsum();
         return func(bsum, new Term[] { a, b, t }, new ImmutableArray<>(qv));
     }
 
@@ -570,7 +570,7 @@ public class TermBuilder {
      * Constructs a bounded product comprehension expression.
      */
     public Term bprod(QuantifiableVariable qv, Term a, Term b, Term t, Services services) {
-        JFunction bprod = services.getTypeConverter().getIntegerLDT().getBprod();
+        Function bprod = services.getTypeConverter().getIntegerLDT().getBprod();
         return func(bprod, new Term[] { a, b, t }, new ImmutableArray<>(qv));
     }
 

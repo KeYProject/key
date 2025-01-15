@@ -71,11 +71,11 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                                 || !alreadyDefinedFn.argSort(0).equals(sort))) {
                     throw new RuntimeException("Name already in namespace: " + argName);
                 }
-                JFunction fn = new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
+                Function fn = new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
                     false, false);
                 dtNamespace.add(fn);
             }
-            JFunction function = new JFunction(name, sort, args, null, true, false);
+            Function function = new JFunction(name, sort, args, null, true, false);
             namespaces().functions().addSafely(function);
         }
         namespaces().functions().addSafely(dtNamespace.allElements());
@@ -91,7 +91,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             semanticError(ctx, "Where-to-bind list must have same length as argument list");
         }
 
-        JFunction p = null;
+        Function p = null;
 
         int separatorIndex = pred_name.indexOf("::");
         if (separatorIndex > 0) {
@@ -134,7 +134,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             semanticError(ctx, "Where-to-bind list must have same length as argument list");
         }
 
-        JFunction f = null;
+        Function f = null;
         assert funcName != null;
         int separatorIndex = funcName.indexOf("::");
         if (separatorIndex > 0) {
