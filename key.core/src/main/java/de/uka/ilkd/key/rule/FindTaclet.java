@@ -16,6 +16,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * An abstract class to represent Taclets with a find part. This means, they have to be attached to
@@ -29,17 +31,16 @@ public abstract class FindTaclet extends Taclet {
     /** contains the find term */
     protected final Term find;
 
-    /** Set of schema variables of the if and the (optional) find part */
-    private ImmutableSet<SchemaVariable> ifFindVariables = null;
+    /** Set of schema variables of the assumes sequent and the (optional) find expression/sequent */
+    private ImmutableSet<SchemaVariable> assumesAndFindSchemaVariables = null;
 
     /**
      * this method is used to determine if top level updates are allowed to be ignored. This is the
-     * case if we have an Antec or SuccTaclet but not for a RewriteTaclet
+     * case if we have an AntecTaclet or SuccTaclet but not for a RewriteTaclet
      *
      * @return true if top level updates shall be ignored
      */
     public abstract boolean ignoreTopLevelUpdates();
-
 
     /**
      * creates a FindTaclet
@@ -61,7 +62,7 @@ public abstract class FindTaclet extends Taclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
-            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, surviveSymbExec,
@@ -89,7 +90,7 @@ public abstract class FindTaclet extends Taclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
-            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices, false,
             tacletAnnotations);
@@ -100,63 +101,22 @@ public abstract class FindTaclet extends Taclet {
         return find;
     }
 
-
-    protected StringBuffer toStringFind(StringBuffer sb) {
-        return sb.append("\\find(").append(find().toString()).append(")\n");
-    }
-
-
-    /**
-     * returns a representation of the Taclet with find part as String
-     *
-     * @return string representation
-     */
-    public String toString() {
-        if (tacletAsString == null) {
-            StringBuffer sb = new StringBuffer();
-            sb = sb.append(name()).append(" {\n");
-            sb = toStringAssumes(sb);
-            sb = toStringFind(sb);
-            sb = toStringVarCond(sb);
-            sb = toStringGoalTemplates(sb);
-            sb = toStringRuleSets(sb);
-            sb = toStringAttribs(sb);
-            sb = toStringTriggers(sb);
-            tacletAsString = sb.append("}").toString();
-        }
-        return tacletAsString;
-    }
-
-
     /**
      * @return Set of schemavariables of the if and the (optional) find part
      */
     public ImmutableSet<SchemaVariable> getAssumesAndFindVariables() {
-        if (ifFindVariables == null) {
+        if (assumesAndFindSchemaVariables == null) {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
             find().execPostOrder(svc);
 
-            ifFindVariables = getAssumesVariables();
+            assumesAndFindSchemaVariables = getAssumesVariables();
 
             for (final SchemaVariable sv : svc.vars()) {
-                ifFindVariables = ifFindVariables.add(sv);
+                assumesAndFindSchemaVariables = assumesAndFindSchemaVariables.add(sv);
             }
         }
 
-        return ifFindVariables;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!super.equals(o)) {
-            return false;
-        }
-        return find.equals(((FindTaclet) o).find);
-    }
-
-
-    public int hashCode() {
-        return 13 * super.hashCode() + find.hashCode();
+        return assumesAndFindSchemaVariables;
     }
 
     /**
@@ -168,4 +128,48 @@ public abstract class FindTaclet extends Taclet {
         return bvv.getBoundVariables();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+        return find.equals(((FindTaclet) o).find);
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        return 13 * super.hashCode() + find.hashCode();
+    }
+
+    /**
+     * appends a string representation of the find expression to the provided stringbuffer
+     *
+     * @param sb the StringBuffer where to append the find expression
+     * @return the same StringBuffer as the one given as argument
+     */
+    protected StringBuffer toStringFind(StringBuffer sb) {
+        return sb.append("\\find(").append(find().toString()).append(")\n");
+    }
+
+    /**
+     * returns a representation of the Taclet with find part as String
+     *
+     * @return string representation
+     */
+    public String toString() {
+        if (tacletAsString == null) {
+            StringBuffer sb = new StringBuffer();
+            sb.append(name()).append(" {\n");
+            sb = toStringAssumes(sb);
+            sb = toStringFind(sb);
+            sb = toStringVarCond(sb);
+            sb = toStringGoalTemplates(sb);
+            sb = toStringRuleSets(sb);
+            sb = toStringAttribs(sb);
+            sb = toStringTriggers(sb);
+            tacletAsString = sb.append("}").toString();
+        }
+        return tacletAsString;
+    }
 }
