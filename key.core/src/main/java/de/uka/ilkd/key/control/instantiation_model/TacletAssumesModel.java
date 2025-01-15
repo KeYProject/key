@@ -22,8 +22,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.RecognitionException;
 
 import org.key_project.logic.LogicServices;
-import org.key_project.prover.rules.AssumesFormulaInstDirect;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 

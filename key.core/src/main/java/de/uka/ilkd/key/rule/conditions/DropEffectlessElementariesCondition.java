@@ -18,8 +18,8 @@ import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 
 public final class DropEffectlessElementariesCondition implements VariableCondition {

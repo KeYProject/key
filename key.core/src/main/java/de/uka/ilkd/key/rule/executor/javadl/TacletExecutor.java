@@ -86,7 +86,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet>
     @Override
     protected Term syntacticalReplace(Term term,
             PosInOccurrence applicationPosInOccurrence,
-            org.key_project.prover.rules.MatchConditions mc, Goal goal,
+            org.key_project.prover.rules.instantiation.MatchConditions mc, Goal goal,
             RuleApp ruleApp,
             LogicServices services,
             Object... /* TermLabelState, TacletLabelHint */ instantiationInfo) {
@@ -99,7 +99,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet>
         return srVisitor.getTerm();
     }
 
-    protected Term applyContextUpdate(org.key_project.prover.rules.inst.SVInstantiations p_svInst,
+    protected Term applyContextUpdate(
+            org.key_project.prover.rules.instantiation.SVInstantiations p_svInst,
             Term formula, Goal goal) {
         // var instantiatedFormula = (de.uka.ilkd.key.logic.Term) formula;
         final SVInstantiations svInst = (SVInstantiations) p_svInst;
@@ -131,7 +132,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet>
     protected ImmutableList<SequentFormula> instantiateSemisequent(
             Semisequent semi,
             PosInOccurrence applicationPosInOccurrence,
-            org.key_project.prover.rules.MatchConditions matchCond, Goal goal,
+            org.key_project.prover.rules.instantiation.MatchConditions matchCond, Goal goal,
             RuleApp tacletApp, LogicServices services,
             Object... instantiationInfo) { // TermLabelState termLabelState, TacletLabelHint
                                            // labelHint) {
@@ -161,7 +162,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet>
     protected void applyAddrule(ImmutableList<? extends org.key_project.prover.rules.Taclet> rules,
             Goal goal,
             LogicServices services,
-            org.key_project.prover.rules.MatchConditions p_matchCond) {
+            org.key_project.prover.rules.instantiation.MatchConditions p_matchCond) {
         var matchCond = (MatchConditions) p_matchCond;
         for (var tacletToAdd : rules) {
             final Node n = goal.node();
@@ -208,7 +209,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet>
             SequentChangeInfo currentSequent,
             Goal goal,
             PosInOccurrence posOfFind,
-            LogicServices p_services, org.key_project.prover.rules.MatchConditions matchCond) {
+            LogicServices p_services,
+            org.key_project.prover.rules.instantiation.MatchConditions matchCond) {
         final Services services = (Services) p_services;
         ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
         for (final SchemaVariable sv : pvs) {

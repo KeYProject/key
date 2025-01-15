@@ -22,8 +22,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.MatchConditions;
 import org.key_project.prover.rules.VariableCondition;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 
 /**
  * Extracts the loop invariants for a loop term (for all applicable heap contexts).

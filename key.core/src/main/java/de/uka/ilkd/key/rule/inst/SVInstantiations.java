@@ -20,8 +20,8 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.inst.InstantiationEntry;
-import org.key_project.prover.rules.inst.ListInstantiation;
+import org.key_project.prover.rules.instantiation.InstantiationEntry;
+import org.key_project.prover.rules.instantiation.ListInstantiation;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -37,7 +37,8 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  * and is used to store instantiations of schemavariables. The class is immutable,
  * this means changing its content results in creating a new object.
  */
-public class SVInstantiations implements org.key_project.prover.rules.inst.SVInstantiations {
+public class SVInstantiations
+        implements org.key_project.prover.rules.instantiation.SVInstantiations {
     /** the empty instantiation */
     public static final SVInstantiations EMPTY_SVINSTANTIATIONS = new SVInstantiations();
 
@@ -596,7 +597,8 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
         return result;
     }
 
-    public SVInstantiations union(org.key_project.prover.rules.inst.SVInstantiations p_other,
+    public SVInstantiations union(
+            org.key_project.prover.rules.instantiation.SVInstantiations p_other,
             LogicServices services) {
         final var other = (SVInstantiations) p_other;
         ImmutableMap<SchemaVariable, InstantiationEntry<?>> result = map;

@@ -35,10 +35,10 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
-import org.key_project.prover.rules.AssumesFormulaInstDirect;
-import org.key_project.prover.rules.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
+import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;

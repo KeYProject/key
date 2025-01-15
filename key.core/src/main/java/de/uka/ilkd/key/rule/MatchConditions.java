@@ -13,7 +13,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * Simple container class containing the information resulting from a Taclet.match-call
  */
-public class MatchConditions extends org.key_project.prover.rules.MatchConditions {
+public class MatchConditions extends org.key_project.prover.rules.instantiation.MatchConditions {
 
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
         new MatchConditions(SVInstantiations.EMPTY_SVINSTANTIATIONS, RenameTable.EMPTY_TABLE);
@@ -40,7 +40,7 @@ public class MatchConditions extends org.key_project.prover.rules.MatchCondition
 
     @Override
     public MatchConditions setInstantiations(
-            org.key_project.prover.rules.inst.SVInstantiations p_instantiations) {
+            org.key_project.prover.rules.instantiation.SVInstantiations p_instantiations) {
         if (instantiations == p_instantiations) {
             return this;
         } else {
