@@ -5,6 +5,23 @@ package org.key_project.prover.rules;
 
 import org.key_project.util.collection.ImmutableList;
 
+/**
+ * <p>There can be several candidates for matching a formula of an assumes clause of a taclet. This record
+ * keeps for a given formula the list of successful instantiations for the sequent formula as well as
+ * their corresponding math results (match conditions) that break down the candidate formula to instantiations
+ * of the schema variables that made up the assumes-formula.
+ * </p><p>
+ *  It is not sufficient to simply keep the match conditions as for the taclet application itself the
+ *  candidate information is used to decide whether to split the goal or not. See {@link AssumesFormulaInstantiation}
+ *  and subclasses for more details.
+ * </p>
+ * <p>
+ *     The two lists are paired in the sense that the match conditions for the i-th candidate can be found at
+ *     the i-th position of list {@code matchConditions}.
+ * </p>
+ * @param candidates the list of candidate instantiations
+ * @param matchConditions the list of match conditions
+ */
 public record AssumesMatchResult(ImmutableList<AssumesFormulaInstantiation> candidates,
                                  ImmutableList<MatchConditions> matchConditions) {
 }
