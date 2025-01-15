@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.util.properties.Properties;
 
@@ -20,8 +21,9 @@ import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-public class InfFlowContractAppTacletExecutor
-        extends RewriteTacletExecutor<InfFlowContractAppTaclet> {
+import org.jspecify.annotations.NonNull;
+
+public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
     /**
      * Strategy property which saves the list of formulas which where added by information flow
      * contract applications. This list is used by the macros UseInformationFlowContractMacro and
@@ -54,7 +56,7 @@ public class InfFlowContractAppTacletExecutor
      *        rewritten
      * @param matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
-     * @param services
+     * @param services the Services
      * @param instantiationInfo additional instantiation information concerning label:
      *        <ul>
      *        <li>termLabelState: The {@link TermLabelState} of the current rule application.</li>
@@ -65,19 +67,19 @@ public class InfFlowContractAppTacletExecutor
     @Override
     protected void addToAntec(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos, PosInOccurrence applicationPosInOccurrence,
-            MatchConditions matchCond, Goal goal,
-            org.key_project.prover.rules.RuleApp tacletApp,
-            LogicServices services, Object... instantionInfo) {
+            MatchConditions matchCond, @NonNull Goal goal,
+            @NonNull TacletApp tacletApp,
+            LogicServices services, Object... instantiationInfo) {
 
         final ImmutableList<org.key_project.prover.sequent.SequentFormula> replacements =
             instantiateSemisequent(semi, pos, matchCond, goal, tacletApp, goal.getOverlayServices(),
-                instantionInfo);
+                instantiationInfo);
         assert replacements.size() == 1
                 : "information flow taclets must have " + "exactly one add!";
         updateStrategyInfo(goal.proof().openEnabledGoals().head(),
             (Term) replacements.iterator().next().formula());
         super.addToAntec(semi, currentSequent, pos, applicationPosInOccurrence, matchCond, goal,
-            tacletApp, services, instantionInfo);
+            tacletApp, services, instantiationInfo);
     }
 
     /**

@@ -56,7 +56,7 @@ public class SuccTaclet extends FindTaclet {
 
     @Override
     protected void createAndInitializeExecutor() {
-        executor = new SuccTacletExecutor<>(this);
+        executor = new SuccTacletExecutor(this);
     }
 
     /**

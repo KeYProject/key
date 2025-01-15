@@ -21,13 +21,13 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
 
-public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends @NonNull RuleApp, T extends Taclet>
+public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends @NonNull RuleApp>
         implements RuleExecutor<Goal> {
     protected static final String AUTO_NAME = "_taclet";
 
-    protected final T taclet;
+    protected final Taclet taclet;
 
-    protected TacletExecutor(T taclet) {
+    protected TacletExecutor(Taclet taclet) {
         this.taclet = taclet;
     }
 

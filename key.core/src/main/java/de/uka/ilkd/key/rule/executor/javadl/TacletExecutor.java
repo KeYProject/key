@@ -24,13 +24,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-
+import org.jspecify.annotations.NonNull;
 
 /**
  * Encapsulates the application engine of taclets.
@@ -44,12 +43,11 @@ import org.key_project.util.collection.ImmutableSet;
  * schemavariables</li>
  * </ul>
  *
- * @param <TacletKind> The kind of taclet that is executed.
  */
-public abstract class TacletExecutor<TacletKind extends Taclet>
-        extends org.key_project.prover.rules.TacletExecutor<Goal, RuleApp, TacletKind> {
+public abstract class TacletExecutor
+        extends org.key_project.prover.rules.TacletExecutor<@NonNull Goal, @NonNull TacletApp> {
 
-    protected TacletExecutor(TacletKind taclet) {
+    protected TacletExecutor(Taclet taclet) {
         super(taclet);
     }
 
@@ -73,8 +71,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet>
      *        this taclet is applied to
      * @param mc the {@link MatchConditions} with all instantiations and the constraint
      * @param goal the {@link Goal} on which this taclet is applied
-     * @param ruleApp the {@link RuleApp} with application information
-     * @param services
+     * @param tacletApp the {@link TacletApp} with application information
+     * @param services the Services
      * @param instantiationInfo additional instantiation information concerning label:
      *        <ul>
      *        <li>termLabelState: The {@link TermLabelState} of the current rule application.</li>
@@ -86,15 +84,16 @@ public abstract class TacletExecutor<TacletKind extends Taclet>
     @Override
     protected Term syntacticalReplace(Term term,
             PosInOccurrence applicationPosInOccurrence,
-            org.key_project.prover.rules.instantiation.MatchConditions mc, Goal goal,
-            RuleApp ruleApp,
+            org.key_project.prover.rules.instantiation.MatchConditions mc,
+            @NonNull Goal goal,
+            @NonNull TacletApp tacletApp,
             LogicServices services,
             Object... /* TermLabelState, TacletLabelHint */ instantiationInfo) {
         final SyntacticalReplaceVisitor srVisitor =
             new SyntacticalReplaceVisitor((TermLabelState) instantiationInfo[0],
                 (TacletLabelHint) instantiationInfo[1], applicationPosInOccurrence,
-                (SVInstantiations) mc.getInstantiations(), goal, taclet,
-                ruleApp);
+                (SVInstantiations) mc.getInstantiations(), goal,
+                taclet, tacletApp);
         term.execPostOrder(srVisitor);
         return srVisitor.getTerm();
     }
@@ -133,7 +132,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet>
             Semisequent semi,
             PosInOccurrence applicationPosInOccurrence,
             org.key_project.prover.rules.instantiation.MatchConditions matchCond, Goal goal,
-            RuleApp tacletApp, LogicServices services,
+            TacletApp tacletApp, LogicServices services,
             Object... instantiationInfo) { // TermLabelState termLabelState, TacletLabelHint
                                            // labelHint) {
 
@@ -155,12 +154,12 @@ public abstract class TacletExecutor<TacletKind extends Taclet>
      * @param rules the rules to be added
      * @param goal the goal describing the node where the rules should be added
      * @param services the Services encapsulating all java information
-     * @param matchCond the MatchConditions containing in particular the instantiations of the
+     * @param p_matchCond the MatchConditions containing in particular the instantiations of the
      *        schemavariables
      */
     @Override
     protected void applyAddrule(ImmutableList<? extends org.key_project.prover.rules.Taclet> rules,
-            Goal goal,
+            @NonNull Goal goal,
             LogicServices services,
             org.key_project.prover.rules.instantiation.MatchConditions p_matchCond) {
         var matchCond = (MatchConditions) p_matchCond;
@@ -200,7 +199,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet>
                 neededInstances = neededInstances.add(gsc, services);
             }
 
-            goal.addTaclet((Taclet) tacletToAdd, neededInstances, true);
+            goal.addTaclet(tacletToAdd, neededInstances, true);
         }
     }
 

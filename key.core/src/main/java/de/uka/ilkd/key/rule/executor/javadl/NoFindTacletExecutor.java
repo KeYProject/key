@@ -17,7 +17,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
-public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
+public class NoFindTacletExecutor extends TacletExecutor {
     public static final AtomicLong PERF_APPLY = new AtomicLong();
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
     public static final AtomicLong PERF_TERM_LABELS = new AtomicLong();
@@ -38,7 +38,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
     protected void applyAdd(TermLabelState termLabelState, Sequent add,
             SequentChangeInfo currentSequent,
             MatchConditions matchCond,
-            Goal goal, org.key_project.prover.rules.RuleApp ruleApp) {
+            Goal goal, TacletApp ruleApp) {
         addToAntec(add.antecedent(), currentSequent, null, null, matchCond, goal, ruleApp,
             goal.getOverlayServices(), termLabelState,
             new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
@@ -100,7 +100,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
             timeTermLabels = System.nanoTime() + timeTermLabels;
             TermLabelManager.refactorSequent(termLabelState, services,
                 ruleApp.posInOccurrence(),
-                (Rule) ruleApp.rule(), currentGoal, null, null);
+                ruleApp.rule(), currentGoal, null, null);
             PERF_TERM_LABELS.getAndAdd(System.nanoTime() - timeTermLabels);
         }
 
