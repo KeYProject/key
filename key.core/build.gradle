@@ -15,6 +15,7 @@ dependencies {
     implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
     implementation group: 'org.antlr', name: 'antlr-runtime', version: '3.5.3'
     implementation group: 'antlr', name: 'antlr', version: '2.7.7'
+    implementation 'com.google.code.gson:gson:2.11.0'
 
     javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
     antlr group: 'org.antlr', name: 'antlr', version: '3.5.3'   // use ANTLR version 3

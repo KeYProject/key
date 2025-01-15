@@ -420,7 +420,6 @@ public abstract class AbstractProblemLoader {
      * @throws IOException Occurred Exception.
      */
     protected EnvInput createEnvInput(FileRepo fileRepo) throws IOException {
-
         final String filename = file.getName();
 
         // set the root directory of the FileRepo (used for resolving paths)
@@ -500,6 +499,11 @@ public abstract class AbstractProblemLoader {
             return new KeYUserProblemFile(filename, file, fileRepo, control, profileOfNewProofs,
                 filename.endsWith(".proof.gz"));
         } else if (file.isDirectory()) {
+            for (File f : file.listFiles()) {
+                if (f.getName().equals("project.key")) {
+                    return new KeYProjectFile(file, fileRepo, control, profileOfNewProofs);
+                }
+            }
             // directory containing java sources, probably enriched
             // by specifications
             return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs,
