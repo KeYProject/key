@@ -28,6 +28,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalR
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
@@ -47,7 +48,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     protected final PosInOccurrence applicationPosInOccurrence;
     protected final Rule rule;
     protected final Goal goal;
-    protected final org.key_project.prover.rules.RuleApp ruleApp;
+    protected final RuleApp ruleApp;
 
     protected final TermLabelState termLabelState;
     protected final TacletLabelHint labelHint;
@@ -79,7 +80,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     private SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
             PosInOccurrence applicationPosInOccurrence,
             SVInstantiations svInst, Goal goal,
-            Rule rule, org.key_project.prover.rules.RuleApp ruleApp, boolean useTermCache) {
+            Rule rule, RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
         this.services = goal.getOverlayServices();
         this.tb = services.getTermBuilder(useTermCache);
@@ -111,7 +112,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
             PosInOccurrence applicationPosInOccurrence,
             Services services,
-            Rule rule, org.key_project.prover.rules.RuleApp ruleApp, boolean useTermCache) {
+            Rule rule, RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
         this.services = services;
         this.tb = this.services.getTermBuilder(useTermCache);

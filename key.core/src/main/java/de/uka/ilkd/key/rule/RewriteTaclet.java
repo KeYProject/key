@@ -28,6 +28,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * A RewriteTaclet represents a taclet, whose find can be matched against any term in the sequent no
  * matter where it occurs. The only constraint to be fulfilled is that the term matches the
@@ -109,7 +111,7 @@ public class RewriteTaclet extends FindTaclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
             int p_applicationRestriction, ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
@@ -120,7 +122,7 @@ public class RewriteTaclet extends FindTaclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
             int p_applicationRestriction, ChoiceExpr choices,
             boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -132,7 +134,7 @@ public class RewriteTaclet extends FindTaclet {
 
     @Override
     protected void createAndInitializeExecutor() {
-        this.executor = new RewriteTacletExecutor<>(this);
+        this.executor = new RewriteTacletExecutor(this);
     }
 
     /**

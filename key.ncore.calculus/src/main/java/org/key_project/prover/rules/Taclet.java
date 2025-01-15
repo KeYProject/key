@@ -8,6 +8,7 @@ import java.util.Iterator;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.conditions.NewDependingOn;
 import org.key_project.prover.rules.conditions.NewVarcond;
 import org.key_project.prover.rules.conditions.NotFreeIn;
@@ -68,7 +69,7 @@ public abstract class Taclet implements Rule {
      * all variables that may appear free in the instantiation of the schemavariable (a bit more
      * complicated for rewrite taclets, see paper of M:Giese)
      */
-    protected final ImmutableMap<org.key_project.logic.op.sv.SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap;
+    protected final ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap;
 
     /** cache; contains set of all bound variables */
     protected ImmutableSet<QuantifiableVariable> boundVariables = null;
@@ -108,7 +109,7 @@ public abstract class Taclet implements Rule {
     /**
      * The taclet executor
      */
-    protected TacletExecutor/* <?, App, ? extends Taclet<?, App>> */ executor;
+    protected TacletExecutor<? extends ProofGoal<?>, ? extends RuleApp> executor;
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
@@ -249,7 +250,7 @@ public abstract class Taclet implements Rule {
      * returns the display name of the taclet, or, if not specified -- the canonical name
      */
     @Override
-    public String displayName() {
+    public @NonNull String displayName() {
         return displayName;
     }
 
@@ -438,7 +439,7 @@ public abstract class Taclet implements Rule {
         return sb;
     }
 
-    public TacletExecutor<?, ?, ?> getExecutor() {
+    public @NonNull TacletExecutor getExecutor() {
         return executor;
     }
 

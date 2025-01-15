@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -28,6 +27,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 
@@ -82,7 +82,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in this taclet
      */
-    private ImmutableMap<SchemaVariable, SchemaVariable> svNameCorrespondences = null;
+    private ImmutableMap<@NonNull SchemaVariable, SchemaVariable> svNameCorrespondences = null;
 
     /** Integer to cache the hashcode */
     private int hashcode = 0;
@@ -102,7 +102,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
-            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, surviveSmbExec,
@@ -125,7 +125,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
-            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
             tacletAnnotations);
@@ -188,7 +188,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     }
 
     @Override
-    public TacletExecutor<Goal, TacletApp, Taclet> getExecutor() {
+    public @NonNull TacletExecutor getExecutor() {
         return executor;
     }
 
@@ -314,10 +314,10 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         // add, replacewith
         for (var tgt : this.goalTemplates()) {
             collectSchemaVarsHelper(tgt.sequent(), oc);
-            if (tgt instanceof AntecSuccTacletGoalTemplate) {
-                collectSchemaVarsHelper(((AntecSuccTacletGoalTemplate) tgt).replaceWith(), oc);
-            } else if (tgt instanceof RewriteTacletGoalTemplate) {
-                ((RewriteTacletGoalTemplate) tgt).replaceWith().execPostOrder(oc);
+            if (tgt instanceof AntecSuccTacletGoalTemplate antecSuccTemplate) {
+                collectSchemaVarsHelper(antecSuccTemplate.replaceWith(), oc);
+            } else if (tgt instanceof RewriteTacletGoalTemplate rwTemplate) {
+                rwTemplate.replaceWith().execPostOrder(oc);
             }
         }
 
@@ -570,7 +570,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         if (tacletAsString == null) {
             // FIXME this essentially reimplements PrettyPrinter::printTaclet
             StringBuffer sb = new StringBuffer();
-            sb = sb.append(name()).append(" {\n");
+            sb.append(name()).append(" {\n");
             sb = toStringAssumes(sb);
             sb = toStringVarCond(sb);
             sb = toStringGoalTemplates(sb);
