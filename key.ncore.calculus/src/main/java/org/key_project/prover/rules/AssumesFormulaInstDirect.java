@@ -9,9 +9,19 @@ import org.key_project.prover.sequent.SequentFormula;
 
 
 /**
- * Instantiation of an if-formula that has to be proven by an explicit if-goal
+ * Instantiation of an assumes-formula that has to be proven by an explicit assumes-goal
+ * <p>
+ * This is used if an assumes sequent cannot be matched against an existing formula in the
+ * proof goal. The instantiation is usually provided by the user or the proof search strategy.
+ * </p>
+ * <p>
+ * Application of a taclet whose instantiations contain a direct instantiation leads to a proof
+ * split
+ * where on one branch the formula used as instantiation has to be proven valid.
+ * </p>
+ *
+ * @see AssumesFormulaInstantiation, AssumesFormulaInstSeq
  */
-
 public class AssumesFormulaInstDirect implements AssumesFormulaInstantiation {
 
     /**

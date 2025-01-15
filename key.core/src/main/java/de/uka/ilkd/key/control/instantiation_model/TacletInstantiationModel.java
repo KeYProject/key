@@ -125,9 +125,9 @@ public class TacletInstantiationModel {
 
         if (size > 0) {
             ImmutableArray<AssumesFormulaInstantiation> antecCand =
-                AssumesFormulaInstSeq.createList(seq, true, services);
+                AssumesFormulaInstSeq.createList(seq, true);
             ImmutableArray<AssumesFormulaInstantiation> succCand =
-                AssumesFormulaInstSeq.createList(seq, false, services);
+                AssumesFormulaInstSeq.createList(seq, false);
 
             Iterator<org.key_project.prover.sequent.SequentFormula> it = ifseq.iterator();
             Term ifFma;
