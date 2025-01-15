@@ -622,7 +622,8 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
          */
         final ImmutableList<Goal> goalList;
         var time = System.nanoTime();
-        ruleApp.execute(localNamespaces.functions());
+        ruleApp.checkApplicability();
+        ruleApp.registerSkolemConstants(localNamespaces.functions());
         addAppliedRuleApp(ruleApp);
         try {
             goalList = ruleApp.rule().<Goal>getExecutor().apply(this, ruleApp);

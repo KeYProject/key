@@ -330,12 +330,11 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
-     * applies the specified rule at the specified position if all schema variables have been
-     * instantiated
+     * asserts that the rule application is complete and executable
      *
      */
     @Override
-    public void execute(Namespace<@NonNull Function> fns) {
+    public void checkApplicability() {
         if (!complete()) {
             throw new IllegalStateException(
                 "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
@@ -345,7 +344,6 @@ public abstract class TacletApp implements RuleApp {
             throw new RuntimeException(
                 "taclet application with unsatisfied 'checkPrefix': " + this);
         }
-        registerSkolemConstants(fns);
     }
 
     /*
@@ -700,7 +698,7 @@ public abstract class TacletApp implements RuleApp {
     }
 
 
-    private void registerSkolemConstants(Namespace<@NonNull Function> fns) {
+    public void registerSkolemConstants(Namespace<@NonNull Function> fns) {
         final var insts = instantiations();
         for (final var pair : insts.getInstantiationMap()) {
             final var sv = pair.key();

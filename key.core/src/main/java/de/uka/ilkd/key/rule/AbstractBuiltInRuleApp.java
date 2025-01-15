@@ -70,9 +70,10 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      *
      */
     @Override
-    public void execute(Namespace<@NonNull Function> fns) {
+    public void checkApplicability() {}
 
-    }
+    @Override
+    public void registerSkolemConstants(Namespace<@NonNull Function> fns) {}
 
     public abstract AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos);
 
