@@ -13,20 +13,21 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
 public class PermissionLDT extends LDT {
 
     public static final Name NAME = new Name("Permission");
 
-    private final JFunction permissionsFor;
+    private final Function permissionsFor;
 
     public PermissionLDT(Services services) {
         super(NAME, services);
         permissionsFor = addFunction(services, "permissionsFor");
     }
 
-    public JFunction getPermissionsFor() {
+    public Function getPermissionsFor() {
         return permissionsFor;
     }
 
@@ -55,7 +56,7 @@ public class PermissionLDT extends LDT {
     }
 
     @Override
-    public JFunction getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         assert false : "PermissionLDT: there are no permission operators: " + op;
         return null;
     }

@@ -402,9 +402,9 @@ public class MergeRuleUtils {
      * @param services The services object.
      * @return A new Skolem constant of the given sort with the given prefix in its name.
      */
-    public static JFunction getNewSkolemConstantForPrefix(String prefix, Sort sort,
+    public static Function getNewSkolemConstantForPrefix(String prefix, Sort sort,
             Services services) {
-        JFunction result = null;
+        Function result = null;
         String newName = "";
 
         do {
@@ -1169,17 +1169,17 @@ public class MergeRuleUtils {
                             .filter(s -> s.name().equals(partnerStateOp.name()))
                             .toList().get(0);
 
-                Operator newOp1;
-                Operator newOp2;
-                if (partnerStateOp instanceof JFunction partnerFun) {
+                org.key_project.logic.op.Operator newOp1;
+                org.key_project.logic.op.Operator newOp2;
+                if (partnerStateOp instanceof Function partnerFun) {
                     newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                        thisGoal.getLocalNamespaces())), (JFunction) mergeStateOp);
-                    thisGoalNamespaces.functions().add((JFunction) newOp1);
+                        thisGoal.getLocalNamespaces())), (Function) mergeStateOp);
+                    thisGoalNamespaces.functions().add((Function) newOp1);
                     thisGoalNamespaces.flushToParent();
 
                     newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
                         thisGoal.getLocalNamespaces())), partnerFun);
-                    thisGoalNamespaces.functions().add((JFunction) newOp2);
+                    thisGoalNamespaces.functions().add((Function) newOp2);
                     thisGoalNamespaces.flushToParent();
                 } else if (partnerStateOp instanceof LocationVariable partnerLV) {
                     newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
@@ -1354,7 +1354,7 @@ public class MergeRuleUtils {
      * @param old the function to be renamed
      * @return equivalent operator with the new name
      */
-    private static JFunction rename(Name newName, JFunction old) {
+    private static Function rename(Name newName, Function old) {
         return new JFunction(newName, old.sort(), old.argSorts(), old.whereToBind(),
             old.isUnique(), old.isSkolemConstant());
     }

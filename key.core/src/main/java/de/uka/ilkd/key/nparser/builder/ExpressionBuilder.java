@@ -14,10 +14,7 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
@@ -351,11 +348,11 @@ public class ExpressionBuilder extends DefaultBuilder {
         for (int i = 0; i < terms.size(); i++) {
             String opname = "";
             switch (ctx.op.get(i).getType()) {
-                case KeYLexer.UTF_INTERSECT -> opname = "intersect";
-                case KeYLexer.UTF_SETMINUS -> opname = "setMinus";
-                case KeYLexer.UTF_UNION -> opname = "union";
-                case KeYLexer.PLUS -> opname = "add";
-                case KeYLexer.MINUS -> opname = "sub";
+                case KeYLexer.UTF_INTERSECT -> opname = LocSetLDT.INTERSECT_STRING;
+                case KeYLexer.UTF_SETMINUS -> opname = LocSetLDT.SETMINUS_STRING;
+                case KeYLexer.UTF_UNION -> opname = LocSetLDT.UNION_STRING;
+                case KeYLexer.PLUS -> opname = IntegerLDT.ADD_STRING;
+                case KeYLexer.MINUS -> opname = IntegerLDT.SUB_STRING;
                 default -> semanticError(ctx, "Unexpected token: %s", ctx.op.get(i));
             }
             Term cur = terms.get(i);
@@ -391,7 +388,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         List<Term> terms = mapOf(ctx.b);
         Term last = termL;
         for (Term cur : terms) {
-            last = binaryLDTSpecificTerm(ctx, "mul", last, cur);
+            last = binaryLDTSpecificTerm(ctx, IntegerLDT.MUL_STRING, last, cur);
         }
         return last;
     }
@@ -1501,7 +1498,7 @@ public class ExpressionBuilder extends DefaultBuilder {
                 current = capsulateTf(ctx, () -> getTermFactory().createTerm(finalOp, finalArgs));
             } else {
                 // sanity check
-                assert op instanceof JFunction;
+                assert op instanceof Function;
                 for (int i = 0; i < args.length; i++) {
                     if (i < op.arity() && !op.bindVarsAt(i)) {
                         for (QuantifiableVariable qv : args[i].freeVars()) {

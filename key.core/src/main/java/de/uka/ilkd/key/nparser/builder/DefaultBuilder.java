@@ -148,7 +148,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         Operator[] operators =
             { (OperatorSV) schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
-                (JFunction) functions().lookup(name),
+                (Operator) functions().lookup(name),
                 AbstractTermTransformer.name2metaop(varfuncName),
 
             };
@@ -166,7 +166,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 new Operator[] { (OperatorSV) schemaVariables().lookup(fqName),
                     variables().lookup(fqName),
                     programVariables().lookup(new ProgramElementName(fqName.toString())),
-                    (JFunction) functions().lookup(fqName),
+                    (Operator) functions().lookup(fqName),
                     AbstractTermTransformer.name2metaop(fqName.toString()) };
 
             for (Operator op : operators) {

@@ -240,7 +240,7 @@ public class OriginTermLabel implements TermLabel {
                 return false;
             }
         } else {
-            return !(op instanceof JFunction) || (op.getClass().equals(JFunction.class)
+            return !(op instanceof Function) || (op.getClass().equals(JFunction.class)
                     && ((Function) op).sort().extendsTrans(JavaDLTheory.FORMULA));
         }
     }

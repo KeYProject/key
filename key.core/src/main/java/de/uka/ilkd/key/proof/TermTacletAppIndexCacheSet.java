@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.op.Function;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -206,7 +207,7 @@ public class TermTacletAppIndexCacheSet {
      */
     private boolean isAcceptedOperator(Operator op) {
         return op instanceof IfThenElse
-                || (op instanceof JFunction && !(op instanceof Transformer))
+                || (op instanceof Function && !(op instanceof Transformer))
                 || op instanceof Junctor || op instanceof Equality || op instanceof Quantifier
                 || op instanceof UpdateApplication || op instanceof Modality;
     }

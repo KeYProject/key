@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
@@ -56,7 +57,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
 
         if (svSubst instanceof Term) {
             Operator op = ((Term) svSubst).op();
-            if (op instanceof JFunction) {
+            if (op instanceof Function) {
                 HeapLDT.SplitFieldName split = HeapLDT.trySplitFieldName(op);
                 if (split == null) {
                     return null;

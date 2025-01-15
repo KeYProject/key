@@ -15,13 +15,17 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.AbstractSortedOperator;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -31,7 +35,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
 /**
  * This handler handles the seqDef binder function specially.
  *
- * For every applicatin of seqDef a new function symbol is introduced which captures its meaning.
+ * For every application of seqDef a new function symbol is introduced which captures its meaning.
  *
  * If there are variables used inside the seqDef expression, the symbol is a function and these
  * variables are used as its arguments.
@@ -68,7 +72,7 @@ public class SeqDefHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
-        Operator op = term.op();
+        var op = term.op();
 
         assert (op == seqLDT.getSeqDef());
 
@@ -118,7 +122,7 @@ public class SeqDefHandler implements SMTHandler {
         }
 
         ImmutableSet<QuantifiableVariable> localBind = boundVars;
-        for (QuantifiableVariable boundVar : term.boundVars()) {
+        for (var boundVar : ((de.uka.ilkd.key.logic.Term) term).boundVars()) {
             localBind = localBind.add(boundVar);
         }
 
@@ -175,7 +179,7 @@ public class SeqDefHandler implements SMTHandler {
         // \forall i; \forall params;
         // and(guards, i_range) -> seqGet(function(params), i) = let i = i + lo in term
         SExpr app = makeApplication(function, vars);
-        QuantifiableVariable last = term.boundVars().last();
+        var last = term.boundVars().last();
         String name = last.name().toString();
         Sort sort = last.sort();
         SExpr i = LogicalVariableHandler.makeVarRef(name, sort);
@@ -220,7 +224,8 @@ public class SeqDefHandler implements SMTHandler {
             throws SMTTranslationException {
         List<SExpr> args = new ArrayList<>();
         for (ParsableVariable var : vars) {
-            SExpr ref = trans.translate(termFactory.createTerm((Operator) var));
+            SExpr ref =
+                trans.translate(termFactory.createTerm((de.uka.ilkd.key.logic.op.Operator) var));
             args.add(SExprs.coerce(ref, Type.UNIVERSE));
         }
         return new SExpr(name, Type.UNIVERSE, args);

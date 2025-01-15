@@ -668,7 +668,7 @@ public final class JmlTermFactory {
 
             Sort os = typeExpr.getType().getSort();
 
-            JFunction ioFunc =
+            Function ioFunc =
                 services.getJavaDLTheory().getExactInstanceofSymbol(os, services);
             Term instanceOf = tb.equals(tb.func(ioFunc, typeofExpr.getTerm()), tb.TRUE());
             IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
@@ -750,7 +750,7 @@ public final class JmlTermFactory {
     private SLExpression buildIntCastExpression(KeYJavaType resultType, Term term) {
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         try {
-            JFunction cast = integerLDT.getSpecCast(resultType.getJavaType());
+            Function cast = integerLDT.getSpecCast(resultType.getJavaType());
             if (cast != null) {
                 return new SLExpression(tb.func(cast, term), resultType);
             } else {
@@ -999,7 +999,7 @@ public final class JmlTermFactory {
     public Term signalsOnly(ImmutableList<KeYJavaType> signalsonly, LocationVariable excVar) {
         Term result = tb.ff();
         for (KeYJavaType kjt : signalsonly) {
-            JFunction instance =
+            Function instance =
                 services.getJavaDLTheory().getInstanceofSymbol(kjt.getSort(), services);
             result = tb.or(result, tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()));
         }
@@ -1018,7 +1018,7 @@ public final class JmlTermFactory {
             OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
 
             Sort os = excType.getSort();
-            JFunction instance = services.getJavaDLTheory().getInstanceofSymbol(os, services);
+            Function instance = services.getJavaDLTheory().getInstanceofSymbol(os, services);
 
             result = tb.imp(tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()),
                 tb.convertToFormula(excVarReplacer.replace(result)));
@@ -1145,7 +1145,7 @@ public final class JmlTermFactory {
         do {
             name = new Name(shortName + "_" + ++x);
         } while (fns.lookup(name) != null);
-        final JFunction sk = new JFunction(name, JavaDLTheory.FORMULA);
+        final Function sk = new JFunction(name, JavaDLTheory.FORMULA);
         fns.add(sk);
         final Term t = tb.func(sk);
         return new SLExpression(t);
@@ -1206,7 +1206,7 @@ public final class JmlTermFactory {
         do {
             name = new Name(shortName + "_" + ++x);
         } while (fns.lookup(name) != null);
-        final JFunction sk = new JFunction(name, sort);
+        final Function sk = new JFunction(name, sort);
         fns.add(sk);
         final Term t = tb.func(sk);
         return new SLExpression(t, type);
@@ -1236,9 +1236,9 @@ public final class JmlTermFactory {
         if (symbol != null) {
             // Function or predicate symbol found
 
-            assert symbol instanceof JFunction
+            assert symbol instanceof Function
                     : "Expecting a function symbol in this namespace";
-            JFunction function = (JFunction) symbol;
+            Function function = (Function) symbol;
 
             Term[] args;
             if (list == null) {

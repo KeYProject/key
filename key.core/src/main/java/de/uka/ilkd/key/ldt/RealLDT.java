@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JFunction;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
 /**
@@ -57,7 +58,7 @@ public final class RealLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, Services services) {
         // return skolem term
-        final JFunction sk =
+        final Function sk =
             new JFunction(new Name(String.valueOf(NAME) + lit), targetSort());
         return services.getTermBuilder().func(sk);
     }
@@ -78,7 +79,7 @@ public final class RealLDT extends LDT {
     // }
 
     @Override
-    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
             Services services,
             ExecutionContext ec) {
         assert false;

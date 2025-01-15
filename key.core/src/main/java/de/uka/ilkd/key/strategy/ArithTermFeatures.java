@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
 class ArithTermFeatures extends StaticFeatureCollection {
@@ -91,13 +92,13 @@ class ArithTermFeatures extends StaticFeatureCollection {
     final Sort intS;
 
     final JFunction Z;
-    final JFunction C;
+    final Function C;
     final JFunction add;
     final JFunction mul;
     final JFunction mod;
-    final JFunction div;
-    final JFunction jmod;
-    final JFunction jdiv;
+    final Function div;
+    final Function jmod;
+    final Function jdiv;
 
     final Operator eq;
     final JFunction leq;

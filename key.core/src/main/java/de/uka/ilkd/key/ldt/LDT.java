@@ -40,7 +40,7 @@ public abstract class LDT implements Named {
     private final Sort sort;
 
     /** the namespace of functions this LDT feels responsible for */
-    private final Namespace<Operator> functions = new Namespace<>();
+    private final Namespace<Function> functions = new Namespace<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -85,14 +85,14 @@ public abstract class LDT implements Named {
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    protected final JFunction addFunction(TermServices services, String funcName) {
+    protected final <F extends Function> F addFunction(TermServices services, String funcName) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name(funcName));
         if (f == null) {
             throw new RuntimeException("LDT: Function " + funcName + " not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
         }
-        return (JFunction) addFunction(f);
+        return (F) addFunction(f);
     }
 
     protected final SortDependingFunction addSortDependingFunction(TermServices services,
@@ -109,7 +109,7 @@ public abstract class LDT implements Named {
      *
      * @return the basic functions of the model
      */
-    protected final Namespace<Operator> functions() {
+    protected final Namespace<Function> functions() {
         return functions;
     }
 
@@ -164,7 +164,7 @@ public abstract class LDT implements Named {
     }
 
     public boolean containsFunction(Function op) {
-        Named n = functions.lookup(op.name());
+        final Operator n = functions.lookup(op.name());
         return (n == op);
     }
 
@@ -229,7 +229,7 @@ public abstract class LDT implements Named {
      * @return the function symbol for the given operation, null if not supported in general or not
      *         supported for this particular operator.
      */
-    public abstract JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public abstract Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
             Services services, ExecutionContext ec);
 
     /**

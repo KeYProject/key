@@ -200,7 +200,7 @@ public class CloseAfterMerge implements BuiltInRule {
         // Create and register the new predicate symbol
         final Name predicateSymbName = new Name(tb.newName("P"));
 
-        final JFunction predicateSymb =
+        final Function predicateSymb =
             new JFunction(predicateSymbName, JavaDLTheory.FORMULA,
                 new ImmutableArray<>(argSorts));
 

@@ -17,6 +17,7 @@ import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -205,7 +206,7 @@ public class OracleGenerator {
 
     private void findConstants(Set<Term> constants, Term term) {
         LOGGER.debug("FindConstants: {} cls {} ", term, term.getClass().getName());
-        if (term.op() instanceof JFunction && term.arity() == 0) {
+        if (term.op() instanceof Function && term.arity() == 0) {
             constants.add(term);
         }
         if (term.op() instanceof ProgramVariable) {
@@ -302,7 +303,7 @@ public class OracleGenerator {
             return new OracleMethodCall(method, args);
         }
         // functions
-        else if (op instanceof JFunction) {
+        else if (op instanceof Function) {
             return translateFunction(term, initialSelect);
         }
         // program variables

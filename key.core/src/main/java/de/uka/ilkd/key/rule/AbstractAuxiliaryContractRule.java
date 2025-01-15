@@ -26,6 +26,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -127,7 +128,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable pv : localOuts) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-            final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
+            final Function anonFunc = new JFunction(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
             final Term elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (anonUpdate == null) {

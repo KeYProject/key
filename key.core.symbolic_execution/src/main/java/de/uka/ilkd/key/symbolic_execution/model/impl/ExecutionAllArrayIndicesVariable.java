@@ -22,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
@@ -70,7 +71,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
             additionalCondition);
         assert parentValue != null;
         TermBuilder tb = getServices().getTermBuilder();
-        JFunction notAValueFunction =
+        Function notAValueFunction =
             new JFunction(new Name(tb.newName(NOT_A_VALUE_NAME)), JavaDLTheory.ANY);
         notAValue = tb.func(notAValueFunction);
     }
@@ -109,14 +110,14 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
                     : getParentValue().getCondition();
             Term arrayTerm = createArrayTerm();
             // Create index constant
-            JFunction constantFunction =
+            Function constantFunction =
                 new JFunction(new Name(tb.newName(ARRAY_INDEX_CONSTANT_NAME)),
                     sideServices.getTypeConverter().getIntegerLDT().targetSort());
             constant = tb.func(constantFunction);
             setName(lazyComputeName()); // Update name because constant has changed
             Term arrayIndex = tb.dotArr(arrayTerm, constant);
             // Create if check
-            JFunction arrayLengthFunction =
+            Function arrayLengthFunction =
                 sideServices.getTypeConverter().getHeapLDT().getLength();
             Term arrayRange = tb.and(tb.geq(constant, tb.zero()),
                 tb.lt(constant, tb.func(arrayLengthFunction, arrayTerm)));

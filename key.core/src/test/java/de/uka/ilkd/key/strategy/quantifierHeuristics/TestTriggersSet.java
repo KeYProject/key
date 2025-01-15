@@ -44,47 +44,47 @@ public class TestTriggersSet {
 
 
     // constant function
-    private JFunction r_a;
-    private JFunction r_b;
-    private JFunction r_c;
+    private Function r_a;
+    private Function r_b;
+    private Function r_c;
 
-    private JFunction s_a;
-    private JFunction s_b;
-    private JFunction s_c;
+    private Function s_a;
+    private Function s_b;
+    private Function s_c;
 
-    private JFunction t_a;
-    private JFunction t_b;
-    private JFunction t_c;
+    private Function t_a;
+    private Function t_b;
+    private Function t_c;
 
     // Rigid function
-    private JFunction frr; // r->r
-    private JFunction f2rr; // r->r
-    private JFunction fsr; // s-> r
-    private JFunction ftr; // t->r
-    private JFunction fstr;// s->t->r
-    private JFunction frstr;// r->s->t->r;
+    private Function frr; // r->r
+    private Function f2rr; // r->r
+    private Function fsr; // s-> r
+    private Function ftr; // t->r
+    private Function fstr;// s->t->r
+    private Function frstr;// r->s->t->r;
 
-    private JFunction gss; // s->s
-    private JFunction grs; // r->s
-    private JFunction gts; // t->s
-    private JFunction grts; // r->t->s
-    private JFunction grsts;// r->s->t->s
+    private Function gss; // s->s
+    private Function grs; // r->s
+    private Function gts; // t->s
+    private Function grts; // r->t->s
+    private Function grsts;// r->s->t->s
 
-    private JFunction htt; // t->t
-    private JFunction hrt; // r -> t
-    private JFunction hst; // s->t
-    private JFunction hrst;// r->s->t
-    private JFunction hrstt;// t->s->t->t
+    private Function htt; // t->t
+    private Function hrt; // r -> t
+    private Function hst; // s->t
+    private Function hrst;// r->s->t
+    private Function hrstt;// t->s->t->t
 
     // Formular function
-    private JFunction pp;// Formula->Formula
-    private JFunction pr;// r->Formula
-    private JFunction ps;// s->Formula
-    private JFunction pt;// t->Formula
-    private JFunction prs;// r->s->Formula
-    private JFunction pst;// s->t->Formula
-    private JFunction prt;// r->t->Formula
-    private JFunction prst;// r->s->t->Formula
+    private Function pp;// Formula->Formula
+    private Function pr;// r->Formula
+    private Function ps;// s->Formula
+    private Function pt;// t->Formula
+    private Function prs;// r->s->Formula
+    private Function pst;// s->t->Formula
+    private Function prt;// r->t->Formula
+    private Function prst;// r->s->t->Formula
     // private Function pi;//ints->Formula
     private Goal g;
 

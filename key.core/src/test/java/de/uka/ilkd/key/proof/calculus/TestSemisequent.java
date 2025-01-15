@@ -33,13 +33,13 @@ public class TestSemisequent {
     @BeforeEach
     public void setUp() {
         TermBuilder TB = TacletForTests.services().getTermBuilder();
-        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, new Sort[] {});
-        JFunction q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, new Sort[] {});
-        JFunction r = new JFunction(new Name("r"), JavaDLTheory.FORMULA, new Sort[] {});
+        Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, new Sort[] {});
+        Function q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, new Sort[] {});
+        Function r = new JFunction(new Name("r"), JavaDLTheory.FORMULA, new Sort[] {});
 
-        JFunction a = new JFunction(new Name("a"), JavaDLTheory.FORMULA, new Sort[] {});
-        JFunction b = new JFunction(new Name("b"), JavaDLTheory.FORMULA, new Sort[] {});
-        JFunction c = new JFunction(new Name("c"), JavaDLTheory.FORMULA, new Sort[] {});
+        Function a = new JFunction(new Name("a"), JavaDLTheory.FORMULA, new Sort[] {});
+        Function b = new JFunction(new Name("b"), JavaDLTheory.FORMULA, new Sort[] {});
+        Function c = new JFunction(new Name("c"), JavaDLTheory.FORMULA, new Sort[] {});
 
 
         Term t_p = TB.func(p, new Term[] {});

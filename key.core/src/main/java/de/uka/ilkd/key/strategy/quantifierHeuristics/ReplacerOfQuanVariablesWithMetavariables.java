@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
@@ -34,7 +35,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
                 Metavariable mv = new Metavariable(ARBITRARY_NAME, q.sort());
                 m = services.getTermBuilder().var(mv);
             } else {
-                JFunction f = new JFunction(ARBITRARY_NAME, q.sort(), new Sort[0]);
+                Function f = new JFunction(ARBITRARY_NAME, q.sort(), new Sort[0]);
                 m = services.getTermBuilder().func(f);
             }
             res = res.put(q, m);

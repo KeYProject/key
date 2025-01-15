@@ -11,6 +11,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -35,8 +36,8 @@ public class TestPosInOcc {
     public void testIterator() {
         Sort sort1 = new SortImpl(new Name("S1"));
         LogicVariable x = new LogicVariable(new Name("x"), sort1);
-        JFunction f = new JFunction(new Name("f"), sort1, sort1);
-        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
+        Function f = new JFunction(new Name("f"), sort1, sort1);
+        Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
 
 
         Term[] terms = new Term[3];
@@ -80,9 +81,9 @@ public class TestPosInOcc {
     public void testReplaceConstrainedFormula() {
         Sort sort1 = new SortImpl(new Name("S1"));
         LogicVariable x = new LogicVariable(new Name("x"), sort1);
-        JFunction c = new JFunction(new Name("c"), sort1, new Sort[] {});
-        JFunction f = new JFunction(new Name("f"), sort1, sort1);
-        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
+        Function c = new JFunction(new Name("c"), sort1, new Sort[] {});
+        Function f = new JFunction(new Name("f"), sort1, sort1);
+        Function p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, sort1);
 
         Term[] terms = new Term[3];
         terms[0] = TB.var(x);

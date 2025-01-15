@@ -778,7 +778,7 @@ public class Recoder2KeYConverter {
         }
 
 
-        JFunction named = (JFunction) namespaceSet.functions().lookup(new Name(name));
+        final JFunction named = (JFunction) namespaceSet.functions().lookup(new Name(name));
 
         if (named == null) {
             // TODO provide position information?!

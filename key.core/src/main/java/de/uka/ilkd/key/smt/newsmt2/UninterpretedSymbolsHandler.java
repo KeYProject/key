@@ -8,12 +8,12 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.JFunction;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
@@ -40,7 +40,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
 
     @Override
     public boolean canHandle(Operator op) {
-        return (op instanceof JFunction && !bindsVars(op)) || op instanceof ProgramVariable;
+        return (op instanceof Function && !bindsVars(op)) || op instanceof ProgramVariable;
     }
 
     /*
