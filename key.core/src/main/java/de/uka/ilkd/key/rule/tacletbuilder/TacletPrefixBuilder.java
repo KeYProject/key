@@ -11,7 +11,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.NotFreeIn;
+import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;

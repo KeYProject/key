@@ -14,10 +14,10 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.rules.NewDependingOn;
-import org.key_project.prover.rules.NewVarcond;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NewVarcond;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
