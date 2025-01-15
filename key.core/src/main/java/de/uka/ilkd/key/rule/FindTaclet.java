@@ -29,7 +29,7 @@ public abstract class FindTaclet extends Taclet {
     /** contains the find term */
     protected final Term find;
 
-    /** Set of schemavariables of the if and the (optional) find part */
+    /** Set of schema variables of the if and the (optional) find part */
     private ImmutableSet<SchemaVariable> ifFindVariables = null;
 
     /**

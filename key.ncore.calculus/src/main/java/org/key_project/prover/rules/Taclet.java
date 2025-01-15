@@ -29,7 +29,7 @@ public abstract class Taclet implements Rule {
     protected final Name name;
 
     /** name displayed by the pretty printer */
-    private final String displayName;
+    protected final String displayName;
 
     /**
      * the <tt>assumes</tt> sequent of the taclet
@@ -79,7 +79,7 @@ public abstract class Taclet implements Rule {
 
     protected String tacletAsString;
 
-    /** Set of schemavariables of the {@code assumes} part */
+    /** Set of schema variables of the {@code assumes} part */
     protected ImmutableSet<SchemaVariable> assumesVariables = null;
 
     /**
@@ -87,10 +87,18 @@ public abstract class Taclet implements Rule {
      */
     protected final ImmutableList<RuleSet> ruleSets;
 
+    /**
+     * trigger of the taclet
+     */
     protected final Trigger trigger;
 
     /* TODO: find better solution */
     private final boolean surviveSymbExec;
+
+    // The two rule engines for matching and execution (application) of taclets
+    // In the long run, we should think about keeping those somewhere else, e.g., in the services
+    // such that we gain more flexibility like combined matchers that do not just match one taclet
+    // but all at once for a given term.
 
     /**
      * The taclet matcher

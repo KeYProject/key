@@ -76,16 +76,6 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class Taclet extends org.key_project.prover.rules.Taclet implements Rule {
 
-
-    public RuleJustification getRuleJustification() {
-        if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
-            return LemmaJustification.INSTANCE;
-        } else {
-            return AxiomJustification.INSTANCE;
-        }
-    }
-
-
     /** the set of taclet options for this taclet */
     protected final ChoiceExpr choices;
 
@@ -96,14 +86,6 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
 
     /** Integer to cache the hashcode */
     private int hashcode = 0;
-
-
-    // The two rule engines for matching and execution (application) of taclets
-    // In the long run, we should think about keeping those somewhere else, e.g., in the services
-    // such that we gain more flexibility like combined matchers that do not just match one taclet
-    // but
-    // all at once for a given term.
-
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
@@ -154,6 +136,15 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     }
 
     protected abstract void createAndInitializeExecutor();
+
+    public RuleJustification getRuleJustification() {
+        if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
+            return LemmaJustification.INSTANCE;
+        } else {
+            return AxiomJustification.INSTANCE;
+        }
+    }
+
 
     /**
      * computes and returns all variables that occur bound in the taclet including the taclets
@@ -285,34 +276,6 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         return svNameCorrespondences.get(p);
     }
 
-    StringBuffer toStringAttribs(StringBuffer sb) {
-        // if (noninteractive()) sb = sb.append(" \\noninteractive");
-        sb.append("\nChoices: ").append(choices);
-        return sb;
-    }
-
-    /**
-     * returns a representation of the Taclet as String
-     *
-     * @return string representation
-     */
-    @Override
-    public String toString() {
-        if (tacletAsString == null) {
-            // FIXME this essentially reimplements PrettyPrinter::printTaclet
-            StringBuffer sb = new StringBuffer();
-            sb = sb.append(name()).append(" {\n");
-            sb = toStringAssumes(sb);
-            sb = toStringVarCond(sb);
-            sb = toStringGoalTemplates(sb);
-            sb = toStringRuleSets(sb);
-            sb = toStringAttribs(sb);
-            sb = toStringTriggers(sb);
-            tacletAsString = sb.append("}").toString();
-        }
-        return tacletAsString;
-    }
-
     /**
      * @return true iff <code>this</code> taclet may be applied for the given mode
      *         (interactive/non-interactive, activated rule sets)
@@ -366,8 +329,6 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
 
         return result;
     }
-
-
 
     private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
         for (SequentFormula cf : s) {
@@ -576,7 +537,6 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
 
     public abstract Taclet setName(String s);
 
-
     /**
      * Information about the origin of the taclet. Should be a location where the user can find the
      * declaration of the taclet.
@@ -592,5 +552,33 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
 
     public void setOrigin(@Nullable String origin) {
         this.origin = origin;
+    }
+
+    StringBuffer toStringAttribs(StringBuffer sb) {
+        // if (noninteractive()) sb = sb.append(" \\noninteractive");
+        sb.append("\nChoices: ").append(choices);
+        return sb;
+    }
+
+    /**
+     * returns a representation of the Taclet as String
+     *
+     * @return string representation
+     */
+    @Override
+    public String toString() {
+        if (tacletAsString == null) {
+            // FIXME this essentially reimplements PrettyPrinter::printTaclet
+            StringBuffer sb = new StringBuffer();
+            sb = sb.append(name()).append(" {\n");
+            sb = toStringAssumes(sb);
+            sb = toStringVarCond(sb);
+            sb = toStringGoalTemplates(sb);
+            sb = toStringRuleSets(sb);
+            sb = toStringAttribs(sb);
+            sb = toStringTriggers(sb);
+            tacletAsString = sb.append("}").toString();
+        }
+        return tacletAsString;
     }
 }
