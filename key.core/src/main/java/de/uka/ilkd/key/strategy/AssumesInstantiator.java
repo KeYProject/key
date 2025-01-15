@@ -73,8 +73,8 @@ public class AssumesInstantiator {
             addResult(tacletAppContainer.getTacletApp());
         } else {
             final Services services = getServices();
-            allAntecFormulas = AssumesFormulaInstSeq.createList(p_seq, true, services);
-            allSuccFormulas = AssumesFormulaInstSeq.createList(p_seq, false, services);
+            allAntecFormulas = AssumesFormulaInstSeq.createList(p_seq, true);
+            allSuccFormulas = AssumesFormulaInstSeq.createList(p_seq, false);
             findIfFormulaInstantiationsHelp(ifSequent.succedent().asList().reverse(), //// Matching
                                                                                       //// with the
                                                                                       //// last

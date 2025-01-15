@@ -12,7 +12,14 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- * Instantiation of an if-formula that is a formula of an existing sequent.
+ * Instantiation of an assumes-formula that is present as a formula of the proof goal's sequent.
+ * <p>
+ * This instantiation kind is used if the formula used as an instantiation for one of the sequent's
+ * assumes formulas is syntactically present. In that case the instantiation has not to be proven
+ * to be valid as part of a separate proof goal.
+ * </p>
+ *
+ * @see AssumesFormulaInstantiation,AssumesFormulaInstDirect
  */
 public class AssumesFormulaInstSeq
         implements AssumesFormulaInstantiation {
@@ -21,31 +28,30 @@ public class AssumesFormulaInstSeq
      */
     private final Sequent seq;
     private final boolean antec; // formula is in antecedent?
-    private final SequentFormula cf;
+    private final SequentFormula instantiation;
 
-    public AssumesFormulaInstSeq(Sequent p_seq, boolean antec, SequentFormula p_cf) {
-        seq = p_seq;
+    public AssumesFormulaInstSeq(Sequent seq, boolean antec, SequentFormula instantiation) {
+        this.seq = seq;
         this.antec = antec;
-        cf = p_cf;
+        this.instantiation = instantiation;
     }
 
-
-    public AssumesFormulaInstSeq(Sequent seq, int formulaNr) {
-        this(seq, seq.numberInAntec(formulaNr), seq.getFormulabyNr(formulaNr));
+    public AssumesFormulaInstSeq(Sequent instantiation, int indexPositionInSequent) {
+        this(instantiation, instantiation.numberInAntec(indexPositionInSequent),
+            instantiation.getFormulabyNr(indexPositionInSequent));
     }
-
 
     /**
      * @return the cf this is pointing to
      */
     @Override
     public SequentFormula getSequentFormula() {
-        return cf;
+        return instantiation;
     }
 
     @Override
     public String toString(LogicServices services) {
-        return cf.formula().toString();
+        return instantiation.formula().toString();
     }
 
     /**
@@ -74,8 +80,7 @@ public class AssumesFormulaInstSeq
     }
 
     public static <SF extends SequentFormula> ImmutableArray<AssumesFormulaInstantiation> createList(
-            Sequent p_s, boolean antec,
-            LogicServices services) {
+            Sequent p_s, boolean antec) {
         return createListHelp(p_s, antec);
     }
 
@@ -89,14 +94,14 @@ public class AssumesFormulaInstSeq
         if (!(p_obj instanceof AssumesFormulaInstSeq other)) {
             return false;
         }
-        return seq == other.seq && cf == other.cf && antec == other.antec;
+        return seq == other.seq && instantiation == other.instantiation && antec == other.antec;
     }
 
     @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + seq.hashCode();
-        result = 37 * result + cf.hashCode();
+        result = 37 * result + instantiation.hashCode();
         result = 37 * result + (antec ? 0 : 1);
         return result;
     }
@@ -109,7 +114,8 @@ public class AssumesFormulaInstSeq
 
     public PosInOccurrence toPosInOccurrence() {
         if (pioCache == null) {
-            PosInOccurrence localPioCache = new PosInOccurrence(cf, PosInTerm.getTopLevel(), antec);
+            PosInOccurrence localPioCache =
+                new PosInOccurrence(instantiation, PosInTerm.getTopLevel(), antec);
             pioCache = localPioCache;
         }
         return pioCache;
