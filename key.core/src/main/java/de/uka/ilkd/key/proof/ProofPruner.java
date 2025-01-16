@@ -67,7 +67,8 @@ class ProofPruner {
             }
 
             if (initConfig != null && visitedNode.parent() != null) {
-                proof.getServices().getDepRepo().ruleUnApplied(visitedNode.parent().getAppliedRuleApp(), proof);
+                proof.getServices().getProject().getDepRepo()
+                        .ruleUnApplied(visitedNode.parent().getAppliedRuleApp(), proof);
                 for (final NoPosTacletApp app : visitedNode.parent()
                         .getLocalIntroducedRules()) {
                     initConfig.getJustifInfo().removeJustificationFor(app.taclet());

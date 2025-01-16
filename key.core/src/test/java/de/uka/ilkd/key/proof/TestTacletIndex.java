@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
@@ -144,7 +145,7 @@ public class TestTacletIndex {
 
     @Test
     public void testShownIfHeuristicFits() {
-        Services services = new Services(AbstractProfile.getDefaultProfile());
+        Services services = new Services(Project.DUMMY, AbstractProfile.getDefaultProfile());
         ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
         listofHeuristic = listofHeuristic.prepend(h3).prepend(h2);
 
@@ -177,7 +178,7 @@ public class TestTacletIndex {
 
     @Test
     public void testNoMatchingFindRule() {
-        Services services = new Services(AbstractProfile.getDefaultProfile());
+        Services services = new Services(Project.DUMMY, AbstractProfile.getDefaultProfile());
         ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
 
         Term term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
@@ -204,7 +205,7 @@ public class TestTacletIndex {
 
     @Test
     public void testMatchConflictOccurs() {
-        Services services = new Services(AbstractProfile.getDefaultProfile());
+        Services services = new Services(Project.DUMMY, AbstractProfile.getDefaultProfile());
         TacletIndex ruleIdx = TacletIndexKit.getKit().createTacletIndex();
         ruleIdx.add(ruleRewriteNonH1H2);
         ruleIdx.add(ruleNoFindNonH1H2H3);
@@ -257,7 +258,8 @@ public class TestTacletIndex {
 
     private RuleAppIndex createGoalFor(Sequent seq_p5, TacletIndex ruleIdx) {
         final Node node_p5 = new Node(new Proof("TestTacletIndex",
-            new InitConfig(new Services(AbstractProfile.getDefaultProfile()))), seq_p5);
+            new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile()))),
+            seq_p5);
         final BuiltInRuleAppIndex builtinIdx = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
         final Goal goal_p5 =
             new Goal(node_p5, ruleIdx, builtinIdx, node_p5.proof().getServices());

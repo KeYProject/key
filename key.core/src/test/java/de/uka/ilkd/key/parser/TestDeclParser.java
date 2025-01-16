@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.mgt.Project;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -40,7 +41,7 @@ public class TestDeclParser {
 
     @BeforeEach
     public void setUp() {
-        serv = new Services(AbstractProfile.getDefaultProfile());
+        serv = new Services(Project.DUMMY, AbstractProfile.getDefaultProfile());
         nss = serv.getNamespaces();
         io = new KeyIO(serv, nss);
         NamespaceBuilder nb = new NamespaceBuilder(nss);

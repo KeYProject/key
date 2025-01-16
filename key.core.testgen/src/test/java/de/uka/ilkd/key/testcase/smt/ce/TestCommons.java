@@ -167,7 +167,7 @@ public abstract class TestCommons {
         try {
             KeYUserProblemFile po = new KeYUserProblemFile(file.getName(), file, null, pro);
             if (initializer == null) {
-                initializer = new ProblemInitializer(po.getProfile());
+                initializer = new ProblemInitializer(po.getProject(), po.getProfile());
             }
             initConfig = initializer.prepare(po);
             result = initializer.startProver(initConfig, po);

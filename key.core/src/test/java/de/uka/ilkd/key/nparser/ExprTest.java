@@ -9,6 +9,7 @@ import java.net.URL;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.junit.jupiter.api.Assumptions;
@@ -42,7 +43,7 @@ public class ExprTest {
     }
 
     private KeyIO getIo() throws IOException {
-        Services services = new Services(new JavaProfile());
+        Services services = new Services(Project.DUMMY, new JavaProfile());
         String p = "/de/uka/ilkd/key/proof/rules/ldt.key";
         URL url = getClass().getResource(p);
         Assumptions.assumeTrue(url != null);

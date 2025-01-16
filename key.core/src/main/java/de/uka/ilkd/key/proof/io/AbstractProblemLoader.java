@@ -529,7 +529,8 @@ public abstract class AbstractProblemLoader {
      */
     protected ProblemInitializer createProblemInitializer(FileRepo fileRepo) {
         Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
-        ProblemInitializer pi = new ProblemInitializer(control, new Services(profile), control);
+        ProblemInitializer pi =
+            new ProblemInitializer(control, new Services(envInput.getProject(), profile), control);
         pi.setFileRepo(fileRepo);
         return pi;
     }

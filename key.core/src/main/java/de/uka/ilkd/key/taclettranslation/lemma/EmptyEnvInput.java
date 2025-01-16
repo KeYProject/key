@@ -9,6 +9,7 @@ import java.util.Collections;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -31,4 +32,8 @@ public class EmptyEnvInput extends AbstractEnvInput {
         return null;
     }
 
+    @Override
+    public Project getProject() {
+        return Project.DUMMY;
+    }
 }

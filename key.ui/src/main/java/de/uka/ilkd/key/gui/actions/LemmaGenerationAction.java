@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
@@ -210,14 +211,13 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             List<File> filesForAxioms = chooser.getFilesForAxioms();
             Profile profile = mainWindow.getMediator().getProfile();
             final ProblemInitializer problemInitializer =
-                new ProblemInitializer(mainWindow.getUserInterface(), new Services(profile),
+                new ProblemInitializer(mainWindow.getUserInterface(),
+                    new Services(Project.DUMMY, profile),
                     mainWindow.getUserInterface());
 
             TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(
                 mainWindow.getUserInterface(), mainWindow.getUserInterface(), problemInitializer,
                 profile, fileForLemmata, filesForAxioms);
-
-
 
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
@@ -287,7 +287,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             List<File> filesForAxioms = chooser.getFilesForAxioms();
             final ProblemInitializer problemInitializer =
                 new ProblemInitializer(mainWindow.getUserInterface(),
-                    new Services(proof.getServices().getProfile()), mainWindow.getUserInterface());
+                    new Services(proof.getServices().getProject(),
+                        proof.getServices().getProfile()),
+                    mainWindow.getUserInterface());
 
             TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(
                 mainWindow.getUserInterface(), mainWindow.getUserInterface(), problemInitializer,

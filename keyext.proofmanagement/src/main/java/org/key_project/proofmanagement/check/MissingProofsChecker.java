@@ -41,8 +41,9 @@ public class MissingProofsChecker implements Checker {
 
         Profile profile = AbstractProfile.getDefaultProfile();
         ProgressMonitor control = ProgressMonitor.Empty.getInstance();
-        ProblemInitializer pi = new ProblemInitializer(control, new Services(profile),
-            new DefaultUserInterfaceControl());
+        ProblemInitializer pi =
+            new ProblemInitializer(control, new Services(data.getSlenv().getProject(), profile),
+                new DefaultUserInterfaceControl());
         pi.setFileRepo(new TrivialFileRepo());
 
         SLEnvInput slenv = data.getSlenv();

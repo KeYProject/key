@@ -72,7 +72,7 @@ public class HelperClassForTests {
 
         try {
             KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
-            pi = new ProblemInitializer(profile);
+            pi = new ProblemInitializer(po.getProject(), profile);
 
             result = pi.startProver(po, po);
 
@@ -90,7 +90,7 @@ public class HelperClassForTests {
     public ProofAggregate parseThrowException(File file, Profile profile)
             throws ProofInputException {
         KeYUserProblemFile po = new KeYUserProblemFile("UpdatetermTest", file, null, profile);
-        ProblemInitializer pi = new ProblemInitializer(profile);
+        ProblemInitializer pi = new ProblemInitializer(po.getProject(), profile);
         return pi.startProver(po, po);
     }
 

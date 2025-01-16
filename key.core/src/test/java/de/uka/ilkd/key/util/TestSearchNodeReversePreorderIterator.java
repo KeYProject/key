@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.Project;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -31,7 +32,8 @@ public class TestSearchNodeReversePreorderIterator {
     public void testNodesThreeLevel() {
         // Create tree to test
         Proof proof =
-            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new Proof("target",
+                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         Node l11 = appendNode(proof, l1);
@@ -57,7 +59,8 @@ public class TestSearchNodeReversePreorderIterator {
     public void testNodesTwoLevel() {
         // Create tree to test
         Proof proof =
-            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new Proof("target",
+                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         appendNode(proof, l1);
@@ -80,7 +83,8 @@ public class TestSearchNodeReversePreorderIterator {
     public void testNodesOneLevel() {
         // Create tree to test
         Proof proof =
-            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new Proof("target",
+                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         appendNode(proof, root);
         appendNode(proof, root);
@@ -97,7 +101,8 @@ public class TestSearchNodeReversePreorderIterator {
     public void testEmptyRoot() {
         // Create tree to test
         Proof proof =
-            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new Proof("target",
+                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         // Test tree
         assertRoot(root);

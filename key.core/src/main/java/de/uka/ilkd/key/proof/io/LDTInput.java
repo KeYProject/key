@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -187,6 +188,11 @@ public class LDTInput implements EnvInput {
     @Override
     public Profile getProfile() {
         return profile;
+    }
+
+    @Override
+    public Project getProject() {
+        return Project.DUMMY;
     }
 
     @Override

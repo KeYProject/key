@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.mgt.DependencyRepository;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
@@ -72,7 +72,7 @@ public class Services implements TermServices, LogicServices {
      */
     private SpecificationRepository specRepos;
 
-    private DependencyRepository depRepo;
+    private Project project;
 
     /*
      * the Java model (with all paths)
@@ -98,7 +98,7 @@ public class Services implements TermServices, LogicServices {
      * creates a new Services object with a new TypeConverter and a new JavaInfo object with no
      * information stored at none of these.
      */
-    public Services(Profile profile) {
+    public Services(Project project, Profile profile) {
         assert profile != null;
         this.profile = profile;
         this.counters = new LinkedHashMap<>();
@@ -106,7 +106,7 @@ public class Services implements TermServices, LogicServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.specRepos = new SpecificationRepository(this);
-        this.depRepo = new DependencyRepository(this);
+        this.project = project;
         cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
         javainfo = new JavaInfo(
@@ -114,7 +114,7 @@ public class Services implements TermServices, LogicServices {
         nameRecorder = new NameRecorder();
     }
 
-    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc,
+    private Services(Project project, Profile profile, KeYCrossReferenceServiceConfiguration crsc,
             KeYRecoderMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
@@ -126,7 +126,7 @@ public class Services implements TermServices, LogicServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.specRepos = new SpecificationRepository(this);
-        this.depRepo = new DependencyRepository(this);
+        this.project = project;
         cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
         javainfo = new JavaInfo(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
@@ -142,7 +142,7 @@ public class Services implements TermServices, LogicServices {
         this.javainfo = s.javainfo;
         this.counters = s.counters;
         this.specRepos = s.specRepos;
-        this.depRepo = s.depRepo;
+        this.project = s.project;
         this.javaModel = s.javaModel;
         this.nameRecorder = s.nameRecorder;
         this.factory = s.factory;
@@ -242,16 +242,18 @@ public class Services implements TermServices, LogicServices {
      *        will use a new empty {@link ServiceCaches} instance.
      * @return The created copy.
      */
+    // TODO: DD: New project?
     public Services copy(Profile profile, boolean shareCaches) {
         Debug.assertTrue(
             !(getJavaInfo().getKeYProgModelInfo()
                     .getServConf() instanceof SchemaCrossReferenceServiceConfiguration),
             "services: tried to copy schema cross reference service config.");
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        Services s = new Services(profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
-            getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
+        Services s =
+            new Services(project, profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
+                getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
         s.specRepos = specRepos;
-        s.depRepo = depRepo;
+        s.project = project;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
@@ -291,7 +293,7 @@ public class Services implements TermServices, LogicServices {
             !(javainfo.getKeYProgModelInfo()
                     .getServConf() instanceof SchemaCrossReferenceServiceConfiguration),
             "services: tried to copy schema cross reference service config.");
-        Services s = new Services(getProfile());
+        Services s = new Services(getProject(), getProfile());
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
@@ -367,12 +369,12 @@ public class Services implements TermServices, LogicServices {
         return proof;
     }
 
-    public DependencyRepository getDepRepo() {
-        return depRepo;
-    }
-
     public interface ITermProgramVariableCollectorFactory {
         TermProgramVariableCollector create(Services services);
+    }
+
+    public Project getProject() {
+        return project;
     }
 
     /**

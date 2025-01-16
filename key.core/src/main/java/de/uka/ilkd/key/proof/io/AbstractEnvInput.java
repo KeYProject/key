@@ -12,7 +12,6 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
-
 /**
  * A simple EnvInput which includes default rules and a Java path.
  */

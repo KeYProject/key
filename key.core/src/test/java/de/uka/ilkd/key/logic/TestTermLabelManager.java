@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -610,7 +611,7 @@ public class TestTermLabelManager {
     @Test
     public void testGetTermLabelManager() {
         Assertions.assertNull(TermLabelManager.getTermLabelManager(null));
-        Services services = new Services(JavaProfile.getDefaultProfile());
+        Services services = new Services(Project.DUMMY, JavaProfile.getDefaultProfile());
         TermLabelManager manager = TermLabelManager.getTermLabelManager(services);
         assertSame(services.getProfile().getTermLabelManager(), manager);
         TermLabelManager managerAgain = TermLabelManager.getTermLabelManager(services);

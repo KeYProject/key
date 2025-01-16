@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
@@ -137,7 +138,8 @@ public abstract class AbstractUserInterfaceControl
     @Override
     public Proof createProof(InitConfig initConfig, ProofOblInput input)
             throws ProofInputException {
-        ProblemInitializer init = createProblemInitializer(initConfig.getProfile());
+        ProblemInitializer init = createProblemInitializer(initConfig.getServices().getProject(),
+            initConfig.getProfile());
         ProofAggregate proofList = init.startProver(initConfig, input);
         createProofEnvironmentAndRegisterProof(input, proofList, initConfig);
         return proofList.getFirstProof();
@@ -245,8 +247,8 @@ public abstract class AbstractUserInterfaceControl
      * @param profile The {@link Profile} to use.
      * @return The instantiated {@link ProblemInitializer}.
      */
-    protected ProblemInitializer createProblemInitializer(Profile profile) {
-        return new ProblemInitializer(this, new Services(profile), this);
+    protected ProblemInitializer createProblemInitializer(Project project, Profile profile) {
+        return new ProblemInitializer(this, new Services(project, profile), this);
     }
 
     @Override

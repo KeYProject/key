@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Name;
@@ -45,7 +46,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
 
     @BeforeEach
     public void setUp() throws IOException {
-        services = new Services(AbstractProfile.getDefaultProfile());
+        services = new Services(Project.DUMMY, AbstractProfile.getDefaultProfile());
         nss = services.getNamespaces();
         tf = services.getTermFactory();
         io = new KeyIO(services, nss);

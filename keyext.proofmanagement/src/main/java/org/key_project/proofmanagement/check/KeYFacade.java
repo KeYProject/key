@@ -175,8 +175,9 @@ public final class KeYFacade {
         // TODO: do we need this?
         profile = keyFile.getProfile() == null ? profile : keyFile.getProfile();
 
-        ProblemInitializer pi = new ProblemInitializer(control, new Services(profile),
-            new DefaultUserInterfaceControl());
+        ProblemInitializer pi =
+            new ProblemInitializer(control, new Services(keyFile.getProject(), profile),
+                new DefaultUserInterfaceControl());
         pi.setFileRepo(fileRepo);
         line.problemInitializer = pi;
 

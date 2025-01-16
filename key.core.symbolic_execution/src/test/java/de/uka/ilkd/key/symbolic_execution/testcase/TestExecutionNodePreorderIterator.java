@@ -12,6 +12,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodePreorderIterator;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.AbstractKeYlessExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStart;
@@ -37,7 +38,8 @@ public class TestExecutionNodePreorderIterator {
     public void testNodesThreeLevel() throws ProofInputException {
         // Create tree to test
         Proof proof =
-            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new Proof("target",
+                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         Node l11 = appendNode(proof, l1);
@@ -86,7 +88,8 @@ public class TestExecutionNodePreorderIterator {
     public void testNodesTwoLevel() throws ProofInputException {
         // Create tree to test
         Proof proof =
-            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new Proof("target",
+                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         Node l11 = appendNode(proof, l1);
@@ -126,7 +129,8 @@ public class TestExecutionNodePreorderIterator {
     public void testNodesOneLevel() throws ProofInputException {
         // Create tree to test
         Proof proof =
-            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new Proof("target",
+                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node child1 = appendNode(proof, root);
         Node child2 = appendNode(proof, root);
@@ -166,7 +170,8 @@ public class TestExecutionNodePreorderIterator {
     public void testEmptyRoot() throws ProofInputException {
         // Create tree to test
         Proof proof =
-            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new Proof("target",
+                new InitConfig(new Services(Project.DUMMY, AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         // Create execution test model
         TreeSettings settings = new TreeSettings(false, false, false, false, false);

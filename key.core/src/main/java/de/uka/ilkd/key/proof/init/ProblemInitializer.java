@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
@@ -77,14 +78,15 @@ public final class ProblemInitializer {
         this.listener = listener;
     }
 
-    public ProblemInitializer(Profile profile) {
+    public ProblemInitializer(Project project, Profile profile) {
         if (profile == null) {
             throw new IllegalArgumentException("Given profile is null");
         }
 
         this.progMon = null;
         this.listener = null;
-        this.services = new Services(Objects.requireNonNull(profile));
+        this.services =
+            new Services(Objects.requireNonNull(project), Objects.requireNonNull(profile));
     }
 
     private void progressStarted(Object sender) {

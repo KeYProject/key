@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -84,6 +85,8 @@ public interface EnvInput {
      * @return The {@link Profile} to use.
      */
     Profile getProfile();
+
+    Project getProject();
 
     /**
      * Returns the initial {@link File} which is loaded if available.

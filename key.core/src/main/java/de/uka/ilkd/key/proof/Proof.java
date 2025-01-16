@@ -183,7 +183,7 @@ public class Proof implements Named {
         settingsListener = config -> updateStrategyOnGoals();
 
         localMgt = new ProofCorrectnessMgt(this);
-        services.getDepRepo().initialize(this);
+        services.getProject().getDepRepo().initialize(this);
 
         initConfig.getSettings().getStrategySettings().addPropertyChangeListener(settingsListener);
 

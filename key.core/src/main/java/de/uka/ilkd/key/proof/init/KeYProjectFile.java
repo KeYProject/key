@@ -5,14 +5,17 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.DependencyRepository;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
@@ -33,6 +36,7 @@ public class KeYProjectFile implements EnvInput {
     private InitConfig initConfig;
     private Path dependenciesPath;
     private Dependencies dependencies;
+    private final Project project;
 
     public KeYProjectFile(File folder, FileRepo fileRepo, ProblemLoaderControl control,
             Profile profile) {
@@ -44,6 +48,7 @@ public class KeYProjectFile implements EnvInput {
         this.profile = profile;
         dependenciesPath = projectFolder.resolve("src").resolve("main").resolve("key")
                 .resolve("dependencies.json");
+        project = Project.create(this);
     }
 
     @Override
@@ -94,6 +99,11 @@ public class KeYProjectFile implements EnvInput {
     }
 
     @Override
+    public Project getProject() {
+        return project;
+    }
+
+    @Override
     public File getInitialFile() {
         return projectFolder.toFile();
     }
@@ -107,8 +117,9 @@ public class KeYProjectFile implements EnvInput {
             this.dependencies = gson.fromJson(content, Dependencies.class);
 
             // add entries from json file to DependencyRepository
-            DependencyRepository depRepo = initConfig.getServices().getDepRepo();
-            SpecificationRepository specRepo = initConfig.getServices().getSpecificationRepository();
+            DependencyRepository depRepo = initConfig.getServices().getProject().getDepRepo();
+            SpecificationRepository specRepo =
+                initConfig.getServices().getSpecificationRepository();
             for (ContractInfo c : dependencies.contracts()) {
                 Contract from = specRepo.getContractByName(c.name());
                 for (DependencyEntry d : c.dependencies()) {
@@ -123,6 +134,26 @@ public class KeYProjectFile implements EnvInput {
             throw new RuntimeException(e);
         }
         return warnings;
+    }
+
+    public void flush() {
+        List<ContractInfo> cis = new ArrayList<>();
+        for (var c : project.getDepRepo().getContractsWithDependencies()) {
+            List<DependencyEntry> deps = new ArrayList<>();
+            for (var d : project.getDepRepo().getDependencies(c)) {
+                deps.add(new DependencyEntry(d.getName(), d.hashCode()));
+            }
+            cis.add(new ContractInfo(c.getName(), c.hashCode(), -1, ProofStatus.OPEN, deps));
+        }
+        var dependencies = new Dependencies(cis);
+        // Write
+        var gson = new Gson();
+        try {
+            Files.writeString(dependenciesPath, gson.toJson(dependencies), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            // TODO: DD: Logging
+            throw new RuntimeException(e);
+        }
     }
 
     private record Dependencies(List<ContractInfo> contracts) {

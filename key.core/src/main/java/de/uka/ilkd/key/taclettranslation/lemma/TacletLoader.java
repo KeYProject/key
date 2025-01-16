@@ -103,7 +103,8 @@ public abstract class TacletLoader {
         if (proofEnvironment == null) {
             EmptyEnvInput envInput = new EmptyEnvInput(profile);
             ProblemInitializer pi =
-                new ProblemInitializer(monitor, new Services(profile), listener);
+                new ProblemInitializer(monitor, new Services(envInput.getProject(), profile),
+                    listener);
 
             try {
                 proofEnvironment = new ProofEnvironment(pi.prepare(envInput));

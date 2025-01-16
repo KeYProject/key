@@ -26,6 +26,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.Configuration;
@@ -65,6 +66,7 @@ public class KeYFile implements EnvInput {
     private @Nullable ProblemFinder problemFinder = null;
     private @Nullable ProblemInformation problemInformation = null;
     private Includes includes;
+    private final Project project;
 
     /**
      * The FileRepo that will store the files.
@@ -80,6 +82,7 @@ public class KeYFile implements EnvInput {
         this.file = Objects.requireNonNull(file);
         this.monitor = monitor;
         this.profile = Objects.requireNonNull(profile);
+        project = new Project();
     }
 
 
@@ -463,6 +466,11 @@ public class KeYFile implements EnvInput {
     @Override
     public Profile getProfile() {
         return profile;
+    }
+
+    @Override
+    public Project getProject() {
+        return project;
     }
 
     @Override

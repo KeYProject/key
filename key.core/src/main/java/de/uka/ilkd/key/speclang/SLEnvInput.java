@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.io.AbstractEnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -49,7 +50,7 @@ import org.key_project.util.collection.ImmutableSet;
  * EnvInput for standalone specification language front ends.
  */
 public final class SLEnvInput extends AbstractEnvInput {
-
+    private final Project project;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -59,6 +60,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             List<File> includes) {
         super(getLanguage() + " specifications", javaPath, classPath, bootClassPath, profile,
             includes);
+        project = new Project();
     }
 
 
@@ -399,5 +401,10 @@ public final class SLEnvInput extends AbstractEnvInput {
     @Override
     public File getInitialFile() {
         return null;
+    }
+
+    @Override
+    public Project getProject() {
+        return project;
     }
 }

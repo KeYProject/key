@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
@@ -209,7 +210,7 @@ public class TestCollisionResolving {
 
     @Test
     public void testNameConflict1() {
-        Services services = new Services(AbstractProfile.getDefaultProfile());
+        Services services = new Services(Project.DUMMY, AbstractProfile.getDefaultProfile());
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup(new Name("v"));
         FindTaclet taclet =

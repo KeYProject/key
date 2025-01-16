@@ -7,13 +7,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -112,7 +108,8 @@ public final class ProofCorrectnessMgt {
                         return false;
                     }
                 } else {
-                    DependencyRepository depRepo = proof.getInitConfig().getServices().getDepRepo();
+                    DependencyRepository depRepo =
+                        proof.getInitConfig().getServices().getProject().getDepRepo();
                     for (Contract contractUsedForEnd : depRepo.getDependencies(end)) {
                         if (!path.contains(contractUsedForEnd)) {
                             final ImmutableList<Contract> extendedPath =

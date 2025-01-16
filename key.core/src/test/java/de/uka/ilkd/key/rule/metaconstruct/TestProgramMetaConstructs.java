@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -39,7 +40,8 @@ public class TestProgramMetaConstructs {
         DoBreak rmLabel = new DoBreak(labeledBlock);
 
         ProgramElement result =
-            rmLabel.transform(rmLabel.body(), new Services(AbstractProfile.getDefaultProfile()),
+            rmLabel.transform(rmLabel.body(),
+                new Services(Project.DUMMY, AbstractProfile.getDefaultProfile()),
                 SVInstantiations.EMPTY_SVINSTANTIATIONS)[0];
         assertTrue(result instanceof Break);
     }
@@ -61,14 +63,15 @@ public class TestProgramMetaConstructs {
             TacletForTests.parsePrg("{while(true) {if (true) break; else continue;}}");
         WhileLoopTransformation trans =
             new WhileLoopTransformation(block2, new ProgramElementName("l1"),
-                new ProgramElementName("l2"), new Services(AbstractProfile.getDefaultProfile()));
+                new ProgramElementName("l2"),
+                new Services(Project.DUMMY, AbstractProfile.getDefaultProfile()));
         trans.start();
         LOGGER.debug("Result:" + trans);
     }
 
     @Test
     public void testTypeOf() { // this is no really sufficient test
-        Services services = new Services(AbstractProfile.getDefaultProfile());
+        Services services = new Services(Project.DUMMY, AbstractProfile.getDefaultProfile());
         // but I can't access programs here
         StatementBlock block = (StatementBlock) TacletForTests.parsePrg(" { int i; int j; i=j; }");
         Expression expr = (Expression) ((Assignment) block.getStatementAt(2)).getChildAt(1);
@@ -91,7 +94,8 @@ public class TestProgramMetaConstructs {
 
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         try {
-            wlt.transform(l, new Services(AbstractProfile.getDefaultProfile()), inst);
+            wlt.transform(l, new Services(Project.DUMMY, AbstractProfile.getDefaultProfile()),
+                inst);
         } catch (java.util.NoSuchElementException e) {
             fail(" Problem with empty while-blocks. See Bug #183 ");
         }
@@ -129,7 +133,7 @@ public class TestProgramMetaConstructs {
         final ForInitUnfoldTransformer tf =
             new ForInitUnfoldTransformer((LoopInit) coll.getNodes().head());
         final Statement[] stmts = (Statement[]) tf.transform(coll.getNodes().head(),
-            new Services(AbstractProfile.getDefaultProfile()),
+            new Services(Project.DUMMY, AbstractProfile.getDefaultProfile()),
             SVInstantiations.EMPTY_SVINSTANTIATIONS);
 
         assertEquals(expectedStmts.length, stmts.length);

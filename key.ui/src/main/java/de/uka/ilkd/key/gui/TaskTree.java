@@ -139,7 +139,8 @@ public class TaskTree extends JPanel {
         mediator.notify(new AbandonTaskEvent());
         for (int i = 0; i < tn.allProofs().length; i++) {
             tn.allProofs()[i].removeProofTreeListener(proofTreeListener);
-            tn.allProofs()[i].getServices().getDepRepo().removeProofListener(tn.allProofs()[i]);
+            tn.allProofs()[i].getServices().getProject().getDepRepo()
+                    .removeProofListener(tn.allProofs()[i]);
         }
         MainWindow.getInstance().getProofTreeView().removeProofs(tn.allProofs());
         // go to some other node, take the last leaf.
