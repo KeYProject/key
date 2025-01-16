@@ -65,10 +65,11 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      *
      * @param instantiationCandidate the {@link ProgramElement} to be matched
      * @param mc the {@link MatchConditions} with additional constraints (e.g. previous matches of
-     *        this instructions {@link SchemaVariable})
+     *        this instructions {@link org.key_project.logic.op.sv.SchemaVariable})
      * @param services the {@link Services}
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
-     *         the pair ({@link SchemaVariable}, {@link ProgramElement}) added
+     *         the pair ({@link org.key_project.logic.op.sv.SchemaVariable}, {@link ProgramElement})
+     *         added
      */
     public MatchConditions match(ProgramElement instantiationCandidate,
             MatchConditions mc,

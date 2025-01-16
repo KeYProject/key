@@ -58,7 +58,8 @@ import org.key_project.util.java.ArrayUtil;
  * {@link IExecutionStart} which is available via {@link #getProof()}.
  * </p>
  * <p>
- * Some assumptions about how {@link Sequent}s in the proof tree looks like are required to extract
+ * Some assumptions about how {@link org.key_project.prover.sequent.Sequent}s in the proof tree
+ * looks like are required to extract
  * the symbolic execution tree. To make sure that they hold (otherwise exceptions are thrown) it is
  * required to execute the {@link SymbolicExecutionStrategy} in KeY's auto mode and not to apply
  * rules manually or to use other strategies.
@@ -236,16 +237,19 @@ public class SymbolicExecutionTreeBuilder {
 
     /**
      * <p>
-     * This method initializes {@link #getMethodCallStack} in case that the initial {@link Sequent}
+     * This method initializes {@link #getMethodCallStack} in case that the initial
+     * {@link org.key_project.prover.sequent.Sequent}
      * contains {@link MethodFrame}s in its modality.
      * </p>
      * <p>
      * This is required because if a block of statements is executed instead of a method the initial
-     * {@link Sequent} contains also a {@link MethodFrame}. This initial {@link MethodFrame} is
+     * {@link org.key_project.prover.sequent.Sequent} contains also a {@link MethodFrame}. This
+     * initial {@link MethodFrame} is
      * required to simulate an execution context which is required to access class members.
      * </p>
      *
-     * @param root The root {@link Node} with the initial {@link Sequent}.
+     * @param root The root {@link Node} with the initial
+     *        {@link org.key_project.prover.sequent.Sequent}.
      * @param services The {@link Services} to use.
      */
     protected void initMethodCallStack(final Node root, Services services) {

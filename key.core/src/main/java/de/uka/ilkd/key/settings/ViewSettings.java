@@ -13,7 +13,8 @@ import javax.swing.*;
  * number is exceeded no SchemaVariables get instantiated in the displayed tooltip. 3) whether
  * intermediate proofsteps should be hidden in the proof tree view
  *
- * @see de.uka.ilkd.key.gui.settings.StandardUISettings
+ * (see also StandardUISettings)
+ *
  * @author unknown
  * @author weigl
  */

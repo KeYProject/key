@@ -38,8 +38,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
 /**
  * An abstract super class for loop invariant rules. Extending rules should usually call
  * {@link #doPreparations(Goal, org.key_project.prover.rules.RuleApp)} directly at the beginning of
- * the
- * {@link Rule#apply(Goal, org.key_project.prover.rules.RuleApp)} method.
+ * the {@link BuiltInRule#apply(Goal, org.key_project.prover.rules.RuleApp)} method.
  *
  * @see LoopScopeInvariantRule
  * @see WhileInvariantRule

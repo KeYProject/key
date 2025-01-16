@@ -128,7 +128,7 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     public static class JavaModalityKind extends Kind {
         private static final Map<String, JavaModalityKind> kinds = new HashMap<>();
         /**
-         * The diamond operator of dynamic logic. A formula <alpha;>Phi can be read as after
+         * The diamond operator of dynamic logic. A formula {@code <alpha;>Phi} can be read as after
          * processing
          * the program alpha there exists a state such that Phi holds.
          */

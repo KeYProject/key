@@ -32,7 +32,7 @@ import org.key_project.util.collection.ImmutableSet;
  * The proof obligation for well-definedness checks.
  * </p>
  * <p>
- * The generated {@link Sequent} has the following form:
+ * The generated {@link org.key_project.prover.sequent.Sequent} has the following form:
  *
  * <pre>
  * {@code

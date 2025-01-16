@@ -7,13 +7,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
@@ -28,6 +26,7 @@ import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.AssumesMatchResult;
+import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -111,7 +110,8 @@ public class VMTacletMatcher implements TacletMatcher {
     /**
      * (non-Javadoc)
      *
-     * @see TacletMatcher#matchIf(Iterable, Term, MatchConditions, Services)
+     * @see TacletMatcher#matchAssumes(Iterable, org.key_project.logic.Term, MatchConditions,
+     *      LogicServices)
      */
     @Override
     public final AssumesMatchResult matchAssumes(Iterable<AssumesFormulaInstantiation> p_toMatch,
@@ -119,11 +119,10 @@ public class VMTacletMatcher implements TacletMatcher {
             org.key_project.prover.rules.instantiation.MatchConditions p_matchCond,
             LogicServices p_services) {
         TacletMatchProgram prg = assumesMatchPrograms.get(p_template);
-        MatchConditions mc = (MatchConditions) p_matchCond;
+        final var mc = (de.uka.ilkd.key.rule.MatchConditions) p_matchCond;
 
-        ImmutableList<AssumesFormulaInstantiation> resFormulas =
-            ImmutableSLList.nil();
-        ImmutableList<org.key_project.prover.rules.instantiation.MatchConditions> resMC =
+        ImmutableList<AssumesFormulaInstantiation> resFormulas = ImmutableSLList.nil();
+        ImmutableList<MatchConditions> resMC =
             ImmutableSLList.nil();
 
         final boolean updateContextPresent = !mc.getInstantiations().getUpdateContext().isEmpty();
@@ -184,21 +183,18 @@ public class VMTacletMatcher implements TacletMatcher {
 
 
     /**
-     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.lang.Iterable,
-     *      de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
+     * @see TacletMatcher#matchAssumes(Iterable, MatchConditions, LogicServices)
      */
     @Override
     public final MatchConditions matchAssumes(
             Iterable<AssumesFormulaInstantiation> p_toMatch,
-            org.key_project.prover.rules.instantiation.MatchConditions p_matchCond,
+            MatchConditions p_matchCond,
             LogicServices p_services) {
 
-        final Iterator<org.key_project.prover.sequent.SequentFormula> anteIterator =
-            assumesSequent.antecedent().iterator();
-        final Iterator<org.key_project.prover.sequent.SequentFormula> succIterator =
-            assumesSequent.succedent().iterator();
+        final Iterator<SequentFormula> anteIterator = assumesSequent.antecedent().iterator();
+        final Iterator<SequentFormula> succIterator = assumesSequent.succedent().iterator();
 
-        ImmutableList<org.key_project.prover.rules.instantiation.MatchConditions> newMC;
+        ImmutableList<MatchConditions> newMC;
 
         for (final AssumesFormulaInstantiation candidateInst : p_toMatch) {
             // Part of fix for #1716: match antecedent with antecedent, succ with succ
@@ -228,7 +224,7 @@ public class VMTacletMatcher implements TacletMatcher {
         assert !anteIterator.hasNext() && !succIterator.hasNext()
                 : "p_toMatch and assumes sequent must have same number of elements";
 
-        return (MatchConditions) p_matchCond;
+        return p_matchCond;
     }
 
     /**
@@ -238,8 +234,9 @@ public class VMTacletMatcher implements TacletMatcher {
     public final MatchConditions checkConditions(
             org.key_project.prover.rules.instantiation.MatchConditions cond,
             LogicServices services) {
-        MatchConditions result = (MatchConditions) cond;
+        var result = (de.uka.ilkd.key.rule.MatchConditions) cond;
         if (result != null) {
+
             final var svIterator = result.getInstantiations().svIterator();
 
             if (!svIterator.hasNext()) {
@@ -250,7 +247,8 @@ public class VMTacletMatcher implements TacletMatcher {
                 final SchemaVariable sv = svIterator.next();
                 final Object o = result.getInstantiations().getInstantiation(sv);
                 if (o instanceof SyntaxElement se) {
-                    result = checkVariableConditions(sv, se, result, services);
+                    result = (de.uka.ilkd.key.rule.MatchConditions) checkVariableConditions(sv, se,
+                        result, services);
                 }
             }
         }
@@ -331,8 +329,10 @@ public class VMTacletMatcher implements TacletMatcher {
         if (sourceOp instanceof UpdateApplication) {
             // updates can be ignored
             Term update = UpdateApplication.getUpdate(source);
-            final var resultingConditions = matchCond.setInstantiations(
-                matchCond.getInstantiations().addUpdate(update, source.getLabels()));
+            final var svInstantiations =
+                ((de.uka.ilkd.key.rule.MatchConditions) matchCond).getInstantiations();
+            final var resultingConditions =
+                matchCond.setInstantiations(svInstantiations.addUpdate(update, source.getLabels()));
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(source),
                 resultingConditions);
         } else {
@@ -344,9 +344,9 @@ public class VMTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
     @Override
-    public final org.key_project.prover.rules.instantiation.MatchConditions matchFind(
+    public final MatchConditions matchFind(
             org.key_project.logic.Term term,
-            org.key_project.prover.rules.instantiation.MatchConditions p_matchCond,
+            MatchConditions p_matchCond,
             LogicServices services) {
         if (findMatchProgram == TacletMatchProgram.EMPTY_PROGRAM) {
             return null;
@@ -354,12 +354,14 @@ public class VMTacletMatcher implements TacletMatcher {
         Term source = (Term) term;
         if (ignoreTopLevelUpdates) {
             Pair</* term below updates */Term, MatchConditions> resultUpdateMatch =
-                matchAndIgnoreUpdatePrefix(source, (MatchConditions) p_matchCond);
+                matchAndIgnoreUpdatePrefix(source, p_matchCond);
             source = resultUpdateMatch.first;
             p_matchCond = resultUpdateMatch.second;
         }
         return checkConditions(
-            findMatchProgram.match(source, (MatchConditions) p_matchCond, services), services);
+            findMatchProgram.match(source, (de.uka.ilkd.key.rule.MatchConditions) p_matchCond,
+                services),
+            services);
     }
 
 
@@ -376,13 +378,14 @@ public class VMTacletMatcher implements TacletMatcher {
             TacletMatchProgram.getMatchInstructionForSV(sv);
 
         if (syntaxElement instanceof Term term) {
-            matchCond = instr.match(term, (MatchConditions) matchCond, services);
+            matchCond =
+                instr.match(term, (de.uka.ilkd.key.rule.MatchConditions) matchCond, services);
             matchCond = checkVariableConditions(sv, syntaxElement, matchCond, services);
         } else if (syntaxElement instanceof ProgramElement pe) {
-            matchCond = instr.match(pe, (MatchConditions) matchCond, services);
+            matchCond = instr.match(pe, (de.uka.ilkd.key.rule.MatchConditions) matchCond, services);
             matchCond = checkConditions(matchCond, services);
         }
-        return (MatchConditions) matchCond;
+        return matchCond;
     }
 
 }

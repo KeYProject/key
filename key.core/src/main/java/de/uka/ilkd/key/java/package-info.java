@@ -4,7 +4,7 @@
  * framework and made immutable. They are transformed into this data
  * structure from a Recoder structure by {@link
  * de.uka.ilkd.key.java.Recoder2KeY} or {@link
- * de.uka.ilkd.key.SchemaRecoder2KeY}. However, in some details both
+ * de.uka.ilkd.key.java.SchemaRecoder2KeY}. However, in some details both
  * data structures might differ more.
  * The following explanations are adapted from the
  * documentation of the Recoder framework.
@@ -16,7 +16,7 @@
  * {@link de.uka.ilkd.key.java.Comment}.
  * <p>
  * A {@link de.uka.ilkd.key.java.ProgramElement} is a {@link de.uka.ilkd.key.java.SourceElement}
- * and a {@link de.uka.ilkd.key.ModelElement}. It is aware of its parent in the syntax
+ * and a {@link de.uka.ilkd.key.java.ModelElement}. It is aware of its parent in the syntax
  * tree, while a pure {@link de.uka.ilkd.key.java.SourceElement} is not considered as a
  * member of the AST even though it is represented in the sources.
  * <p>
@@ -31,7 +31,7 @@
  * {@link de.uka.ilkd.key.java.JavaSourceElement} and
  * {@link de.uka.ilkd.key.java.JavaProgramElement} are abstract classes defining
  * standard implementations that already know their
- * {@link de.uka.ilkd.key.java.JavaProgramFactory}.
+ * {@link de.uka.ilkd.key.java.KeYJavaASTFactory}.
  * </DD>
  * <p>
  * <DT>Expressions and Statements</DT>
