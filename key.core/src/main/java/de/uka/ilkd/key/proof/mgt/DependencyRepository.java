@@ -28,8 +28,7 @@ public class DependencyRepository {
     public DependencyRepository() {
     }
 
-    public void initialize(Proof proof) {
-        SpecificationRepository specRepo = proof.getServices().getSpecificationRepository();
+    public void registerContracts(SpecificationRepository specRepo) {
         specRepo.getAllContracts().forEach(c -> {
             if (c instanceof FunctionalOperationContract foc) {
                 IProgramMethod target = foc.getTarget();
@@ -40,6 +39,9 @@ public class DependencyRepository {
                 }
             }
         });
+    }
+
+    public void registerProof(Proof proof) {
         proof.addRuleAppListener(proofListener);
     }
 

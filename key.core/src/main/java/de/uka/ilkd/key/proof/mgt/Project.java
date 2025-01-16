@@ -24,7 +24,7 @@ public class Project {
     }
 
     public static Project create(KeYProjectFile projectFile) {
-        return PROJECTS.computeIfAbsent(projectFile.getInitialFile().toPath(),
+        return PROJECTS.computeIfAbsent(projectFile.getPath(),
             k -> new Project(projectFile));
     }
 

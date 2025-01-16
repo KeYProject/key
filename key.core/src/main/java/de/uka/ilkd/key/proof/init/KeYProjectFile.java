@@ -42,7 +42,7 @@ public class KeYProjectFile implements EnvInput {
             Profile profile) {
         projectKeYFile = new KeYUserProblemFile("project.key",
             folder.toPath().resolve("project.key").toFile(), control, profile);
-        this.projectFolder = folder.toPath();
+        this.projectFolder = folder.toPath().toAbsolutePath().normalize();
         this.fileRepo = fileRepo;
         this.control = control;
         this.profile = profile;
@@ -120,6 +120,7 @@ public class KeYProjectFile implements EnvInput {
             DependencyRepository depRepo = initConfig.getServices().getProject().getDepRepo();
             SpecificationRepository specRepo =
                 initConfig.getServices().getSpecificationRepository();
+            depRepo.registerContracts(specRepo);
             for (ContractInfo c : dependencies.contracts()) {
                 Contract from = specRepo.getContractByName(c.name());
                 for (DependencyEntry d : c.dependencies()) {
@@ -154,6 +155,10 @@ public class KeYProjectFile implements EnvInput {
             // TODO: DD: Logging
             throw new RuntimeException(e);
         }
+    }
+
+    public Path getPath() {
+        return projectFolder;
     }
 
     private record Dependencies(List<ContractInfo> contracts) {
