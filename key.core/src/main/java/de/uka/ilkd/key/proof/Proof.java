@@ -183,6 +183,7 @@ public class Proof implements Named {
         settingsListener = config -> updateStrategyOnGoals();
 
         localMgt = new ProofCorrectnessMgt(this);
+        services.getDepRepo().initialize(this);
 
         initConfig.getSettings().getStrategySettings().addPropertyChangeListener(settingsListener);
 
@@ -270,10 +271,7 @@ public class Proof implements Named {
         if (getServices() != null) {
             getServices().getSpecificationRepository().removeProof(this);
         }
-        if (localMgt != null) {
-            localMgt.removeProofListener(); // This is strongly required because the listener is
-            // contained in a static List
-        }
+
         // remove setting listener from settings
         initConfig.getSettings().getStrategySettings()
                 .removePropertyChangeListener(settingsListener);

@@ -33,7 +33,6 @@ public final class ProofCorrectnessMgt {
 
     private final Proof proof;
     private final SpecificationRepository specRepos;
-    private final DefaultMgtProofListener proofListener = new DefaultMgtProofListener();
     private final DefaultMgtProofTreeListener proofTreeListener = new DefaultMgtProofTreeListener();
 
     private final Set<RuleApp> cachedRuleApps = new LinkedHashSet<>();
@@ -48,7 +47,6 @@ public final class ProofCorrectnessMgt {
         this.proof = p;
         this.specRepos = p.getServices().getSpecificationRepository();
         proof.addProofTreeListener(proofTreeListener);
-        proof.addRuleAppListener(proofListener);
     }
 
 
@@ -114,16 +112,12 @@ public final class ProofCorrectnessMgt {
                         return false;
                     }
                 } else {
-                    final ImmutableSet<Proof> proofsForEnd = specRepos.getProofs(end);
-                    for (Proof proofForEnd : proofsForEnd) {
-                        final ImmutableSet<Contract> contractsUsedForEnd =
-                            proofForEnd.mgt().getUsedContracts();
-                        for (Contract contractUsedForEnd : contractsUsedForEnd) {
-                            if (!path.contains(contractUsedForEnd)) {
-                                final ImmutableList<Contract> extendedPath =
-                                    path.prepend(contractUsedForEnd);
-                                newPaths = newPaths.add(extendedPath);
-                            }
+                    DependencyRepository depRepo = proof.getInitConfig().getServices().getDepRepo();
+                    for (Contract contractUsedForEnd : depRepo.getDependencies(end)) {
+                        if (!path.contains(contractUsedForEnd)) {
+                            final ImmutableList<Contract> extendedPath =
+                                path.prepend(contractUsedForEnd);
+                            newPaths = newPaths.add(extendedPath);
                         }
                     }
                 }
@@ -132,48 +126,6 @@ public final class ProofCorrectnessMgt {
 
         return true;
     }
-
-
-    @Deprecated
-    public boolean contractApplicableFor(KeYJavaType kjt, IObserverFunction target) {
-        target = specRepos.unlimitObs(target);
-
-        // get the target which is being verified in the passed goal
-        final IObserverFunction targetUnderVerification = specRepos.getTargetOfProof(proof);
-        if (targetUnderVerification == null) {
-            return true;
-        }
-
-        // collect all proofs on which the specification of the
-        // passed target may depend
-        ImmutableSet<Proof> proofs = specRepos.getProofs(kjt, target);
-        ImmutableSet<Proof> newProofs = proofs;
-        while (newProofs.size() > 0) {
-            final Iterator<Proof> it = newProofs.iterator();
-            newProofs = DefaultImmutableSet.nil();
-
-            while (it.hasNext()) {
-                final Proof p = it.next();
-                for (Contract contract : p.mgt().getUsedContracts()) {
-                    ImmutableSet<Proof> proofsForContractTarget =
-                        specRepos.getProofs(contract.getKJT(), contract.getTarget());
-                    newProofs = newProofs.union(proofsForContractTarget);
-                    proofs = proofs.union(proofsForContractTarget);
-                }
-            }
-        }
-
-        // is one of those proofs about the target under verification?
-        for (Proof p : proofs) {
-            final IObserverFunction target2 = specRepos.getTargetOfProof(p);
-            if (target2.equals(targetUnderVerification)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
 
     public void updateProofStatus() {
         final ImmutableSet<Proof> all = specRepos.getAllProofs();
@@ -224,24 +176,6 @@ public final class ProofCorrectnessMgt {
         }
     }
 
-
-    public void ruleApplied(RuleApp r) {
-        RuleJustification rj = getJustification(r);
-        if (rj == null) {
-            LOGGER.debug("No justification found for rule " + r.rule().name());
-            return;
-        }
-        if (!rj.isAxiomJustification()) {
-            cachedRuleApps.add(r);
-        }
-    }
-
-
-    public void ruleUnApplied(RuleApp r) {
-        cachedRuleApps.remove(r);
-    }
-
-
     public ImmutableSet<Contract> getUsedContracts() {
         ImmutableSet<Contract> result = DefaultImmutableSet.nil();
         for (RuleApp ruleApp : cachedRuleApps) {
@@ -257,9 +191,6 @@ public final class ProofCorrectnessMgt {
         return result;
     }
 
-    public void removeProofListener() {
-        proof.removeRuleAppListener(proofListener);
-    }
 
 
     public ProofStatus getStatus() {
@@ -269,13 +200,6 @@ public final class ProofCorrectnessMgt {
     // -------------------------------------------------------------------------
     // inner classes
     // -------------------------------------------------------------------------
-
-    private class DefaultMgtProofListener implements RuleAppListener {
-        public void ruleApplied(ProofEvent e) {
-            ProofCorrectnessMgt.this.ruleApplied(e.getRuleAppInfo().getRuleApp());
-        }
-    }
-
 
     private class DefaultMgtProofTreeListener extends ProofTreeAdapter {
         @Override

@@ -12,7 +12,10 @@ import java.util.List;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.mgt.DependencyRepository;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -102,6 +105,17 @@ public class KeYProjectFile implements EnvInput {
         try {
             String content = Files.readString(dependenciesPath);
             this.dependencies = gson.fromJson(content, Dependencies.class);
+
+            // add entries from json file to DependencyRepository
+            DependencyRepository depRepo = initConfig.getServices().getDepRepo();
+            SpecificationRepository specRepo = initConfig.getServices().getSpecificationRepository();
+            for (ContractInfo c : dependencies.contracts()) {
+                Contract from = specRepo.getContractByName(c.name());
+                for (DependencyEntry d : c.dependencies()) {
+                    Contract to = specRepo.getContractByName(d.name());
+                    depRepo.addDependency(from, to);
+                }
+            }
         } catch (JsonParseException e) {
             warnings = warnings.add(new PositionedString(e.getMessage(), dependenciesPath.toUri()));
         } catch (IOException e) {
