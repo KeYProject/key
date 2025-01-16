@@ -9,7 +9,8 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.MatchConditions;
 
 /**
- * The instantiations of a schemavariable can be restricted on rule scope by attaching conditions on
+ * The instantiations of a schema variable can be restricted on rule scope by attaching conditions
+ * on
  * these variables. Such a condition is realized by a class which implements this interface.
  * <br>
  * The usual place where to put these implementations is inside package
@@ -25,7 +26,7 @@ public interface VariableCondition {
      * @param instCandidate the SVSubstitute (e.g. Term, ProgramElement) to be mapped to var
      * @param matchCond the MatchCondition with the current matching state and in particular the
      *        SVInstantiations that are already known to be needed
-     * @param services the program information object
+     * @param services the logic and program information object
      * @return modified match results if the condition can be satisfied, or <code>null</code>
      *         otherwise
      */

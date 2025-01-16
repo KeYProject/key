@@ -5,6 +5,8 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.io.Serial;
 
+import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
+
 /**
  * this exception is thrown if non-rigid instantiation has been given for a schema variable only
  * allowing rigid instantiations

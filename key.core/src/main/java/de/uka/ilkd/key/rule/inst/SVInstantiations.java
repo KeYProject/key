@@ -20,6 +20,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.prover.rules.instantiation.ListInstantiation;
 import org.key_project.util.collection.DefaultImmutableMap;
