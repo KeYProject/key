@@ -29,7 +29,7 @@ public interface Property<T> {
 
     /**
      * Computes the hash code of {@code t} in a context where
-     * {@link this#equalsModThisProperty(Object, Object, Object[])}
+     * {@link #equalsModThisProperty(Object, Object, Object[])}
      * is used as an equality check, so that it can be used in, e.g., a HashMap.
      *
      * @param t the object to compute the hash code for

@@ -7,21 +7,6 @@ import org.key_project.util.collection.ImmutableList;
 
 public abstract class SequentKit {
 
-    /**
-     * Create a new Semisequent from an ordered collection of formulas (possibly empty).
-     * The provided collection must be redundancy free, i.e., the created sequent must be exactly
-     * the same as when creating the sequent by subsequently inserting all formulas.
-     *
-     * @param seqList list of sequent formulas
-     */
-    // public static Semisequent create(ImmutableList<SequentFormula> seqList, Property<? super
-    // Term> redundanceProperty) {
-    // if (seqList.isEmpty()) {
-    // return EMPTY_SEMISEQUENT;
-    // }
-    // return new Semisequent(seqList, redundanceProperty);
-    // }
-
     // INSTANCE FIELDS and METHODS
 
     protected SequentKit() {

@@ -1073,7 +1073,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param diverges a diverges clause.
          * @param modifiables map from every heap to an modifiable term.
          * @param modifiablesFree map from every heap to a free modifiable term.
-         * @param hasMod map specifying on which heaps this contract has a modifiable clause.
+         * @param hasModifiable map specifying on which heaps this contract has a modifiable clause.
          * @param hasFreeModifiable map specifying on which heaps this contract has a free
          *        modifiable clause.
          * @param services services.
