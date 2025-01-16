@@ -7,11 +7,11 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.sv.OperatorSV;
+import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,8 +71,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
      *         the pair ({@link org.key_project.logic.op.sv.SchemaVariable}, {@link ProgramElement})
      *         added
      */
-    public MatchConditions match(ProgramElement instantiationCandidate,
-            MatchConditions mc,
+    public MatchConditions match(ProgramElement instantiationCandidate, MatchConditions mc,
             LogicServices services) {
         return null;
     }
