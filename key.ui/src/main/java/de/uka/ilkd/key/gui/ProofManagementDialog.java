@@ -431,7 +431,7 @@ public final class ProofManagementDialog extends JDialog {
     }
 
     /**
-     * Finds a proof for the given contract. Preferring a already closed proof, laking that a proof
+     * Finds a proof for the given contract. Preferring an already closed proof, laking that a proof
      * that just misses lemmas.
      *
      * @param contract the contract for which to find a proof
@@ -445,6 +445,10 @@ public final class ProofManagementDialog extends JDialog {
             initConfig.getServices().getSpecificationRepository().getProofs(contract);
         // no proofs?
         if (proofs.isEmpty()) {
+            Proof storedProof = initConfig.getServices().getProject().findOrReplayProof(contract);
+            if (storedProof != null) {
+                return storedProof;
+            }
             return null;
         }
         // try to find closed proof

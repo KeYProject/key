@@ -4,9 +4,11 @@
 package de.uka.ilkd.key.proof.mgt;
 
 import java.nio.file.Path;
-import java.util.WeakHashMap;
+import java.util.*;
 
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.KeYProjectFile;
+import de.uka.ilkd.key.speclang.Contract;
 
 import org.jspecify.annotations.Nullable;
 
@@ -16,6 +18,14 @@ public class Project {
 
     private final DependencyRepository depRepo;
     private final @Nullable KeYProjectFile projectFile;
+
+    /**
+     * The keys of {@code loadedProofs} are a subset of the keys of {@code storedProofs}. The former
+     * holds all proofs loaded in the UI. The latter holds the paths where the proofs are saved (or
+     * will be saved if the proof has been created in the current session).
+     */
+    private final Map<Contract, Proof> loadedProofs = new HashMap<>();
+    private final Map<Contract, Path> storedProofs = new HashMap<>();
 
     private Project(KeYProjectFile projectFile) {
         this.depRepo = new DependencyRepository();
@@ -36,6 +46,22 @@ public class Project {
 
     public DependencyRepository getDepRepo() {
         return depRepo;
+    }
+
+    public void registerProof(Contract contract, Proof proof) {
+        assert !loadedProofs.containsKey(contract);
+        loadedProofs.put(contract, proof);
+    }
+
+    public @Nullable Proof findOrReplayProof(Contract contract) {
+        if (loadedProofs.containsKey(contract))
+            return loadedProofs.get(contract);
+        if (storedProofs.containsKey(contract)) {
+            // Replay proof
+            Path path = storedProofs.get(contract);
+
+        }
+        return null;
     }
 
     public void flush() {
