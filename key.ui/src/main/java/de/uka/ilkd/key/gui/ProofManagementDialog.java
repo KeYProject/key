@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.Project;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -445,9 +447,12 @@ public final class ProofManagementDialog extends JDialog {
             initConfig.getServices().getSpecificationRepository().getProofs(contract);
         // no proofs?
         if (proofs.isEmpty()) {
-            Proof storedProof = initConfig.getServices().getProject().findOrReplayProof(contract);
+            Project project = initConfig.getServices().getProject();
+            @Nullable
+            Path storedProof = project.findStoredProof(contract);
             if (storedProof != null) {
-                return storedProof;
+                mediator.getUI().loadProblem(storedProof.toFile());
+                return mediator.getSelectedProof();
             }
             return null;
         }

@@ -140,6 +140,6 @@ public class DependencyRepository {
 
     public void removeProofListener(Proof proof) {
         proof.removeRuleAppListener(proofListener);
-        proof.getServices().getProject().flush();
+        // proof.getServices().getProject().flushSingleProof(proof);
     }
 }

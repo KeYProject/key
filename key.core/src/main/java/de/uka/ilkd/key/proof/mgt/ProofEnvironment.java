@@ -73,6 +73,8 @@ public class ProofEnvironment {
     public void registerProof(ProofOblInput po, ProofAggregate pl) {
         pl.setProofEnv(this);
         proofs.add(pl);
+        // TODO: WP: What happens with multiple proofs?
+        initConfig.getServices().getProject().registerProof(po, pl.getFirstProof());
         for (Proof p : pl.getProofs()) {
             getServicesForEnvironment().getSpecificationRepository().registerProof(po, p);
         }

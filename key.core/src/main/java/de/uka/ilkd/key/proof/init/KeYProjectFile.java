@@ -108,6 +108,10 @@ public class KeYProjectFile implements EnvInput {
         return projectFolder.toFile();
     }
 
+    public Path getInitialPath() {
+        return projectFolder;
+    }
+
     private ImmutableSet<PositionedString> readDependencies() {
         // TODO: check license of GSON!
         Gson gson = new Gson();
@@ -137,28 +141,27 @@ public class KeYProjectFile implements EnvInput {
         return warnings;
     }
 
+    /**
+     * Writes all the dependencies of the project into {@code dependencies.json}.
+     */
     public void flush() {
         List<ContractInfo> cis = new ArrayList<>();
-        for (var c : project.getDepRepo().getContractsWithDependencies()) {
+        for (Contract c : project.getDepRepo().getContractsWithDependencies()) {
             List<DependencyEntry> deps = new ArrayList<>();
-            for (var d : project.getDepRepo().getDependencies(c)) {
+            for (Contract d : project.getDepRepo().getDependencies(c)) {
                 deps.add(new DependencyEntry(d.getName(), d.hashCode()));
             }
             cis.add(new ContractInfo(c.getName(), c.hashCode(), -1, ProofStatus.OPEN, deps));
         }
-        var dependencies = new Dependencies(cis);
+        Dependencies dependencies = new Dependencies(cis);
         // Write
-        var gson = new Gson();
+        Gson gson = new Gson();
         try {
             Files.writeString(dependenciesPath, gson.toJson(dependencies), StandardCharsets.UTF_8);
         } catch (IOException e) {
             // TODO: DD: Logging
             throw new RuntimeException(e);
         }
-    }
-
-    public Path getPath() {
-        return projectFolder;
     }
 
     private record Dependencies(List<ContractInfo> contracts) {
