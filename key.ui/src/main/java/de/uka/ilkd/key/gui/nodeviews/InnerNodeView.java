@@ -56,7 +56,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
     private final InnerNodeViewListener listener;
 
-    public final JTextArea tacletInfo;
+    private JTextArea tacletInfo = new JTextArea();
 
     private Node node;
     private final org.key_project.prover.rules.RuleApp ruleApp;
@@ -81,14 +81,6 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
                 mainWindow.getMediator().getServices(), getVisibleTermLabels()));
         setSelectionColor(SELECTION_COLOR.get());
         setBackground(INACTIVE_BACKGROUND_COLOR);
-
-        tacletInfo = new JTextArea(
-            TacletDescriber.getTacletDescription(mainWindow.getMediator(), ruleApp,
-                getLineWidth()));
-        tacletInfo.setBackground(getBackground());
-        tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
-            new EmptyBorder(new Insets(4, 0, 0, 0))));
-        tacletInfo.setEditable(false);
     }
 
     static final HighlightPainter RULEAPP_HIGHLIGHTER =
@@ -251,6 +243,27 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         LOGGER.debug("Total printSequent took " + (after - time) / 1e6 + "ms");
     }
 
+    private void updateTacletInfo() {
+        tacletInfo.setText(
+            TacletDescriber.getTacletDescription(getMainWindow().getMediator(), ruleApp,
+                getLineWidth()));
+        tacletInfo.setBackground(getBackground());
+        tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
+            new EmptyBorder(new Insets(4, 0, 0, 0))));
+        tacletInfo.setEditable(false);
+    }
+
+    public void makeTacletInfoVisible(boolean visible) {
+        if (visible) {
+            updateTacletInfo();
+        }
+        tacletInfo.setVisible(visible);
+    }
+
+    public JTextArea getTacletInfo() {
+        return tacletInfo;
+    }
+
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
         node = null;
@@ -261,4 +274,5 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     public void proofDisposed(ProofDisposedEvent e) {
 
     }
+
 }

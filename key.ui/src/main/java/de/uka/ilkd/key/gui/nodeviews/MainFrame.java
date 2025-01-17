@@ -96,7 +96,7 @@ public final class MainFrame extends JPanel {
         this.showTacletInfo = showTacletInfo;
 
         if (sequentView instanceof InnerNodeView view) {
-            view.tacletInfo.setVisible(this.showTacletInfo);
+            view.makeTacletInfoVisible(this.showTacletInfo);
         }
     }
 
