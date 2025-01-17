@@ -189,7 +189,7 @@ public abstract class Notation {
     /**
      * The concrete syntax for DL modalities represented with a SchemaVariable.
      */
-    public static final class ModalSVNotation extends Notation {
+    public static final class ModalSVNotation extends SchemaVariableNotation {
         private final int ass;
 
         public ModalSVNotation(int prio, int ass) {
@@ -473,9 +473,15 @@ public abstract class Notation {
      * The standard concrete syntax for all kinds of variables.
      */
     public static class VariableNotation extends Notation {
+
         public VariableNotation() {
             super(1000);
         }
+
+        protected VariableNotation(int priority) {
+            super(priority);
+        }
+
 
         public void print(Term t, LogicPrinter sp) {
             if (t.op() instanceof ProgramVariable) {
@@ -490,7 +496,15 @@ public abstract class Notation {
     }
 
 
-    public static final class SchemaVariableNotation extends VariableNotation {
+    public static class SchemaVariableNotation extends VariableNotation {
+
+        public SchemaVariableNotation() {
+            super();
+        }
+
+        protected SchemaVariableNotation(int prio) {
+            super(prio);
+        }
 
         public void printDeclaration(SchemaVariable v, LogicPrinter sp) {
 
