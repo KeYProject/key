@@ -936,7 +936,7 @@ public final class SourceView extends JComponent {
         /**
          * The JavaDocument shown in this tab.
          */
-        private JavaDocument doc = null;
+        private SourceHighlightDocument doc = null;
 
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
@@ -1012,7 +1012,7 @@ public final class SourceView extends JComponent {
 
             // insert source code into text pane
             try {
-                doc = new JavaDocument();
+                doc = new SourceHighlightDocument(new JavaJMLEditorLexer());
                 textPane.setDocument(doc);
                 doc.insertString(0, source, new SimpleAttributeSet());
             } catch (BadLocationException e) {
@@ -1192,7 +1192,7 @@ public final class SourceView extends JComponent {
 
         private void dispose() {
             if (doc != null) {
-                doc.dispose();
+                // doc.dispose();
             }
         }
     }
