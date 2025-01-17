@@ -447,13 +447,6 @@ public final class ProofManagementDialog extends JDialog {
             initConfig.getServices().getSpecificationRepository().getProofs(contract);
         // no proofs?
         if (proofs.isEmpty()) {
-            Project project = initConfig.getServices().getProject();
-            @Nullable
-            Path storedProof = project.findStoredProof(contract);
-            if (storedProof != null) {
-                mediator.getUI().loadProblem(storedProof.toFile());
-                return mediator.getSelectedProof();
-            }
             return null;
         }
         // try to find closed proof
@@ -474,25 +467,34 @@ public final class ProofManagementDialog extends JDialog {
         if (proof == null) {
             AbstractMediatorUserInterfaceControl ui = mediator.getUI();
 
-            ProblemInitializer pi = new ProblemInitializer(ui, initConfig.getServices(), ui);
+            Project project = initConfig.getServices().getProject();
+            @Nullable
+            Path storedProof = project.findStoredProof(contract);
+            if (storedProof != null) {
+                // TODO: DD: this does not do exactly what we want. Replace w/ better method
+                ui.loadProblem(storedProof.toFile());
+            } else {
+                ProblemInitializer pi = new ProblemInitializer(ui, initConfig.getServices(), ui);
 
-            // enables to access the FileRepo created in AbstractProblemLoader
-            pi.setFileRepo(initConfig.getFileRepo());
+                // enables to access the FileRepo created in AbstractProblemLoader
+                pi.setFileRepo(initConfig.getFileRepo());
 
-            try {
-                final ProofOblInput po =
-                    contract.createProofObl(initConfig.copyWithServices(initConfig.getServices()));
-                final ProofAggregate pl = pi.startProver(initConfig, po);
+                try {
+                    final ProofOblInput po =
+                        contract.createProofObl(
+                            initConfig.copyWithServices(initConfig.getServices()));
+                    final ProofAggregate pl = pi.startProver(initConfig, po);
 
-                if (env == null) {
-                    env = ui.createProofEnvironmentAndRegisterProof(po, pl, initConfig);
-                } else {
-                    env.registerProof(po, pl);
+                    if (env == null) {
+                        env = ui.createProofEnvironmentAndRegisterProof(po, pl, initConfig);
+                    } else {
+                        env.registerProof(po, pl);
+                    }
+                    mediator.getSelectionModel().setSelectedProof(pl.getFirstProof());
+                } catch (ProofInputException exc) {
+                    LOGGER.error("", exc);
+                    IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
                 }
-                mediator.getSelectionModel().setSelectedProof(pl.getFirstProof());
-            } catch (ProofInputException exc) {
-                LOGGER.error("", exc);
-                IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
             }
         } else {
             mediator.getSelectionModel().setSelectedProof(proof);
