@@ -110,3 +110,14 @@ typeOf
    : TYPE_OF LPAREN expr RPAREN
    ;
 
+loopExpr
+   : loopLabel? infiniteLoopExpr
+   | loopScope
+   ;
+
+infiniteLoopExpr
+   : 'loop' (block=blockExpr | sv=schemaVariable)
+   ;
+
+loopScope
+    : 'loop_scope!' '(' idx=schemaVariable ',' blockExpr ')';

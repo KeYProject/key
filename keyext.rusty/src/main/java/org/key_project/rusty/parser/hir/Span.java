@@ -3,5 +3,4 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.hir;
 
-public record Span(int lo, int hi, LocalDefId parent) {
-}
+public record Span(int lo,int hi,LocalDefId parent){}

@@ -7,7 +7,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.util.collection.ImmutableArray;
 
-//spotless:off
+// spotless:off
 public record AltPattern(ImmutableArray<Pattern> alternatives) implements Pattern {
     @Override
     public SyntaxElement getChild(int n) {

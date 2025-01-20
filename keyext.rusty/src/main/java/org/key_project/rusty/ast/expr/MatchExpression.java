@@ -13,7 +13,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record MatchExpression(Expr expr, ImmutableArray<MatchArm> arms) implements Expr {
     @Override
     public void visit(Visitor v) {

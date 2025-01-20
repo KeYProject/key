@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record EnumVariantTuple(PathInExpression path, ImmutableArray<Expr> elements) implements EnumVariantExpression {
     @Override
     public void visit(Visitor v) {

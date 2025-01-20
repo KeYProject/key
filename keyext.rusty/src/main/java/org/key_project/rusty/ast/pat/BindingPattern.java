@@ -10,7 +10,7 @@ import org.key_project.rusty.logic.op.ProgramVariable;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-//spotless:off
+// spotless:off
 public record BindingPattern(boolean ref, boolean mutRef, boolean mut, ProgramVariable pv,
                              @Nullable Pattern opt) implements Pattern {
 

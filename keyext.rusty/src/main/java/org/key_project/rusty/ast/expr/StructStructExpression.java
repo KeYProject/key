@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record StructStructExpression(PathInExpression path, ImmutableArray<StructExprField> fields,
                                      boolean withRest) implements Expr {
     @Override

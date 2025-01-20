@@ -12,30 +12,14 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-public record PathExpr(Path<Res> path, Type type) implements Expr {
-    @Override
-    public Type type(Services services) {
-        return type;
-    }
+public record PathExpr(Path<Res>path,Type type)implements Expr{@Override public Type type(Services services){return type;}
 
-    @Override
-    public void visit(Visitor v) {
+@Override public void visit(Visitor v){
 
-    }
-
-    @Override
-    public @NonNull SyntaxElement getChild(int n) {
-        if (n==0) return path;
-        throw new IndexOutOfBoundsException("PathExpression has only one child");
-    }
-
-    @Override
-    public int getChildCount() {
-        return 1;
-    }
-
-    @Override
-    public String toString() {
-        return path.toString();
-    }
 }
+
+@Override public @NonNull SyntaxElement getChild(int n){if(n==0)return path;throw new IndexOutOfBoundsException("PathExpression has only one child");}
+
+@Override public int getChildCount(){return 1;}
+
+@Override public String toString(){return path.toString();}}

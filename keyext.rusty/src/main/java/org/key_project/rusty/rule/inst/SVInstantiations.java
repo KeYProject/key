@@ -352,7 +352,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
         ImmutableList<Term> updates = getUpdates(other);
         return new SVInstantiations(result, updates, getGenericSortInstantiations(),
             getGenericSortConditions())
-                    .rebuildSorts(services);
+                .rebuildSorts(services);
     }
 
     private ImmutableList<Term> getUpdates(SVInstantiations other) {
@@ -383,7 +383,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
     public SVInstantiations add(GenericSortCondition p_c, Services services) throws SortException {
         return new SVInstantiations(map, getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions().prepend(p_c))
-                    .checkCondition(p_c, false, services);
+                .checkCondition(p_c, false, services);
     }
 
     public ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> lookupEntryForSV(Name name) {

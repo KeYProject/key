@@ -42,6 +42,10 @@ public abstract class VariableNamer implements InstantiationProposer {
      * default basename for variable name proposals
      */
     private static final String DEFAULT_BASENAME = "var";
+    /**
+     * name of the counter object used for temporary name proposals
+     */
+    private static final String TEMPCOUNTER_NAME = "VarNamerCnt";
 
     /**
      * status of suggestive name proposing
@@ -301,6 +305,21 @@ public abstract class VariableNamer implements InstantiationProposer {
             }
         }
         return true;
+    }
+
+    /**
+     * proposes a unique name; intended for use in places where the information required by
+     * getProposal() is not available
+     *
+     * @param basename desired base name, or null to use default
+     * @return the name proposal
+     */
+    public Name getTemporaryNameProposal(String basename) {
+        if (basename == null || basename.isEmpty()) {
+            basename = DEFAULT_BASENAME;
+        }
+        int cnt = services.getCounter(TEMPCOUNTER_NAME).getCountPlusPlus();
+        return new Name(basename + (cnt == 0 ? "" : "_" + cnt));
     }
 
     /**

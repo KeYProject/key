@@ -8,7 +8,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record PathSegment(String ident, Res res)implements RustyProgramElement {
     @Override
     public @NonNull SyntaxElement getChild(int n) {

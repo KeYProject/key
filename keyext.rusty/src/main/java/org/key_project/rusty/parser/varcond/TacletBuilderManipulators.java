@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
+import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.parser.builder.TacletPBuilder;
 import org.key_project.rusty.rule.VariableCondition;
 import org.key_project.rusty.rule.tacletbuilder.TacletBuilder;
@@ -59,6 +61,31 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder SIMPLIFY_ITE_UPDATE =
         new ConstructorBasedBuilder("simplifyIfThenElseUpdate",
             SimplifyIfThenElseUpdateCondition.class, FSV, USV, USV, FSV, SV);
+
+    public static final AbstractConditionBuilder STORE_TERM_IN =
+        new AbstractConditionBuilder("storeTermIn", SV, T) {
+            @Override
+            public VariableCondition build(Object[] arguments, List<String> parameters,
+                    boolean negated) {
+                return new StoreTermInCondition((SchemaVariable) arguments[0], (Term) arguments[1]);
+            }
+        };
+    public static final AbstractConditionBuilder STORE_EXPR_IN =
+        new ConstructorBasedBuilder("storeExprIn", StoreExprInCondition.class, SV, T);
+    public static final AbstractConditionBuilder HAS_INVARIANT =
+        new ConstructorBasedBuilder("\\hasInvariant", HasLoopInvariantCondition.class, PV, SV);
+    public static final AbstractConditionBuilder GET_INVARIANT =
+        new ConstructorBasedBuilder("\\getInvariant", LoopInvariantCondition.class, PV, SV, SV);
+    public static final AbstractConditionBuilder GET_VARIANT =
+        new AbstractConditionBuilder("\\getVariant", PV, SV) {
+            @Override
+            public VariableCondition build(Object[] arguments, List<String> parameters,
+                    boolean negated) {
+                return new LoopVariantCondition((ProgramSV) arguments[0],
+                    (SchemaVariable) arguments[1]);
+            }
+        };
+
     public static AbstractTacletBuilderCommand NEW_TYPE_OF =
         new AbstractTacletBuilderCommand("newTypeOf", SV, SV) {
             @Override
@@ -85,11 +112,16 @@ public class TacletBuilderManipulators {
             }
         };
 
+    public static final TacletBuilderCommand NEW_LOCAL_VARS =
+        new ConstructorBasedBuilder("newLocalVars", NewLocalVarsCondition.class, SV, SV, SV, SV);
+
     private static final List<TacletBuilderCommand> tacletBuilderCommands = new ArrayList<>(2);
 
     static {
         register(APPLY_UPDATE_ON_RIGID, NEW_DEPENDING_ON, EQUAL_UNIQUE,
-            DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE, NEW_TYPE_OF, NEW_RUSTY_TYPE);
+            DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE, NEW_TYPE_OF, NEW_RUSTY_TYPE,
+            NEW_LOCAL_VARS, STORE_EXPR_IN, STORE_TERM_IN, HAS_INVARIANT, GET_INVARIANT,
+            GET_VARIANT);
     }
 
     /**

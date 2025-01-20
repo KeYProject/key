@@ -20,3 +20,5 @@ CONTEXT_END
 PANIC
     : 'panic!'
     ;
+
+ LOOP_SCOPE: 'loop_scope!';

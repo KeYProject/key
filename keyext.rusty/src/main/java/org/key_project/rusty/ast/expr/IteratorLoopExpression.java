@@ -14,7 +14,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-//spotless:off
+// spotless:off
 public record IteratorLoopExpression(@Nullable Label label, Pattern pattern, Expr expr,
                                      BlockExpression body) implements LoopExpression {
     @Override

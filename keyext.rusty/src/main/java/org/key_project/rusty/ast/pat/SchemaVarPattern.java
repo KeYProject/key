@@ -15,7 +15,7 @@ import org.key_project.rusty.rule.inst.SVInstantiations;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record SchemaVarPattern(boolean reference, boolean mut, OperatorSV operatorSV) implements Pattern {
     @Override
     public @NonNull SyntaxElement getChild(int n) {

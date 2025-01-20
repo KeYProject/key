@@ -61,7 +61,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     // -------------------------------------------------------------------------
 
     private static ResultAndCall getMethodCall(RustyBlock rb,
-                                                                                Services services) {
+            Services services) {
         final Expr actualResult;
         final Call call;
 
@@ -69,32 +69,33 @@ public final class UseOperationContractRule implements BuiltInRule {
         // active statement must be function call, method call or assignment with
         // function/method call
         switch (activeStatement) {
-            case CallExpression ce -> {
-                actualResult = null;
-                call = ce;
-            }
-            case MethodCallExpression me -> {
-                actualResult = null;
-                call = me;
-            }
-            case AssignmentExpression as -> {
-                final Expr lhs = as.lhs();
-                final Expr rhs = as.rhs();
-                if ((rhs instanceof Call c)
-                        && (lhs instanceof ProgramVariable)) {
-                    actualResult = lhs;
-                    call = c;
-                } else {
-                    return null;
-                }
-            }
-            case null, default -> {
+        case CallExpression ce -> {
+            actualResult = null;
+            call = ce;
+        }
+        case MethodCallExpression me -> {
+            actualResult = null;
+            call = me;
+        }
+        case AssignmentExpression as -> {
+            final Expr lhs = as.lhs();
+            final Expr rhs = as.rhs();
+            if ((rhs instanceof Call c)
+                    && (lhs instanceof ProgramVariable)) {
+                actualResult = lhs;
+                call = c;
+            } else {
                 return null;
             }
         }
+        case null, default -> {
+            return null;
+        }
+        }
 
         // receiver must be simple
-        if (call instanceof MethodCallExpression me && !ProgramSVSort.SIMPLE_EXPRESSION.canStandFor(me.callee(), services)) {
+        if (call instanceof MethodCallExpression me
+                && !ProgramSVSort.SIMPLE_EXPRESSION.canStandFor(me.callee(), services)) {
             return null;
         } else {
             return new ResultAndCall(actualResult, call);

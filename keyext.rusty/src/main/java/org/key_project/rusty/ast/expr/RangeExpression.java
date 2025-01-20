@@ -11,7 +11,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-//spotless:off
+// spotless:off
 public record RangeExpression(@Nullable Expr left, @Nullable Expr right, boolean inclusive) implements Expr {
     @Override
     public void visit(Visitor v) {

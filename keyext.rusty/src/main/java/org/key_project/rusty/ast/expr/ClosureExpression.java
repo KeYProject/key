@@ -13,7 +13,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-//spotless:off
+// spotless:off
 public record ClosureExpression(boolean move, ImmutableArray<ClosureParam> params, @Nullable RustType ty,
                                 Expr body) implements Expr {
     @Override

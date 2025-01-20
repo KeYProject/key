@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record TupleStructExpression(PathInExpression path, ImmutableArray<Expr> elements) implements Expr {
     @Override
     public void visit(Visitor v) {

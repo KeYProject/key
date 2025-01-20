@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record TupleExpression(ImmutableArray<Expr> elements) implements Expr {
     public static TupleExpression UNIT = new TupleExpression(new ImmutableArray<>());
 

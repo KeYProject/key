@@ -3,5 +3,4 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.hir;
 
-public record PathSegment(Ident ident, HirId hirId, Res res, GenericArgs args, boolean inferArgs) {
-}
+public record PathSegment(Ident ident,HirId hirId,Res res,GenericArgs args,boolean inferArgs){}

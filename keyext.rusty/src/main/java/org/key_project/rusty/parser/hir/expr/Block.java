@@ -9,7 +9,7 @@ import org.key_project.rusty.parser.hir.HirId;
 import org.key_project.rusty.parser.hir.Span;
 import org.key_project.rusty.parser.hir.stmt.Stmt;
 
-//spotless:off
+// spotless:off
 public record Block(Stmt[] stmts, Expr expr, HirId hirId, BlockCheckMode rules, Span span, boolean targetedByBreak) {
     @Override
     public String toString() {

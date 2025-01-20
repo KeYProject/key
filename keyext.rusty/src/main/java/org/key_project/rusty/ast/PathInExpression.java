@@ -12,7 +12,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record PathInExpression(ImmutableArray<PathExprSegment> segments) implements RustyProgramElement {
     @Override
     public void visit(Visitor v) {

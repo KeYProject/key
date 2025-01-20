@@ -9,7 +9,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.Nullable;
 
-//spotless:off
+// spotless:off
 public record QPathResolved(@Nullable RustType selfTy, Path<Res> path) implements QPath {
     @Override
     public void visit(Visitor v) {

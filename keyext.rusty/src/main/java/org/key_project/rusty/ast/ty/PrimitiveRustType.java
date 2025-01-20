@@ -10,7 +10,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record PrimitiveRustType(PrimitiveType type) implements RustType, Res {
     @Override
     public void visit(Visitor v) {

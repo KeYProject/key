@@ -11,7 +11,7 @@ import org.key_project.rusty.logic.op.sv.ProgramSV;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record SchemaType(ProgramSV sv) implements Type {
     @Override
     public Sort getSort(Services services) {

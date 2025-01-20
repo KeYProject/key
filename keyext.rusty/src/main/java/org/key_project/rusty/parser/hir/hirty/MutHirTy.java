@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.hir.hirty;
 
-//spotless:off
+// spotless:off
 public record MutHirTy(HirTy ty, boolean mutbl) {
 }
 //spotless:on

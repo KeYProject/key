@@ -8,7 +8,7 @@ import org.key_project.rusty.ast.Identifier;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record IdentEnumExprField(Identifier ident, Expr expr) implements EnumExprField {
     @Override
     public @NonNull SyntaxElement getChild(int n) {

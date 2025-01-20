@@ -3,5 +3,4 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.hir.item;
 
-public record Fn(FnSig sig, Generics generics, Body body)implements ItemKind {
-}
+public record Fn(FnSig sig,Generics generics,Body body)implements ItemKind{}

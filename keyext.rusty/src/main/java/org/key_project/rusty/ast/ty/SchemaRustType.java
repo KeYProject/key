@@ -17,7 +17,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * A schema variable standing for a type in SchemaRust
  */
-//spotless:off
+// spotless:off
 public record SchemaRustType(SchemaType type) implements RustType {
     @Override
     public void visit(Visitor v) {

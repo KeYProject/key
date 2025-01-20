@@ -113,10 +113,10 @@ public class HirConverter {
     private Item convertItem(org.key_project.rusty.parser.hir.item.Item item) {
         String ident = convertIdent(item.ident());
         return switch (item.kind()) {
-            case org.key_project.rusty.parser.hir.item.Use use -> convertUse(use);
-            case Fn fn -> convertFn(fn, ident, item.ownerId().defId());
-            case org.key_project.rusty.parser.hir.item.ExternCrate ec -> convertExternCrate(ec, ident);
-            default -> throw new IllegalArgumentException("Unknown item: " + item);
+        case org.key_project.rusty.parser.hir.item.Use use -> convertUse(use);
+        case Fn fn -> convertFn(fn, ident, item.ownerId().defId());
+        case org.key_project.rusty.parser.hir.item.ExternCrate ec -> convertExternCrate(ec, ident);
+        default -> throw new IllegalArgumentException("Unknown item: " + item);
         };
     }
 
@@ -145,9 +145,9 @@ public class HirConverter {
 
     private RustType convertFnRetTy(FnRetTy retTy) {
         return switch (retTy) {
-            case FnRetTy.DefaultReturn ignored -> TupleRustType.UNIT;
-            case FnRetTy.Return(var ty) -> convertHirTy(ty);
-            default -> throw new IllegalArgumentException("Unknown return type: " + retTy);
+        case FnRetTy.DefaultReturn ignored -> TupleRustType.UNIT;
+        case FnRetTy.Return(var ty) -> convertHirTy(ty);
+        default -> throw new IllegalArgumentException("Unknown return type: " + retTy);
         };
     }
 
@@ -160,19 +160,19 @@ public class HirConverter {
         var id = expr.hirId();
         var ty = Objects.requireNonNull(types.get(id), "No type for " + expr);
         return switch (expr.kind()) {
-            case ExprKind.Call e -> convertCall(e);
-            case ExprKind.BlockExpr e -> convertBlockExpr(e);
-            case ExprKind.LitExpr(var e) -> convertLitExpr(e, ty);
-            case ExprKind.Let(var l) -> convertLetExpr(l);
-            case ExprKind.If e -> convertIfExpr(e, ty);
-            case ExprKind.DropTemps(var e) -> convertExpr(e);
-            case ExprKind.Path(var e) -> convertPathExpr(e, ty);
-            case ExprKind.AddrOf e -> convertAddrOf(e);
-            case ExprKind.Assign e -> convertAssign(e, ty);
-            case ExprKind.AssignOp e -> convertAssignOp(e);
-            case ExprKind.Binary e -> convertBinary(e);
-            case ExprKind.Unary e -> convertUnary(e, ty);
-            default -> throw new IllegalArgumentException("Unknown expression: " + expr);
+        case ExprKind.Call e -> convertCall(e);
+        case ExprKind.BlockExpr e -> convertBlockExpr(e);
+        case ExprKind.LitExpr(var e) -> convertLitExpr(e, ty);
+        case ExprKind.Let(var l) -> convertLetExpr(l);
+        case ExprKind.If e -> convertIfExpr(e, ty);
+        case ExprKind.DropTemps(var e) -> convertExpr(e);
+        case ExprKind.Path(var e) -> convertPathExpr(e, ty);
+        case ExprKind.AddrOf e -> convertAddrOf(e);
+        case ExprKind.Assign e -> convertAssign(e, ty);
+        case ExprKind.AssignOp e -> convertAssignOp(e);
+        case ExprKind.Binary e -> convertBinary(e);
+        case ExprKind.Unary e -> convertUnary(e, ty);
+        default -> throw new IllegalArgumentException("Unknown expression: " + expr);
         };
     }
 
@@ -190,29 +190,29 @@ public class HirConverter {
 
     private LiteralExpression convertLitExpr(Lit expr, Type type) {
         return switch (expr.node()) {
-            case LitKind.Bool(var v) -> new BooleanLiteralExpression(v);
-            case LitKind.Int(var val, LitIntTy.Unsigned(var uintTy)) ->
-                    new IntegerLiteralExpression(new BigInteger(String.valueOf(val)), switch (uintTy) {
-                        case UintTy.U8 -> IntegerLiteralExpression.IntegerSuffix.u8;
-                        case UintTy.U16 -> IntegerLiteralExpression.IntegerSuffix.u16;
-                        case UintTy.U32 -> IntegerLiteralExpression.IntegerSuffix.u32;
-                        case UintTy.U64 -> IntegerLiteralExpression.IntegerSuffix.u64;
-                        case UintTy.U128 -> IntegerLiteralExpression.IntegerSuffix.u128;
-                        case UintTy.Usize -> IntegerLiteralExpression.IntegerSuffix.usize;
-                    }, type);
-            case LitKind.Int(var val, LitIntTy.Signed(var intTy)) -> new IntegerLiteralExpression(
-                    new BigInteger(String.valueOf(val)), switch (intTy) {
-                case Isize -> IntegerLiteralExpression.IntegerSuffix.isize;
-                case I8 -> IntegerLiteralExpression.IntegerSuffix.i8;
-                case I16 -> IntegerLiteralExpression.IntegerSuffix.i16;
-                case I32 -> IntegerLiteralExpression.IntegerSuffix.i32;
-                case I64 -> IntegerLiteralExpression.IntegerSuffix.i64;
-                case I128 -> IntegerLiteralExpression.IntegerSuffix.i128;
-            },type
-            );
-            case LitKind.Int(var val, LitIntTy.Unsuffixed u) ->
-                    new IntegerLiteralExpression(new BigInteger(String.valueOf(val)), IntegerLiteralExpression.IntegerSuffix.None,type);
-            default -> throw new IllegalArgumentException("Unknown lit: " + expr.node());
+        case LitKind.Bool(var v) -> new BooleanLiteralExpression(v);
+        case LitKind.Int(var val, LitIntTy.Unsigned(var uintTy)) ->
+            new IntegerLiteralExpression(new BigInteger(String.valueOf(val)), switch (uintTy) {
+            case UintTy.U8 -> IntegerLiteralExpression.IntegerSuffix.u8;
+            case UintTy.U16 -> IntegerLiteralExpression.IntegerSuffix.u16;
+            case UintTy.U32 -> IntegerLiteralExpression.IntegerSuffix.u32;
+            case UintTy.U64 -> IntegerLiteralExpression.IntegerSuffix.u64;
+            case UintTy.U128 -> IntegerLiteralExpression.IntegerSuffix.u128;
+            case UintTy.Usize -> IntegerLiteralExpression.IntegerSuffix.usize;
+            }, type);
+        case LitKind.Int(var val, LitIntTy.Signed(var intTy)) -> new IntegerLiteralExpression(
+            new BigInteger(String.valueOf(val)), switch (intTy) {
+            case Isize -> IntegerLiteralExpression.IntegerSuffix.isize;
+            case I8 -> IntegerLiteralExpression.IntegerSuffix.i8;
+            case I16 -> IntegerLiteralExpression.IntegerSuffix.i16;
+            case I32 -> IntegerLiteralExpression.IntegerSuffix.i32;
+            case I64 -> IntegerLiteralExpression.IntegerSuffix.i64;
+            case I128 -> IntegerLiteralExpression.IntegerSuffix.i128;
+            }, type);
+        case LitKind.Int(var val, LitIntTy.Unsuffixed u) ->
+            new IntegerLiteralExpression(new BigInteger(String.valueOf(val)),
+                IntegerLiteralExpression.IntegerSuffix.None, type);
+        default -> throw new IllegalArgumentException("Unknown lit: " + expr.node());
         };
     }
 
@@ -292,11 +292,11 @@ public class HirConverter {
 
     private Statement convertStmt(Stmt stmt) {
         return switch (stmt.kind()) {
-            case StmtKind.Let(var let) -> convertLet(let);
-            case StmtKind.ItemStmt(var item) -> new ItemStatement(convertItem(item));
-            case StmtKind.ExprStmt(var e) -> new ExpressionStatement(convertExpr(e), false);
-            case StmtKind.Semi(var e) -> new ExpressionStatement(convertExpr(e), true);
-            default -> throw new IllegalArgumentException("Unknown stmt: " + stmt.kind());
+        case StmtKind.Let(var let) -> convertLet(let);
+        case StmtKind.ItemStmt(var item) -> new ItemStatement(convertItem(item));
+        case StmtKind.ExprStmt(var e) -> new ExpressionStatement(convertExpr(e), false);
+        case StmtKind.Semi(var e) -> new ExpressionStatement(convertExpr(e), true);
+        default -> throw new IllegalArgumentException("Unknown stmt: " + stmt.kind());
         };
     }
 
@@ -309,9 +309,9 @@ public class HirConverter {
 
     private RustType convertHirTy(HirTy ty) {
         return switch (ty.kind()) {
-            case HirTyKind.Path p -> convertPathHirTy(p);
-            case HirTyKind.Ref(var m) -> convertMutHirTy(m);
-            default -> throw new IllegalArgumentException("Unknown hirty type: " + ty);
+        case HirTyKind.Path p -> convertPathHirTy(p);
+        case HirTyKind.Ref(var m) -> convertMutHirTy(m);
+        default -> throw new IllegalArgumentException("Unknown hirty type: " + ty);
         };
     }
 
@@ -331,16 +331,16 @@ public class HirConverter {
 
     private PrimitiveRustType convertPrimHirType(PrimHirTy pty) {
         var primTy = switch (pty) {
-            case PrimHirTy.Bool b -> PrimitiveType.BOOL;
-            case PrimHirTy.Uint(var uintTy) -> switch (uintTy) {
-                case UintTy.U8 -> PrimitiveType.U8;
-                case UintTy.U16 -> PrimitiveType.U16;
-                case UintTy.U32 -> PrimitiveType.U32;
-                case UintTy.U64 -> PrimitiveType.U64;
-                case UintTy.U128 -> PrimitiveType.U128;
-                case UintTy.Usize -> PrimitiveType.USIZE;
-            };
-            default -> throw new IllegalArgumentException("Unknown prim type: " + pty);
+        case PrimHirTy.Bool b -> PrimitiveType.BOOL;
+        case PrimHirTy.Uint(var uintTy) -> switch (uintTy) {
+        case UintTy.U8 -> PrimitiveType.U8;
+        case UintTy.U16 -> PrimitiveType.U16;
+        case UintTy.U32 -> PrimitiveType.U32;
+        case UintTy.U64 -> PrimitiveType.U64;
+        case UintTy.U128 -> PrimitiveType.U128;
+        case UintTy.Usize -> PrimitiveType.USIZE;
+        };
+        default -> throw new IllegalArgumentException("Unknown prim type: " + pty);
         };
         return new PrimitiveRustType(primTy);
     }
@@ -350,39 +350,7 @@ public class HirConverter {
     }
 
     private Pattern convertPat(Pat pat, boolean isCtxFnParam) {
-        return switch (pat.kind()) {
-            case PatKind.Binding p -> {
-                boolean ref = false;
-                boolean mutRef = false;
-                if (p.mode().byRef() instanceof ByRef.Yes y) {
-                    ref = true;
-                    mutRef = y.mut();
-                }
-                boolean mut = p.mode().mut();
-                var name = new Name(convertIdent(p.ident()));
-                var id = p.hirId();
-                ProgramVariable pv;
-                if (isCtxFnParam) {
-                    pv = services.getNamespaces().programVariables().lookup(name);
-                } else {
-                    pv = new ProgramVariable(name, services.getRustInfo().getKeYRustyType(types.get(id)));
-                }
-                declarePV(id, pv);
-                Pattern opt = p.pat() == null ? null : convertPat(p.pat());
-                yield new BindingPattern(ref, mutRef, mut, pv, opt);
-            }
-            case PatKind.Wild w -> WildCardPattern.WILDCARD;
-            case PatKind.Path p -> {
-                yield new PathPattern();
-            }
-            case PatKind.Range r -> {
-                var left = r.lhs() == null ? null: convertExpr(r.lhs());
-                var right = r.rhs() == null ? null: convertExpr(r.rhs());
-                var bounds = r.inclusive() ? RangePattern.Bounds.Inclusive : RangePattern.Bounds.Exclusive;
-                yield new RangePattern(left, bounds, right);
-            }
-            default -> throw new IllegalArgumentException("Unknown pat: " + pat);
-        };
+        return switch(pat.kind()){case PatKind.Binding p->{boolean ref=false;boolean mutRef=false;if(p.mode().byRef()instanceof ByRef.Yes y){ref=true;mutRef=y.mut();}boolean mut=p.mode().mut();var name=new Name(convertIdent(p.ident()));var id=p.hirId();ProgramVariable pv;if(isCtxFnParam){pv=services.getNamespaces().programVariables().lookup(name);}else{pv=new ProgramVariable(name,services.getRustInfo().getKeYRustyType(types.get(id)));}declarePV(id,pv);Pattern opt=p.pat()==null?null:convertPat(p.pat());yield new BindingPattern(ref,mutRef,mut,pv,opt);}case PatKind.Wild w->WildCardPattern.WILDCARD;case PatKind.Path p->{yield new PathPattern();}case PatKind.Range r->{var left=r.lhs()==null?null:convertExpr(r.lhs());var right=r.rhs()==null?null:convertExpr(r.rhs());var bounds=r.inclusive()?RangePattern.Bounds.Inclusive:RangePattern.Bounds.Exclusive;yield new RangePattern(left,bounds,right);}default->throw new IllegalArgumentException("Unknown pat: "+pat);};
     }
 
     private <R, S> Path<R> convertPath(org.key_project.rusty.parser.hir.Path<S> path,
@@ -394,9 +362,9 @@ public class HirConverter {
 
     private QPath convertQPath(org.key_project.rusty.parser.hir.QPath qPath) {
         return switch (qPath) {
-            case org.key_project.rusty.parser.hir.QPath.Resolved(var selfTy, var path) ->
-                    new QPathResolved(convertHirTy(selfTy), convertPath(path, this::convertRes));
-            default -> throw new IllegalArgumentException("Unknown path: " + qPath);
+        case org.key_project.rusty.parser.hir.QPath.Resolved(var selfTy, var path) ->
+            new QPathResolved(convertHirTy(selfTy), convertPath(path, this::convertRes));
+        default -> throw new IllegalArgumentException("Unknown path: " + qPath);
         };
     }
 
@@ -406,51 +374,24 @@ public class HirConverter {
 
     private Res convertRes(org.key_project.rusty.parser.hir.Res res) {
         return switch (res) {
-            case org.key_project.rusty.parser.hir.Res.PrimTy(var ty) -> convertPrimHirType(ty);
-            case org.key_project.rusty.parser.hir.Res.Local(var id) -> getPV(id);
-            case org.key_project.rusty.parser.hir.Res.DefRes(var def) -> new ResDef(convertDef(def));
-            case org.key_project.rusty.parser.hir.Res.Err e -> new ResErr();
-            default -> throw new IllegalArgumentException("Unknown hirty type: " + res);
+        case org.key_project.rusty.parser.hir.Res.PrimTy(var ty) -> convertPrimHirType(ty);
+        case org.key_project.rusty.parser.hir.Res.Local(var id) -> getPV(id);
+        case org.key_project.rusty.parser.hir.Res.DefRes(var def) -> new ResDef(convertDef(def));
+        case org.key_project.rusty.parser.hir.Res.Err e -> new ResErr();
+        default -> throw new IllegalArgumentException("Unknown hirty type: " + res);
         };
     }
 
     private Def convertDef(org.key_project.rusty.parser.hir.Def def) {
         return switch (def.kind()) {
-            case DefKind.Fn f -> services.getRustInfo().getFunction(localFns.get(new LocalDefId(def.id().index())));
-            case DefKind.Mod m -> null;
-            default -> throw new IllegalArgumentException("Unknown def: " + def);
+        case DefKind.Fn f ->
+            services.getRustInfo().getFunction(localFns.get(new LocalDefId(def.id().index())));
+        case DefKind.Mod m -> null;
+        default -> throw new IllegalArgumentException("Unknown def: " + def);
         };
     }
 
     private Type convertTy(Ty ty) {
-        Type type = switch (ty) {
-            case Ty.Bool ignored -> PrimitiveType.BOOL;
-            case Ty.Int(var i) -> switch (i) {
-                case Isize -> PrimitiveType.ISIZE;
-                case I8 -> PrimitiveType.I8;
-                case I16 -> PrimitiveType.I16;
-                case I32 -> PrimitiveType.I32;
-                case I64 -> PrimitiveType.I64;
-                case I128 -> PrimitiveType.I128;
-            };
-            case Ty.Uint(var u) -> switch (u) {
-                case Usize -> PrimitiveType.USIZE;
-                case U8 -> PrimitiveType.U8;
-                case U16 -> PrimitiveType.U16;
-                case U32 -> PrimitiveType.U32;
-                case U64 -> PrimitiveType.U64;
-                case U128 -> PrimitiveType.U128;
-            };
-            case Ty.Ref(var t, var m) -> ReferenceType.get(convertTy(t), m);
-            case Ty.FnDef(var id) ->  {
-                assert id.krate() == 0 : "only local FnDef tys allowed";
-                var fn = localFns.get(new LocalDefId(id.index()));
-                yield new FnDefType(fn);
-            }
-            case Ty.Tuple(var ts) -> TupleType.getInstance(Arrays.stream(ts).map(this::convertTy).toList());
-            default -> throw new IllegalArgumentException("Unknown ty: " + ty);
-        };
-        services.getRustInfo().registerType(type);
-        return type;
+        Type type=switch(ty){case Ty.Bool ignored->PrimitiveType.BOOL;case Ty.Int(var i)->switch(i){case Isize->PrimitiveType.ISIZE;case I8->PrimitiveType.I8;case I16->PrimitiveType.I16;case I32->PrimitiveType.I32;case I64->PrimitiveType.I64;case I128->PrimitiveType.I128;};case Ty.Uint(var u)->switch(u){case Usize->PrimitiveType.USIZE;case U8->PrimitiveType.U8;case U16->PrimitiveType.U16;case U32->PrimitiveType.U32;case U64->PrimitiveType.U64;case U128->PrimitiveType.U128;};case Ty.Ref(var t,var m)->ReferenceType.get(convertTy(t),m);case Ty.FnDef(var id)->{assert id.krate()==0:"only local FnDef tys allowed";var fn=localFns.get(new LocalDefId(id.index()));yield new FnDefType(fn);}case Ty.Tuple(var ts)->TupleType.getInstance(Arrays.stream(ts).map(this::convertTy).toList());default->throw new IllegalArgumentException("Unknown ty: "+ty);};services.getRustInfo().registerType(type);return type;
     }
 }

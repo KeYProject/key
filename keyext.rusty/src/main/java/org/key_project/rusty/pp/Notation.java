@@ -306,40 +306,41 @@ public abstract class Notation {
     }
 
     public static final class SchemaVariableNotation extends VariableNotation {
-        public void printDeclaration(org.key_project.logic.op.sv.SchemaVariable v, LogicPrinter sp) {
+        public void printDeclaration(org.key_project.logic.op.sv.SchemaVariable v,
+                LogicPrinter sp) {
             String svType;
             String specificSort = "";
             if (v instanceof OperatorSV) {
                 switch (v) {
-                    case ProgramSV psv -> {
-                        svType = "\\program";
-                        specificSort = psv.sort().declarationString();
-                    }
-                    case TermSV tsv -> {
-                        svType = "\\term";
-                        specificSort = tsv.sort().name().toString();
-                    }
-                    case FormulaSV fsv -> {
-                        svType = "\\formula";
-                        specificSort = fsv.sort().name().toString();
-                    }
-                    case VariableSV varSV -> {
-                        svType = "\\variables";
-                        specificSort = varSV.sort().name().toString();
-                    }
-                    case UpdateSV ignored -> svType = "\\update";
-                    case SkolemTermSV skolemTermSV -> {
-                        if (skolemTermSV.sort() == RustyDLTheory.FORMULA) {
-                            svType = "\\skolemFormula";
-                        } else {
-                            svType = "\\skolemTerm";
-                            specificSort = skolemTermSV.sort().name().toString();
-                        }
-                    }
-                    default -> throw new RuntimeException("Unknown variable type: " + v.getClass());
+                case ProgramSV psv -> {
+                    svType = "\\program";
+                    specificSort = psv.sort().declarationString();
                 }
-                sp.layouter().print("\\schemaVar ").print(svType + " ").
-                        print(specificSort).print(" ").print(v.name().toString());
+                case TermSV tsv -> {
+                    svType = "\\term";
+                    specificSort = tsv.sort().name().toString();
+                }
+                case FormulaSV fsv -> {
+                    svType = "\\formula";
+                    specificSort = fsv.sort().name().toString();
+                }
+                case VariableSV varSV -> {
+                    svType = "\\variables";
+                    specificSort = varSV.sort().name().toString();
+                }
+                case UpdateSV ignored -> svType = "\\update";
+                case SkolemTermSV skolemTermSV -> {
+                    if (skolemTermSV.sort() == RustyDLTheory.FORMULA) {
+                        svType = "\\skolemFormula";
+                    } else {
+                        svType = "\\skolemTerm";
+                        specificSort = skolemTermSV.sort().name().toString();
+                    }
+                }
+                default -> throw new RuntimeException("Unknown variable type: " + v.getClass());
+                }
+                sp.layouter().print("\\schemaVar ").print(svType + " ").print(specificSort)
+                        .print(" ").print(v.name().toString());
             } else if (v instanceof ModalOperatorSV modalOperatorSV) {
                 sp.layouter().beginC(0).beginC().print("\\schemaVar \\modalOperator {").brk(0);
                 boolean first = true;
@@ -351,7 +352,8 @@ public abstract class Notation {
                     }
                     sp.layouter().print(modality.name().toString());
                 }
-                sp.layouter().end().brk(0).print("}").end().print(" ").print(modalOperatorSV.name().toString());
+                sp.layouter().end().brk(0).print("}").end().print(" ")
+                        .print(modalOperatorSV.name().toString());
             } else {
                 throw new RuntimeException("Unknown variable type: " + v.getClass());
             }

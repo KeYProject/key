@@ -5,7 +5,7 @@ package org.key_project.rusty.parser.hir.expr;
 
 import org.key_project.rusty.parser.hir.Span;
 
-//spotless:off
+// spotless:off
 public record BinOp(BinOpKind node, Span span) {
 }
 //spotless:on

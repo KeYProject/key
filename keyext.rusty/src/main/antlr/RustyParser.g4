@@ -618,25 +618,11 @@ closureParam
    ;
 
 loopExpr
-   : loopLabel? (infiniteLoopExpr | predicateLoopExpr | predicatePatternLoopExpr | iteratorLoopExpr)
+   : loopLabel? infiniteLoopExpr
    ;
 
 infiniteLoopExpr
    : 'loop' blockExpr
-   ;
-
-predicateLoopExpr
-   : 'while' expr /*except structExpression*/
-   
-   blockExpr
-   ;
-
-predicatePatternLoopExpr
-   : KW_WHILE KW_LET pattern EQ expr blockExpr
-   ;
-
-iteratorLoopExpr
-   : KW_FOR pattern KW_IN expr blockExpr
    ;
 
 loopLabel

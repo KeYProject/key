@@ -13,7 +13,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-//spotless:off
+// spotless:off
 public record ContinueExpression(@Nullable Label label, @Nullable Expr expr) implements Expr {
     @Override
     public void visit(Visitor v) {

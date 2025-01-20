@@ -12,8 +12,8 @@ import org.key_project.rusty.ast.visitor.Visitor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-//spotless:off
-public record InfiniteLoopExpression(@Nullable Label label, BlockExpression body) implements LoopExpression {
+// spotless:off
+public record InfiniteLoopExpression(@Nullable Label label, Expr body) implements LoopExpression {
     @Override
     public void visit(Visitor v) {
         v.performActionOnInfiniteLoop(this);

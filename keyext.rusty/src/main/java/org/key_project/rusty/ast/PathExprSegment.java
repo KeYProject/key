@@ -5,7 +5,7 @@ package org.key_project.rusty.ast;
 
 import org.key_project.logic.SyntaxElement;
 
-//spotless:off
+// spotless:off
 public record PathExprSegment(PathIdentSegment segment) implements SyntaxElement {
     @Override
     public SyntaxElement getChild(int n) {

@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import org.key_project.rusty.parser.hir.hirty.HirTy;
 
-//spotless:off
+// spotless:off
 public record FnDecl(HirTy[] inputs, FnRetTy output, boolean cVariadic, ImplicitSelfKind implicitSelf,
                      boolean lifetimeElisionAllowed) {
     @Override

@@ -279,9 +279,9 @@ public class SyntacticalReplaceVisitor implements Visitor<Term> {
          * instantiatedOp =
          * handleSortDependingSymbol((SortDependingFunction) p_operatorToBeInstantiated);
          * } else
-         */ if (p_operatorToBeInstantiated instanceof ElementaryUpdate) {
+         */ if (p_operatorToBeInstantiated instanceof ElementaryUpdate eu) {
             instantiatedOp =
-                instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
+                instantiateElementaryUpdate(eu);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
             if (!(p_operatorToBeInstantiated instanceof ProgramSV)
                     || !((ProgramSV) p_operatorToBeInstantiated).isListSV()) {

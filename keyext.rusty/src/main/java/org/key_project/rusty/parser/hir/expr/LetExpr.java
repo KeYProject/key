@@ -9,5 +9,4 @@ import org.key_project.rusty.parser.hir.pat.Pat;
 
 import org.jspecify.annotations.Nullable;
 
-public record LetExpr(Span span, Pat pat, @Nullable HirTy ty, Expr init, boolean recovered) {
-}
+public record LetExpr(Span span,Pat pat,@Nullable HirTy ty,Expr init,boolean recovered){}

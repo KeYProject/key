@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record EnumVariantStruct(PathInExpression path,
                                 ImmutableArray<EnumExprField> fields) implements EnumVariantExpression {
     @Override

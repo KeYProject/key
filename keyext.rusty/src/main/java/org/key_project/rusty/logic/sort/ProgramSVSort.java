@@ -9,6 +9,7 @@ import java.util.Map;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.Label;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.abstraction.PrimitiveType;
 import org.key_project.rusty.ast.abstraction.Type;
@@ -53,6 +54,8 @@ public abstract class ProgramSVSort extends SortImpl {
     public static final ProgramSVSort STATEMENT = new StatementSort();
     public static final ProgramSVSort TYPE = new TypeReferenceSort();
     public static final ProgramSVSort TYPE_PRIMITIVE = new TypeReferencePrimitiveSort();
+
+    public static final ProgramSVSort LABEL = new LabelSort();
 
     protected ProgramSVSort(Name name) {
         super(name, false, DefaultImmutableSet.nil());
@@ -319,6 +322,17 @@ public abstract class ProgramSVSort extends SortImpl {
         @Override
         public boolean canStandFor(RustyProgramElement check, Services services) {
             return check instanceof Pattern;
+        }
+    }
+
+    private static class LabelSort extends ProgramSVSort {
+        protected LabelSort() {
+            super(new Name("Label"));
+        }
+
+        @Override
+        public boolean canStandFor(RustyProgramElement check, Services services) {
+            return check instanceof Label;
         }
     }
 }

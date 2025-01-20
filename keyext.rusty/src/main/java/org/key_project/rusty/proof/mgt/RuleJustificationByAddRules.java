@@ -9,7 +9,7 @@ import org.key_project.rusty.proof.Node;
 import org.key_project.rusty.rule.RuleApp;
 import org.key_project.rusty.rule.Taclet;
 
-//spotless:off
+// spotless:off
 public record RuleJustificationByAddRules(Node node, boolean isAxiom) implements RuleJustification {
     public RuleJustificationByAddRules {
         assert node != null;

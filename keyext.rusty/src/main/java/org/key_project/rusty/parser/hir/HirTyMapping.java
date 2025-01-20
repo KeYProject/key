@@ -5,5 +5,4 @@ package org.key_project.rusty.parser.hir;
 
 import org.key_project.rusty.parser.hir.ty.Ty;
 
-public record HirTyMapping(HirId hirId, Ty ty) {
-}
+public record HirTyMapping(HirId hirId,Ty ty){}

@@ -7,11 +7,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.expr.InfiniteLoopExpression;
+import org.key_project.rusty.ast.expr.LoopExpression;
 import org.key_project.rusty.logic.TermBuilder;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.speclang.Contract;
 import org.key_project.rusty.speclang.FunctionalOperationContract;
+import org.key_project.rusty.speclang.LoopSpecification;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -24,6 +27,7 @@ public class SpecificationRepository {
         new LinkedHashMap<>();
     private final Map<String, Contract> contractsByName = new LinkedHashMap<>();
     private final Map<String, Integer> contractCounters = new LinkedHashMap<>();
+    private Map<LoopExpression, LoopSpecification> loopInvs = new LinkedHashMap<>();
 
     public SpecificationRepository(Services services) {
         this.services = services;
@@ -92,5 +96,13 @@ public class SpecificationRepository {
             return null;
         }
         return contractsByName.get(name);
+    }
+
+    /**
+     * Returns the registered loop invariant for the passed loop, or null.
+     */
+    public LoopSpecification getLoopSpec(InfiniteLoopExpression loop) {
+        // TODO: Java uses a pair of lines and loops. Why? Do we need that?
+        return loopInvs.get(loop);
     }
 }

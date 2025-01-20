@@ -9,7 +9,7 @@ import org.key_project.rusty.ast.RustyProgramElement;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record RustyBlock(RustyProgramElement program) implements Program {
     @Override
     public @NonNull SyntaxElement getChild(int n) {

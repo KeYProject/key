@@ -605,40 +605,25 @@ public class SchemaConverter {
             ctx.loopLabel() == null ? null : convertLabel(ctx.loopLabel().LIFETIME_OR_LABEL());
         if (ctx.infiniteLoopExpr() != null)
             return convertInfiniteLoopExpr(ctx.infiniteLoopExpr(), label);
-        if (ctx.predicateLoopExpr() != null)
-            return convertPredicateLoopExpr(ctx.predicateLoopExpr(), label);
-        if (ctx.predicatePatternLoopExpr() != null)
-            return convertPredicatePatternLoopExpr(ctx.predicatePatternLoopExpr(), label);
-        if (ctx.iteratorLoopExpr() != null)
-            return convertIteratorLoopExpr(ctx.iteratorLoopExpr(), label);
+        if (ctx.loopScope() != null)
+            return convertLoopScope(ctx.loopScope());
         throw new UnsupportedOperationException("Unknown loop: " + ctx.getText());
+    }
+
+    private LoopScope convertLoopScope(RustySchemaParser.LoopScopeContext ctx) {
+        var sv = (ProgramSV) lookupSchemaVariable(ctx.schemaVariable().getText().substring(2));
+        return new LoopScope(sv, convertBlockExpr(ctx.blockExpr()));
     }
 
     private InfiniteLoopExpression convertInfiniteLoopExpr(
             org.key_project.rusty.parsing.RustySchemaParser.InfiniteLoopExprContext ctx,
             @Nullable Label label) {
-        return new InfiniteLoopExpression(label, convertBlockExpr(ctx.blockExpr()));
-    }
-
-    private PredicateLoopExpression convertPredicateLoopExpr(
-            org.key_project.rusty.parsing.RustySchemaParser.PredicateLoopExprContext ctx,
-            @Nullable Label label) {
-        return new PredicateLoopExpression(label, convertExpr(ctx.expr()),
-            convertBlockExpr(ctx.blockExpr()));
-    }
-
-    private PredicatePatternLoopExpression convertPredicatePatternLoopExpr(
-            org.key_project.rusty.parsing.RustySchemaParser.PredicatePatternLoopExprContext ctx,
-            @Nullable Label label) {
-        return new PredicatePatternLoopExpression(label, convertPattern(ctx.pattern()),
-            convertExpr(ctx.expr()), convertBlockExpr(ctx.blockExpr()));
-    }
-
-    private IteratorLoopExpression convertIteratorLoopExpr(
-            org.key_project.rusty.parsing.RustySchemaParser.IteratorLoopExprContext ctx,
-            @Nullable Label label) {
-        return new IteratorLoopExpression(label, convertPattern(ctx.pattern()),
-            convertExpr(ctx.expr()), convertBlockExpr(ctx.blockExpr()));
+        Expr body;
+        if (ctx.block != null)
+            body = convertBlockExpr(ctx.block);
+        else
+            body = (ProgramSV) lookupSchemaVariable(ctx.schemaVariable().getText().substring(2));
+        return new InfiniteLoopExpression(label, body);
     }
 
     private IfExpression convertIfExpr(

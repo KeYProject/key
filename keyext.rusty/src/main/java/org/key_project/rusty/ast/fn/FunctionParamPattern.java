@@ -11,7 +11,7 @@ import org.key_project.rusty.ast.visitor.Visitor;
 
 import org.jspecify.annotations.NonNull;
 
-//spotless:off
+// spotless:off
 public record FunctionParamPattern(Pattern pattern, RustType type, KeYRustyType keYRustyType) implements FunctionParam {
     @Override
     public int getChildCount() {

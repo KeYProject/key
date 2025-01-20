@@ -16,6 +16,12 @@ varexpId
  | NEW_TYPE_OF
  | NEW_DEPENDING_ON
  | NEW
+ | NEW_LOCAL_VARS
+ | STORE_TERM_IN
+ | STORE_EXPR_IN
+ | HAS_INVARIANT
+ | GET_INVARIANT
+ | GET_VARIANT
  ;
 
 elementary_update_term: a=mutating_update_term (ASSIGN b=mutating_update_term)?;
