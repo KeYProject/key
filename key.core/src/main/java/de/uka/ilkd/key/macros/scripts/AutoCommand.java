@@ -39,6 +39,11 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     @Override
+    public String getDocumentation() {
+        return "The AutoCommand invokes the automatic strategy \"Auto\"";
+    }
+
+    @Override
     public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
             throws ConversionException, ArgumentRequiredException, InjectionReflectionException,
             NoSpecifiedConverterException {

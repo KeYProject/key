@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 
 /**
@@ -24,10 +23,5 @@ public abstract class NoArgumentCommand implements ProofScriptCommand<Void> {
     public Void evaluateArguments(EngineState state,
             Map<String, Object> arguments) {
         return null;
-    }
-
-    @Override
-    public String getDocumentation() {
-        return DescriptionFacade.getDocumentation(this);
     }
 }

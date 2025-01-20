@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -48,7 +49,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * An optional field denoting a script contained in the proof file.
      */
-    private final KeyAst.@Nullable ProofScript proofScript;
+    private final @Nullable ProofScript proofScript;
 
     /**
      * Indicates that this {@link KeYEnvironment} is disposed.
@@ -78,7 +79,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param proofScript add an optional proof script
      */
     public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof,
-            KeyAst.@Nullable ProofScript proofScript, ReplayResult replayResult) {
+                          @Nullable ProofScript proofScript, ReplayResult replayResult) {
         this.ui = ui;
         this.initConfig = initConfig;
         this.loadedProof = loadedProof;
@@ -322,7 +323,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
         return disposed;
     }
 
-    public KeyAst.@Nullable ProofScript getProofScript() {
+    public @Nullable ProofScript getProofScript() {
         return proofScript;
     }
 }

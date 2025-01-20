@@ -10,7 +10,6 @@ import java.util.Map;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.scripts.meta.ArgumentsLifter;
-import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -82,18 +81,10 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
      * @throws ScriptException
      * @throws InterruptedException
      */
-    protected void execute(T args) throws ScriptException, InterruptedException {
+    protected void execute(T args) throws ScriptException, InterruptedException {}
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getDocumentation() {
-        if (documentation == null) {
-            documentation = DescriptionFacade.getDocumentation(this);
-        }
-        return documentation;
+        return "";
     }
 }

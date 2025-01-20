@@ -38,7 +38,7 @@ public class LetCommand implements ProofScriptCommand<Map<String, Object>> {
 
         for (Map.Entry<String, Object> entry : args.entrySet()) {
             String key = entry.getKey();
-            if (key.startsWith("#") && key.equals("force")) {
+            if (key.startsWith("#") || key.equals("force")) {
                 continue;
             }
 

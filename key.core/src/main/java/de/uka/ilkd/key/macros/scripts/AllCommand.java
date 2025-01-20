@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.proof.Goal;
@@ -56,9 +55,7 @@ public class AllCommand implements ProofScriptCommand<Map<String, Object>> {
      */
     @Override
     public String getDocumentation() {
-        if (documentation == null) {
-            documentation = DescriptionFacade.getDocumentation(this);
-        }
-        return documentation;
+        return """
+                Applies the given command to all the open goals.""";
     }
 }
