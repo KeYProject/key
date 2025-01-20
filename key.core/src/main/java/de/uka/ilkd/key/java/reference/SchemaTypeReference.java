@@ -1,6 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
@@ -17,7 +19,7 @@ public class SchemaTypeReference extends TypeReferenceImp implements AbstractPro
 
     public SchemaTypeReference(ProgramElementName name, int dimension, ReferencePrefix prefix) {
         super(name, dimension, prefix);
-        final StringBuffer sb = new StringBuffer("");
+        final StringBuilder sb = new StringBuilder();
 
         // as no inner classes prefix must be package reference
         PackageReference rp = (PackageReference) prefix;
@@ -64,10 +66,6 @@ public class SchemaTypeReference extends TypeReferenceImp implements AbstractPro
      */
     public void visit(Visitor v) {
         v.performActionOnAbstractProgramElement(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printSchemaTypeReference(this);
     }
 
 }

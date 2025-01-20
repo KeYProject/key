@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
+
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Node;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Objects;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Information on exploration that is attached to nodes. If such an object is attached to a node,
@@ -15,7 +19,7 @@ public class ExplorationNodeData {
 
     private String explorationAction;
 
-    public static @Nonnull ExplorationNodeData get(@Nonnull Node node) {
+    public static @NonNull ExplorationNodeData get(@NonNull Node node) {
         @Nullable
         ExplorationNodeData data = node.lookup(ExplorationNodeData.class);
         if (data == null) {
@@ -42,12 +46,15 @@ public class ExplorationNodeData {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null)
+        }
+        if (o == null) {
             return false;
-        if (o.getClass() != getClass())
+        }
+        if (o.getClass() != getClass()) {
             return false;
+        }
         ExplorationNodeData that = (ExplorationNodeData) o;
         return Objects.equals(getExplorationAction(), that.getExplorationAction());
     }

@@ -7,15 +7,15 @@
             <callStackEntry path="/0"/>
             <loopInvariant name="invariant: (  (i &gt;= 0
  &amp; i &lt;= array.length)&lt;&lt;SC&gt;&gt;
- &amp; result = javaCastInt(bsum{int j;}(0, i, array[j])))&lt;&lt;SC&gt;&gt;;
-variant: javaSubInt(array.length, i)
+ &amp; result = bsum{int j;}(0, i, array[j]))&lt;&lt;SC&gt;&gt;;
+variant: array.length - i
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="false">
                <callStackEntry path="/0"/>
                <branchCondition name="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="true" branchCondition="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
-                  <loopCondition name="i&lt;array.length" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="false" blockOpened="false">
+                  <loopCondition name="i &lt; array.length;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="false" blockOpened="false">
                      <callStackEntry path="/0"/>
-                     <statement name="result+=array[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="false">
+                     <statement name="result += array[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
                         <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_0)))" pathConditionChanged="false">
                            <callStackEntry path="/0"/>

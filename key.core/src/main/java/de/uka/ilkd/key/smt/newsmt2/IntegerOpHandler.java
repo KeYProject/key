@@ -1,17 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
@@ -36,7 +33,7 @@ public class IntegerOpHandler implements SMTHandler {
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
     private final Set<Operator> predicateOperators = new HashSet<>();
-    private Function mul;
+    private JFunction mul;
     private boolean limitedToPresbuger;
     private IntegerLDT integerLDT;
 
@@ -51,6 +48,7 @@ public class IntegerOpHandler implements SMTHandler {
         supportedOperators.put(mul, "*");
         supportedOperators.put(integerLDT.getSub(), "-");
         supportedOperators.put(integerLDT.getDiv(), "div");
+        supportedOperators.put(integerLDT.getMod(), "mod");
         supportedOperators.put(integerLDT.getNeg(), "-");
 
         supportedOperators.put(integerLDT.getLessOrEquals(), "<=");
@@ -87,8 +85,8 @@ public class IntegerOpHandler implements SMTHandler {
             return Capability.YES_THIS_OPERATOR;
         }
 
-        if (op == mul && (isIntLiteral(term.sub(0)) || isIntLiteral(term.sub(1)))) {
-            return Capability.YES_THIS_INSTANCE;
+        if (!isIntLiteral(term.sub(0))) {
+            isIntLiteral(term.sub(1));
         }
 
         return Capability.YES_THIS_INSTANCE;
@@ -120,7 +118,7 @@ public class IntegerOpHandler implements SMTHandler {
      */
     @Override
     public List<SMTHandlerProperty<?>> getProperties() {
-        return Arrays.asList(PROPERTY_PRESBURGER);
+        return List.of(PROPERTY_PRESBURGER);
     }
 
 }

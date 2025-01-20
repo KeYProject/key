@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.magic()&gt;" pathCondition="true" pathConditionChanged="false">
-      <statement name="this.x=2;" pathCondition="true" pathConditionChanged="false">
+      <statement name="this.x = 2;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <statement name="this.y=3;" pathCondition="true" pathConditionChanged="false">
+         <statement name="this.y = 3;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
             <blockContract name="self#magic()) catch(exc#1)
 pre measuredByEmpty &amp; self.x = 2
@@ -12,7 +12,7 @@ mod {(self, BlockContractThisTest::$x)}termination diamond" pathCondition="true"
                <callStackEntry path="/0"/>
                <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Validity">
                   <callStackEntry path="/0"/>
-                  <statement name="this.x=-2;" pathCondition="true" pathConditionChanged="false">
+                  <statement name="this.x = -2;" pathCondition="true" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
                      <termination name="&lt;block contract end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="BLOCK_CONTRACT_NORMAL" branchVerified="true">
                      </termination>

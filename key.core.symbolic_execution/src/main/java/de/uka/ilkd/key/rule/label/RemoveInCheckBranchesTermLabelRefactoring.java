@@ -1,15 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.label;
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -21,6 +18,10 @@ import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This {@link TermLabelRefactoring} removes the supported {@link TermLabel} in check branches.
@@ -95,13 +96,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     @Override
     public void refactorLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Term term, List<TermLabel> labels) {
-        Iterator<TermLabel> iter = labels.iterator();
-        while (iter.hasNext()) {
-            TermLabel next = iter.next();
-            if (termLabelNameToRemove.equals(next.name())) {
-                iter.remove();
-            }
-        }
+            Object hint, Term tacletTerm, Term term, LabelCollection labels) {
+        labels.removeIf(next -> termLabelNameToRemove.equals(next.name()));
     }
 }

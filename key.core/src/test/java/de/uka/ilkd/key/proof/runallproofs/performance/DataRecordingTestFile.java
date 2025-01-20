@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs.performance;
+
+import java.io.File;
+import java.io.IOException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -11,13 +17,13 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.Strategy;
 
-import java.io.File;
-
-@SuppressWarnings("serial")
 class DataRecordingTestFile extends TestFile {
+    public final ProfilingDirectories directories;
+
     public DataRecordingTestFile(TestProperty testProperty, String path,
-            ProofCollectionSettings settings) {
-        super(testProperty, path, settings, new ProfilingDirectories(settings.runStart));
+            ProofCollectionSettings settings) throws IOException {
+        super(testProperty, path, settings);
+        this.directories = new ProfilingDirectories(settings.runStart);
     }
 
     @Override
@@ -44,10 +50,10 @@ class DataRecordingTestFile extends TestFile {
         proof.setActiveStrategy(strategy);
         return new ApplyStrategy(
             proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create())
-                    .start(proof, proof.openGoals().head());
+                .start(proof, proof.openGoals().head());
     }
 
     public final ProfilingDirectories getProfileDirectories() {
-        return (ProfilingDirectories) directories;
+        return directories;
     }
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.model;
 
 /**
@@ -19,8 +22,9 @@ public class Sequence {
     public Sequence(int length, String name) {
         super();
         this.name = name;
-        if (length >= 0)
+        if (length >= 0) {
             content = new String[length];
+        }
     }
 
     public String getName() {
@@ -44,14 +48,14 @@ public class Sequence {
     }
 
     public String toString() {
-        String result = "Seq: " + name + "\n";
-        result += "Length: " + content.length + "\n";
+        StringBuilder result = new StringBuilder("Seq: " + name + "\n");
+        result.append("Length: ").append(content.length).append("\n");
 
         for (int i = 0; content != null && i < content.length; ++i) {
 
-            result += "[" + i + "] = " + content[i] + "\n";
+            result.append("[").append(i).append("] = ").append(content[i]).append("\n");
         }
-        return result;
+        return result.toString();
     }
 
 }

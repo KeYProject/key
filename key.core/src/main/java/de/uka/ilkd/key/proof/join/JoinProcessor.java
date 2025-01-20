@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.join;
 
 import java.util.Collection;
@@ -5,16 +8,8 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
@@ -24,6 +19,9 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * <p>
@@ -56,16 +54,16 @@ public class JoinProcessor implements Runnable {
     private final Proof proof;
     private final Services services;
     private final ProspectivePartner partner;
-    private final LinkedList<Listener> listeners = new LinkedList<Listener>();
+    private final LinkedList<Listener> listeners = new LinkedList<>();
     private static final String HIDE_RIGHT_TACLET = "hide_right";
     private static final String OR_RIGHT_TACLET = "orRight";
-    public static final String SIMPLIFY_UPDATE[] =
+    public static final String[] SIMPLIFY_UPDATE =
         { "simplifyIfThenElseUpdate1", "simplifyIfThenElseUpdate2", "simplifyIfThenElseUpdate3" };
 
     public interface Listener {
-        public void exceptionWhileJoining(Throwable e);
+        void exceptionWhileJoining(Throwable e);
 
-        public void endOfJoining(ImmutableList<Goal> goals);
+        void endOfJoining(ImmutableList<Goal> goals);
     }
 
     public JoinProcessor(ProspectivePartner partner, Proof proof) {
@@ -103,7 +101,7 @@ public class JoinProcessor implements Runnable {
 
         orRight(result);
 
-        ImmutableList<Goal> list = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> list = ImmutableSLList.nil();
 
         for (NodeGoalPair pair : cut.getGoalsAfterUncovering()) {
             if (pair.node == partner.getNode(0) || pair.node == partner.getNode(1)) {
@@ -161,7 +159,7 @@ public class JoinProcessor implements Runnable {
 
         };
         ImmutableList<NoPosTacletApp> apps =
-            goal.ruleAppIndex().getFindTaclet(filter, pio, services);
+            goal.ruleAppIndex().getFindTaclet(filter, pio);
 
         if (apps.isEmpty()) {
             return null;
@@ -250,7 +248,7 @@ public class JoinProcessor implements Runnable {
 
     private Collection<Term> createConstrainedTerms(Collection<Term> terms, Term predicate,
             boolean gamma) {
-        Collection<Term> result = new LinkedList<Term>();
+        Collection<Term> result = new LinkedList<>();
         for (Term term : terms) {
             if (gamma) {
                 result.add(services.getTermBuilder().imp(predicate, term));
@@ -274,7 +272,7 @@ public class JoinProcessor implements Runnable {
 
     private Collection<Term> computeDifference(Semisequent s, Collection<Term> excludeSet,
             Term exclude) {
-        LinkedList<Term> result = new LinkedList<Term>();
+        LinkedList<Term> result = new LinkedList<>();
         for (SequentFormula sf : s) {
             if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {
                 result.add(sf.formula());
@@ -294,13 +292,7 @@ public class JoinProcessor implements Runnable {
     }
 
     private TreeSet<Term> createTree() {
-        return new TreeSet<Term>(new Comparator<Term>() {
-
-            @Override
-            public int compare(Term o1, Term o2) {
-                return o1.serialNumber() - o2.serialNumber();
-            }
-        });
+        return new TreeSet<>(Comparator.comparingInt(Term::serialNumber));
     }
 
     @Override

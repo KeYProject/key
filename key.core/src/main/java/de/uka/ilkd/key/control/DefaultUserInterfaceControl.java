@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
-
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * The {@link DefaultUserInterfaceControl} which allows proving in case that no specific user

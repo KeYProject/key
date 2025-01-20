@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -19,7 +22,7 @@ public interface InteractiveRuleApplicationCompletion {
      *        unique or can be chosen in a reasonable way as if unique
      * @return the completed app or null if completion was not possible
      */
-    public abstract IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced);
+    IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced);
 
     /**
      * checks if this instance is responsible for the given app
@@ -27,6 +30,6 @@ public interface InteractiveRuleApplicationCompletion {
      * @param app the rule app
      * @return true iff this instance might be able to complete the app
      */
-    public abstract boolean canComplete(IBuiltInRuleApp app);
+    boolean canComplete(IBuiltInRuleApp app);
 
 }

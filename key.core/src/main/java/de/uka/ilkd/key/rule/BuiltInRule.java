@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Buit-in rule interface. As applications of this rule kind may not be successful in each case one
@@ -23,9 +26,8 @@ public interface BuiltInRule extends Rule {
 
     IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);
 
-    @Nullable
     @Override
-    default String getOrigin() {
+    default @Nullable String getOrigin() {
         return "defined in Java: " + getClass().getName();
     }
 }

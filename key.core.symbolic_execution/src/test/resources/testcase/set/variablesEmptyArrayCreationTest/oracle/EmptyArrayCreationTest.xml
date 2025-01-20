@@ -4,12 +4,12 @@
       <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
-   <methodCall name="&lt;call EmptyArrayCreationTest.main(obj,n)&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call EmptyArrayCreationTest.main(obj, n)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="obj.array=new int[n];" pathCondition="true" pathConditionChanged="false">
+      <statement name="obj.array = new int[n];" pathCondition="true" pathConditionChanged="false">
          <variable name="obj" isArrayIndex="false">
             <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="array" isArrayIndex="false">
@@ -47,7 +47,7 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <methodReturn name="&lt;return of main&gt;" signature="&lt;return of EmptyArrayCreationTest.main(obj,n)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+            <methodReturn name="&lt;return of main&gt;" signature="&lt;return of EmptyArrayCreationTest.main(obj, n)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                <variable name="obj" isArrayIndex="false">
                   <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="array" isArrayIndex="false">

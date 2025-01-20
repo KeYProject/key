@@ -1,30 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.List;
 
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import recoder.ServiceConfiguration;
-import recoder.service.NameInfo;
-import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.NullType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Final;
@@ -33,7 +13,7 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -41,15 +21,18 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.ServiceConfiguration;
 import recoder.service.NameInfo;
-
-import java.util.List;
 
 /**
  * provide means to convert recoder types to the corresponding KeY type structures.
@@ -93,7 +76,7 @@ public class Recoder2KeYTypeConverter {
      */
     private final Recoder2KeY recoder2key;
 
-    private JavaInfo javaInfo;
+    private final JavaInfo javaInfo;
 
     public Recoder2KeYTypeConverter(Services services, TypeConverter typeConverter,
             NamespaceSet namespaces, Recoder2KeY recoder2key) {
@@ -137,12 +120,12 @@ public class Recoder2KeYTypeConverter {
      * Return the cached value if present - otherwise create a new type. Store this in the cache.
      * <p>
      * This method retrieves the recoder nameinfo and queries it for the type for typeName and
-     * passes this result to {@link #getKeYJavaType(Type)}
+     * passes this result to {@link #getKeYJavaType(recoder.abstraction.Type)}}
      *
      * @param typeName name of a type to be converted
      * @return the KJT for the string representation.
      * @author mu
-     * @see #getKeYJavaType(Type)
+     * @see #getKeYJavaType(recoder.abstraction.Type)
      */
 
     public KeYJavaType getKeYJavaType(String typeName) {
@@ -162,8 +145,9 @@ public class Recoder2KeYTypeConverter {
     public KeYJavaType getKeYJavaType(recoder.abstraction.Type t) {
 
         // change from 2012-02-07: there must be a definite KJT
-        if (t == null)
+        if (t == null) {
             throw new NullPointerException("null cannot be converted into a KJT");
+        }
 
         // lookup in the cache
         KeYJavaType kjt = lookupInCache(t);
@@ -181,18 +165,17 @@ public class Recoder2KeYTypeConverter {
             }
             addKeYJavaType(t, s);
         } else if (t instanceof recoder.abstraction.NullType) {
-            s = (Sort) namespaces.sorts().lookup(NullSort.NAME);
+            s = namespaces.sorts().lookup(NullSort.NAME);
             if (s == null) {
-                Sort objectSort = (Sort) namespaces.sorts().lookup(new Name("java.lang.Object"));
+                Sort objectSort = namespaces.sorts().lookup(new Name("java.lang.Object"));
                 assert objectSort != null;
                 s = new NullSort(objectSort);
             }
             addKeYJavaType(t, s);
-        } else if (t instanceof recoder.abstraction.ParameterizedType) {
-            recoder.abstraction.ParameterizedType pt = (recoder.abstraction.ParameterizedType) t;
+        } else if (t instanceof recoder.abstraction.ParameterizedType pt) {
             return getKeYJavaType(pt.getGenericType());
         } else if (t instanceof recoder.abstraction.ClassType) {
-            s = (Sort) namespaces.sorts().lookup(new Name(t.getFullName()));
+            s = namespaces.sorts().lookup(new Name(t.getFullName()));
             if (s == null) {
                 recoder.abstraction.ClassType ct = (recoder.abstraction.ClassType) t;
                 if (ct.isInterface()) {
@@ -310,7 +293,7 @@ public class Recoder2KeYTypeConverter {
     private ImmutableSet<Sort> directSuperSorts(recoder.abstraction.ClassType classType) {
 
         List<recoder.abstraction.ClassType> supers = classType.getSupertypes();
-        ImmutableSet<Sort> ss = DefaultImmutableSet.<Sort>nil();
+        ImmutableSet<Sort> ss = DefaultImmutableSet.nil();
         for (recoder.abstraction.ClassType aSuper : supers) {
             ss = ss.add(getKeYJavaType(aSuper).getSort());
         }
@@ -345,8 +328,7 @@ public class Recoder2KeYTypeConverter {
      * @return a freshly created Sort object
      */
     private Sort createObjectSort(recoder.abstraction.ClassType ct, ImmutableSet<Sort> supers) {
-        if (ct instanceof recoder.abstraction.ArrayType) {
-            var at = (recoder.abstraction.ArrayType) ct;
+        if (ct instanceof recoder.abstraction.ArrayType at) {
             Sort objectSort = javaInfo.objectSort();
             Sort cloneableSort = javaInfo.cloneableSort();
             Sort serializableSort = javaInfo.serializableSort();
@@ -431,8 +413,9 @@ public class Recoder2KeYTypeConverter {
 
         de.uka.ilkd.key.java.abstraction.Type base = baseType.getJavaType();
         int dimension = base instanceof ArrayType ? ((ArrayType) base).getDimension() + 1 : 1;
-        TypeRef parentReference = new TypeRef(new ProgramElementName("" + parent.getSort().name()),
-            dimension, null, parent);
+        TypeRef parentReference =
+            new TypeRef(new ProgramElementName(String.valueOf(parent.getSort().name())),
+                dimension, null, parent);
 
         // add methods
         // the only situation where base can be null is in case of a
@@ -464,7 +447,7 @@ public class Recoder2KeYTypeConverter {
      *         of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = ImmutableSLList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
@@ -481,7 +464,7 @@ public class Recoder2KeYTypeConverter {
      *         of the given list
      */
     private ImmutableList<Field> filterField(ExtList list) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = ImmutableSLList.nil();
         for (Object aList : list) {
             Object pe = aList;
             if (pe instanceof FieldDeclaration) {
@@ -496,7 +479,7 @@ public class Recoder2KeYTypeConverter {
             getKeYJavaType(getServiceConfiguration().getNameInfo().getIntType());
         final KeYJavaType objectType = javaInfo.getJavaLangObject();
         final HeapLDT heapLDT = typeConverter.getHeapLDT();
-        Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
+        Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
         int heapCount = (heapLDT == null) ? 1 : (heapLDT.getAllHeaps().size() - 1);
         arrayMethodBuilder =
             new CreateArrayMethodBuilder(integerType, objectType, heapSort, heapCount);

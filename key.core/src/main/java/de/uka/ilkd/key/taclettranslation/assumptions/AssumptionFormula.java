@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.Collection;
@@ -10,10 +13,10 @@ import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
 public class AssumptionFormula implements TacletFormula {
 
-    Taclet taclet;
-    Collection<Term> formula;
-    String status;
-    TacletConditions conditions;
+    final Taclet taclet;
+    final Collection<Term> formula;
+    final String status;
+    final TacletConditions conditions;
 
     public TacletConditions getConditions() {
         return conditions;
@@ -23,6 +26,7 @@ public class AssumptionFormula implements TacletFormula {
         this.taclet = taclet;
         this.formula = formula;
         this.status = status;
+        this.conditions = null;
     }
 
 
@@ -38,7 +42,7 @@ public class AssumptionFormula implements TacletFormula {
     }
 
     public Term getFormula(TermServices services) {
-        return services.getTermBuilder().and(formula.toArray(new Term[formula.size()]));
+        return services.getTermBuilder().and(formula.toArray(new Term[0]));
         // return formula;
     }
 

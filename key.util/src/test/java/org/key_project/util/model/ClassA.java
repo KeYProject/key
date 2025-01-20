@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.model;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "nullness" })
 public class ClassA {
-    private int privateField = 1;
+    private final int privateField = 1;
 
     protected int protectedField = 2;
 
@@ -10,9 +13,9 @@ public class ClassA {
 
     int defaultField = 4;
 
-    private String onlyInA = "A";
+    private final String onlyInA = "A";
 
-    private boolean booleanField = true;
+    private final boolean booleanField = true;
 
     public static int staticField = -42;
 

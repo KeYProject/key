@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 /**
@@ -101,10 +103,12 @@ public class Sorting {
             int j = ri;
             Object x = median(a[le], a[ri], a[(le + ri) / 2], ord);
             do {
-                while (ord.less(a[i], x))
+                while (ord.less(a[i], x)) {
                     ++i;
-                while (ord.less(x, a[j]))
+                }
+                while (ord.less(x, a[j])) {
                     --j;
+                }
                 if (i <= j) {
                     Object h = a[i];
                     a[i] = a[j];
@@ -165,4 +169,3 @@ public class Sorting {
      */
 
 }
-

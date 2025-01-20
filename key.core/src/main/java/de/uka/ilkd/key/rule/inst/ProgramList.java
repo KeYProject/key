@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.inst;
 
+import de.uka.ilkd.key.java.ProgramElement;
+
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-
-public class ProgramList implements SVSubstitute {
+public class ProgramList implements SyntaxElement {
 
     private final ImmutableArray<ProgramElement> list;
 
@@ -31,4 +34,14 @@ public class ProgramList implements SVSubstitute {
         return list.hashCode();
     }
 
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        return list.get(n);
+    }
+
+    @Override
+    public int getChildCount() {
+        return list.size();
+    }
 }

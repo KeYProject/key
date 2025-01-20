@@ -1,27 +1,22 @@
-/**
- * represents a name that is part of a program
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.TerminalProgramElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.logic.Name;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
+/**
+ * represents a name that is part of a program
+ */
 public class ProgramElementName extends Name
         implements TerminalProgramElement, Label, ReferenceSuffix, MethodName {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramElementName.class);
@@ -38,7 +33,7 @@ public class ProgramElementName extends Name
      */
     public ProgramElementName(String name) {
         super(name);
-        this.qualifierString = "".intern();
+        this.qualifierString = "";
         this.shortName = name.intern();
         this.creationInfo = null;
         comments = new Comment[0];
@@ -51,7 +46,7 @@ public class ProgramElementName extends Name
      */
     public ProgramElementName(String name, Comment[] c) {
         super(name);
-        this.qualifierString = "".intern();
+        this.qualifierString = "";
         this.shortName = name.intern();
         this.creationInfo = null;
         comments = c;
@@ -59,7 +54,7 @@ public class ProgramElementName extends Name
 
     public ProgramElementName(String name, NameCreationInfo creationInfo) {
         super(name);
-        this.qualifierString = "".intern();
+        this.qualifierString = "";
         this.shortName = name.intern();
         this.creationInfo = creationInfo;
         comments = new Comment[0];
@@ -67,7 +62,7 @@ public class ProgramElementName extends Name
 
     public ProgramElementName(String name, NameCreationInfo creationInfo, Comment[] c) {
         super(name);
-        this.qualifierString = "".intern();
+        this.qualifierString = "";
         this.shortName = name.intern();
         this.creationInfo = creationInfo;
         comments = c;
@@ -75,7 +70,7 @@ public class ProgramElementName extends Name
 
     public ProgramElementName(String n, String q) {
         super(q + "::" + n);
-        assert q.length() > 0 : "Tried to create qualified name with missing qualifier";
+        assert !q.isEmpty() : "Tried to create qualified name with missing qualifier";
 
         this.qualifierString = q.intern();
         this.shortName = n.intern();
@@ -99,16 +94,11 @@ public class ProgramElementName extends Name
         return getFirstElement();
     }
 
-
     /**
      * to be compatible to a ProgramElement
      */
     public SourceElement getLastElement() {
         return this;
-    }
-
-    public void prettyPrint(PrettyPrinter w) throws java.io.IOException {
-        w.printProgramElementName(this);
     }
 
     /**
@@ -120,7 +110,6 @@ public class ProgramElementName extends Name
     public void visit(Visitor v) {
         v.performActionOnProgramElementName(this);
     }
-
 
     /**
      * Returns the start position of the primary token of this element. To get the start position of
@@ -149,28 +138,13 @@ public class ProgramElementName extends Name
      *
      * @return the relative position of the primary token.
      */
-    public Position getRelativePosition() {
-        return Position.UNDEFINED;
+    public recoder.java.SourceElement.Position getRelativePosition() {
+        return recoder.java.SourceElement.Position.UNDEFINED;
     }
-
 
     public PositionInfo getPositionInfo() {
         return PositionInfo.UNDEFINED;
     }
-
-
-    /**
-     * equals modulo renaming is described in the corresponding comment in class SourceElement. The
-     * ProgramElementName has to check if an abstract name has been assigned and if, if both
-     * elements are assigned to the same name, otherwise the names have to be equal
-     */
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (!(se instanceof ProgramElementName)) {
-            return false;
-        }
-        return nat.sameAbstractName(this, se);
-    }
-
 
     public String getQualifier() {
         return qualifierString;
@@ -190,7 +164,6 @@ public class ProgramElementName extends Name
             source.next();
             return matchCond;
         } else {
-            LOGGER.debug("Program match failed (pattern {}, source {})", this, src);
             return null;
         }
     }

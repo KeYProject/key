@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public class MethodStackInfo implements NameCreationInfo {
 
@@ -25,13 +28,12 @@ public class MethodStackInfo implements NameCreationInfo {
      * returns the method call stack
      */
     public ImmutableList<IProgramMethod> getMethodStack() {
-        ImmutableList<IProgramMethod> list = ImmutableSLList.<IProgramMethod>nil();
+        ImmutableList<IProgramMethod> list = ImmutableSLList.nil();
         if (element instanceof ProgramPrefix) {
             final ImmutableArray<ProgramPrefix> prefix =
                 ((ProgramPrefix) element).getPrefixElements();
             for (int i = prefix.size() - 1; i >= 0; i--) {
-                if (prefix.get(i) instanceof MethodFrame) {
-                    final MethodFrame frame = (MethodFrame) prefix.get(i);
+                if (prefix.get(i) instanceof MethodFrame frame) {
                     IProgramMethod method = frame.getProgramMethod();
                     if (method != null) {
                         list = list.prepend(method);
@@ -44,18 +46,19 @@ public class MethodStackInfo implements NameCreationInfo {
 
 
     public String infoAsString() {
-        String result = "Method stack:\n";
+        StringBuilder result = new StringBuilder("Method stack:\n");
 
         for (IProgramMethod method : getMethodStack()) {
-            result += "- " + method.getProgramElementName().toString() + "\n";
+            result.append("- ").append(method.getProgramElementName().toString()).append("\n");
         }
 
-        if (result.length() < 1)
+        if (result.length() < 1) {
             return "";
+        }
 
-        result = result.substring(0, result.length() - 1);
+        result = new StringBuilder(result.substring(0, result.length() - 1));
 
-        return result;
+        return result.toString();
     }
 
 

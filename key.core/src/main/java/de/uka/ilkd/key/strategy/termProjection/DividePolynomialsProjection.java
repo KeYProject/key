@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termProjection;
 
 import java.math.BigInteger;
@@ -40,10 +43,11 @@ public abstract class DividePolynomialsProjection extends AbstractDividePolynomi
 
         BigInteger res = numerator.divide(denominator);
         if (remainder.signum() != 0 && numerator.signum() < 0) {
-            if (denominator.signum() > 0)
+            if (denominator.signum() > 0) {
                 res = res.subtract(BigInteger.ONE);
-            else
+            } else {
                 res = res.add(BigInteger.ONE);
+            }
         }
         return res;
     }

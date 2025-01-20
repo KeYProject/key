@@ -1,9 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
-
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import de.uka.ilkd.key.proof.runallproofs.TestResult;
-import de.uka.ilkd.key.settings.PathConfig;
-import de.uka.ilkd.key.util.IOForwarder;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,6 +10,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import de.uka.ilkd.key.proof.runallproofs.TestResult;
+import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.util.IOForwarder;
+
+import org.junit.jupiter.api.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,12 +28,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Kai Wallisch
  */
 public abstract class ForkedTestFileRunner implements Serializable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ForkedTestFileRunner.class);
 
     private static final long serialVersionUID = 1L;
 
-    private static final String FORK_TIMEOUT_KEY = "forkTimeout";
-
-    private static final String FORK_DEBUG_PORT = "forkDebugPort";
 
     private static Path getLocationOfSerializedTestFiles(Path tempDirectory) {
         return Paths.get(tempDirectory.toString(), "TestFiles.serialized");
@@ -98,12 +102,12 @@ public abstract class ForkedTestFileRunner implements Serializable {
         List<String> command = pb.command();
 
         // TODO make sure no injection happens here?
-        String forkMemory = settings.get("forkMemory");
+        String forkMemory = settings.getForkMemory();
         if (forkMemory != null) {
             command.add("-Xmx" + forkMemory);
         }
 
-        String debugPort = settings.get(FORK_DEBUG_PORT);
+        String debugPort = settings.getForkDebugPort();
         if (debugPort != null) {
             String suspend = "n";
             if (debugPort.startsWith("wait:")) {
@@ -135,8 +139,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
         Path exceptionFile = getLocationOfSerializedException(pathToTempDir);
         if (exceptionFile.toFile().exists()) {
             Throwable t = ForkedTestFileRunner.readObject(exceptionFile, Throwable.class);
-            throw new Exception(
-                "Subprocess returned exception (see cause for details):\n" + t.getMessage(), t);
+            Assertions.fail("Subprocess returned exception", t);
         }
 
         /*
@@ -171,7 +174,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     testResults.add(testFile.runKey());
                 } catch (Exception e) {
                     error = true;
-                    e.printStackTrace();
+                    LOGGER.warn("Run failed", e);
                 }
             }
             writeObject(getLocationOfSerializedTestResults(tempDirectory),
@@ -188,8 +191,9 @@ public abstract class ForkedTestFileRunner implements Serializable {
             }
         }
 
-        if (error)
+        if (error) {
             fail("Exception during the execution of proofs. See log for more details.");
+        }
     }
 
     /**
@@ -206,12 +210,12 @@ public abstract class ForkedTestFileRunner implements Serializable {
     private static void installTimeoutWatchdog(ProofCollectionSettings settings,
             final Path tempDirectory) {
 
-        String timeoutString = settings.get(FORK_TIMEOUT_KEY);
+        String timeoutString = settings.getForkTimeout();
         if (timeoutString == null) {
             return;
         }
 
-        final boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
+        final boolean verbose = settings.getVerboseOutput();
 
         final int timeout;
         try {
@@ -231,7 +235,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
             public void run() {
                 try {
                     if (verbose) {
-                        System.err.println("Timeout watcher launched (" + timeout + " secs.)");
+                        LOGGER.info("Timeout watcher launched (" + timeout + " secs.)");
                     }
                     Thread.sleep(timeout * 1000L);
                     InterruptedException ex =
@@ -239,13 +243,12 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     writeObject(getLocationOfSerializedException(tempDirectory), ex);
                     // TODO consider something other than 0 here
                     if (verbose) {
-                        System.err.println("Process timed out");
+                        LOGGER.info("Process timed out");
                     }
                     System.exit(0);
                 } catch (Exception ex) {
-                    System.err.println(
-                        "The watchdog has been interrupted or failed. Timeout cancelled.");
-                    ex.printStackTrace();
+                    LOGGER.warn("The watchdog has been interrupted or failed. Timeout cancelled.",
+                        ex);
                 }
             }
         };

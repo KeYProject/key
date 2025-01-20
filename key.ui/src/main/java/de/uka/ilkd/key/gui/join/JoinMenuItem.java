@@ -1,13 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.join;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
-
-import org.key_project.util.collection.ImmutableList;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -17,6 +15,8 @@ import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.join.JoinProcessor.Listener;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The menu item for the "delayed-cut" join rule.
@@ -39,16 +39,14 @@ public class JoinMenuItem extends JMenuItem {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                mediator.stopInterface(true);
                 JoinDialog dialog = new JoinDialog(partner, proof, PredicateEstimator.STD_ESTIMATOR,
                     proof.getServices());
+                dialog.setModal(true);
                 dialog.setVisible(true);
                 if (dialog.okButtonHasBeenPressed()) {
+                    mediator.stopInterface(true);
                     start(dialog.getSelectedPartner(), proof, mediator);
-                } else {
-                    mediator.startInterface(true);
                 }
-
             }
         });
     }
@@ -63,24 +61,16 @@ public class JoinMenuItem extends JMenuItem {
             @Override
             public void exceptionWhileJoining(Throwable e) {
                 mediator.notify(new ExceptionFailureEvent(e.getMessage(), e));
-                mediator.startInterface(true);
             }
 
             @Override
             public void endOfJoining(final ImmutableList<Goal> goals) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        mediator.startInterface(true);
-                        // This method delegates the request only to the UserInterfaceControl which
-                        // implements the functionality.
-                        // No functionality is allowed in this method body!
-                        mediator.getUI().getProofControl()
-                                .startAutoMode(mediator.getSelectedProof(), goals);
-
-
-                    }
+                SwingUtilities.invokeLater(() -> {
+                    // This method delegates the request only to the UserInterfaceControl which
+                    // implements the functionality.
+                    // No functionality is allowed in this method body!
+                    mediator.getUI().getProofControl()
+                            .startAutoMode(mediator.getSelectedProof(), goals);
                 });
 
 

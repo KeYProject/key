@@ -1,10 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -19,6 +20,8 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Implementation of thin backward slicing.
@@ -35,8 +38,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
             throws ProofInputException {
         try {
             boolean accept = false;
-            if (activeStatement instanceof CopyAssignment) {
-                CopyAssignment copyAssignment = (CopyAssignment) activeStatement;
+            if (activeStatement instanceof CopyAssignment copyAssignment) {
                 ImmutableArray<Expression> arguments = copyAssignment.getArguments();
                 if (arguments.size() >= 1) {
                     SourceElement originalTarget = arguments.get(0);
@@ -50,8 +52,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                         }
                     }
                 }
-            } else if (activeStatement instanceof MethodBodyStatement) {
-                MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
+            } else if (activeStatement instanceof MethodBodyStatement mbs) {
                 IProgramVariable resultVariable = mbs.getResultVariable();
                 ReferencePrefix relevantTarget = toReferencePrefix(resultVariable);
                 if (relevantTarget != null
@@ -65,7 +66,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                 // Compute this reference
                 PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
                 // Compute modified locations
-                List<Location> modifiedLocations = new LinkedList<Location>();
+                List<Location> modifiedLocations = new LinkedList<>();
                 Term loopConditionModalityTerm =
                     SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);
                 if (loopConditionModalityTerm.op() != UpdateApplication.UPDATE_APPLICATION) {

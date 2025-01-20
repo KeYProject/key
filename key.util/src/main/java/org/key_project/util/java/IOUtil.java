@@ -1,21 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.CodeSource;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides static methods to work with java IO.
@@ -29,7 +31,7 @@ public final class IOUtil {
     public static final int BUFFER_SIZE = 1024 * 10;
 
     /**
-     * The default charset to use. The value is independent from the current operating system.
+     * The default charset to use. The value is independent of the current operating system.
      */
     public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
@@ -40,58 +42,11 @@ public final class IOUtil {
     }
 
     /**
-     * Computes the MD5 checksum of the given {@link File}.
-     *
-     * @param file The {@link File} to compute its MD5 checksum.
-     * @return The computed MD5 checksum.
-     * @throws IOException Occurred Exception.
-     */
-    public static String computeMD5(File file) throws IOException {
-        if (file == null) {
-            throw new IOException("Can't compute MD5 without a File.");
-        }
-        if (!file.isFile()) {
-            throw new IOException(
-                "Can't compute MD5, because \"" + file + "\" is not an existing file.");
-        }
-        return computeMD5(new FileInputStream(file));
-    }
-
-    /**
-     * Computes the MD5 checksum of the given {@link InputStream} and closes it.
-     *
-     * @param in The {@link InputStream} which provides the content to compute its MD5 checksum. The
-     *        {@link InputStream} will be closed.
-     * @return The computed MD5 checksum.
-     * @throws IOException Occurred Exception.
-     */
-    public static String computeMD5(InputStream in) throws IOException {
-        if (in == null) {
-            throw new IOException("Can't compute MD5 without an InputStream.");
-        }
-        try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            byte[] buffer = new byte[8192];
-            int read;
-            while ((read = in.read(buffer)) > 0) {
-                digest.update(buffer, 0, read);
-            }
-            byte[] md5sum = digest.digest();
-            BigInteger bigInt = new BigInteger(1, md5sum);
-            return bigInt.toString(16);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IOException("Algorithm MD5 is not available.");
-        } finally {
-            in.close();
-        }
-    }
-
-    /**
      * Returns the home directory.
      *
      * @return The home directory.
      */
-    public static File getHomeDirectory() {
+    public static @Nullable File getHomeDirectory() {
         String path = System.getProperty("user.home");
         if (path != null) {
             return new File(path);
@@ -106,19 +61,11 @@ public final class IOUtil {
      * @param file The file to extract it extension.
      * @return The file extension or {@code null} if not available.
      */
-    public static String getFileExtension(File file) {
-        if (file != null) {
-            String name = file.getName();
-            if (name != null) {
-                int dotIndex = name.lastIndexOf(".");
-                if (dotIndex >= 0) {
-                    return name.substring(dotIndex + 1);
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
+    public static @Nullable String getFileExtension(File file) {
+        String name = file.getName();
+        int dotIndex = name.lastIndexOf('.');
+        if (dotIndex >= 0) {
+            return name.substring(dotIndex + 1);
         } else {
             return null;
         }
@@ -129,18 +76,14 @@ public final class IOUtil {
      *
      * @param fileName The file name with extension for that the file name without extension is
      *        needed.
-     * @return The file name without extension or {@code null} if it was not possible to compute it.
+     * @return The file name without extension.
      */
     public static String getFileNameWithoutExtension(String fileName) {
-        if (fileName != null) {
-            int dotIndex = fileName.lastIndexOf('.');
-            if (dotIndex >= 0) {
-                return fileName.substring(0, dotIndex);
-            } else {
-                return fileName;
-            }
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex >= 0) {
+            return fileName.substring(0, dotIndex);
         } else {
-            return null;
+            return fileName;
         }
     }
 
@@ -150,7 +93,7 @@ public final class IOUtil {
      * @param file The file/folder to delete.
      */
     public static void delete(File file) {
-        if (file != null && file.exists()) {
+        if (file.exists()) {
             if (file.isDirectory()) {
                 File[] children = file.listFiles();
                 if (children != null) {
@@ -170,24 +113,30 @@ public final class IOUtil {
      * @return The read content or {@code null} if the {@link URL} is {@code null}.
      * @throws IOException Occurred Exception.
      */
-    public static String readFrom(URL url) throws IOException {
-        if (url != null) {
-            return readFrom(url.openStream());
-        } else {
-            return null;
-        }
+    public static @Nullable String readFrom(URL url) throws IOException {
+        return readFrom(url.openStream());
+    }
+
+    /**
+     * Reads the complete content from the {@link URL}.
+     *
+     * @param url The {@link URL} to read from.
+     * @return The read content or {@code null} if the {@link URL} is {@code null}.
+     * @throws IOException Occurred Exception.
+     */
+    public static @Nullable String readFrom(URI url) throws IOException {
+        return readFrom(url.toURL().openStream());
     }
 
     /**
      * Reads the complete content from the {@link File}.
      *
      * @param file The {@link File} to read from.
-     * @return The read content or {@code null} if the {@link File} is {@code null} or not an
-     *         existing file.
+     * @return The read content or {@code null} if the {@link File} is not an existing file.
      * @throws IOException Occurred Exception.
      */
-    public static String readFrom(File file) throws IOException {
-        if (file != null && file.isFile()) {
+    public static @Nullable String readFrom(File file) throws IOException {
+        if (file.isFile()) {
             return readFrom(new FileInputStream(file));
         } else {
             return null;
@@ -198,15 +147,11 @@ public final class IOUtil {
      * Reads the complete content from the {@link InputStream} and closes it.
      *
      * @param in The {@link InputStream} to read from and to close.
-     * @return The read content or {@code null} if the {@link InputStream} is {@code null}.
+     * @return The read content.
      * @throws IOException Occurred Exception.
      */
     public static String readFrom(InputStream in) throws IOException {
-        if (in == null) {
-            return null;
-        }
-
-        try (InputStreamReader reader = new InputStreamReader(in)) {
+        try (InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
             StringBuilder sb = new StringBuilder();
             char[] buffer = new char[BUFFER_SIZE];
             int read;
@@ -226,7 +171,7 @@ public final class IOUtil {
      * @throws IOException Occurred Exception.
      */
     public static void writeTo(OutputStream out, String content) throws IOException {
-        writeTo(out, content, (String) null);
+        writeTo(out, content, DEFAULT_CHARSET);
     }
 
     /**
@@ -239,7 +184,7 @@ public final class IOUtil {
      */
     public static void writeTo(OutputStream out, String content, Charset encoding)
             throws IOException {
-        writeTo(out, content, encoding != null ? encoding.displayName() : null);
+        writeTo(out, content, encoding.displayName());
     }
 
     /**
@@ -253,11 +198,7 @@ public final class IOUtil {
      */
     public static void writeTo(OutputStream out, String content, String encoding)
             throws IOException {
-        if (out == null || content == null)
-            return;
-
-        try (PrintStream printStream =
-            encoding != null ? new PrintStream(out, false, encoding) : new PrintStream(out)) {
+        try (PrintStream printStream = new PrintStream(out, false, encoding)) {
             printStream.print(content);
         }
     }
@@ -295,11 +236,7 @@ public final class IOUtil {
      * @throws IOException Occurred Exception.
      */
     public static LineInformation[] computeLineInformation(File file) throws IOException {
-        if (file != null) {
-            return computeLineInformation(new FileInputStream(file));
-        } else {
-            return computeLineInformation((InputStream) null);
-        }
+        return computeLineInformation(new FileInputStream(file));
     }
 
     /**
@@ -334,11 +271,9 @@ public final class IOUtil {
      * @return The computed start indices.
      * @throws IOException Occurred Exception.
      */
-    public static LineInformation[] computeLineInformation(InputStream in) throws IOException {
-        if (in == null)
-            return new LineInformation[0];
-
-        try (InputStreamReader reader = new InputStreamReader(in)) {
+    public static LineInformation[] computeLineInformation(InputStream in)
+            throws IOException {
+        try (InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
             List<LineInformation> result = new LinkedList<>();
             char[] buffer = new char[BUFFER_SIZE]; // Buffer with the read signs
 
@@ -568,23 +503,18 @@ public final class IOUtil {
      * {@link IFilter}.
      *
      * @param file The {@link File} to start search in.
-     * @param filter An optional {@link IFilter} used to accept files. Without a filter all
+     * @param filter An optional {@link Predicate} used to accept files. Without a filter all
      *        {@link File}s are accepted.
      * @return The accepted {@link File}s.
      * @throws IOException Occurred Exception
      */
-    public static List<File> search(File file, final IFilter<File> filter) throws IOException {
-        final List<File> result = new LinkedList<File>();
-        if (file != null) {
-            visit(file, new IFileVisitor() {
-                @Override
-                public void visit(File visitedFile) {
-                    if (filter == null || filter.select(visitedFile)) {
-                        result.add(visitedFile);
-                    }
-                }
-            });
-        }
+    public static List<File> search(File file, final Predicate<File> filter) throws IOException {
+        final List<File> result = new LinkedList<>();
+        visit(file, visitedFile -> {
+            if (filter == null || filter.test(visitedFile)) {
+                result.add(visitedFile);
+            }
+        });
         return result;
     }
 
@@ -596,13 +526,11 @@ public final class IOUtil {
      * @throws IOException Occurred Exception
      */
     public static void visit(File file, IFileVisitor visitor) throws IOException {
-        if (file != null && visitor != null) {
-            visitor.visit(file);
-            File[] children = file.listFiles();
-            if (children != null) {
-                for (File child : children) {
-                    visit(child, visitor);
-                }
+        visitor.visit(file);
+        File[] children = file.listFiles();
+        if (children != null) {
+            for (File child : children) {
+                visit(child, visitor);
             }
         }
     }
@@ -612,14 +540,14 @@ public final class IOUtil {
      *
      * @author Martin Hentschel
      */
-    public static interface IFileVisitor {
+    public interface IFileVisitor {
         /**
          * Do something with the visited {@link File}.
          *
          * @param file The visited {@link File}.
          * @throws IOException Occurred Exception
          */
-        public void visit(File file) throws IOException;
+        void visit(File file) throws IOException;
     }
 
     /**
@@ -629,15 +557,12 @@ public final class IOUtil {
      * @return A new {@link InputStream} with with the replaced line breaks.
      * @throws IOException Occurred Exception.
      */
-    public static InputStream unifyLineBreaks(InputStream in) throws IOException {
-        if (in != null) {
-            String text = IOUtil.readFrom(in);
-            text = text.replace("\r\n", "\n");
-            text = text.replace("\r", "\n");
-            return new ByteArrayInputStream(text.getBytes());
-        } else {
-            return null;
-        }
+    public static InputStream unifyLineBreaks(InputStream in)
+            throws IOException {
+        String text = IOUtil.readFrom(in);
+        text = text.replace("\r\n", "\n");
+        text = text.replace("\r", "\n");
+        return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -669,13 +594,13 @@ public final class IOUtil {
      */
     public static boolean contains(File parent, File child) {
         boolean contains = false;
-        if (parent != null && child != null) {
-            while (!contains && child != null) {
-                if (parent.equals(child)) {
-                    contains = true;
-                }
-                child = child.getParentFile();
+        @Nullable
+        File current = child;
+        while (!contains && current != null) {
+            if (parent.equals(current)) {
+                contains = true;
             }
+            current = current.getParentFile();
         }
         return contains;
     }
@@ -690,25 +615,16 @@ public final class IOUtil {
      */
     public static boolean copy(Reader source, StringWriter target) throws IOException {
         try {
-            if (source != null && target != null) {
-                char[] buffer = new char[BUFFER_SIZE];
-                int read;
-                while ((read = source.read(buffer)) >= 1) {
-                    target.write(buffer, 0, read);
-                }
-                return true;
-            } else {
-                return false;
+            char[] buffer = new char[BUFFER_SIZE];
+            int read;
+            while ((read = source.read(buffer)) >= 1) {
+                target.write(buffer, 0, read);
             }
+            return true;
         } finally {
-            if (source != null) {
-                source.close();
-            }
-            if (target != null) {
-                target.close();
-            }
+            source.close();
+            target.close();
         }
-
     }
 
     /**
@@ -722,65 +638,43 @@ public final class IOUtil {
      */
     public static boolean copy(InputStream source, OutputStream target) throws IOException {
         try {
-            if (source != null && target != null) {
-                byte[] buffer = new byte[BUFFER_SIZE];
-                int read;
-                while ((read = source.read(buffer)) >= 1) {
-                    target.write(buffer, 0, read);
-                }
-                return true;
-            } else {
-                return false;
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int read;
+            while ((read = source.read(buffer)) >= 1) {
+                target.write(buffer, 0, read);
             }
+            return true;
         } finally {
-            if (source != null) {
-                source.close();
-            }
-            if (target != null) {
-                target.close();
-            }
+            source.close();
+            target.close();
         }
     }
 
-    /**
-     * Checks if the given {@link File} exists.
-     *
-     * @param file The {@link File} to check.
-     * @return {@code true} {@link File} is not {@code null} and exists, {@code false} otherwise.
-     */
-    public static boolean exists(File file) {
-        return file != null && file.exists();
-    }
-
-    public static URL getClassLocationURL(Class<?> classInstance) {
+    public static @Nullable URL getClassLocationURL(Class<?> classInstance) {
         CodeSource cs = classInstance.getProtectionDomain().getCodeSource();
         return cs != null ? cs.getLocation() : null;
     }
 
-    public static File getClassLocation(Class<?> classInstance) {
-        if (classInstance != null) {
-            return toFile(getClassLocationURL(classInstance));
-        } else {
-            return null;
-        }
+    public static @Nullable File getClassLocation(Class<?> classInstance) {
+        return toFile(getClassLocationURL(classInstance));
     }
 
-    public static File getProjectRoot(Class<?> classInstance) {
+    public static @Nullable File getProjectRoot(Class<?> classInstance) {
         File file = getClassLocation(classInstance);
         return file != null ? file.getParentFile() : null;
     }
 
-    public static File toFile(URL url) {
+    public static @Nullable File toFile(@Nullable URL url) {
         URI uri = toURI(url);
         return uri != null ? new File(uri) : null;
     }
 
-    public static String toFileString(URL url) {
+    public static @Nullable String toFileString(@Nullable URL url) {
         File file = toFile(url);
         return file != null ? file.toString() : null;
     }
 
-    public static URI toURI(URL url) {
+    public static @Nullable URI toURI(@Nullable URL url) {
         try {
             if (url != null) {
                 String protocol = url.getProtocol();
@@ -788,7 +682,7 @@ public final class IOUtil {
                 String host = url.getHost();
                 // A '+' in file names is not supported, since it is converted
                 // into a space ('%20') according to the URI standard.
-                String path = URLDecoder.decode(url.getPath(), "UTF-8");
+                String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8);
                 String query = url.getQuery();
                 String ref = url.getRef();
                 return new URI(!StringUtil.isEmpty(protocol) ? protocol : null,
@@ -800,7 +694,7 @@ public final class IOUtil {
             } else {
                 return null;
             }
-        } catch (URISyntaxException | UnsupportedEncodingException e) {
+        } catch (URISyntaxException e) {
             return null;
         }
     }
@@ -811,7 +705,10 @@ public final class IOUtil {
      * @return The current directory.
      */
     public static File getCurrentDirectory() {
-        return new File(".").getAbsoluteFile().getParentFile();
+        File result = new File(".").getAbsoluteFile().getParentFile();
+        assert result != null
+                : "@AssumeAssertion(nullness): this always works, even in the toplevel directory ...";
+        return result;
     }
 
     /**
@@ -855,6 +752,42 @@ public final class IOUtil {
     /**
      * Extracts a ZIP archive to the given target directory.
      *
+     * @param in the ZIP archive to extract
+     * @param targetDir the directory the extracted files will be located in
+     * @throws ZipException if a ZIP format error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    public static void extractZip(InputStream in, Path targetDir) throws IOException {
+        try (ZipInputStream zin = new ZipInputStream(in)) {
+            for (ZipEntry entry = zin.getNextEntry(); entry != null; entry = zin.getNextEntry()) {
+                Path path = targetDir.resolve(entry.getName());
+                if (!path.normalize().startsWith(targetDir)) {
+                    // malicious file entry name outside of parent
+                    continue;
+                }
+                if (entry.isDirectory()) {
+                    /*
+                     * we use createDirectories instead of createDirectory in case the parent
+                     * directory does not exist
+                     */
+                    Files.createDirectories(path);
+                } else {
+                    // create nonexistent parent directories and then extract the file
+                    // Since path is the result of resolving a zip entry name in the
+                    // target directory, it does have a parent.
+                    @SuppressWarnings("nullness")
+                    @NonNull
+                    Path parent = path.getParent();
+                    Files.createDirectories(parent);
+                    Files.copy(zin, path);
+                }
+            }
+        }
+    }
+
+    /**
+     * Extracts a ZIP archive to the given target directory.
+     *
      * @param archive the ZIP archive to extract
      * @param targetDir the directory the extracted files will be located in
      * @throws ZipException if a ZIP format error occurs
@@ -864,63 +797,24 @@ public final class IOUtil {
         if (archive == null || targetDir == null) {
             return;
         }
-
-        try (ZipFile zipFile = new ZipFile(archive.toFile())) {
-            Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                if (entry.isDirectory()) {
-                    /*
-                     * we use createDirectories instead of createDirectory in case the parent
-                     * directory does not exist
-                     */
-                    Files.createDirectories(targetDir.resolve(entry.getName()));
-                } else {
-                    // create nonexistent parent directories and then extract the file
-                    Files.createDirectories(targetDir.resolve(entry.getName()).getParent());
-                    Files.copy(zipFile.getInputStream(entry), targetDir.resolve(entry.getName()));
-                }
-            }
-        }
+        extractZip(new FileInputStream(archive.toFile()), targetDir);
     }
-
-
-    private static Pattern URL_JAR_FILE = Pattern.compile("jar:file:([^!]+)!/(.+)");
 
     /**
      * Tries to open a stream with the given file name.
      *
-     * @param resourceLocation either an URL or a file name
+     * @param resourceLocation either a URL or a file name
      * @throws IOException if file could not be opened
      */
     public static InputStream openStream(String resourceLocation) throws IOException {
-        final Matcher matcher = URL_JAR_FILE.matcher(resourceLocation);
-        if (matcher.matches()) {
-            return openStreamFileInJar(matcher);
-        }
+        // Removed Jar file handling:
+        // Did not work and URL already handles it
 
         try {
             URL url = new URL(resourceLocation);
             return url.openStream();
         } catch (MalformedURLException e) {
             return new FileInputStream(resourceLocation);
-        }
-    }
-
-    private static InputStream openStreamFileInJar(String fileName) throws IOException {
-        final Matcher matcher = URL_JAR_FILE.matcher(fileName);
-        if (matcher.matches()) {
-            return openStreamFileInJar(matcher);
-        }
-        throw new IllegalArgumentException("Given filename is not a file in jar file");
-    }
-
-    private static InputStream openStreamFileInJar(Matcher matcher) throws IOException {
-        String jarFile = matcher.group(1);
-        String file = matcher.group(2);
-        try (ZipFile zipFile = new ZipFile(jarFile)) {
-            ZipEntry entry = zipFile.getEntry(file);
-            return zipFile.getInputStream(entry);
         }
     }
 }

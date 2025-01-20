@@ -1,11 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
+@SuppressWarnings("nullness")
 public class PropertiesUtil {
 
     private PropertiesUtil() {
@@ -13,14 +18,13 @@ public class PropertiesUtil {
     }
 
     public static void readLineBased(Properties properties, InputStream is) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         String line;
         String currentKey = null;
         StringBuilder sb = new StringBuilder();
 
         while ((line = br.readLine()) != null) {
             if (line.startsWith("#")) {
-                continue;
             } else if (line.startsWith(" ") || line.startsWith("\t")) {
                 if (sb.length() > 0) {
                     sb.append("\n");

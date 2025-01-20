@@ -1,7 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.FormulaTag;
@@ -9,6 +9,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -93,10 +96,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     static RuleAppContainer createAppContainer(IBuiltInRuleApp bir, PosInOccurrence pio,
             Goal goal) {
         final RuleAppCost cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
-
-        final BuiltInRuleAppContainer container = new BuiltInRuleAppContainer(bir, pio, cost, goal);
-
-        return container;
+        return new BuiltInRuleAppContainer(bir, pio, cost, goal);
     }
 
     /**
@@ -107,7 +107,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      */
     static ImmutableList<RuleAppContainer> createInitialAppContainers(
             ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio, Goal goal) {
-        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+        ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
         for (IBuiltInRuleApp bir : birs) {
             result = result.prepend(createAppContainer(bir, pio, goal));
@@ -121,14 +121,14 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     @Override
     public ImmutableList<RuleAppContainer> createFurtherApps(Goal goal) {
         if (!isStillApplicable(goal)) {
-            return ImmutableSLList.<RuleAppContainer>nil();
+            return ImmutableSLList.nil();
         }
 
         final PosInOccurrence pio = getPosInOccurrence(goal);
 
         RuleAppContainer container = createAppContainer(bir, pio, goal);
         if (container.getCost() instanceof TopRuleAppCost) {
-            return ImmutableSLList.<RuleAppContainer>nil();
+            return ImmutableSLList.nil();
         }
         return ImmutableSLList.<RuleAppContainer>nil().prepend(container);
     }

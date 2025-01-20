@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
@@ -5,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 
 /**
@@ -33,14 +37,16 @@ public class SubTermFeature implements TermFeature {
     private final TermFeature[] features;
     private final RuleAppCost arityMismatchCost;
 
-    public RuleAppCost compute(Term term, Services services) {
-        if (term.arity() != features.length)
+    public RuleAppCost compute(Term term, MutableState mState, Services services) {
+        if (term.arity() != features.length) {
             return arityMismatchCost;
+        }
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
 
-        for (int i = 0; i < features.length && !(res instanceof TopRuleAppCost); i++)
-            res = res.add(features[i].compute(term.sub(i), services));
+        for (int i = 0; i < features.length && !(res instanceof TopRuleAppCost); i++) {
+            res = res.add(features[i].compute(term.sub(i), mState, services));
+        }
 
         return res;
     }

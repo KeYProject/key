@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.api;
 
 import java.util.HashMap;
@@ -28,22 +31,22 @@ public class VariableAssignments {
     /**
      * Reference to parent assignments
      */
-    private VariableAssignments parent;
+    private final VariableAssignments parent;
 
     /**
      * Current Assignments
      */
-    private Map<String, Object> currentAssignments;
+    private final Map<String, Object> currentAssignments;
 
     /**
      * Type Map of assignments
      */
-    private Map<String, VariableAssignments.VarType> typeMap;
+    private final Map<String, VariableAssignments.VarType> typeMap;
 
     /**
      * Create new, empty variable assignment, to add variables
      *
-     * @param parent
+     * @param parentAssignments the parent assignments
      */
     public VariableAssignments(VariableAssignments parentAssignments) {
         this.currentAssignments = new HashMap<>();

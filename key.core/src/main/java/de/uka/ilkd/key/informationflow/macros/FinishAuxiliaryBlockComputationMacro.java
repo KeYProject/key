@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.macros;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
@@ -21,6 +22,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  *
  * @author christoph
@@ -36,9 +39,7 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
                 final Goal initiatingGoal = ((BlockExecutionPO) poForProof).getInitiatingGoal();
                 if (initiatingGoal.node().parent() != null) {
                     final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
-                    if (app instanceof BlockContractInternalBuiltInRuleApp) {
-                        return true;
-                    }
+                    return app instanceof BlockContractInternalBuiltInRuleApp;
                 }
             }
         }

@@ -5,13 +5,13 @@
          <callStackEntry path="/0"/>
          <methodCall name="&lt;call ArrayAverage.sum(array_1)&gt;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <branchStatement name="if (array_1==null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+            <branchStatement name="if (array_1 == null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                <callStackEntry path="/0/0/0"/>
                <callStackEntry path="/0"/>
                <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <callStackEntry path="/0/0/0"/>
                   <callStackEntry path="/0"/>
-                  <statement name="throw new Exception ();" pathCondition="equals(array,null)" pathConditionChanged="false">
+                  <statement name="throw new Exception();" pathCondition="equals(array,null)" pathConditionChanged="false">
                      <callStackEntry path="/0/0/0"/>
                      <callStackEntry path="/0"/>
                      <exceptionalMethodReturn name="&lt;throw java.lang.Exception&gt;" signature="&lt;exceptional return of &lt;call ArrayAverage.sum(array_1)&gt;&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" methodReturnCondition="equals(array,null)">
@@ -37,17 +37,17 @@
                         <callStackEntry path="/0"/>
                         <loopInvariant name="invariant: (  (i &gt;= 0
  &amp; i &lt;= array_1.length)&lt;&lt;SC&gt;&gt;
- &amp; sum_2 = javaCastInt(bsum{int j;}(0, i, array_1[j])))&lt;&lt;SC&gt;&gt;;
-variant: javaSubInt(array_1.length, i)
+ &amp; sum_2 = bsum{int j;}(0, i, array_1[j]))&lt;&lt;SC&gt;&gt;;
+variant: array_1.length - i
 mod: false" pathCondition="not(equals(array,null))" pathConditionChanged="false" initiallyValid="true">
                            <callStackEntry path="/0/0/0"/>
                            <callStackEntry path="/0"/>
                            <branchCondition name="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="true" branchCondition="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                               <callStackEntry path="/0/0/0"/>
                               <callStackEntry path="/0"/>
-                              <loopCondition name="i&lt;array_1.length" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false" blockOpened="false">
+                              <loopCondition name="i &lt; array_1.length;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false" blockOpened="false">
                                  <callStackEntry path="/0/0/0"/>
-                                 <statement name="sum_2+=array_1[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false">
+                                 <statement name="sum_2 += array_1[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false">
                                     <callStackEntry path="/0/0/0"/>
                                     <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false">
                                        <callStackEntry path="/0/0/0"/>
@@ -68,7 +68,7 @@ mod: false" pathCondition="not(equals(array,null))" pathConditionChanged="false"
                                     </methodReturnValue>
                                     <callStackEntry path="/0/0/0"/>
                                     <callStackEntry path="/0"/>
-                                    <statement name="return sum_1/array.length;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false">
+                                    <statement name="return sum_1 / array.length;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false">
                                        <callStackEntry path="/0"/>
                                        <branchCondition name="equals(i_0,Z(0(#)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),equals(i_0,Z(0(#)))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="true" branchCondition="equals(i_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                                           <exceptionalMethodReturn name="&lt;throw java.lang.ArithmeticException&gt;" signature="&lt;exceptional return of &lt;call ArrayAverage.average(array)&gt;&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),equals(i_0,Z(0(#)))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),equals(i_0,Z(0(#)))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))">

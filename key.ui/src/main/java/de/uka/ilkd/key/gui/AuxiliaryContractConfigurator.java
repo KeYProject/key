@@ -1,17 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
@@ -88,12 +83,10 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract> extends 
         okButton = new JButton("OK");
         okButton.setPreferredSize(dimension);
         okButton.setMinimumSize(dimension);
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                successful = true;
-                setVisible(false);
-                dispose();
-            }
+        okButton.addActionListener(event -> {
+            successful = true;
+            setVisible(false);
+            dispose();
         });
         container.add(okButton);
         getRootPane().setDefaultButton(okButton);
@@ -103,12 +96,10 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract> extends 
         cancelButton = new JButton("Cancel");
         cancelButton.setPreferredSize(dimension);
         cancelButton.setMinimumSize(dimension);
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                successful = false;
-                setVisible(false);
-                dispose();
-            }
+        cancelButton.addActionListener(event -> {
+            successful = false;
+            setVisible(false);
+            dispose();
         });
         container.add(cancelButton);
         GuiUtilities.attachClickOnEscListener(cancelButton);

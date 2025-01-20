@@ -1,48 +1,40 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.*;
 import java.awt.Dialog.ModalityType;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.Observer;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingWorker;
+import java.util.concurrent.*;
+import java.util.function.Consumer;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionModel;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.proof.Proof;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProofScriptWorker extends SwingWorker<Object, Object> implements InterruptListener {
+/**
+ * Executes s given script.
+ */
+public class ProofScriptWorker extends SwingWorker<Object, ProofScriptEngine.Message>
+        implements InterruptListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptWorker.class);
 
     private final KeYMediator mediator;
@@ -56,11 +48,11 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     private JDialog monitor;
     private JTextArea logArea;
 
-    private final Observer observer = (o, arg) -> publish(arg);
+    private final Consumer<ProofScriptEngine.Message> observer = this::publish;
 
     public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
-        this.initialLocation = new Location(file.toURI().toURL(), 1, 1);
-        this.script = new String(Files.readAllBytes(file.toPath()));
+        this.initialLocation = new Location(file.toURI(), Position.newOneBased(1, 1));
+        this.script = Files.readString(file.toPath());
         this.mediator = mediator;
         this.initiallySelectedGoal = null;
     }
@@ -105,7 +97,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         URL url = script.getUrl();
 
         if (monitor != null) {
-            logArea.setText("Running script from URL '" + url + "':\n");
+            logArea.setText("Running script from URL '" + uri + "':\n");
             return;
         }
 
@@ -115,7 +107,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         logArea = new JTextArea();
         logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         logArea.setEditable(false);
-        logArea.setText("Running script from URL '" + url + "':\n");
+        logArea.setText("Running script from URL '" + uri + "':\n");
         cp.add(new JScrollPane(logArea), BorderLayout.CENTER);
 
         JButton cancelButton = new JButton("Cancel");
@@ -131,19 +123,28 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     }
 
     @Override
-    protected void process(List<Object> chunks) {
+    protected void process(List<ProofScriptEngine.Message> chunks) {
         Document doc = logArea.getDocument();
-        for (Object chunk : chunks) {
-            assert chunk instanceof String;
-
-            try {
-                if (!((String) chunk).startsWith("'")) {
-                    doc.insertString(doc.getLength(), "\n---\n" + chunk, null);
-                } else if (!((String) chunk).startsWith("'echo ")) {
-                    doc.insertString(doc.getLength(), "\n---\nExecuting: " + chunk, null);
+        for (ProofScriptEngine.Message info : chunks) {
+            var message = new StringBuilder("\n---\n");
+            if (info instanceof ProofScriptEngine.EchoMessage echo) {
+                message.append(echo.message());
+            } else {
+                var exec = (ProofScriptEngine.ExecuteInfo) info;
+                if (exec.command().startsWith("'echo ")) {
+                    continue;
                 }
+                if (exec.location().getFileURI().isPresent()) {
+                    message.append(exec.location().getFileURI().get()).append(":");
+                }
+                message.append(exec.location().getPosition().line())
+                        .append(": Executing on goal ").append(exec.nodeSerial()).append('\n')
+                        .append(exec.command());
+            }
+            try {
+                doc.insertString(doc.getLength(), message.toString(), null);
             } catch (BadLocationException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed to insert string", e);
             }
         }
     }
@@ -152,8 +153,9 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
      * initiate the GUI stuff and relay to superclass
      */
     public void init() {
-        mediator.stopInterface(true);
-        mediator.setInteractive(false);
+        mediator.initiateAutoMode(initiallySelectedGoal != null ? initiallySelectedGoal.proof()
+                : mediator.getSelectedProof(),
+            true, false);
         mediator.addInterruptedListener(this);
         makeDialog();
         monitor.setVisible(true);
@@ -171,29 +173,36 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         try {
             get();
         } catch (CancellationException ex) {
-            LOGGER.info("Scripting was cancelled.", ex);
+            LOGGER.info("Scripting was cancelled.");
         } catch (Throwable ex) {
+            LOGGER.error("", ex);
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), ex);
         }
 
         mediator.removeInterruptedListener(this);
-        runWithDeadline(() -> {
-            mediator.startInterface(true);
-        }, 1000);
-        runWithDeadline(() -> {
-            mediator.getUI().getProofControl().stopAndWaitAutoMode();
-        }, 1000);
 
-        try {
-            if (!mediator.getSelectedProof().closed()) {
-                mediator.getSelectionModel()
+        final Proof proof = initiallySelectedGoal != null ? initiallySelectedGoal.proof()
+                : mediator.getSelectedProof();
+        mediator.finishAutoMode(proof, true, true,
+            () -> {
+                selectGoalOrNode();
+            });
+    }
+
+    private void selectGoalOrNode() {
+        final KeYSelectionModel selectionModel = mediator.getSelectionModel();
+        if (!mediator.getSelectedProof().closed()) {
+            try {
+                selectionModel
                         .setSelectedGoal(engine.getStateMap().getFirstOpenAutomaticGoal());
+                return;
+            } catch (ScriptException e) {
+                LOGGER.warn("Script threw exception", e);
+            } catch (Exception e) {
+                LOGGER.warn("Unexpected exception", e);
             }
-        } catch (ScriptException e) {
-            LOGGER.warn("", e);
         }
-
-        mediator.setInteractive(true);
+        selectionModel.defaultSelection();
     }
 
     private static void runWithDeadline(Runnable runnable, int milliseconds) {

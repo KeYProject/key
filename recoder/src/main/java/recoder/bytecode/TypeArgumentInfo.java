@@ -1,14 +1,12 @@
-/*
- * Created on 27.11.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.bytecode;
 
-import recoder.abstraction.TypeArgument;
-
 import java.util.List;
+
+import recoder.abstraction.TypeArgument;
 
 /**
  * @author Tobias Gutzmann
@@ -27,8 +25,9 @@ public class TypeArgumentInfo implements TypeArgument {
             List<? extends TypeArgument> typeArgs, ByteCodeElement parent, boolean isTypeVariable) {
         super();
         if ((typeName == null && wildcardMode != WildcardMode.Any) || wildcardMode == null
-                || parent == null)
+                || parent == null) {
             throw new NullPointerException();
+        }
         this.wildcardMode = wildcardMode;
         this.typeName = typeName;
         this.typeArgs = typeArgs;
@@ -53,15 +52,17 @@ public class TypeArgumentInfo implements TypeArgument {
     }
 
     public ClassFile getContainingClassFile() {
-        if (parent instanceof ClassFile)
+        if (parent instanceof ClassFile) {
             return (ClassFile) parent;
-        else
+        } else {
             return (ClassFile) ((MethodInfo) parent).getContainingClassType();
+        }
     }
 
     public MethodInfo getContainingMethodInfo() {
-        if (parent instanceof MethodInfo)
+        if (parent instanceof MethodInfo) {
             return (MethodInfo) parent;
+        }
         return null;
     }
 

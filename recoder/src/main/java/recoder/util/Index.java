@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 import java.util.Enumeration;
@@ -36,8 +38,9 @@ public class Index implements Cloneable {
 
     public Index(HashCode hasher, int initialCapacity) {
         this.hasher = (hasher != null) ? hasher : HashCode.NATURAL;
-        if (initialCapacity < 4)
+        if (initialCapacity < 4) {
             initialCapacity = 4;
+        }
         ld = 2;
         int cap = 4;
         while (cap < initialCapacity) {
@@ -194,12 +197,12 @@ public class Index implements Cloneable {
 
     public String toString() {
         int max = size() - 1;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Enumeration k = keys();
         buf.append("{");
         for (int i = 0; i <= max; i++) {
             Object key = k.nextElement();
-            buf.append(key.toString() + "=" + get(key));
+            buf.append(key.toString()).append("=").append(get(key));
             if (i < max) {
                 buf.append(", ");
             }
@@ -209,9 +212,9 @@ public class Index implements Cloneable {
     }
 
     static class Entry {
-        int hash;
+        final int hash;
 
-        Object key;
+        final Object key;
 
         long value;
 
@@ -232,7 +235,7 @@ public class Index implements Cloneable {
     private static class Enumerator implements Enumeration {
         int index;
 
-        Entry[] table;
+        final Entry[] table;
 
         Entry entry;
 

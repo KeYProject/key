@@ -3,7 +3,7 @@
    <methodCall name="&lt;call AnotherStaticContractTest.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="return magic(x);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_magic = magic(x) catch(exc_0)
-post: ((exc_0 = null)&lt;&lt;impl&gt;&gt; -&gt; result_magic = 4711)
+post:   ((exc_0 = null)&lt;&lt;impl&gt;&gt; -&gt; result_magic = 4711)
 &amp; (   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
    -&gt;   java.lang.Error::instance(exc_0) = TRUE
       |   java.lang.RuntimeException::instance(exc_0)

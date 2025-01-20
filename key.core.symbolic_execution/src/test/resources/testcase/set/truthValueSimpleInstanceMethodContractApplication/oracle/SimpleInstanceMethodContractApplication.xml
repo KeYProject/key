@@ -6,18 +6,12 @@
 pre: (  (21 &gt;= 0
  &amp; \forall int x; true)&lt;&lt;SC&gt;&gt;
  &amp; _o.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
-post: (result_0 = javaMulInt(21, 2)
+post:   (result_0 = 21 * 2
 &amp; _o.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
 &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: {}&lt;&lt;impl&gt;&gt;, creates no new objects
-termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="_o" contractParameters="Z(1(2(#)))" preconditionComplied="true" hasNotNullCheck="true" notNullCheckComplied="true">
-            <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleInstanceMethodContractApplication.main(_o)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
-               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
-               </termination>
-            </methodReturn>
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="_o" contractParameters="Z(1(2(#)))" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="true">
          </operationContract>
       </statement>
-      <methodReturnEntry path="/0/0/0/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/0/0"/>
 </start>

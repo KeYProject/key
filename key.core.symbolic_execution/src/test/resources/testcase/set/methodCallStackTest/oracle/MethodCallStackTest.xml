@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="&lt;call MethodCallStackTest.magic(x,y)&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call MethodCallStackTest.magic(x, y)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="boolean first = positive(x);" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
          <methodCall name="&lt;call MethodCallStackTest.positive(x_2)&gt;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <branchStatement name="if (x_2&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+            <branchStatement name="if (x_2 &gt;= 0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                <callStackEntry path="/0/0/0"/>
                <callStackEntry path="/0"/>
                <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -23,7 +23,7 @@
                            <callStackEntry path="/0"/>
                            <methodCall name="&lt;call MethodCallStackTest.positive(x_5)&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
-                              <branchStatement name="if (x_5&gt;=0)" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" blockOpened="true">
+                              <branchStatement name="if (x_5 &gt;= 0)" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" blockOpened="true">
                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0"/>
                                  <callStackEntry path="/0"/>
                                  <branchCondition name="gt(y,Z(neglit(1(#))))" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="true" branchCondition="gt(y,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -37,9 +37,9 @@
                                           </methodReturnValue>
                                           <callStackEntry path="/0/0/0/0/0/0/0/0/0"/>
                                           <callStackEntry path="/0"/>
-                                          <statement name="return first_1&amp;&amp;second_1;" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="false">
+                                          <statement name="return first_1 &amp;&amp; second_1;" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="false">
                                              <callStackEntry path="/0"/>
-                                             <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of MethodCallStackTest.magic(x,y)&gt;" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of magic&gt;" signatureIncludingReturnValue="&lt;return TRUE as result of MethodCallStackTest.magic(x,y)&gt;" isReturnValueComputed="true" methodReturnCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))">
+                                             <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of MethodCallStackTest.magic(x, y)&gt;" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of magic&gt;" signatureIncludingReturnValue="&lt;return TRUE as result of MethodCallStackTest.magic(x, y)&gt;" isReturnValueComputed="true" methodReturnCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))">
                                                 <methodReturnValue name="TRUE" returnValueString="TRUE" hasCondition="false">
                                                 </methodReturnValue>
                                                 <callStackEntry path="/0"/>
@@ -62,9 +62,9 @@
                                           </methodReturnValue>
                                           <callStackEntry path="/0/0/0/0/0/0/0/0/0"/>
                                           <callStackEntry path="/0"/>
-                                          <statement name="return first_1&amp;&amp;second_1;" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false">
+                                          <statement name="return first_1 &amp;&amp; second_1;" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false">
                                              <callStackEntry path="/0"/>
-                                             <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of MethodCallStackTest.magic(x,y)&gt;" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return FALSE as result of magic&gt;" signatureIncludingReturnValue="&lt;return FALSE as result of MethodCallStackTest.magic(x,y)&gt;" isReturnValueComputed="true" methodReturnCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))">
+                                             <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of MethodCallStackTest.magic(x, y)&gt;" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return FALSE as result of magic&gt;" signatureIncludingReturnValue="&lt;return FALSE as result of MethodCallStackTest.magic(x, y)&gt;" isReturnValueComputed="true" methodReturnCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))">
                                                 <methodReturnValue name="FALSE" returnValueString="FALSE" hasCondition="false">
                                                 </methodReturnValue>
                                                 <callStackEntry path="/0"/>
@@ -102,7 +102,7 @@
                            <callStackEntry path="/0"/>
                            <methodCall name="&lt;call MethodCallStackTest.positive(x_5)&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
-                              <branchStatement name="if (x_5&gt;=0)" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" blockOpened="true">
+                              <branchStatement name="if (x_5 &gt;= 0)" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" blockOpened="true">
                                  <callStackEntry path="/0/0/0/0/1/0/0/0/0"/>
                                  <callStackEntry path="/0"/>
                                  <branchCondition name="gt(y,Z(neglit(1(#))))" pathCondition="and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#))))" pathConditionChanged="true" branchCondition="gt(y,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -116,9 +116,9 @@
                                           </methodReturnValue>
                                           <callStackEntry path="/0/0/0/0/1/0/0/0/0"/>
                                           <callStackEntry path="/0"/>
-                                          <statement name="return first_1&amp;&amp;second_1;" pathCondition="and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#))))" pathConditionChanged="false">
+                                          <statement name="return first_1 &amp;&amp; second_1;" pathCondition="and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#))))" pathConditionChanged="false">
                                              <callStackEntry path="/0"/>
-                                             <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of MethodCallStackTest.magic(x,y)&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return FALSE as result of magic&gt;" signatureIncludingReturnValue="&lt;return FALSE as result of MethodCallStackTest.magic(x,y)&gt;" isReturnValueComputed="true" methodReturnCondition="and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#))))">
+                                             <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of MethodCallStackTest.magic(x, y)&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return FALSE as result of magic&gt;" signatureIncludingReturnValue="&lt;return FALSE as result of MethodCallStackTest.magic(x, y)&gt;" isReturnValueComputed="true" methodReturnCondition="and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#))))">
                                                 <methodReturnValue name="FALSE" returnValueString="FALSE" hasCondition="false">
                                                 </methodReturnValue>
                                                 <callStackEntry path="/0"/>
@@ -141,9 +141,9 @@
                                           </methodReturnValue>
                                           <callStackEntry path="/0/0/0/0/1/0/0/0/0"/>
                                           <callStackEntry path="/0"/>
-                                          <statement name="return first_1&amp;&amp;second_1;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false">
+                                          <statement name="return first_1 &amp;&amp; second_1;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false">
                                              <callStackEntry path="/0"/>
-                                             <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of MethodCallStackTest.magic(x,y)&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return FALSE as result of magic&gt;" signatureIncludingReturnValue="&lt;return FALSE as result of MethodCallStackTest.magic(x,y)&gt;" isReturnValueComputed="true" methodReturnCondition="and(leq(x,Z(neglit(1(#)))),leq(y,Z(neglit(1(#)))))">
+                                             <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of MethodCallStackTest.magic(x, y)&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return FALSE as result of magic&gt;" signatureIncludingReturnValue="&lt;return FALSE as result of MethodCallStackTest.magic(x, y)&gt;" isReturnValueComputed="true" methodReturnCondition="and(leq(x,Z(neglit(1(#)))),leq(y,Z(neglit(1(#)))))">
                                                 <methodReturnValue name="FALSE" returnValueString="FALSE" hasCondition="false">
                                                 </methodReturnValue>
                                                 <callStackEntry path="/0"/>

@@ -1,6 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import de.uka.ilkd.key.util.Debug;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
@@ -17,11 +26,6 @@ import recoder.java.reference.ThisReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 /**
  * Creates the preparation method for pre-initilizing the object fields with their default settings.
@@ -51,8 +55,7 @@ public class PrepareObjectBuilder extends RecoderModelTransformer {
     private List<Field> getFields(ClassDeclaration cd) {
         List<Field> result = new ArrayList<>(cd.getChildCount());
         outer: for (int i = 0; i < cd.getChildCount(); i++) {
-            if (cd.getChildAt(i) instanceof FieldDeclaration) {
-                final FieldDeclaration fd = (FieldDeclaration) cd.getChildAt(i);
+            if (cd.getChildAt(i) instanceof FieldDeclaration fd) {
                 for (Modifier mod : fd.getModifiers()) {
                     if (mod instanceof Model) {
                         continue outer;

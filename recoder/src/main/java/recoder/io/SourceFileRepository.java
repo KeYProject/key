@@ -1,15 +1,17 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.io;
+
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.List;
 
 import recoder.ParserException;
 import recoder.Service;
 import recoder.java.CompilationUnit;
 import recoder.util.ProgressListener;
-
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Retrieval, storage and write back of abstract syntax trees.
@@ -141,4 +143,3 @@ public interface SourceFileRepository extends Service {
     void removeProgressListener(ProgressListener l);
 
 }
-

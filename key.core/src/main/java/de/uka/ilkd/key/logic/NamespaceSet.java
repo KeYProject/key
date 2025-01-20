@@ -1,24 +1,33 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.Function;
+
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RuleSet;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 
 public class NamespaceSet {
 
-    private Namespace<QuantifiableVariable> varNS = new Namespace<QuantifiableVariable>();
-    private Namespace<IProgramVariable> progVarNS = new Namespace<IProgramVariable>();
-    private Namespace<Function> funcNS = new Namespace<Function>();
-    private Namespace<RuleSet> ruleSetNS = new Namespace<RuleSet>();
-    private Namespace<Sort> sortNS = new Namespace<Sort>();
-    private Namespace<Choice> choiceNS = new Namespace<Choice>();
+    private Namespace<QuantifiableVariable> varNS = new Namespace<>();
+    private Namespace<IProgramVariable> progVarNS = new Namespace<>();
+    // TODO: Operators should not be local to goals
+    private Namespace<JFunction> funcNS = new Namespace<>();
+    private Namespace<RuleSet> ruleSetNS = new Namespace<>();
+    private Namespace<Sort> sortNS = new Namespace<>();
+    private Namespace<Choice> choiceNS = new Namespace<>();
 
     public NamespaceSet() {
     }
 
-    public NamespaceSet(Namespace<QuantifiableVariable> varNS, Namespace<Function> funcNS,
+    public NamespaceSet(Namespace<QuantifiableVariable> varNS,
+            Namespace<JFunction> funcNS,
             Namespace<Sort> sortNS, Namespace<RuleSet> ruleSetNS, Namespace<Choice> choiceNS,
             Namespace<IProgramVariable> programVarNS) {
         this.varNS = varNS;
@@ -30,21 +39,23 @@ public class NamespaceSet {
     }
 
     public NamespaceSet copy() {
-        return new NamespaceSet(variables().copy(), functions().copy(), sorts().copy(),
+        return new NamespaceSet(variables().copy(), functions().copy(),
+            sorts().copy(),
             ruleSets().copy(), choices().copy(), programVariables().copy());
     }
 
     public NamespaceSet shallowCopy() {
-        return new NamespaceSet(variables(), functions(), sorts(), ruleSets(), choices(),
+        return new NamespaceSet(variables(), functions(), sorts(), ruleSets(),
+            choices(),
             programVariables());
     }
 
     // TODO MU: Rename into sth with wrap or similar
     public NamespaceSet copyWithParent() {
-        return new NamespaceSet(new Namespace<QuantifiableVariable>(variables()),
-            new Namespace<Function>(functions()), new Namespace<Sort>(sorts()),
-            new Namespace<RuleSet>(ruleSets()), new Namespace<Choice>(choices()),
-            new Namespace<IProgramVariable>(programVariables()));
+        return new NamespaceSet(new Namespace<>(variables()),
+            new Namespace<>(functions()), new Namespace<>(sorts()),
+            new Namespace<>(ruleSets()), new Namespace<>(choices()),
+            new Namespace<>(programVariables()));
     }
 
     public Namespace<QuantifiableVariable> variables() {
@@ -63,11 +74,11 @@ public class NamespaceSet {
         this.progVarNS = progVarNS;
     }
 
-    public Namespace<Function> functions() {
+    public Namespace<JFunction> functions() {
         return funcNS;
     }
 
-    public void setFunctions(Namespace<Function> funcNS) {
+    public void setFunctions(Namespace<JFunction> funcNS) {
         this.funcNS = funcNS;
     }
 
@@ -148,8 +159,9 @@ public class NamespaceSet {
     private Named lookup(Name name, final Namespace<?>[] spaces) {
         for (Namespace<?> space : spaces) {
             final Named n = space.lookup(name);
-            if (n != null)
+            if (n != null) {
                 return n;
+            }
         }
         return null;
     }

@@ -1,16 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-import de.uka.ilkd.key.nparser.KeyAst;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
@@ -25,7 +20,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -36,6 +31,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
@@ -44,15 +40,13 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.util.List;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.
@@ -66,7 +60,6 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
     ImmutableList<Proof> proofStack = ImmutableSLList.nil();
 
-    final byte verbosity;
     final KeYMediator mediator;
 
     // for a progress bar
@@ -91,36 +84,27 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      */
     public boolean allProofsSuccessful = true;
 
-    public ConsoleUserInterfaceControl(byte verbosity, boolean loadOnly) {
-        this.verbosity = verbosity;
+    public ConsoleUserInterfaceControl(boolean loadOnly) {
         this.mediator = new KeYMediator(this);
         this.loadOnly = loadOnly;
     }
 
-    public ConsoleUserInterfaceControl(boolean verbose, boolean loadOnly) {
-        this(verbose ? Verbosity.TRACE : Verbosity.NORMAL, loadOnly);
-    }
-
     private void printResults(final int openGoals, TaskFinishedInfo info, final Object result2) {
-        if (verbosity >= Verbosity.DEBUG) {
-            LOGGER.info("]"); // end progress bar
+        LOGGER.info("]"); // end progress bar
+        LOGGER.info("[ DONE  ... rule application ]");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("\n== Proof {} ==", (openGoals > 0 ? "open" : "closed"));
+            final Statistics stat = info.getProof().getStatistics();
+            LOGGER.debug("Proof steps: {}", stat.nodes);
+            LOGGER.debug("Branches: {}", stat.branches);
+            LOGGER.debug("Automode Time: {} ms", stat.autoModeTimeInMillis);
+            LOGGER.debug("Time per step: {} ms", stat.timePerStepInMillis);
         }
-        if (verbosity > Verbosity.SILENT) {
-            LOGGER.info("[ DONE  ... rule application ]");
-            if (verbosity >= Verbosity.DEBUG) {
-                LOGGER.info("\n== Proof {} ==", (openGoals > 0 ? "open" : "closed"));
-                final Statistics stat = info.getProof().getStatistics();
-                LOGGER.info("Proof steps: {}", stat.nodes);
-                LOGGER.info("Branches: {}", stat.branches);
-                LOGGER.info("Automode Time: {} ms", stat.autoModeTimeInMillis);
-                LOGGER.info("Time per step: {} ms", stat.timePerStepInMillis);
-            }
-            LOGGER.info("Number of goals remaining open: {}", openGoals);
-            if (openGoals == 0) {
-                LOGGER.info("Proved");
-            } else {
-                LOGGER.info("Not proved");
-            }
+        LOGGER.info("Number of goals remaining open: {}", openGoals);
+        if (openGoals == 0) {
+            LOGGER.info("Proved");
+        } else {
+            LOGGER.info("Not proved");
         }
         // this seems to be a good place to free some memory
         Runtime.getRuntime().gc();
@@ -147,48 +131,53 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         super.taskFinished(info);
         progressMax = 0; // reset progress bar marker
         final Proof proof = info.getProof();
+        final Object result = info.getResult();
         if (proof == null) {
-            if (verbosity > Verbosity.SILENT) {
+            LOGGER.info("Proof loading failed");
+            if (result instanceof Throwable thrown) {
+                LOGGER.info("Proof loading failed", thrown);
+            } else {
                 LOGGER.info("Proof loading failed");
-                final Object error = info.getResult();
-                if (error instanceof Throwable) {
-                    ((Throwable) error).printStackTrace();
-                }
             }
             System.exit(1);
         }
         final int openGoals = proof.openGoals().size();
-        final Object result2 = info.getResult();
         if (info.getSource() instanceof ProverCore || info.getSource() instanceof ProofMacro) {
             if (!isAtLeastOneMacroRunning()) {
-                printResults(openGoals, info, result2);
+                printResults(openGoals, info, result);
             }
         } else if (info.getSource() instanceof ProblemLoader) {
-            LOGGER.debug("{}", result2);
-            System.exit(-1);
-        }
-        if (loadOnly || openGoals == 0) {
-            LOGGER.info("Number of open goals after loading: {}", openGoals);
-            System.exit(0);
-        }
-        ProblemLoader problemLoader = (ProblemLoader) info.getSource();
-        if (problemLoader.hasProofScript()) {
-            try {
+            if (result != null) {
+                LOGGER.debug("{}", result);
+                if (result instanceof Throwable thrown) {
+                    LOGGER.debug("Exception: ", thrown);
+                }
+                System.exit(-1);
+            }
+            if (loadOnly || openGoals == 0) {
+                LOGGER.info("Number of open goals after loading: {}", openGoals);
+                System.exit(0);
+            }
+            ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+            if (problemLoader.hasProofScript()) {
+                try {
                    KeyAst.ProofScript script = problemLoader.readProofScript();
                    ProofScriptEngine pse = new ProofScriptEngine(script);
                 this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
-                pse.execute(this, proof);
-                // The start and end messages are fake to persuade the system ...
-                // All this here should refactored anyway ...
-                this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
-            } catch (Exception e) {
-                LOGGER.debug("", e);
-                System.exit(-1);
+                        pse.execute(this, proof);
+                        // The start and end messages are fake to persuade the system ...
+                        // All this here should refactored anyway ...
+                        this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+                    }
+                } catch (Exception e) {
+                    LOGGER.debug("", e);
+                    System.exit(-1);
+                }
+            } else if (macroChosen()) {
+                applyMacro();
+            } else {
+                finish(proof);
             }
-        } else if (macroChosen()) {
-            applyMacro();
-        } else {
-            finish(proof);
         }
     }
 
@@ -196,11 +185,11 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
-        progressMax = info.getSize();
-        if (TaskKind.Strategy.equals(info.getKind())) {
-            System.out.println(info.getMessage() + " ["); // start progress bar
+        progressMax = info.size();
+        if (TaskKind.Strategy.equals(info.kind())) {
+            System.out.println(info.message() + " ["); // start progress bar
         } else {
-            System.out.println(info.getMessage());
+            System.out.println(info.message());
         }
     }
 
@@ -240,7 +229,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
         super.registerProofAggregate(pa);
-        mediator.setProof(pa.getFirstProof());
+        mediator.getSelectionModel().setSelectedProof(pa.getFirstProof());
         proofStack = proofStack.prepend(pa.getFirstProof());
     }
 
@@ -286,7 +275,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public final void taskProgress(int position) {
         super.taskProgress(position);
-        if (verbosity >= Verbosity.DEBUG && progressMax > 0) {
+        if (progressMax > 0) {
             if ((position * PROGRESS_BAR_STEPS) % progressMax == 0) {
                 System.out.print(PROGRESS_MARK);
             }
@@ -328,7 +317,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             Proof p = proofStack.head();
             proofStack = proofStack.removeAll(p);
             assert p.name().equals(e.getSource().name());
-            mediator.setProof(proofStack.head());
+            mediator.getSelectionModel().setSelectedProof(proofStack.head());
         } else {
             // proofStack might be empty, though proof != null. This can
             // happen for symbolic execution tests, if proofCreated was not
@@ -398,22 +387,20 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
         try {
             // a copy with running number to compare different runs
-            proof.saveToFile(new File(f.getAbsolutePath()));
+            ProofSaver.saveToFile(new File(f.getAbsolutePath()), proof);
             // save current proof under common name as well
-            proof.saveToFile(new File(baseName + ".auto.proof"));
+            ProofSaver.saveToFile(new File(baseName + ".auto.proof"), proof);
 
             // save proof statistics
             ShowProofStatistics.getCSVStatisticsMessage(proof);
             File file = new File(MiscTools.toValidFileName(proof.name().toString()) + ".csv");
             try (BufferedWriter writer =
-                new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)))) {
+                new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
                 writer.write(ShowProofStatistics.getCSVStatisticsMessage(proof));
-            } catch (IOException e) {
-                e.printStackTrace();
-                assert false;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to write proof stats", e);
         }
         // Says true if all Proofs have succeeded,
         // or false if there is at least one open Proof

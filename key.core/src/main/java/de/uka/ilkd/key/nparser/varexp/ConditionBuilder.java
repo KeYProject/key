@@ -1,9 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.varexp;
+
+import java.util.List;
 
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
-
-import java.util.List;
 
 /**
  * A specilized {@link TacletBuilderCommand} for handling {@code \varcond}s.

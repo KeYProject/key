@@ -1,11 +1,6 @@
-// This file is taken from the RECODER library, which is protected by the LGPL,
-// and modified.
-/**
- * This class is part of the AST RECODER builds when it parses and resolves Java programs with meta
- * constructs and schema variables. It is transformed by Recoder2KeY to a subclass of
- * ...rule.metaconstruct.ProgramMetaConstruct.
- */
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.ProgramElement;
@@ -28,7 +23,7 @@ public class RMethodCallStatement extends JavaStatement
     private ProgramVariableSVWrapper resultVar;
 
     /** schemavariable needed by method call */
-    private ExecutionContext ecsvw;
+    private final ExecutionContext ecsvw;
 
     /**
      * Body.
@@ -63,12 +58,15 @@ public class RMethodCallStatement extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (resultVar != null)
+        if (resultVar != null) {
             result++;
-        if (ecsvw != null)
+        }
+        if (ecsvw != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -82,18 +80,21 @@ public class RMethodCallStatement extends JavaStatement
 
     public ProgramElement getChildAt(int index) {
         if (resultVar != null) {
-            if (index == 0)
+            if (index == 0) {
                 return resultVar;
+            }
             index--;
         }
         if (ecsvw != null) {
-            if (index == 0)
+            if (index == 0) {
                 return ecsvw;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

@@ -1,16 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.ChoiceExpr;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Used to implement a Taclet that has no <I>find</I> part. This kind of taclet is not attached to
@@ -19,16 +22,17 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 public class NoFindTaclet extends Taclet {
 
     /**
-     * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
+     * creates a {@link Taclet} (previously Schematic Theory Specific Rule) with the given
+     * parameters.
      *
      * @param name the name of the Taclet
-     * @param applPart contains the application part of an Taclet that is the if-sequent, the
+     * @param applPart contains the application part of a Taclet that is the if-sequent, the
      *        variable conditions
-     * @param goalTemplates the IList<TacletGoalTemplate> containg all goal descriptions of the
+     * @param goalTemplates the IList containing all goal descriptions of the
      *        taclet to be created
      * @param ruleSets a list of rule sets for the Taclet
      * @param attrs attributes for the Taclet; these are boolean values
-     * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the prefix for each
+     * @param prefixMap a ImmutableMap that contains the prefix for each
      *        SchemaVariable in the Taclet
      * @param choices the SetOf<Choices> to which this taclet belongs to
      */
@@ -62,7 +66,7 @@ public class NoFindTaclet extends Taclet {
      */
     @Override
     protected ImmutableSet<QuantifiableVariable> getBoundVariablesHelper() {
-        return DefaultImmutableSet.<QuantifiableVariable>nil();
+        return DefaultImmutableSet.nil();
     }
 
     @Override

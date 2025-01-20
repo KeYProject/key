@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.reference;
 
 import recoder.java.*;
@@ -126,8 +128,9 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement
             name.setParent(this);
         }
         if (typeArguments != null) {
-            for (TypeArgumentDeclaration ta : typeArguments)
+            for (TypeArgumentDeclaration ta : typeArguments) {
                 ta.setParent(this);
+            }
         }
     }
 
@@ -152,7 +155,7 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
@@ -224,12 +227,15 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (prefix != null)
+        if (prefix != null) {
             result++;
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (typeArguments != null)
+        }
+        if (typeArguments != null) {
             result += typeArguments.size();
+        }
         return result;
     }
 
@@ -243,13 +249,15 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement
 
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
             index--;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (typeArguments != null) {
@@ -270,8 +278,9 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement
         }
         if (typeArguments != null) {
             int idx = typeArguments.indexOf(child);
-            if (idx != -1)
+            if (idx != -1) {
                 return (idx << 4) | 2;
+            }
         }
         return -1;
     }

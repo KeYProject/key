@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 import java.io.File;
@@ -72,7 +74,7 @@ public class FileUtils {
             // no common header: different devices; use absolute path
             return destname;
         }
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         if (index != slen) {
             while (index > 0 && (startname.charAt(index) != File.separatorChar)) {
                 index -= 1;
@@ -103,10 +105,11 @@ public class FileUtils {
         String classpath = System.getProperty("java.class.path");
         if (classpath != null) {
             char sep = File.separatorChar;
-            if (sep == '/')
+            if (sep == '/') {
                 classpath = classpath.replace('\\', sep);
-            else if (sep == '\\')
+            } else if (sep == '\\') {
                 classpath = classpath.replace('/', sep);
+            }
             StringTokenizer tok = new StringTokenizer(classpath, File.separator);
             while (tok.hasMoreTokens()) {
                 classpath = tok.nextToken();

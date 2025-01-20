@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
+
+import de.uka.ilkd.key.logic.op.OperatorSV;
 
 import recoder.java.Identifier;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.statement.Catch;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrapper {
 
@@ -12,26 +16,17 @@ public class CatchSVWrapper extends Catch implements KeYRecoderExtension, SVWrap
      *
      */
     private static final long serialVersionUID = 6288254708744002494L;
-    protected SchemaVariable sv;
+    protected final OperatorSV sv;
 
-    public CatchSVWrapper(SchemaVariable sv) {
+    public CatchSVWrapper(OperatorSV sv) {
         this.sv = sv;
     }
 
-
-    /**
-     * sets the schema variable of sort statement
-     *
-     * @param sv the SchemaVariable
-     */
-    public void setSV(SchemaVariable sv) {
-        this.sv = sv;
-    }
 
     /**
      * returns a String name of this meta construct.
      */
-    public SchemaVariable getSV() {
+    public OperatorSV getSV() {
         return sv;
     }
 

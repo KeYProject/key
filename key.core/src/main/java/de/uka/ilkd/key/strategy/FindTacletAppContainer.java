@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -14,6 +15,10 @@ import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableList;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Instances of this class are immutable
@@ -58,10 +63,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
     @Override
     protected boolean isStillApplicable(Goal p_goal) {
         PosInOccurrence topPos = p_goal.getFormulaTagManager().getPosForTag(positionTag);
-        if (topPos == null || subformulaOrPreceedingUpdateHasChanged(p_goal)) {
-            return false;
-        }
-        return true;
+        return topPos != null && !subformulaOrPreceedingUpdateHasChanged(p_goal);
     }
 
 
@@ -77,13 +79,13 @@ public class FindTacletAppContainer extends TacletAppContainer {
             final FormulaChangeInfo info = infoList.head();
             infoList = infoList.tail();
 
-            final SequentFormula newFormula = info.getNewFormula();
+            final SequentFormula newFormula = info.newFormula();
             if (newFormula == applicationPosition.sequentFormula()) {
                 // then there were no relevant modifications since the creation
                 // of the rule app object
                 return false;
             }
-            if (!independentSubformulas(info.getPositionOfModification(), newFormula)) {
+            if (!independentSubformulas(info.positionOfModification(), newFormula)) {
                 return true;
             }
         }
@@ -125,12 +127,18 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // program does not change. this is a pretty common situation
                 // during symbolic program execution; also consider
                 // <code>TermTacletAppIndex.updateCompleteRebuild</code>
-                if (beforeChangeOp instanceof Modality) {
+                if (beforeChangeOp instanceof Modality beforeChangeMod) {
                     final PosInOccurrence afterChangePos =
                         changePos.replaceConstrainedFormula(newFormula);
                     final Term afterChangeTerm = afterChangePos.subTerm();
-                    return beforeChangeOp == afterChangeTerm.op() && beforeChangeTerm.sub(0)
-                            .equalsModIrrelevantTermLabels(afterChangeTerm.sub(0));
+                    if (afterChangeTerm.op() instanceof Modality afterChangeMod) {
+                        return beforeChangeMod.kind() == afterChangeMod.kind()
+                                && beforeChangeTerm.sub(0)
+                                        .equalsModProperty(afterChangeTerm.sub(0),
+                                            IRRELEVANT_TERM_LABELS_PROPERTY);
+                    } else {
+                        return false;
+                    }
                 }
 
                 return false;

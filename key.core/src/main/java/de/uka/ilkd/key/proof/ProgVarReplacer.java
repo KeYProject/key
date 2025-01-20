@@ -1,38 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
 import java.util.Map;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SemisequentChangeInfo;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.OperatorInstantiation;
-import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
-import de.uka.ilkd.key.rule.inst.ProgramListInstantiation;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import de.uka.ilkd.key.rule.inst.*;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -43,7 +31,7 @@ public final class ProgVarReplacer {
     /**
      * map specifying the replacements to be done
      */
-    private final Map<ProgramVariable, ProgramVariable> map;
+    private final Map<LocationVariable, LocationVariable> map;
 
 
     /**
@@ -55,34 +43,9 @@ public final class ProgVarReplacer {
     /**
      * creates a ProgVarReplacer that replaces program variables as specified by the map parameter
      */
-    public ProgVarReplacer(Map<ProgramVariable, ProgramVariable> map, Services services) {
+    public ProgVarReplacer(Map<LocationVariable, LocationVariable> map, Services services) {
         this.map = map;
         this.services = services;
-    }
-
-
-    /**
-     * merges "next" into "base" precondition: "next" is the result of replacing in "base" the
-     * formula at position "idx" by calling Semisequent.replace() (this implies that "next" contains
-     * exactly one removed and one added formula)
-     */
-    public static void mergeSemiCIs(SemisequentChangeInfo base, SemisequentChangeInfo next,
-            int idx) {
-        assert next.modifiedFormulas().isEmpty();
-
-        Iterator<SequentFormula> remIt = next.removedFormulas().iterator();
-        assert remIt.hasNext();
-        SequentFormula remCf = remIt.next();
-        assert !remIt.hasNext();
-        base.removedFormula(idx, remCf);
-
-        Iterator<SequentFormula> addIt = next.addedFormulas().iterator();
-        assert addIt.hasNext();
-        SequentFormula addCf = addIt.next();
-        assert !addIt.hasNext();
-        base.addedFormula(idx, addCf);
-
-        base.setFormulaList(next.getFormulaList());
     }
 
     /**
@@ -92,7 +55,7 @@ public final class ProgVarReplacer {
         ImmutableSet<IProgramVariable> result = vars;
 
         for (final IProgramVariable var : vars) {
-            IProgramVariable newVar = map.get(var);
+            final IProgramVariable newVar = map.get(var);
             if (newVar != null) {
                 result = result.remove(var);
                 result = result.add(newVar);
@@ -109,12 +72,10 @@ public final class ProgVarReplacer {
     public void replace(TacletIndex tacletIndex) {
         ImmutableList<NoPosTacletApp> noPosTacletApps = tacletIndex.getPartialInstantiatedApps();
         ImmutableSet<NoPosTacletApp> appsToBeRemoved, appsToBeAdded;
-        appsToBeRemoved = DefaultImmutableSet.<NoPosTacletApp>nil();
-        appsToBeAdded = DefaultImmutableSet.<NoPosTacletApp>nil();
+        appsToBeRemoved = DefaultImmutableSet.nil();
+        appsToBeAdded = DefaultImmutableSet.nil();
 
-        Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
-        while (it.hasNext()) {
-            NoPosTacletApp noPosTacletApp = it.next();
+        for (NoPosTacletApp noPosTacletApp : noPosTacletApps) {
             SVInstantiations insts = noPosTacletApp.instantiations();
 
             SVInstantiations newInsts = replace(insts);
@@ -179,7 +140,7 @@ public final class ProgVarReplacer {
                 }
 
                 if (changedSomething) {
-                    ImmutableArray<ProgramElement> newA = new ImmutableArray<ProgramElement>(array);
+                    ImmutableArray<ProgramElement> newA = new ImmutableArray<>(array);
                     result = result.replace(sv, newA, services);
                 }
             } else if (ie instanceof TermInstantiation) {
@@ -254,11 +215,9 @@ public final class ProgVarReplacer {
 
     private Term replaceProgramVariable(Term t) {
         final ProgramVariable pv = (ProgramVariable) t.op();
-        Object o = map.get(pv);
-        if (o instanceof ProgramVariable) {
-            return services.getTermFactory().createTerm((ProgramVariable) o, t.getLabels());
-        } else if (o instanceof Term) {
-            return (Term) o;
+        ProgramVariable o = map.get(pv);
+        if (o != null) {
+            return services.getTermFactory().createTerm(o, t.getLabels());
         }
         return t;
     }
@@ -267,7 +226,7 @@ public final class ProgVarReplacer {
     private Term standardReplace(Term t) {
         Term result = t;
 
-        final Term newSubTerms[] = new Term[t.arity()];
+        final Term[] newSubTerms = new Term[t.arity()];
 
         boolean changedSubTerm = false;
 
@@ -279,18 +238,22 @@ public final class ProgVarReplacer {
             }
         }
 
+        Operator op = t.op();
+
+        // TODO (DD): Clean up
         final JavaBlock jb = t.javaBlock();
         JavaBlock newJb = jb;
-        if (!jb.isEmpty()) {
+        if (op instanceof Modality mod) {
             Statement s = (Statement) jb.program();
             Statement newS = (Statement) replace(s);
             if (newS != s) {
                 newJb = JavaBlock.createJavaBlock((StatementBlock) newS);
+                op = Modality.getModality(mod.kind(), newJb);
             }
         }
 
         if (changedSubTerm || newJb != jb) {
-            result = services.getTermFactory().createTerm(t.op(), newSubTerms, t.boundVars(), newJb,
+            result = services.getTermFactory().createTerm(op, newSubTerms, t.boundVars(),
                 t.getLabels());
         }
         return result;
@@ -304,9 +267,26 @@ public final class ProgVarReplacer {
         final Operator op = t.op();
         if (op instanceof ProgramVariable) {
             return replaceProgramVariable(t);
+        } else if (op instanceof ElementaryUpdate
+                && map.containsKey(((ElementaryUpdate) op).lhs())) {
+            return replaceProgramVariableInLHSOfElementaryUpdate(t);
         } else {
             return standardReplace(t);
         }
+    }
+
+    /**
+     * replaces a program variable on the lefthandside of an elementary update
+     * requires the given term to have an elementary update operator as top level operator
+     *
+     * @param t the Term where to replace renamed variables
+     * @return the term with all replacements done
+     */
+    private Term replaceProgramVariableInLHSOfElementaryUpdate(Term t) {
+        final Term newTerm = services.getTermBuilder().elementary(
+            (UpdateableOperator) map.get(((ElementaryUpdate) t.op()).lhs()),
+            standardReplace(t.sub(0)));
+        return newTerm;
     }
 
 

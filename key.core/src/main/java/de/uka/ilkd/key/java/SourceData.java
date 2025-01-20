@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 /**
@@ -90,8 +93,9 @@ public class SourceData {
      * @return the ProgramElement to be matched next or <tt>null</tt> if there is no such element
      */
     public ProgramElement getSource() {
-        if (childPos == -1)
+        if (childPos == -1) {
             return element;
+        }
 
         final NonTerminalProgramElement ntpe = (NonTerminalProgramElement) element;
 

@@ -1,5 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
+import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -18,6 +22,29 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
  * @author lanzinger
  */
 public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel> {
+
+    public OriginTermLabel createOriginTermLabel(Origin origin) {
+        return new OriginTermLabel(origin);
+    }
+
+    /**
+     * Creates a new {@link OriginTermLabel}.
+     *
+     * @param origin the term's origin.
+     * @param subtermOrigins the origins of the term's (former) subterms.
+     */
+    public OriginTermLabel createOriginTermLabel(Origin origin, Set<Origin> subtermOrigins) {
+        return new OriginTermLabel(origin, subtermOrigins);
+    }
+
+    /**
+     * Creates a new {@link OriginTermLabel}.
+     *
+     * @param subtermOrigins the origins of the term's (former) subterms.
+     */
+    public OriginTermLabel createOriginTermLabel(Set<Origin> subtermOrigins) {
+        return new OriginTermLabel(subtermOrigins);
+    }
 
     @Override
     public OriginTermLabel parseInstance(List<String> arguments, TermServices services)
@@ -92,17 +119,21 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
                     int line = Integer.parseInt(tokenizer.nextToken());
                     matchEnd(tokenizer, str);
 
-                    return new FileOrigin(specType, filename, line);
+                    return new FileOrigin(specType, Paths.get(filename).toUri(), line);
                 } else if (token.equals("node")) {
                     int number = Integer.parseInt(tokenizer.nextToken());
 
                     String ruleName = tokenizer.nextToken();
 
-                    if (!ruleName.startsWith("(") || !ruleName.endsWith(")")) {
+                    if (ruleName.startsWith("(")) {
+                        ruleName = ruleName.substring(1);
+                        while (!ruleName.endsWith(")")) {
+                            ruleName += tokenizer.nextToken();
+                        }
+                        ruleName = ruleName.substring(0, ruleName.length() - 1);
+                    } else {
                         throw new IllegalArgumentException();
                     }
-
-                    ruleName = ruleName.substring(1, ruleName.length() - 1);
 
                     matchEnd(tokenizer, str);
 
@@ -181,8 +212,8 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
      */
     private void matchEnd(StringTokenizer tokenizer, String line) throws TermLabelException {
         if (tokenizer.hasMoreTokens()) {
-            throw new TermLabelException("Unexpected token \'" + tokenizer.nextToken() + "\', "
-                + "expected: \'\"\'" + "\nin line \"" + line + "\"");
+            throw new TermLabelException("Unexpected token '" + tokenizer.nextToken() + "', "
+                + "expected: '\"'" + "\nin line \"" + line + "\"");
         }
     }
 }

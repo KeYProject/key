@@ -1,7 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.solvertypes;
 
-import javax.annotation.Nonnull;
 import java.util.*;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Facade for the management of {@link SolverType}. This class holds references to common and known
@@ -35,8 +39,7 @@ public final class SolverTypes {
      *
      * @return the available solver types, including legacy solvers
      */
-    @Nonnull
-    public static Collection<SolverType> getSolverTypes() {
+    public static @NonNull Collection<SolverType> getSolverTypes() {
         if (SOLVERS.isEmpty()) {
             SolverPropertiesLoader solverLoader = new SolverPropertiesLoader();
             SOLVERS.addAll(solverLoader.getSolvers());
@@ -50,8 +53,7 @@ public final class SolverTypes {
      *
      * @return the available legacy solver types
      */
-    @Nonnull
-    public static Collection<SolverType> getLegacySolvers() {
+    public static @NonNull Collection<SolverType> getLegacySolvers() {
         if (SOLVERS.isEmpty()) {
             getSolverTypes();
         }

@@ -1,15 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.logic.Name;
 
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves the
@@ -60,11 +64,10 @@ public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
             try {
                 final RuleApp ruleApp =
                     stateMap.getFirstOpenAutomaticGoal().node().parent().getAppliedRuleApp();
-                if (ruleApp instanceof TacletApp) {
-                    final TacletApp tacletApp = (TacletApp) ruleApp;
+                if (ruleApp instanceof TacletApp tacletApp) {
                     final Object inst = tacletApp.matchConditions().getInstantiations()
                             .lookupValue(new Name(value.toString()));
-                    if (inst != null && ((Term) inst).op() instanceof Function) {
+                    if (inst != null && ((Term) inst).op() instanceof JFunction) {
                         abbrMap.put((Term) inst, key, true);
                     } else {
                         throw new ScriptException(String.format(

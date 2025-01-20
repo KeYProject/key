@@ -1,6 +1,13 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.List;
 
 import recoder.java.*;
 import recoder.java.declaration.*;
@@ -12,11 +19,6 @@ import recoder.java.expression.operator.*;
 import recoder.java.reference.*;
 import recoder.java.statement.*;
 import recoder.list.generic.ASTList;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.List;
 
 public interface ProgramFactory extends Service {
 

@@ -1,9 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
 /**
@@ -24,15 +30,43 @@ public class Semisequent implements Iterable<SequentFormula> {
         seqList = ImmutableSLList.nil();
     }
 
-
     /**
-     * creates a new Semisequent with the Semisequent elements in seqList; the provided list must be
-     * redundance free, i.e., the created sequent must be exactly the same as when creating the
-     * sequent by subsequently inserting all formulas
+     * Create a new Semisequent from an ordered collection of formulas.
+     * The provided list must be redundancy free, i.e., the created sequent must be exactly
+     * the same as when creating the sequent by subsequently inserting all formulas
+     *
+     * @param seqList list of sequent formulas
      */
-    Semisequent(ImmutableList<SequentFormula> seqList) {
+    public Semisequent(ImmutableList<SequentFormula> seqList) {
         assert !seqList.isEmpty();
         this.seqList = seqList;
+    }
+
+    /**
+     * Create a new Semisequent from an ordered collection of formulas.
+     * The provided collection must be redundancy free, i.e., the created sequent must be exactly
+     * the same as when creating the sequent by subsequently inserting all formulas
+     *
+     * @param seqList list of sequent formulas
+     */
+    public Semisequent(Collection<SequentFormula> seqList) {
+        assert !seqList.isEmpty();
+        this.seqList = ImmutableList.fromList(seqList);
+    }
+
+    /**
+     * Create a new Semisequent from an ordered collection of formulas (possibly empty).
+     * The provided collection must be redundancy free, i.e., the created sequent must be exactly
+     * the same as when creating the
+     * sequent by subsequently inserting all formulas.
+     *
+     * @param seqList list of sequent formulas
+     */
+    public static Semisequent create(Collection<SequentFormula> seqList) {
+        if (seqList.isEmpty()) {
+            return EMPTY_SEMISEQUENT;
+        }
+        return new Semisequent(seqList);
     }
 
 
@@ -152,7 +186,8 @@ public class Semisequent implements Iterable<SequentFormula> {
             searchList = searchList.tail();
 
             if (sequentFormula != null
-                    && cf.formula().equalsModRenaming(sequentFormula.formula())) {
+                    && cf.formula().equalsModProperty(sequentFormula.formula(),
+                        RENAMING_TERM_PROPERTY)) {
                 semiCI.rejectedFormula(sequentFormula);
                 return semiCI; // semisequent already contains formula
 
@@ -343,7 +378,8 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     /**
      * returns the index of the given {@link SequentFormula} or {@code -1} if the sequent formula is
-     * not found. Equality of sequent formulas is checked sing the identy check (i.e.,{@link ==})
+     * not found. Equality of sequent formulas is checked sing the identy check (i.e.,
+     * <code>==</code>)
      *
      * @param sequentFormula the {@link SequentFormula} to look for
      * @return index of sequentFormula (-1 if not found)

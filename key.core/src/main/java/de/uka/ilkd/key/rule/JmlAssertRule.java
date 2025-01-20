@@ -1,30 +1,31 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
+
+import java.util.Optional;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 
 /**
  * A rule for JML assert/assume statements.
- *
  * This implements the rules as:
  *
  * <p>
@@ -101,7 +102,7 @@ public final class JmlAssertRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {
         if (!(ruleApp instanceof JmlAssertBuiltInRuleApp)) {
             throw new IllegalArgumentException("can only apply JmlAssertBuiltInRuleApp");
@@ -125,7 +126,19 @@ public final class JmlAssertRule implements BuiltInRule {
         final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
         final Term self = MiscTools.getSelfTerm(frame, services);
 
-        final Term condition = jmlAssert.getCond(self, services);
+        final var spec = services.getSpecificationRepository().getStatementSpec(jmlAssert);
+
+        if (spec == null) {
+            throw new RuleAbortException(
+                "No specification found for JmlAssert. Internal Error. Not your fault");
+        }
+
+        Term condition =
+            tb.convertToFormula(spec.getTerm(services, self, JmlAssert.INDEX_CONDITION));
+
+        condition = tb.addLabel(condition, new OriginTermLabel.Origin(
+            kind == Kind.ASSERT ? OriginTermLabel.SpecType.ASSERT
+                    : OriginTermLabel.SpecType.ASSUME));
 
         final ImmutableList<Goal> result;
         if (kind == Kind.ASSERT) {
@@ -153,7 +166,8 @@ public final class JmlAssertRule implements BuiltInRule {
         goal.setBranchLabel("Usage");
         final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
         final Term newTerm = tb.apply(update,
-            tb.imp(condition, tb.prog((Modality) target.op(), javaBlock, target.sub(0), null)));
+            tb.imp(condition,
+                tb.prog(((Modality) target.op()).kind(), javaBlock, target.sub(0), null)));
 
         goal.changeFormula(new SequentFormula(newTerm), occurrence);
     }

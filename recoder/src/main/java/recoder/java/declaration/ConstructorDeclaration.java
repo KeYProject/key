@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.abstraction.Constructor;
@@ -44,7 +46,7 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
     public ConstructorDeclaration(VisibilityModifier modifier, Identifier name,
             ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
         super(null, null, name, parameters, exceptions, body);
-        ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
+        ASTList<DeclarationSpecifier> mods = new ASTArrayList<>(1);
         if (mods != null) {
             mods.add(modifier);
             setDeclarationSpecifiers(mods);

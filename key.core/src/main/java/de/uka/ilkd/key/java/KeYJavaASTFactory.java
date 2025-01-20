@@ -1,9 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.List;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -31,42 +31,18 @@ import de.uka.ilkd.key.java.reference.ThisConstructorReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.Case;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.Continue;
-import de.uka.ilkd.key.java.statement.Default;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.EmptyStatement;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.Finally;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.ForUpdates;
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.IForUpdates;
-import de.uka.ilkd.key.java.statement.IGuard;
-import de.uka.ilkd.key.java.statement.ILoopInit;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopInit;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Return;
-import de.uka.ilkd.key.java.statement.Switch;
-import de.uka.ilkd.key.java.statement.SynchronizedBlock;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.java.statement.Throw;
-import de.uka.ilkd.key.java.statement.TransactionStatement;
-import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.NameRecorder;
+
+import org.key_project.logic.Name;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * The KeYASTFactory helps building KeY Java AST structures.
@@ -284,7 +260,7 @@ public abstract class KeYJavaASTFactory {
     /**
      * create a local variable
      */
-    public static ProgramVariable localVariable(ProgramElementName name, KeYJavaType kjt) {
+    public static LocationVariable localVariable(ProgramElementName name, KeYJavaType kjt) {
         return new LocationVariable(name, kjt);
     }
 
@@ -299,8 +275,17 @@ public abstract class KeYJavaASTFactory {
      */
     public static ProgramVariable localVariable(final Services services, final String name,
             final KeYJavaType type) {
+        // first check for a saved name for this variable
+        final NameRecorder nameRecorder = services.getNameRecorder();
+        for (var prop : nameRecorder.getSetProposals()) {
+            if (prop.toString().startsWith(name + VariableNamer.TEMP_INDEX_SEPARATOR)) {
+                return KeYJavaASTFactory.localVariable(new ProgramElementName(prop.toString()),
+                    type);
+            }
+        }
         final ProgramElementName uniqueName =
             services.getVariableNamer().getTemporaryNameProposal(name);
+        nameRecorder.addProposal(new Name(uniqueName.getProgramName()));
         final ProgramVariable variable = KeYJavaASTFactory.localVariable(uniqueName, type);
 
         return variable;
@@ -822,7 +807,7 @@ public abstract class KeYJavaASTFactory {
         Statement[] block = new Statement[b.getStatementCount() + stmnt.length];
         System.arraycopy(stmnt, 0, block, 0, stmnt.length);
         b.getBody().arraycopy(0, block, stmnt.length, b.getStatementCount());
-        return new StatementBlock(new ImmutableArray<Statement>(block));
+        return new StatementBlock(new ImmutableArray<>(block));
     }
 
     /**
@@ -833,8 +818,9 @@ public abstract class KeYJavaASTFactory {
      */
     public static StatementBlock insertStatementInBlock(StatementBlock stmnt, StatementBlock b) {
         Statement[] stmnts = new Statement[stmnt.getStatementCount()];
-        for (int i = 0; i < stmnt.getStatementCount(); i++)
+        for (int i = 0; i < stmnt.getStatementCount(); i++) {
             stmnts[i] = stmnt.getStatementAt(i);
+        }
         return insertStatementInBlock(stmnts, b);
     }
 
@@ -1213,7 +1199,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link ForUpdates} that consists of <code>update</code> only
      */
     public static IForUpdates forUpdates(final Expression update) {
-        final IForUpdates forUpdates = new ForUpdates(new ImmutableArray<Expression>(update));
+        final IForUpdates forUpdates = new ForUpdates(new ImmutableArray<>(update));
 
         return forUpdates;
     }
@@ -1475,7 +1461,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declare(final Modifier modifier,
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
-        final ImmutableArray<Modifier> modifiers = new ImmutableArray<Modifier>(modifier);
+        final ImmutableArray<Modifier> modifiers = new ImmutableArray<>(modifier);
         final LocalVariableDeclaration declaration =
             KeYJavaASTFactory.declare(modifiers, variable, init, type);
 
@@ -1498,7 +1484,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declare(final Modifier[] modifiers,
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
-        final ImmutableArray<Modifier> m = new ImmutableArray<Modifier>(modifiers);
+        final ImmutableArray<Modifier> m = new ImmutableArray<>(modifiers);
         final LocalVariableDeclaration declaration =
             KeYJavaASTFactory.declare(m, variable, init, type);
 
@@ -1670,7 +1656,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>type</code> with arguments <code>args</code>
      */
     public static MethodReference methodCall(final KeYJavaType type, final String name) {
-        final ImmutableArray<? extends Expression> args = new ImmutableArray<Expression>();
+        final ImmutableArray<? extends Expression> args = new ImmutableArray<>();
         final MethodReference call = KeYJavaASTFactory.methodCall(type, name, args);
 
         return call;
@@ -1689,7 +1675,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>reference</code> with no arguments
      */
     public static MethodReference methodCall(final ReferencePrefix reference, final String name) {
-        final ImmutableArray<Expression> args = new ImmutableArray<Expression>();
+        final ImmutableArray<Expression> args = new ImmutableArray<>();
         final MethodReference call = KeYJavaASTFactory.methodCall(reference, name, args);
 
         return call;
@@ -1710,7 +1696,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static MethodReference methodCall(final ReferencePrefix reference, final String name,
             final Expression... args) {
-        final ImmutableArray<? extends Expression> a = new ImmutableArray<Expression>(args);
+        final ImmutableArray<? extends Expression> a = new ImmutableArray<>(args);
         final MethodReference call = KeYJavaASTFactory.methodCall(reference, name, a);
 
         return call;
@@ -1731,7 +1717,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static MethodReference methodCall(final ReferencePrefix reference, final MethodName name,
             final Expression... args) {
-        final ImmutableArray<Expression> a = new ImmutableArray<Expression>(args);
+        final ImmutableArray<Expression> a = new ImmutableArray<>(args);
         final MethodReference call = KeYJavaASTFactory.methodCall(reference, name, a);
 
         return call;
@@ -1874,7 +1860,7 @@ public abstract class KeYJavaASTFactory {
      * modifiers typePrefix.baseType[] variable = init;
      * </pre>
      *
-     * @param modifiers the {@link Modifiers}
+     * @param modifiers the {@link Modifier}s
      * @param variable the named and typed {@link IProgramVariable} to be declared
      * @param init the {@link Expression} <code>variable</code> is initialized with
      * @param typeName the type's {@link ProgramElementName}
@@ -1942,7 +1928,7 @@ public abstract class KeYJavaASTFactory {
             final ReferencePrefix reference, final IProgramMethod method,
             final Expression[] arguments) {
         final MethodBodyStatement methodBody = KeYJavaASTFactory.methodBody(result, reference,
-            method, new ImmutableArray<Expression>(arguments));
+            method, new ImmutableArray<>(arguments));
 
         return methodBody;
     }
@@ -2506,7 +2492,7 @@ public abstract class KeYJavaASTFactory {
      * </pre>
      *
      * @param statement the {@link Statement} to be executed
-     * @param branches the try-catch {@link Branch}
+     * @param branch the try-catch {@link Branch}
      * @return a new {@link Try} block for the execution of <code>branch</code> depending on the
      *         events during the execution of <code>statement</code>
      */

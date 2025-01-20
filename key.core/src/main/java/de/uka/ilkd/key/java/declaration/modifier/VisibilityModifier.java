@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration.modifier;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.declaration.Modifier;
+
+import org.key_project.util.ExtList;
 
 
 /**
@@ -33,13 +36,13 @@ public abstract class VisibilityModifier extends Modifier
     /** Whether it represents a <code>public</code> modifier. */
     public static boolean isPublic(VisibilityModifier vm) {
         assert sane(vm) : "Unknown visibility modifier: " + vm;
-        return vm != null && vm instanceof Public;
+        return vm instanceof Public;
     }
 
     /** Whether it represents at least a <code>protected</code> modifier. */
     public static boolean allowsInheritance(VisibilityModifier vm) {
         assert sane(vm) : "Unknown visibility modifier: " + vm;
-        return vm != null && (vm instanceof Public || vm instanceof Protected);
+        return (vm instanceof Public || vm instanceof Protected);
     }
 
     /** Whether it represents at least default (package-private) visibility. */
@@ -51,7 +54,7 @@ public abstract class VisibilityModifier extends Modifier
     /** Whether it represents a <code>private</code> modifier. */
     public static boolean isPrivate(VisibilityModifier vm) {
         assert sane(vm) : "Unknown visibility modifier: " + vm;
-        return vm != null && vm instanceof Private;
+        return vm instanceof Private;
     }
 
     private static boolean sane(VisibilityModifier vm) {

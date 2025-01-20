@@ -1,11 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
@@ -13,7 +12,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -21,14 +19,14 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.logic.Named;
+import org.key_project.util.collection.ImmutableList;
 
 public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowCompositePO {
 
@@ -66,7 +64,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
         super(initConfig,
             ContractFactory.generateContractName(loopInv.getName(), loopInv.getKJT(),
                 loopInv.getTarget(), loopInv.getTarget().getContainerType(),
-                loopInv.getLoop().getStartPosition().getLine()));
+                loopInv.getLoop().getStartPosition().line()));
         this.loopInvariant = loopInv;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
@@ -119,10 +117,9 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof LoopInvExecutionPO)) {
+        if (!(po instanceof LoopInvExecutionPO lPO)) {
             return false;
         }
-        LoopInvExecutionPO lPO = (LoopInvExecutionPO) po;
         return loopInvariant.equals(lPO.loopInvariant);
     }
 
@@ -159,8 +156,8 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     }
 
     @Override
-    protected Modality getTerminationMarker() {
-        return Modality.BOX;
+    protected Modality.JavaModalityKind getTerminationMarker() {
+        return Modality.JavaModalityKind.BOX;
     }
 
     @Override
@@ -170,11 +167,14 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
-        super.fillSaveProperties(properties);
-        properties.setProperty("Non-interference contract", loopInvariant.getUniqueName());
+    public Configuration createLoaderConfig() {
+        var c = super.createLoaderConfig();
+        c.set("Non-interference contract", loopInvariant.getUniqueName());
+        return c;
     }
 
 
@@ -253,16 +253,16 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     @Deprecated
-    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services) {
+    protected Term generateMbyAtPreDef(LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
     @Override
     @Deprecated
-    protected Term getPre(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
+    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
@@ -270,9 +270,9 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     @Deprecated
-    protected Term getPost(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
-            ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+    protected Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
@@ -281,7 +281,8 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     @Override
     @Deprecated
     protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }

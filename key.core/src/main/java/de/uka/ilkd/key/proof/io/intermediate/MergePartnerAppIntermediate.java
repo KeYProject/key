@@ -1,14 +1,14 @@
-/**
- *
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.intermediate;
 
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 /**
  * Encapsulates intermediate information for constructing a close-join-partner rule application.
@@ -30,7 +30,7 @@ public class MergePartnerAppIntermediate extends BuiltInAppIntermediate {
      */
     public MergePartnerAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
             int mergeNodeId, ImmutableList<Name> newNames) {
-        super(ruleName, pos, null, null, newNames);
+        super(ruleName, pos, null, null, null, newNames);
 
         assert ruleName.equals(CloseAfterMerge.INSTANCE.name().toString())
                 : "Check if something should be changed when implementing a new rule for merge partners.";

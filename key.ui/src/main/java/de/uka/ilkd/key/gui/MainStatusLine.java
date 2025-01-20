@@ -1,16 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
+
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
 
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import java.awt.*;
-
 /**
  * Status line of the KeY MainWindow.
  * <p>
- * The status line hold a lblStatusText and a progress panel.
+ * The status line holds a lblStatusText and a progress panel.
  * <p>
  * You add additional components by using the extension points
  * {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine}
@@ -25,10 +28,8 @@ import java.awt.*;
  * @see de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine
  */
 class MainStatusLine extends JPanel {
-    private static final long serialVersionUID = 2278249652314818379L;
     private final JLabel lblStatusText = new JLabel();
     private final JProgressBar progressBar = new JProgressBar();
-    // private boolean phantomBoxAdded = false;
 
     MainStatusLine(String initialText, Font font) {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -72,6 +73,7 @@ class MainStatusLine extends JPanel {
      */
     public void reset() {
         setProgressPanelVisible(false);
+        lblStatusText.setText("");
     }
 
     /**

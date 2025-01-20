@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.po;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -13,6 +14,8 @@ import de.uka.ilkd.key.proof.init.POExtension;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Implementation of {@link POExtension} to support truth value evaluation.
@@ -63,8 +66,8 @@ public class TruthValuePOExtension implements POExtension {
                     }
                 }
                 term = subsChanged
-                        ? tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs),
-                            term.boundVars(), term.javaBlock(), term.getLabels())
+                        ? tf.createTerm(term.op(), new ImmutableArray<>(newSubs),
+                            term.boundVars(), term.getLabels())
                         : term;
             }
             ImmutableArray<TermLabel> oldLabels = term.getLabels();
@@ -73,8 +76,8 @@ public class TruthValuePOExtension implements POExtension {
                 services.getCounter(FormulaTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
             int labelSubID = FormulaTermLabel.newLabelSubID(services, labelID);
             newLabels[oldLabels.size()] = new FormulaTermLabel(labelID, labelSubID);
-            return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(),
-                new ImmutableArray<TermLabel>(newLabels));
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
+                new ImmutableArray<>(newLabels));
         } else {
             return null;
         }

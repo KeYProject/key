@@ -1,14 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,14 +23,14 @@ import org.slf4j.LoggerFactory;
 /**
  * The objects of this class represent families of function symbols, where each family contains an
  * instantiation of a template symbol for a particular sort. The following invariant has to hold:
- * Given two sort depending functions f1 and f2 then from f1.isSimilar(f2) and
+ * Given two sort-depending functions f1 and f2 then from f1.isSimilar(f2) and
  * f1.getSortDependingOn() == f2.getSortDependingOn() follows f1 == f2
  */
-public final class SortDependingFunction extends Function {
+public final class SortDependingFunction extends JFunction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SortDependingFunction.class);
 
     private final SortDependingFunctionTemplate template;
-    private final Sort sortDependingOn;
+    private final Qualifier<Sort> sortDependingOn;
 
 
     // -------------------------------------------------------------------------
@@ -35,7 +42,7 @@ public final class SortDependingFunction extends Function {
             instantiateResultSort(template, sortDependingOn),
             instantiateArgSorts(template, sortDependingOn), null, template.unique, false);
         this.template = template;
-        this.sortDependingOn = sortDependingOn;
+        this.sortDependingOn = Qualifier.create(sortDependingOn);
     }
 
 
@@ -78,13 +85,13 @@ public final class SortDependingFunction extends Function {
             Sort sort, Sort[] argSorts, boolean unique) {
         SortDependingFunctionTemplate template = new SortDependingFunctionTemplate(sortDependingOn,
             kind, sort, new ImmutableArray<>(argSorts), unique);
-        return new SortDependingFunction(template, Sort.ANY);
+        return new SortDependingFunction(template, JavaDLTheory.ANY);
     }
 
 
     public static SortDependingFunction getFirstInstance(Name kind, TermServices services) {
         return (SortDependingFunction) services.getNamespaces().functions()
-                .lookup(instantiateName(kind, Sort.ANY));
+                .lookup(instantiateName(kind, JavaDLTheory.ANY));
     }
 
     /**
@@ -103,13 +110,15 @@ public final class SortDependingFunction extends Function {
                 .lookup(instantiateName(getKind(), sort));
 
 
-        if (sort instanceof ProgramSVSort)
+        if (sort instanceof ProgramSVSort) {
             throw new AssertionError();
-        if (sort == AbstractTermTransformer.METASORT)
+        }
+        if (sort == AbstractTermTransformer.METASORT) {
             throw new AssertionError();
+        }
 
         final NamespaceSet namespaces = services.getNamespaces();
-        Namespace<Function> functions = namespaces.functions();
+        Namespace<JFunction> functions = namespaces.functions();
 
         SortDependingFunction result;
         synchronized (namespaces) {
@@ -123,15 +132,14 @@ public final class SortDependingFunction extends Function {
                     functions.add(result);
                     if (instantiateName(getKind(), sort).toString().contains("String")
                             && instantiateName(getKind(), sort).toString().contains("seqGet")
-                            && (n == null || sort instanceof GenericSort
-                                    && n.getSortDependingOn() != sort)) {
+                            && (n == null || n.getSortDependingOn() != sort)) {
                         LOGGER.debug("Hash code: {}", result.hashCode());
                     }
                 }
             } else if (result == null) {
                 result = new SortDependingFunction(template, sort);
                 // The namespaces may be wrapped for local symbols
-                // Sort depending functions are to be added to the "root" namespace, however.
+                // Sort depending on functions are to be added to the "root" namespace, however.
                 // Therefore, let's rewind to the root (MU, 2017-03)
                 synchronized (functions) {
                     while (functions.parent() != null) {
@@ -161,7 +169,7 @@ public final class SortDependingFunction extends Function {
 
 
     public Sort getSortDependingOn() {
-        return sortDependingOn;
+        return sortDependingOn.getQualifier();
     }
 
 
@@ -178,20 +186,21 @@ public final class SortDependingFunction extends Function {
     // inner classes
     // -------------------------------------------------------------------------
 
-    private static final class SortDependingFunctionTemplate {
-        public final GenericSort sortDependingOn;
-        public final Name kind;
-        public final Sort sort;
-        public final ImmutableArray<Sort> argSorts;
-        public final boolean unique;
+    private record SortDependingFunctionTemplate(GenericSort sortDependingOn, Name kind, Sort sort,
+            ImmutableArray<Sort> argSorts, boolean unique) {
+    }
 
-        public SortDependingFunctionTemplate(GenericSort sortDependingOn, Name kind, Sort sort,
-                ImmutableArray<Sort> argSorts, boolean unique) {
-            this.sortDependingOn = sortDependingOn;
-            this.kind = kind;
-            this.sort = sort;
-            this.argSorts = argSorts;
-            this.unique = unique;
+    @Override
+    public int getChildCount() {
+        return 1;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        if (n == 0) {
+            return sortDependingOn;
         }
+        throw new IndexOutOfBoundsException(
+            "SortDependingFunction " + name() + " has only one child");
     }
 }

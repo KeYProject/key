@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.delayedcut;
 
 import java.util.Iterator;
@@ -7,9 +10,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
+
+import org.key_project.logic.Name;
 
 /**
  * Determines conflicts relevant for a delayed cut application.
@@ -34,21 +38,22 @@ public interface ApplicationCheck {
      *
      * @author Benjamin Niedermann
      */
-    public static class NoNewSymbolsCheck implements ApplicationCheck {
+    class NoNewSymbolsCheck implements ApplicationCheck {
         private Node node;
-        private Set<String> names = new TreeSet<String>();
+        private final Set<String> names = new TreeSet<>();
 
         private static final String INFORMATION1 =
             "The formula contains a symbol that has been introduced below Node ";
         private static final String INFORMATION2 =
             "The formula contains symbols that have been introduced below Node ";
         private static final String ADD_INFORMATION =
-            "The formula that you specify at this point will be introduced at the inner node %i\n"
-                + "of the proof tree by using a cut. Afterwards, the sub-trees of that node will be replayed.\n"
-                + "In order to sustain the correctness of the proof, the formula must therefore not contain symbols\n"
-                + "that have been introduced in the sub-trees of Node %i. In particular this restriction ensures\n"
-                + "that symbols that are introduced within the subtrees of Node %i are actually new symbols\n"
-                + "as required by the corresponding rule definitions.";
+            """
+                    The formula that you specify at this point will be introduced at the inner node %i
+                    of the proof tree by using a cut. Afterwards, the sub-trees of that node will be replayed.
+                    In order to sustain the correctness of the proof, the formula must therefore not contain symbols
+                    that have been introduced in the sub-trees of Node %i. In particular this restriction ensures
+                    that symbols that are introduced within the subtrees of Node %i are actually new symbols
+                    as required by the corresponding rule definitions.""";
 
         @Override
         public String check(Node cutNode, Term cutFormula) {
@@ -70,7 +75,7 @@ public interface ApplicationCheck {
         }
 
         private void buildCaches(Node cutNode) {
-            LinkedList<Node> queue = new LinkedList<Node>();
+            LinkedList<Node> queue = new LinkedList<>();
             queue.add(cutNode);
             while (!queue.isEmpty()) {
                 Node next = queue.pollFirst();
@@ -87,7 +92,7 @@ public interface ApplicationCheck {
         }
 
         private String checkFormula(Term formula) {
-            final List<String> newSymbols = new LinkedList<String>();
+            final List<String> newSymbols = new LinkedList<>();
             formula.execPreOrder(new DefaultVisitor() {
                 @Override
                 public void visit(Term visited) {
@@ -102,8 +107,8 @@ public interface ApplicationCheck {
                 return null;
             }
 
-            StringBuffer buf =
-                new StringBuffer(newSymbols.size() == 1 ? INFORMATION1 : INFORMATION2);
+            StringBuilder buf =
+                new StringBuilder(newSymbols.size() == 1 ? INFORMATION1 : INFORMATION2);
             buf.append(node.serialNr()).append(": ");
             for (String name : newSymbols) {
                 buf.append(name);

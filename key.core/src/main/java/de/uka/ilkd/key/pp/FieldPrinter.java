@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -6,9 +9,11 @@ import de.uka.ilkd.key.java.UnknownJavaTypeException;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 
 /**
  * Common superclass of {@link StorePrinter} and {@link SelectPrinter}.
@@ -17,10 +22,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 class FieldPrinter {
 
-    protected final LogicPrinter lp;
+    // protected final LogicPrinter lp;
+    protected final Services services;
 
-    FieldPrinter(LogicPrinter lp) {
-        this.lp = lp;
+    FieldPrinter(Services services) {
+        this.services = services;
     }
 
     /**
@@ -29,13 +35,9 @@ class FieldPrinter {
      * hidden by another field, the name of the field is preceeded by the corresponding class name.
      *
      * Example default: object.field Example hidden field: object.(package.class::field)
-     *
-     * Remark: This method is declared static because it is also used in method
-     * {@link StorePrinter#printStoreOnFieldConstant(de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, boolean) }
      */
     protected String getPrettySyntaxForFieldConstant(Term objectTerm, Term fieldTerm) {
-
-        JavaInfo javaInfo = lp.services.getJavaInfo();
+        JavaInfo javaInfo = services.getJavaInfo();
 
         if (isCanonicField(objectTerm, fieldTerm, javaInfo)) {
             /*
@@ -92,13 +94,9 @@ class FieldPrinter {
      * Determine whether a term is a constant function symbol of type field.
      */
     protected static boolean isFieldConstant(Term fieldTerm, HeapLDT heapLDT) {
-        return fieldTerm.op() instanceof Function && ((Function) fieldTerm.op()).isUnique()
+        return fieldTerm.op() instanceof JFunction && ((Function) fieldTerm.op()).isUnique()
                 && fieldTerm.sort() == heapLDT.getFieldSort() && fieldTerm.arity() == 0
                 && fieldTerm.boundVars().isEmpty();
-    }
-
-    protected boolean isFieldConstant(Term fieldTerm) {
-        return isFieldConstant(fieldTerm, lp.getHeapLDT());
     }
 
     /**
@@ -124,7 +122,7 @@ class FieldPrinter {
     }
 
     protected boolean isJavaFieldConstant(Term fieldTerm) {
-        return isJavaFieldConstant(fieldTerm, lp.getHeapLDT(), lp.services);
+        return isJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
     }
 
     /*
@@ -133,7 +131,7 @@ class FieldPrinter {
      */
     protected boolean isBuiltinObjectProperty(Term fieldTerm) {
         return fieldTerm.op().name().toString().contains("::<")
-                && isFieldConstant(fieldTerm, lp.getHeapLDT());
+                && isFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT());
     }
 
     /*
@@ -141,8 +139,8 @@ class FieldPrinter {
      * reference object is null.
      */
     protected boolean isStaticFieldConstant(Term objectTerm, Term fieldTerm) {
-        return objectTerm.equals(lp.services.getTermBuilder().NULL())
-                && isFieldConstant(fieldTerm, lp.getHeapLDT());
+        return objectTerm.equals(services.getTermBuilder().NULL())
+                && isFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT());
     }
 
 }

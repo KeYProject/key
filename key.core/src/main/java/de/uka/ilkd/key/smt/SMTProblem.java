@@ -1,10 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
 import java.util.LinkedList;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -12,8 +12,12 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Represents a problem that can be passed to a solver. This class was introduced because the SMT
@@ -26,8 +30,9 @@ public class SMTProblem {
     private final Term term;
     private final Collection<SMTSolver> solvers = new LinkedList<>();
     private final Goal goal;
+    private final Node node;
     private Sequent sequent;
-    private String name;
+    private final String name;
 
     /* ############# public interface ############# */
     /**
@@ -57,12 +62,14 @@ public class SMTProblem {
 
     public SMTProblem(Goal goal) {
         this.goal = goal;
+        this.node = goal.node();
         name = "Goal " + goal.node().serialNr();
         term = goalToTerm(goal);
     }
 
     public SMTProblem(Sequent s, Services services) {
         this.goal = null;
+        this.node = null;
         this.sequent = s;
         name = "Sequent " + s.toString();
         this.term = sequentToTerm(s, services);
@@ -70,12 +77,17 @@ public class SMTProblem {
 
     public SMTProblem(Term t) {
         this.goal = null;
+        this.node = null;
         name = "Term " + t.toString();
         this.term = t;
     }
 
     public Goal getGoal() {
         return goal;
+    }
+
+    public Node getNode() {
+        return node;
     }
 
     public Sequent getSequent() {
@@ -114,6 +126,19 @@ public class SMTProblem {
             return invalid;
         }
         return unknown;
+    }
+
+    /**
+     * @return the solver that finished this problem
+     */
+    public SMTSolver getSuccessfulSolver() {
+        for (SMTSolver solver : solvers) {
+            if (solver.getFinalResult() != null
+                    && solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
+                return solver;
+            }
+        }
+        return null;
     }
 
     public String getName() {

@@ -1,24 +1,20 @@
-// This file is taken from the RECODER library, which is protected by the LGPL,
-// and modified.
-/**
- * This class is part of the AST RECODER builds when it parses and resolves Java programs with meta
- * constructs and schema variables. It is transformed by Recoder2KeY to a subclass of
- * ...rule.metaconstruct.ProgramMetaConstruct.
- */
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
+
+import de.uka.ilkd.key.logic.op.ProgramSV;
 
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
 import recoder.java.StatementContainer;
 import recoder.java.statement.JavaStatement;
-import de.uka.ilkd.key.logic.op.ProgramSV;
 
 public class RKeYMetaConstruct extends JavaStatement
         implements StatementContainer, KeYRecoderExtension {
@@ -35,7 +31,7 @@ public class RKeYMetaConstruct extends JavaStatement
     protected String name = "";
 
     /** schemavariable needed by meta construct */
-    private List<SVWrapper> sv = new Vector<SVWrapper>(); // of ProgramVariableSVWrapper
+    private final List<SVWrapper> sv = new ArrayList<>(); // of ProgramVariableSVWrapper
 
     /**
      * Loop statement.
@@ -70,8 +66,9 @@ public class RKeYMetaConstruct extends JavaStatement
      */
     public int getChildCount() {
         int result = 0;
-        if (child != null)
+        if (child != null) {
             result++;
+        }
         return result;
     }
 
@@ -84,8 +81,9 @@ public class RKeYMetaConstruct extends JavaStatement
      */
     public ProgramElement getChildAt(int index) {
         if (child != null) {
-            if (index == 0)
+            if (index == 0) {
                 return child;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

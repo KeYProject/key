@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
@@ -11,14 +17,12 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValueTracingResult;
 import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+
 import org.junit.jupiter.api.*;
-
-import java.util.*;
-import java.util.Map.Entry;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Tests for {@link TruthValueTracingUtil}.
@@ -85,10 +89,10 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     }
 
     /**
-     * Tests example: /set/truthValueExceptinalAssignableNothingTest
+     * Tests example: /set/truthValueExceptionalModifiableNothingTest
      */
     @Test
-    public void testExceptinalAssignableNothingTest_OSS() throws Exception {
+    public void testExceptionalModifiableNothingTest_OSS() throws Exception {
         // Create expected results
         ExpectedBranchResult goal374 =
             new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
@@ -134,16 +138,16 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
             new ExpectedTruthValueEvaluationResult(goal374, goal407, goal444, goal475, goal476);
         // Perform test
         doTruthValueEvaluationTest(
-            "/set/truthValueExceptinalAssignableNothingTest/test/ExceptinalAssignableNothingTest_OSS.proof",
-            "/set/truthValueExceptinalAssignableNothingTest/oracle/ExceptinalAssignableNothingTest.xml",
+            "/set/truthValueExceptionalModifiableNothingTest/test/ExceptionalModifiableNothingTest_OSS.proof",
+            "/set/truthValueExceptionalModifiableNothingTest/oracle/ExceptionalModifiableNothingTest.xml",
             false, false, false, exceptionResult);
     }
 
     /**
-     * Tests example: /set/truthValueExceptinalAssignableNothingTest
+     * Tests example: /set/truthValueExceptionalModifiableNothingTest
      */
     @Test
-    public void testExceptinalAssignableNothingTest() throws Exception {
+    public void testExceptionalModifiableNothingTest() throws Exception {
         // Create expected results
         ExpectedBranchResult goal374 =
             new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
@@ -189,8 +193,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
             new ExpectedTruthValueEvaluationResult(goal374, goal407, goal444, goal475, goal476);
         // Perform test
         doTruthValueEvaluationTest(
-            "/set/truthValueExceptinalAssignableNothingTest/test/ExceptinalAssignableNothingTest.proof",
-            "/set/truthValueExceptinalAssignableNothingTest/oracle/ExceptinalAssignableNothingTest.xml",
+            "/set/truthValueExceptionalModifiableNothingTest/test/ExceptionalModifiableNothingTest.proof",
+            "/set/truthValueExceptionalModifiableNothingTest/oracle/ExceptionalModifiableNothingTest.xml",
             false, false, false, exceptionResult);
     }
 
@@ -306,11 +310,11 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     }
 
     /**
-     * Tests example: /set/truthValueAssignableAndLoop
+     * Tests example: /set/truthValueModifiableAndLoop
      */
     @Test
     @Disabled
-    public void IGNORE_testAssignableAndLoop() throws Exception {
+    public void IGNORE_testModifiableAndLoop() throws Exception {
         // Create expected results
         ExpectedBranchResult goal430 =
             new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.FALSE),
@@ -366,8 +370,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
         ExpectedTruthValueEvaluationResult result5 =
             new ExpectedTruthValueEvaluationResult(goal1113, goal1134, goal1137);
         // Perform test
-        doTruthValueEvaluationTest("/set/truthValueAssignableAndLoop/test/MagicProofNoOSS.proof",
-            "/set/truthValueAssignableAndLoop/oracle/MagicProofNoOSS.xml", true, true, false,
+        doTruthValueEvaluationTest("/set/truthValueModifiableAndLoop/test/MagicProofNoOSS.proof",
+            "/set/truthValueModifiableAndLoop/oracle/MagicProofNoOSS.xml", true, true, false,
             resultExceptionBranch, resultInvInitial, resultPrecondition, resultLoopEnd, result5);
     }
 
@@ -1282,24 +1286,24 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
      * @param current The current results.
      */
     protected void assertBranchResult(ExpectedBranchResult expected, BranchResult current) {
-        Map<String, MultiEvaluationResult> currentResults = current.getResults();
+        Map<String, MultiEvaluationResult> currentResults = current.results();
         Assertions.assertTrue(expected.labelResults.size() <= currentResults.size(),
-            "To many expected results at goal " + current.getLeafNode().serialNr());
+            "To many expected results at goal " + current.leafNode().serialNr());
         for (Entry<String, TruthValue> expectedEntry : expected.labelResults.entrySet()) {
             MultiEvaluationResult currentInstruction = currentResults.get(expectedEntry.getKey());
             assertNotNull(currentInstruction, "Current result of " + expectedEntry.getKey()
-                + " is missing at goal " + current.getLeafNode().serialNr() + ".");
+                + " is missing at goal " + current.leafNode().serialNr() + ".");
             TruthValue currentResult =
-                currentInstruction.evaluate(current.getTermLabelName(), currentResults);
+                currentInstruction.evaluate(current.termLabelName(), currentResults);
             TruthValue expectedValue = expectedEntry.getValue();
             if (expectedValue == null) {
                 Assertions.assertNull(currentResult);
             } else {
                 assertNotNull(currentResult, "Current result of " + expectedEntry.getKey()
-                    + " at goal " + current.getLeafNode().serialNr() + " is not available.");
+                    + " at goal " + current.leafNode().serialNr() + " is not available.");
                 Assertions.assertEquals(expectedValue, currentResult,
                     "Wrong truth value of " + expectedEntry.getKey() + " at goal "
-                        + current.getLeafNode().serialNr() + ".");
+                        + current.leafNode().serialNr() + ".");
             }
         }
     }

@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.axiom_abstraction;
-
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
 
 import java.util.Iterator;
 
@@ -10,14 +11,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
+
 /**
  * An abstract domain is a countable lattice with a partial order relation and a join operator. It
  * supplies methods to abstract from a concrete domain to this abstract domain, and for iterating
  * through the domain elements, thereby respecting the partial order.
  *
  * @author Dominic Scheurer
- *
- * @param <AbstrDomElem>
  */
 public abstract class AbstractDomainLattice
         implements PartialComparator<AbstractDomainElement>, Iterable<AbstractDomainElement> {
@@ -39,11 +40,8 @@ public abstract class AbstractDomainLattice
      */
     public AbstractDomainElement abstractFrom(SymbolicExecutionState state, Term term,
             Services services) {
-        Iterator<AbstractDomainElement> it = iterator();
 
-        while (it.hasNext()) {
-            AbstractDomainElement elem = it.next();
-
+        for (AbstractDomainElement elem : this) {
             Term toProve = getSideConditionForAxiom(state, term, elem, services);
 
             if (isProvableWithSplitting(toProve, services, AXIOM_PROVE_TIMEOUT_MS)) {
@@ -121,9 +119,7 @@ public abstract class AbstractDomainLattice
      * @throws RuntimeException if s cannot be parsed.
      */
     public AbstractDomainElement fromString(String s, Services services) {
-        final Iterator<AbstractDomainElement> it = iterator();
-        while (it.hasNext()) {
-            final AbstractDomainElement elem = it.next();
+        for (AbstractDomainElement elem : this) {
             if (elem.toParseableString(services).equals(s)) {
                 return elem;
             }

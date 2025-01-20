@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.model;
 
 import java.util.LinkedList;
@@ -22,7 +25,7 @@ public class LocationSet {
 
     public LocationSet(String name) {
         this.name = name;
-        locations = new LinkedList<Location>();
+        locations = new LinkedList<>();
     }
 
     public String getName() {
@@ -57,43 +60,37 @@ public class LocationSet {
 
     public String toString() {
 
-        String result = name;
+        StringBuilder result = new StringBuilder(name);
 
-        result += " = {";
+        result.append(" = {");
 
         for (Location ls : locations) {
-            result += ls;
-            result += ", ";
+            result.append(ls);
+            result.append(", ");
         }
 
-        result = result.trim();
-        if (result.contains(",")) {
-            result = result.substring(0, result.lastIndexOf(','));
+        result = new StringBuilder(result.toString().trim());
+        if (result.toString().contains(",")) {
+            result = new StringBuilder(result.substring(0, result.toString().lastIndexOf(',')));
         }
-        result += "}";
+        result.append("}");
 
 
-        return result;
+        return result.toString();
     }
 
     /**
      * Location sets with equal names are equal.
      */
     public boolean equals(Object o) {
-
-        if (o instanceof LocationSet) {
-
-            LocationSet ls = (LocationSet) o;
+        if (o instanceof LocationSet ls) {
             return ls.name.equals(name);
-
-
         }
-
         return false;
-
-
     }
 
-
-
+    @Override
+    public int hashCode() {
+        return 7 * name.hashCode();
+    }
 }

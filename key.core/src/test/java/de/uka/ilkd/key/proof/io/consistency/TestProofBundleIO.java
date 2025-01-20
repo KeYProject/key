@@ -1,23 +1,32 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.consistency;
-
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.control.ProofControl;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.io.ProofBundleSaver;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.key_project.util.java.IOUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofBundleSaver;
+import de.uka.ilkd.key.proof.runallproofs.ProveTest;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.util.java.IOUtil;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Wolfram Pfeifer
  */
 public class TestProofBundleIO {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProveTest.class);
     /** the resources path for this test */
     private static Path testDir;
 
@@ -158,6 +168,13 @@ public class TestProofBundleIO {
      */
     private Proof loadBundle(Path p) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(p.toFile());
+        AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
+        if (replayResult.hasErrors()) {
+            LOGGER.debug("Error(s) while loading");
+            for (Throwable error : replayResult.getErrorList()) {
+                LOGGER.debug("Error ", error);
+            }
+        }
         assertNotNull(env);
 
         Proof proof = env.getLoadedProof();

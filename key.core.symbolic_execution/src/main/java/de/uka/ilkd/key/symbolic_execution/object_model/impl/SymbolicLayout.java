@@ -1,13 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Default implementation of {@link ISymbolicLayout}.
@@ -71,7 +74,7 @@ public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
     /**
      * Adds a new {@link ISymbolicObject}.
      *
-     * @param value The new {@link ISymbolicObject} to add.
+     * @param object The new {@link ISymbolicObject} to add.
      */
     public void addObject(ISymbolicObject object) {
         objects = objects.append(object);

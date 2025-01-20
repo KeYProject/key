@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.macros;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
@@ -18,6 +19,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.prover.ProverTaskListener;
+
+import org.key_project.util.collection.ImmutableList;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  *
@@ -47,7 +52,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        if (goals == null || goals.head() == null) {
+        if (goals == null || goals.isEmpty()) {
             return false;
         }
         if (posInOcc == null || posInOcc.subTerm() == null) {
@@ -55,17 +60,16 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
         }
         Services services = proof.getServices();
         ProofOblInput poForProof = services.getSpecificationRepository().getProofOblInput(proof);
-        if (!(poForProof instanceof InfFlowContractPO)) {
+        if (!(poForProof instanceof InfFlowContractPO po)) {
             return false;
         }
-        final InfFlowContractPO po = (InfFlowContractPO) poForProof;
 
         final InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(po.getContract(),
             po.getIFVars().c1, po.getIFVars().c2, services);
         final Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
 
-        return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
+        return posInOcc.subTerm().equalsModProperty(selfComposedExec, RENAMING_TERM_PROPERTY);
     }
 
     @Override

@@ -1,34 +1,29 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Color;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.dnd.Autoscroll;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
 import java.util.EventObject;
 import java.util.LinkedList;
-
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,22 +34,10 @@ import org.slf4j.LoggerFactory;
  */
 public final class CurrentGoalView extends SequentView implements Autoscroll {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 8494000234215913553L;
 
-    public static final ColorSettings.ColorProperty DEFAULT_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]defaultHighlight", "", new Color(70, 100, 170, 76));
-
-    public static final ColorSettings.ColorProperty ADDITIONAL_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]addtionalHighlight", "", new Color(0, 0, 0, 38));
-
-    private static final ColorSettings.ColorProperty UPDATE_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]updateHighlight", "", new Color(0, 150, 130, 38));
-
-    public static final ColorSettings.ColorProperty DND_HIGHLIGHT_COLOR =
-        ColorSettings.define("[currentGoal]dndHighlight", "", new Color(0, 150, 130, 104));
+    // The color constants that used to be here have been moved to SequentView to collect them in
+    // one place.
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrentGoalView.class);
 
@@ -66,7 +49,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     private final CurrentGoalViewListener listener;
 
     // enables this component to be a Drag Source
-    private DragSource dragSource;
+    private final DragSource dragSource;
 
     private static final Insets autoScrollSensitiveRegion = new Insets(20, 20, 20, 20);
 
@@ -161,7 +144,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         }
 
         updateHighlights.clear();
-        InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
+        InitialPositionTable ipt = getInitialPositionTable();
         Range[] ranges = ipt.getUpdateRanges();
 
         if (ranges != null) {
@@ -173,28 +156,14 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
                 // be a starting place to find the mistake.
                 range = new Range(range.start() + 1, range.end() + 1);
 
-                Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR.get());
+                Object tag = createColorHighlight(UPDATE_HIGHLIGHT_COLOR.get());
                 updateHighlights.add(tag);
                 paintHighlight(range, tag);
             }
         }
     }
 
-
-    /**
-     * given a node and a sequent formula, returns the first node among the node's parents that
-     * contains the sequent formula @form.
-     */
-    public Node jumpToIntroduction(Node node, SequentFormula form) {
-        while (node.parent() != null && node.sequent().contains(form)) {
-            node = node.parent();
-        }
-        return node;
-    }
-
-
-
-    protected DragSource getDragSource() {
+    DragSource getDragSource() {
         return dragSource;
     }
 
@@ -220,24 +189,14 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
             // (avoids NPE when no proof is loaded and font size is changed)
             return;
         }
+        var time = System.nanoTime();
 
         removeMouseListener(listener);
 
         setLineWidth(computeLineWidth());
 
         if (getLogicPrinter() != null) {
-            getLogicPrinter().update(getFilter(), getLineWidth());
-            boolean errorocc;
-            do {
-                errorocc = false;
-                try {
-                    setText(getSyntaxHighlighter().process(getLogicPrinter().toString(),
-                        getMainWindow().getMediator().getSelectedNode()));
-                } catch (Error e) {
-                    LOGGER.error("Error occurred while printing Sequent!", e);
-                    errorocc = true;
-                }
-            } while (errorocc);
+            updateSequent(getMainWindow().getMediator().getSelectedNode());
         }
 
         updateUpdateHighlights();
@@ -245,6 +204,8 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         restorePosition();
         addMouseListener(listener);
         updateHidingProperty();
+        var after = System.nanoTime();
+        LOGGER.trace("Total printSequentImmediately took " + (after - time) / 1e6 + "ms");
     }
 
     // last highlighted caret position
@@ -269,12 +230,8 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      */
     public void setPrinter(Goal goal) {
         getFilter().setSequent(goal.sequent());
-        setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
-            getMediator().getNotationInfo(), mediator.getServices(), getVisibleTermLabels()));
-    }
-
-    protected SequentPrintFilter getSequentPrintFilter() {
-        return getFilter();
+        setLogicPrinter(SequentViewLogicPrinter.positionPrinter(getMediator().getNotationInfo(),
+            mediator.getServices(), getVisibleTermLabels()));
     }
 
     /**
@@ -282,7 +239,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      *
      * @return the KeYMediator
      */
-    public final KeYMediator getMediator() {
+    public KeYMediator getMediator() {
         return mediator;
     }
 
@@ -300,30 +257,6 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         Goal goal = r.getSelectedGoal();
         Debug.assertTrue(goal != null);
         r.getUI().getProofControl().selectedTaclet(taclet.taclet(), goal, pos.getPosInOccurrence());
-    }
-
-    /**
-     * Enables drag'n'drop of highlighted subterms in the sequent window.
-     *
-     * @param allowDragNDrop enables drag'n'drop iff set to true.
-     */
-    public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
-        listener.setModalDragNDropEnabled(allowDragNDrop);
-    }
-
-    /**
-     * Checks whether drag'n'drop of highlighted subterms in the sequent window currently is
-     * enabled..
-     *
-     * @return true iff drag'n'drop is enabled.
-     */
-    public synchronized boolean modalDragNDropEnabled() {
-        return listener.modalDragNDropEnabled();
-    }
-
-    @Override
-    public String getHighlightedText() {
-        return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 
     public PosInSequent getMousePosInSequent() {

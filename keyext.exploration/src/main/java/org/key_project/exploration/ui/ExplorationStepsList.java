@@ -1,28 +1,31 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration.ui;
 
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.*;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.tree.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppListener;
+
 import org.key_project.exploration.ExplorationNodeData;
 import org.key_project.exploration.Icons;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.*;
+import bibliothek.gui.dock.common.action.CAction;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A view that summaries the exploration steps inside a proof.
@@ -66,8 +69,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         if (currentProof != null) {
             currentProof.removeRuleAppListener(ruleAppListener);
         }
-        if (proof != null)
+        if (proof != null) {
             proof.addRuleAppListener(ruleAppListener);
+        }
         currentProof = proof;
         createModel(proof);
     }
@@ -116,10 +120,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     }
 
     @Override
-    public @Nonnull Collection<CAction> getTitleCActions() {
-        CButton helpButton = new CButton(null, IconFactory.HELP.get());
-        helpButton.addActionListener(e -> HelpFacade.openHelp("/Using%20KeY/Exploration/"));
-        return Collections.singleton(helpButton);
+    public @NonNull Collection<CAction> getTitleCActions() {
+        return Collections.singleton(HelpFacade.createHelpButton("user/Exploration/"));
     }
 
     /**
@@ -128,15 +130,14 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
      * During collection of the nodes, the nodes are grouped in the given TreeModel {@code dtm}
      * </p>
      *
-     * @param n start node of exploration indow, KeYMediator mediator) { if (leftPanel == null)
-     *        leftPanel = new ExplorationStepsList(window); return Collections.singleton(leftPanel);
-     *        }* @param foundNodes filled with found exploration nodes
+     * @param node start node of exploration
+     * @param foundNodes filled with found exploration nodes
      * @param dtm a tree model which is filled with nodes
      * @param parent the corresponding entry of {@code n} in the tree model
      */
-    private void findExplorationChildren(@Nonnull Node node,
-            final @Nonnull ArrayList<Node> foundNodes, @Nonnull DefaultTreeModel dtm,
-            @Nonnull MyTreeNode parent) {
+    private void findExplorationChildren(@NonNull Node node,
+            final @NonNull ArrayList<Node> foundNodes, @NonNull DefaultTreeModel dtm,
+            @NonNull MyTreeNode parent) {
         Set<Node> reached = new HashSet<>(512000);
         ArrayDeque<Node> nodes = new ArrayDeque<>(8);
         nodes.add(node);
@@ -156,8 +157,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
             reached.add(n);
             for (Node child : n) {
-                if (!reached.contains(child))
+                if (!reached.contains(child)) {
                     nodes.push(child);
+                }
             }
         }
     }
@@ -219,15 +221,13 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         return buttonPanel;
     }
 
-    @Nonnull
     @Override
-    public String getTitle() {
+    public @NonNull String getTitle() {
         return "Exploration Steps";
     }
 
-    @Nonnull
     @Override
-    public JComponent getComponent() {
+    public @NonNull JComponent getComponent() {
         return this;
     }
 

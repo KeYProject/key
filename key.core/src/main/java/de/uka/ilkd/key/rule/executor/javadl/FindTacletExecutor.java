@@ -1,16 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
+import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -20,9 +17,13 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.util.collection.ImmutableList;
+
 public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
         extends TacletExecutor<TacletKind> {
-
+    public static final AtomicLong PERF_APPLY = new AtomicLong();
+    public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
+    public static final AtomicLong PERF_TERM_LABELS = new AtomicLong();
 
     public FindTacletExecutor(TacletKind taclet) {
         super(taclet);
@@ -56,7 +57,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate)
      *        result of applying the taclet
-     * @param whereToAdd the {@link PosInOccurrence} where to add the sequent or {@link null} if it
+     * @param whereToAdd the {@link PosInOccurrence} where to add the sequent or {@code null} if it
      *        should just be added to the head of the sequent (otherwise it will be tried to add the
      *        new formulas close to that position)
      * @param posOfFind the {@link PosInOccurrence} providing the position information where the
@@ -102,6 +103,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
             final Goal currentGoal = goalIt.next();
             final SequentChangeInfo currentSequent = newSequentsIt.next();
 
+            var timeApply = System.nanoTime();
             applyReplacewith(gt, termLabelState, currentSequent, tacletApp.posInOccurrence(), mc,
                 currentGoal, ruleApp, services);
 
@@ -122,15 +124,22 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
             // in the new sequent
             applyAddProgVars(gt.addedProgVars(), currentSequent, currentGoal,
                 tacletApp.posInOccurrence(), services, mc);
+            PERF_APPLY.getAndAdd(System.nanoTime() - timeApply);
 
+            var timeTermLabels = System.nanoTime();
             TermLabelManager.mergeLabels(currentSequent, services);
+            timeTermLabels = System.nanoTime() - timeTermLabels;
 
+            var timeSetSequent = System.nanoTime();
             currentGoal.setSequent(currentSequent);
+            PERF_SET_SEQUENT.getAndAdd(System.nanoTime() - timeSetSequent);
 
             currentGoal.setBranchLabel(gt.name());
 
+            timeTermLabels = System.nanoTime() + timeTermLabels;
             TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(),
                 ruleApp.rule(), currentGoal, null, null);
+            PERF_TERM_LABELS.getAndAdd(System.nanoTime() - timeTermLabels);
         }
 
         // in case the assumes sequent of the taclet did not
@@ -171,7 +180,7 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet>
                 // add it close to the modified formula
                 final FormulaChangeInfo head = modifiedFormulas.head();
                 result =
-                    new PosInOccurrence(head.getNewFormula(), PosInTerm.getTopLevel(), inAntec);
+                    new PosInOccurrence(head.newFormula(), PosInTerm.getTopLevel(), inAntec);
             } else {
                 // just add it
                 result = null;

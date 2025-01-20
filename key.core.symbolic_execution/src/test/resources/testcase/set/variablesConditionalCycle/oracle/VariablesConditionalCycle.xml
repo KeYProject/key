@@ -17,7 +17,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="this.next.value=42;" pathCondition="true" pathConditionChanged="false">
+      <statement name="this.next.value = 42;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>

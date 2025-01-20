@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -59,7 +61,7 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
      */
     public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x,
             Statement statement) {
-        this(sc, x, new ASTArrayList<Statement>(statement));
+        this(sc, x, new ASTArrayList<>(statement));
     }
 
     /**
@@ -121,8 +123,7 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
         body.addAll(position, statements);
         ChangeHistory ch = getChangeHistory();
         StatementContainer parent = statement.getStatementContainer();
-        for (int i = 0; i < statements.size(); i += 1) {
-            Statement s = statements.get(i);
+        for (Statement s : statements) {
             s.setStatementContainer(parent);
             if (isVisible()) {
                 ch.attached(s);

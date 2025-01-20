@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This filter takes a {@link PosInOccurrence} and only shows the sub-formula at that position.
@@ -16,7 +19,7 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
     /**
      * The position of the only sub-formula to show.
      */
-    private PosInOccurrence pos;
+    private final PosInOccurrence pos;
 
     /**
      * Create a new {@link ShowSelectedSequentPrintFilter}.
@@ -35,7 +38,7 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
         if (pos.isInAntec()) {
             return ImmutableSLList.<SequentPrintFilterEntry>nil().append(new Entry(pos));
         } else {
-            return ImmutableSLList.<SequentPrintFilterEntry>nil();
+            return ImmutableSLList.nil();
         }
     }
 
@@ -44,12 +47,12 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
         if (!pos.isInAntec()) {
             return ImmutableSLList.<SequentPrintFilterEntry>nil().append(new Entry(pos));
         } else {
-            return ImmutableSLList.<SequentPrintFilterEntry>nil();
+            return ImmutableSLList.nil();
         }
     }
 
     /**
-     * An Entry in {@link accessibility} {@link ShowSelectedSequentPrintFilter}.
+     * An Entry in accessibility {@link ShowSelectedSequentPrintFilter}.
      *
      * The only entry created for such a filter contains the sub-term at the specified position as
      * filtered term ({@link #getFilteredFormula()}) and that sub-term's top-level term as the
@@ -62,12 +65,12 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
         /**
          * The filtered formula, i.e., the formula at {@code pos}.
          */
-        private SequentFormula filtered;
+        private final SequentFormula filtered;
 
         /**
          * The origin formula, i.e., the formula at {@code pos.getTopLevel()}.
          */
-        private SequentFormula original;
+        private final SequentFormula original;
 
         private Entry(PosInOccurrence pos) {
             filtered = new SequentFormula(pos.subTerm());

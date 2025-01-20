@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An instance of this class loads several XML files, whose contents are displayed in
@@ -48,7 +51,7 @@ public class XMLResources {
     private static Properties getResource(String xmlFile) {
         Properties ret = new Properties();
 
-        try (InputStream is = XMLResources.class.getResourceAsStream(xmlFile);) {
+        try (InputStream is = XMLResources.class.getResourceAsStream(xmlFile)) {
             if (is == null) {
                 throw new FileNotFoundException("Descriptions file " + xmlFile + " not found.");
             }

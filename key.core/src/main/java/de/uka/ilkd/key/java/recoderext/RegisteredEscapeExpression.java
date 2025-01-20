@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
+
+import java.util.List;
 
 import de.uka.ilkd.key.speclang.njml.JmlTermFactory;
 import de.uka.ilkd.key.util.MiscTools;
-import recoder.java.Expression;
 
-import java.util.List;
+import recoder.java.Expression;
 
 /**
  * This class handles all escape expressions in set-statements, that are registered in

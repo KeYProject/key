@@ -1,6 +1,11 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
@@ -8,9 +13,6 @@ import recoder.java.declaration.VariableSpecification;
 import recoder.java.reference.VariableReference;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that renames a variable by renaming all known references to that variable. The new
@@ -57,7 +59,7 @@ public class RenameVariable extends TwoPassTransformation {
      * @return the problem report.
      */
     public ProblemReport analyze() {
-        refs = new ArrayList<VariableReference>();
+        refs = new ArrayList<>();
         if (newName.equals(vs.getName())) {
             return setProblemReport(IDENTITY);
         }
@@ -80,4 +82,3 @@ public class RenameVariable extends TwoPassTransformation {
         }
     }
 }
-

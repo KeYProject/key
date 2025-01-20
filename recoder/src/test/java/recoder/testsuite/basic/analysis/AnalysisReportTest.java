@@ -1,7 +1,17 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.testsuite.basic.analysis;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.zip.GZIPOutputStream;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import recoder.abstraction.ProgramModelElement;
 import recoder.abstraction.Type;
 import recoder.convenience.Format;
@@ -21,13 +31,8 @@ import recoder.util.Index;
 import recoder.util.Order;
 import recoder.util.Sorting;
 
-import java.io.*;
-import java.util.List;
-import java.util.zip.GZIPOutputStream;
 
-import static org.junit.Assert.fail;
-
-@Ignore
+@Disabled
 public class AnalysisReportTest {
 
     final static Order UNIT_NAME_ORDER = new Order.CustomLexicalOrder() {
@@ -62,7 +67,7 @@ public class AnalysisReportTest {
     public void testAnalysisReport() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(10000);
         GZIPOutputStream gzip = new GZIPOutputStream(baos);
-        OutputStreamWriter osw = new OutputStreamWriter(gzip);
+        OutputStreamWriter osw = new OutputStreamWriter(gzip, StandardCharsets.UTF_8);
         createReport(osw);
         osw.close();
         byte[] buffer = baos.toByteArray();
@@ -71,7 +76,7 @@ public class AnalysisReportTest {
             FileOutputStream fos = new FileOutputStream(referenceLogFile);
             baos.writeTo(fos);
             fos.close();
-            fail("No reference log - created " + referenceLogFile.getPath());
+            Assertions.fail("No reference log - created " + referenceLogFile.getPath());
         }
         InputStream is = new FileInputStream(referenceLogFile);
         byte[] referenceBuffer = new byte[buffer.length];
@@ -83,7 +88,8 @@ public class AnalysisReportTest {
                 FileOutputStream fos = new FileOutputStream(failureFile);
                 baos.writeTo(fos);
                 fos.close();
-                fail("Reference report did not match - created protocol " + failureFile.getPath());
+                Assertions.fail(
+                    "Reference report did not match - created protocol " + failureFile.getPath());
                 break;
             }
         }
@@ -144,7 +150,7 @@ public class AnalysisReportTest {
                 n += 1;
             }
         }
-        StringBuffer line = new StringBuffer(1024);
+        StringBuilder line = new StringBuilder(1024);
         int number = 1;
         for (CompilationUnit unit : uarray) {
             TreeWalker tw = new TreeWalker(unit);

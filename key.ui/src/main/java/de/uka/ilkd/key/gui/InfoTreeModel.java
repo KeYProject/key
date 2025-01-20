@@ -1,17 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
+import java.util.*;
 import javax.swing.tree.DefaultTreeModel;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -20,6 +14,8 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.XMLResources;
+
+import org.key_project.logic.Name;
 
 /**
  * Extension of {@link DefaultTreeModel} used by {@link InfoTree}.
@@ -63,10 +59,10 @@ public class InfoTreeModel extends DefaultTreeModel {
         FunctionsNode(Properties functionExplanations) {
             super("Function Symbols", DEFAULT_FUNCTIONS_LABEL);
 
-            Map<String, InfoTreeNode> categoryMap = new HashMap<String, InfoTreeNode>();
+            Map<String, InfoTreeNode> categoryMap = new HashMap<>();
 
             List<String> sortedKeys =
-                new ArrayList<String>(functionExplanations.stringPropertyNames());
+                new ArrayList<>(functionExplanations.stringPropertyNames());
             java.util.Collections.sort(sortedKeys);
 
             for (String key : sortedKeys) {
@@ -171,7 +167,7 @@ public class InfoTreeModel extends DefaultTreeModel {
          */
         private void insertAndGroup(InfoTreeNode ins, InfoTreeNode parent,
                 Properties ruleExplanations) {
-            InfoTreeNode insNode = (InfoTreeNode) ins;
+            InfoTreeNode insNode = ins;
             if (parent.getChildCount() > 0) {
                 InfoTreeNode lastNode =
                     (InfoTreeNode) parent.getChildAt(parent.getChildCount() - 1);
@@ -200,7 +196,7 @@ public class InfoTreeModel extends DefaultTreeModel {
                 String title = t1.toString();
 
                 // strip number of taclets
-                int parenIdx = title.lastIndexOf("(");
+                int parenIdx = title.lastIndexOf('(');
                 if (parenIdx >= 0) {
                     return title.substring(0, parenIdx - 1).intern();
                 } else {
@@ -210,15 +206,12 @@ public class InfoTreeModel extends DefaultTreeModel {
         }
 
         private List<NoPosTacletApp> sort(Set<NoPosTacletApp> set) {
-            final ArrayList<NoPosTacletApp> l = new ArrayList<NoPosTacletApp>(set);
+            final ArrayList<NoPosTacletApp> l = new ArrayList<>(set);
 
-            Collections.sort(l, new Comparator<NoPosTacletApp>() {
-                @Override
-                public int compare(NoPosTacletApp o1, NoPosTacletApp o2) {
-                    final Taclet t1 = o1.taclet();
-                    final Taclet t2 = o2.taclet();
-                    return t1.displayName().compareTo(t2.displayName());
-                }
+            l.sort((o1, o2) -> {
+                final Taclet t1 = o1.taclet();
+                final Taclet t2 = o2.taclet();
+                return t1.displayName().compareTo(t2.displayName());
             });
             return l;
         }

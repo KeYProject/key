@@ -1,57 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="&lt;call WhileWithMethodCallAsConditionFullImplemented.size(array)&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call WhileWithMethodCallAsConditionFullImplemented.size(
+  array
+)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <loopInvariant name="invariant: ((i &gt;= 0 &amp; i &lt;= array.length)&lt;&lt;SC&gt;&gt; &amp; result = i)&lt;&lt;SC&gt;&gt;;
-variant: javaSubInt(array.length, i)
+variant: array.length - i
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
-               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
-}\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+}\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
-}\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+}\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
-                  <branchCondition name="not(equals(array,null))" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                  <branchCondition name="not(equals(array,null))" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i))))))),equals(array,null)))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <loopCondition name="goOnNice(array,i);" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                     <loopCondition name="goOnNice(array, i);" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i))))))),equals(array,null)))" pathConditionChanged="false" blockOpened="false">
-                        <methodCall name="&lt;call WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_2,i_2)&gt;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                        <methodCall name="&lt;call WhileWithMethodCallAsConditionFullImplemented.goOnNice(
+  array_2,
+  i_2
+)&gt;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i))))))),equals(array,null)))" pathConditionChanged="false">
-                           <branchStatement name="if (i_2&lt;0)" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                           <branchStatement name="if (i_2 &lt; 0)" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i))))))),equals(array,null)))" pathConditionChanged="false" blockOpened="true">
-                              <statement name="return i_2&lt;array_2.length;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                              <statement name="return i_2 &lt; array_2.length;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i))))))),equals(array,null)))" pathConditionChanged="false">
-                                 <methodReturn name="&lt;return of goOnNice&gt;" signature="&lt;return of WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_2,i_2)&gt;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                                 <methodReturn name="&lt;return of goOnNice&gt;" signature="&lt;return of WhileWithMethodCallAsConditionFullImplemented.goOnNice(
+  array_2,
+  i_2
+)&gt;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
-}\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i))))))),equals(array,null)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of goOnNice&gt;" signatureIncludingReturnValue="&lt;return TRUE as result of WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_2,i_2)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
+}\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i))))))),equals(array,null)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return TRUE as result of goOnNice&gt;" signatureIncludingReturnValue="&lt;return TRUE as result of WhileWithMethodCallAsConditionFullImplemented.goOnNice(
+  array_2,
+  i_2
+)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                     <methodReturnValue name="TRUE" returnValueString="TRUE" hasCondition="false">
                                     </methodReturnValue>
-                                    <statement name="result++;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                                    <statement name="result++;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i))))))),equals(array,null)))" pathConditionChanged="false">
-                                       <statement name="i++;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                                       <statement name="i++;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i))))))),equals(array,null)))" pathConditionChanged="false">
-                                          <termination name="&lt;loop body end&gt;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                                          <termination name="&lt;loop body end&gt;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i))))))),equals(array,null)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                                           </termination>
@@ -66,39 +113,74 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                         </methodCall>
                      </loopCondition>
                   </branchCondition>
-                  <branchCondition name="equals(array,null)" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                  <branchCondition name="equals(array,null)" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))))))" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <loopCondition name="goOnNice(array,i);" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                     <loopCondition name="goOnNice(array, i);" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))))))" pathConditionChanged="false" blockOpened="false">
-                        <methodCall name="&lt;call WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_2,i_2)&gt;" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                        <methodCall name="&lt;call WhileWithMethodCallAsConditionFullImplemented.goOnNice(
+  array_2,
+  i_2
+)&gt;" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))))))" pathConditionChanged="false">
-                           <branchStatement name="if (i_2&lt;0)" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                           <branchStatement name="if (i_2 &lt; 0)" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))))))" pathConditionChanged="false" blockOpened="true">
-                              <statement name="return i_2&lt;array_2.length;" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                              <statement name="return i_2 &lt; array_2.length;" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))))))" pathConditionChanged="false">
-                                 <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call WhileWithMethodCallAsConditionFullImplemented.goOnNice(array_2,i_2)&gt;&gt;" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                                 <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call WhileWithMethodCallAsConditionFullImplemented.goOnNice(
+  array_2,
+  i_2
+)&gt;&gt;" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))))))" pathConditionChanged="false" methodReturnCondition="true">
-                                    <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call WhileWithMethodCallAsConditionFullImplemented.size(array)&gt;&gt;" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                                    <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call WhileWithMethodCallAsConditionFullImplemented.size(
+  array
+)&gt;&gt;" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
-}\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))))))" pathConditionChanged="false" methodReturnCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+}\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))))))" pathConditionChanged="false" methodReturnCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))))))">
-                                       <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                                       <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\[{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\] (and(equals(b,TRUE),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                                        </termination>
@@ -113,31 +195,56 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                      </loopCondition>
                   </branchCondition>
                </branchCondition>
-               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+               <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
-}\&gt; (and(not(equals(b,TRUE)),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+}\&gt; (and(not(equals(b,TRUE)),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
-}\&gt; (and(not(equals(b,TRUE)),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+}\&gt; (and(not(equals(b,TRUE)),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" pathConditionChanged="true" branchCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\&gt; (and(not(equals(b,TRUE)),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
-                  <statement name="return result;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                  <statement name="return result;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\&gt; (and(not(equals(b,TRUE)),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of size&gt;" signature="&lt;return of WhileWithMethodCallAsConditionFullImplemented.size(array)&gt;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                     <methodReturn name="&lt;return of size&gt;" signature="&lt;return of WhileWithMethodCallAsConditionFullImplemented.size(
+  array
+)&gt;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
-}\&gt; (and(not(equals(b,TRUE)),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return i_0 as result of size&gt;" signatureIncludingReturnValue="&lt;return i_0 as result of WhileWithMethodCallAsConditionFullImplemented.size(array)&gt;" isReturnValueComputed="true" methodReturnCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+}\&gt; (and(not(equals(b,TRUE)),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return i_0 as result of size&gt;" signatureIncludingReturnValue="&lt;return i_0 as result of WhileWithMethodCallAsConditionFullImplemented.size(
+  array
+)&gt;" isReturnValueComputed="true" methodReturnCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\&gt; (and(not(equals(b,TRUE)),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))">
                         <methodReturnValue name="i_0" returnValueString="i_0" hasCondition="false">
                         </methodReturnValue>
-                        <termination name="&lt;end&gt;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
-    b=goOnNice(array,i);
+                        <termination name="&lt;end&gt;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result)(result_0)),\&lt;{
+  method-frame (
+    source=size(int[])@WhileWithMethodCallAsConditionFullImplemented
+  ) {
+    b = goOnNice(array, i);
   }
 }\&gt; (and(not(equals(b,TRUE)),and(and(geq(i,Z(0(#))),geq(length(array),i))&lt;&lt;SC&gt;&gt;,equals(result,i)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>

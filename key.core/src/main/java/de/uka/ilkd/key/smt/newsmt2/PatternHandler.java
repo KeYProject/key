@@ -1,14 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 // package de.uka.ilkd.key.smt.newsmt2;
 //
 // import de.uka.ilkd.key.java.Services;
 // import de.uka.ilkd.key.ldt.LocSetLDT;
 // import de.uka.ilkd.key.logic.Name;
 // import de.uka.ilkd.key.logic.Term;
-// import de.uka.ilkd.key.logic.op.Function;
+// import org.key_project.logic.op.Function;
 // import de.uka.ilkd.key.logic.op.Operator;
 // import de.uka.ilkd.key.logic.op.SortDependingFunction;
 // import de.uka.ilkd.key.logic.sort.GenericSort;
-// import de.uka.ilkd.key.logic.sort.Sort;
+// import org.key_project.logic.sort.Sort;
 // import de.uka.ilkd.key.smt.SMTTranslationException;
 // import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 //

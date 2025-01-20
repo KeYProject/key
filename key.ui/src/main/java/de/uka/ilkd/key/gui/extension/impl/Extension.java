@@ -1,17 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.extension.impl;
-
-import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.extension.ExtensionManager;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
+
+import de.uka.ilkd.key.gui.extension.ExtensionManager;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.settings.FeatureSettings;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Alexander Weigl
  * @version 1 (07.04.19)
  */
-public class Extension<T> implements Comparable<Extension> {
+public class Extension<T> implements Comparable<Extension<T>> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Extension.class);
     private final Class<T> clazz;
     private final KeYGuiExtension.Info info;
     private T instance = null;
@@ -27,7 +34,7 @@ public class Extension<T> implements Comparable<Extension> {
                 instance = clazz.getDeclaredConstructor().newInstance();
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException
                     | InvocationTargetException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed initialize instance", e);
             }
         }
         return instance;
@@ -38,7 +45,8 @@ public class Extension<T> implements Comparable<Extension> {
     }
 
     public boolean isOptional() {
-        return info != null && info.optional() && (!isExperimental() || Main.isExperimentalMode());
+        return info != null && info.optional()
+                && (!isExperimental() || FeatureSettings.isFeatureActivated(getName()));
     }
 
     public int getPriority() {
@@ -47,9 +55,10 @@ public class Extension<T> implements Comparable<Extension> {
 
     public boolean isDisabled() {
         return isDisabledByMaintainer() // disabled by options
-                || (!Main.isExperimentalMode() && isExperimental()) // disabled because of wrong
-                                                                    // mode
-                || ExtensionManager.getExtensionSettings() // disabled by command line
+                // disabled because of wrong // mode
+                || (!FeatureSettings.isFeatureActivated(getName()) && isExperimental())
+                // disabled by command line
+                || ExtensionManager.getExtensionSettings()
                         .getForbiddenClasses().contains(getType().getName());
     }
 
@@ -77,11 +86,12 @@ public class Extension<T> implements Comparable<Extension> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof Extension))
+        }
+        if (!(o instanceof Extension<?> extension)) {
             return false;
-        Extension<?> extension = (Extension<?>) o;
+        }
         return clazz.equals(extension.clazz);
     }
 

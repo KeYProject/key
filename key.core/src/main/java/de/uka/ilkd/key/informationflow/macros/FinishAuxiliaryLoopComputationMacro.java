@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.macros;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
@@ -21,6 +22,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.key_project.util.collection.ImmutableList;
+
 public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliaryComputationMacro {
 
     @Override
@@ -32,10 +35,8 @@ public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliary
             if (poForProof instanceof LoopInvExecutionPO) {
                 final Node parentOfInitiatingGoal =
                     ((LoopInvExecutionPO) poForProof).getInitiatingGoal().node().parent();
-                if (parentOfInitiatingGoal != null && parentOfInitiatingGoal
-                        .getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
-                    return true;
-                }
+                return parentOfInitiatingGoal != null && parentOfInitiatingGoal
+                        .getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp;
             }
         }
 

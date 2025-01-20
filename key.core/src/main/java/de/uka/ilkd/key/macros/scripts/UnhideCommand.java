@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.logic.Sequent;
@@ -9,11 +12,8 @@ import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
-import org.key_project.util.collection.ImmutableList;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Proof script command to insert a formula hidden earlier in the proof.
@@ -85,7 +85,7 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
         return "unhide";
     }
 
-    public class Parameters {
+    public static class Parameters {
         @Option("#2")
         public Sequent sequent;
     }

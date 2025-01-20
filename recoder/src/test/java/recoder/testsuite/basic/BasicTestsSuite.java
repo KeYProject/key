@@ -1,12 +1,14 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.testsuite.basic;
 
+import java.io.File;
+
+import org.jspecify.annotations.NonNull;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.service.DefaultErrorHandler;
-
-import javax.annotation.Nonnull;
-import java.io.File;
 
 /**
  * Call example: java test.TransformationTests standard.tst collections.prj
@@ -17,15 +19,14 @@ public class BasicTestsSuite {
     private static CrossReferenceServiceConfiguration config;
     private static File projectFile;
 
-    @Nonnull
-    public static File getProjectFile() {
-        if (projectFile == null)
+    public static @NonNull File getProjectFile() {
+        if (projectFile == null) {
             init();
+        }
         return projectFile;
     }
 
-    @Nonnull
-    public static CrossReferenceServiceConfiguration getConfig() {
+    public static @NonNull CrossReferenceServiceConfiguration getConfig() {
         if (config == null) {
             init();
         }
@@ -38,9 +39,8 @@ public class BasicTestsSuite {
         // to check if errors are reported correctly
         config.getProjectSettings().setErrorHandler(new DefaultErrorHandler(0));
         projectFile = new File(projectConfig);
-        if (!projectFile.exists())
+        if (!projectFile.exists()) {
             throw new IllegalArgumentException("Project File not found!");
+        }
     }
 }
-
-

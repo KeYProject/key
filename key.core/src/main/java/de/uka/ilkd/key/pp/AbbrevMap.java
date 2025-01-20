@@ -1,25 +1,29 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
-
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.util.Pair;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.logic.Term;
+
+import org.key_project.util.collection.Pair;
+
 public class AbbrevMap {
 
     /**
      * HashMaps used to store the mappings from Term to String, String to Term and Term to Enabled.
      */
-    private HashMap<AbbrevWrapper, String> termstring;
-    private HashMap<String, AbbrevWrapper> stringterm;
+    private final HashMap<AbbrevWrapper, String> termstring;
+    private final HashMap<String, AbbrevWrapper> stringterm;
 
     /**
      * Enabled is set true if a abbreviation should be used when printing the term.
      */
-    private HashMap<AbbrevWrapper, Boolean> termenabled;
+    private final HashMap<AbbrevWrapper, Boolean> termenabled;
 
     /**
      * Creates a AbbrevMap.
@@ -129,8 +133,9 @@ public class AbbrevMap {
      */
     public boolean isEnabled(Term t) {
         Boolean b = termenabled.get(new AbbrevWrapper(t));
-        if (b != null)
-            return b.booleanValue();
+        if (b != null) {
+            return b;
+        }
         return false;
     }
 
@@ -154,31 +159,21 @@ public class AbbrevMap {
 
     }
 
-    public static class AbbrevWrapper {
-
-        private Term t;
-
-        public AbbrevWrapper(Term t) {
-            this.t = t;
-        }
+    public record AbbrevWrapper(Term t) {
 
         @Override
-        public int hashCode() {
-            return t.hashCode();
-        }
+            public boolean equals(Object o) {
+                if (!(o instanceof AbbrevWrapper scw)) {
+                    return false;
+                }
+                if (scw.getTerm() == t) {
+                    return true;
+                }
+                return t.equals(scw.getTerm());
+            }
 
-        @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof AbbrevWrapper))
-                return false;
-            AbbrevWrapper scw = (AbbrevWrapper) o;
-            if (scw.getTerm() == t)
-                return true;
-            return t.equals(scw.getTerm());
+            public Term getTerm() {
+                return t;
+            }
         }
-
-        public Term getTerm() {
-            return t;
-        }
-    }
 }

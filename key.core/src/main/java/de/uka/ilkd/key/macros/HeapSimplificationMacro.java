@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
 import java.util.Set;
@@ -34,7 +37,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
     }
 
     // note that rules in the 'concrete' rule set are usually not included here
-    private static final Set<String> ADMITTED_RULES_SET = asSet(new String[] { "selectOfStore",
+    private static final Set<String> ADMITTED_RULES_SET = asSet("selectOfStore",
         "selectOfCreate", "selectOfAnon", "selectOfMemset",
 
         "selectCreatedOfStore", "selectCreatedOfCreate", "selectCreatedOfAnon",
@@ -103,7 +106,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         // "replace_known_right",
 
         // others
-        "castDel", "nonNull", "nonNullZero", "allRight", "exLeft", });
+        "castDel", "nonNull", "nonNullZero", "allRight", "exLeft");
 
 
     @Override

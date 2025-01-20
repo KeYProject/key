@@ -1,11 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.testcase.java;
 
-import org.junit.jupiter.api.Test;
-import org.key_project.util.java.StringUtil;
-
-import static org.junit.jupiter.api.Assertions.*;
 import java.util.Comparator;
 
+import org.key_project.util.java.StringUtil;
+
+import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.key_project.util.java.StringUtil.count;
 import static org.key_project.util.java.StringUtil.trim;
 
 /**
@@ -65,7 +71,7 @@ public class StringUtilTest {
     @Test
     public void testTrimRight() {
         // Test empty stuff
-        assertEquals(null, StringUtil.trimRight(null));
+        assertNull(StringUtil.trimRight(null));
         assertEquals("", StringUtil.trimRight(""));
         assertEquals("", StringUtil.trimRight(" "));
         assertEquals("", StringUtil.trimRight("\t"));
@@ -158,7 +164,6 @@ public class StringUtilTest {
     public void testReplaceAll() {
         String text = "ABCDABCDABCDABCD";
         assertNull(StringUtil.replaceAll(null, new char[] {}, 'X'));
-        assertEquals(text, StringUtil.replaceAll(text, null, 'X'));
         assertEquals(text, StringUtil.replaceAll(text, new char[] {}, 'X'));
         assertEquals("XBCDXBCDXBCDXBCD", StringUtil.replaceAll(text, new char[] { 'A' }, 'X'));
         assertEquals("AXCDAXCDAXCDAXCD", StringUtil.replaceAll(text, new char[] { 'B' }, 'X'));
@@ -204,13 +209,6 @@ public class StringUtilTest {
         assertEquals("#####", StringUtil.repeat("#", 5));
         // Test line with multiple characters
         assertEquals("ABABAB", StringUtil.repeat("AB", 3));
-
-        // Test null text
-        try {
-            assertEquals("nullnullnullnull", StringUtil.repeat(null, 4));
-            fail();
-        } catch (NullPointerException expected) {
-        }
     }
 
     /**
@@ -218,7 +216,7 @@ public class StringUtilTest {
      */
     @Test
     public void testCreateIgnoreCaseComparator() {
-        Comparator<String> c = StringUtil.createIgnoreCaseComparator();
+        Comparator<@Nullable String> c = StringUtil.createIgnoreCaseComparator();
         assertNotNull(c);
         assertSame("A".compareToIgnoreCase("A"), c.compare("A", "A"));
         assertSame("A".compareToIgnoreCase("a"), c.compare("A", "a"));
@@ -288,5 +286,26 @@ public class StringUtilTest {
             "   \n\t\fa234231hsdafhvnyxcksdaökfhsdaöfhsahövcln231847231 42310897423187sdfsdafbc\n",
             it -> true));
         assertEquals("", trim("", 'c'));
+
+        assertEquals(".", trim("\".\"", '"'));
+        assertEquals(".", trim(".", '"'));
+        assertEquals(".", trim(".", it -> false));
+    }
+
+    @Test
+    void testCount() {
+        assertEquals(3, count("AbAbA", 0, 5, 'A'));
+        assertEquals(2, count("AbAbA", 0, 4, 'A'));
+        assertEquals(2, count("AbAbA", 0, 3, 'A'));
+        assertEquals(1, count("AbAbA", 0, 2, 'A'));
+        assertEquals(1, count("AbAbA", 0, 1, 'A'));
+        assertEquals(0, count("AbAbA", 0, 0, 'A'));
+
+        assertEquals(2, count("AbAbA", 1, 5, 'A'));
+        assertEquals(2, count("AbAbA", 2, 5, 'A'));
+        assertEquals(1, count("AbAbA", 3, 5, 'A'));
+        assertEquals(1, count("AbAbA", 4, 5, 'A'));
+
+        assertEquals(0, count("AbAbA", 5, 5, 'A'));
     }
 }

@@ -1,13 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Instanceof.
@@ -43,10 +45,12 @@ public class ExactInstanceof extends TypeOperator {
 
     public int getChildCount() {
         int result = 0;
-        if (children != null)
+        if (children != null) {
             result += children.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
+        }
         return result;
     }
 
@@ -72,8 +76,9 @@ public class ExactInstanceof extends TypeOperator {
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -116,9 +121,5 @@ public class ExactInstanceof extends TypeOperator {
      */
     public void visit(Visitor v) {
         v.performActionOnExactInstanceof(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printExactInstanceof(this);
     }
 }

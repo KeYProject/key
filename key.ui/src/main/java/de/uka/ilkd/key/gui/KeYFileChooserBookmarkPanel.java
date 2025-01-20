@@ -1,19 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ViewSettings;
-import javax.annotation.Nonnull;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This is a Panel used as accessory for the JFileChooser.
@@ -24,13 +28,12 @@ import java.util.List;
  *
  * @author Jonas Klamroth
  * @author weigl
- * @see ViewSettings#USER_FOLDER_BOOKMARKS
  * @see ViewSettings#getFolderBookmarks()
  */
 public class KeYFileChooserBookmarkPanel extends JPanel {
     private static final long serialVersionUID = -6498548666886815605L;
 
-    private final @Nonnull JFileChooser chooser;
+    private final @NonNull JFileChooser chooser;
 
     private final ViewSettings viewSettings =
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
@@ -48,7 +51,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
      *
      * @param chooser non null {@link JFileChooser}
      */
-    public KeYFileChooserBookmarkPanel(@Nonnull JFileChooser chooser) {
+    public KeYFileChooserBookmarkPanel(@NonNull JFileChooser chooser) {
         this.chooser = chooser;
         // register ad the given file chooser
         chooser.setAccessory(this);
@@ -101,9 +104,7 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private void loadBookmarks() {
-        viewSettings.getFolderBookmarks().forEach(it ->
-        // make absolute? .getAbsoluteFile())
-        bookmarks.addElement(new File(it)));
+        viewSettings.getFolderBookmarks().forEach(it -> bookmarks.addElement(new File(it)));
     }
 
     private void saveBookmarks() {

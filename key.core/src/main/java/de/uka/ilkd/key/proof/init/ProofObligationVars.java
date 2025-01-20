@@ -1,8 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -14,11 +13,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -97,7 +96,7 @@ public class ProofObligationVars {
     }
 
     public ProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
-        if (pre.heap.op() instanceof Function
+        if (pre.heap.op() instanceof JFunction
                 && !pre.heap.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL)) {
             ImmutableArray<TermLabel> labels = pre.heap.getLabels();
             TermLabel[] newLabels = new TermLabel[labels.size() + 1];
@@ -105,7 +104,7 @@ public class ProofObligationVars {
             newLabels[labels.size()] = ParameterlessTermLabel.ANON_HEAP_LABEL;
             StateVars newPre =
                 new StateVars(pre.self, pre.guard, pre.localVars, pre.result, pre.exception,
-                    tb.label(pre.heap, new ImmutableArray<TermLabel>(newLabels)), pre.mbyAtPre);
+                    tb.label(pre.heap, new ImmutableArray<>(newLabels)), pre.mbyAtPre);
             return new ProofObligationVars(newPre, post, exceptionParameter, formalParams, tb);
         } else {
             return this;
@@ -133,7 +132,7 @@ public class ProofObligationVars {
      */
     private ImmutableList<Term> buildFormalParamVars(Services services)
             throws IllegalArgumentException {
-        ImmutableList<Term> formalParamVars = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> formalParamVars = ImmutableSLList.nil();
         for (Term param : pre.localVars) {
             ProgramVariable paramVar = param.op(ProgramVariable.class);
             ProgramElementName pen = new ProgramElementName("_" + paramVar.name());

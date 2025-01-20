@@ -1,10 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs.performance;
-
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
-import org.junit.jupiter.api.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,15 +9,24 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import de.uka.ilkd.key.proof.runallproofs.ProofCollections;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.strategy.feature.Feature;
+
+import org.junit.jupiter.api.*;
+
 /**
  * Same as {@link RunAllProofsFunctional} but we alter
- * {@link JavaCardDLStrategy#computeCost(de.uka.ilkd.key.rule.RuleApp, de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.proof.Goal)}
+ * {@link Feature#computeCost(de.uka.ilkd.key.rule.RuleApp, de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.proof.Goal, de.uka.ilkd.key.strategy.feature.MutableState)}
  * so that statistical data about that method can be recorded (time duration, number of invocations
  * and potentially other stuff).
  */
 @Tag("performance")
 @Tag("owntest")
-public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
+@Tag("slow")
+public class RunAllProofsTestWithComputeCostProfiling {
     private static ProfilingDirectories directories;
     static File plotScript;
 
@@ -36,11 +42,11 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
     @TestFactory
     Stream<DynamicTest> data() throws Exception {
-        ProofCollection proofCollection =
-            parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
+        ProofCollection proofCollection = ProofCollections.automaticJavaDL();
+        // TODO weigl parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
         proofCollection.getSettings().getStatisticsFile().setUp();
         initDirectories(proofCollection.getSettings().runStart);
-        return data(proofCollection);
+        return RunAllProofsTest.data(proofCollection);
     }
 
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.LinkedHashMap;
@@ -5,8 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -35,6 +36,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.java.StringUtil;
 
 /**
  * The default implementation of {@link IExecutionMethodReturn}.
@@ -131,7 +134,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * {@link #getNameIncludingReturnValue()} is called the first time.
      *
      * @return The name including the return value.
-     * @throws Occurred Exception.
+     * @throws ProofInputException
      */
     protected String lazyComputeNameIncludingReturnValue() throws ProofInputException {
         IExecutionMethodReturnValue[] returnValues = getReturnValues();
@@ -174,7 +177,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * {@link #getNameIncludingReturnValue()} is called the first time.
      *
      * @return The name including the return value.
-     * @throws Occurred Exception.
+     * @throws ProofInputException
      */
     protected String lazyComputeSigntureIncludingReturnValue() throws ProofInputException {
         IExecutionMethodReturnValue[] returnValues = getReturnValues();
@@ -221,7 +224,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     }
 
     /**
-     * Computes the return value lazily when {@link #getReturnValue()} is called the first time.
+     * Computes the return value lazily when {@link #getReturnValues()} is called the first time.
      *
      * @return The return value.
      * @throws ProofInputException Occurred Exception.
@@ -276,18 +279,15 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                         } else {
                             // Group equal values of different branches
                             Map<Term, List<Node>> valueNodeMap =
-                                new LinkedHashMap<Term, List<Node>>();
+                                new LinkedHashMap<>();
                             for (Goal goal : info.getProof().openGoals()) {
                                 Term returnValue = SymbolicExecutionSideProofUtil
                                         .extractOperatorValue(goal, input.getOperator());
                                 assert returnValue != null;
                                 returnValue = SymbolicExecutionUtil.replaceSkolemConstants(
                                     goal.node().sequent(), returnValue, services);
-                                List<Node> nodeList = valueNodeMap.get(returnValue);
-                                if (nodeList == null) {
-                                    nodeList = new LinkedList<Node>();
-                                    valueNodeMap.put(returnValue, nodeList);
-                                }
+                                List<Node> nodeList = valueNodeMap.computeIfAbsent(returnValue,
+                                    k -> new LinkedList<>());
                                 nodeList.add(goal.node());
                             }
                             // Create result
@@ -301,15 +301,15 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                                     new IExecutionMethodReturnValue[valueNodeMap.size()];
                                 int i = 0;
                                 for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
-                                    List<Term> conditions = new LinkedList<Term>();
+                                    List<Term> conditions = new LinkedList<>();
                                     for (Node node : entry.getValue()) {
                                         Term condition = SymbolicExecutionUtil.computePathCondition(
-                                            node, getSettings().isSimplifyConditions(), false);
+                                            node, getSettings().simplifyConditions(), false);
                                         conditions.add(condition);
                                     }
                                     Term condition = services.getTermBuilder().or(conditions);
                                     if (conditions.size() >= 2) {
-                                        if (getSettings().isSimplifyConditions()) {
+                                        if (getSettings().simplifyConditions()) {
                                             condition = SymbolicExecutionUtil.simplify(initConfig,
                                                 info.getProof(), condition);
                                         }
@@ -357,7 +357,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                 if ("methodCallReturn".equals(MiscTools.getRuleDisplayName(node))) {
                     SymbolicExecutionTermLabel currentLabel =
                         SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
-                    if (currentLabel != null && origianlLabel.equals(currentLabel)) {
+                    if (origianlLabel.equals(currentLabel)) {
                         resultNode = node;
                     }
                 }

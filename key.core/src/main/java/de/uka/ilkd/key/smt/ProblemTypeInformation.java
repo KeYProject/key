@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
 import java.util.HashMap;
@@ -11,18 +14,19 @@ import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
 import de.uka.ilkd.key.smt.lang.Util;
+
+import org.key_project.logic.sort.Sort;
 
 public class ProblemTypeInformation {
 
     Services services;
 
-    Map<String, SMTSort> fieldTypes;
-    Map<String, SMTSort> constantsTypes;
-    Map<String, Sort> originalConstantType;
+    final Map<String, SMTSort> fieldTypes;
+    final Map<String, SMTSort> constantsTypes;
+    final Map<String, Sort> originalConstantType;
 
     Set<Sort> javaSorts;
 
@@ -34,10 +38,10 @@ public class ProblemTypeInformation {
 
     public ProblemTypeInformation(TermServices services) {
         super();
-        fieldTypes = new HashMap<String, SMTSort>();
-        constantsTypes = new HashMap<String, SMTSort>();
-        javaSorts = new HashSet<Sort>();
-        originalConstantType = new HashMap<String, Sort>();
+        fieldTypes = new HashMap<>();
+        constantsTypes = new HashMap<>();
+        javaSorts = new HashSet<>();
+        originalConstantType = new HashMap<>();
     }
 
     public void putOriginalConstantType(String c, Sort s) {
@@ -111,19 +115,19 @@ public class ProblemTypeInformation {
      * @return
      */
     public Set<String> getFieldsForSort(Sort s) {
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         result.add(Util.processName("java.lang.Object::<created>"));
 
         JavaInfo info = services.getJavaInfo();
 
         KeYJavaType kjt = info.getKeYJavaType(s);
 
-        if (kjt != null && kjt.getJavaType() instanceof ClassDeclaration) {
-            ClassDeclaration c = (ClassDeclaration) kjt.getJavaType();
+        if (kjt != null && kjt.getJavaType() instanceof ClassDeclaration c) {
 
             for (KeYJavaType sp : info.getAllSupertypes(kjt)) {
-                if (!sp.equals(kjt))
+                if (!sp.equals(kjt)) {
                     result.addAll(getFieldsForSort(sp.getSort()));
+                }
             }
 
             for (Field f : info.getAllFields(c)) {
@@ -170,13 +174,13 @@ public class ProblemTypeInformation {
 
         long val = n.getIntValue();
 
-        String s = Long.toBinaryString(val);
+        StringBuilder s = new StringBuilder(Long.toBinaryString(val));
 
         while (s.length() < 3) {
-            s = "0" + s;
+            s.insert(0, "0");
         }
 
-        return s;
+        return s.toString();
 
 
     }

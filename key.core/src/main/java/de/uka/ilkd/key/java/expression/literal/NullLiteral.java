@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression.literal;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.Name;
+
+import org.key_project.logic.Name;
 
 /**
  * Null literal. Is used as singleton.
@@ -22,6 +25,16 @@ public class NullLiteral extends Literal {
         super();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return o == this;
+    }
+
+    @Override
+    protected int computeHashCode() {
+        return System.identityHashCode(this);
+    }
+
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
@@ -30,11 +43,6 @@ public class NullLiteral extends Literal {
      */
     public void visit(Visitor v) {
         v.performActionOnNullLiteral(this);
-    }
-
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printNullLiteral(this);
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {

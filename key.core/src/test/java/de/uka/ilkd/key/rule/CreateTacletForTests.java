@@ -1,21 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 
+import java.io.IOException;
+
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -45,12 +52,12 @@ public class CreateTacletForTests extends AbstractTestTermParser {
     public static RewriteTaclet switchfirstsucc;
     public static SuccTaclet closewitheq;
 
-    static Function func_0;
-    static Function func_eq;
-    static Function func_plus;
-    static Function func_min1;
-    static Function func_plus1;
-    static Function func_p; // Sort.FORMULA
+    static JFunction func_0;
+    static JFunction func_eq;
+    static JFunction func_plus;
+    static JFunction func_min1;
+    static JFunction func_plus1;
+    static JFunction func_p; // Sort.FORMULA
 
     static Sequent seq_test1;
     static Sequent seq_test2;
@@ -65,7 +72,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
     static NamespaceSet nss;
 
-    public Services services;
+    public final Services services;
 
     public CreateTacletForTests() {
         services = new Services(AbstractProfile.getDefaultProfile());
@@ -100,11 +107,11 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
     public void createNatTaclets() {
         // decls for nat
-        func_0 = new Function(new Name("zero"), nat, new Sort[] {});
-        func_eq = new Function(new Name("="), Sort.FORMULA, nat, nat);
-        func_plus = new Function(new Name("+"), nat, nat, nat);
-        func_min1 = new Function(new Name("pred"), nat, nat);
-        func_plus1 = new Function(new Name("succ"), nat, nat);
+        func_0 = new JFunction(new Name("zero"), nat, new Sort[] {});
+        func_eq = new JFunction(new Name("="), JavaDLTheory.FORMULA, nat, nat);
+        func_plus = new JFunction(new Name("+"), nat, nat, nat);
+        func_min1 = new JFunction(new Name("pred"), nat, nat);
+        func_plus1 = new JFunction(new Name("succ"), nat, nat);
 
         nss.functions().add(func_0);
         nss.functions().add(func_eq);
@@ -112,8 +119,8 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         nss.functions().add(func_min1);
         nss.functions().add(func_plus1);
 
-        SchemaVariable var_rn = SchemaVariableFactory.createTermSV(new Name("rn"), nat);
-        SchemaVariable var_rm = SchemaVariableFactory.createTermSV(new Name("rm"), nat);
+        TermSV var_rn = SchemaVariableFactory.createTermSV(new Name("rn"), nat);
+        TermSV var_rm = SchemaVariableFactory.createTermSV(new Name("rm"), nat);
 
         Term t_rn = tf.createTerm(var_rn);
         Term t_rm = tf.createTerm(var_rm);
@@ -216,8 +223,14 @@ public class CreateTacletForTests extends AbstractTestTermParser {
     public void setUp() throws IOException {
         nss = new NamespaceSet();
 
-        parseDecls("\\sorts { Nat; testSort1; }\n" + "\\schemaVariables {\n" + "  \\formula b,b0;\n"
-            + "  \\term testSort1 x;\n" + "  \\variables testSort1 z;\n" + "}\n");
+        parseDecls("""
+                \\sorts { Nat; testSort1; }
+                \\schemaVariables {
+                  \\formula b,b0;
+                  \\term testSort1 x;
+                  \\variables testSort1 z;
+                }
+                """);
 
         sort1 = nss.sorts().lookup(new Name("testSort1"));
         nat = nss.sorts().lookup(new Name("Nat"));
@@ -233,7 +246,8 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         String test1 = "\\predicates {A; B; } (A -> B) -> (!(!(A -> B)))";
         Term t_test1 = null;
         try {
-            t_test1 = io.load(test1).loadDeclarations().loadProblem().getProblemTerm();
+            t_test1 = io.load(test1).loadDeclarations().loadProblem().getProblem().succedent()
+                    .get(0).formula();
         } catch (Exception e) {
             LOGGER.error("Parser Error or Input Error", e);
             fail("Parser Error");
@@ -248,13 +262,13 @@ public class CreateTacletForTests extends AbstractTestTermParser {
             Semisequent.EMPTY_SEMISEQUENT.insert(0, cf2).semisequent());
 
 
-        func_p = new Function(new Name("P"), Sort.FORMULA, sort1);
+        func_p = new JFunction(new Name("P"), JavaDLTheory.FORMULA, sort1);
         nss.functions().add(func_p);
 
         // nat problem:
-        Function const_c = new Function(new Name("c"), nat, new SortImpl[0]);
+        JFunction const_c = new JFunction(new Name("c"), nat, new SortImpl[0]);
         nss.functions().add(const_c);
-        Function const_d = new Function(new Name("d"), nat, new SortImpl[0]);
+        JFunction const_d = new JFunction(new Name("d"), nat, new SortImpl[0]);
         nss.functions().add(const_d);
 
         Term t_c = tf.createTerm(const_c);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.axiom_abstraction.boollattice;
 
 import java.util.Iterator;
@@ -39,13 +42,10 @@ public class BooleanLattice extends AbstractDomainLattice {
     @Override
     public AbstractDomainElement join(AbstractDomainElement elem1, AbstractDomainElement elem2) {
 
-        if (!(elem1 instanceof BooleanDomainElem) || !(elem2 instanceof BooleanDomainElem)) {
+        if (!(elem1 instanceof BooleanDomainElem a) || !(elem2 instanceof BooleanDomainElem b)) {
             throw new IllegalArgumentException(
                 "Expected arguments of the abstract domain of sign analysis.");
         }
-
-        BooleanDomainElem a = (BooleanDomainElem) elem1;
-        BooleanDomainElem b = (BooleanDomainElem) elem2;
 
         if (a.isTop() || b.isTop()) {
             return Top.getInstance();
@@ -73,7 +73,7 @@ public class BooleanLattice extends AbstractDomainLattice {
 
     @Override
     public Iterator<AbstractDomainElement> iterator() {
-        return new Iterator<AbstractDomainElement>() {
+        return new Iterator<>() {
 
             int pos = 0;
             final int size = ABSTRACT_DOMAIN_ELEMS.length;

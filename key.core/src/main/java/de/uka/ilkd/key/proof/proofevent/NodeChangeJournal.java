@@ -1,13 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.proofevent;
 
 
 import java.util.Iterator;
-
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -15,6 +12,12 @@ import de.uka.ilkd.key.proof.GoalListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -34,7 +37,7 @@ public class NodeChangeJournal implements GoalListener {
      * applied to each of them
      */
     private ImmutableMap<Node, NodeChangesHolder> changes =
-        DefaultImmutableMap.<Node, NodeChangesHolder>nilMap();
+        DefaultImmutableMap.nilMap();
 
     /**
      * @param p_goal the original goal/node
@@ -51,11 +54,11 @@ public class NodeChangeJournal implements GoalListener {
      * listeners
      */
     public RuleAppInfo getRuleAppInfo(RuleApp p_ruleApp) {
-        ImmutableList<NodeReplacement> nrs = ImmutableSLList.<NodeReplacement>nil();
+        ImmutableList<NodeReplacement> nrs = ImmutableSLList.nil();
 
         for (final ImmutableMapEntry<Node, NodeChangesHolder> entry : changes) {
             final Node newNode = entry.key();
-            final Goal newGoal = proof.getGoal(newNode);
+            final Goal newGoal = proof.getOpenGoal(newNode);
 
             if (newGoal != null) {
                 final NodeChangesHolder nc = entry.value();
@@ -78,8 +81,9 @@ public class NodeChangeJournal implements GoalListener {
     public void sequentChanged(Goal source, SequentChangeInfo sci) {
         NodeChangesHolder nc = getChangeObj(source.node());
 
-        if (nc != null)
+        if (nc != null) {
             nc.addSCI(sci);
+        }
     }
 
 
@@ -97,8 +101,9 @@ public class NodeChangeJournal implements GoalListener {
             if (it.hasNext()) {
                 while (true) {
                     putChangeObj(it.next().node(), nc);
-                    if (!it.hasNext())
+                    if (!it.hasNext()) {
                         break;
+                    }
                     nc = (NodeChangesHolder) nc.clone();
                 }
             }

@@ -1,6 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.macros.scripts.meta.Option;
@@ -75,10 +77,8 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
     private Strategy getStrategy(StrategyProperties properties) {
         final Profile profile = state.getProof().getServices().getProfile();
 
-        final Iterator<StrategyFactory> supportedStrategies = //
-            profile.supportedStrategies().iterator();
-        while (supportedStrategies.hasNext()) {
-            final StrategyFactory s = supportedStrategies.next();
+        //
+        for (StrategyFactory s : profile.supportedStrategies()) {
             if (state.getProof().getActiveStrategy().name().equals(s.name())) {
                 return s.create(proof, properties);
             }

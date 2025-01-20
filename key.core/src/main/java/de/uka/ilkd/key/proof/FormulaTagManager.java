@@ -1,19 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.util.Debug;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Class to manage the tags of the formulas of a sequent (node). Instances of this class are stored
@@ -33,8 +30,8 @@ public class FormulaTagManager {
      * Create a new manager that is initialised with the formulas of the given sequent
      */
     FormulaTagManager(Goal p_goal) {
-        tagToFormulaInfo = new LinkedHashMap<FormulaTag, FormulaInfo>();
-        pioToTag = new LinkedHashMap<PosInOccurrence, FormulaTag>();
+        tagToFormulaInfo = new LinkedHashMap<>();
+        pioToTag = new LinkedHashMap<>();
         createNewTags(p_goal);
     }
 
@@ -58,8 +55,9 @@ public class FormulaTagManager {
      */
     public PosInOccurrence getPosForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
-        if (info == null)
+        if (info == null) {
             return null;
+        }
         return info.pio;
     }
 
@@ -70,8 +68,9 @@ public class FormulaTagManager {
      */
     public long getAgeForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
-        if (info == null)
+        if (info == null) {
             return 0;
+        }
         return info.age;
     }
 
@@ -97,8 +96,9 @@ public class FormulaTagManager {
     }
 
     private void updateTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-        for (FormulaChangeInfo formulaChangeInfo : sci.modifiedFormulas(p_antec))
+        for (FormulaChangeInfo formulaChangeInfo : sci.modifiedFormulas(p_antec)) {
             updateTag(formulaChangeInfo, sci.sequent(), p_goal);
+        }
     }
 
     private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
@@ -148,9 +148,8 @@ public class FormulaTagManager {
         final Sequent seq = p_goal.sequent();
         final Semisequent ss = p_antec ? seq.antecedent() : seq.succedent();
 
-        for (Object s : ss) {
-            final PosInOccurrence pio =
-                new PosInOccurrence((SequentFormula) s, PosInTerm.getTopLevel(), p_antec);
+        for (SequentFormula s : ss) {
+            final PosInOccurrence pio = new PosInOccurrence(s, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
     }
@@ -182,7 +181,7 @@ public class FormulaTagManager {
     private void updateTag(FormulaChangeInfo p_info, Sequent p_newSeq, Goal p_goal) {
 
 
-        final PosInOccurrence oldPIO = p_info.getPositionOfModification().topLevel();
+        final PosInOccurrence oldPIO = p_info.positionOfModification().topLevel();
         final FormulaTag tag = getTagForPos(oldPIO);
         final FormulaInfo oldInfo = getFormulaInfo(tag);
         final FormulaInfo newInfo = oldInfo.addModification(p_info, p_newSeq, p_goal.getTime());
@@ -207,8 +206,9 @@ public class FormulaTagManager {
     ////////////////////////////////////////////////////////////////////////////
 
     private FormulaInfo getFormulaInfo(FormulaTag p_tag) {
-        if (lastTagQueried != p_tag)
+        if (lastTagQueried != p_tag) {
             putInQueryCache(p_tag, tagToFormulaInfo.get(p_tag));
+        }
         return lastQueryResult;
     }
 
@@ -244,7 +244,7 @@ public class FormulaTagManager {
         public final long age;
 
         public FormulaInfo(PosInOccurrence p_pio, long p_age) {
-            this(p_pio, ImmutableSLList.<FormulaChangeInfo>nil(), p_age);
+            this(p_pio, ImmutableSLList.nil(), p_age);
         }
 
         private FormulaInfo(PosInOccurrence p_pio, ImmutableList<FormulaChangeInfo> p_modifications,
@@ -255,7 +255,7 @@ public class FormulaTagManager {
         }
 
         public FormulaInfo addModification(FormulaChangeInfo p_info, Sequent p_newSeq, long p_age) {
-            final PosInOccurrence newPIO = new PosInOccurrence(p_info.getNewFormula(),
+            final PosInOccurrence newPIO = new PosInOccurrence(p_info.newFormula(),
                 PosInTerm.getTopLevel(), pio.isInAntec());
 
             return new FormulaInfo(newPIO, modifications.prepend(p_info), p_age);

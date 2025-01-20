@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.communication;
+
+import java.io.IOException;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 
-import javax.annotation.Nonnull;
-import java.io.IOException;
+import org.jspecify.annotations.NonNull;
 
 public class CVC4Socket extends AbstractSolverSocket {
 
@@ -13,7 +17,7 @@ public class CVC4Socket extends AbstractSolverSocket {
     }
 
     @Override
-    public void messageIncoming(@Nonnull Pipe pipe, @Nonnull String msg) throws IOException {
+    public void messageIncoming(@NonNull Pipe pipe, @NonNull String msg) throws IOException {
         SolverCommunication sc = pipe.getSolverCommunication();
         if ("".equals(msg.trim())) {
             return;
@@ -32,17 +36,18 @@ public class CVC4Socket extends AbstractSolverSocket {
         // Currently we rely on the solver to terminate after receiving "(exit)". If this does
         // not work in future, it may be that we have to forcibly close the pipe.
         if (sc.getState() == WAIT_FOR_RESULT) {
-            if (msg.contains("\n" + "unsat")) {
+            msg = msg.trim();
+            if (msg.equals("unsat")) {
                 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
                 // pipe.close();
-            } else if (msg.contains("\n" + "sat")) {
+            } else if (msg.equals("sat")) {
                 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
                 // pipe.close();
-            } else if (msg.contains("\n" + "unknown")) {
+            } else if (msg.equals("unknown")) {
                 sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");

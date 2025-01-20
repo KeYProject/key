@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import java.util.EventObject;
-import java.util.LinkedList;
-import java.util.Properties;
+import java.util.*;
 
-import de.uka.ilkd.key.proof.io.AutoSaver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-public class GeneralSettings implements Settings, Cloneable {
+public class GeneralSettings extends AbstractSettings {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneralSettings.class);
+
     /**
      * This parameter disables the possibility to prune in closed branches. It is meant as a
      * fallback solution if storing all closed goals needs too much memory or is not needed. Pruning
@@ -27,25 +31,46 @@ public class GeneralSettings implements Settings, Cloneable {
      * regular settings
      */
     public static boolean disableSpecs = false;
-    private static final String TACLET_FILTER = "[General]StupidMode";
-    private static final String DND_DIRECTION_SENSITIVE_KEY = "[General]DnDDirectionSensitive";
-    private static final String USE_JML_KEY = "[General]UseJML";
-    private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
-    private static final String AUTO_SAVE = "[General]AutoSavePeriod";
 
-    /** The key for storing the ensureSourceConsistency flag in settings */
-    private static final String ENSURE_SOURCE_CONSISTENCY = "[General]EnsureSourceConsistency";
+    private static final String CATEGORY = "General";
 
-    /** minimize interaction is on by default */
+    public static final String TACLET_FILTER = "StupidMode";
+    public static final String DND_DIRECTION_SENSITIVE_KEY = "DnDDirectionSensitive";
+    public static final String USE_JML_KEY = "UseJML";
+
+    public static final String KEY_JML_ENABLED_KEYS = "JML_ENABLED_KEYS";
+
+    public static final String RIGHT_CLICK_MACROS_KEY = "RightClickMacros";
+    public static final String AUTO_SAVE = "AutoSavePeriod";
+
+    /**
+     * The key for storing the ensureSourceConsistency flag in settings
+     */
+    private static final String ENSURE_SOURCE_CONSISTENCY = "EnsureSourceConsistency";
+
+    /** Default value for {@link #getJmlEnabledKeys()} */
+    public static final Set<String> JML_ENABLED_KEYS_DEFAULT = Set.of("key");
+
+    private Set<String> jmlEnabledKeys = new TreeSet<>(JML_ENABLED_KEYS_DEFAULT);
+
+    /**
+     * minimize interaction is on by default
+     */
     private boolean tacletFilter = true;
 
-    /** is drag and drop instantiation direction sensitive */
+    /**
+     * is drag and drop instantiation direction sensitive
+     */
     private boolean dndDirectionSensitive = true;
 
-    /** launches the rightclick the macro menu. on by default. */
+    /**
+     * launches the rightclick the macro menu. on by default.
+     */
     private boolean rightClickMacros = true;
 
-    /** JML is active by default */
+    /**
+     * JML is active by default
+     */
     private boolean useJML = true;
 
     /**
@@ -59,14 +84,21 @@ public class GeneralSettings implements Settings, Cloneable {
      */
     private boolean ensureSourceConsistency = true;
 
-    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
-
     GeneralSettings() {
-        addSettingsListener(AutoSaver.settingsListener);
+        // addSettingsListener(AutoSaver.settingsListener);
     }
 
-    // getter
-    public boolean tacletFilter() {
+    public Set<String> getJmlEnabledKeys() {
+        return jmlEnabledKeys;
+    }
+
+    public void setJmlEnabledKeys(Set<String> jmlEnabledKeys) {
+        var oldValue = this.jmlEnabledKeys;
+        this.jmlEnabledKeys = Objects.requireNonNull(jmlEnabledKeys);
+        firePropertyChange(KEY_JML_ENABLED_KEYS, oldValue, jmlEnabledKeys);
+    }
+
+    public boolean getTacletFilter() {
         return tacletFilter;
     }
 
@@ -78,7 +110,7 @@ public class GeneralSettings implements Settings, Cloneable {
         return rightClickMacros;
     }
 
-    public boolean useJML() {
+    public boolean isUseJML() {
         return useJML && !disableSpecs;
     }
 
@@ -92,36 +124,33 @@ public class GeneralSettings implements Settings, Cloneable {
 
     // setter
     public void setTacletFilter(boolean b) {
-        if (tacletFilter != b) {
-            tacletFilter = b;
-            fireSettingsChanged();
-        }
+        var old = tacletFilter;
+        tacletFilter = b;
+        firePropertyChange(TACLET_FILTER, old, b);
     }
 
     public void setDnDDirectionSensitivity(boolean b) {
-        if (dndDirectionSensitive != b) {
-            dndDirectionSensitive = b;
-            fireSettingsChanged();
-        }
+        var old = dndDirectionSensitive;
+        dndDirectionSensitive = b;
+        firePropertyChange(DND_DIRECTION_SENSITIVE_KEY, old, dndDirectionSensitive);
     }
 
     public void setRightClickMacros(boolean b) {
-        if (this.rightClickMacros != b) {
-            rightClickMacros = b;
-            fireSettingsChanged();
-        }
+        var old = rightClickMacros;
+        rightClickMacros = b;
+        firePropertyChange(RIGHT_CLICK_MACROS_KEY, old, rightClickMacros);
     }
 
     public void setUseJML(boolean b) {
-        if (useJML != b) {
-            useJML = b;
-            fireSettingsChanged();
-        }
+        var old = useJML;
+        useJML = b;
+        firePropertyChange(USE_JML_KEY, old, useJML);
     }
 
     public void setAutoSave(int period) {
+        var old = autoSave;
         autoSave = period;
-        fireSettingsChanged();
+        firePropertyChange(AUTO_SAVE, old, autoSave);
     }
 
     /**
@@ -131,10 +160,9 @@ public class GeneralSettings implements Settings, Cloneable {
      * @param b the new truth value of the flag
      */
     public void setEnsureSourceConsistency(boolean b) {
-        if (ensureSourceConsistency != b) {
-            ensureSourceConsistency = b;
-            fireSettingsChanged();
-        }
+        var old = ensureSourceConsistency;
+        ensureSourceConsistency = b;
+        firePropertyChange(ENSURE_SOURCE_CONSISTENCY, old, ensureSourceConsistency);
     }
 
     /**
@@ -142,83 +170,113 @@ public class GeneralSettings implements Settings, Cloneable {
      * object in a way that it represents the stored settings
      */
     public void readSettings(Properties props) {
-        String val = props.getProperty(TACLET_FILTER);
+        var prefix = "[" + CATEGORY + "]";
+        String val = props.getProperty(prefix + TACLET_FILTER);
         if (val != null) {
-            tacletFilter = Boolean.valueOf(val).booleanValue();
+            setTacletFilter(Boolean.parseBoolean(val));
         }
 
-        val = props.getProperty(DND_DIRECTION_SENSITIVE_KEY);
+        val = props.getProperty(prefix + DND_DIRECTION_SENSITIVE_KEY);
         if (val != null) {
-            dndDirectionSensitive = Boolean.valueOf(val).booleanValue();
+            dndDirectionSensitive = Boolean.parseBoolean(val);
         }
 
-        val = props.getProperty(RIGHT_CLICK_MACROS_KEY);
+        val = props.getProperty(prefix + RIGHT_CLICK_MACROS_KEY);
         if (val != null) {
-            rightClickMacros = Boolean.valueOf(val).booleanValue();
+            setRightClickMacros(Boolean.parseBoolean(val));
         }
 
-        val = props.getProperty(USE_JML_KEY);
+        val = props.getProperty(prefix + USE_JML_KEY);
         if (val != null) {
-            useJML = Boolean.valueOf(val).booleanValue();
+            setUseJML(Boolean.parseBoolean(val));
         }
 
-        val = props.getProperty(AUTO_SAVE);
+        val = props.getProperty(prefix + AUTO_SAVE);
         if (val != null) {
             try {
-                autoSave = Integer.parseInt(val);
-                if (autoSave < 0)
-                    autoSave = 0;
+                setAutoSave(Integer.parseInt(val));
+                if (autoSave < 0) {
+                    setAutoSave(0);
+                }
             } catch (NumberFormatException e) {
-                autoSave = 0;
+                setAutoSave(0);
             }
         }
 
-        val = props.getProperty(ENSURE_SOURCE_CONSISTENCY);
+        val = props.getProperty(prefix + ENSURE_SOURCE_CONSISTENCY);
         if (val != null) {
-            ensureSourceConsistency = Boolean.valueOf(val).booleanValue();
+            setEnsureSourceConsistency(Boolean.parseBoolean(val));
+        }
+
+        {
+            String sysProp = System.getProperty(KEY_JML_ENABLED_KEYS);
+            if (sysProp != null) {
+                val = sysProp;
+                LOGGER.warn("Use system property -P{}={}", KEY_JML_ENABLED_KEYS, sysProp);
+            } else {
+                val = props.getProperty(prefix + KEY_JML_ENABLED_KEYS);
+            }
+
+            if (val != null) {
+                setJmlEnabledKeys(new TreeSet<>(Arrays.stream(val.split(",")).toList()));
+            }
         }
     }
 
     /**
      * implements the method required by the Settings interface. The settings are written to the
-     * given Properties object. Only entries of the form <key> = <value> (,<value>)* are allowed.
+     * given Properties object. Only entries of the form
+     * <key> = <value> (,<value>)* are allowed.
      *
      * @param props the Properties object where to write the settings as (key, value) pair
      */
+    @Override
     public void writeSettings(Properties props) {
-        props.setProperty(TACLET_FILTER, "" + tacletFilter);
-        props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
-        props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
-        props.setProperty(USE_JML_KEY, "" + useJML);
-        props.setProperty(AUTO_SAVE, "" + autoSave);
-        props.setProperty(ENSURE_SOURCE_CONSISTENCY, "" + ensureSourceConsistency);
+        var prefix = "[" + CATEGORY + "]";
+        props.setProperty(prefix + TACLET_FILTER, String.valueOf(tacletFilter));
+        props.setProperty(prefix + DND_DIRECTION_SENSITIVE_KEY,
+            String.valueOf(dndDirectionSensitive));
+        props.setProperty(prefix + RIGHT_CLICK_MACROS_KEY, String.valueOf(rightClickMacros));
+        props.setProperty(prefix + USE_JML_KEY, String.valueOf(useJML));
+        props.setProperty(prefix + AUTO_SAVE, String.valueOf(autoSave));
+        props.setProperty(prefix + ENSURE_SOURCE_CONSISTENCY,
+            String.valueOf(ensureSourceConsistency));
+        props.setProperty(KEY_JML_ENABLED_KEYS, String.join(",", jmlEnabledKeys));
     }
 
-    /**
-     * sends the message that the state of this setting has been changed to its registered listeners
-     * (not thread-safe)
-     */
-    protected void fireSettingsChanged() {
-        for (SettingsListener aListenerList : listenerList) {
-            aListenerList.settingsChanged(new EventObject(this));
+    @Override
+    public void readSettings(Configuration props) {
+        setTacletFilter(props.getBool(TACLET_FILTER));
+        setDnDDirectionSensitivity(props.getBool(DND_DIRECTION_SENSITIVE_KEY));
+        setRightClickMacros(props.getBool(RIGHT_CLICK_MACROS_KEY));
+        setUseJML(props.getBool(USE_JML_KEY));
+        try {
+            var autoSave = props.getInt(AUTO_SAVE);
+            setAutoSave(autoSave);
+            if (autoSave < 0)
+                setAutoSave(0);
+        } catch (NumberFormatException e) {
+            setAutoSave(0);
+        }
+        setEnsureSourceConsistency(props.getBool(ENSURE_SOURCE_CONSISTENCY));
+
+        var sysProp = System.getProperty(KEY_JML_ENABLED_KEYS);
+        if (sysProp != null) {
+            LOGGER.warn("Use system property -P{}={}", KEY_JML_ENABLED_KEYS, sysProp);
+            setJmlEnabledKeys(new TreeSet<>(Arrays.stream(sysProp.split(",")).toList()));
+        } else {
+            setJmlEnabledKeys(new TreeSet<>(props.getStringList(KEY_JML_ENABLED_KEYS)));
         }
     }
 
-    /**
-     * adds a listener to the settings object
-     *
-     * @param l the listener
-     */
-    public void addSettingsListener(SettingsListener l) {
-        listenerList.add(l);
-    }
-
-    /**
-     * removes the listener from the settings object
-     *
-     * @param l the listener to remove
-     */
-    public void removeSettingsListener(SettingsListener l) {
-        listenerList.remove(l);
+    @Override
+    public void writeSettings(Configuration props) {
+        props.set(TACLET_FILTER, tacletFilter);
+        props.set(DND_DIRECTION_SENSITIVE_KEY, dndDirectionSensitive);
+        props.set(RIGHT_CLICK_MACROS_KEY, rightClickMacros);
+        props.set(USE_JML_KEY, useJML);
+        props.set(AUTO_SAVE, autoSave);
+        props.set(ENSURE_SOURCE_CONSISTENCY, ensureSourceConsistency);
+        props.set(KEY_JML_ENABLED_KEYS, jmlEnabledKeys.stream().toList());
     }
 }

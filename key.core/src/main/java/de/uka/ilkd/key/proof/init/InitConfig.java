@@ -1,23 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.*;
 
-import de.uka.ilkd.key.rule.*;
-import javax.annotation.Nonnull;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -26,8 +20,18 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * an instance of this class describes the initial configuration of the prover. This includes sorts,
@@ -50,7 +54,7 @@ public class InitConfig {
      * maps categories to their default choice (both represented as Strings), which is used if no
      * other choice is specified in the problemfile
      */
-    private HashMap<String, String> category2DefaultChoice = new LinkedHashMap<String, String>();
+    private Map<String, String> category2DefaultChoice = new LinkedHashMap<>();
 
     /**
      * maps taclets to their TacletBuilders. This information is needed when a taclet contains
@@ -65,7 +69,7 @@ public class InitConfig {
      * allow to use different ruleset modelling or skipping certain features (e.g. nullpointer
      * checks when resolving references)
      */
-    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
+    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
 
     /** HashMap for quick lookups taclet name->taclet */
     private Map<Name, Taclet> activatedTacletCache = null;
@@ -86,8 +90,8 @@ public class InitConfig {
     public InitConfig(Services services) {
         this.services = services;
 
-        category2DefaultChoice =
-            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+        category2DefaultChoice = new HashMap<>(
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices());
     }
 
 
@@ -121,7 +125,7 @@ public class InitConfig {
      *
      * @return true if the default was successfully set
      */
-    public boolean addCategoryDefaultChoice(@Nonnull String category, @Nonnull String choice) {
+    public boolean addCategoryDefaultChoice(@NonNull String category, @NonNull String choice) {
         if (!category2DefaultChoice.containsKey(category)) {
             category2DefaultChoice.put(category, choice);
             return true;
@@ -132,7 +136,7 @@ public class InitConfig {
     /**
      * Adds default choices given in {@code init}. Not overriding previous default choices.
      */
-    public void addCategory2DefaultChoices(@Nonnull Map<String, String> init) {
+    public void addCategory2DefaultChoices(@NonNull Map<String, String> init) {
         boolean changed = false;
         for (final Map.Entry<String, String> entry : init.entrySet()) {
             changed = addCategoryDefaultChoice(entry.getKey(), entry.getValue()) || changed;
@@ -140,9 +144,8 @@ public class InitConfig {
         if (changed) {
             // FIXME weigl: I do not understand why the default choices are back progragated!
             // For me this is a design flaw.
-            @SuppressWarnings("unchecked")
-            HashMap<String, String> clone =
-                (HashMap<String, String>) category2DefaultChoice.clone();
+            Map<String, String> clone =
+                new HashMap<>(category2DefaultChoice);
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
             // invalidate active taclet cache
             activatedTacletCache = null;
@@ -175,21 +178,21 @@ public class InitConfig {
         category2DefaultChoice =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
 
-        @SuppressWarnings("unchecked")
-        HashMap<String, String> c2DC = (HashMap<String, String>) category2DefaultChoice.clone();
+        HashMap<String, String> c2DC = new HashMap<>(category2DefaultChoice);
         for (final Choice c : activatedChoices) {
             c2DC.remove(c.category());
         }
 
         ImmutableList<Choice> category2DefaultChoiceList = ImmutableSLList.nil();
         for (final String s : c2DC.values()) {
-            final Choice c = (Choice) choiceNS().lookup(new Name(s));
+            final Choice c = choiceNS().lookup(new Name(s));
             if (c != null) {
                 category2DefaultChoiceList = category2DefaultChoiceList.prepend(c);
             }
         }
         this.activatedChoices = activatedChoices
-                .union(DefaultImmutableSet.fromImmutableList(category2DefaultChoiceList));
+                .union(
+                    DefaultImmutableSet.fromImmutableList(category2DefaultChoiceList));
 
         // invalidate active taclet cache
         activatedTacletCache = null;
@@ -253,7 +256,7 @@ public class InitConfig {
         if (activatedTacletCache != null) {
             return;
         }
-        final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
+        final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<>();
         var choices = Collections.unmodifiableSet(activatedChoices.toSet());
         for (Taclet t : taclets) {
             TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
@@ -277,8 +280,8 @@ public class InitConfig {
      */
     public ImmutableList<BuiltInRule> builtInRules() {
         Profile profile = getProfile();
-        return (profile == null ? ImmutableSLList.<BuiltInRule>nil()
-                : profile.getStandardRules().getStandardBuiltInRules());
+        return (profile == null ? ImmutableSLList.nil()
+                : profile.getStandardRules().standardBuiltInRules());
     }
 
 
@@ -343,7 +346,7 @@ public class InitConfig {
      *
      * @return a non-null namespace
      */
-    public Namespace<Function> funcNS() {
+    public Namespace<JFunction> funcNS() {
         return namespaces().functions();
     }
 
@@ -426,7 +429,7 @@ public class InitConfig {
             ic.setSettings(new ProofSettings(settings));
         }
         ic.setActivatedChoices(activatedChoices);
-        ic.category2DefaultChoice = ((HashMap<String, String>) category2DefaultChoice.clone());
+        ic.category2DefaultChoice = new HashMap<>(category2DefaultChoice);
         ic.setTaclet2Builder(
             (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
         ic.taclets = taclets;

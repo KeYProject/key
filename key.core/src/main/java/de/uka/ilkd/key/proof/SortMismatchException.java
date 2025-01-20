@@ -1,6 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.java.Position;
+
+import org.key_project.logic.sort.Sort;
 
 
 public class SortMismatchException extends SVInstantiationExceptionWithPosition {
@@ -9,11 +14,11 @@ public class SortMismatchException extends SVInstantiationExceptionWithPosition 
      *
      */
     private static final long serialVersionUID = -5791743260310763761L;
-    private String toInstantiate;
-    private Sort givenSort;
+    private final String toInstantiate;
+    private final Sort givenSort;
 
-    public SortMismatchException(String toInstantiate, Sort givenSort, int row, int column) {
-        super("Sorts mismatch", row, column, false);
+    public SortMismatchException(String toInstantiate, Sort givenSort, Position position) {
+        super("Sorts mismatch", position, false);
         this.toInstantiate = toInstantiate;
         this.givenSort = givenSort;
     }

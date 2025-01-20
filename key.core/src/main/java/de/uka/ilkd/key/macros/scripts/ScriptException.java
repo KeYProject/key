@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
-import javax.annotation.Nullable;
-import java.net.URL;
+import org.jspecify.annotations.Nullable;
 
 public class ScriptException extends Exception implements HasLocation {
 
@@ -17,22 +19,14 @@ public class ScriptException extends Exception implements HasLocation {
         this.location = null;
     }
 
-    public ScriptException(String message, URL url, int line, int col, Throwable cause) {
+    public ScriptException(String message, Location location, Throwable cause) {
         super(message, cause);
-        if (url != null) {
-            this.location = new Location(url, line, col);
-        } else {
-            this.location = null;
-        }
+        this.location = location;
     }
 
-    public ScriptException(String message, URL url, int line, int col) {
+    public ScriptException(String message, Location location) {
         super(message);
-        if (url != null) {
-            this.location = new Location(url, line, col);
-        } else {
-            this.location = null;
-        }
+        this.location = location;
     }
 
 
@@ -51,9 +45,8 @@ public class ScriptException extends Exception implements HasLocation {
         this.location = null;
     }
 
-    @Nullable
     @Override
-    public Location getLocation() {
+    public @Nullable Location getLocation() {
         return location;
     }
 

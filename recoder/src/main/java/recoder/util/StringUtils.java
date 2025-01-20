@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 import java.util.StringTokenizer;
@@ -71,8 +73,9 @@ public class StringUtils {
      */
     public static String basename(String s) {
         int lastIndex = s.lastIndexOf(java.io.File.separator);
-        if (lastIndex == -1)
+        if (lastIndex == -1) {
             return s;
+        }
         return s.substring(lastIndex + 1);
     }
 
@@ -81,8 +84,9 @@ public class StringUtils {
      */
     public static String basenameDot(String s) {
         int lastIndex = s.lastIndexOf(".");
-        if (lastIndex == -1)
+        if (lastIndex == -1) {
             return s;
+        }
         return s.substring(lastIndex + 1);
     }
 
@@ -91,8 +95,9 @@ public class StringUtils {
      */
     public static String cutSuffix(String s) {
         int lastIndex = s.lastIndexOf(".");
-        if (lastIndex == -1)
+        if (lastIndex == -1) {
             return s;
+        }
         return s.substring(0, lastIndex);
     }
 
@@ -101,8 +106,9 @@ public class StringUtils {
      */
     public static String cutPrefix(String s) {
         int firstIndex = s.indexOf('.');
-        if (firstIndex == -1)
+        if (firstIndex == -1) {
             return null;
+        }
         return s.substring(firstIndex + 1);
     }
 
@@ -112,10 +118,12 @@ public class StringUtils {
     public static String removeDoubleQuotes(String s) {
         int firstIndex = s.indexOf("\"");
         int lastIndex = s.lastIndexOf("\"");
-        if (lastIndex == -1 && firstIndex == -1)
+        if (lastIndex == -1 && firstIndex == -1) {
             return s; // none in.
-        if (lastIndex == firstIndex)
+        }
+        if (lastIndex == firstIndex) {
             return s; // one in.
+        }
         return s.substring(firstIndex + 1, lastIndex);
     }
 
@@ -124,8 +132,9 @@ public class StringUtils {
      */
     public static String getPrefix(String s) {
         int firstIndex = s.indexOf('.');
-        if (firstIndex == -1)
+        if (firstIndex == -1) {
             return null;
+        }
         return s.substring(0, firstIndex);
     }
 
@@ -134,8 +143,9 @@ public class StringUtils {
      */
     public static String getSuffix(String s) {
         int lastIndex = s.lastIndexOf(".");
-        if (lastIndex == -1)
+        if (lastIndex == -1) {
             return null;
+        }
         return s.substring(lastIndex + 1);
     }
 
@@ -172,14 +182,14 @@ public class StringUtils {
      * Transform a String[] to a string, separated by blanks.
      */
     public static String stringArray2String(String[] argv) {
-        String returnString = "";
+        StringBuilder returnString = new StringBuilder();
         for (int i = 0; i < argv.length; i++) {
-            returnString = returnString + argv[i];
+            returnString.append(argv[i]);
             if (i <= argv.length - 1) {
-                returnString = returnString + " ";
+                returnString.append(" ");
             }
         }
-        return returnString;
+        return returnString.toString();
     }
 
     /**
@@ -189,8 +199,9 @@ public class StringUtils {
         StringTokenizer tokenizer = new StringTokenizer(s, " ");
         int tokenCount = tokenizer.countTokens();
         String[] returnArray = new String[tokenCount + 1];
-        if (tokenCount == 0)
+        if (tokenCount == 0) {
             return returnArray;
+        }
 
         int i = 0;
         while (tokenizer.hasMoreTokens()) {
@@ -211,22 +222,30 @@ public class StringUtils {
      * @throws IllegalArgumentException if the value cannot be interpreted.
      */
     public static boolean parseBooleanProperty(String str) {
-        if (str.equalsIgnoreCase("true"))
+        if (str.equalsIgnoreCase("true")) {
             return true;
-        if (str.equalsIgnoreCase("false"))
+        }
+        if (str.equalsIgnoreCase("false")) {
             return false;
-        if (str.equalsIgnoreCase("t"))
+        }
+        if (str.equalsIgnoreCase("t")) {
             return true;
-        if (str.equalsIgnoreCase("f"))
+        }
+        if (str.equalsIgnoreCase("f")) {
             return false;
-        if (str.equalsIgnoreCase("yes"))
+        }
+        if (str.equalsIgnoreCase("yes")) {
             return true;
-        if (str.equalsIgnoreCase("no"))
+        }
+        if (str.equalsIgnoreCase("no")) {
             return false;
-        if (str.equals("1"))
+        }
+        if (str.equals("1")) {
             return true;
-        if (str.equals("0"))
+        }
+        if (str.equals("0")) {
             return false;
+        }
         throw new IllegalArgumentException(str + " cannot be interpreted as boolean value");
     }
 

@@ -1,6 +1,11 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.ProgramFactory;
 import recoder.abstraction.ClassType;
@@ -10,9 +15,6 @@ import recoder.java.reference.PackageReference;
 import recoder.service.ChangeHistory;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * this class implements basic functions for package handling.
@@ -37,8 +39,9 @@ public class PackageKit {
         PackageReference result = null;
         String name = p.getFullName();
         /* Fix by T.Gutzmann */
-        if (name.equals(""))
+        if (name.isEmpty()) {
             return null; // null is admissible as prefix
+        }
         int i, j = -1;
         do {
             i = j + 1;
@@ -57,7 +60,7 @@ public class PackageKit {
      *         {@link recoder.java.declaration.TypeDeclaration}s.
      */
     public static List<ClassType> getNonSourcePackageTypes(Package pkg) {
-        List<ClassType> result = new ArrayList<ClassType>();
+        List<ClassType> result = new ArrayList<>();
         List<? extends ClassType> classes = pkg.getTypes();
         for (int i = classes.size() - 1; i >= 0; i -= 1) {
             ClassType ct = classes.get(i);

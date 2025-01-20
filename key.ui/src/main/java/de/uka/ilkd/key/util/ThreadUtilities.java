@@ -1,15 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
+
+import java.awt.EventQueue;
+import java.lang.reflect.InvocationTargetException;
+import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.EventQueue;
-import java.lang.reflect.InvocationTargetException;
-
-import javax.swing.SwingUtilities;
-
 public final class ThreadUtilities {
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadUtilities.class);
+
+    private ThreadUtilities() {
+    }
 
 
     /**
@@ -20,9 +25,9 @@ public final class ThreadUtilities {
      * @param runner Runnable capturing code to execute on the awt thread.
      */
     public static void invokeAndWait(Runnable runner) {
-        if (SwingUtilities.isEventDispatchThread())
+        if (SwingUtilities.isEventDispatchThread()) {
             runner.run();
-        else {
+        } else {
             try {
                 SwingUtilities.invokeAndWait(runner);
             } catch (InterruptedException e) {
@@ -50,4 +55,22 @@ public final class ThreadUtilities {
         }
     }
 
+    /**
+     * Get all running threads.
+     *
+     * @return array of threads, some entries may be null
+     */
+    public static Thread[] getThreads() {
+        ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
+        ThreadGroup parentGroup;
+        while ((parentGroup = rootGroup.getParent()) != null) {
+            rootGroup = parentGroup;
+        }
+
+        Thread[] threads = new Thread[rootGroup.activeCount() + 1];
+        while (rootGroup.enumerate(threads, true) == threads.length) {
+            threads = new Thread[threads.length * 2];
+        }
+        return threads;
+    }
 }

@@ -1,17 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression.literal;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.logic.Name;
+
+import org.key_project.logic.Name;
+import org.key_project.util.ExtList;
 
 /**
  * Double literal.
@@ -42,7 +42,7 @@ public class DoubleLiteral extends Literal {
      */
 
     public DoubleLiteral(double value) {
-        this.value = "" + value;
+        this.value = String.valueOf(value);
     }
 
     /**
@@ -67,11 +67,12 @@ public class DoubleLiteral extends Literal {
         this.value = value;
     }
 
-    /**
-     * tests if equals
-     */
-    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o instanceof DoubleLiteral)) {
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
         return ((DoubleLiteral) o).getValue().equals(getValue());
@@ -80,10 +81,6 @@ public class DoubleLiteral extends Literal {
     @Override
     protected int computeHashCode() {
         return 37 * super.computeHashCode() + getValue().hashCode();
-    }
-
-    public boolean equals(Object o) {
-        return super.equals(o);
     }
 
     /**
@@ -104,10 +101,6 @@ public class DoubleLiteral extends Literal {
      */
     public void visit(Visitor v) {
         v.performActionOnDoubleLiteral(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printDoubleLiteral(this);
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {

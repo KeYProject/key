@@ -1,12 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression;
 
-import java.io.IOException;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.visitor.Visitor;
 
 
 /**
@@ -37,9 +37,5 @@ public class PassiveExpression extends ParenthesizedExpression {
      */
     public void visit(Visitor v) {
         v.performActionOnPassiveExpression(this);
-    }
-
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        w.printPassiveExpression(this);
     }
 }

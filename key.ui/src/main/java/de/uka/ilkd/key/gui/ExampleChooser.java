@@ -1,16 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
-import org.key_project.util.java.IOUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -18,10 +10,29 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.key_project.util.java.IOUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Dialog to choose an example to load.
+ * May be opened automatically when KeY starts.
+ */
 public final class ExampleChooser extends JDialog {
     /**
      * This path is also accessed by the Eclipse integration of KeY to find the right examples.
@@ -238,9 +249,14 @@ public final class ExampleChooser extends JDialog {
         exampleList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    loadButton.doClick();
+                // row is -1 when the user does not click on an entry but on the background
+                int row = exampleList.getRowForLocation(e.getX(), e.getY());
+
+                // Check that it is a double click on an item, not a folder or the background
+                if (e.getClickCount() != 2 || row == -1 || selectedExample == null) {
+                    return;
                 }
+                loadButton.doClick();
             }
         });
         final JScrollPane exampleScrollPane = new JScrollPane(exampleList);
@@ -263,11 +279,21 @@ public final class ExampleChooser extends JDialog {
                 .setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) buttonDim.getHeight() + 10));
         getContentPane().add(buttonPanel);
 
+        // create the checkbox to hide example load on next startup
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        JCheckBox showAgainCheckbox =
+            new JCheckBox("Show this dialog on startup", vs.getShowLoadExamplesDialog());
+        buttonPanel.add(showAgainCheckbox);
+        showAgainCheckbox.addActionListener(e -> {
+            vs.setShowLoadExamplesDialog(showAgainCheckbox.isSelected());
+        });
+
         // create "load" button
         loadButton = new JButton("Load Example");
         loadButton.addActionListener(e -> {
-            if (selectedExample == null)
+            if (selectedExample == null) {
                 throw new RuntimeException("No example selected");
+            }
             fileToLoad = selectedExample.getObligationFile();
             setVisible(false);
         });
@@ -277,10 +303,12 @@ public final class ExampleChooser extends JDialog {
         // create "load proof" button
         loadProofButton = new JButton("Load Proof");
         loadProofButton.addActionListener(e -> {
-            if (selectedExample == null)
+            if (selectedExample == null) {
                 throw new IllegalStateException("No example selected");
-            if (!selectedExample.hasProof())
+            }
+            if (!selectedExample.hasProof()) {
                 throw new IllegalStateException("Selected example has no proof.");
+            }
             fileToLoad = selectedExample.getProofFile();
             setVisible(false);
         });
@@ -294,6 +322,7 @@ public final class ExampleChooser extends JDialog {
         });
         buttonPanel.add(cancelButton);
         GuiUtilities.attachClickOnEscListener(cancelButton);
+
 
         // select first example
         DefaultMutableTreeNode firstLeaf =
@@ -337,7 +366,7 @@ public final class ExampleChooser extends JDialog {
 
     private static StringBuilder extractDescription(File file, StringBuilder sb,
             Properties properties) {
-        try (BufferedReader r = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader r = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             String line;
             boolean emptyLineSeen = false;
             while ((line = r.readLine()) != null) {
@@ -376,8 +405,7 @@ public final class ExampleChooser extends JDialog {
         Object nodeObj = node.getUserObject();
         tabPane.removeAll();
 
-        if (nodeObj instanceof Example) {
-            Example example = (Example) nodeObj;
+        if (nodeObj instanceof Example example) {
 
             if (example != selectedExample) {
                 addTab(example.getDescription(), "Description", true);
@@ -460,7 +488,8 @@ public final class ExampleChooser extends JDialog {
 
         String line;
         final File index = new File(new File(examplesDir, "index"), "samplesIndex.txt");
-        try (BufferedReader br = new BufferedReader(new FileReader(index))) {
+        try (BufferedReader br =
+            new BufferedReader(new FileReader(index, StandardCharsets.UTF_8))) {
             while ((line = br.readLine()) != null) {
                 line = line.trim();
                 if (line.startsWith("#") || line.length() == 0) {

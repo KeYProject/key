@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.reference;
 
 import recoder.java.*;
@@ -125,10 +127,12 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     public int getExpressionCount() {
         int c = 0;
-        if (accessPath instanceof Expression)
+        if (accessPath instanceof Expression) {
             c += 1;
-        if (inits != null)
+        }
+        if (inits != null) {
             c += inits.size();
+        }
         return c;
     }
 
@@ -140,8 +144,9 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     public Expression getExpressionAt(int index) {
         if (accessPath instanceof Expression) {
-            if (index == 0)
+            if (index == 0) {
                 return (Expression) accessPath;
+            }
             index--;
         }
         if (inits != null) {
@@ -157,7 +162,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
@@ -262,10 +267,12 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     public int getChildCount() {
         int result = 0;
-        if (accessPath != null)
+        if (accessPath != null) {
             result++;
-        if (inits != null)
+        }
+        if (inits != null) {
             result += inits.size();
+        }
         return result;
     }
 
@@ -279,8 +286,9 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     public ProgramElement getChildAt(int index) {
         if (accessPath != null) {
-            if (index == 0)
+            if (index == 0) {
                 return accessPath;
+            }
             index--;
         }
         if (inits != null) {

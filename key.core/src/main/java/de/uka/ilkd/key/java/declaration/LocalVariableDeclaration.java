@@ -1,13 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.LoopInitializer;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Local variable declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -42,7 +44,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(Modifier[] mods, TypeReference typeRef,
             VariableSpecification[] vars) {
         super(mods, typeRef, false);
-        this.varSpecs = new ImmutableArray<VariableSpecification>(vars);
+        this.varSpecs = new ImmutableArray<>(vars);
     }
 
     /**
@@ -52,7 +54,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      * @param var the variable specification
      */
     public LocalVariableDeclaration(TypeReference typeRef, VariableSpecification var) {
-        this(new ImmutableArray<Modifier>(new Modifier[0]), typeRef, var);
+        this(new ImmutableArray<>(new Modifier[0]), typeRef, var);
     }
 
 
@@ -66,7 +68,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
             VariableSpecification var) {
         super(mods, typeRef, false);
-        this.varSpecs = new ImmutableArray<VariableSpecification>(var);
+        this.varSpecs = new ImmutableArray<>(var);
     }
 
     /**
@@ -79,7 +81,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
             VariableSpecification[] vars) {
         super(mods, typeRef, false);
-        this.varSpecs = new ImmutableArray<VariableSpecification>(vars);
+        this.varSpecs = new ImmutableArray<>(vars);
     }
 
 
@@ -95,7 +97,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(ExtList children) {
         super(children, false);
 
-        this.varSpecs = new ImmutableArray<VariableSpecification>(
+        this.varSpecs = new ImmutableArray<>(
             children.collect(VariableSpecification.class));
     }
 
@@ -121,12 +123,15 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (varSpecs != null)
+        }
+        if (varSpecs != null) {
             result += varSpecs.size();
+        }
         return result;
     }
 
@@ -148,8 +153,9 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (varSpecs != null) {
@@ -206,10 +212,6 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      */
     public void visit(Visitor v) {
         v.performActionOnLocalVariableDeclaration(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printLocalVariableDeclaration(this);
     }
 
 }

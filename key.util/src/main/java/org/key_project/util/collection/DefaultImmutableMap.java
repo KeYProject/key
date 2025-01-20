@@ -1,76 +1,84 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.collection;
 
 import java.util.Iterator;
+import java.util.Objects;
+
+import org.key_project.util.Strings;
+
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
- * This class implements ImmMap<S,T> and provides a persistent Map. It is a simple implementation
- * like lists
+ * This class implements {@code ImmutableMap<S,T>} and provides a persistent map.
+ * It is a simple implementation like lists
  */
-public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
-
-    /**
-     * generated serial
-     */
-    private static final long serialVersionUID = 3268346732418187405L;
+public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     /** the empty map */
+    private static final DefaultImmutableMap<?, ?> EMPTY_MAP = new DefaultImmutableMap<>();
 
     @SuppressWarnings("unchecked")
     public static <S, T> DefaultImmutableMap<S, T> nilMap() {
-        return (DefaultImmutableMap<S, T>) NILMap.EMPTY_MAP;
+        return (DefaultImmutableMap<S, T>) EMPTY_MAP;
     }
 
-    private final DefaultImmutableMap<S, T> parent;
+    /**
+     * The map this map builds on. Lookups will also consider entries in this map if the key
+     * does not match {@link #entry}.
+     */
+    private final @Nullable DefaultImmutableMap<S, T> parent;
 
-    /** list of pairs (key,value) */
-    private final ImmutableMapEntry<S, T> entry;
+    /**
+     * The (key, value) mapping last inserted into this map.
+     */
+    private final @Nullable ImmutableMapEntry<S, T> entry;
 
+    /**
+     * Number of entries in the map. Equal to <code>1 + parent.size</code> if entry is not null,
+     * <code>parent.size</code> otherwise.
+     */
     private final int size;
 
     /** only for use by NILMap */
-    protected DefaultImmutableMap() {
-        entry = null;
+    private DefaultImmutableMap() {
+        this.entry = null;
         this.parent = null;
         this.size = 0;
     }
 
-
-    /** creates new map with mapping entry */
-    protected DefaultImmutableMap(ImmutableMapEntry<S, T> entry) {
-        if (entry == null)
-            throw new RuntimeException("'null' is not allowed as entry");
-        this.entry = entry;
-        this.parent = DefaultImmutableMap.<S, T>nilMap();
-        this.size = 1;
-    }
-
     /** creates new map with mapping entry and parent map */
-    protected DefaultImmutableMap(ImmutableMapEntry<S, T> entry, DefaultImmutableMap<S, T> parent) {
-        if (entry == null)
-            throw new IllegalArgumentException("'null' is not allowed as entry");
-        this.entry = entry;
+    private DefaultImmutableMap(ImmutableMapEntry<S, T> entry, DefaultImmutableMap<S, T> parent) {
+        this.entry = Objects.requireNonNull(entry);
         this.parent = parent;
         this.size = parent.size + 1;
     }
 
-
     /**
-     * inserts mapping <key,val> into the map (old map is not modified) if key exists old entry has
+     * inserts mapping {@code <key,val>} into the map (old map is not modified) if key exists old
+     * entry has
      * to be removed {@code null} is not allowed for key or value.
      *
      * @param key a S to be used as key
      * @param value a T to be stored as value
-     * @return a ImmMap<S,T> including the <key, value> pair and all other pairs of the current map
+     * @return a ImmutableMap including the {@code <key, value>}-pair and all other pairs of the
+     *         current map
      *         with keys different from the given key
      */
     public ImmutableMap<S, T> put(S key, T value) {
-        return new DefaultImmutableMap<S, T>(new MapEntry<S, T>(key, value), this.remove(key));
+        return new DefaultImmutableMap<>(new MapEntry<>(key, value), this.remove(key));
     }
 
-
-
-    /** @return value of type T that is mapped by key of type S */
-    public T get(S key) {
+    /**
+     * Retrieves the value mapped to key in this map.
+     *
+     * @param key key to look up
+     * @return value of type T that is mapped by key of type S, null if key is not in the map
+     */
+    public @Nullable T get(S key) {
         DefaultImmutableMap<S, T> queue = this;
         while (!queue.isEmpty()) {
             final ImmutableMapEntry<S, T> e = queue.entry;
@@ -91,8 +99,15 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     }
 
     /** returns true if the map is empty */
+    @EnsuresNonNullIf(result = false, expression = { "entry", "parent" })
     public boolean isEmpty() {
-        return false;
+        if (parent == null) {
+            return true;
+        } else {
+            assert entry != null
+                    : "@AssumeAssertion(nullness): entry and parent are both nonnull ...";
+            return false;
+        }
     }
 
     /** @return true iff the map includes key */
@@ -129,7 +144,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
             DefaultImmutableMap<S, T> p_parent) {
         DefaultImmutableMap<S, T> result = p_parent;
         for (int i = 0; i < counter; i++) {
-            result = new DefaultImmutableMap<S, T>(stack[i], result);
+            result = new DefaultImmutableMap<>(stack[i], result);
         }
         return result;
     }
@@ -187,59 +202,52 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
         return counter < stack.length
-                ? createMap(stack, counter, DefaultImmutableMap.<S, T>nilMap())
+                ? createMap(stack, counter, DefaultImmutableMap.nilMap())
                 : this;
     }
 
     /** @return iterator for all keys */
     public Iterator<S> keyIterator() {
-        return new MapKeyIterator<S, T>(this);
+        return new MapKeyIterator<>(this);
     }
 
     /** @return iterator for all values */
     public Iterator<T> valueIterator() {
-        return new MapValueIterator<S, T>(this);
+        return new MapValueIterator<>(this);
     }
 
     /** @return iterator for entries */
     public Iterator<ImmutableMapEntry<S, T>> iterator() {
-        return new MapEntryIterator<S, T>(this);
+        return new MapEntryIterator<>(this);
     }
 
     public String toString() {
-        final StringBuffer sb = new StringBuffer("[");
-        final Iterator<ImmutableMapEntry<S, T>> it = iterator();
-        while (it.hasNext()) {
-            sb.append("" + it.next());
-            if (it.hasNext()) {
-                sb.append(",");
-            }
-        }
-        sb.append("]");
-        return sb.toString();
+        return Strings.formatAsList(this, "[", ",", "]");
     }
 
+    /**
+     * The equality checks if the argument is another immutable map with the same
+     * entries.
+     *
+     * @return true iff the other object is an immutable map with the same entries
+     */
     @SuppressWarnings("unchecked")
-    public boolean equals(Object o) {
-        if (!(o instanceof ImmutableMap))
+    public boolean equals(@Nullable Object o) {
+        if (!(o instanceof ImmutableMap)) {
             return false;
+        }
+
         if (o == this) {
             return true;
         }
 
-        ImmutableMap<S, T> o1 = null;
-        try {
-            o1 = (ImmutableMap<S, T>) o;
-            if (o1.size() != size())
-                return false;
-        } catch (ClassCastException cce) {
+        // TODO: This unchecked cast is a bit blunt but seems safe in the current implementations
+        ImmutableMap<S, T> o1 = (ImmutableMap<S, T>) o;
+        if (o1.size() != size()) {
             return false;
         }
 
-
-        final Iterator<ImmutableMapEntry<S, T>> p = iterator();
-        while (p.hasNext()) {
-            final ImmutableMapEntry<S, T> e = p.next();
+        for (ImmutableMapEntry<S, T> e : this) {
             if (!e.value().equals(o1.get(e.key()))) {
                 return false;
             }
@@ -250,131 +258,10 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     public int hashCode() {
         int hashCode = 1;
-        final Iterator<ImmutableMapEntry<S, T>> p = iterator();
-        while (p.hasNext()) {
-            hashCode += 7 * p.next().hashCode();
+        for (ImmutableMapEntry<S, T> stImmutableMapEntry : this) {
+            hashCode += 7 * stImmutableMapEntry.hashCode();
         }
         return hashCode;
-    }
-
-    /** the empty map */
-    private static class NILMap<S, T> extends DefaultImmutableMap<S, T> {
-
-        @SuppressWarnings("rawtypes")
-        static final NILMap<?, ?> EMPTY_MAP = new NILMap();
-
-        /**
-         * generated serial
-         */
-        private static final long serialVersionUID = 412820308341055305L;
-
-        private NILMap() {
-        }
-
-        public ImmutableMap<S, T> put(S key, T value) {
-            return new DefaultImmutableMap<S, T>(new MapEntry<S, T>(key, value));
-        }
-
-        public T get(S key) {
-            return null;
-        }
-
-        public boolean isEmpty() {
-            return true;
-        }
-
-        public boolean containsKey(S key) {
-            return false;
-        }
-
-        public boolean containsValue(T val) {
-            return false;
-        }
-
-        public DefaultImmutableMap<S, T> remove(S key) {
-            return this;
-        }
-
-        public ImmutableMap<S, T> removeAll(T value) {
-            return this;
-        }
-
-        /** @return iterator for keys */
-        public Iterator<S> keyIterator() {
-            return ImmutableSLList.<S>nil().iterator();
-        }
-
-        /** @return iterator for values */
-        public Iterator<T> valueIterator() {
-            return ImmutableSLList.<T>nil().iterator();
-        }
-
-        /** @return iterator for entries */
-        public Iterator<ImmutableMapEntry<S, T>> iterator() {
-            return ImmutableSLList.<ImmutableMapEntry<S, T>>nil().iterator();
-        }
-
-        public int size() {
-            return 0;
-        }
-
-        public String toString() {
-            return "[(,)]";
-        }
-    }
-
-    /** inner class for the entries */
-    private static class MapEntry<S, T> implements ImmutableMapEntry<S, T> {
-        /**
-         *
-         */
-        private static final long serialVersionUID = -6785625761293313622L;
-        // the key
-        private final S key;
-        // the value
-        private final T value;
-
-        /** creates a new map entry that contains key and value */
-        MapEntry(S key, T value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        /** @return the key stored in this entry */
-        public S key() {
-            return key;
-        }
-
-        /** @return the value stored in this entry */
-        public T value() {
-            return value;
-        }
-
-        /**
-         * @return true iff both objects have equal pairs of key and value
-         */
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (!(obj instanceof ImmutableMapEntry)) {
-                return false;
-            }
-            @SuppressWarnings("unchecked")
-            final ImmutableMapEntry<S, T> cmp = (ImmutableMapEntry<S, T>) obj;
-            final S cmpKey = cmp.key();
-            final T cmpVal = cmp.value();
-            return (key == cmpKey && value == cmpVal)
-                    || (key.equals(cmpKey) && value.equals(cmpVal));
-        }
-
-        public int hashCode() {
-            return key.hashCode() * 7 + value.hashCode();
-        }
-
-        public String toString() {
-            return key + "->" + value;
-        }
     }
 
     /** iterator for the values */
@@ -394,7 +281,10 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
         /** @return next value in list */
         protected final ImmutableMapEntry<S, T> nextEntry() {
-            final ImmutableMapEntry<S, T> entry = map.entry;
+            if (map.isEmpty()) {
+                throw new IllegalStateException("No more elements in iterator");
+            }
+            final @NonNull ImmutableMapEntry<S, T> entry = map.entry;
             map = map.parent;
             return entry;
         }
@@ -409,6 +299,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
     }
 
+
     /** iterator for the values */
     private static final class MapEntryIterator<S, T> extends MapIterator<S, T>
             implements Iterator<ImmutableMapEntry<S, T>> {
@@ -418,7 +309,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
         /** @return next value in list */
-        public final ImmutableMapEntry<S, T> next() {
+        public ImmutableMapEntry<S, T> next() {
             return nextEntry();
         }
     }
@@ -432,10 +323,11 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
         /** @return next value in list */
-        public final T next() {
+        public T next() {
             return nextEntry().value();
         }
     }
+
 
     private static final class MapKeyIterator<S, T> extends MapIterator<S, T>
             implements Iterator<S> {
@@ -447,6 +339,38 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         /** @return next value in list */
         public S next() {
             return nextEntry().key();
+        }
+    }
+
+    /**
+     * class for the map entries
+     *
+     * @param key   the key
+     * @param value the value
+     */
+    // @formatter:off Spotless cannot deal with inner records yet or so it seems :(
+    private record MapEntry<S,T>(S key, T value) implements ImmutableMapEntry<S,T> {
+
+        /**
+         * @return true iff both objects have equal pairs of key and value
+         */
+        public boolean equals(@Nullable Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (!(obj instanceof ImmutableMapEntry)) {
+                return false;
+            }
+            @SuppressWarnings("unchecked")
+            final ImmutableMapEntry<S, T> cmp = (ImmutableMapEntry<S, T>) obj;
+            final S cmpKey = cmp.key();
+            final T cmpVal = cmp.value();
+            return (key == cmpKey && value == cmpVal)
+                    || (key.equals(cmpKey) && value.equals(cmpVal));
+        }
+
+        public String toString() {
+            return key + "->" + value;
         }
     }
 

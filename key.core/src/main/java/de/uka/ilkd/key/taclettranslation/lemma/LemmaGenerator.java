@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
@@ -14,13 +17,13 @@ import de.uka.ilkd.key.taclettranslation.TacletTranslator;
  * validity implies the validity of the taclet.
  */
 public interface LemmaGenerator extends TacletTranslator {
-    public TacletFormula translate(Taclet taclet, TermServices services);
+    TacletFormula translate(Taclet taclet, TermServices services);
 }
 
 
 class LemmaFormula implements TacletFormula {
-    private Taclet taclet;
-    private LinkedList<Term> formula = new LinkedList<Term>();
+    private final Taclet taclet;
+    private final LinkedList<Term> formula = new LinkedList<>();
 
     public LemmaFormula(Taclet taclet, Term formula) {
         this.taclet = taclet;

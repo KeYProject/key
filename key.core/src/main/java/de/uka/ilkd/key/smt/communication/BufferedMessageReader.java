@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.communication;
-
-import org.key_project.util.java.IOUtil;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
+
+import org.key_project.util.java.IOUtil;
 
 /**
  * Wraps BufferedReader in order to provide different message delimiters.

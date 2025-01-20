@@ -34,11 +34,11 @@ methodlevel_element
 
 modifiers: modifier+;
 modifier
-  : ABSTRACT | FINAL | GHOST | HELPER | INSTANCE | MODEL | NON_NULL
+  : mod = (ABSTRACT | FINAL | GHOST | HELPER | INSTANCE | MODEL | NON_NULL
   | NULLABLE | NULLABLE_BY_DEFAULT | PRIVATE | PROTECTED | PUBLIC | PURE
   | STRICTLY_PURE | SPEC_PROTECTED | SPEC_PUBLIC | STATIC | TWO_STATE
-  | NO_STATE | SPEC_JAVA_MATH | SPEC_SAVE_MATH | SPEC_BIGINT_MATH
-  | CODE_JAVA_MATH | CODE_SAVE_MATH | CODE_BIGINT_MATH
+  | NO_STATE | SPEC_JAVA_MATH | SPEC_SAFE_MATH | SPEC_BIGINT_MATH
+  | CODE_JAVA_MATH | CODE_SAFE_MATH | CODE_BIGINT_MATH)
  ;
 
 
@@ -50,7 +50,7 @@ class_invariant: INVARIANT expression SEMI_TOPLEVEL;
 method_specification: (also_keyword)* spec_case ((also_keyword)+ spec_case)*;
 also_keyword: (ALSO | FOR_EXAMPLE | IMPLIES_THAT);
 spec_case:
-  (modifier)?
+  (modifiers)?
   behavior=(BEHAVIOR | NORMAL_BEHAVIOR | MODEL_BEHAVIOUR | EXCEPTIONAL_BEHAVIOUR
            | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR )?
   spec_body
@@ -87,7 +87,11 @@ accessible_clause
                     (lhs=expression COLON)? rhs=storeRefUnion
                     (MEASURED_BY mby=expression)?
     SEMI_TOPLEVEL;
-assignable_clause: (ASSIGNABLE|MODIFIES|MODIFIABLE) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
+/**
+ * The name 'assignable' is kept here for legacy reasons.
+ * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+ */
+assignable_clause: ASSIGNABLE targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
 //depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
 //decreases_clause: DECREASES termexpression (COMMA termexpression)*;
 represents_clause
@@ -161,7 +165,7 @@ in_group_clause: IN expression;
 maps_into_clause: MAPS expression;
 nowarn_pragma: NOWARN expression;
 debug_statement: DEBUG expression;
-set_statement: SET expression EQUAL_SINGLE expression SEMI_TOPLEVEL;
+set_statement: SET (assignee=expression) EQUAL_SINGLE (value=expression) SEMI_TOPLEVEL;
 merge_point_statement:
   MERGE_POINT
   (MERGE_PROC (proc=STRING_LITERAL))?
@@ -174,10 +178,15 @@ loop_specification
     | determines_clause
     | loop_separates_clause
     | loop_determines_clause
-    | assignable_clause
+    | loop_assignable_clause
     | variant_function)*;
 
 loop_invariant: LOOP_INVARIANT targetHeap? expression SEMI_TOPLEVEL;
+/**
+ * The name 'assignable' is kept here for legacy reasons.
+ * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+ */
+loop_assignable_clause: (LOOP_ASSIGNABLE | ASSIGNABLE) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
 variant_function: DECREASING expression (COMMA expression)* SEMI_TOPLEVEL;
 //loop_separates_clause: SEPARATES expression;
 //loop_determines_clause: DETERMINES expression;
@@ -217,7 +226,7 @@ storeRefUnion: list = storeRefList;
 storeRefList: storeref (COMMA storeref)*;
 storeRefIntersect: storeRefList;
 storeref: (NOTHING | EVERYTHING | NOT_SPECIFIED |  STRICTLY_NOTHING | storeRefExpr);
-createLocset: (LOCSET | SINGLETON) LPAREN exprList RPAREN;
+createLocset: (LOCSET | SINGLETON) LPAREN exprList? RPAREN;
 exprList: expression (COMMA expression)*;
 storeRefExpr: expression;
 predornot: (predicate |NOT_SPECIFIED | SAME);
@@ -261,6 +270,7 @@ primaryexpr
   : constant
   | ident
   | inv
+  | inv_free
   | true_
   | false_
   | null_
@@ -271,13 +281,14 @@ primaryexpr
 this_: THIS;
 ident: IDENT | JML_IDENT | SPECIAL_IDENT | THIS | SUPER;
 inv:INV;
+inv_free:INV_FREE;
 true_:TRUE;
 false_:FALSE;
 null_:NULL;
 transactionUpdated: TRANSACTIONUPDATED LPAREN expression RPAREN;
 
 primarysuffix
-  : DOT (IDENT | TRANSIENT | THIS | INV | MULT)
+  : DOT (IDENT | TRANSIENT | THIS | INV | INV_FREE | MULT)
     (LPAREN (expressionlist)? RPAREN)? #primarySuffixAccess
   | (LPAREN (expressionlist)? RPAREN)  #primarySuffixCall
   | LBRACKET (from=expression (DOTDOT to=expression)? | MULT) RBRACKET #primarySuffixArray
@@ -307,6 +318,9 @@ jmlprimary
   | bsumterm                                                                          #pignore3
   | seqdefterm                                                                        #pignore4
   | oldexpression                                                                     #pignore5
+  | bigint_math_expression                                                            #primaryBigintMathExpression
+  | safe_math_expression                                                              #primarySafeMathExpression
+  | java_math_expression                                                              #primaryJavaMathExpression
   | beforeexpression                                                                  #pignore6
   | transactionUpdated                                                                #pignore7
   | BACKUP LPAREN expression RPAREN                                                   #primaryBackup
@@ -333,15 +347,16 @@ jmlprimary
   | LOCKSET                                                                           #primaryLockset
   | IS_INITIALIZED LPAREN referencetype RPAREN                                        #primaryIsInitialised
   | INVARIANT_FOR LPAREN expression RPAREN                                            #primaryInvFor
+  | INVARIANT_FREE_FOR LPAREN expression RPAREN                                       #primaryInvFreeFor
   | STATIC_INVARIANT_FOR LPAREN referencetype RPAREN                                  #primaryStaticInv
+  | STATIC_INVARIANT_FREE_FOR LPAREN referencetype RPAREN                             #primaryStaticInvFree
   | LPAREN LBLNEG IDENT expression RPAREN                                             #primaryLblNeg
   | LPAREN LBLPOS IDENT expression RPAREN                                             #primaryLblPos
   | INDEX                                                                             #primaryIndex
   | VALUES                                                                            #primaryValues
   | STRING_EQUAL LPAREN expression COMMA expression RPAREN                            #primaryStringEq
   | EMPTYSET                                                                          #primaryEmptySet
-  | STOREREF LPAREN storeRefUnion RPAREN                                              #primaryStoreRef
-  | LOCSET LPAREN fieldarrayaccess (COMMA fieldarrayaccess)* RPAREN                   #primaryCreateLocset
+  | (LOCSET|STOREREF) LPAREN storeRefUnion? RPAREN                                    #primaryStoreRef
   | SINGLETON LPAREN expression RPAREN                                                #primaryCreateLocsetSingleton
   | UNION LPAREN storeRefUnion RPAREN                                                 #primaryUnion
   | INTERSECT LPAREN storeRefIntersect RPAREN                                         #primaryIntersect
@@ -356,18 +371,10 @@ jmlprimary
   | sequence                                                                         #primaryignore10
   ;
 
-fieldarrayaccess: (ident|this_|super_) (fieldarrayaccess_suffix)*;
-fieldarrayaccess_suffix
-    : DOT (ident | inv | this_ | super_ | TRANSIENT | INV)
-    | LBRACKET (expression) RBRACKET
-;
-
-super_: SUPER;
-
 sequence
   : SEQEMPTY                                                              #sequenceEmpty
   | seqdefterm                                                            #sequenceIgnore1
-  | (SEQSINGLETON | SEQ) LPAREN exprList RPAREN                           #sequenceCreate
+  | (SEQSINGLETON | SEQ) LPAREN exprList? RPAREN                          #sequenceCreate
   | SEQSUB LPAREN expression COMMA expression COMMA expression RPAREN     #sequenceSub
   | SEQREVERSE LPAREN expression RPAREN                                   #sequenceReverse
   | SEQREPLACE LPAREN expression COMMA expression COMMA expression RPAREN #sequenceReplace
@@ -380,6 +387,9 @@ quantifier: FORALL | EXISTS | MIN | MAX | NUM_OF | PRODUCT | SUM;
 infinite_union_expr: LPAREN UNIONINF (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI)* storeref RPAREN;
 specquantifiedexpression: LPAREN quantifier (boundvarmodifiers)? quantifiedvardecls SEMI (expression SEMI)? expression RPAREN;
 oldexpression: (PRE LPAREN expression RPAREN | OLD LPAREN expression (COMMA IDENT)? RPAREN);
+java_math_expression: (JAVA_MATH LPAREN expression RPAREN);
+safe_math_expression: (SAFE_MATH LPAREN expression RPAREN);
+bigint_math_expression: (BIGINT_MATH LPAREN expression RPAREN);
 beforeexpression: (BEFORE LPAREN expression RPAREN);
 bsumterm: LPAREN BSUM quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
 seqdefterm: LPAREN SEQDEF quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;

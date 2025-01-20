@@ -1,20 +1,22 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.bytecode;
+
+import java.util.List;
 
 import recoder.abstraction.Field;
 import recoder.abstraction.Type;
 import recoder.convenience.Naming;
 
-import java.util.List;
-
 public class FieldInfo extends MemberInfo implements Field {
 
-    protected String type;
+    protected final String type;
 
-    protected String constantValue;
+    protected final String constantValue;
 
-    protected List<TypeArgumentInfo> typeArgs;
+    protected final List<TypeArgumentInfo> typeArgs;
 
     public FieldInfo(int accessFlags, String name, String type, ClassFile cf, String constantValue,
             List<TypeArgumentInfo> typeArgs) {

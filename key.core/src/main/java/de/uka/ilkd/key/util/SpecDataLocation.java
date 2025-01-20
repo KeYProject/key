@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.io.IOException;
@@ -14,9 +17,9 @@ public class SpecDataLocation implements DataLocation {
     /** unknown location (e.g. if the location does not denote a file) */
     public static final DataLocation UNKNOWN_LOCATION = new SpecDataLocation("UNKNOWN", "unknown");
 
-    String type;
+    final String type;
 
-    String location;
+    final String location;
 
     public SpecDataLocation(String type, String location) {
         this.type = type;

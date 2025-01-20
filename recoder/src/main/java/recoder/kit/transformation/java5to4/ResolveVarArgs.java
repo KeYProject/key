@@ -1,10 +1,11 @@
-/*
- * Created on 25.03.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
@@ -25,9 +26,6 @@ import recoder.kit.TwoPassTransformation;
 import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Replaces references to var arg methods and var arg methods itself to make it java 1.4 compliant.
@@ -52,31 +50,31 @@ public class ResolveVarArgs extends TwoPassTransformation {
 
     @Override
     public ProblemReport analyze() {
-        varArgMeths = new ArrayList<MethodDeclaration>();
-        refs = new ArrayList<MethodReference>();
-        sigs = new ArrayList<List<Type>>();
-        lastParamTypes = new ArrayList<Type>();
+        varArgMeths = new ArrayList<>();
+        refs = new ArrayList<>();
+        sigs = new ArrayList<>();
+        lastParamTypes = new ArrayList<>();
         TreeWalker tw = new TreeWalker(cu);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof MethodDeclaration) {
-                MethodDeclaration md = (MethodDeclaration) pe;
+            if (pe instanceof MethodDeclaration md) {
                 if (md.isVarArgMethod()) {
                     varArgMeths.add(md);
                     lastParamTypes.add(getSourceInfo().getType(
                         md.getParameterDeclarationAt(md.getParameterDeclarationCount() - 1)
                                 .getTypeReference()));
                     List<MemberReference> rl = getCrossReferenceSourceInfo().getReferences(md);
-                    for (int i = 0, s = rl.size(); i < s; i++) {
+                    for (MemberReference memberReference : rl) {
                         // if dimensions already match, don't add!!
-                        MethodReference toAdd = (MethodReference) rl.get(i);
+                        MethodReference toAdd = (MethodReference) memberReference;
                         if (toAdd.getArguments() != null && toAdd.getArguments().size() == md
                                 .getParameterDeclarationCount()) {
                             int idx = toAdd.getArguments().size() - 1;
                             Type tt = getSourceInfo().getType(toAdd.getExpressionAt(idx));
                             if (tt instanceof ArrayType && tt.equals(getSourceInfo().getType(
-                                md.getParameterDeclarationAt(idx).getVariableSpecification())))
+                                md.getParameterDeclarationAt(idx).getVariableSpecification()))) {
                                 continue;
+                            }
                         }
                         refs.add(toAdd);
                         sigs.add(getSourceInfo().getMethod(toAdd).getSignature());
@@ -97,7 +95,7 @@ public class ResolveVarArgs extends TwoPassTransformation {
             List<Type> sig = sigs.get(idx++);
             int from = sig.size() - 1;
             int cnt = mr.getArguments() == null ? 0 : mr.getArguments().size() - from;
-            ASTList<Expression> eml = new ASTArrayList<Expression>(cnt);
+            ASTList<Expression> eml = new ASTArrayList<>(cnt);
             for (int i = 0; i < cnt; i++) {
                 eml.add(mr.getArguments().get(from + i).deepClone());
             }
@@ -105,10 +103,12 @@ public class ResolveVarArgs extends TwoPassTransformation {
             NewArray na =
                 f.createNewArray(TypeKit.createTypeReference(f, sig.get(sig.size() - 1)), 0, ai);
             MethodReference repl = mr.deepClone();
-            while (cnt-- > 0)
+            while (cnt-- > 0) {
                 repl.getArguments().remove(repl.getArguments().size() - 1);
-            if (repl.getArguments() == null)
-                repl.setArguments(new ASTArrayList<Expression>(0));
+            }
+            if (repl.getArguments() == null) {
+                repl.setArguments(new ASTArrayList<>(0));
+            }
             repl.getArguments().add(na);
             repl.makeParentRoleValid();
             replace(mr, repl);

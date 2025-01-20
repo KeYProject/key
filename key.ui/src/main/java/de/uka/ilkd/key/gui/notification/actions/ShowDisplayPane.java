@@ -1,6 +1,6 @@
-/*
- * Created on 13.03.2005
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.notification.actions;
 
 import java.awt.Frame;
@@ -18,7 +18,7 @@ public abstract class ShowDisplayPane implements NotificationAction {
      * the message to be displayed
      */
     private String message = "";
-    protected Frame parentComponent;
+    protected final Frame parentComponent;
 
 
     /**

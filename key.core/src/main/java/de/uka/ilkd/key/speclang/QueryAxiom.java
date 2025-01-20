@@ -1,16 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -19,29 +15,29 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 
 /**
@@ -125,19 +121,19 @@ public final class QueryAxiom extends ClassAxiom {
         final TermBuilder tb = services.getTermBuilder();
 
         // create schema variables
-        final List<SchemaVariable> heapSVs = new ArrayList<SchemaVariable>();
+        final List<TermSV> heapSVs = new ArrayList<>();
         for (int i = 0; i < target.getHeapCount(services); i++) {
             heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + i), heapLDT.targetSort(),
                 false, false));
         }
-        final SchemaVariable selfSV = target.isStatic() ? null
+        final var selfSV = target.isStatic() ? null
                 : SchemaVariableFactory.createTermSV(new Name("self"), kjt.getSort(), false, false);
-        final SchemaVariable[] paramSVs = new SchemaVariable[target.getNumParams()];
+        final TermSV[] paramSVs = new TermSV[target.getNumParams()];
         for (int i = 0; i < paramSVs.length; i++) {
             paramSVs[i] = SchemaVariableFactory.createTermSV(new Name("p" + i),
                 target.getParamType(i).getSort(), false, false);
         }
-        final SchemaVariable skolemSV = SchemaVariableFactory
+        final var skolemSV = SchemaVariableFactory
                 .createSkolemTermSV(new Name(target.getName() + "_sk"), target.sort());
 
         // create schema variables for program variables
@@ -156,7 +152,7 @@ public final class QueryAxiom extends ClassAxiom {
         // program variables
         Term update = null;
         int hc = 0;
-        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+        for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             if (hc >= target.getHeapCount(services)) {
                 break;
             }
@@ -178,10 +174,11 @@ public final class QueryAxiom extends ClassAxiom {
         // create java block
         final ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil()
                 .append(target.getParamTypes().toArray(new KeYJavaType[target.getNumParams()]));
+        // get real implementation of program method
         final IProgramMethod targetImpl =
             services.getJavaInfo().getProgramMethod(kjt, target.getName(), sig, kjt);
         final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl, selfProgSV,
-            resultProgSV, new ImmutableArray<Expression>(paramProgSVs));
+            resultProgSV, new ImmutableArray<>(paramProgSVs));
         final StatementBlock sb = new StatementBlock(mbs);
         final JavaBlock jb = JavaBlock.createJavaBlock(sb);
 
@@ -200,7 +197,7 @@ public final class QueryAxiom extends ClassAxiom {
         // create find
         final Term[] subs = new Term[target.arity()];
         int offset = 0;
-        for (SchemaVariable heapSV : heapSVs) {
+        for (var heapSV : heapSVs) {
             subs[offset] = tb.var(heapSV);
             offset++;
         }
@@ -208,8 +205,8 @@ public final class QueryAxiom extends ClassAxiom {
             subs[offset] = tb.var(selfSV);
             offset++;
         }
-        for (int i = 0; i < paramSVs.length; i++) {
-            subs[offset] = tb.var(paramSVs[i]);
+        for (var paramSV : paramSVs) {
+            subs[offset] = tb.var(paramSV);
             offset++;
         }
         final Term find = tb.func(target, subs);
@@ -218,7 +215,8 @@ public final class QueryAxiom extends ClassAxiom {
         final Term replacewith = tb.var(skolemSV);
 
         // create added sequent
-        final Term addedFormula = tb.apply(update, tb.prog(Modality.BOX, jb, post), null);
+        final Term addedFormula =
+            tb.apply(update, tb.prog(Modality.JavaModalityKind.BOX, jb, post), null);
         final SequentFormula addedCf = new SequentFormula(addedFormula);
         final Semisequent addedSemiSeq =
             Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
@@ -226,7 +224,7 @@ public final class QueryAxiom extends ClassAxiom {
 
         // build taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =
-            new RewriteTacletBuilder<RewriteTaclet>();
+            new RewriteTacletBuilder<>();
         tacletBuilder.setFind(find);
         for (SchemaVariable heapSV : heapSVs) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV);
@@ -243,7 +241,7 @@ public final class QueryAxiom extends ClassAxiom {
         tacletBuilder.addVarsNew(resultProgSV, target.getReturnType());
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         tacletBuilder.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil(), replacewith));
+            new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.nil(), replacewith));
         tacletBuilder.setName(MiscTools.toValidTacletName(name));
         tacletBuilder.addRuleSet(new RuleSet(new Name("query_axiom")));
         // Originally used to be "simplify"

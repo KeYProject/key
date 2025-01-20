@@ -1,21 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.LinkedHashSet;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -29,6 +27,10 @@ import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Extracts called methods.
@@ -50,14 +52,13 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                     IProofReference<IProgramMethod> reference = createReference(node, services,
                         context, (MethodReference) info.getActiveStatement());
                     LinkedHashSet<IProofReference<?>> result =
-                        new LinkedHashSet<IProofReference<?>>();
+                        new LinkedHashSet<>();
                     result.add(reference);
                     return result;
-                } else if (info.getActiveStatement() instanceof Assignment) {
-                    Assignment assignment = (Assignment) info.getActiveStatement();
+                } else if (info.getActiveStatement() instanceof Assignment assignment) {
                     ExecutionContext context = extractContext(node, services);
                     LinkedHashSet<IProofReference<?>> result =
-                        new LinkedHashSet<IProofReference<?>>();
+                        new LinkedHashSet<>();
                     for (int i = 0; i < assignment.getChildCount(); i++) {
                         ProgramElement child = assignment.getChildAt(i);
                         if (child instanceof MethodReference) {
@@ -106,9 +107,9 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
         if (context != null) {
             KeYJavaType refPrefixType = mr.determineStaticPrefixType(services, context);
             IProgramMethod pm = mr.method(services, refPrefixType, context);
-            return new DefaultProofReference<IProgramMethod>(IProofReference.CALL_METHOD, node, pm);
+            return new DefaultProofReference<>(IProofReference.CALL_METHOD, node, pm);
         } else {
-            if (!(node.getAppliedRuleApp() instanceof PosTacletApp)) {
+            if (!(node.getAppliedRuleApp() instanceof PosTacletApp app)) {
                 throw new IllegalArgumentException("PosTacletApp expected.");
             }
             if (!"staticMethodCallStaticWithAssignmentViaTypereference"
@@ -117,7 +118,6 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                     "Rule \"staticMethodCallStaticWithAssignmentViaTypereference\" expected, but is \""
                         + MiscTools.getRuleName(node) + "\".");
             }
-            PosTacletApp app = (PosTacletApp) node.getAppliedRuleApp();
             SchemaVariable methodSV = app.instantiations().lookupVar(new Name("#mn"));
             SchemaVariable typeSV = app.instantiations().lookupVar(new Name("#t"));
             SchemaVariable argsSV = app.instantiations().lookupVar(new Name("#elist"));
@@ -131,8 +131,8 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                 throw new IllegalArgumentException("Empty argument list expected.");
             }
             IProgramMethod pm = services.getJavaInfo().getProgramMethod(type.getKeYJavaType(),
-                method.toString(), ImmutableSLList.<Type>nil(), type.getKeYJavaType());
-            return new DefaultProofReference<IProgramMethod>(IProofReference.CALL_METHOD, node, pm);
+                method.toString(), ImmutableSLList.nil(), type.getKeYJavaType());
+            return new DefaultProofReference<>(IProofReference.CALL_METHOD, node, pm);
         }
     }
 }

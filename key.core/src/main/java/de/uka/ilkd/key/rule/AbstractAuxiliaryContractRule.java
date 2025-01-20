@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
-
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -14,23 +15,21 @@ import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -122,15 +121,15 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      * @param services services.
      * @return an anonymizing update for the specified variables.
      */
-    protected static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
+    protected static Term createLocalAnonUpdate(ImmutableSet<LocationVariable> localOuts,
             Services services) {
         Term anonUpdate = null;
         final TermBuilder tb = services.getTermBuilder();
-        for (ProgramVariable pv : localOuts) {
+        for (LocationVariable pv : localOuts) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-            final Function anonFunc = new Function(anonFuncName, pv.sort(), true);
+            final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
-            final Term elemUpd = tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+            final Term elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (anonUpdate == null) {
                 anonUpdate = elemUpd;
             } else {
@@ -148,7 +147,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      * @param services services.
      * @return a new local variable with the specified base name of the specified type.
      */
-    protected static ProgramVariable createLocalVariable(final String nameBase,
+    protected static LocationVariable createLocalVariable(final String nameBase,
             final KeYJavaType type, final Services services) {
         return KeYJavaASTFactory.localVariable(
             services.getVariableNamer().getTemporaryNameProposal(nameBase), type);
@@ -157,73 +156,33 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
     /**
      * This encapsulates all information from the rule application that is needed to apply the rule.
      *
+     * @param update    The context update.
+     * @param formula   The update target.
+     * @param modality  The contract's modality.
+     * @param self      The self variable.
+     * @param statement The statement the contract belongs to.
+     * @param context   The execution context in which the block occurs.
      * @see AbstractAuxiliaryContractBuiltInRuleApp
      */
-    public static final class Instantiation {
-
-        /**
-         * The context update.
-         */
-        public final Term update;
-
-        /**
-         * The update target.
-         */
-        public final Term formula;
-
-        /**
-         * The contract's modality.
-         */
-        public final Modality modality;
-
-        /**
-         * The self variable.
-         */
-        public final Term self;
-
-        /**
-         * The statement the contract belongs to.
-         */
-        public final JavaStatement statement;
-
-        /**
-         * The execution context in which the block occurs.
-         */
-        public final ExecutionContext context;
-
-        /**
-         *
-         * @param update the context update.
-         * @param formula the update target.
-         * @param modality the modality.
-         * @param self the self variable.
-         * @param statement the statement the contract belongs to.
-         * @param context the execution context in which the block occurs.
-         */
-        public Instantiation(final Term update, final Term formula, final Modality modality,
-                final Term self, final JavaStatement statement, final ExecutionContext context) {
+        public record Instantiation(@NonNull Term update, @NonNull Term formula, @NonNull Modality modality, Term self,
+                                    @NonNull JavaStatement statement,
+                                    ExecutionContext context) {
+        public Instantiation {
             assert update != null;
-            assert update.sort() == Sort.UPDATE;
+            assert update.sort() == JavaDLTheory.UPDATE;
             assert formula != null;
-            assert formula.sort() == Sort.FORMULA;
+            assert formula.sort() == JavaDLTheory.FORMULA;
             assert modality != null;
             assert statement != null;
-            this.update = update;
-            this.formula = formula;
-            this.modality = modality;
-            this.self = self;
-            this.statement = statement;
-            this.context = context;
         }
 
-        /**
-         *
-         * @return {@code true} iff the modality is transactional.
-         */
-        public boolean isTransactional() {
-            return modality.transaction();
+            /**
+             * @return {@code true} iff the modality is transactional.
+             */
+            public boolean isTransactional() {
+                return modality.transaction();
+            }
         }
-    }
 
     /**
      * A builder for {@link Instantiation}s.
@@ -264,13 +223,12 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         public Instantiation instantiate() {
             final Term update = extractUpdate();
             final Term target = extractUpdateTarget();
-            if (!(target.op() instanceof Modality)) {
+            if (!(target.op() instanceof Modality modality)) {
                 return null;
             }
-            final Modality modality = (Modality) target.op();
             final JavaStatement statement =
                 getFirstStatementInPrefixWithAtLeastOneApplicableContract(modality,
-                    target.javaBlock(), goal);
+                    goal);
             if (statement == null) {
                 return null;
             }
@@ -331,20 +289,18 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         }
 
         /**
-         *
          * @param modality the contract's modality.
-         * @param java the java block.
          * @param goal the current goal.
          * @return the first block in the java block's prefix with at least one applicable contract.
          */
         private JavaStatement getFirstStatementInPrefixWithAtLeastOneApplicableContract(
-                final Modality modality, final JavaBlock java, final Goal goal) {
-            SourceElement element = java.program().getFirstElement();
+                final Modality modality, final Goal goal) {
+            SourceElement element = modality.program().program().getFirstElement();
             while ((element instanceof ProgramPrefix || element instanceof CatchAllStatement)
                     && !(element instanceof StatementBlock
                             && ((StatementBlock) element).isEmpty())) {
                 if (element instanceof StatementBlock && hasApplicableContracts(services,
-                    (StatementBlock) element, modality, goal)) {
+                    (StatementBlock) element, modality.kind(), goal)) {
                     return (StatementBlock) element;
                 } else if (element instanceof StatementContainer) {
                     element = ((StatementContainer) element).getStatementAt(0);
@@ -354,7 +310,8 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
             }
 
             if (element instanceof LoopStatement) {
-                if (hasApplicableContracts(services, (LoopStatement) element, modality, goal)) {
+                if (hasApplicableContracts(services, (LoopStatement) element, modality.kind(),
+                    goal)) {
                     return (LoopStatement) element;
                 }
             }
@@ -363,15 +320,15 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         }
 
         /**
-         *
          * @param services services.
          * @param element a block or loop.
-         * @param modality the current goal's modality.
+         * @param modalityKind the current goal's modality kind.
          * @param goal the current goal.
          * @return {@code true} iff the block has applicable contracts.
          */
         protected abstract boolean hasApplicableContracts(final Services services,
-                final JavaStatement element, final Modality modality, Goal goal);
+                final JavaStatement element, final Modality.JavaModalityKind modalityKind,
+                Goal goal);
     }
 
 }

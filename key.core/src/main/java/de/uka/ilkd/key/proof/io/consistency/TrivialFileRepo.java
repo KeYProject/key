@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.consistency;
 
 import java.io.File;
@@ -22,7 +25,7 @@ import de.uka.ilkd.key.proof.io.RuleSource;
  */
 public class TrivialFileRepo implements FileRepo {
     @Override
-    public InputStream getInputStream(Path path) throws FileNotFoundException, IOException {
+    public InputStream getInputStream(Path path) throws IOException {
 
         // wrap path into URL for uniform treatment
         return getInputStream(path.toUri().toURL());

@@ -1,6 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
-import org.key_project.util.ExtList;
+import java.nio.file.Paths;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.SourceElement;
@@ -15,7 +18,7 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
-import java.nio.file.Paths;
+import org.key_project.util.ExtList;
 
 public class LineBreakpoint extends AbstractConditionalBreakpoint {
     /**
@@ -26,17 +29,17 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * The line of the Breakpoint in the respective class.
      */
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * The start of the method containing the associated Breakpoint
      */
-    protected int methodStart;
+    protected final int methodStart;
 
     /**
      * The end of the method containing the associated Breakpoint
      */
-    protected int methodEnd;
+    protected final int methodEnd;
 
     /**
      * Creates a new {@link LineBreakpoint}.
@@ -85,7 +88,7 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
         }
         // find last interesting statement
         for (int i = 0; i < nextResult.size(); i++) {
-            if (!(((SourceElement) nextResult.get(i)).getEndPosition().getLine() <= lineNumber)) {
+            if (!(((SourceElement) nextResult.get(i)).getEndPosition().line() <= lineNumber)) {
                 if (nextResult.get(i) instanceof StatementContainer) {
                     // go into inner scope
                     nextResult.set(i, getStatementBlock((StatementContainer) nextResult.get(i)));
@@ -105,14 +108,11 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
      *
      * @param line The current line of code, that the auto mode is evaluating
      * @param path The path of the Class, that contains the currently evaluated code
-     * @return true if a {@link JavaLineBreakpoint} is in the given line and the condition evaluates
+     * @return true if a {@link LineBreakpoint} is in the given line and the condition evaluates
      *         to true and the Hitcount is exceeded, false otherwise
      */
     protected boolean shouldStopInLine(int line, String path) {
-        if (lineNumber == line && getClassPath().equals(path)) {
-            return true;
-        }
-        return false;
+        return lineNumber == line && getClassPath().equals(path);
     }
 
     @Override
@@ -129,8 +129,8 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
         if (activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED) {
             final String path =
                 Paths.get(activeStatement.getPositionInfo().getParentClassURI()).toString();
-            int startLine = activeStatement.getStartPosition().getLine();
-            int endLine = activeStatement.getEndPosition().getLine();
+            int startLine = activeStatement.getStartPosition().line();
+            int endLine = activeStatement.getEndPosition().line();
             boolean isInLine = endLine > startLine + 1 ? shouldStopInLine(startLine, path)
                     : shouldStopInLine(endLine, path);
             return isInLine;
@@ -155,8 +155,8 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
                 NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
             if (activeStatement != null
                     && activeStatement.getStartPosition() != Position.UNDEFINED) {
-                if (activeStatement.getStartPosition().getLine() >= methodStart
-                        && activeStatement.getEndPosition().getLine() <= methodEnd) {
+                if (activeStatement.getStartPosition().line() >= methodStart
+                        && activeStatement.getEndPosition().line() <= methodEnd) {
                     return true;
                 }
                 break;
@@ -174,8 +174,8 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
                 NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
             if (activeStatement != null
                     && activeStatement.getStartPosition() != Position.UNDEFINED) {
-                if (activeStatement.getStartPosition().getLine() >= methodStart
-                        && activeStatement.getEndPosition().getLine() <= methodEnd
+                if (activeStatement.getStartPosition().line() >= methodStart
+                        && activeStatement.getEndPosition().line() <= methodEnd
                         && activeStatement instanceof LocalVariableDeclaration) {
                     return true;
                 }

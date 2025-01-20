@@ -1,17 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
 import java.io.File;
 import java.util.Locale;
-
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.core.Main;
+
+import org.key_project.util.java.IOUtil;
 
 /**
  * Extends the usual Swing file chooser by a bookmark panel and predefined filters. This class is a
@@ -49,6 +51,14 @@ public final class KeYFileChooser extends JFileChooser {
     /** The Constant for the filter for statistics files. */
     public static final FileFilter STATISTICS_FILTER =
         new FileNameExtensionFilter("proof statistics files (.csv, .html)", "csv", "html");
+
+    /** file filter for proof management reports (*.html) */
+    public static final FileFilter PROOF_MANAGEMENT_REPORT_FILTER =
+        new FileNameExtensionFilter("proof management reports (.html)", "html");
+
+    /** The Constant for the filter for dot files. */
+    public static final FileFilter DOT_FILTER = new FileNameExtensionFilter(
+        "dot graphviz files (.dot)", "dot");
 
     /** filter for single java source files */
     public static final FileFilter JAVA_FILTER =
@@ -99,6 +109,7 @@ public final class KeYFileChooser extends JFileChooser {
         // for simplicity, we always show all filters
         addChoosableFileFilter(DEFAULT_FILTER);
         addChoosableFileFilter(STATISTICS_FILTER);
+        addChoosableFileFilter(PROOF_MANAGEMENT_REPORT_FILTER);
         addChoosableFileFilter(JAVA_FILTER);
         addChoosableFileFilter(COMPRESSED_FILTER);
         addChoosableFileFilter(INTERACTION_LOG_FILTER);

@@ -1,23 +1,12 @@
-/*
- *
- * Uses code by Hans Muller and Kathy Walrath from
- * http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
- *
- */
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.prover.impl;
 
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import java.util.concurrent.atomic.AtomicLong;
 
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
@@ -25,19 +14,26 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Applies rules in an automated fashion. The caller should ensure that the strategy runs in its own
  * thread
+ * <a href="http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html">Uses code by Hans
+ * Muller
+ * and Kathy Walrath</a>
  *
  * @author Richard Bubel
  */
 public class ApplyStrategy extends AbstractProverCore {
     public static final Logger LOGGER = LoggerFactory.getLogger(ApplyStrategy.class);
+
+    public static final AtomicLong PERF_GOAL_APPLY = new AtomicLong();
 
     /**
      * the proof that is worked with
@@ -50,7 +46,7 @@ public class ApplyStrategy extends AbstractProverCore {
      * The default {@link GoalChooser} to choose goals to which rules are applied if the
      * {@link StrategySettings} of the proof provides no customized one.
      */
-    private GoalChooser defaultGoalChooser;
+    private final GoalChooser defaultGoalChooser;
 
     private long time;
 
@@ -59,7 +55,7 @@ public class ApplyStrategy extends AbstractProverCore {
 
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
-    /** true if the prover should stop as soon as a non closable goal is detected */
+    /** true if the prover should stop as soon as a non-closable goal is detected */
     private boolean stopAtFirstNonClosableGoal;
     /** the number of (so far) closed goal by the current running strategy */
     private int closedGoals;
@@ -71,7 +67,7 @@ public class ApplyStrategy extends AbstractProverCore {
     private GoalChooser goalChooser;
 
     // Please create this object beforehand and re-use it.
-    // Otherwise the addition/removal of the InteractiveProofListener
+    // Otherwise, the addition/removal of the InteractiveProofListener
     // can cause a ConcurrentModificationException during ongoing operation
     public ApplyStrategy(GoalChooser defaultGoalChooser) {
         this.defaultGoalChooser = defaultGoalChooser;
@@ -80,7 +76,7 @@ public class ApplyStrategy extends AbstractProverCore {
     /**
      * applies rules that are chosen by the active strategy
      *
-     * @return true iff a rule has been applied, false otherwise
+     * @return information whether the rule application was successful or not
      */
     private synchronized SingleRuleApplicationInfo applyAutomaticRule(final GoalChooser goalChooser,
             final StopCondition stopCondition, boolean stopAtFirstNonClosableGoal) {
@@ -114,12 +110,15 @@ public class ApplyStrategy extends AbstractProverCore {
             return new SingleRuleApplicationInfo(
                 "No more rules automatically applicable to any goal.", g, app);
         } else {
-            assert g != null;
-            g.apply(app);
+            var time = System.nanoTime();
+            try {
+                g.apply(app);
+            } finally {
+                PERF_GOAL_APPLY.getAndAdd(System.nanoTime() - time);
+            }
             return new SingleRuleApplicationInfo(g, app);
         }
     }
-
 
     /**
      * applies rules until this is no longer possible or the thread is interrupted.
@@ -128,13 +127,22 @@ public class ApplyStrategy extends AbstractProverCore {
             final StopCondition stopCondition) {
         time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
+
+        var perfScope = new PerfScope();
+        long applyAutomatic = 0;
         try {
-            LOGGER.debug("Strategy started.");
+            LOGGER.trace("Strategy started.");
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, time,
                 countApplied, srInfo);
 
             while (!shouldStop) {
-                srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonClosableGoal);
+                var applyAutomaticTime = System.nanoTime();
+                try {
+                    srInfo =
+                        applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonClosableGoal);
+                } finally {
+                    applyAutomatic += System.nanoTime() - applyAutomaticTime;
+                }
                 if (!srInfo.isSuccess()) {
                     return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(),
                         System.currentTimeMillis() - time, countApplied, closedGoals);
@@ -151,7 +159,7 @@ public class ApplyStrategy extends AbstractProverCore {
                 return new ApplyStrategyInfo(
                     stopCondition.getStopMessage(maxApplications, timeout, proof, time,
                         countApplied, srInfo),
-                    proof, null, (Goal) null, System.currentTimeMillis() - time, countApplied,
+                    proof, null, null, System.currentTimeMillis() - time, countApplied,
                     closedGoals);
             }
         } catch (InterruptedException e) {
@@ -159,14 +167,15 @@ public class ApplyStrategy extends AbstractProverCore {
             return new ApplyStrategyInfo("Interrupted.", proof, null, goalChooser.getNextGoal(),
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
-            t.printStackTrace();
+            LOGGER.warn("doWork exception", t);
             return new ApplyStrategyInfo("Error.", proof, t, null,
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } finally {
             time = (System.currentTimeMillis() - time);
-            LOGGER.debug("Strategy stopped.");
-            LOGGER.debug("Applied {} steps", countApplied);
-            LOGGER.debug("Time elapsed: {} ms", time);
+            LOGGER.trace("Strategy stopped, applied {} steps in {}ms", countApplied, time);
+
+            LOGGER.trace("applyAutomaticRule: " + PerfScope.formatTime(applyAutomatic));
+            perfScope.report();
         }
         assert srInfo != null;
         return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time,
@@ -277,7 +286,7 @@ public class ApplyStrategy extends AbstractProverCore {
 
         ProofListener pl = new ProofListener();
         proof.addRuleAppListener(pl);
-        ApplyStrategyInfo result = null;
+        ApplyStrategyInfo result;
         try {
             result = doWork(goalChooser, stopCondition);
         } finally {
@@ -349,7 +358,7 @@ public class ApplyStrategy extends AbstractProverCore {
         final GoalChooser goalChooser = getGoalChooserForProof(proof);
         proof = null;
         if (goalChooser != null) {
-            goalChooser.init(null, ImmutableSLList.<Goal>nil());
+            goalChooser.init(null, ImmutableSLList.nil());
         }
     }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ComponentEvent;
@@ -34,7 +37,7 @@ class SequentViewChangeListener
             // But only update them if we have the correct SequentView
             // (i.e., the main window's sequent view) (lanzinger)
             if (sequentView.isMainSequentView()) {
-                MainWindow.getInstance().sequentViewSearchBar.setSequentView(sequentView);
+                MainWindow.getInstance().setSequentView(sequentView);
             }
         }
 
@@ -60,7 +63,6 @@ class SequentViewChangeListener
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        reprint();
     }
 
     @Override

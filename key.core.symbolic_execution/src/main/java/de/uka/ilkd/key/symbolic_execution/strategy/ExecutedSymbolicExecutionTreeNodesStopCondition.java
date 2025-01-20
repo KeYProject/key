@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.Iterator;
@@ -22,7 +25,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * </p>
  * <p>
  * If a {@link Node} in KeY's proof tree is also a node in a symbolic execution tree is computed via
- * {@link SymbolicExecutionUtil#isSymbolicExecutionTreeNode(Node)}.
+ * {@link SymbolicExecutionUtil#isSymbolicExecutionTreeNode}.
  * </p>
  * <p>
  * The auto mode is stopped exactly in the open goal {@link Node} which will become the next
@@ -52,7 +55,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * Maps a {@link Goal} to the number of executed symbolic execution tree nodes.
      */
     private final Map<Goal, Integer> executedNumberOfSetNodesPerGoal =
-        new LinkedHashMap<Goal, Integer>();
+        new LinkedHashMap<>();
 
     /**
      * Stores for each {@link Node} which is a symbolic execution tree node the computed result of
@@ -61,7 +64,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * for the same {@link Node}.
      */
     private final Map<Node, Boolean> goalAllowedResultPerSetNode =
-        new LinkedHashMap<Node, Boolean>();
+        new LinkedHashMap<>();
 
     /**
      * Constructor to stop after one executed symbolic execution tree node.
@@ -110,10 +113,10 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                     // Get the number of executed set nodes on the current goal
                     Integer executedNumberOfSetNodes = executedNumberOfSetNodesPerGoal.get(goal);
                     if (executedNumberOfSetNodes == null) {
-                        executedNumberOfSetNodes = Integer.valueOf(0);
+                        executedNumberOfSetNodes = 0;
                     }
                     // Check if limit of set nodes of the current goal is exceeded
-                    if (executedNumberOfSetNodes.intValue()
+                    if (executedNumberOfSetNodes
                             + 1 > maximalNumberOfSetNodesToExecutePerGoal) {
                         handleNodeLimitExceeded(maxApplications, timeout, proof, startTime,
                             countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
@@ -121,7 +124,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                     } else {
                         // Increase number of set nodes on this goal and allow rule application
                         executedNumberOfSetNodes =
-                            Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
+                            executedNumberOfSetNodes.intValue() + 1;
                         executedNumberOfSetNodesPerGoal.put(goal, executedNumberOfSetNodes);
                         handleNodeLimitNotExceeded(maxApplications, timeout, proof, startTime,
                             countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
@@ -129,7 +132,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                     }
                 } else {
                     // Reuse already computed result.
-                    return value.booleanValue();
+                    return value;
                 }
             } else {
                 return true;
@@ -220,7 +223,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                     Iterator<Node> childIter = updatedNode.childrenIterator();
                     while (childIter.hasNext()) {
                         Node next = childIter.next();
-                        Goal nextGoal = next.proof().getGoal(next);
+                        Goal nextGoal = next.proof().getOpenGoal(next);
                         // Check if the current goal is a new one
                         if (nextGoal != goal) {
                             // New goal found, use the number of set nodes for it.

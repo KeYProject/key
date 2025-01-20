@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.io.BufferedReader;
@@ -5,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -28,7 +32,7 @@ public class LineProperties {
     private final Map<String, String> map = new LinkedHashMap<>();
 
     public void read(InputStream is) throws IOException {
-        read(new InputStreamReader(is));
+        read(new InputStreamReader(is, StandardCharsets.UTF_8));
     }
 
     public void read(Reader reader) throws IOException {

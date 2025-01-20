@@ -1,20 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Function;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 
 public final class DropEffectlessStoresCondition implements VariableCondition {
@@ -40,7 +43,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
             final Term objTerm = heapTerm.sub(1);
             final Term fieldTerm = heapTerm.sub(2);
             final Term valueTerm = heapTerm.sub(3);
-            final Pair<Term, Term> loc = new Pair<Term, Term>(objTerm, fieldTerm);
+            final Pair<Term, Term> loc = new Pair<>(objTerm, fieldTerm);
             final Term newSubHeapTerm =
                 dropEffectlessStoresHelper(subHeapTerm, services, overwrittenLocs.add(loc), store);
             if (overwrittenLocs.contains(loc)) {
@@ -59,13 +62,14 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     private static Term dropEffectlessStores(Term t, Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         assert t.sort() == heapLDT.targetSort();
-        return dropEffectlessStoresHelper(t, services, DefaultImmutableSet.<Pair<Term, Term>>nil(),
+        return dropEffectlessStoresHelper(t, services, DefaultImmutableSet.nil(),
             heapLDT.getStore());
     }
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions mc,
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term hInst = (Term) svInst.getInstantiation(h);

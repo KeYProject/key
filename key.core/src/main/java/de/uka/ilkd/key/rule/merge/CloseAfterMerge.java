@@ -1,9 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
-
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.substConstantsByFreshVars;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,13 +10,8 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -26,10 +19,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -40,6 +31,21 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.substConstantsByFreshVars;
 
 /**
  * Rule for closing a partner goal after a merge operation. It does so by adding a formula
@@ -89,7 +95,7 @@ public class CloseAfterMerge implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final Services services,
+    public @NonNull ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
 
@@ -181,11 +187,11 @@ public class CloseAfterMerge implements BuiltInRule {
         allLocs = allLocs
                 .union(getLocationVariables(closeApp.getMergeState().getPathCondition(), services));
 
-        final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
+        final LinkedList<Term> origQfdVarTerms = new LinkedList<>();
 
         // Collect sorts and create logical variables for
         // closing over program variables.
-        final LinkedList<Sort> argSorts = new LinkedList<Sort>();
+        final LinkedList<Sort> argSorts = new LinkedList<>();
         for (LocationVariable var : allLocs) {
             argSorts.add(var.sort());
             origQfdVarTerms.add(tb.var(var));
@@ -194,11 +200,12 @@ public class CloseAfterMerge implements BuiltInRule {
         // Create and register the new predicate symbol
         final Name predicateSymbName = new Name(tb.newName("P"));
 
-        final Function predicateSymb =
-            new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<Sort>(argSorts));
+        final JFunction predicateSymb =
+            new JFunction(predicateSymbName, JavaDLTheory.FORMULA,
+                new ImmutableArray<>(argSorts));
 
         final Goal mergedGoal =
-            services.getProof().getGoal(closeApp.getMergeState().getCorrespondingNode());
+            services.getProof().getOpenGoal(closeApp.getMergeState().getCorrespondingNode());
 
         isWeakeningGoal.getLocalNamespaces().functions().add(predicateSymb);
         isWeakeningGoal.getLocalNamespaces().add(mergedGoal.getLocalNamespaces());
@@ -210,7 +217,7 @@ public class CloseAfterMerge implements BuiltInRule {
         // Obtain set of new Skolem constants in merge state
         HashSet<Function> newConstants = closeApp.getNewNames().stream()
                 .map(name -> isWeakeningGoal.getLocalNamespaces().functions().lookup(name))
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<Function>()));
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         //@formatter:off
         // Create the formula \forall v1,...,vn. (C2 -> {U2}P(...)) -> (C1 -> {U1}P(...))
@@ -235,14 +242,15 @@ public class CloseAfterMerge implements BuiltInRule {
      * @param constsToReplace Skolem constants to replace before the universal closure.
      * @param services The services object.
      * @return A new term which is equivalent to the universal closure of the argument term, with
-     *         Skolem constants in constsToReplace having been replaced by fresh variables before.
+     *         Skolem constants in {@code constsToReplace} having been replaced by fresh variables
+     *         before.
      */
     private Term allClosure(final Term term, final HashSet<Function> constsToReplace,
             Services services) {
         TermBuilder tb = services.getTermBuilder();
 
         Term termWithReplConstants = substConstantsByFreshVars(term, constsToReplace,
-            new HashMap<Function, LogicVariable>(), services);
+            new HashMap<>(), services);
 
         return tb.all(termWithReplConstants.freeVars(), termWithReplConstants);
     }
@@ -273,8 +281,9 @@ public class CloseAfterMerge implements BuiltInRule {
      * @param mergeNodeState The SE state for the merge node; needed for adding an implicative
      *        premise ensuring the soundness of merge rules.
      * @param partnerState The SE state for the partner node.
-     * @param pc The program counter common to the two states -- a formula of the form U\<{...}\>
-     *        PHI, where U is an update in normal form and PHI is a DL formula).
+     * @param pc The program counter common to the two states -- a formula of the form
+     *        {@code U\<{...}\>
+     *        PHI}, where U is an update in normal form and PHI is a DL formula).
      * @param newNames The set of new names (of Skolem constants) introduced in the merge.
      * @return A complete {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */

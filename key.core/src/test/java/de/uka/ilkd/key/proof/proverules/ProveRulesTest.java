@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.proverules;
+
+import java.io.File;
+import java.util.*;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -12,18 +19,14 @@ import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.helper.FindResources;
+
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
-import org.key_project.util.helper.FindResources;
 
-import java.io.File;
-import java.util.*;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit test class for re-running taclet proofs (formerly implemented as Perl script
@@ -58,7 +61,7 @@ public class ProveRulesTest {
         assertNotNull(taclet, "Proof file " + proofFile
             + " claims that it contains a proof for taclet " + tacletName
             + " but corresponding taclet seems to be unavailable (maybe it is not annotated with \\lemma?).");
-        assertTrue(taclet.getRuleJustification() instanceof LemmaJustification,
+        assertInstanceOf(LemmaJustification.class, taclet.getRuleJustification(),
             "Found a taclet proof for taclet " + tacletName
                 + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
                 + "adding annotation \\lemma to the declaration of the taclet.");

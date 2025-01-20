@@ -1,8 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -14,10 +14,13 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left untouched.
  *
- * This uses the code provided by Michael Kirsten in {@link InteractiveProver$AutoWorker}.
+ * This uses the code provided by Michael Kirsten in {@code InteractiveProver$AutoWorker}.
  *
  * Unlike many macros, this macros has got a parameter ({@link #numberSteps}), such that several
  * instances of the class may exist with different semantics.
@@ -159,7 +162,7 @@ public class TryCloseMacro extends AbstractProofMacro {
         //
         // inform the listener
         ProofMacroFinishedInfo info =
-            new ProofMacroFinishedInfo(this, goals, proof, 0, 0, 0, false);
+            new ProofMacroFinishedInfo(this, goals, proof, 0, 0, 0);
 
         //
         // start actual autoprove

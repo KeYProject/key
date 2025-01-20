@@ -3,14 +3,16 @@
    <methodCall name="&lt;call BlockContractWithReturnPostconditionNotVerified.main(_x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="return magic(_x);" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <methodCall name="&lt;call BlockContractWithReturnPostconditionNotVerified.magic(x_3)&gt;" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="&lt;call BlockContractWithReturnPostconditionNotVerified.magic(
+  x_3
+)&gt;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
             <blockContract name="result_0 = magic()) catch(exc_0)
 pre measuredByEmpty &amp; x_3 = 2
-post returned = TRUE
+post   returned = TRUE
 &amp; exc_0 = null
 &amp; (returned = TRUE -&gt; result_0 = -2)
-mod {}&lt;&lt;impl&gt;&gt;termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
+mod {}&lt;&lt;impl&gt;&gt;termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false">
                <callStackEntry path="/0/0/0"/>
                <callStackEntry path="/0"/>
                <branchCondition name="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))" pathCondition="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))" pathConditionChanged="true" branchCondition="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Usage">
@@ -19,7 +21,11 @@ mod {}&lt;&lt;impl&gt;&gt;termination diamond" pathCondition="true" pathConditio
                   <branchCondition name="true" pathCondition="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <callStackEntry path="/0/0/0"/>
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of BlockContractWithReturnPostconditionNotVerified.magic(x_3)&gt;" pathCondition="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(2(#))) as result of magic&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(2(#))) as result of BlockContractWithReturnPostconditionNotVerified.magic(x_3)&gt;" isReturnValueComputed="true" methodReturnCondition="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))">
+                     <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of BlockContractWithReturnPostconditionNotVerified.magic(
+  x_3
+)&gt;" pathCondition="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(2(#))) as result of magic&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(2(#))) as result of BlockContractWithReturnPostconditionNotVerified.magic(
+  x_3
+)&gt;" isReturnValueComputed="true" methodReturnCondition="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))">
                         <methodReturnValue name="Z(neglit(2(#)))" returnValueString="Z(neglit(2(#)))" hasCondition="false">
                         </methodReturnValue>
                         <callStackEntry path="/0/0/0"/>

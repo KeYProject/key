@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashMap;
@@ -6,19 +9,19 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.key_project.util.LRUCache;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+
+import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Direct-mapped cache of lists of formulas (potential instantiations of if-formulas of taclets)
  * that were modified after a certain point of time
- *
+ * <p>
  * Hashmaps of the particular lists of formulas; the keys of the maps is the point of time that
  * separates old from new (modified) formulas
- *
+ * <p>
  * Keys: Long Values: IList<IfFormulaInstantiation>
  */
 public class IfInstantiationCachePool {
@@ -56,7 +59,7 @@ public class IfInstantiationCachePool {
     }
 
     public void release(Node n) {
-        IfInstantiationCache cache = null;
+        IfInstantiationCache cache;
         synchronized (cacheMgr) {
             cache = cacheMgr.remove(n);
         }
@@ -67,19 +70,19 @@ public class IfInstantiationCachePool {
 
     public static class IfInstantiationCache {
 
-        private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> antecCache =
+        private final HashMap<Long, ImmutableArray<IfFormulaInstantiation>> antecCache =
             new LinkedHashMap<>();
-        private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> succCache =
+        private final HashMap<Long, ImmutableArray<IfFormulaInstantiation>> succCache =
             new LinkedHashMap<>();
 
         private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         private final ReadLock readLock = lock.readLock();
         private final WriteLock writeLock = lock.writeLock();
 
-        public ImmutableList<IfFormulaInstantiation> get(boolean antec, Long key) {
+        public ImmutableArray<IfFormulaInstantiation> get(boolean antec, Long key) {
             try {
                 readLock.lock();
-                final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache =
+                final HashMap<Long, ImmutableArray<IfFormulaInstantiation>> cache =
                     antec ? antecCache : succCache;
                 return cache.get(key);
             } finally {
@@ -87,8 +90,8 @@ public class IfInstantiationCachePool {
             }
         }
 
-        public void put(boolean antec, Long key, ImmutableList<IfFormulaInstantiation> value) {
-            final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache =
+        public void put(boolean antec, Long key, ImmutableArray<IfFormulaInstantiation> value) {
+            final HashMap<Long, ImmutableArray<IfFormulaInstantiation>> cache =
                 antec ? antecCache : succCache;
             try {
                 writeLock.lock();

@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Utility class to select elements which also allows that exceptions are thrown during selection
@@ -6,7 +11,7 @@ package org.key_project.util.java;
  *
  * @author Martin Hentschel
  */
-public interface IFilterWithException<T, E extends Throwable> {
+public interface IFilterWithException<T extends @Nullable Object, E extends Throwable> {
     /**
      * Checks if the given element should be selected.
      *
@@ -14,5 +19,5 @@ public interface IFilterWithException<T, E extends Throwable> {
      * @return {@code true} handle element, {@code false} ignore element.
      * @throws E An occurred exception.
      */
-    public boolean select(T element) throws E;
+    boolean select(T element) throws E;
 }

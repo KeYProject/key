@@ -1,22 +1,41 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
-
+import de.uka.ilkd.key.logic.equality.EqualsModProperty;
+import de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty;
+import de.uka.ilkd.key.logic.equality.Property;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
+import org.key_project.logic.Name;
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.java.CollectionUtil;
+
 /**
+ * <p>
  * The labeled term class is used for terms that have a label attached.
+ * </p>
  *
- * Two labeled terms are equal if they have equal term structure and equal annotations. In contrast
- * the method {@link Term#equalsModRenaming(Object)} does not care about annotations and will just
- * compare the term structure alone modula renaming.
+ * Two labeled terms are equal if they have equal term structure and equal annotations. In contrast,
+ * the method {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} can be used to
+ * compare terms
+ * while ignoring certain
+ * given properties. E.g. by using {@link RenamingTermProperty#RENAMING_TERM_PROPERTY}, just the
+ * term structures modulo
+ * renaming are compared whilst ignoring annotations.
+ * <p>
+ * Prior implementations of {@link EqualsModProofIrrelevancy} are now in
+ * {@link ProofIrrelevancyProperty}.
+ * </p>
+ *
  *
  * @see Term
  * @see TermImpl
@@ -34,13 +53,30 @@ class LabeledTermImpl extends TermImpl {
      * @param op the top level operator
      * @param subs the Term that are the subterms of this term
      * @param boundVars logic variables bound by the operator
-     * @param javaBlock contains the program part of the term (if any)
+     * @param labels the term's labels (must not be null or empty)
+     * @param origin a String with origin information
+     */
+    public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
+            ImmutableArray<QuantifiableVariable> boundVars,
+            ImmutableArray<TermLabel> labels, String origin) {
+        super(op, subs, boundVars, origin);
+        assert labels != null : "Term labels must not be null";
+        assert !labels.isEmpty() : "There must be at least one term label";
+        this.labels = labels;
+    }
+
+    /**
+     * creates an instance of a labeled term.
+     *
+     * @param op the top level operator
+     * @param subs the Term that are the subterms of this term
+     * @param boundVars logic variables bound by the operator
      * @param labels the terms labels (must not be null or empty)
      */
     public LabeledTermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
+            ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels) {
-        super(op, subs, boundVars, javaBlock);
+        super(op, subs, boundVars, "");
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
         this.labels = labels;
@@ -64,12 +100,8 @@ class LabeledTermImpl extends TermImpl {
 
     @Override
     public TermLabel getLabel(final Name termLabelName) {
-        return CollectionUtil.search(labels, new IFilter<TermLabel>() {
-            @Override
-            public boolean select(TermLabel element) {
-                return ObjectUtil.equals(element.name(), termLabelName);
-            }
-        });
+        return CollectionUtil.search(labels,
+            element -> Objects.equals(element.name(), termLabelName));
     }
 
     /**
@@ -91,19 +123,28 @@ class LabeledTermImpl extends TermImpl {
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o)) {
-            return false;
+        if (o == this) {
+            return true;
         }
 
-        final LabeledTermImpl cmp = (LabeledTermImpl) o;
-        if (labels.size() == cmp.labels.size()) {
-            for (int i = 0, sz = labels.size(); i < sz; i++) {
-                // this is not optimal, but as long as number of labels limited ok
-                if (!cmp.labels.contains(labels.get(i))) {
-                    return false;
-                }
+        if (o instanceof final LabeledTermImpl cmp) {
+            if (labels.size() != cmp.labels.size()) {
+                return false;
             }
-            return true;
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            if (labels.size() == cmp.labels.size()) {
+                for (int i = 0, sz = labels.size(); i < sz; i++) {
+                    // this is not optimal, but as long as number of labels limited ok
+                    if (!cmp.labels.contains(labels.get(i))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
         return false;
     }

@@ -1,23 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.docking;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
-
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 
-import javax.annotation.Nonnull;
-
-import bibliothek.gui.dock.common.CGrid;
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import bibliothek.gui.dock.common.MultipleCDockable;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
-import bibliothek.gui.dock.common.action.CCheckBox;
-import bibliothek.gui.dock.common.intern.CDockable;
 import de.uka.ilkd.key.gui.GoalList;
 import de.uka.ilkd.key.gui.InfoView;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -27,6 +19,20 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.nodeviews.MainFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
+
+import bibliothek.gui.dock.common.CGrid;
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.MultipleCDockable;
+import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
+import bibliothek.gui.dock.common.action.CCheckBox;
+import bibliothek.gui.dock.common.action.core.CommonDecoratableDockAction;
+import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
+import bibliothek.gui.dock.control.focus.DefaultFocusRequest;
+import bibliothek.gui.dock.control.focus.FocusRequest;
+import org.jspecify.annotations.NonNull;
 
 public class DockingHelper {
     public final static List<String> LEFT_TOP_PANEL = new LinkedList<>();
@@ -45,6 +51,15 @@ public class DockingHelper {
         MAIN_PANEL.add(MainFrame.class.getName());
 
         RIGHT_PANEL.add(SourceViewFrame.class.getName());
+    }
+
+    /**
+     * Define that another panel should be in the lower left corner on factory reset.
+     *
+     * @param className class name of that panel
+     */
+    public static void addLeftPanel(String className) {
+        LEFT_PANEL.add(className);
     }
 
     /**
@@ -104,6 +119,42 @@ public class DockingHelper {
         mainWindow.getDockControl().getContentArea().deploy(grid);
     }
 
+    /**
+     * Focus the specified panel.
+     *
+     * @param mainWindow main window
+     * @param panel class name of the panel to show
+     */
+    public static void focus(MainWindow mainWindow, Class<?> panel) {
+        SingleCDockable dockable = mainWindow.getDockControl().getSingleDockable(panel.getName());
+        if (dockable == null) {
+            return;
+        }
+        dockable.setVisible(true);
+        FocusRequest request =
+            new DefaultFocusRequest(dockable.intern(), null, false, true, false, true);
+        dockable.getControl().getController().setFocusedDockable(request);
+    }
+
+    /**
+     * Iterates through all dockables and restores the visibility of all hidden dockables.
+     * Dockables may be hidden if they are part of an extension that was disabled previously.
+     * They are inserted in the left panels (more precisely, next to the goal list).
+     *
+     * @param mainWindow the main window
+     */
+    public static void restoreMissingPanels(MainWindow mainWindow) {
+        for (int c = mainWindow.getDockControl().getCDockableCount(), i = 0; i < c; i++) {
+            final CDockable cur = mainWindow.getDockControl().getCDockable(i);
+            if (cur.isVisible()) {
+                continue;
+            }
+            cur.setLocationsAside(
+                mainWindow.getDockControl().getSingleDockable(GoalList.class.getName()));
+            cur.setVisible(true);
+        }
+    }
+
 
     /**
      * Constructs a dockable for the given component.
@@ -133,7 +184,7 @@ public class DockingHelper {
             p.getComponent(), p.getPermissions(), a);
     }
 
-    public static @Nonnull CAction translateAction(@Nonnull Action action) {
+    public static @NonNull CAction translateAction(@NonNull Action action) {
         if (action.getValue(Action.SELECTED_KEY) != null) {
             return createCheckBox(action);
 
@@ -142,7 +193,20 @@ public class DockingHelper {
         }
     }
 
-    private static @Nonnull CAction createCheckBox(@Nonnull Action action) {
+    public static <A extends CommonDecoratableDockAction> void deriveBaseProperties(
+            CDecorateableAction<A> derive, @NonNull Action action) {
+        derive.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
+        derive.setEnabled(action.isEnabled());
+
+        action.addPropertyChangeListener(evt -> {
+            derive.setText((String) action.getValue(Action.NAME));
+            derive.setIcon((Icon) action.getValue(Action.SMALL_ICON));
+            derive.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
+            derive.setEnabled(action.isEnabled());
+        });
+    }
+
+    private static @NonNull CAction createCheckBox(@NonNull Action action) {
         CCheckBox button = new CCheckBox((String) action.getValue(Action.NAME),
             (Icon) action.getValue(Action.SMALL_ICON)) {
             @Override
@@ -152,15 +216,8 @@ public class DockingHelper {
             }
         };
 
-        button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-        button.setEnabled(action.isEnabled());
         button.setSelected(Boolean.TRUE == action.getValue(Action.SELECTED_KEY));
-        action.addPropertyChangeListener(evt -> {
-            button.setText((String) action.getValue(Action.NAME));
-            button.setIcon((Icon) action.getValue(Action.SMALL_ICON));
-            button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-            button.setEnabled(action.isEnabled());
-        });
+        deriveBaseProperties(button, action);
         return button;
     }
 
@@ -168,16 +225,7 @@ public class DockingHelper {
         CButton button = new CButton((String) action.getValue(Action.NAME),
             (Icon) action.getValue(Action.SMALL_ICON));
         button.addActionListener(action);
-        button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-        button.setEnabled(action.isEnabled());
-
-        action.addPropertyChangeListener(evt -> {
-            button.setText((String) action.getValue(Action.NAME));
-            button.setIcon((Icon) action.getValue(Action.SMALL_ICON));
-            button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-            button.setEnabled(action.isEnabled());
-        });
-
+        deriveBaseProperties(button, action);
         return button;
     }
 }

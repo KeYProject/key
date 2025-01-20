@@ -1,25 +1,32 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
+import java.net.URI;
+import java.net.URL;
+import java.util.List;
+
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
 import de.uka.ilkd.key.nparser.builder.IncludeFinder;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
+
+import org.key_project.util.java.StringUtil;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.StringUtil;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This is a monad around the parse tree. We use this class to hide the
@@ -33,10 +40,10 @@ import java.net.URL;
  * @version 1 (5.12.19)
  */
 public abstract class KeyAst<T extends ParserRuleContext> {
-    @Nonnull
-    final T ctx;
 
-    protected KeyAst(@Nonnull T ctx) {
+    final @NonNull T ctx;
+
+    protected KeyAst(@NonNull T ctx) {
         this.ctx = ctx;
     }
 
@@ -49,6 +56,15 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         return getClass().getName() + ": " + BuilderHelpers.getPosition(ctx);
     }
 
+    public Location getStartLocation() {
+        return Location.fromToken(ctx.start);
+    }
+
+    public String getText() {
+        var interval = new Interval(ctx.start.getStartIndex(), ctx.stop.getStopIndex() + 1);
+        return ctx.start.getInputStream().getText(interval);
+    }
+
     public static class File extends KeyAst<KeYParser.FileContext> {
         File(KeYParser.FileContext ctx) {
             super(ctx);
@@ -57,24 +73,37 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         @Nullable
         public ProofSettings findProofSettings() {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-            if (ctx.decls() != null && ctx.decls().pref != null) {
-                String text =
-                    StringUtil.trim(ctx.decls().pref.s.getText(), '"').replace("\\\\:", ":");
-                settings.loadSettingsFromString(text);
+
+            if (ctx.preferences() != null && ctx.preferences().s != null) {
+                String text = StringUtil.trim(ctx.preferences().s.getText(), '"')
+                        .replace("\\\\:", ":");
+                settings.loadSettingsFromPropertyString(text);
+            } else if (ctx.preferences() != null && ctx.preferences().c != null) {
+                var cb = new ConfigurationBuilder();
+                var c = (Configuration) ctx.preferences().c.accept(cb);
+                settings.readSettings(c);
             }
             return settings;
         }
 
-        @Nullable
-        public ProofScript findProofScript() {
-            if (ctx.problem() != null && ctx.problem().proofScriptEntry() != null) {
-                var pctx = ctx.problem().proofScriptEntry();
-                if (pctx.STRING_LITERAL() != null) {
-                    var ps = new PositionedString(pctx.STRING_LITERAL().getText(), pctx.STRING_LITERAL().getSymbol());
-                    return ParsingFacade.parseScript(ps);
-                } else {
-                    return new KeyAst.ProofScript(pctx.proofScript());
-                }
+        /**
+         * Returns the a {@link ProofScriptEntry} from the underlying AST if an {@code \proofscript}
+         * entry is present.
+         * The {@code url} is used as the source of input and might be later used for error message,
+         * or including
+         * other files.
+         *
+         * @param url location pointing to the source of the AST
+         * @return a {@link ProofScriptEntry} if {@code \proofscript} is present
+         */
+        public @Nullable ProofScript findProofScript(URI url) {
+            if (ctx.problem() != null && ctx.problem().proofScript() != null) {
+                KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
+                Location location = new Location(url,
+                    Position.newOneBased(pctx.ps.getLine(), pctx.ps.getCharPositionInLine()));
+
+                String text = pctx.ps.getText();
+                return new ProofScriptEntry(StringUtil.trim(text, '"'), location);
             }
             return null;
         }
@@ -99,18 +128,23 @@ public abstract class KeyAst<T extends ParserRuleContext> {
 
         public Token findProof() {
             KeYParser.ProofContext a = ctx.proof();
-            if (a != null)
+            if (a != null) {
                 return a.PROOF().getSymbol();
+            }
             return null;
         }
 
         /**
-         * Extracts the decls and taclets into a string. This method is required for saving and
-         * loading proofs.
+         * Extracts the decls and taclets into a string.
+         * The problem header may contain the bootstrap classpath,
+         * the regular classpath, the Java source file to load,
+         * include statements to load other files, configuration of options,
+         * declarations of sorts, program variables, schema variables, predicates, and more.
+         * See the grammar (KeYParser.g4) for more possible elements.
          */
         public String getProblemHeader() {
             final KeYParser.DeclsContext decls = ctx.decls();
-            if (decls != null) {
+            if (decls != null && decls.getChildCount() > 0) {
                 final Token start = decls.start;
                 final Token stop = decls.stop;
                 if (start != null && stop != null) {
@@ -125,6 +159,43 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
     }
 
+    public static class ConfigurationFile extends KeyAst<KeYParser.CfileContext> {
+        ConfigurationFile(KeYParser.CfileContext ctx) {
+            super(ctx);
+        }
+
+        public Configuration asConfiguration() {
+            final var cfg = new ConfigurationBuilder();
+            List<Object> res = cfg.visitCfile(ctx);
+            if (!res.isEmpty())
+                return (Configuration) res.get(0);
+            else
+                throw new RuntimeException("Error in configuration. Source: "
+                    + ctx.start.getTokenSource().getSourceName());
+        }
+    }
+
+    public static class SetStatementContext extends KeyAst<JmlParser.Set_statementContext> {
+        public SetStatementContext(JmlParser.@NonNull Set_statementContext ctx) {
+            super(ctx);
+        }
+
+        public Expression getAssignee() {
+            return new Expression(ctx.assignee);
+        }
+
+        public Expression getValue() {
+            return new Expression(ctx.value);
+        }
+    }
+
+    public static class Expression extends KeyAst<JmlParser.ExpressionContext> {
+        public Expression(JmlParser.@NonNull ExpressionContext ctx) {
+            super(ctx);
+        }
+    }
+
+
     public static class Term extends KeyAst<KeYParser.TermContext> {
         Term(KeYParser.TermContext ctx) {
             super(ctx);
@@ -134,6 +205,12 @@ public abstract class KeyAst<T extends ParserRuleContext> {
     public static class Seq extends KeyAst<KeYParser.SeqContext> {
         Seq(KeYParser.SeqContext ctx) {
             super(ctx);
+        }
+    }
+
+    public static class Taclet extends KeyAst<KeYParser.TacletContext> {
+        public Taclet(KeYParser.TacletContext taclet) {
+            super(taclet);
         }
     }
 
@@ -155,4 +232,6 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             }
         }
     }
+
+
 }

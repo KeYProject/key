@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Field;
@@ -10,7 +16,6 @@ import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -20,15 +25,16 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.translation.Context;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * Adds the funtionality to breakpoints to evaluate conditions.
@@ -52,36 +58,36 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     private String conditionString;
 
     /**
-     * A list of {@link ProgramVariable}s containing all variables that were parsed and have to be
+     * A list of {@link LocationVariable}s containing all variables that were parsed and have to be
      * possibly replaced during runtime.
      */
-    private ImmutableList<ProgramVariable> varsForCondition;
+    private ImmutableList<LocationVariable> varsForCondition;
 
     /**
      * The KeYJavaType of the container of the element associated with the breakpoint.
      */
-    private KeYJavaType containerType;
+    private final KeYJavaType containerType;
 
     /**
      * A list of variables KeY has to hold to evaluate the condition
      */
-    private Set<LocationVariable> toKeep;
+    private final Set<LocationVariable> toKeep;
 
     /**
      * A {@link Map} mapping from relevant variables for the condition to their runtime equivalent
      * in KeY
      */
-    private Map<SVSubstitute, SVSubstitute> variableNamingMap;
+    private Map<SyntaxElement, SyntaxElement> variableNamingMap;
 
     /**
      * The list of parameter variables of the method that contains the associated breakpoint
      */
-    private Set<LocationVariable> paramVars;
+    private final Set<LocationVariable> paramVars;
 
     /**
-     * A {@link ProgramVariable} representing the instance the class KeY is working on
+     * A {@link LocationVariable} representing the instance the class KeY is working on
      */
-    private ProgramVariable selfVar;
+    private LocationVariable selfVar;
 
     /**
      * The {@link IProgramMethod} this Breakpoint lies within
@@ -107,9 +113,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             KeYJavaType containerType) {
         super(hitCount, proof, enabled);
         this.setPm(pm);
-        paramVars = new HashSet<LocationVariable>();
-        setVariableNamingMap(new HashMap<SVSubstitute, SVSubstitute>());
-        toKeep = new HashSet<LocationVariable>();
+        paramVars = new HashSet<>();
+        setVariableNamingMap(new HashMap<>());
+        toKeep = new HashSet<>();
         this.containerType = containerType;
         this.conditionEnabled = conditionEnabled;
     }
@@ -157,14 +163,14 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      *
      * @return the cloned map
      */
-    private Map<SVSubstitute, SVSubstitute> getOldMap() {
-        Map<SVSubstitute, SVSubstitute> oldMap = new HashMap<SVSubstitute, SVSubstitute>();
-        Iterator<?> iter = getVariableNamingMap().entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<?, ?> oldEntry = (Entry<?, ?>) iter.next();
-            if (oldEntry.getKey() instanceof SVSubstitute
-                    && oldEntry.getValue() instanceof SVSubstitute) {
-                oldMap.put((SVSubstitute) oldEntry.getKey(), (SVSubstitute) oldEntry.getValue());
+    private Map<SyntaxElement, SyntaxElement> getOldMap() {
+        Map<SyntaxElement, SyntaxElement> oldMap = new HashMap<>();
+        for (Entry<SyntaxElement, SyntaxElement> svSubstituteSVSubstituteEntry : getVariableNamingMap()
+                .entrySet()) {
+            Entry<?, ?> oldEntry = svSubstituteSVSubstituteEntry;
+            if (oldEntry.getKey() instanceof SyntaxElement
+                    && oldEntry.getValue() instanceof SyntaxElement) {
+                oldMap.put((SyntaxElement) oldEntry.getKey(), (SyntaxElement) oldEntry.getValue());
             }
         }
         return oldMap;
@@ -195,7 +201,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @param oldMap the oldMap variableNamings
      */
     private void putValuesFromRenamings(ProgramVariable varForCondition, Node node, boolean inScope,
-            Map<SVSubstitute, SVSubstitute> oldMap, RuleApp ruleApp) {
+            Map<SyntaxElement, SyntaxElement> oldMap, RuleApp ruleApp) {
         // look for renamings KeY did
         boolean found = false;
         // get current renaming tables
@@ -206,11 +212,11 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             while (itr.hasNext() && !found) {
                 RenamingTable renamingTable = itr.next();
                 // iterate over renamings within table
-                Iterator<?> renameItr = renamingTable.getHashMap().entrySet().iterator();
-                while (renameItr.hasNext()) {
-                    Map.Entry<?, ?> entry = (Entry<?, ?>) renameItr.next();
+                for (Entry<? extends SourceElement, ? extends SourceElement> value : renamingTable
+                        .getHashMap().entrySet()) {
+                    Entry<?, ?> entry = value;
                     if (entry.getKey() instanceof LocationVariable
-                            && entry.getValue() instanceof SVSubstitute) {
+                            && entry.getValue() instanceof SyntaxElement) {
                         if ((VariableNamer.getBasename(((LocationVariable) entry.getKey()).name()))
                                 .equals(varForCondition.name())
                                 && ((LocationVariable) entry.getKey()).name().toString()
@@ -224,7 +230,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                             // add new value
                             toKeep.add((LocationVariable) entry.getValue());
                             getVariableNamingMap().put(varForCondition,
-                                (SVSubstitute) entry.getValue());
+                                (SyntaxElement) entry.getValue());
                             found = true;
                             break;
                         } else if (inScope && ((LocationVariable) entry.getKey()).name()
@@ -237,7 +243,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                             // add new value
                             toKeep.add((LocationVariable) entry.getValue());
                             getVariableNamingMap().put(varForCondition,
-                                (SVSubstitute) entry.getValue());
+                                (SyntaxElement) entry.getValue());
                             found = true;
                             break;
                         }
@@ -253,12 +259,12 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * given ruleApp on the given node
      *
      * @param ruleApp the applied rule app
-     * @param nodethe current node
+     * @param node the current node
      */
     protected void refreshVarMaps(RuleApp ruleApp, Node node) {
         boolean inScope = isInScope(node);
         // collect old values
-        Map<SVSubstitute, SVSubstitute> oldMap = getOldMap();
+        Map<SyntaxElement, SyntaxElement> oldMap = getOldMap();
         // put values into map which have to be replaced
         for (ProgramVariable varForCondition : getVarsForCondition()) {
             // put global variables only done when a variable is instantiated by
@@ -286,14 +292,14 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         setSelfVar(new LocationVariable(
             new ProgramElementName(getProof().getServices().getTermBuilder().newName("self")),
             containerType, null, false, false));
-        ImmutableList<ProgramVariable> varsForCondition = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> varsForCondition = ImmutableSLList.nil();
         if (getPm() != null) {
             // collect parameter variables
             for (ParameterDeclaration pd : getPm().getParameters()) {
                 for (VariableSpecification vs : pd.getVariables()) {
                     this.paramVars.add((LocationVariable) vs.getProgramVariable());
                     varsForCondition =
-                        varsForCondition.append((ProgramVariable) vs.getProgramVariable());
+                        varsForCondition.append((LocationVariable) vs.getProgramVariable());
                 }
             }
             // Collect local variables
@@ -308,16 +314,17 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         }
         JavaInfo info = getProof().getServices().getJavaInfo();
         ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(containerType);
-        ImmutableList<ProgramVariable> globalVars = ImmutableSLList.nil();
+        ImmutableList<LocationVariable> globalVars = ImmutableSLList.nil();
         for (KeYJavaType kjtloc : kjts) {
             if (kjtloc.getJavaType() instanceof TypeDeclaration) {
                 ImmutableList<Field> fields =
                     info.getAllFields((TypeDeclaration) kjtloc.getJavaType());
                 for (Field field : fields) {
                     if ((kjtloc.equals(containerType) || !field.isPrivate())
-                            && !((LocationVariable) field.getProgramVariable()).isImplicit())
+                            && !((LocationVariable) field.getProgramVariable()).isImplicit()) {
                         globalVars =
-                            globalVars.append((ProgramVariable) field.getProgramVariable());
+                            globalVars.append((LocationVariable) field.getProgramVariable());
+                    }
                 }
             }
         }
@@ -326,8 +333,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         // parse string
         PositionedString ps = new PositionedString(condition);
 
-        JmlIO io = new JmlIO().services(getProof().getServices()).classType(containerType)
-                .selfVar(getSelfVar()).parameters(varsForCondition);
+        var context = Context.inMethodWithSelfVar(pm, selfVar);
+        JmlIO io = new JmlIO(getProof().getServices()).context(context)
+                .parameters(varsForCondition);
 
         return io.parseExpression(ps);
     }
@@ -416,10 +424,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      */
     protected abstract boolean isInScopeForCondition(Node node);
 
-    private ImmutableList<ProgramVariable> saveAddVariable(LocationVariable x,
-            ImmutableList<ProgramVariable> varsForCondition) {
+    private ImmutableList<LocationVariable> saveAddVariable(LocationVariable x,
+            ImmutableList<LocationVariable> varsForCondition) {
         boolean contains = false;
-        for (ProgramVariable paramVar : varsForCondition) {
+        for (var paramVar : varsForCondition) {
             if (paramVar.toString().equals(x.toString())) {
                 contains = true;
                 break;
@@ -452,7 +460,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * Checks if the condition for the associated Breakpoint is enabled.
      *
-     * @param conditionEnabled true if the condition for the associated Breakpoint is enabled
+     * @return returns true if the condition for the associated Breakpoint is enabled
      */
     public boolean isConditionEnabled() {
         return conditionEnabled;
@@ -491,42 +499,42 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * @return the variableNamingMap
      */
-    public Map<SVSubstitute, SVSubstitute> getVariableNamingMap() {
+    public Map<SyntaxElement, SyntaxElement> getVariableNamingMap() {
         return variableNamingMap;
     }
 
     /**
      * @param variableNamingMap the variableNamingMap to set
      */
-    public void setVariableNamingMap(Map<SVSubstitute, SVSubstitute> variableNamingMap) {
+    public void setVariableNamingMap(Map<SyntaxElement, SyntaxElement> variableNamingMap) {
         this.variableNamingMap = variableNamingMap;
     }
 
     /**
      * @return the selfVar
      */
-    public ProgramVariable getSelfVar() {
+    public LocationVariable getSelfVar() {
         return selfVar;
     }
 
     /**
      * @param selfVar the selfVar to set
      */
-    public void setSelfVar(ProgramVariable selfVar) {
+    public void setSelfVar(LocationVariable selfVar) {
         this.selfVar = selfVar;
     }
 
     /**
      * @return the varsForCondition
      */
-    public ImmutableList<ProgramVariable> getVarsForCondition() {
+    public ImmutableList<LocationVariable> getVarsForCondition() {
         return varsForCondition;
     }
 
     /**
      * @param varsForCondition the varsForCondition to set
      */
-    public void setVarsForCondition(ImmutableList<ProgramVariable> varsForCondition) {
+    public void setVarsForCondition(ImmutableList<LocationVariable> varsForCondition) {
         this.varsForCondition = varsForCondition;
     }
 

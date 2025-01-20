@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Wed Apr 13 17:18:32 CEST 2022
+#Wed Apr 12 13:14:02 CEST 2023
 [NewSMT]NoTypeHierarchy=false
 [Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
@@ -12,7 +12,7 @@
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
-[Choice]DefaultChoices=JavaCard-JavaCard\\:on , Strings-Strings\\:on , assertions-assertions\\:safe , bigint-bigint\\:on , finalFields-finalFields\\:immutable , floatRules-floatRules\\:strictfpOnly , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , integerSimplificationRules-integerSimplificationRules\\:full , javaLoopTreatment-javaLoopTreatment\\:efficient , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , methodExpansion-methodExpansion\\:modularOnly , modelFields-modelFields\\:treatAsAxiom , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , programRules-programRules\\:Java , reach-reach\\:on , runtimeExceptions-runtimeExceptions\\:ban , sequences-sequences\\:on , wdChecks-wdChecks\\:off , wdOperator-wdOperator\\:L
+[Choice]DefaultChoices=JavaCard-JavaCard\\:on, Strings-Strings\\:on, assertions-assertions\\:safe, bigint-bigint\\:on, finalFields-finalFields\\:immutable, floatRules-floatRules\\:strictfpOnly, initialisation-initialisation\\:disableStaticInitialisation, intRules-intRules\\:arithmeticSemanticsIgnoringOF, integerSimplificationRules-integerSimplificationRules\\:full, javaLoopTreatment-javaLoopTreatment\\:efficient, mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off, methodExpansion-methodExpansion\\:modularOnly, modelFields-modelFields\\:treatAsAxiom, moreSeqRules-moreSeqRules\\:on, permissions-permissions\\:off, programRules-programRules\\:Java, reach-reach\\:on, runtimeExceptions-runtimeExceptions\\:ban, sequences-sequences\\:on, wdChecks-wdChecks\\:off, wdOperator-wdOperator\\:L
 [StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET
 [StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]UseBuiltUniqueness=false
@@ -47,17 +47,15 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Wed Apr 13 17:18:32 CEST 2022
-name=ifthenelse_equals_2
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "ifthenelse_equals_2",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proof {
-(keyLog "0" (keyUser "Julian" ) (keyVersion "e1a85b31e7"))
-(keyLog "1" (keyUser "Julian" ) (keyVersion "e1a85b31e7"))
+(keyLog "0" (keyUser "Julian" ) (keyVersion "80a871ca3bac8bb405ecc216fcb6fa9ef6f8a395"))
 
-(autoModeTime "33")
+(autoModeTime "0")
 
 (branch "dummy ID"
 (rule "eqSymm" (formula "1") (term "0") (newnames "f_b,f_c"))

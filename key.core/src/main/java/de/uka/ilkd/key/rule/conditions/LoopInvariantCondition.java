@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Optional;
@@ -13,13 +16,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.SyntaxElement;
 
 /**
  * Extracts the loop invariants for a loop term (for all applicable heap contexts).
@@ -39,7 +43,7 @@ public class LoopInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final TermBuilder tb = services.getTermBuilder();
@@ -64,10 +68,13 @@ public class LoopInvariantCondition implements VariableCondition {
         final Term selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
-        final Modality modality = (Modality) svInst.getInstantiation(modalitySV);
+        // TODO: handle exception
+        final Modality.JavaModalityKind modalityKind =
+            (Modality.JavaModalityKind) svInst.getInstantiation(modalitySV);
 
         Term invInst = tb.tt();
-        for (final LocationVariable heap : MiscTools.applicableHeapContexts(modality, services)) {
+        for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,
+            services)) {
             final Term currentInvInst = invInst;
 
             final Optional<Term> maybeInvInst = Optional.ofNullable(

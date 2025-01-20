@@ -1,13 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
+
+import org.key_project.logic.Name;
 
 /**
  * Label attached to a symbolic execution thread.
+ *
+ * @param id The unique ID of this term label in the {@link Sequent}.
  */
-public class SymbolicExecutionTermLabel implements TermLabel {
+public record SymbolicExecutionTermLabel(int id) implements TermLabel {
     /**
      * The unique name of this label.
      */
@@ -19,17 +25,11 @@ public class SymbolicExecutionTermLabel implements TermLabel {
     public static final String PROOF_COUNTER_NAME = "SE_LABEL_COUNTER";
 
     /**
-     * The unique ID of this term label in the {@link Sequent}.
-     */
-    private final int id;
-
-    /**
      * Constructor.
      *
      * @param id The unique ID of this term label in the {@link Sequent}.
      */
-    public SymbolicExecutionTermLabel(int id) {
-        this.id = id;
+    public SymbolicExecutionTermLabel {
     }
 
     /**
@@ -43,27 +43,25 @@ public class SymbolicExecutionTermLabel implements TermLabel {
      * {@inheritDoc}
      */
     public String toString() {
-        return NAME.toString() + "(" + getId() + ")";
+        return NAME + "(" + id() + ")";
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Object getChild(int i) {
-        switch (i) {
-        case 0:
-            return getId();
-        default:
-            return null;
+    public Object getTLChild(int i) {
+        if (i == 0) {
+            return id();
         }
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int getChildCount() {
+    public int getTLChildCount() {
         return 1;
     }
 
@@ -72,7 +70,8 @@ public class SymbolicExecutionTermLabel implements TermLabel {
      *
      * @return The unique ID of this label in the {@link Sequent}.
      */
-    public int getId() {
+    @Override
+    public int id() {
         return id;
     }
 

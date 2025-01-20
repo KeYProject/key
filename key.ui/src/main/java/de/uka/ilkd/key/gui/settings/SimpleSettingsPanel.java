@@ -1,22 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import javax.annotation.Nullable;
-import org.key_project.util.java.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.awt.*;
+import java.text.Format;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
-import java.text.Format;
+
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+
+import org.key_project.util.java.StringUtil;
+
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple panel for using inside of the {@link SettingsUi}.
@@ -39,10 +44,10 @@ public class SimpleSettingsPanel extends JPanel {
         ColorSettings.define("SETTINGS_TEXTFIELD_ERROR",
             "Color for marking errornous textfields in settings dialog", new Color(200, 100, 100));
 
-    protected Box pNorth = new Box(BoxLayout.Y_AXIS);
-    protected JPanel pCenter = new JPanel();
-    protected JLabel lblHead = new JLabel();
-    protected JLabel lblSubhead = new JLabel();
+    protected final Box pNorth = new Box(BoxLayout.Y_AXIS);
+    protected final JPanel pCenter = new JPanel();
+    protected final JLabel lblHead = new JLabel();
+    protected final JLabel lblSubhead = new JLabel();
 
     protected SimpleSettingsPanel() {
         setLayout(new BorderLayout());
@@ -106,6 +111,13 @@ public class SimpleSettingsPanel extends JPanel {
         return new JScrollPane(area);
     }
 
+    protected JTextArea createTextAreaWithoutScroll(String text, Validator<String> validator) {
+        JTextArea area = new JTextArea(text);
+        area.setRows(5);
+        area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
+        return area;
+    }
+
 
     protected JTextField createTextField(String text, final @Nullable Validator<String> validator) {
         JTextField field = new JTextField(text);
@@ -164,9 +176,9 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
     public static JLabel createHelpLabel(String s) {
-        if (s == null || s.isEmpty())
+        if (s == null || s.isEmpty()) {
             s = "";
-        else {
+        } else {
             String brokenLines = StringUtil.wrapLines(s);
             s = "<html>"
                 + brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
@@ -175,6 +187,28 @@ public class SimpleSettingsPanel extends JPanel {
         JLabel infoButton =
             new JLabel(IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
         infoButton.setToolTipText(s);
+        return infoButton;
+    }
+
+    public static JLabel createHelpTextLabel(String s) {
+        if (s == null || s.isEmpty()) {
+            s = "";
+        }
+        if (s.contains("\n")) {
+            s = s.substring(0, s.indexOf('\n'));
+        }
+
+        JLabel infoButton = new JLabel(s);
+        infoButton.setFont(infoButton.getFont().deriveFont(10f));
+        infoButton.setBackground(Color.orange);
+        return infoButton;
+    }
+
+    public static JButton createHelpButton(Runnable callback) {
+        var infoButton =
+            new JButton(IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
+        infoButton.setToolTipText("Open online help...");
+        infoButton.addActionListener(e -> callback.run());
         return infoButton;
     }
 

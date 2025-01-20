@@ -1,6 +1,6 @@
-/**
- * Created on: Dec 23, 2011
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.lang;
 
 import java.util.LinkedList;
@@ -21,10 +21,9 @@ public class SMTTerms extends SMTTerm {
     }
 
     public List<SMTTerm> flatten() {
-        List<SMTTerm> termList = new LinkedList<SMTTerm>();
+        List<SMTTerm> termList = new LinkedList<>();
         for (SMTTerm arg : this.getTerms()) {
-            if (arg instanceof SMTTerms) {
-                SMTTerms terms = (SMTTerms) arg;
+            if (arg instanceof SMTTerms terms) {
                 termList.addAll(terms.flatten());
 
             }
@@ -61,7 +60,7 @@ public class SMTTerms extends SMTTerm {
      */
     @Override
     public boolean occurs(SMTTermVariable a) {
-        Boolean b = false;
+        boolean b = false;
         for (SMTTerm term : terms) {
             b = b && term.occurs(a);
         }
@@ -76,8 +75,9 @@ public class SMTTerms extends SMTTerm {
     @Override
     public boolean occurs(String id) {
         for (SMTTerm term : terms) {
-            if (term.occurs(id))
+            if (term.occurs(id)) {
                 return true;
+            }
         }
         return false;
     }
@@ -90,7 +90,7 @@ public class SMTTerms extends SMTTerm {
      */
     @Override
     public SMTTerm substitute(SMTTermVariable a, SMTTerm b) {
-        List<SMTTerm> ret = new LinkedList<SMTTerm>();
+        List<SMTTerm> ret = new LinkedList<>();
         for (SMTTerm term : terms) {
             ret.add(term.substitute(a, b));
         }
@@ -99,7 +99,7 @@ public class SMTTerms extends SMTTerm {
 
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
-        List<SMTTerm> ret = new LinkedList<SMTTerm>();
+        List<SMTTerm> ret = new LinkedList<>();
         for (SMTTerm term : terms) {
             ret.add(term.substitute(a, b));
         }
@@ -108,7 +108,7 @@ public class SMTTerms extends SMTTerm {
 
     @Override
     public SMTTerm replace(SMTTermCall a, SMTTerm b) {
-        List<SMTTerm> ret = new LinkedList<SMTTerm>();
+        List<SMTTerm> ret = new LinkedList<>();
         for (SMTTerm term : terms) {
             ret.add(term.replace(a, b));
         }
@@ -117,7 +117,7 @@ public class SMTTerms extends SMTTerm {
 
     @Override
     public SMTTerm instantiate(SMTTermVariable a, SMTTerm b) {
-        List<SMTTerm> ret = new LinkedList<SMTTerm>();
+        List<SMTTerm> ret = new LinkedList<>();
         for (SMTTerm term : terms) {
             ret.add(term.instantiate(a, b));
         }
@@ -138,17 +138,14 @@ public class SMTTerms extends SMTTerm {
     }
 
     public String toString(int nestPos) {
-        StringBuffer ret = new StringBuffer();
-        StringBuffer tab = new StringBuffer();
+        StringBuilder ret = new StringBuilder();
         for (int i = 0; i < nestPos; i++) {
-            tab = tab.append(" ");
+            ret.append(" ");
         }
 
-        StringBuffer buff = new StringBuffer();
-        buff.append(tab);
-
-        if (terms.size() == 0)
+        if (terms.size() == 0) {
             throw new RuntimeException("Unexpected: Empty args for TermLogicalOp ");
+        }
 
         for (SMTTerm term : terms) {
             ret.append(term.toString(nestPos));

@@ -1,27 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 /**
  * A class axiom which is essentially of the form "o.<inv> -> phi": it demands that the invariants
@@ -78,15 +78,15 @@ public final class PartialInvAxiom extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || this.getClass() != o.getClass())
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
+        }
         final PartialInvAxiom other = (PartialInvAxiom) o;
 
-        if (!target.equals(other.target))
+        if (!target.equals(other.target)) {
             return false;
-        if (!inv.equals(other.inv))
-            return false;
-        return true;
+        }
+        return inv.equals(other.inv);
     }
 
     @Override
@@ -121,7 +121,7 @@ public final class PartialInvAxiom extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
-        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+        ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
 
         for (int i = 0; i < 2; i++) {
             // i==0 normal and i==1 EQ version
@@ -131,20 +131,20 @@ public final class PartialInvAxiom extends ClassAxiom {
 
             // create schema variables
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-            final List<SchemaVariable> heapSVs = new LinkedList<SchemaVariable>();
-            for (int j = 0; j < HeapContext.getModHeaps(services, false).size(); j++) {
+            final List<TermSV> heapSVs = new LinkedList<>();
+            for (int j = 0; j < HeapContext.getModifiableHeaps(services, false).size(); j++) {
                 heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + j),
                     heapLDT.targetSort(), false, false));
             }
-            final SchemaVariable selfSV = target.isStatic() ? null
+            final var selfSV = target.isStatic() ? null
                     : SchemaVariableFactory.createTermSV(new Name("self"), inv.getKJT().getSort());
-            final SchemaVariable eqSV = target.isStatic() ? null
+            final var eqSV = target.isStatic() ? null
                     : SchemaVariableFactory.createTermSV(new Name("EQ"),
                         services.getJavaInfo().objectSort());
 
             ImmutableSet<Taclet> taclets = TG.generatePartialInvTaclet(name, heapSVs, selfSV, eqSV,
-                inv.getInv(selfSV, services), inv.getKJT(), toLimit, target.isStatic(), i == 1,
-                services);
+                inv.getInv(selfSV, services), inv.getKJT(), toLimit, target.isStatic(),
+                inv.isFree(), i == 1, services);
             result = result.union(taclets);
 
             // EQ taclet (with i==1) only for non-static invariants
@@ -160,7 +160,8 @@ public final class PartialInvAxiom extends ClassAxiom {
 
     @Override
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
-        final ProgramVariable dummySelfVar = services.getTermBuilder().selfVar(inv.getKJT(), false);
+        final LocationVariable dummySelfVar =
+            services.getTermBuilder().selfVar(inv.getKJT(), false);
         return MiscTools.collectObservers(inv.getInv(dummySelfVar, services));
     }
 

@@ -1,27 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml;
+
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
+import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.util.MiscTools;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Helper class used by the JML translation. Provides methods that look for certain keywords (such
  * as "pure") in comments, and that help in desugaring such keywords.
  */
 public final class JMLInfoExtractor {
-
     // -------------------------------------------------------------------------
     // internal methods
     // -------------------------------------------------------------------------
@@ -30,9 +30,7 @@ public final class JMLInfoExtractor {
      * Checks whether "comment" is a JML comment containing "key". see bugreport #1166
      */
     private static boolean checkFor(String key, String comment) {
-        int index = comment.indexOf(key);
-        boolean result = MiscTools.isJMLComment(comment) && index >= 0;
-        return result;
+        return comment.contains(key) && MiscTools.isJMLComment(comment);
     }
 
 
@@ -48,58 +46,95 @@ public final class JMLInfoExtractor {
         return false;
     }
 
+    /**
+     * Checks whether one of the passed comments is a JML comment containing "key" and not *bad*.
+     */
+    private static boolean checkForNotContaining(String key, String bad,
+            ImmutableList<Comment> coms) {
+        for (Comment c : coms) {
+            if (checkFor(key, c.getText()) && !c.getText().contains(bad)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    /**
+     * Checks the passed comments for the spec math mode.
+     */
+    private static SpecMathMode checkForSpecMathMode(ImmutableList<Comment> comments) {
+        // This is hacky but hard to do better
+        // We exclude comments containing 'behaviour' since they can be from the method contract
+        var specBigintMath = checkForNotContaining("spec_bigint_math", "behaviour", comments);
+        var specSafeMath = checkForNotContaining("spec_safe_math", "behaviour", comments);
+        var specJavaMath = checkForNotContaining("spec_java_math", "behaviour", comments);
+        // Consistency: bigint > safe > java
+        return specBigintMath ? SpecMathMode.BIGINT
+                : (specSafeMath ? SpecMathMode.SAFE : (specJavaMath ? SpecMathMode.JAVA : null));
+    }
 
-    private static boolean hasJMLModifier(TypeDeclaration td, String mod) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+    private static ImmutableList<Comment> getJMLComments(TypeDeclaration decl) {
+        ImmutableList<Comment> coms = ImmutableSLList.nil();
 
-        // Either mod is attached to the declaration itself ...
-        coms = coms.prepend(td.getComments());
+        // Either decl is attached to the declaration itself ...
+        coms = coms.prepend(decl.getComments());
 
         // ... or to a modifier ...
-        for (Modifier m : td.getModifiers()) {
-            coms = coms.prepend(m.getComments());
+        for (Modifier modifier : decl.getModifiers()) {
+            coms = coms.prepend(modifier.getComments());
         }
 
         // ... or to the name
-        if (td.getProgramElementName() != null) {
-            coms = coms.prepend(td.getProgramElementName().getComments());
+        if (decl.getProgramElementName() != null) {
+            coms = coms.prepend(decl.getProgramElementName().getComments());
         }
-
-        return checkFor(mod, coms);
+        return coms;
     }
 
+    private static ImmutableList<Comment> getJMLComments(MethodDeclaration method) {
+        ImmutableList<Comment> coms = ImmutableSLList.nil();
 
-
-    private static boolean hasJMLModifier(IProgramMethod pm, String mod) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
-        final MethodDeclaration method = pm.getMethodDeclaration();
-
-        // Either mod is attached to the method itself ...
+        // Either method is attached to the method itself ...
         Comment[] methodComments = method.getComments();
         if (methodComments.length > 0) {
             coms = coms.prepend(methodComments[methodComments.length - 1]);
         }
 
         // ... or to a modifier ...
-        for (Modifier m : method.getModifiers()) {
-            coms = coms.prepend(m.getComments());
+        for (Modifier modifier : method.getModifiers()) {
+            coms = coms.prepend(modifier.getComments());
         }
 
         // ... or to the return type ...
-        if (!pm.isVoid() && !pm.isConstructor()) {
+        if (!method.isVoid() && !(method instanceof ConstructorDeclaration)) {
             coms = coms.prepend(method.getTypeReference().getComments());
         }
 
-        // ... or to 'void' ...
+        // ... or to 'void' (special case) ...
         if (method.getVoidComments() != null) {
             coms = coms.prepend(method.getVoidComments());
         }
 
         // ... or to the method name
         coms = coms.prepend(method.getProgramElementName().getComments());
+        return coms;
+    }
 
-        return checkFor(mod, coms);
+    /**
+     * Parses a modifiers of a method
+     *
+     * @param methodDeclaration the method declaration
+     * @return modifiers
+     */
+    public static MethodDeclaration.JMLModifiers parseMethod(MethodDeclaration methodDeclaration) {
+        var comments = getJMLComments(methodDeclaration);
+
+        var pure = checkFor("pure", comments);
+        var strictlyPure = checkFor("strictly_pure", comments);
+        var helper = checkFor("helper", comments);
+        var specMathMode = checkForSpecMathMode(comments);
+
+        return new MethodDeclaration.JMLModifiers(pure, strictlyPure, helper, specMathMode);
     }
 
 
@@ -107,23 +142,17 @@ public final class JMLInfoExtractor {
      * Extracts the list of comments for a given field. The comments should usually be modifiers.
      *
      * @param fieldName
-     * @param containingClass
+     * @param td
      * @return
      */
     private static ImmutableList<Comment> extractFieldModifiers(String fieldName,
-            KeYJavaType containingClass) {
-        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
-        if (!(containingClass.getJavaType() instanceof TypeDeclaration)) {
-            return comments;
-        }
-
-        TypeDeclaration td = (TypeDeclaration) containingClass.getJavaType();
+            TypeDeclaration td) {
+        ImmutableList<Comment> comments = ImmutableSLList.nil();
         FieldDeclaration fd = null;
         int position = 0;
 
-        for (final MemberDeclaration md : td.getMembers()) {
-            if (md instanceof FieldDeclaration) {
-                FieldDeclaration tmp = (FieldDeclaration) md;
+        for (final MemberDeclaration decl : td.getMembers()) {
+            if (decl instanceof FieldDeclaration tmp) {
                 ImmutableArray<FieldSpecification> aofs = tmp.getFieldSpecifications();
                 for (int j = 0; j < aofs.size(); j++) {
                     if (aofs.get(j).getProgramName().equals(fieldName)) {
@@ -143,8 +172,8 @@ public final class JMLInfoExtractor {
         comments = comments.prepend(fd.getTypeReference().getComments());
         comments = comments.prepend(fd.getFieldSpecifications().get(position).getComments());
 
-        for (Modifier mod : fd.getModifiers()) {
-            comments = comments.prepend(mod.getComments());
+        for (Modifier modifier : fd.getModifiers()) {
+            comments = comments.prepend(modifier.getComments());
         }
         return comments;
     }
@@ -154,49 +183,49 @@ public final class JMLInfoExtractor {
     // public interface
     // -------------------------------------------------------------------------
 
-    public static boolean hasJMLModifier(FieldDeclaration fd, String mod) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+    public static boolean hasJMLModifier(FieldDeclaration fd, String modifiers) {
+        ImmutableList<Comment> coms = ImmutableSLList.nil();
 
-        // Either mod is attached to the declaration itself ...
+        // Either fd is attached to the declaration itself ...
         coms = coms.prepend(fd.getComments());
 
         // ... or to a modifier ...
-        for (Modifier m : fd.getModifiers()) {
-            coms = coms.prepend(m.getComments());
+        for (Modifier modifier : fd.getModifiers()) {
+            coms = coms.prepend(modifier.getComments());
         }
 
         // ... or to the type
         coms = coms.prepend(fd.getTypeReference().getComments());
 
-        return checkFor(mod, coms);
+        return checkFor(modifiers, coms);
     }
 
 
     /**
      * Returns true iff the given type is specified as pure, i.e. all methods and constructors are
      * by default specified "pure"
-     *
+     * <p>
      * If t is not a reference type, false is returned.
      */
     public static boolean isPureByDefault(KeYJavaType t) {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return hasJMLModifier((TypeDeclaration) t.getJavaType(), "pure");
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().pure();
         }
     }
 
     /**
      * Returns true iff the given type is specified as pure, i.e. all methods and constructors are
      * by default specified "strictly_pure"
-     *
+     * <p>
      * If t is not a reference type, false is returned.
      */
     public static boolean isStrictlyPureByDefault(KeYJavaType t) {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return hasJMLModifier((TypeDeclaration) t.getJavaType(), "strictly_pure");
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().strictlyPure();
         }
     }
 
@@ -204,38 +233,55 @@ public final class JMLInfoExtractor {
     /**
      * Returns true if the given type is specified as nullable, i.e. all fields and method
      * parameters are by default specified "nullable"
-     *
+     * <p>
      * If t is not a reference type, false is returned.
      */
     public static boolean isNullableByDefault(KeYJavaType t) {
         if (!(t.getJavaType() instanceof TypeDeclaration)) {
             return false;
         } else {
-            return hasJMLModifier((TypeDeclaration) t.getJavaType(), "nullable_by_default");
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().nullableByDefault();
         }
     }
 
+    /**
+     * Parses modifiers of a type
+     *
+     * @param td the type declaration
+     * @return modifiers
+     */
+    public static TypeDeclaration.JMLModifiers parseClass(TypeDeclaration td) {
+        var comments = getJMLComments(td);
+
+        var strictlyPure = checkFor("strictly_pure", comments);
+        var pure = checkFor("pure", comments);
+        var nullableByDefault = checkFor("nullable_by_default", comments);
+        var specMathMode = checkForSpecMathMode(comments);
+
+        return new TypeDeclaration.JMLModifiers(strictlyPure, pure, nullableByDefault,
+            specMathMode);
+    }
 
     /**
      * Returns true, if <tt>containingClass</tt> is a reference Type and has a field declaration
      * with name <tt>fieldName</tt>, which is explicitly or implicitly declared "nullable"
      */
-    public static boolean isNullable(String fieldName, KeYJavaType containingClass) {
+    public static boolean isNullable(String fieldName, TypeDeclaration td) {
 
-        ImmutableList<Comment> comments = extractFieldModifiers(fieldName, containingClass);
-        if (comments.isEmpty())
+        ImmutableList<Comment> comments = extractFieldModifiers(fieldName, td);
+        if (comments.isEmpty()) {
             return false;
+        }
 
         boolean non_null = checkFor("non_null", comments);
         boolean nullable = checkFor("nullable", comments);
 
         if (!non_null && !nullable) {
-            return isNullableByDefault(containingClass);
+            return td.getJmlModifiers().nullableByDefault();
         } else {
             return nullable;
         }
     }
-
 
 
     /**
@@ -243,8 +289,8 @@ public final class JMLInfoExtractor {
      * (implicitly or explicitly).
      */
     public static boolean parameterIsNullable(IProgramMethod pm, int pos) {
-        MethodDeclaration md = pm.getMethodDeclaration();
-        ParameterDeclaration pd = md.getParameterDeclarationAt(pos);
+        MethodDeclaration decl = pm.getMethodDeclaration();
+        ParameterDeclaration pd = decl.getParameterDeclarationAt(pos);
 
         return parameterIsNullable(pm, pd);
     }
@@ -257,12 +303,12 @@ public final class JMLInfoExtractor {
     public static boolean parameterIsNullable(IProgramMethod pm, ParameterDeclaration pd) {
         assert pm.getMethodDeclaration().getParameters().contains(pd)
                 : "parameter " + pd + " does not belong to method declaration " + pm;
-        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> comments = ImmutableSLList.nil();
         comments = comments.prepend(pd.getComments());
         comments = comments.prepend(pd.getTypeReference().getComments());
         comments = comments.prepend(pd.getVariableSpecification().getComments());
-        for (Modifier mod : pd.getModifiers()) {
-            comments = comments.prepend(mod.getComments());
+        for (Modifier modifier : pd.getModifiers()) {
+            comments = comments.prepend(modifier.getComments());
         }
 
         boolean non_null = checkFor("non_null", comments);
@@ -277,16 +323,16 @@ public final class JMLInfoExtractor {
 
 
     public static boolean resultIsNullable(IProgramMethod pm) {
-        MethodDeclaration md = pm.getMethodDeclaration();
+        MethodDeclaration decl = pm.getMethodDeclaration();
 
-        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
-        for (Modifier mod : md.getModifiers()) {
-            comments = comments.prepend(mod.getComments());
+        ImmutableList<Comment> comments = ImmutableSLList.nil();
+        for (Modifier modifier : decl.getModifiers()) {
+            comments = comments.prepend(modifier.getComments());
         }
         if (!pm.isVoid() && !pm.isConstructor()) {
-            comments = comments.prepend(md.getTypeReference().getComments());
+            comments = comments.prepend(decl.getTypeReference().getComments());
         }
-        Comment[] methodComments = md.getComments();
+        Comment[] methodComments = decl.getComments();
         if (methodComments.length > 0) {
             comments = comments.prepend(methodComments[methodComments.length - 1]);
         }
@@ -306,7 +352,8 @@ public final class JMLInfoExtractor {
      * Returns true iff the given method is specified "pure".
      */
     public static boolean isPure(IProgramMethod pm) {
-        return hasJMLModifier(pm, "pure") || isPureByDefault(pm.getContainerType());
+        return pm.getMethodDeclaration().getJmlModifiers().pure()
+                || isPureByDefault(pm.getContainerType());
     }
 
 
@@ -314,7 +361,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the given method is specified "helper".
      */
     public static boolean isHelper(IProgramMethod pm) {
-        return hasJMLModifier(pm, "helper");
+        return pm.getMethodDeclaration().getJmlModifiers().helper();
     }
 
     /**
@@ -322,7 +369,44 @@ public final class JMLInfoExtractor {
      * specified so.
      */
     public static boolean isStrictlyPure(IProgramMethod pm) {
-        return hasJMLModifier(pm, "strictly_pure")
+        return pm.getMethodDeclaration().getJmlModifiers().strictlyPure()
                 || isStrictlyPureByDefault(pm.getContainerType());
+    }
+
+    /**
+     * Returns the spec math mode of this type
+     */
+    public static @Nullable SpecMathMode getSpecMathMode(@NonNull KeYJavaType t) {
+        if (!(t.getJavaType() instanceof TypeDeclaration)) {
+            return null;
+        } else {
+            return ((TypeDeclaration) t.getJavaType()).getJmlModifiers().specMathMode();
+        }
+    }
+
+    private static @NonNull SpecMathMode modeOrDefault(@Nullable SpecMathMode mode) {
+        return mode == null ? SpecMathMode.defaultMode() : mode;
+    }
+
+    /**
+     * Returns the spec math mode of this type or the default
+     */
+    public static @NonNull SpecMathMode getSpecMathModeOrDefault(@NonNull KeYJavaType t) {
+        return modeOrDefault(getSpecMathMode(t));
+    }
+
+    /**
+     * Returns the spec math mode of this method
+     */
+    public static @Nullable SpecMathMode getSpecMathMode(@NonNull IProgramMethod pm) {
+        var methodMode = pm.getMethodDeclaration().getJmlModifiers().specMathMode();
+        return methodMode != null ? methodMode : getSpecMathMode(pm.getContainerType());
+    }
+
+    /**
+     * Returns the spec math mode of this method
+     */
+    public static @NonNull SpecMathMode getSpecMathModeOrDefault(@NonNull IProgramMethod pm) {
+        return modeOrDefault(getSpecMathMode(pm));
     }
 }

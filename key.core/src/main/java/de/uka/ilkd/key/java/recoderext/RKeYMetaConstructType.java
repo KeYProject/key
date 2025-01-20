@@ -1,11 +1,6 @@
-// This file is taken from the RECODER library, which is protected by the LGPL,
-// and modified.
-/**
- * This class is part of the AST RECODER builds when it parses and resolves Java programs with meta
- * constructs and schema variables. It is transformed by SchemaRecoder2KeY to a subclass of
- * ...rule.metaconstruct.ProgramMetaConstruct.
- */
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.Expression;
@@ -44,8 +39,9 @@ public class RKeYMetaConstructType extends TypeReference implements KeYRecoderEx
      */
     public int getChildCount() {
         int result = 0;
-        if (child != null)
+        if (child != null) {
             result++;
+        }
         return result;
     }
 
@@ -58,8 +54,9 @@ public class RKeYMetaConstructType extends TypeReference implements KeYRecoderEx
      */
     public ProgramElement getChildAt(int index) {
         if (child != null) {
-            if (index == 0)
+            if (index == 0) {
                 return child;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -89,8 +86,9 @@ public class RKeYMetaConstructType extends TypeReference implements KeYRecoderEx
     }
 
     public int getRoleOfChild(int i) {
-        if (i == 0)
+        if (i == 0) {
             return getChildPositionCode(child);
+        }
         return -1;
     }
 

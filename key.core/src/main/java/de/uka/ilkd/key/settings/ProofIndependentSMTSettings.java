@@ -1,52 +1,58 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
+
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Optional;
+import java.util.Properties;
 
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
-public final class ProofIndependentSMTSettings
-        implements de.uka.ilkd.key.settings.Settings, Cloneable {
-
-    private static final String ACTIVE_SOLVER = "[SMTSettings]ActiveSolver";
-
-    private static final String KEY_TIMEOUT = "[SMTSettings]SolverTimeout";
-
-
-    private static final String PATH_FOR_SMT_TRANSLATION = "[SMTSettings]pathForSMTTranslation";
-
-    private static final String PATH_FOR_TACLET_TRANSLATION =
-        "[SMTSettings]pathForTacletTranslation";
-
-    private static final String SHOW_SMT_RES_DIA = "[SMTSettings]showSMTResDialog";
-
-
-    private static final String PROGRESS_DIALOG_MODE = "[SMTSettings]modeOfProgressDialog";
-
-
-    private static final String MAX_CONCURRENT_PROCESSES = "[SMTSettings]maxConcurrentProcesses";
+public final class ProofIndependentSMTSettings extends AbstractSettings {
+    private static final String CATEGORY = "SMTSettings";
+    public static final String ACTIVE_SOLVER = "ActiveSolver";
+    public static final String KEY_TIMEOUT = "SolverTimeout";
+    public static final String PATH_FOR_SMT_TRANSLATION = "pathForSMTTranslation";
+    public static final String PATH_FOR_TACLET_TRANSLATION = "pathForTacletTranslation";
+    public static final String SHOW_SMT_RES_DIA = "showSMTResDialog";
+    public static final String PROGRESS_DIALOG_MODE = "modeOfProgressDialog";
+    public static final String MAX_CONCURRENT_PROCESSES = "maxConcurrentProcesses";
 
     /*
      * The following properties are used to set the bit sizes for bounded counter example
      * generation.
      */
-    private static final String INT_BOUND = "[SMTSettings]intBound";
-    private static final String HEAP_BOUND = "[SMTSettings]heapBound";
-    private static final String FIELD_BOUND = "[SMTSettings]fieldBound";
-    private static final String OBJECT_BOUND = "[SMTSettings]objectBound";
-    private static final String LOCSET_BOUND = "[SMTSettings]locsetBound";
+    public static final String INT_BOUND = "intBound";
+    public static final String HEAP_BOUND = "heapBound";
+    public static final String FIELD_BOUND = "fieldBound";
+    public static final String OBJECT_BOUND = "objectBound";
+    public static final String LOCSET_BOUND = "locsetBound";
 
-    private static final String SOLVER_PARAMETERS = "[SMTSettings]solverParametersV1";
-    private static final String SOLVER_COMMAND = "[SMTSettings]solverCommand";
-    private static final String PROP_TIMEOUT = "[SMTSettings]timeout";
-    private static final String SOLVER_CHECK_FOR_SUPPORT = "[SMTSettings]checkForSupport";
+    public static final String SOLVER_PARAMETERS = "solverParametersV1";
+    public static final String SOLVER_COMMAND = "solverCommand";
+    public static final String PROP_TIMEOUT = "timeout";
+    public static final String SOLVER_CHECK_FOR_SUPPORT = "checkForSupport";
+    public static final String SOLVER_ENABLED_ON_LOAD = "enableWhenLoading";
 
     private static final ProofIndependentSMTSettings DEFAULT_DATA =
         new ProofIndependentSMTSettings();
 
     private static final int DEFAULT_BIT_LENGTH_FOR_CE_GENERATION = 3;
+    public static final String PROP_SOLVER_UNION = "activeSolverUnion";
+    public static final String PROP_SHOW_RESULT_AFTER_EXECUTION =
+        "PROP_SHOW_RESULT_AFTER_EXECUTION";
+    public static final String PROP_STORE_SMT_TRANSLATION_FILE = "PROP_STORE_SMT_TRANSLATION_FILE";
+    public static final String PROP_STORE_TACLET_TRANSLATION_FILE =
+        "PROP_STORE_TACLET_TRANSLATION_FILE";
+
+    private static final FeatureSettings.Feature FEATURE_EXPERIMENTAL_SMT_SOLVERS =
+        createFeature("EXPERIMENTAL_SMT_SOLVERS", "Activate experimental SMT solvers");
 
     private final Collection<SolverType> solverTypes = new LinkedList<>();
     private boolean showResultsAfterExecution = false;
@@ -69,13 +75,12 @@ public final class ProofIndependentSMTSettings
     private long objectBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
     private long locsetBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
 
-    private Collection<SettingsListener> listeners = new LinkedHashSet<>();
-
     private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
     private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<>();
     private LinkedList<SolverTypeCollection> legacyTranslationSolverUnions = new LinkedList<>();
 
     private boolean checkForSupport = true;
+    private boolean enableOnLoad = true;
 
     private ProofIndependentSMTSettings(ProofIndependentSMTSettings data) {
         copy(data);
@@ -94,7 +99,7 @@ public final class ProofIndependentSMTSettings
         // Z3_CE solver should not be a usable solver union or part of any as it is
         // treated separately.
         for (SolverType type : nonLegacyTypes.stream().filter(t -> t != SolverTypes.Z3_CE_SOLVER)
-                .collect(Collectors.toList())) {
+                .toList()) {
             solverUnions.add(new SolverTypeCollection(type.getName(), 1, type));
         }
 
@@ -109,7 +114,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setShowResultsAfterExecution(boolean showResultsAfterExecution) {
+        var old = this.showResultsAfterExecution;
         this.showResultsAfterExecution = showResultsAfterExecution;
+        firePropertyChange(PROP_SHOW_RESULT_AFTER_EXECUTION, old, this.showResultsAfterExecution);
+
     }
 
     public boolean isStoreSMTTranslationToFile() {
@@ -117,7 +125,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setStoreSMTTranslationToFile(boolean storeSMTTranslationToFile) {
+        var old = this.storeSMTTranslationToFile;
         this.storeSMTTranslationToFile = storeSMTTranslationToFile;
+        firePropertyChange(PROP_STORE_SMT_TRANSLATION_FILE, old, this.storeSMTTranslationToFile);
+
     }
 
     public boolean isStoreTacletTranslationToFile() {
@@ -125,7 +136,11 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setStoreTacletTranslationToFile(boolean storeTacletTranslationToFile) {
+        var old = this.storeTacletTranslationToFile;
         this.storeTacletTranslationToFile = storeTacletTranslationToFile;
+        firePropertyChange(PROP_STORE_TACLET_TRANSLATION_FILE, old,
+            this.storeTacletTranslationToFile);
+
     }
 
     public long getTimeout() {
@@ -133,7 +148,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setTimeout(long timeout) {
+        var old = this.timeout;
         this.timeout = timeout;
+        firePropertyChange(PROP_TIMEOUT, old, this.timeout);
+
     }
 
     public ProgressMode getModeOfProgressDialog() {
@@ -141,7 +159,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setModeOfProgressDialog(ProgressMode modeOfProgressDialog) {
+        var old = this.modeOfProgressDialog;
         this.modeOfProgressDialog = modeOfProgressDialog;
+        firePropertyChange(PROGRESS_DIALOG_MODE, old, this.modeOfProgressDialog);
+
     }
 
     public String getPathForSMTTranslation() {
@@ -149,7 +170,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setPathForSMTTranslation(String pathForSMTTranslation) {
+        var old = this.pathForSMTTranslation;
         this.pathForSMTTranslation = pathForSMTTranslation;
+        firePropertyChange(PATH_FOR_SMT_TRANSLATION, old, this.pathForSMTTranslation);
+
     }
 
     public String getPathForTacletTranslation() {
@@ -157,7 +181,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setPathForTacletTranslation(String pathForTacletTranslation) {
+        var old = this.pathForTacletTranslation;
         this.pathForTacletTranslation = pathForTacletTranslation;
+        firePropertyChange(PATH_FOR_TACLET_TRANSLATION, old, this.pathForTacletTranslation);
+
     }
 
     public String getActiveSolver() {
@@ -165,7 +192,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setActiveSolver(String activeSolver) {
+        var old = this.activeSolver;
         this.activeSolver = activeSolver;
+        firePropertyChange(ACTIVE_SOLVER, old, this.activeSolver);
+
     }
 
     public long getIntBound() {
@@ -173,7 +203,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setIntBound(long intBound) {
+        var old = this.intBound;
         this.intBound = intBound;
+        firePropertyChange(INT_BOUND, old, this.intBound);
+
     }
 
     public long getHeapBound() {
@@ -181,7 +214,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setHeapBound(long heapBound) {
+        var old = this.heapBound;
         this.heapBound = heapBound;
+        firePropertyChange(HEAP_BOUND, old, this.heapBound);
+
     }
 
     public long getSeqBound() {
@@ -189,7 +225,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setSeqBound(long seqBound) {
+        var old = this.seqBound;
         this.seqBound = seqBound;
+        firePropertyChange(FIELD_BOUND, old, this.seqBound);
+
     }
 
     public long getObjectBound() {
@@ -197,7 +236,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setObjectBound(long objectBound) {
+        var old = this.objectBound;
         this.objectBound = objectBound;
+        firePropertyChange(OBJECT_BOUND, old, this.objectBound);
+
     }
 
     public long getLocsetBound() {
@@ -205,7 +247,10 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setLocsetBound(long locsetBound) {
+        var old = this.locsetBound;
         this.locsetBound = locsetBound;
+        firePropertyChange(LOCSET_BOUND, old, this.locsetBound);
+
     }
 
     public boolean isCheckForSupport() {
@@ -213,7 +258,9 @@ public final class ProofIndependentSMTSettings
     }
 
     public void setCheckForSupport(boolean checkForSupport) {
+        var old = this.checkForSupport;
         this.checkForSupport = checkForSupport;
+        firePropertyChange(SOLVER_CHECK_FOR_SUPPORT, old, this.checkForSupport);
     }
 
     public enum ProgressMode {
@@ -226,33 +273,42 @@ public final class ProofIndependentSMTSettings
 
 
     public void setMaxConcurrentProcesses(int maxConcurrentProcesses) {
+        var old = this.maxConcurrentProcesses;
         this.maxConcurrentProcesses = maxConcurrentProcesses;
+        firePropertyChange(MAX_CONCURRENT_PROCESSES, old, this.maxConcurrentProcesses);
+
     }
 
+    public boolean isEnableOnLoad() {
+        return enableOnLoad;
+    }
+
+    public void setEnableOnLoad(boolean enableOnLoad) {
+        this.enableOnLoad = enableOnLoad;
+    }
 
     public void copy(ProofIndependentSMTSettings data) {
-        this.showResultsAfterExecution = data.showResultsAfterExecution;
-        this.storeSMTTranslationToFile = data.storeSMTTranslationToFile;
-        this.storeTacletTranslationToFile = data.storeTacletTranslationToFile;
-        this.timeout = data.timeout;
-        this.maxConcurrentProcesses = data.maxConcurrentProcesses;
-        this.pathForSMTTranslation = data.pathForSMTTranslation;
-        this.pathForTacletTranslation = data.pathForTacletTranslation;
-        this.modeOfProgressDialog = data.modeOfProgressDialog;
-        this.checkForSupport = data.checkForSupport;
-        this.intBound = data.intBound;
-        this.heapBound = data.heapBound;
-        this.seqBound = data.seqBound;
-        this.locsetBound = data.locsetBound;
-        this.objectBound = data.objectBound;
+        setShowResultsAfterExecution(data.showResultsAfterExecution);
+        setStoreSMTTranslationToFile(data.storeSMTTranslationToFile);
+        setStoreTacletTranslationToFile(data.storeTacletTranslationToFile);
+        setTimeout(data.timeout);
+        setMaxConcurrentProcesses(data.maxConcurrentProcesses);
+        setPathForSMTTranslation(data.pathForSMTTranslation);
+        setPathForTacletTranslation(data.pathForTacletTranslation);
+        setModeOfProgressDialog(data.modeOfProgressDialog);
+        setCheckForSupport(data.checkForSupport);
+        setIntBound(data.intBound);
+        setHeapBound(data.heapBound);
+        setSeqBound(data.seqBound);
+        setLocsetBound(data.locsetBound);
+        setObjectBound(data.objectBound);
+        setEnableOnLoad(data.enableOnLoad);
 
 
         solverTypes.addAll(data.solverTypes);
 
         solverUnions = new LinkedList<>();
-        for (SolverTypeCollection solverUnion : data.solverUnions) {
-            solverUnions.add(solverUnion);
-        }
+        solverUnions.addAll(data.solverUnions);
 
         legacyTranslationSolverUnions = new LinkedList<>();
         legacyTranslationSolverUnions.addAll(data.legacyTranslationSolverUnions);
@@ -291,70 +347,150 @@ public final class ProofIndependentSMTSettings
     }
 
     public void readSettings(Properties props) {
-        timeout = SettingsConverter.read(props, KEY_TIMEOUT, timeout);
+        var prefix = "[" + CATEGORY + "]";
+
+        timeout = SettingsConverter.read(props, prefix + KEY_TIMEOUT, timeout);
         showResultsAfterExecution =
-            SettingsConverter.read(props, SHOW_SMT_RES_DIA, showResultsAfterExecution);
+            SettingsConverter.read(props, prefix + SHOW_SMT_RES_DIA, showResultsAfterExecution);
         pathForSMTTranslation =
-            SettingsConverter.read(props, PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
+            SettingsConverter.read(props, prefix + PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
         pathForTacletTranslation =
-            SettingsConverter.read(props, PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
-        modeOfProgressDialog = SettingsConverter.read(props, PROGRESS_DIALOG_MODE,
+            SettingsConverter.read(props, prefix + PATH_FOR_TACLET_TRANSLATION,
+                pathForTacletTranslation);
+        modeOfProgressDialog = SettingsConverter.read(props, prefix + PROGRESS_DIALOG_MODE,
             modeOfProgressDialog, ProgressMode.values());
         maxConcurrentProcesses =
-            SettingsConverter.read(props, MAX_CONCURRENT_PROCESSES, maxConcurrentProcesses);
-        checkForSupport = SettingsConverter.read(props, SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
-        intBound = SettingsConverter.read(props, INT_BOUND, intBound);
-        heapBound = SettingsConverter.read(props, HEAP_BOUND, heapBound);
-        seqBound = SettingsConverter.read(props, FIELD_BOUND, seqBound);
-        locsetBound = SettingsConverter.read(props, LOCSET_BOUND, locsetBound);
-        objectBound = SettingsConverter.read(props, OBJECT_BOUND, objectBound);
+            SettingsConverter.read(props, prefix + MAX_CONCURRENT_PROCESSES,
+                maxConcurrentProcesses);
+        checkForSupport =
+            SettingsConverter.read(props, prefix + SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
+        intBound = SettingsConverter.read(props, prefix + INT_BOUND, intBound);
+        heapBound = SettingsConverter.read(props, prefix + HEAP_BOUND, heapBound);
+        seqBound = SettingsConverter.read(props, prefix + FIELD_BOUND, seqBound);
+        locsetBound = SettingsConverter.read(props, prefix + LOCSET_BOUND, locsetBound);
+        objectBound = SettingsConverter.read(props, prefix + OBJECT_BOUND, objectBound);
+        enableOnLoad = SettingsConverter.read(props, SOLVER_ENABLED_ON_LOAD, enableOnLoad);
+
 
         for (SolverType type : solverTypes) {
-            type.setSolverTimeout(SettingsConverter.read(props, PROP_TIMEOUT + type.getName(),
-                type.getDefaultSolverTimeout()));
+            type.setSolverTimeout(
+                SettingsConverter.read(props, prefix + PROP_TIMEOUT + type.getName(),
+                    type.getDefaultSolverTimeout()));
             type.setSolverParameters(SettingsConverter.read(props,
-                SOLVER_PARAMETERS + type.getName(), type.getDefaultSolverParameters()));
-            type.setSolverCommand(SettingsConverter.read(props, SOLVER_COMMAND + type.getName(),
-                type.getDefaultSolverCommand()));
+                prefix + SOLVER_PARAMETERS + type.getName(), type.getDefaultSolverParameters()));
+            type.setSolverCommand(
+                SettingsConverter.read(props, prefix + SOLVER_COMMAND + type.getName(),
+                    type.getDefaultSolverCommand()));
         }
     }
 
     public void writeSettings(Properties props) {
-        SettingsConverter.store(props, KEY_TIMEOUT, timeout);
-        SettingsConverter.store(props, SHOW_SMT_RES_DIA, showResultsAfterExecution);
-        SettingsConverter.store(props, PROGRESS_DIALOG_MODE, modeOfProgressDialog);
-        SettingsConverter.store(props, PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
-        SettingsConverter.store(props, PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
-        SettingsConverter.store(props, ACTIVE_SOLVER, activeSolver);
-        SettingsConverter.store(props, MAX_CONCURRENT_PROCESSES, maxConcurrentProcesses);
-        SettingsConverter.store(props, SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
-        SettingsConverter.store(props, INT_BOUND, intBound);
-        SettingsConverter.store(props, HEAP_BOUND, heapBound);
-        SettingsConverter.store(props, OBJECT_BOUND, objectBound);
-        SettingsConverter.store(props, FIELD_BOUND, seqBound);
-        SettingsConverter.store(props, LOCSET_BOUND, locsetBound);
+        var prefix = "[" + CATEGORY + "]";
+        SettingsConverter.store(props, prefix + KEY_TIMEOUT, timeout);
+        SettingsConverter.store(props, prefix + SHOW_SMT_RES_DIA, showResultsAfterExecution);
+        SettingsConverter.store(props, prefix + PROGRESS_DIALOG_MODE, modeOfProgressDialog);
+        SettingsConverter.store(props, prefix + PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
+        SettingsConverter.store(props, prefix + PATH_FOR_TACLET_TRANSLATION,
+            pathForTacletTranslation);
+        SettingsConverter.store(props, prefix + ACTIVE_SOLVER, activeSolver);
+        SettingsConverter.store(props, prefix + MAX_CONCURRENT_PROCESSES, maxConcurrentProcesses);
+        SettingsConverter.store(props, prefix + SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
+        SettingsConverter.store(props, prefix + INT_BOUND, intBound);
+        SettingsConverter.store(props, prefix + HEAP_BOUND, heapBound);
+        SettingsConverter.store(props, prefix + OBJECT_BOUND, objectBound);
+        SettingsConverter.store(props, prefix + FIELD_BOUND, seqBound);
+        SettingsConverter.store(props, prefix + LOCSET_BOUND, locsetBound);
+        SettingsConverter.store(props, prefix + SOLVER_ENABLED_ON_LOAD, enableOnLoad);
 
         for (SolverType type : solverTypes) {
-            SettingsConverter.store(props, PROP_TIMEOUT + type.getName(), type.getSolverTimeout());
-            SettingsConverter.store(props, SOLVER_PARAMETERS + type.getName(),
+            SettingsConverter.store(props, prefix + PROP_TIMEOUT + type.getName(),
+                type.getSolverTimeout());
+            SettingsConverter.store(props, prefix + SOLVER_PARAMETERS + type.getName(),
                 type.getSolverParameters());
-            SettingsConverter.store(props, SOLVER_COMMAND + type.getName(),
+            SettingsConverter.store(props, prefix + SOLVER_COMMAND + type.getName(),
                 type.getSolverCommand());
         }
     }
 
-    public void setActiveSolverUnion(SolverTypeCollection solverUnion) {
-        if (activeSolverUnion != solverUnion) {
-            activeSolverUnion = solverUnion;
-            activeSolver = activeSolverUnion.name();
-            fireSettingsChanged();
+    @Override
+    public void readSettings(Configuration props) {
+        var cat = props.getSection(CATEGORY);
+        if (cat == null)
+            return;
+
+        setTimeout(cat.getLong(KEY_TIMEOUT, timeout));
+        setShowResultsAfterExecution(cat.getBool(SHOW_SMT_RES_DIA, showResultsAfterExecution));
+        setPathForSMTTranslation(cat.getString(PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation));
+        setPathForTacletTranslation(
+            cat.getString(PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation));
+        setModeOfProgressDialog(cat.getEnum(PROGRESS_DIALOG_MODE, modeOfProgressDialog));
+        setMaxConcurrentProcesses(cat.getInt(MAX_CONCURRENT_PROCESSES, maxConcurrentProcesses));
+        setCheckForSupport(cat.getBool(SOLVER_CHECK_FOR_SUPPORT, checkForSupport));
+        setIntBound(cat.getLong(INT_BOUND, intBound));
+        setHeapBound(cat.getLong(HEAP_BOUND, heapBound));
+        setSeqBound(cat.getLong(FIELD_BOUND, seqBound));
+        setLocsetBound(cat.getLong(LOCSET_BOUND, locsetBound));
+        setObjectBound(cat.getLong(OBJECT_BOUND, objectBound));
+
+        for (SolverType type : solverTypes) {
+            var solver = cat.getTable(type.getName());
+            if (solver == null)
+                return;
+
+            type.setSolverParameters(
+                props.getString(SOLVER_PARAMETERS, type.getDefaultSolverParameters()));
+            type.setSolverTimeout(solver.getLong(PROP_TIMEOUT, type.getDefaultSolverTimeout()));
+            type.setSolverCommand(solver.getString(SOLVER_COMMAND, type.getDefaultSolverCommand()));
         }
     }
 
+    @Override
+    public void writeSettings(Configuration props) {
+        var cat = props.getOrCreateSection(CATEGORY);
+
+        cat.set(KEY_TIMEOUT, timeout);
+        cat.set(SHOW_SMT_RES_DIA, showResultsAfterExecution);
+        cat.set(PROGRESS_DIALOG_MODE, modeOfProgressDialog.toString());
+        cat.set(PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
+        cat.set(PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
+        cat.set(ACTIVE_SOLVER, activeSolver);
+        cat.set(MAX_CONCURRENT_PROCESSES, maxConcurrentProcesses);
+        cat.set(SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
+        cat.set(INT_BOUND, intBound);
+        cat.set(HEAP_BOUND, heapBound);
+        cat.set(OBJECT_BOUND, objectBound);
+        cat.set(FIELD_BOUND, seqBound);
+        cat.set(LOCSET_BOUND, locsetBound);
+
+        for (SolverType type : solverTypes) {
+            var solver = new Configuration();
+            solver.set(SOLVER_PARAMETERS, type.getSolverParameters());
+            solver.set(SOLVER_COMMAND, type.getSolverCommand());
+            solver.set(PROP_TIMEOUT, type.getSolverTimeout());
+            cat.set(type.getName(), solver);
+        }
+    }
+
+    public void setActiveSolverUnion(SolverTypeCollection solverUnion) {
+        var oldActiveSolverUnion = activeSolverUnion;
+        activeSolverUnion = solverUnion;
+        firePropertyChange(PROP_SOLVER_UNION, oldActiveSolverUnion, activeSolver);
+        setActiveSolver(activeSolverUnion.name());
+    }
+
     public SolverTypeCollection computeActiveSolverUnion() {
+        // if there is already a solver union configured, return that
         if (activeSolverUnion.isUsable()) {
             return activeSolverUnion;
         }
+        // otherwise, first try the default solver: Z3
+        Optional<SolverTypeCollection> z3 = solverUnions.stream()
+                .filter(x -> x.name().equals("Z3")).findFirst();
+        if (z3.isPresent() && z3.get().isUsable()) {
+            setActiveSolverUnion(z3.get());
+            return z3.get();
+        }
+        // failing that, any usable solver is accepted...
         for (SolverTypeCollection solverUnion : solverUnions) {
             if (solverUnion.isUsable()) {
                 setActiveSolverUnion(solverUnion);
@@ -366,6 +502,11 @@ public final class ProofIndependentSMTSettings
     }
 
 
+    public Collection<SolverTypeCollection> getUsableSolverUnions() {
+        return getUsableSolverUnions(
+            FeatureSettings.isFeatureActivated(FEATURE_EXPERIMENTAL_SMT_SOLVERS));
+    }
+
     public Collection<SolverTypeCollection> getUsableSolverUnions(boolean experimental) {
         LinkedList<SolverTypeCollection> unions = new LinkedList<>();
         for (SolverTypeCollection union : getSolverUnions(experimental)) {
@@ -376,29 +517,17 @@ public final class ProofIndependentSMTSettings
         return unions;
     }
 
+    public Collection<SolverTypeCollection> getSolverUnions() {
+        return getSolverUnions(
+            FeatureSettings.isFeatureActivated(FEATURE_EXPERIMENTAL_SMT_SOLVERS));
+    }
+
     public Collection<SolverTypeCollection> getSolverUnions(boolean experimental) {
         LinkedList<SolverTypeCollection> res = new LinkedList<>(solverUnions);
         if (experimental) {
             res.addAll(legacyTranslationSolverUnions);
         }
         return res;
-    }
-
-    public void fireSettingsChanged() {
-        for (SettingsListener aListenerList : listeners) {
-            aListenerList.settingsChanged(new EventObject(this));
-        }
-
-    }
-
-    @Override
-    public void addSettingsListener(SettingsListener l) {
-        listeners.add(l);
-    }
-
-    @Override
-    public void removeSettingsListener(SettingsListener l) {
-        listeners.remove(l);
     }
 
 }

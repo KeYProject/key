@@ -1,18 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class InspectorForDecisionPredicates implements CheckedUserInputInspector {
 
@@ -57,7 +60,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
         // return NO_USER_INPUT;
         // }
 
-        if (term == null || term.sort() != Sort.FORMULA) {
+        if (term == null || term.sort() != JavaDLTheory.FORMULA) {
             return "Not a formula.";
         }
         for (ApplicationCheck check : additionalChecks) {
@@ -72,7 +75,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
 
     public static Term translate(Services services, String toBeChecked) {
         try {
-            return new KeyIO(services).parseExpression((String) toBeChecked);
+            return new KeyIO(services).parseExpression(toBeChecked);
         } catch (Throwable e) {
             return null;
         }

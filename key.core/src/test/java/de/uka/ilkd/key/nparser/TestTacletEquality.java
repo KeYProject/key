@@ -1,23 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
-import javax.annotation.Nonnull;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -25,6 +12,22 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
+import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * This class provides regression tests for KeY Taclets.
@@ -51,22 +54,27 @@ public class TestTacletEquality {
         InputStream is = TestTacletEquality.class.getResourceAsStream("taclets.old.txt");
         Assumptions.assumeTrue(is != null);
         var seq = Stream.<Arguments>builder();
-        try (BufferedReader r = new BufferedReader(new InputStreamReader(is))) {
+        try (BufferedReader r =
+            new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String tmp;
             while ((tmp = r.readLine()) != null) {
-                if (tmp.trim().isEmpty())
+                if (tmp.trim().isEmpty()) {
                     continue;
-                if (tmp.startsWith("#"))
+                }
+                if (tmp.startsWith("#")) {
                     continue;
+                }
                 if (tmp.startsWith("== ")) {
                     StringBuilder expected = new StringBuilder();
                     int nameEnd = tmp.indexOf(' ', 4);
                     String name = tmp.substring(3, nameEnd + 1).trim();
                     while ((tmp = r.readLine()) != null) {
-                        if (tmp.trim().isEmpty())
+                        if (tmp.trim().isEmpty()) {
                             continue;
-                        if (tmp.startsWith("#"))
+                        }
+                        if (tmp.startsWith("#")) {
                             continue;
+                        }
                         if (tmp.startsWith("---")) {
                             seq.add(Arguments.of(name, expected.toString()));
                             break;
@@ -82,7 +90,7 @@ public class TestTacletEquality {
     private static InitConfig initConfig;
 
     @BeforeAll
-    static void setUp() throws ProofInputException, IOException, ProblemLoaderException {
+    static void setUp() throws Exception {
         File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/gcd.closed.proof");
         if (initConfig == null) {
             ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
@@ -95,6 +103,7 @@ public class TestTacletEquality {
         }
     }
 
+    @SuppressWarnings("unused")
     public static void createNewOracle() {
         var path = Paths.get("src/test/resources/de/uka/ilkd/key/nparser/taclets.new.txt");
         var taclets = new ArrayList<>(initConfig.activatedTaclets());
@@ -112,9 +121,13 @@ public class TestTacletEquality {
                 out.format("-----------------------------------------------------\n");
             }
         } catch (IOException e) {
-            System.out.println("Exception for opening " + path);
-            e.printStackTrace();
+            Assertions.fail("Exception for opening " + path, e);
         }
+    }
+
+    // @Test
+    public void createOracle() {
+        createNewOracle();
     }
 
     @ParameterizedTest
@@ -130,8 +143,7 @@ public class TestTacletEquality {
         Assertions.assertEquals(normalise(expected).trim(), normalise(actual).trim());
     }
 
-    @Nonnull
-    private String normalise(String expected) {
+    private @NonNull String normalise(String expected) {
         return expected.replaceAll("\\s+", "\n").replaceAll("Choices:\\s*\\{.*?\\}", "");
     }
 

@@ -1,10 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
@@ -15,6 +14,10 @@ import de.uka.ilkd.key.rule.conditions.TypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.GenericSortResolver;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.NonGenericSortResolver;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
+
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class is used for wrapping all variable conditions of a taclet in one object.
@@ -106,9 +109,8 @@ class TacletConditions {
     private boolean containsAbstractInterfaceCondition(Sort s, boolean negated) {
         for (AbstractOrInterfaceType cond : abstractInterfaceCondition) {
             if ((negated && cond.isNegated()) || (!negated && !cond.isNegated())) {
-                if (cond.getTypeResolver() instanceof GenericSortResolver) {
+                if (cond.getTypeResolver() instanceof GenericSortResolver res) {
 
-                    GenericSortResolver res = (GenericSortResolver) cond.getTypeResolver();
                     if (res.getGenericSort().equals(s)) {
                         return true;
                     }
@@ -143,12 +145,10 @@ class TacletConditions {
     public boolean conatainsComparisionConditionSymmetric(Sort s1, Sort s2,
             TypeComparisonCondition.Mode mode) {
         if (!containsComparisionCondition(s1, s2, mode)) {
-            if (containsComparisionCondition(s2, s1, mode))
-                return true;
+            return containsComparisionCondition(s2, s1, mode);
         } else {
             return true;
         }
-        return false;
     }
 
     /**
@@ -193,9 +193,7 @@ class TacletConditions {
                 if (first.getGenericSort().equals(s1) && second.getGenericSort().equals(s2)) {
                     return true;
                 }
-                if (first.getGenericSort().equals(s2) && second.getGenericSort().equals(s1)) {
-                    return true;
-                }
+                return first.getGenericSort().equals(s2) && second.getGenericSort().equals(s1);
             }
         }
         return false;
@@ -207,9 +205,8 @@ class TacletConditions {
         for (TypeComparisonCondition tcc : comparisionCondition) {
             if (tcc.getMode() == mode) {
                 if (tcc.getSecondResolver() instanceof NonGenericSortResolver
-                        && tcc.getFirstResolver() instanceof GenericSortResolver) {
+                        && tcc.getFirstResolver() instanceof GenericSortResolver first) {
 
-                    GenericSortResolver first = (GenericSortResolver) tcc.getFirstResolver();
                     if (first.getGenericSort().equals(gen)) {
                         Sort superType =
                             ((NonGenericSortResolver) tcc.getSecondResolver()).getSort();

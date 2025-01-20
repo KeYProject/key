@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.removegenerics;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,7 +33,7 @@ import recoder.kit.TwoPassTransformation;
 
 public class ResolveGenerics extends TwoPassTransformation {
 
-    private CompilationUnit compUnitUnderTest;
+    private final CompilationUnit compUnitUnderTest;
 
     private List<TwoPassTransformation> transformations;
 
@@ -61,7 +63,7 @@ public class ResolveGenerics extends TwoPassTransformation {
     @Override
     public ProblemReport analyze() {
         TreeWalker tw = new TreeWalker(compUnitUnderTest);
-        transformations = new LinkedList<TwoPassTransformation>();
+        transformations = new LinkedList<>();
 
         while (tw.next()) {
 
@@ -103,20 +105,16 @@ public class ResolveGenerics extends TwoPassTransformation {
             }
         }
 
-        Iterator<TwoPassTransformation> it = transformations.iterator();
-        while (it.hasNext()) {
-            TwoPassTransformation tpt = it.next();
-            if (tpt.analyze() == IDENTITY)
-                it.remove();
-        }
+        transformations.removeIf(tpt -> tpt.analyze() == IDENTITY);
 
         // perform transformations bottom up, so reverse the list
         Collections.reverse(transformations);
 
-        if (transformations.isEmpty())
+        if (transformations.isEmpty()) {
             return IDENTITY;
-        else
+        } else {
             return EQUIVALENCE;
+        }
     }
 
     /**
@@ -124,8 +122,9 @@ public class ResolveGenerics extends TwoPassTransformation {
      */
     @Override
     public void transform() {
-        for (TwoPassTransformation tpt : transformations)
+        for (TwoPassTransformation tpt : transformations) {
             tpt.transform();
+        }
     }
 
     public CompilationUnit getCU() {

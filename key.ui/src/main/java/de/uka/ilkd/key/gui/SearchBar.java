@@ -1,28 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.awt.event.KeyEvent;
-
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
+import org.jspecify.annotations.NonNull;
 
 /*
  * Abstract parent class of SequentSearchBar and ProofTreeSearchPanel. Might be used for additional
@@ -34,10 +28,10 @@ public abstract class SearchBar extends JPanel {
      *
      */
     private static final long serialVersionUID = -4821960226273983607L;
-    public JTextField searchField = new JTextField(20);
-    private JButton prev;
-    private JButton next;
-    private JButton close;
+    public final JTextField searchField = new JTextField(20);
+    private final JButton prev;
+    private final JButton next;
+    private final JButton close;
     private final ColorSettings.ColorProperty ALERT_COLOR =
         ColorSettings.define("[searchBar]alert", "", new Color(255, 178, 178));
 
@@ -48,37 +42,23 @@ public abstract class SearchBar extends JPanel {
 
         // Initialize the Actionlisteners here:
 
-        close.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent) {
-                setVisible(false);
-            }
+        close.addActionListener(actionEvent -> setVisible(false));
+
+        next.addActionListener(actionEvent -> {
+            searchNext();
+            searchField.requestFocusInWindow();
         });
 
-        next.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent) {
-                searchNext();
-                searchField.requestFocusInWindow();
-            }
+        prev.addActionListener(actionEvent -> {
+            searchPrevious();
+            searchField.requestFocusInWindow();
         });
 
-        prev.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent) {
-                searchPrevious();
-                searchField.requestFocusInWindow();
-            }
-        });
+        searchField.registerKeyboardAction(e -> searchNext(),
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_FOCUSED);
 
-        searchField.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                searchNext();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_FOCUSED);
-
-        registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+        registerKeyboardAction(e -> setVisible(false),
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
             JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -133,11 +113,11 @@ public abstract class SearchBar extends JPanel {
     /*
      * The boolean return value of this function indicates, whether search was successful or not.
      */
-    public abstract boolean search(String s);
+    public abstract boolean search(@NonNull String s);
 
     public void search() {
-        boolean b = search(searchField.getText());
-        if (b) {
+        boolean match = search(searchField.getText());
+        if (match) {
             searchField.setBackground(Color.WHITE);
         } else {
             searchField.setBackground(ALERT_COLOR.get());

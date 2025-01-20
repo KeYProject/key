@@ -1,3 +1,7 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -82,7 +86,7 @@ public final class ProgressListenerManager {
         progressListeners.remove(chl);
     }
 
-    private class ReuseableProgressEvent extends ProgressEvent {
+    private static class ReuseableProgressEvent extends ProgressEvent {
 
         /**
          * serialization id

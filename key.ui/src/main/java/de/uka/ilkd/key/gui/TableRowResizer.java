@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
@@ -17,11 +19,11 @@ import javax.swing.event.MouseInputAdapter;
  */
 
 public class TableRowResizer extends MouseInputAdapter {
-    public static Cursor resizeCursor = Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR);
+    public static final Cursor resizeCursor = Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR);
 
     private int mouseYOffset, resizingRow;
     private Cursor otherCursor = resizeCursor;
-    private JTable table;
+    private final JTable table;
 
     public TableRowResizer(JTable table) {
         this.table = table;

@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration.actions;
+
+import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -8,9 +13,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import org.key_project.exploration.ProofExplorationService;
 
-import java.awt.event.ActionEvent;
+import org.key_project.exploration.ProofExplorationService;
 
 /**
  * Action to edit formulas in the actions mode
@@ -39,8 +43,9 @@ public class EditFormulaAction extends ExplorationAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (posInSeq.isSequent())
+        if (posInSeq.isSequent()) {
             return;
+        }
 
         TermBuilder tb = getMediator().getServices().getTermBuilder();
         PosInOccurrence pio = posInSeq.getPosInOccurrence();

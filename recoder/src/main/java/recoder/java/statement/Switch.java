@@ -1,6 +1,13 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.statement;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import recoder.abstraction.ClassType;
 import recoder.java.*;
@@ -8,11 +15,6 @@ import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Switch.
@@ -123,10 +125,12 @@ public class Switch extends BranchStatement
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null)
+        if (expression != null) {
             result++;
-        if (branches != null)
+        }
+        if (branches != null) {
             result += branches.size();
+        }
         return result;
     }
 
@@ -140,8 +144,9 @@ public class Switch extends BranchStatement
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0)
+            if (index == 0) {
                 return expression;
+            }
             index--;
         }
         if (branches != null) {
@@ -193,7 +198,7 @@ public class Switch extends BranchStatement
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
@@ -337,9 +342,9 @@ public class Switch extends BranchStatement
 
     public List<TypeDeclaration> getTypesInScope() {
         if (name2type == null || name2type.isEmpty()) {
-            return new ArrayList<TypeDeclaration>(0);
+            return new ArrayList<>(0);
         }
-        List<TypeDeclaration> res = new ArrayList<TypeDeclaration>();
+        List<TypeDeclaration> res = new ArrayList<>();
         for (TypeDeclaration td : name2type.values()) {
             res.add(td);
         }
@@ -357,7 +362,7 @@ public class Switch extends BranchStatement
     public void addTypeToScope(ClassType type, String name) {
         Debug.assertNonnull(type, name);
         if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            name2type = new HashMap<String, TypeDeclaration>();
+            name2type = new HashMap<>();
         }
         name2type.put(name, (TypeDeclaration) type);
     }
@@ -373,9 +378,9 @@ public class Switch extends BranchStatement
     public List<VariableSpecification> getVariablesInScope() {
         if (name2var == null || name2var.isEmpty()) {
             // TODO EMPTY_LIST ?
-            return new ArrayList<VariableSpecification>(0);
+            return new ArrayList<>(0);
         }
-        List<VariableSpecification> res = new ArrayList<VariableSpecification>();
+        List<VariableSpecification> res = new ArrayList<>();
         for (VariableSpecification vs : name2var.values()) {
             res.add(vs);
         }
@@ -393,7 +398,7 @@ public class Switch extends BranchStatement
     public void addVariableToScope(VariableSpecification var) {
         Debug.assertNonnull(var);
         if (name2var == null || name2var == UNDEFINED_SCOPE) {
-            name2var = new HashMap<String, VariableSpecification>();
+            name2var = new HashMap<>();
         }
         name2var.put(var.getName(), var);
     }
@@ -411,8 +416,9 @@ public class Switch extends BranchStatement
     }
 
     public SourceElement getLastElement() {
-        if (getBranchCount() == 0)
+        if (getBranchCount() == 0) {
             return this;
+        }
         return getBranchAt(getBranchCount() - 1).getLastElement();
     }
 }

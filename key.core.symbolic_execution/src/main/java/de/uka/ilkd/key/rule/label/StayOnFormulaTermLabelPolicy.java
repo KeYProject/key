@@ -1,30 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.label;
 
 import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SubstOp;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * This {@link TermLabelPolicy} maintains a {@link FormulaTermLabel} on predicates.
@@ -38,22 +35,20 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
     @Override
     public TermLabel keepLabel(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
-            ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,
-            ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
+            Object hint, Term tacletTerm,
+            Term newTerm, TermLabel label) {
         // Maintain label if new Term is a predicate
-        if (TruthValueTracingUtil.isPredicate(newTermOp)
-                || TruthValueTracingUtil.isLogicOperator(newTermOp, newTermSubs)) {
+        if (TruthValueTracingUtil.isPredicate(newTerm.op())
+                || TruthValueTracingUtil.isLogicOperator(newTerm.op(), newTerm.subs())) {
             assert label instanceof FormulaTermLabel;
             FormulaTermLabel formulaLabel = (FormulaTermLabel) label;
-            FormulaTermLabel originalLabel = searchFormulaTermLabel(newTermOriginalLabels);
+            FormulaTermLabel originalLabel = searchFormulaTermLabel(newTerm.getLabels());
             FormulaTermLabel mostImportantLabel =
                 originalLabel != null ? originalLabel : formulaLabel;
             // May change sub ID if logical operators like junctors are used
             boolean newLabelIdRequired = false;
-            Set<String> originalLabelIds = new LinkedHashSet<String>();
-            if (hint instanceof TacletLabelHint) {
-                TacletLabelHint tacletHint = (TacletLabelHint) hint;
+            Set<String> originalLabelIds = new LinkedHashSet<>();
+            if (hint instanceof TacletLabelHint tacletHint) {
                 if (isBelowIfThenElse(tacletHint.getTacletTermStack())) {
                     return null; // Do not label children of if-then-else. They are labeled when a
                                  // rule rewrites them outside of the if-then-else.
@@ -111,8 +106,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                     return label;
                 }
             }
-        } else if (UpdateApplication.UPDATE_APPLICATION.equals(newTermOp)) {
-            Term target = newTermSubs.get(UpdateApplication.targetPos());
+        } else if (UpdateApplication.UPDATE_APPLICATION.equals(newTerm.op())) {
+            Term target = newTerm.subs().get(UpdateApplication.targetPos());
             TermLabel targetLabel = target.getLabel(FormulaTermLabel.NAME);
             if (targetLabel instanceof FormulaTermLabel) {
                 if (applicationPosInOccurrence != null) {
@@ -121,13 +116,13 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                     if (applicationLabel instanceof FormulaTermLabel) {
                         // Let the PredicateTermLabelRefactoring perform the refactoring, see also
                         // PredicateTermLabelRefactoring#UPDATE_REFACTORING_REQUIRED
-                        FormulaTermLabelRefactoring.setUpdateRefactroingRequired(state, true);
+                        FormulaTermLabelRefactoring.setUpdateRefactoringRequired(state, true);
                     }
                 }
             }
             return null;
-        } else if (newTermOp instanceof SubstOp) { // Such operations perform for instance
-                                                   // skolemization (e.g. rule allRight)
+        } else if (newTerm.op() instanceof SubstOp) { // Such operations perform for instance
+                                                      // skolemization (e.g. rule allRight)
             return label;
         } else {
             return null;
@@ -142,12 +137,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      */
     protected boolean isBelowIfThenElse(Deque<Term> visitStack) {
         if (visitStack != null) {
-            return CollectionUtil.search(visitStack, new IFilter<Term>() {
-                @Override
-                public boolean select(Term element) {
-                    return element.op() == IfThenElse.IF_THEN_ELSE;
-                }
-            }) != null;
+            return CollectionUtil.search(visitStack,
+                element -> element.op() == IfThenElse.IF_THEN_ELSE) != null;
         } else {
             return false;
         }
@@ -160,12 +151,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
      * @return The found {@link FormulaTermLabel} or {@code null} if not available.
      */
     public static FormulaTermLabel searchFormulaTermLabel(ImmutableArray<TermLabel> labels) {
-        TermLabel result = CollectionUtil.search(labels, new IFilter<TermLabel>() {
-            @Override
-            public boolean select(TermLabel element) {
-                return element instanceof FormulaTermLabel;
-            }
-        });
+        TermLabel result =
+            CollectionUtil.search(labels, element -> element instanceof FormulaTermLabel);
         return (FormulaTermLabel) result;
     }
 

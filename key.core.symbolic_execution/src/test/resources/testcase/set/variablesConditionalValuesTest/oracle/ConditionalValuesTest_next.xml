@@ -19,7 +19,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="b.x.value=2;" pathCondition="true" pathConditionChanged="false">
+      <statement name="b.x.value = 2;" pathCondition="true" pathConditionChanged="false">
          <variable name="b" isArrayIndex="false">
             <value name="b {equals(b,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(b,null)">
             </value>
@@ -62,7 +62,7 @@
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <statement name="b.y.value=3;" pathCondition="and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null)))" pathConditionChanged="false">
+               <statement name="b.y.value = 3;" pathCondition="and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null)))" pathConditionChanged="false">
                   <variable name="b" isArrayIndex="false">
                      <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="x" isArrayIndex="false">
@@ -110,7 +110,7 @@
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <statement name="return b.x.value+b.y.value;" pathCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null)))" pathConditionChanged="false">
+                     <statement name="return b.x.value + b.y.value;" pathCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null)))" pathConditionChanged="false">
                         <variable name="b" isArrayIndex="false">
                            <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="x" isArrayIndex="false">

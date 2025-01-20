@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.speclang.PositionedString;
-import org.antlr.v4.runtime.ParserRuleContext;
-
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Facade for implementing syntactical JML syntax checks.
@@ -42,15 +46,14 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
     private final List<PositionedString> warnings = new LinkedList<>();
 
     @Override
-    public @Nonnull List<PositionedString> check(@Nonnull ParserRuleContext ctx) {
+    public @NonNull List<PositionedString> check(@NonNull ParserRuleContext ctx) {
         warnings.clear();
         ctx.accept(this);
         return warnings;
     }
 
     protected void addWarning(ParserRuleContext ctx, String text) {
-        PositionedString ps = new PositionedString(text, ctx.start.getTokenSource().getSourceName(),
-            new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
+        PositionedString ps = new PositionedString(text, Location.fromToken(ctx.start));
         warnings.add(ps);
     }
 }
@@ -78,8 +81,8 @@ class JmlWarnDifferentRequiresSemantics extends AbstractCheck implements JmlChec
 
             if (isRequiresClause(clause) && otherClause) {
                 addWarning(clause,
-                    "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
-                        + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO");
+                    "Diverging Semantics from JML Reference: Requires does not initiate a new contract. "
+                        + "See https://keyproject.github.io/key-docs/user/JMLGrammar/#TODO");
             }
         }
     }

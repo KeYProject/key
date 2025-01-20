@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
-
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
@@ -9,6 +10,8 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Allows to observe and control the loading performed by an {@link AbstractProblemLoader}.
@@ -38,7 +41,7 @@ public interface ProblemLoaderControl extends ProblemInitializerListener, Progre
     /**
      * This method is called if no {@link LoadedPOContainer} was created via
      * {@link AbstractProblemLoader#createProofObligationContainer()} and can be overwritten for
-     * instance to open the proof management dialog as done by {@link ProblemLoader}.
+     * instance to open the proof management dialog as done by {@link AbstractProblemLoader}.
      *
      * @return true if the proof obligation was selected, and false if action was aborted
      */

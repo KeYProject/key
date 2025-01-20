@@ -1,12 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
 import java.io.IOException;
-import java.util.HashMap;
-
+import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -16,6 +15,9 @@ import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTr
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+
+import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 
 /**
  * Tests for {@link StepReturnSymbolicExecutionTreeNodesStopCondition} and
@@ -32,7 +34,7 @@ public class TestStepReturnSymbolicExecutionTreeNodesStopCondition
     @Test // weigl was not prev. activated
     public void testStepReturn() throws ProofInputException, IOException,
             ParserConfigurationException, SAXException, ProblemLoaderException {
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         // Define test settings

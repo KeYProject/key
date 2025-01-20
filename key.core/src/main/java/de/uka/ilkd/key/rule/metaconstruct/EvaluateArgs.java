@@ -1,10 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -27,6 +28,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * TODO
@@ -76,7 +79,7 @@ public class EvaluateArgs extends ProgramTransformer {
         MethodOrConstructorReference mr = (MethodOrConstructorReference) //
         (pe instanceof CopyAssignment ? ((CopyAssignment) pe).getChildAt(1) : pe);
 
-        List<Statement> evalstat = new LinkedList<Statement>();
+        List<Statement> evalstat = new LinkedList<>();
 
         final ReferencePrefix newCalled;
         final ReferencePrefix invocationTarget = mr.getReferencePrefix();

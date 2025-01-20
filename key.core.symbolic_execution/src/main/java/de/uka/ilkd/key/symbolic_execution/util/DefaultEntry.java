@@ -1,9 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Map.Entry;
 
 public class DefaultEntry<K, V> implements Entry<K, V> {
-    private K key;
+    private final K key;
 
     private V value;
 

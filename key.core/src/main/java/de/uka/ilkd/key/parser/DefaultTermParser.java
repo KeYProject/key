@@ -1,21 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
+
+import java.io.IOException;
+import java.io.Reader;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
+
+import org.key_project.logic.sort.Sort;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.RecognitionException;
-
-import java.io.IOException;
-import java.io.Reader;
 
 
 /**
@@ -38,7 +43,8 @@ public final class DefaultTermParser {
      *         correctly or the term has an invalid sort.
      */
     public Term parse(Reader in, Sort sort, Services services,
-            Namespace<QuantifiableVariable> var_ns, Namespace<Function> func_ns,
+            Namespace<QuantifiableVariable> var_ns,
+            Namespace<JFunction> func_ns,
             Namespace<Sort> sort_ns, Namespace<IProgramVariable> progVar_ns, AbbrevMap scm)
             throws ParserException {
         return parse(in, sort, services, new NamespaceSet(var_ns, func_ns, sort_ns,
@@ -61,10 +67,11 @@ public final class DefaultTermParser {
         keyIO.setAbbrevMap(scm);
         try {
             Term result = keyIO.parseExpression(CharStreams.fromReader(in));
-            if (sort != null && !result.sort().extendsTrans(sort))
+            if (sort != null && !result.sort().extendsTrans(sort)) {
                 throw new ParserException(
                     "Expected sort " + sort + ", but parser returns sort " + result.sort() + ".",
                     null);
+            }
             return result;
         } catch (RecognitionException re) {
             // problemParser cannot be null since exception is thrown during parsing.
@@ -85,8 +92,9 @@ public final class DefaultTermParser {
     public Sequent parseSeq(Reader in, Services services, NamespaceSet nss, AbbrevMap scm)
             throws ParserException {
         KeyIO keyIO = new KeyIO(services, nss);
+        keyIO.setAbbrevMap(scm);
         try {
-            final Sequent seq = keyIO.parseSequence(CharStreams.fromReader(in));
+            final Sequent seq = keyIO.parseSequent(CharStreams.fromReader(in));
             // p = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""), new Recoder2KeY(services,
             // nss), services, nss, scm);
             return seq;

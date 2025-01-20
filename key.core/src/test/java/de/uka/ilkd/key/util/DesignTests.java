@@ -1,22 +1,30 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+
 import de.uka.ilkd.key.logic.Term;
+
+import org.key_project.util.java.IOUtil;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
 
 
 /**
@@ -24,7 +32,8 @@ import java.util.LinkedList;
  */
 public class DesignTests {
 
-    private static final File binaryPath;
+    private static final Path BINARY_PATH;
+    private static final Path PROJECT_ROOT;
     private static final Logger LOGGER = LoggerFactory.getLogger(DesignTests.class);
 
     static {
@@ -36,16 +45,11 @@ public class DesignTests {
                 "key.core" + File.separator + "bin");
         }
 
-        binaryPath = new File(projectRoot,
-            "de" + File.separator + "uka" + File.separator + "ilkd" + File.separator + "key");
+        PROJECT_ROOT = projectRoot.toPath();
+        BINARY_PATH = Paths.get(projectRoot.toString(), "de", "uka", "ilkd", "key");
     }
 
-    private static final FileFilter FILTER = fileName -> {
-        final String absolutePath = fileName.getAbsolutePath();
-        return absolutePath.endsWith(".class");
-    };
-
-    private Class<?>[] allClasses;
+    private ArrayList<Class<?>> allClasses;
 
     private String message = "";
 
@@ -57,71 +61,41 @@ public class DesignTests {
 
     @BeforeEach
     public void setUp() {
-        allClasses = getAllClasses(binaryPath);
-        Assertions.assertTrue(allClasses.length >= 1,
-            "No classes found in and below " + binaryPath);
-    }
-
-    /**
-     * collects all found in the given directory
-     *
-     * @param directory a File denoting the directory where to look for the classes
-     * @return array of found class files
-     */
-    private static Class<?>[] getClasses(File directory) {
-        LOGGER.info(".");
-        File[] classFiles = directory.listFiles(FILTER);
-
-        Class<?>[] classes = new Class[(classFiles == null) ? 0 : classFiles.length];
-        for (int i = 0; i < classes.length; i++) {
-            String absoluteName = classFiles[i].getAbsolutePath();
-            String className =
-                absoluteName.substring(absoluteName.indexOf("de" + File.separatorChar))
-                        .replace(File.separatorChar, '.');
-            className = className.substring(0, className.indexOf(".class"));
-
-            try {
-                classes[i] = Term.class.getClassLoader().loadClass(className);
-            } catch (ClassNotFoundException cnfe) {
-                LOGGER.error("That's weird. Cannot find class {}", className, cnfe);
-            } catch (NoClassDefFoundError ncdfe) {
-                LOGGER.error("{} skipped. Please check your classpath.", className, ncdfe);
-            }
-        }
-
-        return classes;
-    }
-
-    /**
-     * adds all elements of <code>source</code> to <code>target</code>
-     *
-     * @param source the array whose elements have to inserted
-     * @param target the LinkedList where to insert the elements of the source
-     */
-    private static void copyToList(Class<?>[] source, LinkedList<Class<?>> target) {
-        Collections.addAll(target, source);
+        allClasses = getAllClasses(BINARY_PATH, PROJECT_ROOT);
+        Assertions.assertFalse(allClasses.isEmpty(),
+            "No classes found in and below " + BINARY_PATH);
     }
 
     /**
      * iterates through the directory structure starting at <code>topDir</code> and collects all
      * found classes.
      *
-     * @param topDir File giving the directory where to start the iteration
-     * @return all found classes including the ones in <code>topDir</code>
+     * @param path File giving the directory where to start the iteration
      */
-    public static Class<?>[] getAllClasses(File topDir) {
-        LinkedList<Class<?>> result = new LinkedList<>();
-        copyToList(getClasses(topDir), result);
+    public static ArrayList<Class<?>> getAllClasses(Path path, Path root) {
+        ArrayList<Class<?>> acc = new ArrayList<>();
+        try (var files = Files.walk(path)) {
+            files.forEach(child -> {
+                var relative = root.relativize(child).toString();
+                var index = relative.indexOf(".class");
+                if (index == -1) {
+                    return;
+                }
 
-        File[] subDirectories = topDir.listFiles(File::isDirectory);
-        if (subDirectories == null) {
-            return new Class[0];
-        } else {
-            for (File subDirectory : subDirectories) {
-                copyToList(getAllClasses(subDirectory), result);
-            }
-            return (Class<?>[]) result.toArray(new Class[0]);
+                var name = relative.toString().substring(0, index).replace(File.separatorChar, '.');
+
+                try {
+                    acc.add(Term.class.getClassLoader().loadClass(name));
+                } catch (ClassNotFoundException cnfe) {
+                    LOGGER.error("That's weird. Cannot find class {} ", name, cnfe);
+                } catch (NoClassDefFoundError ncdfe) {
+                    LOGGER.error("{} skipped. Please check your classpath.", name, ncdfe);
+                }
+            });
+        } catch (IOException e) {
+            Assertions.fail(e);
         }
+        return acc;
     }
 
     /**
@@ -182,8 +156,9 @@ public class DesignTests {
                     || allClass.getPackage().getName().contains("key.strategy")) {
 
                 // exclude KeYMediator for the moment (contains some workarounds)
-                if (allClass.getName().contains("KeYMediator"))
+                if (allClass.getName().contains("KeYMediator")) {
                     continue;
+                }
 
                 for (Field f : allClass.getDeclaredFields()) {
                     if (java.awt.Component.class.isAssignableFrom(f.getType())) {
@@ -201,13 +176,14 @@ public class DesignTests {
                             "Illegal GUI reference as return type of {} declared in class {}",
                             m.getName(), allClass.getName());
                     }
-                    for (Class<?> t : m.getParameterTypes())
+                    for (Class<?> t : m.getParameterTypes()) {
                         if (java.awt.Component.class.isAssignableFrom(t)) {
                             LOGGER.error(
                                 "Illegal GUI reference as parameter type of {} declared in class {}",
                                 m.getName(), allClass.getName());
                             badClasses.add(allClass);
                         }
+                    }
                 }
             }
         }
@@ -260,33 +236,5 @@ public class DesignTests {
         }
 
         Assertions.assertEquals(0, badClasses.size(), message);
-    }
-
-
-    public void runTests() {
-        Method[] meth = getClass().getMethods();
-        LOGGER.info("[Collecting classes. Please wait...]");
-        allClasses = getAllClasses(binaryPath);
-        LOGGER.info("[Testing " + allClasses.length + " classes.]");
-        int failures = 0;
-        int testcases = 0;
-        for (Method method : meth) {
-            if (method.getName().startsWith("test")) {
-                try {
-                    testcases++;
-                    message = ".";
-                    method.invoke(this, (Object[]) null);
-                    LOGGER.info(message);
-                } catch (Exception e) {
-                    LOGGER.error("Test failed: {}", method, e);
-                    failures++;
-                }
-            }
-        }
-        LOGGER.info("[Design tests finished. (" + (testcases - failures) + "/" + testcases
-            + ") tests passed.]");
-        if (failures > 0) {
-            System.exit(1);
-        }
     }
 }

@@ -1,42 +1,32 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
 
-import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty;
-import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
-
-import java.util.Collections;
-import java.util.EventObject;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Properties;
 
 /**
  * A collection of settings for the new (= 2021) SMT translation.
- *
+ * <p>
  * Unlike the other settings, these settings do not have a fixed set of keys but are driven by
  * arbitrary keys.
- *
+ * <p>
  * Hence, all that this class here does, is to essentially delegate methods to the underlying hash
  * map.
- *
+ * <p>
  * The list of available settings can be retrieved from
  * {@link de.uka.ilkd.key.smt.newsmt2.SMTHandlerServices#getSMTProperties()}.
  *
  * @author Mattias Ulbrich
  */
-public class NewSMTTranslationSettings implements Settings, Cloneable {
-
+public class NewSMTTranslationSettings extends AbstractSettings {
     private static final String PREFIX = "[NewSMT]";
 
     // Using a linked hash map to make the order deterministic in writing to
     // file
     private final Map<String, String> map = new LinkedHashMap<>();
-
-    private final List<SettingsListener> listeners = new LinkedList<>();
 
     /**
      * Creates a new settings object in which no option is set.
@@ -85,6 +75,26 @@ public class NewSMTTranslationSettings implements Settings, Cloneable {
         }
     }
 
+    @Override
+    public void readSettings(Configuration props) {
+        var newSmt = props.getSection("NewSMT");
+        if (newSmt == null)
+            return;
+        for (var entry : newSmt.getEntries()) {
+            final var value = entry.getValue();
+            assert value instanceof String;
+            map.put(entry.getKey(), value.toString());
+        }
+    }
+
+    @Override
+    public void writeSettings(Configuration props) {
+        var newSmt = props.getOrCreateSection("NewSMT");
+        for (Entry<String, String> en : map.entrySet()) {
+            newSmt.set(en.getKey(), en.getValue());
+        }
+    }
+
 
     /**
      * Retreive an immutable view onto the underlying hash map
@@ -113,26 +123,12 @@ public class NewSMTTranslationSettings implements Settings, Cloneable {
      * @return the value that was in the map prior to the call (see {@link Map#put(Object, Object)}.
      */
     public String put(String key, String value) {
+        var old = map.get(key);
         String result = map.put(Objects.requireNonNull(key), Objects.requireNonNull(value));
-        for (SettingsListener listener : listeners) {
-            listener.settingsChanged(new EventObject(this));
-        }
+        firePropertyChange(key, old, value);
         return result;
     }
 
-    @Override
-    public void addSettingsListener(SettingsListener l) {
-        listeners.add(l);
-    }
-
-    @Override
-    public void removeSettingsListener(SettingsListener l) {
-        listeners.remove(l);
-    }
-
-    /**
-     * see {@link SMTSettings#copy(SMTSettings)}
-     */
     public void copy(NewSMTTranslationSettings newTranslationSettings) {
         this.map.clear();
         this.map.putAll(newTranslationSettings.map);

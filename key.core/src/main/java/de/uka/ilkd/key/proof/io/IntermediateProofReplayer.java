@@ -1,29 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
-
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.rule.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
@@ -31,68 +15,56 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredica
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.SMTAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.prover.impl.PerfScope;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 
 /**
@@ -100,9 +72,10 @@ import org.slf4j.LoggerFactory;
  * generated by {@link IntermediatePresentationProofFileParser}.
  * <p>
  *
- * Replay is started using {@link #replay()}. In the course of replaying, new nodes are added to the
- * supplied proof object. The last goal touched during replay can be obtained by
- * {@link #getLastSelectedGoal()}.
+ * Replay is started using
+ * {@link #replay(ProblemInitializer.ProblemInitializerListener, ProgressMonitor)}. In the course of
+ * replaying, new nodes are added to the supplied proof object. The last goal touched during replay
+ * can be obtained by {@link #getLastSelectedGoal()}.
  *
  * TODO: Check if joining with more than one partner works out of the box. Potential problem:
  * Different order may result in syntactically different nodes.
@@ -112,6 +85,12 @@ import org.slf4j.LoggerFactory;
  * @author Dominic Scheurer
  */
 public class IntermediateProofReplayer {
+    /**
+     * Set as {@link #getStatus()} if the proof contains SMT steps that didn't reload successfully.
+     * Usually occurs if the timeout is set too low.
+     */
+    public static final String SMT_NOT_RUN =
+        "Your proof has been loaded, but SMT solvers have not been run";
 
     private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof.\n";
     private static final String NOT_APPLICABLE =
@@ -125,17 +104,26 @@ public class IntermediateProofReplayer {
     private Proof proof = null;
 
     /** Encountered errors */
-    private List<Throwable> errors = new LinkedList<Throwable>();
+    private final List<Throwable> errors = new LinkedList<>();
     /** Error status */
     private String status = "";
 
     /** Stores open branches */
-    private LinkedList<Pair<Node, NodeIntermediate>> queue =
-        new LinkedList<Pair<Node, NodeIntermediate>>();
+    private final LinkedList<Pair<Node, NodeIntermediate>> queue =
+        new LinkedList<>();
+
+    /**
+     * Used by the node merging during the proof replay.
+     *
+     * @param node the other node to be merged with
+     * @param pio pio of ??? (ask Dominic Steinhöfel)
+     * @param intermediate representation of the node during the replay
+     * @see MergePartnerAppIntermediate
+     */
+    private record PartnerNode(Node node, PosInOccurrence pio, NodeIntermediate intermediate) {}
 
     /** Maps join node IDs to previously seen join partners */
-    private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes =
-        new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
+    private final HashMap<Integer, HashSet<PartnerNode>> joinPartnerNodes = new HashMap<>();
 
     /** The current open goal */
     private Goal currGoal = null;
@@ -145,7 +133,7 @@ public class IntermediateProofReplayer {
      *
      * @param loader The problem loader, for reporting errors.
      * @param proof The proof object into which to load the replayed proof.
-     * @param intermediate
+     * @param parserResult the result of the proof file parser to be replayed
      */
     public IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof,
             IntermediatePresentationProofFileParser.Result parserResult) {
@@ -153,7 +141,21 @@ public class IntermediateProofReplayer {
         this.loader = loader;
 
         queue.addFirst(
-            new Pair<Node, NodeIntermediate>(proof.root(), parserResult.getParsedResult()));
+            new Pair<>(proof.root(), parserResult.parsedResult()));
+    }
+
+    /**
+     * Constructs a new {@link IntermediateProofReplayer} without initializing the queue of
+     * intermediate parsing results. Note that
+     * {@link #replay(ProblemInitializer.ProblemInitializerListener, ProgressMonitor)} will not
+     * work as expected when using this constructor, but other methods will.
+     *
+     * @param loader The problem loader, for reporting errors.
+     * @param proof The proof object into which to load the replayed proof.
+     */
+    protected IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof) {
+        this.proof = proof;
+        this.loader = loader;
     }
 
     /**
@@ -166,18 +168,37 @@ public class IntermediateProofReplayer {
     /**
      * Starts the actual replay process. Results are stored in the supplied proof object; the last
      * selected goal may be obtained by {@link #getLastSelectedGoal()}.
+     * Note: This method deletes the intermediate proof tree!
      *
-     * @param listener problem initializer listener for the current proof
-     * @param progressMonitor progress monitor used to report replay progress
+     * @param listener problem initializer listener for the current proof (may be null)
+     * @param progressMonitor progress monitor used to report replay progress (may be null)
      * @return result of the replay procedure (see {@link Result})
      */
     public Result replay(ProblemInitializer.ProblemInitializerListener listener,
             ProgressMonitor progressMonitor) {
+        return replay(listener, progressMonitor, true);
+    }
+
+    /**
+     * Starts the actual replay process. Results are stored in the supplied
+     * proof object; the last selected goal may be obtained by
+     * {@link #getLastSelectedGoal()}.
+     *
+     * @param listener problem initializer listener for the current proof
+     * @param progressMonitor progress monitor used to report replay progress
+     * @param deleteIntermediateTree indicates if the intermediate proof tree should be
+     *        deleted (set to false if it shal be kept for further use)
+     * @return result of the replay procedure (see {@link Result})
+     */
+    public Result replay(ProblemInitializer.ProblemInitializerListener listener,
+            ProgressMonitor progressMonitor, boolean deleteIntermediateTree) {
         // initialize progress monitoring
         int stepIndex = 0;
         int reportInterval = 1;
+        int max = 0;
+        var time = System.nanoTime();
         if (listener != null && progressMonitor != null) {
-            int max = !queue.isEmpty() && queue.peekFirst().second != null
+            max = !queue.isEmpty() && queue.peekFirst().second != null
                     ? queue.peekFirst().second.countAllChildren()
                     : 1;
             listener.reportStatus(this, "Replaying proof", max);
@@ -194,7 +215,7 @@ public class IntermediateProofReplayer {
             final Pair<Node, NodeIntermediate> currentP = queue.pollFirst();
             final Node currNode = currentP.first;
             final NodeIntermediate currNodeInterm = currentP.second;
-            currGoal = proof.getGoal(currNode);
+            currGoal = proof.getOpenGoal(currNode);
 
             try {
                 if (currNodeInterm instanceof BranchNodeIntermediate) {
@@ -203,12 +224,10 @@ public class IntermediateProofReplayer {
                     if (currNodeInterm.getChildren().size() == 1) {
                         currNode.getNodeInfo().setBranchLabel(
                             ((BranchNodeIntermediate) currNodeInterm).getBranchTitle());
-                        queue.addFirst(new Pair<Node, NodeIntermediate>(currNode,
+                        queue.addFirst(new Pair<>(currNode,
                             currNodeInterm.getChildren().get(0)));
                     }
-                    continue;
-                } else if (currNodeInterm instanceof AppNodeIntermediate) {
-                    AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
+                } else if (currNodeInterm instanceof AppNodeIntermediate currInterm) {
 
                     currNode.getNodeInfo().setNotes(currInterm.getNotes());
 
@@ -235,17 +254,14 @@ public class IntermediateProofReplayer {
                             currNode.getNodeInfo()
                                     .setScriptRuleApplication(currInterm.isScriptRuleApplication());
 
-                            // Children are no longer needed, set them to null
-                            // to free memory.
-                            currInterm.setChildren(null);
+                            if (deleteIntermediateTree) {
+                                // Children are no longer needed, set them to null
+                                // to free memory.
+                                currInterm.setChildren(null);
+                            }
 
 
-
-                        } catch (Exception e) {
-                            reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
-                                + ", goal " + currGoal.node().serialNr() + ", rule "
-                                + appInterm.getRuleName() + NOT_APPLICABLE, e);
-                        } catch (AssertionError e) {
+                        } catch (Exception | AssertionError e) {
                             reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
                                 + ", goal " + currGoal.node().serialNr() + ", rule "
                                 + appInterm.getRuleName() + NOT_APPLICABLE, e);
@@ -256,9 +272,8 @@ public class IntermediateProofReplayer {
                         BuiltInAppIntermediate appInterm =
                             (BuiltInAppIntermediate) currInterm.getIntermediateRuleApp();
 
-                        if (appInterm instanceof MergeAppIntermediate) {
-                            MergeAppIntermediate joinAppInterm = (MergeAppIntermediate) appInterm;
-                            HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo =
+                        if (appInterm instanceof MergeAppIntermediate joinAppInterm) {
+                            HashSet<PartnerNode> partnerNodesInfo =
                                 joinPartnerNodes.get(((MergeAppIntermediate) appInterm).getId());
 
                             if (partnerNodesInfo == null
@@ -282,7 +297,7 @@ public class IntermediateProofReplayer {
                                 // will
                                 // result in non-termination!
                                 queue.addLast(
-                                    new Pair<Node, NodeIntermediate>(currNode, currNodeInterm));
+                                    new Pair<>(currNode, currNodeInterm));
                             } else {
                                 try {
                                     final Services services = proof.getServices();
@@ -298,26 +313,20 @@ public class IntermediateProofReplayer {
                                     final Iterator<Node> childrenIterator =
                                         currNode.childrenIterator();
                                     for (NodeIntermediate child : currInterm.getChildren()) {
-                                        queue.addFirst(new Pair<Node, NodeIntermediate>(
+                                        queue.addFirst(new Pair<>(
                                             childrenIterator.next(), child));
                                     }
 
                                     // Now add children of partner nodes
-                                    for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+                                    for (PartnerNode partnerNodeInfo : partnerNodesInfo) {
                                         Iterator<Node> children =
-                                            partnerNodeInfo.first.childrenIterator();
+                                            partnerNodeInfo.node.childrenIterator();
                                         LinkedList<NodeIntermediate> intermChildren =
-                                            partnerNodeInfo.third.getChildren();
+                                            partnerNodeInfo.intermediate.getChildren();
 
                                         addChildren(children, intermChildren);
                                     }
-                                } catch (SkipSMTRuleException e) {
-                                    reportError(
-                                        ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
-                                            + ", goal " + currGoal.node().serialNr() + ", rule "
-                                            + appInterm.getRuleName() + NOT_APPLICABLE,
-                                        e);
-                                } catch (BuiltInConstructionException e) {
+                                } catch (SkipSMTRuleException | BuiltInConstructionException e) {
                                     reportError(
                                         ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
                                             + ", goal " + currGoal.node().serialNr() + ", rule "
@@ -325,21 +334,13 @@ public class IntermediateProofReplayer {
                                         e);
                                 }
                             }
-                        } else if (appInterm instanceof MergePartnerAppIntermediate) {
+                        } else if (appInterm instanceof MergePartnerAppIntermediate joinPartnerApp) {
                             // Register this partner node
-                            MergePartnerAppIntermediate joinPartnerApp =
-                                (MergePartnerAppIntermediate) appInterm;
-                            HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodeInfo =
-                                joinPartnerNodes.get(joinPartnerApp.getMergeNodeId());
+                            HashSet<PartnerNode> partnerNodeInfo =
+                                joinPartnerNodes.computeIfAbsent(joinPartnerApp.getMergeNodeId(),
+                                    k -> new HashSet<>());
 
-                            if (partnerNodeInfo == null) {
-                                partnerNodeInfo =
-                                    new HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>();
-                                joinPartnerNodes.put(joinPartnerApp.getMergeNodeId(),
-                                    partnerNodeInfo);
-                            }
-
-                            partnerNodeInfo.add(new Triple<Node, PosInOccurrence, NodeIntermediate>(
+                            partnerNodeInfo.add(new PartnerNode(
                                 currNode,
                                 PosInOccurrence.findInSequent(currGoal.sequent(),
                                     appInterm.getPosInfo().first, appInterm.getPosInfo().second),
@@ -361,15 +362,8 @@ public class IntermediateProofReplayer {
                                 // silently continue; status will be reported
                                 // via
                                 // polling
-                            } catch (BuiltInConstructionException e) {
-                                reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                                    + appInterm.getLineNr() + ", goal " + currGoal.node().serialNr()
-                                    + ", rule " + appInterm.getRuleName() + NOT_APPLICABLE, e);
-                            } catch (RuntimeException e) {
-                                reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                                    + appInterm.getLineNr() + ", goal " + currGoal.node().serialNr()
-                                    + ", rule " + appInterm.getRuleName() + NOT_APPLICABLE, e);
-                            } catch (AssertionError e) {
+                            } catch (BuiltInConstructionException | AssertionError
+                                    | RuntimeException e) {
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                     + appInterm.getLineNr() + ", goal " + currGoal.node().serialNr()
                                     + ", rule " + appInterm.getRuleName() + NOT_APPLICABLE, e);
@@ -384,7 +378,14 @@ public class IntermediateProofReplayer {
                 reportError(ERROR_LOADING_PROOF_LINE, throwable);
             }
         }
+        if (listener != null) {
+            listener.reportStatus(this, "Proof loaded.");
+        }
 
+        if (listener != null && progressMonitor != null) {
+            progressMonitor.setProgress(max);
+        }
+        LOGGER.debug("Proof replay took " + PerfScope.formatTime(System.nanoTime() - time));
         return new Result(status, errors, currGoal);
     }
 
@@ -409,8 +410,8 @@ public class IntermediateProofReplayer {
             // check in the above conjunction.
 
             Node child = children.next();
-            if (!proof.getGoal(child).isLinked()) {
-                queue.add(i, new Pair<Node, NodeIntermediate>(child, intermChildren.get(i++)));
+            if (!proof.getOpenGoal(child).isLinked()) {
+                queue.add(i, new Pair<>(child, intermChildren.get(i++)));
             }
         }
     }
@@ -446,7 +447,7 @@ public class IntermediateProofReplayer {
         final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
         final Sequent seq = currGoal.sequent();
 
-        TacletApp ourApp = null;
+        TacletApp ourApp;
         PosInOccurrence pos = null;
 
         Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
@@ -455,6 +456,12 @@ public class IntermediateProofReplayer {
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
         }
+
+        if (ourApp == null) {
+            throw new TacletAppConstructionException(
+                "Unknown taclet with name \"" + tacletName + "\"");
+        }
+
         Services services = proof.getServices();
 
         if (currFormula != 0) { // otherwise we have no pos
@@ -476,16 +483,17 @@ public class IntermediateProofReplayer {
 
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
                 ourApp = ourApp.setPosInOccurrence(pos, services);
+            } catch (TacletAppConstructionException e) {
+                throw e;
             } catch (Exception e) {
-                throw (TacletAppConstructionException) new TacletAppConstructionException(
-                    "Wrong position information: " + pos).initCause(e);
+                throw new TacletAppConstructionException("Wrong position information: " + pos, e);
             }
         }
 
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(), services);
 
         ImmutableList<IfFormulaInstantiation> ifFormulaList =
-            ImmutableSLList.<IfFormulaInstantiation>nil();
+            ImmutableSLList.nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
             ifFormulaList =
                 ifFormulaList.append(new IfFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
@@ -571,12 +579,7 @@ public class IntermediateProofReplayer {
                     final PosInOccurrence ifInst = PosInOccurrence.findInSequent(currGoal.sequent(),
                         currIfInstFormula, currIfInstPosInTerm);
                     builtinIfInsts = builtinIfInsts.append(ifInst);
-                } catch (RuntimeException e) {
-                    reportError(
-                        ERROR_LOADING_PROOF_LINE + "Line " + currInterm.getLineNr() + ", goal "
-                            + currGoal.node().serialNr() + ", rule " + ruleName + NOT_APPLICABLE,
-                        e);
-                } catch (AssertionError e) {
+                } catch (RuntimeException | AssertionError e) {
                     reportError(
                         ERROR_LOADING_PROOF_LINE + "Line " + currInterm.getLineNr() + ", goal "
                             + currGoal.node().serialNr() + ", rule " + ruleName + NOT_APPLICABLE,
@@ -585,29 +588,56 @@ public class IntermediateProofReplayer {
             }
         }
 
-        if (RuleAppSMT.rule.name().toString().equals(ruleName)) {
+        if (SMTRuleApp.RULE.name().toString().equals(ruleName)) {
+            if (!ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().isEnableOnLoad()) {
+                status = SMT_NOT_RUN;
+                throw new SkipSMTRuleException();
+            }
             boolean error = false;
             final SMTProblem smtProblem = new SMTProblem(currGoal);
             try {
-                DefaultSMTSettings settings =
-                    new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                        ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                        proof.getSettings().getNewSMTSettings(), proof);
-                SolverLauncher launcher = new SolverLauncher(settings);
-                // launcher.addListener(new SolverListener(settings, proof));
-                SolverTypeCollection active = ProofIndependentSettings.DEFAULT_INSTANCE
-                        .getSMTSettings().computeActiveSolverUnion();
-                ArrayList<SMTProblem> problems = new ArrayList<SMTProblem>();
+                DefaultSMTSettings settings = new DefaultSMTSettings(
+                    proof.getSettings().getSMTSettings(),
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                    proof.getSettings().getNewSMTSettings(),
+                    proof);
+
+                ProofIndependentSMTSettings smtSettings = ProofIndependentSettings.DEFAULT_INSTANCE
+                        .getSMTSettings();
+                SolverTypeCollection active = smtSettings.computeActiveSolverUnion();
+                SMTAppIntermediate smtAppIntermediate = (SMTAppIntermediate) currInterm;
+                String smtSolver = smtAppIntermediate.getSolver();
+                if (smtSolver == null || smtSolver.isEmpty()) {
+                    // default to Z3 because this one most likely was used when saving the proof
+                    smtSolver = "Z3";
+                }
+                // try to find the solver that closed the proof
+                for (SolverTypeCollection su : smtSettings.getSolverUnions(true)) {
+                    if (su.name().equals(smtSolver)) {
+                        active = su;
+                        break;
+                    }
+                }
+                ArrayList<SMTProblem> problems = new ArrayList<>();
                 problems.add(smtProblem);
-                launcher.launch(active.getTypes(), problems, proof.getServices());
+
+                SolverLauncher launcher = new SolverLauncher(settings);
+                launcher.launch(active.getTypes(), problems,
+                    proof.getServices());
             } catch (Exception e) {
                 error = true;
             }
             if (error || smtProblem.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
-                status = "Your proof has been loaded, but SMT solvers have not been run";
+                status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
             } else {
-                return RuleAppSMT.rule.createApp(null, proof.getServices());
+                String name = smtProblem.getSuccessfulSolver().name();
+                ImmutableList<PosInOccurrence> unsatCore = SMTFocusResults.getUnsatCore(smtProblem);
+                if (unsatCore != null) {
+                    return SMTRuleApp.RULE.createApp(name, unsatCore);
+                } else {
+                    return SMTRuleApp.RULE.createApp(name);
+                }
             }
         }
 
@@ -634,6 +664,11 @@ public class IntermediateProofReplayer {
                 useContractRule = UseDependencyContractRule.INSTANCE;
                 contractApp = (((UseDependencyContractRule) useContractRule).createApp(pos))
                         .setContract(currContract);
+                // restore "step" if needed
+                var depContractApp = ((UseDependencyContractApp) contractApp);
+                if (depContractApp.step() == null) {
+                    contractApp = depContractApp.setStep(builtinIfInsts.head());
+                }
             }
 
             if (contractApp.check(currGoal.proof().getServices()) == null) {
@@ -663,6 +698,9 @@ public class IntermediateProofReplayer {
             }
         }
         ourApp = ruleApps.iterator().next();
+        if (ourApp instanceof OneStepSimplifierRuleApp) {
+            ((OneStepSimplifierRuleApp) ourApp).restrictAssumeInsts(builtinIfInsts);
+        }
         builtinIfInsts = null;
         return ourApp;
     }
@@ -684,7 +722,7 @@ public class IntermediateProofReplayer {
      */
     private MergeRuleBuiltInRuleApp instantiateJoinApp(final MergeAppIntermediate joinAppInterm,
             final Node currNode,
-            final Set<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodesInfo,
+            final HashSet<PartnerNode> partnerNodesInfo,
             final Services services) throws SkipSMTRuleException, BuiltInConstructionException {
         final MergeRuleBuiltInRuleApp joinApp =
             (MergeRuleBuiltInRuleApp) constructBuiltinApp(joinAppInterm, currGoal);
@@ -694,7 +732,7 @@ public class IntermediateProofReplayer {
 
         // Predicate abstraction join rule
         if (joinApp.getConcreteRule() instanceof MergeWithPredicateAbstractionFactory) {
-            List<AbstractionPredicate> predicates = new ArrayList<AbstractionPredicate>();
+            List<AbstractionPredicate> predicates = new ArrayList<>();
 
             // It may happen that the abstraction predicates are null -- in this
             // case, it is the expected behavior to create a default lattice
@@ -704,7 +742,8 @@ public class IntermediateProofReplayer {
                 try {
                     predicates =
                         AbstractionPredicate.fromString(joinAppInterm.getAbstractionPredicates(),
-                            services, services.getProof().getGoal(currNode).getLocalNamespaces());
+                            services,
+                            services.getProof().getOpenGoal(currNode).getLocalNamespaces());
                 } catch (ParserException e) {
                     errors.add(e);
                 }
@@ -714,7 +753,7 @@ public class IntermediateProofReplayer {
                 joinAppInterm.getPredAbstrLatticeType();
 
             LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices =
-                new LinkedHashMap<ProgramVariable, AbstractDomainElement>();
+                new LinkedHashMap<>();
 
             if (joinAppInterm.getUserChoices() != null) {
                 final Pattern p = Pattern.compile("\\('(.+?)', `(.+?)`\\)");
@@ -737,7 +776,7 @@ public class IntermediateProofReplayer {
                             MergeRuleUtils.parsePlaceholder(progVarStr, false, services);
 
                         final List<AbstractionPredicate> applicablePredicates =
-                            StreamSupport.stream(predicates.spliterator(), false)
+                            predicates.stream()
                                     .filter(pred -> pred.getArgSort().equals(ph.first))
                                     .collect(Collectors.toList());
 
@@ -749,7 +788,7 @@ public class IntermediateProofReplayer {
                         final Named pv =
                             services.getNamespaces().programVariables().lookup(ph.second);
 
-                        assert pv != null && pv instanceof ProgramVariable
+                        assert pv instanceof ProgramVariable
                                 && ((ProgramVariable) pv).sort().equals(ph.first)
                                 : "Program variable involved in join is not known to the system";
 
@@ -772,18 +811,18 @@ public class IntermediateProofReplayer {
         }
 
         ImmutableList<MergePartner> joinPartners = ImmutableSLList.nil();
-        for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
+        for (PartnerNode partnerNodeInfo : partnerNodesInfo) {
 
-            final Triple<Term, Term, Term> ownSEState =
+            SymbolicExecutionStateWithProgCnt ownSEState =
                 sequentToSETriple(currNode, joinApp.posInOccurrence(), services);
-            final Triple<Term, Term, Term> partnerSEState =
-                sequentToSETriple(partnerNodeInfo.first, partnerNodeInfo.second, services);
+            var partnerSEState =
+                sequentToSETriple(partnerNodeInfo.node, partnerNodeInfo.pio, services);
 
-            assert ownSEState.third.equals(partnerSEState.third)
+            assert ownSEState.programCounter().equals(partnerSEState.programCounter())
                     : "Cannot merge incompatible program counters";
 
             joinPartners = joinPartners.append(
-                new MergePartner(proof.getGoal(partnerNodeInfo.first), partnerNodeInfo.second));
+                new MergePartner(proof.getOpenGoal(partnerNodeInfo.node), partnerNodeInfo.pio));
         }
 
         joinApp.setMergeNode(currNode);
@@ -814,10 +853,10 @@ public class IntermediateProofReplayer {
      * @param pos Position of interest in the given goal.
      * @return All matching rule applications at pos in g.
      */
-    private static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g,
+    public static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g,
             PosInOccurrence pos) {
 
-        ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
+        ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.nil();
 
         for (final IBuiltInRuleApp app : g.ruleAppIndex().getBuiltInRules(g, pos)) {
             if (app.rule().name().toString().equals(ruleName)) {
@@ -837,10 +876,11 @@ public class IntermediateProofReplayer {
      * @param services The services object.
      * @return The instantiated taclet.
      */
-    private static TacletApp constructInsts(TacletApp app, Goal currGoal,
-            LinkedList<String> loadedInsts, Services services) {
-        if (loadedInsts == null)
+    public static TacletApp constructInsts(@NonNull TacletApp app, Goal currGoal,
+            Collection<String> loadedInsts, Services services) {
+        if (loadedInsts == null) {
             return app;
+        }
         ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
 
         // first pass: add variables
@@ -855,9 +895,9 @@ public class IntermediateProofReplayer {
                 LOGGER.error("{} from {} is not in uninsts", varname, app.rule().name());
                 continue;
             }
-            final String value = s.substring(eq + 1, s.length());
-            if (sv instanceof VariableSV) {
-                app = parseSV1(app, sv, value, services);
+            final String value = s.substring(eq + 1);
+            if (sv instanceof VariableSV vsv) {
+                app = parseSV1(app, vsv, value, services);
             }
         }
 
@@ -871,7 +911,7 @@ public class IntermediateProofReplayer {
                 continue;
             }
 
-            String value = s.substring(eq + 1, s.length());
+            String value = s.substring(eq + 1);
             app = parseSV2(app, sv, value, currGoal);
         }
 
@@ -887,8 +927,9 @@ public class IntermediateProofReplayer {
      */
     private static SchemaVariable lookupName(ImmutableSet<SchemaVariable> set, String name) {
         for (SchemaVariable v : set) {
-            if (v.name().toString().equals(name))
+            if (v.name().toString().equals(name)) {
                 return v;
+            }
         }
         return null; // handle this better!
     }
@@ -904,10 +945,11 @@ public class IntermediateProofReplayer {
      * @throws ParserException In case of an error.
      */
     public static Term parseTerm(String value, Proof proof, Namespace<QuantifiableVariable> varNS,
-            Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
+            Namespace<IProgramVariable> progVarNS, Namespace<JFunction> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
-                varNS, functNS, proof.getNamespaces().sorts(), progVarNS, new AbbrevMap());
+                varNS, functNS, proof.getNamespaces().sorts(),
+                progVarNS, new AbbrevMap());
         } catch (ParserException e) {
             throw new RuntimeException(
                 "Error while parsing value " + value + "\nVar namespace is: " + varNS + "\n", e);
@@ -930,13 +972,13 @@ public class IntermediateProofReplayer {
      * Instantiates a schema variable in the given taclet application. 1st pass: only VariableSV.
      *
      * @param app Application to instantiate.
-     * @param sv Schema variable (VariableSV) to instantiate.
+     * @param sv VariableSV to instantiate.
      * @param value Name for the instantiated logic variable.
      * @param services The services object.
      * @return An instantiated taclet application, where the schema variable has been instantiated
      *         by a logic variable of the given name.
      */
-    public static TacletApp parseSV1(TacletApp app, SchemaVariable sv, String value,
+    public static TacletApp parseSV1(TacletApp app, VariableSV sv, String value,
             Services services) {
         LogicVariable lv = new LogicVariable(new Name(value), app.getRealSort(sv, services));
         Term instance = services.getTermFactory().createTerm(lv);
@@ -954,7 +996,7 @@ public class IntermediateProofReplayer {
      * @return An instantiated taclet application, where the schema variable has been instantiated,
      *         depending on its type, by a Skolem constant, program element, or term of the given
      *         name.
-     * @see #parseSV1(TacletApp, SchemaVariable, String, Services)
+     * @see #parseSV1(TacletApp, VariableSV, String, Services)
      */
     public static TacletApp parseSV2(TacletApp app, SchemaVariable sv, String value,
             Goal targetGoal) {
@@ -964,16 +1006,20 @@ public class IntermediateProofReplayer {
         if (sv instanceof VariableSV) {
             // ignore -- already done
             result = app;
-        } else if (sv instanceof ProgramSV) {
-            final ProgramElement pe = app.getProgramElement(value, sv, services);
+        } else if (sv instanceof ProgramSV psv) {
+            final ProgramElement pe = app.getProgramElement(value, psv, services);
             result = app.addCheckedInstantiation(sv, pe, services, true);
-        } else if (sv instanceof SkolemTermSV) {
-            result = app.createSkolemConstant(value, sv, true, services);
+        } else if (sv instanceof SkolemTermSV skolemSv) {
+            result = app.createSkolemConstant(value, skolemSv, true, services);
+        } else if (sv instanceof ModalOperatorSV msv) {
+            result = app.addInstantiation(
+                app.instantiations().add(msv, Modality.JavaModalityKind.getKind(value), services),
+                services);
         } else {
             Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();
             Namespace<IProgramVariable> prgVarNS =
                 targetGoal.getLocalNamespaces().programVariables();
-            Namespace<Function> funcNS = targetGoal.getLocalNamespaces().functions();
+            Namespace<JFunction> funcNS = targetGoal.getLocalNamespaces().functions();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
             Term instance = parseTerm(value, p, varNS, prgVarNS, funcNS);
             result = app.addCheckedInstantiation(sv, instance, services, true);
@@ -984,25 +1030,25 @@ public class IntermediateProofReplayer {
     /**
      * Signals an error during construction of a taclet app.
      */
-    static class TacletAppConstructionException extends Exception {
+    public static class TacletAppConstructionException extends Exception {
         private static final long serialVersionUID = 7859543482157633999L;
 
         TacletAppConstructionException(String s) {
             super(s);
         }
 
-        TacletAppConstructionException(Throwable cause) {
-            super(cause);
+        TacletAppConstructionException(String s, Throwable cause) {
+            super(s, cause);
         }
     }
 
     /**
      * Signals an error during construction of a built-in rule app.
      */
-    static class BuiltInConstructionException extends Exception {
+    public static class BuiltInConstructionException extends Exception {
         private static final long serialVersionUID = -735474220502290816L;
 
-        BuiltInConstructionException(String s) {
+        public BuiltInConstructionException(String s) {
             super(s);
         }
 
@@ -1028,9 +1074,9 @@ public class IntermediateProofReplayer {
      *
      * @author Dominic Scheurer
      */
-    static class Result {
-        private String status;
-        private List<Throwable> errors;
+    public static class Result {
+        private final String status;
+        private final List<Throwable> errors;
         private Goal lastSelectedGoal = null;
 
         public Result(String status, List<Throwable> errors, Goal lastSelectedGoal) {

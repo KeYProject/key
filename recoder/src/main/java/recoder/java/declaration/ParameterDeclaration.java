@@ -1,16 +1,19 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTList;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Formal parameters require a VariableSpecificationList of size() <= 1 (size() == 0 for abstract
+ * Formal parameters require a VariableSpecificationList of {@code size() <= 1} ({@code size() == 0}
+ * for abstract
  * methods) without initializer (for Java).
  */
 
@@ -114,7 +117,7 @@ public class ParameterDeclaration extends VariableDeclaration {
     }
 
     public List<VariableSpecification> getVariables() {
-        List<VariableSpecification> res = new ArrayList<VariableSpecification>(1);
+        List<VariableSpecification> res = new ArrayList<>(1);
         res.add(varSpec);
         return res;
     }
@@ -137,12 +140,15 @@ public class ParameterDeclaration extends VariableDeclaration {
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null)
+        if (declarationSpecifiers != null) {
             result += declarationSpecifiers.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (varSpec != null)
+        }
+        if (varSpec != null) {
             result++;
+        }
         return result;
     }
 
@@ -164,13 +170,15 @@ public class ParameterDeclaration extends VariableDeclaration {
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (varSpec != null) {
-            if (index == 0)
+            if (index == 0) {
                 return varSpec;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -201,7 +209,7 @@ public class ParameterDeclaration extends VariableDeclaration {
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */

@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
 import recoder.convenience.Format;
@@ -71,7 +73,7 @@ public class DetachChange extends TreeChange {
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (isMinor()) {
             buf.append("Minor ");
         }
@@ -89,4 +91,3 @@ public class DetachChange extends TreeChange {
         return buf.toString();
     }
 }
-

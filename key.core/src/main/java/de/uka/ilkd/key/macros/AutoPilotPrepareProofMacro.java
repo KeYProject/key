@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
-import java.util.*;
+import java.util.Set;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
@@ -10,24 +12,17 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.strategy.*;
+import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.Name;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
-
-    private static final String[] ADMITTED_RULES = { "orRight", "impRight", "close", "andRight" };
-
-    private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
-
-    private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
+    private static final Set<String> ADMITTED_RULES =
+        Set.of(new String[] { "orRight", "impRight", "close", "andRight" });
+    private static final Set<String> ADMITTED_RULE_SETS =
+        Set.of(new String[] { "update_elim", "update_join" });
 
     public AutoPilotPrepareProofMacro() { super(); }
 
@@ -52,26 +47,17 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         return "autopilot-prep";
     }
 
-    /*
-     * convert a string array to a set of strings
-     */
-    protected static Set<String> asSet(String[] strings) {
-        return Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(strings)));
-    }
+    public static boolean isAdmittedRule(Rule rule) {
+        String name = rule.name().toString();
+        if (ADMITTED_RULES.contains(name)) {
+            return true;
+        }
 
-    /*
-     * Checks if a rule is marked as not suited for interaction.
-     */
-    private static boolean isNonHumanInteractionTagged(Rule rule) {
-        return isInRuleSet(rule, NON_HUMAN_INTERACTION_RULESET);
-    }
-
-    private static boolean isInRuleSet(Rule rule, Name ruleSetName) {
-        if (rule instanceof Taclet) {
-            Taclet taclet = (Taclet) rule;
+        if (rule instanceof Taclet taclet) {
             for (RuleSet rs : taclet.getRuleSets()) {
-                if (ruleSetName.equals(rs.name()))
+                if (ADMITTED_RULE_SETS.contains(rs.name().toString())) {
                     return true;
+                }
             }
         }
         return false;
@@ -84,7 +70,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         /** the modality cache used by this strategy */
         private final ModalityCache modalityCache = new ModalityCache();
 
-        public AutoPilotStrategy(Proof proof, PosInOccurrence posInOcc) {
+        public AutoPilotStrategy(Proof proof) {
             this.delegate = proof.getActiveStrategy();
         }
 
@@ -95,14 +81,14 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE &&
+            return computeCost(app, pio, goal, new MutableState()) != TopRuleAppCost.INSTANCE &&
             // Assumptions are normally not considered by the cost
             // computation, because they are normally not yet
             // instantiated when the costs are computed. Because the
             // application of a rule sometimes makes sense only if
             // the assumptions are instantiated in a particular way
             // (for instance equalities should not be applied on
-            // themselves), we need to give the delegate the possiblity
+            // themselves), we need to give the delegate the possibility
             // to reject the application of a rule by calling
             // isApprovedApp. Otherwise, in particular equalities may
             // be applied on themselves.
@@ -110,19 +96,19 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
 
             Rule rule = app.rule();
-            if (isNonHumanInteractionTagged(rule)) {
+            if (FinishSymbolicExecutionMacro.isForbiddenRule(rule)) {
                 return TopRuleAppCost.INSTANCE;
             }
 
             if (modalityCache.hasModality(goal.node().sequent())) {
-                return delegate.computeCost(app, pio, goal);
+                return delegate.computeCost(app, pio, goal, mState);
             }
 
-            String name = rule.name().toString();
-            if (ADMITTED_RULES_SET.contains(name)) {
+            if (isAdmittedRule(rule)) {
                 return NumberRuleAppCost.getZeroCost();
             }
 
@@ -155,6 +141,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
-        return new AutoPilotStrategy(proof, posInOcc);
+        return new AutoPilotStrategy(proof);
     }
 }

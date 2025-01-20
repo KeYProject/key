@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 /**
@@ -15,12 +18,12 @@ public interface DefaultProfileResolver {
      *
      * @return The profile name.
      */
-    public String getProfileName();
+    String getProfileName();
 
     /**
      * Returns the default {@link Profile} instance.
      *
      * @return The default {@link Profile} instance.
      */
-    public Profile getDefaultProfile();
+    Profile getDefaultProfile();
 }

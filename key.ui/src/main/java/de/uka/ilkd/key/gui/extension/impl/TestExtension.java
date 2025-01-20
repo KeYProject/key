@@ -1,4 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.extension.impl;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -15,16 +26,10 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
+
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Alexander Weigl
@@ -95,7 +100,8 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     }
 
     @Override
-    public Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator) {
+    public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window,
+            @NonNull KeYMediator mediator) {
         return Collections.singleton(new TabPanel() {
             @Override
             public String getTitle() {
@@ -115,7 +121,7 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         return Collections.singleton(actionTest);
     }
 
-    private class TestAction extends KeyAction {
+    private static class TestAction extends KeyAction {
         private static final long serialVersionUID = -2701623640497343330L;
 
         public TestAction() {
@@ -133,15 +139,17 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         }
     }
 
-    private class TestSettingsProvider implements SettingsProvider {
+    private static class TestSettingsProvider implements SettingsProvider {
         @Override
         public String getDescription() {
             return "Test Settings";
         }
 
         @Override
-        public JComponent getPanel(MainWindow window) {
-            return new JLabel("Test");
+        public JPanel getPanel(MainWindow window) {
+            JPanel p = new JPanel();
+            p.add(new JLabel("Test"));
+            return p;
         }
 
         @Override

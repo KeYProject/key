@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.definition;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Defines that a user interface control which edits a single key-value-pair of the
@@ -79,7 +82,7 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
             StrategyPropertyValueDefinition... values) {
         super(apiKey, name, tooltip, subProperties);
         this.columnsPerRow = columnsPerRow;
-        this.values = new ImmutableArray<StrategyPropertyValueDefinition>(values);
+        this.values = new ImmutableArray<>(values);
     }
 
     /**

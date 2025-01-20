@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="&lt;call self.min(i,j)&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.min(i, j)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result;" pathCondition="true" pathConditionChanged="false">
-         <branchStatement name="if (invert(i)&lt;invert(j))" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+         <branchStatement name="if (invert(i) &lt; invert(j))" pathCondition="true" pathConditionChanged="false" blockOpened="true">
             <methodCall name="&lt;call self.invert(a)&gt;" pathCondition="true" pathConditionChanged="false">
-               <statement name="return a*-1;" pathCondition="true" pathConditionChanged="false">
+               <statement name="return a * -1;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of invert&gt;" signature="&lt;return of self.invert(a)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                      <methodCall name="&lt;call self.invert(a_1)&gt;" pathCondition="true" pathConditionChanged="false">
-                        <statement name="return a_1*-1;" pathCondition="true" pathConditionChanged="false">
+                        <statement name="return a_1 * -1;" pathCondition="true" pathConditionChanged="false">
                            <methodReturn name="&lt;return of invert&gt;" signature="&lt;return of self.invert(a_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                               <branchCondition name="lt(j,i)" pathCondition="lt(j,i)" pathConditionChanged="true" branchCondition="lt(j,i)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                 <statement name="result=i;" pathCondition="lt(j,i)" pathConditionChanged="false">
+                                 <statement name="result = i;" pathCondition="lt(j,i)" pathConditionChanged="false">
                                     <statement name="return result;" pathCondition="lt(j,i)" pathConditionChanged="false">
-                                       <methodReturn name="&lt;return of min&gt;" signature="&lt;return of self.min(i,j)&gt;" pathCondition="lt(j,i)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="lt(j,i)">
+                                       <methodReturn name="&lt;return of min&gt;" signature="&lt;return of self.min(i, j)&gt;" pathCondition="lt(j,i)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="lt(j,i)">
                                           <termination name="&lt;end&gt;" pathCondition="lt(j,i)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                           </termination>
                                        </methodReturn>
@@ -21,9 +21,9 @@
                                  </statement>
                               </branchCondition>
                               <branchCondition name="geq(j,i)" pathCondition="geq(j,i)" pathConditionChanged="true" branchCondition="geq(j,i)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                 <statement name="result=j;" pathCondition="geq(j,i)" pathConditionChanged="false">
+                                 <statement name="result = j;" pathCondition="geq(j,i)" pathConditionChanged="false">
                                     <statement name="return result;" pathCondition="geq(j,i)" pathConditionChanged="false">
-                                       <methodReturn name="&lt;return of min&gt;" signature="&lt;return of self.min(i,j)&gt;" pathCondition="geq(j,i)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="geq(j,i)">
+                                       <methodReturn name="&lt;return of min&gt;" signature="&lt;return of self.min(i, j)&gt;" pathCondition="geq(j,i)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="geq(j,i)">
                                           <termination name="&lt;end&gt;" pathCondition="geq(j,i)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                           </termination>
                                        </methodReturn>

@@ -1,7 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.bitops;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Represents a non-negative number with access to single bits; the length of the bit set is fixed.
@@ -9,10 +14,11 @@ import java.util.BitSet;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class ImmutableFixedLengthBitSet {
 
-    private boolean[] bitSet = null;
-    private int value = -1;
+    private final boolean[] bitSet;
+    private int value;
 
     /**
      * Constructs a new {@link ImmutableFixedLengthBitSet} for the given length. All bits are set to
@@ -89,8 +95,8 @@ public class ImmutableFixedLengthBitSet {
     public/* @ pure @ */int getNumOfZeroBits() {
         int result = 0;
 
-        for (int i = 0; i < bitSet.length; i++) {
-            if (!bitSet[i]) {
+        for (boolean b : bitSet) {
+            if (!b) {
                 result++;
             }
         }
@@ -102,7 +108,7 @@ public class ImmutableFixedLengthBitSet {
      * @return A list of all non-zero positions in the {@link ImmutableFixedLengthBitSet}.
      */
     public ArrayList<Integer> getNonzeroPositions() {
-        ArrayList<Integer> result = new ArrayList<Integer>();
+        ArrayList<Integer> result = new ArrayList<>();
         for (int i = 0; i < bitSet.length; i++) {
             if (bitSet[i]) {
                 result.add(i);
@@ -119,7 +125,7 @@ public class ImmutableFixedLengthBitSet {
      */
     @Override
     public String toString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         result.append(getValue()).append(" [");
 

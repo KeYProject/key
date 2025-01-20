@@ -1,7 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
-
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableMap;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -9,14 +9,16 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.logic.op.Function;
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.ImmutableMap;
 
 /**
  * This visitor is used to collect information about schema variable pairs occurring within the same
@@ -24,13 +26,13 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
  * or skolem functions.
  */
 
-public class SVNameCorrespondenceCollector extends DefaultVisitor {
+public class SVNameCorrespondenceCollector implements DefaultVisitor {
 
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in the taclet
      */
     private ImmutableMap<SchemaVariable, SchemaVariable> nameCorrespondences =
-        DefaultImmutableMap.<SchemaVariable, SchemaVariable>nilMap();
+        DefaultImmutableMap.nilMap();
 
     private final HeapLDT heapLDT;
 
@@ -48,13 +50,15 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
      */
     public void visit(Term t) {
 
-        final Operator top = t.op();
+        final var top = t.op();
 
         if (top instanceof SubstOp) {
-            final Operator substTermOp = t.sub(0).op();
-            final QuantifiableVariable substVar = t.varsBoundHere(1).get(0);
-            if (substTermOp instanceof SchemaVariable && substVar instanceof SchemaVariable)
-                addNameCorrespondence((SchemaVariable) substTermOp, (SchemaVariable) substVar);
+            final var substTermOp = t.sub(0).op();
+            final var substVar = t.varsBoundHere(1).get(0);
+            if (substTermOp instanceof SchemaVariable substTermSV
+                    && substVar instanceof SchemaVariable substVarSV) {
+                addNameCorrespondence(substTermSV, substVarSV);
+            }
         }
 
     }
@@ -110,7 +114,7 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
             findTerm.execPostOrder(this);
             if (findTerm.op() instanceof SchemaVariable) {
                 findSV = (SchemaVariable) findTerm.op();
-            } else if (findTerm.op() instanceof Function
+            } else if (findTerm.op() instanceof JFunction
                     && heapLDT.containsFunction((Function) findTerm.op())) {
                 findSV = (SchemaVariable) findTerm.sub(2).op();
             }
@@ -121,8 +125,9 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
             if (gt instanceof RewriteTacletGoalTemplate) {
                 final Term replaceWithTerm = ((RewriteTacletGoalTemplate) gt).replaceWith();
                 replaceWithTerm.execPostOrder(this);
-                if (findSV != null && replaceWithTerm.op() instanceof SchemaVariable)
+                if (findSV != null && replaceWithTerm.op() instanceof SchemaVariable) {
                     addNameCorrespondence((SchemaVariable) replaceWithTerm.op(), findSV);
+                }
             } else {
                 if (gt instanceof AntecSuccTacletGoalTemplate) {
                     visit(((AntecSuccTacletGoalTemplate) gt).replaceWith());

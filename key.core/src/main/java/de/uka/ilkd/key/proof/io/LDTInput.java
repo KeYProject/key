@@ -1,16 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -21,7 +25,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
  */
 public class LDTInput implements EnvInput {
     public interface LDTInputListener {
-        public void reportStatus(String status, int progress);
+        void reportStatus(String status, int progress);
     }
 
     private static final String NAME = "language data types";
@@ -36,7 +40,8 @@ public class LDTInput implements EnvInput {
      * creates a representation of the LDT files to be used as input to the KeY prover.
      *
      * @param keyFiles an array containing the LDT .key files
-     * @param main the main class used to report the progress of reading
+     * @param listener an LDTInputListener for stsus reports while loading
+     * @param profile the Profile for which the LDTs are load
      */
     public LDTInput(KeYFile[] keyFiles, LDTInputListener listener, Profile profile) {
         assert profile != null;
@@ -55,8 +60,8 @@ public class LDTInput implements EnvInput {
     @Override
     public int getNumberOfChars() {
         int sum = 0;
-        for (int i = 0; i < keyFiles.length; i++) {
-            sum = sum + keyFiles[i].getNumberOfChars();
+        for (KeYFile keyFile : keyFiles) {
+            sum = sum + keyFile.getNumberOfChars();
         }
         return sum;
     }
@@ -65,8 +70,8 @@ public class LDTInput implements EnvInput {
     @Override
     public void setInitConfig(InitConfig conf) {
         this.initConfig = conf;
-        for (int i = 0; i < keyFiles.length; i++) {
-            keyFiles[i].setInitConfig(conf);
+        for (KeYFile keyFile : keyFiles) {
+            keyFile.setInitConfig(conf);
         }
     }
 
@@ -74,23 +79,23 @@ public class LDTInput implements EnvInput {
     @Override
     public Includes readIncludes() throws ProofInputException {
         Includes result = new Includes();
-        for (int i = 0; i < keyFiles.length; i++) {
-            result.putAll(keyFiles[i].readIncludes());
+        for (KeYFile keyFile : keyFiles) {
+            result.putAll(keyFile.readIncludes());
         }
         return result;
     }
 
 
     @Override
-    public String readJavaPath() throws ProofInputException {
+    public String readJavaPath() {
         return "";
     }
 
 
     // no class path elements here
     @Override
-    public List<File> readClassPath() throws ProofInputException {
-        return null;
+    public List<File> readClassPath() {
+        return new ArrayList<>();
     }
 
 
@@ -105,49 +110,54 @@ public class LDTInput implements EnvInput {
      * reads all LDTs, i.e., all associated .key files with respect to the given modification
      * strategy. Reading is done in a special order: first all sort declarations then all function
      * and predicate declarations and third the rules. This procedure makes it possible to use all
-     * declared sorts in all rules, e.g.
+     * declared sorts in all rules.
+     *
+     * @return a list of warnings during the parsing the process
      */
     @Override
-    public ImmutableSet<PositionedString> read() throws ProofInputException {
+    public ImmutableSet<PositionedString> read() {
+        var warnings = new ArrayList<PositionedString>();
+
         if (initConfig == null) {
             throw new IllegalStateException("LDTInput: InitConfig not set.");
         }
 
-        for (int i = 0; i < keyFiles.length; i++) {
-            keyFiles[i].readSorts();
+        for (KeYFile keYFile : keyFiles) {
+            var w = keYFile.readSorts();
+            warnings.addAll(w);
         }
-        for (int i = 0; i < keyFiles.length; i++) {
-            keyFiles[i].readFuncAndPred();
+        for (KeYFile file : keyFiles) {
+            var w = file.readFuncAndPred();
+            warnings.addAll(w);
         }
         // create LDT objects to have them available for parsing
         initConfig.getServices().getTypeConverter().init();
-        for (int i = 0; i < keyFiles.length; i++) {
+        for (KeYFile keyFile : keyFiles) {
             if (listener != null) {
-                listener.reportStatus("Reading " + keyFiles[i].name(),
-                    keyFiles[i].getNumberOfChars());
+                listener.reportStatus("Reading " + keyFile.name(),
+                    keyFile.getNumberOfChars());
             }
-            keyFiles[i].readRules();
+            keyFile.readRules();
         }
 
 
-        return DefaultImmutableSet.nil();
+        return DefaultImmutableSet.fromCollection(warnings);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof LDTInput)) {
+        if (!(o instanceof LDTInput li)) {
             return false;
         }
 
-        LDTInput li = (LDTInput) o;
         if (keyFiles.length != li.keyFiles.length) {
             return false;
         }
 
-        for (int i = 0; i < keyFiles.length; i++) {
+        for (KeYFile keyFile : keyFiles) {
             boolean found = false;
             for (int j = 0; j < keyFiles.length; j++) {
-                if (li.keyFiles[j].equals(keyFiles[i])) {
+                if (li.keyFiles[j].equals(keyFile)) {
                     found = true;
                     break;
                 }
@@ -160,12 +170,11 @@ public class LDTInput implements EnvInput {
         return true;
     }
 
-
     @Override
     public int hashCode() {
         int result = 0;
-        for (int i = 0; i < keyFiles.length; i++) {
-            result += keyFiles[i].hashCode();
+        for (KeYFile keyFile : keyFiles) {
+            result += keyFile.hashCode();
         }
         return result;
     }

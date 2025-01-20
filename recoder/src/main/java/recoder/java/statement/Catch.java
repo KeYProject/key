@@ -1,14 +1,16 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.statement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.java.*;
 import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Catch.
@@ -110,10 +112,12 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     public int getChildCount() {
         int result = 0;
-        if (parameter != null)
+        if (parameter != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -127,13 +131,15 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
 
     public ProgramElement getChildAt(int index) {
         if (parameter != null) {
-            if (index == 0)
+            if (index == 0) {
                 return parameter;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -158,7 +164,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
@@ -296,7 +302,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
             return parameter.getVariables();
         }
         // TODO EMPTY_LIST ?!
-        return new ArrayList<VariableSpecification>(0);
+        return new ArrayList<>(0);
     }
 
     public VariableSpecification getVariableInScope(String name) {

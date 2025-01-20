@@ -1,14 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.Modifier;
@@ -33,6 +31,10 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 /**
  *
  * @author christoph
@@ -45,7 +47,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         assert poVars.exceptionParameter.op() instanceof LocationVariable
                 : "Something is wrong with the catch variable";
 
-        ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> posts = ImmutableSLList.nil();
         if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
@@ -64,8 +66,9 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "program-term for a contract without modality.");
         }
-        assert Modality.class.equals(BasicSnippetData.Key.MODALITY.getType());
-        Modality modality = (Modality) d.get(BasicSnippetData.Key.MODALITY);
+        assert Modality.JavaModalityKind.class.equals(BasicSnippetData.Key.MODALITY.getType());
+        Modality.JavaModalityKind kind =
+            (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
 
 
         // create java block
@@ -76,11 +79,11 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             vs.exceptionParameter.op(LocationVariable.class));
 
         // create program term
-        final Modality symbExecMod;
-        if (modality == Modality.BOX) {
-            symbExecMod = Modality.DIA;
+        final Modality.JavaModalityKind symbExecMod;
+        if (kind == Modality.JavaModalityKind.BOX) {
+            symbExecMod = Modality.JavaModalityKind.DIA;
         } else {
-            symbExecMod = Modality.BOX;
+            symbExecMod = Modality.JavaModalityKind.BOX;
         }
         final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
         // final Term programTerm = tb.not(tb.prog(modality, jb, tb.not(postTerm)));
@@ -104,17 +107,16 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             LocationVariable eVar) {
         IObserverFunction targetMethod =
             (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
-        if (!(targetMethod instanceof IProgramMethod)) {
+        if (!(targetMethod instanceof IProgramMethod pm)) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "java-block for an observer which is no program method.");
         }
         JavaInfo javaInfo = d.services.getJavaInfo();
-        IProgramMethod pm = (IProgramMethod) targetMethod;
 
         // create method call
         ProgramVariable[] formalParVars = extractProgramVariables(formalPars);
         final ImmutableArray<Expression> formalArray =
-            new ImmutableArray<Expression>(formalParVars);
+            new ImmutableArray<>(formalParVars);
         final StatementBlock sb;
         if (pm.isConstructor()) {
             assert selfVar != null;
@@ -143,7 +145,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         final CopyAssignment assignStat = new CopyAssignment(exceptionVar, eVar);
         final Catch catchStat = new Catch(excDecl, new StatementBlock(assignStat));
         final Try tryStat = new Try(sb, new Branch[] { catchStat });
-        final StatementBlock sb2 = new StatementBlock(new Statement[] { nullStat, tryStat });
+        final StatementBlock sb2 = new StatementBlock(nullStat, tryStat);
 
         // create java block
         JavaBlock result = JavaBlock.createJavaBlock(sb2);

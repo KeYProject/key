@@ -1,13 +1,15 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.abstraction;
+
+import java.util.List;
 
 import recoder.ModelException;
 import recoder.convenience.Naming;
 import recoder.service.ProgramModelInfo;
 import recoder.util.Debug;
-
-import java.util.List;
 
 /**
  * Default constructor of class types.
@@ -18,7 +20,7 @@ public class DefaultConstructor implements Constructor {
 
     protected ProgramModelInfo service;
 
-    protected ClassType ownerClass;
+    protected final ClassType ownerClass;
 
     /**
      * Create a new default constructor for the given class type. The name of the constructor is set

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
@@ -125,9 +128,10 @@ public enum Typicons implements IconFont {
 
     @Override
     public Font getFont() throws IOException, FontFormatException {
-        if (font == null)
+        if (font == null) {
             font = Font.createFont(Font.TRUETYPE_FONT,
                 getClass().getResourceAsStream("/fonts/typicons.ttf"));
+        }
         return font;
 
     }

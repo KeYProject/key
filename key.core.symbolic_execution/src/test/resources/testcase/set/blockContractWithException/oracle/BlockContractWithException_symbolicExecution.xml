@@ -5,14 +5,14 @@
          <methodCall name="&lt;call BlockContractWithException.magic(x_3)&gt;" pathCondition="true" pathConditionChanged="false">
             <blockContract name="magic()) catch(exc_0)
 pre measuredByEmpty &amp; x_3 = 2
-post !exc_0 = null
+post   !exc_0 = null
 &amp; (   !exc_0 = null
    -&gt;   java.lang.NullPointerException::instance(exc_0)
       = TRUE)
 mod {}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false">
                <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Validity">
-                  <branchStatement name="if (x_3==2)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
-                     <statement name="throw new NullPointerException ();" pathCondition="true" pathConditionChanged="false">
+                  <branchStatement name="if (x_3 == 2)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                     <statement name="throw new NullPointerException();" pathCondition="true" pathConditionChanged="false">
                         <termination name="&lt;block contract uncaught java.lang.NullPointerException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="BLOCK_CONTRACT_EXCEPTIONAL" branchVerified="true">
                         </termination>
                         <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>

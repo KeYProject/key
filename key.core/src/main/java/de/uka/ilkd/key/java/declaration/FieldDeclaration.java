@@ -1,12 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Field declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -33,7 +35,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     public FieldDeclaration(Modifier[] mods, TypeReference typeRef, FieldSpecification[] vars,
             boolean parentIsInterfaceDeclaration) {
         super(mods, typeRef, parentIsInterfaceDeclaration);
-        fieldSpecs = new ImmutableArray<FieldSpecification>(vars);
+        fieldSpecs = new ImmutableArray<>(vars);
     }
 
     /**
@@ -47,7 +49,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     public FieldDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
         super(children, parentIsInterfaceDeclaration);
         fieldSpecs =
-            new ImmutableArray<FieldSpecification>(children.collect(FieldSpecification.class));
+            new ImmutableArray<>(children.collect(FieldSpecification.class));
     }
 
     public ImmutableArray<FieldSpecification> getFieldSpecifications() {
@@ -66,12 +68,15 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (fieldSpecs != null)
+        }
+        if (fieldSpecs != null) {
             result += fieldSpecs.size();
+        }
         return result;
     }
 
@@ -92,8 +97,9 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (fieldSpecs != null) {
@@ -183,9 +189,5 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
      */
     public void visit(Visitor v) {
         v.performActionOnFieldDeclaration(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printFieldDeclaration(this);
     }
 }

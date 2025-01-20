@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call SimpleIntQuery.mainWithSymbolicUpdates(x)&gt;" pathCondition="true" pathConditionChanged="false">
-      <statement name="x=x+11;" pathCondition="true" pathConditionChanged="false">
+      <statement name="x = x + 11;" pathCondition="true" pathConditionChanged="false">
          <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
             <operationContract name="result_magic = magic(x) catch(exc_0)
-post: result_magic = SimpleIntQuery.subMagic(x)
+post:   result_magic = SimpleIntQuery.subMagic(x)
 &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_magic" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">

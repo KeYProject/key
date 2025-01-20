@@ -1,7 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.logic.op.OperatorSV;
+
 import recoder.java.Identifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public class LabelSVWrapper extends Identifier implements KeYRecoderExtension, SVWrapper {
 
@@ -9,30 +13,22 @@ public class LabelSVWrapper extends Identifier implements KeYRecoderExtension, S
      *
      */
     private static final long serialVersionUID = 5338442155201858492L;
-    SchemaVariable sv = null;
+    private final OperatorSV sv;
 
-    public LabelSVWrapper(SchemaVariable sv) {
+    public LabelSVWrapper(OperatorSV sv) {
         this.sv = sv;
     }
 
     protected LabelSVWrapper(LabelSVWrapper proto) {
         super(proto);
+        sv = proto.getSV();
         id = proto.id;
-    }
-
-    /**
-     * sets the schema variable of sort label
-     *
-     * @param sv the SchemaVariable
-     */
-    public void setSV(SchemaVariable sv) {
-        this.sv = sv;
     }
 
     /**
      * returns the schema variable of this label sv wrapper
      */
-    public SchemaVariable getSV() {
+    public OperatorSV getSV() {
         return sv;
     }
 

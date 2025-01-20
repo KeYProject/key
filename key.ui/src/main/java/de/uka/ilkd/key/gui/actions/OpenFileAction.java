@@ -1,15 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.nio.file.Path;
-
 import javax.swing.*;
 
-import de.uka.ilkd.key.gui.ProofSelectionDialog;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ProofSelectionDialog;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 public class OpenFileAction extends MainWindowAction {
@@ -24,7 +26,6 @@ public class OpenFileAction extends MainWindowAction {
         setName("Load...");
         setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Browse and load problem or proof files.");
-        setAcceleratorLetter(KeyEvent.VK_O);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -41,11 +42,10 @@ public class OpenFileAction extends MainWindowAction {
                 Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
                 if (proofPath == null) {
                     // canceled by user!
-                    return;
                 } else {
                     mainWindow.loadProofFromBundle(file, proofPath.toFile());
-                    return;
                 }
+                return;
             }
 
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour()

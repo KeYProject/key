@@ -1,20 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.colors;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
-
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
 /**
  * @author Alexander Weigl
@@ -29,7 +32,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         super();
         setHeaderText(getDescription());
         setSubHeaderText(
-            "Color settings are stored in: " + ColorSettings.SETTINGS_FILE.getAbsolutePath());
+            "Color settings are stored in: " + ColorSettings.SETTINGS_FILE_NEW.getAbsolutePath());
         add(new JScrollPane(tblColors));
     }
 
@@ -39,7 +42,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         List<ColorPropertyData> properties = ColorSettings.getInstance().getProperties()
                 .map(it -> new ColorPropertyData(it, it.get())).collect(Collectors.toList());
 
@@ -72,7 +75,12 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
             }
 
             private Icon drawRect(Color c, int size) {
-                BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+                /*
+                 * Not sure if the alpha channel is used. Highlights seem to be blended correctly
+                 * even if the color is not transparent at all. However, make sure to use ARGB to
+                 * avoid black icons here ...
+                 */
+                BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
                 Graphics g = bi.getGraphics();
                 g.setColor(c);
                 g.fillRect(0, 0, size, size);
@@ -114,21 +122,19 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            switch (columnIndex) {
-            case 0:
-                return colorData.get(rowIndex).property.getKey();
-            case 1:
-                return colorData.get(rowIndex).property.getDescription();
-            case 2:
-                return colorData.get(rowIndex).color;
-            }
-            return "";
+            return switch (columnIndex) {
+            case 0 -> colorData.get(rowIndex).property.getKey();
+            case 1 -> colorData.get(rowIndex).property.getDescription();
+            case 2 -> colorData.get(rowIndex).color;
+            default -> "";
+            };
         }
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 2)
+            if (columnIndex == 2) {
                 return Color.class;
+            }
             return String.class;
         }
 
@@ -166,6 +172,10 @@ class HexColorCellEditor extends DefaultCellEditor {
 
     HexColorCellEditor(JTextField textField) {
         super(textField);
+
+        // this is somehow important to avoid visual artifacts such as overlapping text:
+        textField.setOpaque(false);
+
         textField.addActionListener(e -> stopCellEditing());
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override

@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -10,7 +17,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -24,12 +30,13 @@ import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleMethod;
 import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
 import de.uka.ilkd.key.util.KeYConstants;
+
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.java.StringUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * @author gladisch
@@ -78,8 +85,8 @@ public class TestCaseGenerator {
     }
 
     private final boolean rflAsInternalClass;
-    protected boolean useRFL;
-    protected ReflectionClassCreator rflCreator;
+    protected final boolean useRFL;
+    protected final ReflectionClassCreator rflCreator;
     private final String dontCopy;
     protected final String modDir;
     protected final String directory;
@@ -454,7 +461,7 @@ public class TestCaseGenerator {
         oracleMethods.addAll(oracleGenerator.getOracleMethods());
 
         LOGGER.debug("Modifier Set: {}",
-            oracleGenerator.getOracleLocationSet(info.getAssignable()));
+            oracleGenerator.getOracleLocationSet(info.getModifiable()));
 
         return "assertTrue(" + oracleCall + ");";
     }
@@ -472,8 +479,9 @@ public class TestCaseGenerator {
         exportCodeUnderTest();
         createDummyClasses();
         try {
-            if (useRFL)
+            if (useRFL) {
                 writeRFLFile();
+            }
         } catch (Exception ex) {
             logger.writeln("Error: The file RFL" + JAVA_FILE_EXTENSION_WITH_DOT
                 + " is either not generated or it has an error.");
@@ -615,7 +623,7 @@ public class TestCaseGenerator {
                     pv.getKeYJavaType());
                 map.put(name, pv.sort());
             }
-        } else if (op instanceof Function && !(op instanceof ObserverFunction)) {
+        } else if (op instanceof JFunction && !(op instanceof ObserverFunction)) {
             // This case collects fields of classes. The function itself has
             // sort "Field" because it is just the name of the field. To get
             // the actual class of the field
@@ -651,8 +659,7 @@ public class TestCaseGenerator {
     private ProgramVariable getProgramVariable(Term locationTerm) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         ProgramVariable result = null;
-        if (locationTerm.op() instanceof Function) {
-            Function function = (Function) locationTerm.op();
+        if (locationTerm.op() instanceof JFunction function) {
             // Make sure that the function is not an array
             if (heapLDT.getArr() != function) {
                 String typeName = HeapLDT.getClassName(function);
@@ -722,12 +729,9 @@ public class TestCaseGenerator {
     }
 
     public String generateModifierSetAssertions(Model m) {
-        StringBuilder res = new StringBuilder();
-
-        res.append(TAB + "//Modifier set assertions");
 
 
-        return res.toString();
+        return TAB + "//Modifier set assertions";
     }
 
     public String generateTestCase(Model m, Map<String, Sort> typeInfMap) {
@@ -766,8 +770,9 @@ public class TestCaseGenerator {
                         right = "RFL.new" + ReflectionClassCreator.cleanTypeName(type) + "()";
                         rflCreator.addSort(type);
                         LOGGER.debug("Adding sort (create Object): {}", type);
-                    } else
+                    } else {
                         right = "new " + type + "()";
+                    }
                 }
 
                 String objName = createObjectName(o);
@@ -829,7 +834,7 @@ public class TestCaseGenerator {
                     if (f.contains("<") || f.contains(">")) {
                         continue;
                     }
-                    String fieldName = f.substring(f.lastIndexOf(":") + 1);
+                    String fieldName = f.substring(f.lastIndexOf(':') + 1);
                     fieldName = fieldName.replace("|", "");
                     String val = o.getFieldvalues().get(f);
                     String fieldName2 = f.replace("|", "");
@@ -1061,7 +1066,7 @@ public class TestCaseGenerator {
 
     protected String translateValueExpression(String val) {
         if (val.contains("/")) {
-            val = val.substring(0, val.indexOf("/"));
+            val = val.substring(0, val.indexOf('/'));
         }
         if (val.equals("#o0")) {
             return "null";
@@ -1078,7 +1083,8 @@ public class TestCaseGenerator {
         }
         final File pcFile = new File(dir, file);
         LOGGER.debug("Writing file: {}", pcFile);
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(pcFile))) {
+        try (BufferedWriter bw =
+            new BufferedWriter(new FileWriter(pcFile, StandardCharsets.UTF_8))) {
             bw.write(sb.toString());
         }
     }

@@ -1,7 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -9,8 +9,11 @@ import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Extracts specifications from comments.
@@ -20,22 +23,22 @@ public interface SpecExtractor {
     /**
      * Returns the operation contracts for the passed operation.
      */
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
+    ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
             throws SLTranslationException;
 
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
+    ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
             boolean addInvariant) throws SLTranslationException;
 
     /**
      * Returns the class invariants for the passed type.
      */
-    public ImmutableSet<SpecificationElement> extractClassSpecs(KeYJavaType kjt)
+    ImmutableSet<SpecificationElement> extractClassSpecs(KeYJavaType kjt)
             throws SLTranslationException;
 
     /**
      * Returns the loop invariant for the passed loop (if any).
      */
-    public LoopSpecification extractLoopInvariant(IProgramMethod pm, LoopStatement loop)
+    LoopSpecification extractLoopInvariant(IProgramMethod pm, LoopStatement loop)
             throws SLTranslationException;
 
     /**
@@ -45,7 +48,7 @@ public interface SpecExtractor {
      * @param block the statement block
      * @return the block contracts
      */
-    public ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method,
+    ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method,
             StatementBlock block) throws SLTranslationException;
 
     /**
@@ -56,7 +59,7 @@ public interface SpecExtractor {
      * @return the loop contracts
      * @throws SLTranslationException a translation exception
      */
-    public ImmutableSet<LoopContract> extractLoopContracts(IProgramMethod method,
+    ImmutableSet<LoopContract> extractLoopContracts(IProgramMethod method,
             StatementBlock block) throws SLTranslationException;
 
     /**
@@ -67,7 +70,7 @@ public interface SpecExtractor {
      * @return the loop contracts
      * @throws SLTranslationException a translation exception
      */
-    public ImmutableSet<LoopContract> extractLoopContracts(IProgramMethod method,
+    ImmutableSet<LoopContract> extractLoopContracts(IProgramMethod method,
             LoopStatement loop) throws SLTranslationException;
 
     /**
@@ -75,8 +78,8 @@ public interface SpecExtractor {
      *
      * @param methodParams TODO
      */
-    public ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
-            MergePointStatement mps, ImmutableList<ProgramVariable> methodParams)
+    ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
+            MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException;
 
     /**
@@ -87,7 +90,7 @@ public interface SpecExtractor {
      * @return the block contracts
      * @throws SLTranslationException a translation exception
      */
-    public ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method,
+    ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method,
             LabeledStatement labeled) throws SLTranslationException;
 
     /**
@@ -98,12 +101,14 @@ public interface SpecExtractor {
      * @return the loop contracts
      * @throws SLTranslationException a translation exception
      */
-    public ImmutableSet<LoopContract> extractLoopContracts(IProgramMethod method,
+    ImmutableSet<LoopContract> extractLoopContracts(IProgramMethod method,
             LabeledStatement labeled) throws SLTranslationException;
 
     /**
      * Returns all warnings generated so far in the translation process. (e.g. this may warn about
      * unsupported features which have been ignored by the translation)
      */
-    public ImmutableList<PositionedString> getWarnings();
+    ImmutableList<PositionedString> getWarnings();
+
+    Contract createDefaultContract(IProgramMethod pm, boolean useSoundDefault);
 }

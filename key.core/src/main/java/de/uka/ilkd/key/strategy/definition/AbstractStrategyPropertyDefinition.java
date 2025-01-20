@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.definition;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Provides the basic function definition of user interface controls to edit a single key-value-pair
@@ -46,7 +49,7 @@ public abstract class AbstractStrategyPropertyDefinition {
         this.apiKey = apiKey;
         this.name = name;
         this.tooltip = tooltip;
-        this.subProperties = new ImmutableArray<AbstractStrategyPropertyDefinition>(subProperties);
+        this.subProperties = new ImmutableArray<>(subProperties);
     }
 
     /**

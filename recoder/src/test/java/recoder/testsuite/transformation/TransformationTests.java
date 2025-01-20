@@ -1,10 +1,12 @@
-/*
- * Created on 11.03.2005
- *
- *
- * This file is part of the RECODER library and protected by the LGPL.
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.testsuite.transformation;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -22,10 +24,6 @@ import recoder.java.declaration.modifier.VisibilityModifier;
 import recoder.java.reference.TypeReference;
 import recoder.service.ChangeHistory;
 import recoder.service.NameInfo;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.fail;
 // import application.Obfuscate;

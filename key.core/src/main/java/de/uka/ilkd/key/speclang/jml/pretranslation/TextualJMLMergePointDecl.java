@@ -1,45 +1,54 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
-
-import de.uka.ilkd.key.speclang.njml.JmlParser;
-import javax.annotation.Nonnull;
-import org.key_project.util.collection.ImmutableList;
 
 import java.util.Objects;
 
+import de.uka.ilkd.key.speclang.njml.JmlParser;
+
+import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
+
+
 /**
  * A JML merge point declaration in textual form.
- *
+ * <p>
  * TODO: Adapt this to the specific needs of merge point declarations.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
-    private final @Nonnull JmlParser.Merge_point_statementContext mergeProc;
 
-    public TextualJMLMergePointDecl(@Nonnull ImmutableList<String> mods,
-            @Nonnull JmlParser.Merge_point_statementContext mergeProc) {
-        super(mods);
+    private final JmlParser.Merge_point_statementContext mergeProc;
+
+    public TextualJMLMergePointDecl(ImmutableList<JMLModifier> modifiers,
+            JmlParser.Merge_point_statementContext mergeProc) {
+        super(modifiers);
         this.mergeProc = mergeProc;
         setPosition(mergeProc);
     }
 
-    public @Nonnull JmlParser.Merge_point_statementContext getMergeProc() {
+    public JmlParser.Merge_point_statementContext getMergeProc() {
         return mergeProc;
     }
 
     @Override
     public String toString() {
-        return "TextualJMLMergePointDecl{" + "mergeProc=" + mergeProc.getText() + ", mods=" + mods
-            + ", name='" + name + '\'' + '}';
+        return "TextualJMLMergePointDecl{" + "mergeProc=" + mergeProc.getText() + ", modifiers="
+            + modifiers + ", name='" + name + '\'' + '}';
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof TextualJMLMergePointDecl))
+        }
+        if (!(o instanceof TextualJMLMergePointDecl that)) {
             return false;
-        TextualJMLMergePointDecl that = (TextualJMLMergePointDecl) o;
+        }
         return getMergeProc().equals(that.getMergeProc());
     }
 

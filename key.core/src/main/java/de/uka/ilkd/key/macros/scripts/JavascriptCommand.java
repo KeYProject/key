@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
+
+import java.util.Map;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -8,15 +16,12 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.proof.Proof;
 
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import java.util.Map;
-
 public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Parameters> {
 
-    private static final String PREAMBLE = "var goal = __state.getSelectedGoal();\n"
-        + "function setVar(v, t) { __state.setVar(v,t); }\n";
+    private static final String PREAMBLE = """
+            var goal = __state.getSelectedGoal();
+            function setVar(v, t) { __state.setVar(v,t); }
+            """;
 
     public JavascriptCommand() {
         super(Parameters.class);

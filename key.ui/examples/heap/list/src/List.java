@@ -35,7 +35,7 @@ public interface List {
     
     /*@ public normal_behaviour
       @   assignable footprint;
-      @   ensures size() == \old(size()) + 1 && get(size() - 1) == o;
+      @   ensures size() == \old(size()) + 1 && get(\old(size())) == o;
       @   ensures (\forall int i; 0 <= i && i < size() - 1; get(i) == \old(get(i)));
       @   ensures \new_elems_fresh(footprint);
       @*/    
@@ -62,7 +62,7 @@ public interface List {
       @   ensures size() == \old(size()) - 1;
       @   ensures (\exists int i; 0 <= i && i < \old(size()) && \old(get(i)) == o;
       @              (\forall int j; 0 <= j && j < i; get(j) == \old(get(j)))
-      @              && (\forall int k; i <= k && k < size(); get(k) == \old(get(k+1))));
+      @              && (\forall int k; i <= k && k < size(); get(k) == \old(get((int)(k+1)))));
       @   ensures \new_elems_fresh(footprint);
       @*/
     public void remove(Object o);

@@ -1,14 +1,16 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Local variable declaration.
@@ -52,7 +54,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     public LocalVariableDeclaration(TypeReference typeRef, Identifier name) {
         setTypeReference(typeRef);
-        ASTList<VariableSpecification> list = new ASTArrayList<VariableSpecification>(1);
+        ASTList<VariableSpecification> list = new ASTArrayList<>(1);
         list.add(getFactory().createVariableSpecification(name));
         setVariableSpecifications(list);
         makeParentRoleValid();
@@ -87,7 +89,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
             Identifier name, Expression init) {
         setDeclarationSpecifiers(mods);
         setTypeReference(typeRef);
-        ASTList<VariableSpecification> list = new ASTArrayList<VariableSpecification>(1);
+        ASTList<VariableSpecification> list = new ASTArrayList<>(1);
         list.add(getFactory().createVariableSpecification(name, init));
         setVariableSpecifications(list);
         makeParentRoleValid();
@@ -139,7 +141,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     }
 
     public List<VariableSpecification> getVariables() {
-        return new ArrayList<VariableSpecification>(varSpecs);
+        return new ArrayList<>(varSpecs);
     }
 
     /**
@@ -150,12 +152,15 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null)
+        if (declarationSpecifiers != null) {
             result += declarationSpecifiers.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (varSpecs != null)
+        }
+        if (varSpecs != null) {
             result += varSpecs.size();
+        }
         return result;
     }
 
@@ -177,8 +182,9 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (varSpecs != null) {
@@ -216,7 +222,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */

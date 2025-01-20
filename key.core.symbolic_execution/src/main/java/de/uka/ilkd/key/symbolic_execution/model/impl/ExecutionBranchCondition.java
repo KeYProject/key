@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.Iterator;
@@ -137,7 +140,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
                 branchCondition = services.getTermBuilder().and(mergedBranchCondtions);
                 // Simplify merged branch conditions
                 if (mergedConditions.length >= 2) {
-                    if (getSettings().isSimplifyConditions()) {
+                    if (getSettings().simplifyConditions()) {
                         branchCondition =
                             SymbolicExecutionUtil.simplify(initConfig, getProof(), branchCondition);
                     }
@@ -146,7 +149,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
                 }
             } else {
                 branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(),
-                    getSettings().isSimplifyConditions(), true);
+                    getSettings().simplifyConditions(), true);
             }
             // Format branch condition
             formatedBranchCondition = formatTerm(branchCondition, services);
@@ -207,7 +210,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             }
             pathCondition = services.getTermBuilder().and(parentPath, branchCondition);
             // Simplify path condition
-            if (getSettings().isSimplifyConditions()) {
+            if (getSettings().simplifyConditions()) {
                 pathCondition =
                     SymbolicExecutionUtil.simplify(initConfig, getProof(), pathCondition);
             }
@@ -224,7 +227,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      */
     public void addMergedProofNode(Node node) {
         if (mergedProofNodes == null) {
-            mergedProofNodes = new LinkedList<Node>();
+            mergedProofNodes = new LinkedList<>();
             mergedProofNodes.add(getProofNode());
         }
         mergedProofNodes.add(node);
@@ -236,7 +239,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     @Override
     public Node[] getMergedProofNodes() {
         return mergedProofNodes != null
-                ? mergedProofNodes.toArray(new Node[mergedProofNodes.size()])
+                ? mergedProofNodes.toArray(new Node[0])
                 : new Node[0];
     }
 
@@ -263,7 +266,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             Iterator<Node> iter = mergedProofNodes.iterator();
             for (int i = 0; i < result.length; i++) {
                 result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(),
-                    getSettings().isSimplifyConditions(), true);
+                    getSettings().simplifyConditions(), true);
             }
             return result;
         } else {

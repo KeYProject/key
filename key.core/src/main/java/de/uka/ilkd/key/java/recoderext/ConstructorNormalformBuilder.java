@@ -1,6 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.*;
+
 import de.uka.ilkd.key.util.Debug;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.*;
 import recoder.java.*;
@@ -14,12 +20,10 @@ import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
-import java.util.*;
-
 /**
  * Transforms the constructors of the given class to their normalform. The constructor normalform
- * can then be accessed via a methodcall <code>&lt;init&gt;<cons_args)</code>. The visibility of the
- * normalform is the same as for the original constructor.
+ * can then be accessed via a methodcall {@code <init>;<cons_args)}. The visibility of the
+ * normal form is the same as for the original constructor.
  */
 public class ConstructorNormalformBuilder extends RecoderModelTransformer {
 
@@ -227,8 +231,9 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
         TypeDeclaration td = class2enclosingClass.get(cd);
         final List<Variable> outerVars = getLocalClass2FinalVar().get(cd);
         int j = et == null ? 0 : 1;
-        if (outerVars != null)
+        if (outerVars != null) {
             j += outerVars.size();
+        }
         ParameterDeclaration pd = null;
         CopyAssignment ca = null;
         String etId = "_ENCLOSING_THIS";
@@ -240,13 +245,12 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
                 new VariableReference(new Identifier(etId)));
         }
 
-        if (!(cons instanceof ConstructorDeclaration)) {
+        if (!(cons instanceof ConstructorDeclaration consDecl)) {
             mods.add(new Public());
             parameters = new ASTArrayList<>(j);
             recThrows = null;
             body = new StatementBlock();
         } else {
-            ConstructorDeclaration consDecl = (ConstructorDeclaration) cons;
             mods = (consDecl.getDeclarationSpecifiers() == null ? null
                     : consDecl.getDeclarationSpecifiers().deepClone());
             parameters = consDecl.getParameters().deepClone();
@@ -254,9 +258,11 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
 
             StatementBlock origBody = consDecl.getBody();
             if (origBody == null) // may happen if a stub is defined with an empty constructor
+            {
                 body = null;
-            else
+            } else {
                 body = origBody.deepClone();
+            }
         }
 
         if (outerVars != null && !outerVars.isEmpty()) {
@@ -300,12 +306,14 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
                         ((SuperConstructorReference) first).getReferencePrefix();
                     ASTList<Expression> args = ((SpecialConstructorReference) first).getArguments();
                     if (referencePrefix instanceof Expression) {
-                        if (args == null)
+                        if (args == null) {
                             args = new ASTArrayList<>(1);
+                        }
                         args.add((Expression) referencePrefix);
                     } else if (class2superContainer.get(cd) != null) {
-                        if (args == null)
+                        if (args == null) {
                             args = new ASTArrayList<>(1);
+                        }
                         args.add(new VariableReference(new Identifier(etId)));
                     }
                     attach(
@@ -346,10 +354,10 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
     }
 
     private ConstructorDeclaration attachConstructorDecl(TypeDeclaration td) {
-        if (td.getASTParent() instanceof New) {
-            New n = (New) td.getASTParent();
-            if (n.getArguments() == null || n.getArguments().isEmpty())
+        if (td.getASTParent() instanceof New n) {
+            if (n.getArguments() == null || n.getArguments().isEmpty()) {
                 return null;
+            }
             ConstructorDeclaration constr =
                 services.getCrossReferenceSourceInfo().getConstructorDeclaration(
                     services.getCrossReferenceSourceInfo().getConstructor(n));
@@ -376,8 +384,9 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
             if (td.getName() == null) {
                 anonConstr = attachConstructorDecl(td);
             }
-            if (anonConstr != null)
+            if (anonConstr != null) {
                 constructors.add(anonConstr);
+            }
             for (Constructor constructor : constructors) {
                 attach(normalform((ClassDeclaration) td, constructor), td, 0);
             }

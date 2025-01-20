@@ -73,6 +73,8 @@ provable ./heap/block_loop_contracts/Free/assertions0.key
 provable ./heap/block_loop_contracts/Free/assertions1.key
 provable ./heap/block_loop_contracts/Free/blockContracts0.key
 provable ./heap/block_loop_contracts/Free/blockContracts1.key
+provable ./heap/block_loop_contracts/Free/blockContracts2.key
+notprovable ./heap/block_loop_contracts/Free/blockContracts3.key
 notprovable ./heap/block_loop_contracts/Finally/block_finally.key
 notprovable ./heap/block_loop_contracts/Finally/loop_finally.key
 
@@ -160,8 +162,8 @@ provable: ./heap/simple/invariant_preservation.key
 provable: ./heap/simple/locsets.key
 provable: ./heap/simple/loop1.key
 provable: ./heap/simple/loop2.key
-provable: ./heap/simple/modifies_datagroup.key
-provable: ./heap/simple/modifies.key
+provable: ./heap/simple/modifiable_datagroup.key
+provable: ./heap/simple/modifiable.key
 provable: ./heap/simple/object_creation.key
 provable: ./heap/simple/operation_contracts.key
 provable: ./heap/simple/select_store.key
@@ -260,6 +262,8 @@ provable: ./standard_key/arrays/arrayStoreException/throwArrayStoreException.key
 provable: ./standard_key/arrays/creation/arrayCreation1.key
 provable: ./standard_key/BookExamples/02FirstOrderLogic/Ex2.58.key
 provable: ./standard_key/BookExamples/03DynamicLogic/Sect3.3.1.key
+notprovable: ./standard_key/defaultContracts/soundDefault.key
+provable: ./standard_key/defaultContracts/unsoundDefault.key
 provable: ./standard_key/inEqSimp/division.key
 provable: ./standard_key/inEqSimp/inequations0.key
 provable: ./standard_key/inEqSimp/inequations1.key
@@ -330,9 +334,20 @@ provable: ./standard_key/java_dl/java5/for_Array.key
 provable: ./standard_key/java_dl/java5/for_Iterable.key
 provable: ./standard_key/java_dl/java5/for_ReferenceArray.key
 provable: ./standard_key/java_dl/jml-bigint/cast.key
+provable: ./standard_key/java_dl/jml-free/invFree1.key
+provable: ./standard_key/java_dl/jml-free/invFree2.key
+provable: ./standard_key/java_dl/jml-free/invFree3.key
+notprovable: ./standard_key/java_dl/jml-free/invFree4.key
 # proof gets very long
 # requires further investigations
 provable: ./standard_key/java_dl/jml-information-flow.key
+provable: ./standard_key/java_dl/jml-free/assignableFree0.key
+provable: ./standard_key/java_dl/jml-free/assignableFree1.key
+provable: ./standard_key/java_dl/jml-free/assignableFree2.key
+provable: ./standard_key/java_dl/jml-free/assignableFree3.key
+notprovable: ./standard_key/java_dl/jml-free/assignableFree4.key
+notprovable: ./standard_key/java_dl/jml-free/assignableFreeLoopScopeRule.key
+notprovable: ./standard_key/java_dl/jml-free/assignableFreeLoopTransformationRule.key
 notprovable: ./standard_key/java_dl/jml-min/min-unprovable1.key
 notprovable: ./standard_key/java_dl/jml-min/min-unprovable2.key
 provable: ./standard_key/java_dl/methodCall.key
@@ -473,6 +488,7 @@ provable: ./standard_key/strings/substring2.key
 provable: ./standard_key/strings/substring3.key
 provable: ./standard_key/strings/substring4.key
 provable: ./standard_key/strings/substring5.key
+provable: ./standard_key/types/subtypes.key
 provable: ./_testcase/classpath/classpath.key
 
 notprovable: ./heap/inconsistent_represents/MyClass_m.key

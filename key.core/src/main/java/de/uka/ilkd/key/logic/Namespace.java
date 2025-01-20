@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.util.ArrayList;
@@ -6,11 +9,13 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 
 /**
  * A Namespace keeps track of already used {@link Name}s and the objects carrying these names. These
@@ -218,15 +223,17 @@ public class Namespace<E extends Named> implements java.io.Serializable {
 
     public String toString() {
         String res = "Namespace: [local:" + symbols;
-        if (parent != null)
+        if (parent != null) {
             res = res + "; parent:" + parent;
+        }
         return res + "]";
     }
 
     public Namespace<E> copy() {
         Namespace<E> copy = new Namespace<>(parent);
-        if (symbols != null)
+        if (symbols != null) {
             copy.add(symbols.values());
+        }
 
         return copy;
     }

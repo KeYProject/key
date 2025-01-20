@@ -1,15 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
-import org.key_project.util.LRUCache;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
@@ -18,6 +15,12 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMapEntry;
 
 public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeature {
 
@@ -32,8 +35,9 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
     }
 
     protected int introductionTime(Operator op, Goal goal) {
-        if (op == add || op == mul || op == Z)
+        if (op == add || op == mul || op == Z) {
             return -1;
+        }
 
         final LRUCache<Operator, Integer> introductionTimeCache =
             goal.proof().getServices().getCaches().getIntroductionTimeCache();
@@ -44,13 +48,13 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
         }
 
         if (res == null) {
-            res = Integer.valueOf(introductionTimeHelp(op, goal));
+            res = introductionTimeHelp(op, goal);
             synchronized (introductionTimeCache) {
                 introductionTimeCache.put(op, res);
             }
         }
 
-        return res.intValue();
+        return res;
     }
 
     private int introductionTimeHelp(Operator op, Goal goal) {
@@ -59,13 +63,14 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
             final RuleApp app = appliedRules.head();
             appliedRules = appliedRules.tail();
 
-            if (app instanceof TacletApp) {
-                final TacletApp tapp = (TacletApp) app;
-                if (!inNewSmallSymRuleSet(tapp))
+            if (app instanceof TacletApp tapp) {
+                if (!inNewSmallSymRuleSet(tapp)) {
                     continue;
+                }
 
-                if (introducesSkolemSymbol(tapp, op))
+                if (introducesSkolemSymbol(tapp, op)) {
                     return appliedRules.size();
+                }
             }
         }
 
@@ -77,10 +82,12 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
             tapp.instantiations().pairIterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
-            if (!(entry.key() instanceof SkolemTermSV))
+            if (!(entry.key() instanceof SkolemTermSV)) {
                 continue;
-            if (op == ((Term) entry.value().getInstantiation()).op())
+            }
+            if (op == ((Term) entry.value().getInstantiation()).op()) {
                 return true;
+            }
         }
         return false;
     }
@@ -90,8 +97,9 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
         while (!ruleSets.isEmpty()) {
             final RuleSet rs = ruleSets.head();
             ruleSets = ruleSets.tail();
-            if (rs.name().equals(newSymRuleSetName))
+            if (rs.name().equals(newSymRuleSetName)) {
                 return true;
+            }
         }
         return false;
     }

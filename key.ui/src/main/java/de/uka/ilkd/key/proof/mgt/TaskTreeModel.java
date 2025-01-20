@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.mgt;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -17,13 +19,13 @@ public class TaskTreeModel extends DefaultTreeModel {
     *
     */
     private static final long serialVersionUID = -4168248377205879699L;
-    private Map<Proof, TaskTreeNode> proofToTask = new LinkedHashMap<Proof, TaskTreeNode>();
+    private final Map<Proof, TaskTreeNode> proofToTask = new LinkedHashMap<>();
 
     public TaskTreeModel() {
         super(new DefaultMutableTreeNode("Tasks"));
     }
 
-    public void addTask(TaskTreeNode p) {
+    public synchronized void addTask(TaskTreeNode p) {
         ProofEnvironment env = p.getProofEnv();
         int size = getChildCount(getRoot());
         for (int i = 0; i < size; i++) {
@@ -40,10 +42,10 @@ public class TaskTreeModel extends DefaultTreeModel {
         p.insertNode(this, envNode);
     }
 
-    public void removeTask(TaskTreeNode p) {
+    public synchronized void removeTask(TaskTreeNode p) {
         Proof[] allProofs = p.allProofs();
-        for (int i = 0; i < allProofs.length; i++) {
-            proofToTask.remove(allProofs[i]);
+        for (Proof allProof : allProofs) {
+            proofToTask.remove(allProof);
             p.decoupleFromEnv();
         }
         ProofEnvironment env = p.getProofEnv();
@@ -69,14 +71,14 @@ public class TaskTreeModel extends DefaultTreeModel {
         }
     }
 
-    public TaskTreeNode getTaskForProof(Proof p) {
+    public synchronized TaskTreeNode getTaskForProof(Proof p) {
         if (p == null) {
             return null;
         }
         return proofToTask.get(p);
     }
 
-    public TaskTreeNode addProof(ProofAggregate plist) {
+    public synchronized TaskTreeNode addProof(ProofAggregate plist) {
         TaskTreeNode bp;
         if (plist.size() == 1) {
             bp = new BasicTask(plist);

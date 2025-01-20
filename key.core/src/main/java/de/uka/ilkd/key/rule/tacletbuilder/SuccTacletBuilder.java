@@ -1,7 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 
@@ -18,8 +21,9 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      * @return this SuccTacletBuilder
      */
     public SuccTacletBuilder setFind(Term findTerm) {
-        if (findTerm.sort() == Sort.FORMULA)
+        if (findTerm.sort() == JavaDLTheory.FORMULA) {
             find = findTerm;
+        }
         checkContainsFreeVarSV(findTerm, this.getName(), "find term");
         return this;
     }

@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
@@ -8,12 +15,12 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -23,6 +30,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
+import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -34,16 +42,18 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
+import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * Saves a proof to a given {@link OutputStream}.
@@ -52,6 +62,19 @@ import java.util.*;
  */
 public class OutputStreamProofSaver {
     private static final Logger LOGGER = LoggerFactory.getLogger(OutputStreamProofSaver.class);
+
+    /**
+     * The proof to save.
+     */
+    protected final Proof proof;
+    /**
+     * Currently running KeY version (usually a git commit hash).
+     */
+    protected final String internalVersion;
+    /**
+     * Whether the proof steps should be output (usually true).
+     */
+    protected final boolean saveProofSteps;
 
 
     /**
@@ -74,11 +97,6 @@ public class OutputStreamProofSaver {
         return null;
     }
 
-    protected final Proof proof;
-    protected final String internalVersion;
-
-    LogicPrinter printer;
-
     public OutputStreamProofSaver(Proof proof) {
         this(proof, KeYConstants.INTERNAL_VERSION);
     }
@@ -86,6 +104,20 @@ public class OutputStreamProofSaver {
     public OutputStreamProofSaver(Proof proof, String internalVersion) {
         this.proof = proof;
         this.internalVersion = internalVersion;
+        this.saveProofSteps = true;
+    }
+
+    /**
+     * Create a new OutputStreamProofSaver.
+     *
+     * @param proof the proof to save
+     * @param internalVersion currently running KeY version
+     * @param saveProofSteps whether to save the performed proof steps
+     */
+    public OutputStreamProofSaver(Proof proof, String internalVersion, boolean saveProofSteps) {
+        this.proof = proof;
+        this.internalVersion = internalVersion;
+        this.saveProofSteps = saveProofSteps;
     }
 
     /**
@@ -97,18 +129,18 @@ public class OutputStreamProofSaver {
         final StringBuffer logstr = new StringBuffer();
         // Advance the Log entries
         if (proof.userLog == null) {
-            proof.userLog = new Vector<>();
+            proof.userLog = new ArrayList<>();
         }
         if (proof.keyVersionLog == null) {
-            proof.keyVersionLog = new Vector<>();
+            proof.keyVersionLog = new ArrayList<>();
         }
         proof.userLog.add(System.getProperty("user.name"));
         proof.keyVersionLog.add(internalVersion);
         final int s = proof.userLog.size();
         for (int i = 0; i < s; i++) {
             logstr.append("(keyLog \"").append(i).append("\" (keyUser \"")
-                    .append(proof.userLog.elementAt(i)).append("\" ) (keyVersion \"")
-                    .append(proof.keyVersionLog.elementAt(i)).append("\"))\n");
+                    .append(proof.userLog.get(i)).append("\" ) (keyVersion \"")
+                    .append(proof.keyVersionLog.get(i)).append("\"))\n");
         }
         return logstr;
     }
@@ -118,14 +150,15 @@ public class OutputStreamProofSaver {
     }
 
     public String writeSettings(ProofSettings ps) {
-        return "\\settings {\n\"" + escapeCharacters(ps.settingsToString()) + "\"\n}\n";
+        return String.format("\\settings %s \n", ps.settingsToString());
     }
 
     public void save(OutputStream out) throws IOException {
-        try (var ps = new PrintWriter(out, true)) {
+        CopyReferenceResolver.copyCachedGoals(proof, null, null, null);
+        try (var ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-            printer = createLogicPrinter(proof.getServices(), false);
+            LogicPrinter printer = createLogicPrinter(proof.getServices(), false);
 
             // profile
             ps.println(writeProfile(proof.getServices().getProfile()));
@@ -162,37 +195,39 @@ public class OutputStreamProofSaver {
             ps.print(header);
 
             // \problem or \proofObligation
-            if (po instanceof IPersistablePO
+            if (po instanceof IPersistablePO ppo
                     && (!(po instanceof AbstractInfFlowPO) || (!(po instanceof InfFlowCompositePO)
                             && ((InfFlowProof) proof).getIFSymbols().isFreshContract()))) {
-                final Properties properties = new Properties();
-                ((IPersistablePO) po).fillSaveProperties(properties);
-                try (StringWriter writer = new StringWriter()) {
-                    properties.store(writer, "Proof Obligation Settings");
-                    ps.println(
-                        "\\proofObligation \"" + escapeCharacters(writer.toString()) + "\";\n");
-                }
+                var loadingConfig = ppo.createLoaderConfig();
+                ps.println("\\proofObligation ");
+                loadingConfig.save(ps, "Proof-Obligation settings");
+                ps.println("\n");
             } else {
                 if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
                         || !((InfFlowProof) proof).getIFSymbols().isFreshContract())) {
-                    final Properties properties = new Properties();
-                    ((IPersistablePO) po).fillSaveProperties(properties);
                     ps.print(((InfFlowProof) proof).printIFSymbols());
                 }
                 final Sequent problemSeq = proof.root().sequent();
                 ps.println("\\problem {");
-                printer.printSemisequent(problemSeq.succedent());
+                if (problemSeq.antecedent().isEmpty() && problemSeq.succedent().size() == 1) {
+                    // Problem statement is a single formula ...
+                    printer.printSemisequent(problemSeq.succedent());
+                } else {
+                    // Problem statement is a proper sequent ...
+                    printer.printSequent(problemSeq);
+                }
                 ps.println(printer.result());
                 ps.println("}\n");
             }
 
-            // \proof
-            ps.println("\\proof {");
-            ps.println(writeLog());
-            ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");
-            node2Proof(proof.root(), ps);
-            ps.println("}");
-
+            if (saveProofSteps) {
+                // \proof
+                ps.println("\\proof {");
+                ps.println(writeLog());
+                ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");
+                node2Proof(proof.root(), ps);
+                ps.println("}");
+            }
         }
     }
 
@@ -233,22 +268,22 @@ public class OutputStreamProofSaver {
                 String tmp2 = tmp.substring(0, i);
                 StringBuilder relPathString = new StringBuilder();
                 i += s.length();
-                final int l = tmp.indexOf(";", i);
+                final int l = tmp.indexOf(';', i);
 
                 // there may be more than one path
-                while (0 <= tmp.indexOf("\"", i) && tmp.indexOf("\"", i) < l) {
+                while (0 <= tmp.indexOf('"', i) && tmp.indexOf('"', i) < l) {
                     if (relPathString.length() > 0) {
                         relPathString.append(", ");
                     }
 
                     // path is always put in quotation marks
-                    final int k = tmp.indexOf("\"", i) + 1;
-                    final int j = tmp.indexOf("\"", k);
+                    final int k = tmp.indexOf('"', i) + 1;
+                    final int j = tmp.indexOf('"', k);
 
                     // add new relative path
                     final String absPath = tmp.substring(k, j);
                     final String relPath = tryToMakeFilenameRelative(absPath, basePath);
-                    final String correctedRelPath = relPath.equals("") ? "." : relPath;
+                    final String correctedRelPath = relPath.isEmpty() ? "." : relPath;
                     relPathString.append(" \"").append(escapeCharacters(correctedRelPath))
                             .append("\"");
                     i = j + 1;
@@ -259,7 +294,7 @@ public class OutputStreamProofSaver {
                 tmp = tmp2 + (i < tmp.length() ? tmp.substring(l + 1) : "");
             }
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to make relative", e);
         }
         return tmp;
     }
@@ -419,7 +454,7 @@ public class OutputStreamProofSaver {
                     .append(" \"");
             output.append(escapeCharacters(
                 printAnything(mergeApp.getDistinguishingFormula(), proof.getServices(), false)
-                        .toString().trim().replaceAll("(\\r|\\n|\\r\\n)+", "")));
+                        .trim().replaceAll("(\\r|\\n|\\r\\n)+", "")));
             output.append("\")");
         }
 
@@ -461,6 +496,12 @@ public class OutputStreamProofSaver {
         output.append("\")");
     }
 
+    private void printSingleSMTRuleApp(SMTRuleApp smtApp, Node node, String prefix,
+            Appendable output) throws IOException {
+        output.append(" (").append(ProofElementID.SOLVERTYPE.getRawName())
+                .append(" \"").append(smtApp.getSuccessfulSolverName()).append("\")");
+    }
+
     /**
      * Print rule justification for applied built-in rule application into the passed writer.
      *
@@ -478,7 +519,7 @@ public class OutputStreamProofSaver {
 
         final RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
         output.append(" (contract \"");
-        output.append(ruleJustiBySpec.getSpec().getName());
+        output.append(ruleJustiBySpec.spec().getName());
         output.append("\")");
     }
 
@@ -504,6 +545,17 @@ public class OutputStreamProofSaver {
         if (appliedRuleApp.rule() instanceof UseOperationContractRule
                 || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
             printRuleJustification(appliedRuleApp, output);
+
+            // for operation contract rules we add the modality under which the rule was applied
+            // -> needed for proof management tool
+            if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
+                if (appliedRuleApp instanceof ContractRuleApp app) {
+                    Modality modality = (Modality) app.programTerm().op();
+                    output.append(" (modality \"");
+                    output.append(modality.toString());
+                    output.append("\")");
+                }
+            }
         }
         if (appliedRuleApp instanceof MergeRuleBuiltInRuleApp) {
             printSingleMergeRuleApp((MergeRuleBuiltInRuleApp) appliedRuleApp, node, prefix, output);
@@ -512,6 +564,8 @@ public class OutputStreamProofSaver {
         if (appliedRuleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
             printSingleCloseAfterMergeRuleApp((CloseAfterMergeRuleBuiltInRuleApp) appliedRuleApp,
                 node, prefix, output);
+        } else if (appliedRuleApp instanceof SMTRuleApp) {
+            printSingleSMTRuleApp((SMTRuleApp) appliedRuleApp, node, prefix, output);
         }
 
         output.append("");
@@ -530,23 +584,21 @@ public class OutputStreamProofSaver {
      */
     private void printSingleNode(Node node, String prefix, Appendable output) throws IOException {
         final RuleApp appliedRuleApp = node.getAppliedRuleApp();
-        if (appliedRuleApp == null && (proof.getGoal(node) != null)) {
+        if (appliedRuleApp == null && (proof.getOpenGoal(node) != null)) {
             // open goal
             output.append(prefix);
             output.append(" (opengoal \"");
-            final LogicPrinter logicPrinter = createLogicPrinter(proof.getServices(), false);
+            final LogicPrinter printer = createLogicPrinter(proof.getServices(), false);
 
-            logicPrinter.printSequent(node.sequent());
-            output.append(escapeCharacters(printer.result().toString().replace('\n', ' ')));
+            printer.printSequent(node.sequent());
+            output.append(escapeCharacters(printer.result().replace('\n', ' ')));
             output.append("\")\n");
             return;
         }
 
         if (appliedRuleApp instanceof TacletApp) {
             printSingleTacletApp((TacletApp) appliedRuleApp, node, prefix, output);
-        }
-
-        if (appliedRuleApp instanceof IBuiltInRuleApp) {
+        } else if (appliedRuleApp instanceof IBuiltInRuleApp) {
             printSingleBuiltInRuleApp((IBuiltInRuleApp) appliedRuleApp, node, prefix, output);
         }
     }
@@ -664,8 +716,15 @@ public class OutputStreamProofSaver {
         return s;
     }
 
-    public String getInteresting(SVInstantiations inst) {
-        StringBuilder s = new StringBuilder();
+    /**
+     * Get the "interesting" instantiations of the provided object.
+     *
+     * @see SVInstantiations#interesting()
+     * @param inst instantiations
+     * @return the "interesting" instantiations (serialized)
+     */
+    public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
+        Collection<String> s = new ArrayList<>();
 
         for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair : inst
                 .interesting()) {
@@ -681,6 +740,16 @@ public class OutputStreamProofSaver {
 
             String singleInstantiation =
                 var.name() + "=" + printAnything(value, proof.getServices(), false);
+            s.add(singleInstantiation);
+        }
+
+        return s;
+    }
+
+    private String getInteresting(SVInstantiations inst) {
+        StringBuilder s = new StringBuilder();
+
+        for (String singleInstantiation : getInterestingInstantiations(inst)) {
             s.append(" (inst \"").append(escapeCharacters(singleInstantiation)).append("\")");
         }
 
@@ -699,8 +768,7 @@ public class OutputStreamProofSaver {
             } else if (aL instanceof IfFormulaInstDirect) {
 
                 final String directInstantiation =
-                    printTerm(aL.getConstrainedFormula().formula(), node.proof().getServices())
-                            .toString();
+                    printTerm(aL.getConstrainedFormula().formula(), node.proof().getServices());
 
                 s.append(" (ifdirectformula \"").append(escapeCharacters(directInstantiation))
                         .append("\")");
@@ -740,41 +808,27 @@ public class OutputStreamProofSaver {
         return result;
     }
 
-    public static StringBuffer printProgramElement(ProgramElement pe) {
-        final java.io.StringWriter sw = new java.io.StringWriter();
-        final ProgramPrinter prgPrinter = new ProgramPrinter(sw);
-        try {
-            pe.prettyPrint(prgPrinter);
-        } catch (final IOException ioe) {
-            LOGGER.error("", ioe);
-        }
-        return sw.getBuffer();
+    public static String printProgramElement(ProgramElement pe) {
+        PrettyPrinter printer = PrettyPrinter.purePrinter();
+        printer.printFragment(pe);
+        return printer.result();
     }
 
-    public static StringBuffer printTerm(Term t, Services serv) {
+    public static String printTerm(Term t, Services serv) {
         return printTerm(t, serv, false);
     }
 
-    public static StringBuffer printTerm(Term t, Services serv, boolean shortAttrNotation) {
-        StringBuffer result;
+    public static String printTerm(Term t, Services serv, boolean shortAttrNotation) {
         final LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
-        try {
-            logicPrinter.printTerm(t);
-        } catch (final IOException ioe) {
-            LOGGER.info("", ioe);
-        }
-        result = logicPrinter.result();
-        if (result.charAt(result.length() - 1) == '\n') {
-            result.deleteCharAt(result.length() - 1);
-        }
-        return result;
+        logicPrinter.printTerm(t);
+        return logicPrinter.result();
     }
 
     public static String printAnything(Object val, Services services) {
-        return printAnything(val, services, true).toString();
+        return printAnything(val, services, true);
     }
 
-    public static StringBuffer printAnything(Object val, Services services,
+    public static String printAnything(Object val, Services services,
             boolean shortAttrNotation) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
@@ -783,7 +837,7 @@ public class OutputStreamProofSaver {
         } else if (val instanceof Sequent) {
             return printSequent((Sequent) val, services);
         } else if (val instanceof Name) {
-            return new StringBuffer(val.toString());
+            return val.toString();
         } else if (val instanceof TermInstantiation) {
             return printTerm(((TermInstantiation) val).getInstantiation(), services);
         } else if (val == null) {
@@ -791,11 +845,11 @@ public class OutputStreamProofSaver {
         } else {
             LOGGER.warn("Don't know how to prettyprint {}", val.getClass());
             // try to String by chance
-            return new StringBuffer(val.toString());
+            return val.toString();
         }
     }
 
-    private static StringBuffer printSequent(Sequent val, Services services) {
+    private static String printSequent(Sequent val, Services services) {
         final LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
         return printer.result();
@@ -805,8 +859,7 @@ public class OutputStreamProofSaver {
 
         final NotationInfo ni = new NotationInfo();
 
-        return new LogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null),
-            true);
+        return LogicPrinter.purePrinter(ni, (shortAttrNotation ? serv : null));
     }
 
 }

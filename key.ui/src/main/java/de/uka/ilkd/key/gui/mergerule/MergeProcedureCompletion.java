@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.mergerule;
 
 import java.util.Collection;
@@ -6,11 +9,12 @@ import java.util.function.Function;
 import de.uka.ilkd.key.gui.mergerule.predicateabstraction.PredicateAbstractionCompletion;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergePartner;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 /**
  * A completion class for merge procedures. Certain procedures, such as
@@ -35,9 +39,10 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
 
     public static <T extends MergeProcedure> MergeProcedureCompletion<T> create(
             final Function<T, T> completion) {
-        return new MergeProcedureCompletion<T>() {
+        return new MergeProcedureCompletion<>() {
             @Override
-            public T complete(T proc, Pair<Goal, PosInOccurrence> mergeGoalPio,
+            public T complete(
+                    T proc, Pair<Goal, PosInOccurrence> mergeGoalPio,
                     Collection<MergePartner> partners) {
                 return completion.apply(proc);
             }

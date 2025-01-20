@@ -1,9 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
-
-import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -12,6 +10,9 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
+
+import org.key_project.util.collection.ImmutableArray;
+
 
 /**
  * Instantiation of an if-formula that is a formula of an existing sequent.
@@ -49,29 +50,33 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     /**
      * Create a list with all formulas of a given semisequent
      */
-    private static ImmutableList<IfFormulaInstantiation> createListHelp(Sequent p_s,
+    private static ImmutableArray<IfFormulaInstantiation> createListHelp(Sequent p_s,
             boolean antec) {
-        ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
-        Iterator<SequentFormula> it;
+        Semisequent semi;
         if (antec) {
-            it = p_s.antecedent().iterator();
+            semi = p_s.antecedent();
         } else {
-            it = p_s.succedent().iterator();
-        }
-        while (it.hasNext()) {
-            res = res.prepend(new IfFormulaInstSeq(p_s, antec, it.next()));
+            semi = p_s.succedent();
         }
 
-        return res;
+        final IfFormulaInstSeq[] assumesInstFromSeq = new IfFormulaInstSeq[semi.size()];
+        int i = assumesInstFromSeq.length - 1;
+
+        for (final var sf : semi) {
+            assumesInstFromSeq[i] = new IfFormulaInstSeq(p_s, antec, sf);
+            --i;
+        }
+
+        return new ImmutableArray<>(assumesInstFromSeq);
     }
 
-    public static ImmutableList<IfFormulaInstantiation> createList(Sequent p_s, boolean antec,
+    public static ImmutableArray<IfFormulaInstantiation> createList(Sequent p_s, boolean antec,
             Services services) {
         final IfFormulaInstantiationCache cache =
             services.getCaches().getIfFormulaInstantiationCache();
         final Semisequent semi = antec ? p_s.antecedent() : p_s.succedent();
 
-        ImmutableList<IfFormulaInstantiation> val = cache.get(antec, semi);
+        ImmutableArray<IfFormulaInstantiation> val = cache.get(antec, semi);
 
         if (val == null) {
             val = createListHelp(p_s, antec);
@@ -93,10 +98,9 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 
     @Override
     public boolean equals(Object p_obj) {
-        if (!(p_obj instanceof IfFormulaInstSeq)) {
+        if (!(p_obj instanceof IfFormulaInstSeq other)) {
             return false;
         }
-        final IfFormulaInstSeq other = (IfFormulaInstSeq) p_obj;
         return seq == other.seq && cf == other.cf && antec == other.antec;
     }
 

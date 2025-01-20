@@ -1,7 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.PosConvertException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -11,11 +19,9 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -52,9 +58,11 @@ public class TestParser {
 
     @Test
     public void testGenericSort() throws IOException {
-        String content = "\\sorts { \\generic gen; } \n\n"
-            + "\\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }\n"
-            + "\\problem { true }";
+        String content = """
+                \\sorts { \\generic gen; }\s
+
+                \\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }
+                \\problem { true }""";
 
         Services services = TacletForTests.services();
         KeyIO io = new KeyIO(services);
@@ -77,6 +85,21 @@ public class TestParser {
             KeYEnvironment<DefaultUserInterfaceControl> env =
                 KeYEnvironment.load(file, null, null, null);
         });
+
+    }
+
+    @Test
+    void testConstantEvaluationError() throws MalformedURLException {
+        var file =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "parserErrorTest/AssignToArray.java");
+        var problemLoaderException = assertThrows(ProblemLoaderException.class, () -> {
+            KeYEnvironment<DefaultUserInterfaceControl> env =
+                KeYEnvironment.load(file, null, null, null);
+        });
+        var error = (PosConvertException) problemLoaderException.getCause();
+        assertEquals(4, error.getPosition().line());
+        assertEquals(9, error.getPosition().column());
+        assertEquals(file.toURI(), error.getLocation().getFileURI().orElseThrow());
 
     }
 }

@@ -1,14 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Functions with a restricted/special rule set only applicable for the top level of the term
@@ -22,14 +26,14 @@ import de.uka.ilkd.key.logic.sort.Sort;
  *
  * @author Michael Kirsten
  */
-public class Transformer extends Function {
+public class Transformer extends JFunction {
 
     public Transformer(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
         super(name, sort, argSorts, false);
     }
 
     public Transformer(Name name, Sort argSort) {
-        this(name, Sort.FORMULA, new ImmutableArray<Sort>(argSort));
+        this(name, JavaDLTheory.FORMULA, new ImmutableArray<>(argSort));
     }
 
     /**
@@ -45,8 +49,7 @@ public class Transformer extends Function {
     public static Transformer getTransformer(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             TermServices services) {
         final Named f = services.getNamespaces().functions().lookup(name);
-        if (f != null && f instanceof Transformer) {
-            Transformer t = (Transformer) f;
+        if (f instanceof Transformer t) {
             assert t.sort() == sort;
             assert t.argSorts().size() == argSorts.size();
             return t;
@@ -106,8 +109,9 @@ public class Transformer extends Function {
             while (it.next() != -1) {
                 final Term t = it.getSubTerm();
                 op = t.op();
-                if (op instanceof Transformer)
+                if (op instanceof Transformer) {
                     return (Transformer) op;
+                }
             }
         }
         return null;

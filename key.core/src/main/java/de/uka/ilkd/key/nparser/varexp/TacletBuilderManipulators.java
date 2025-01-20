@@ -1,21 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.varexp;
-
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.VariableCondition;
-import de.uka.ilkd.key.rule.conditions.*;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
-import javax.annotation.Nonnull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.OperatorSV;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.conditions.*;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
+
+import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.SORT;
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.TYPE_RESOLVER;
@@ -84,17 +90,19 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder STRICT =
         new AbstractConditionBuilder("scrictSub", TR, TR) {
             @Override
-            public boolean isSuitableFor(@Nonnull String name) {
-                if (super.isSuitableFor(name))
+            public boolean isSuitableFor(@NonNull String name) {
+                if (super.isSuitableFor(name)) {
                     return true;
+                }
                 return "\\strict\\sub".equalsIgnoreCase(name);
             }
 
             @Override
             public TypeComparisonCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
-                if (negated)
+                if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
+                }
                 return new TypeComparisonCondition((TypeResolver) arguments[0],
                     (TypeResolver) arguments[1], STRICT_SUBTYPE);
             }
@@ -109,8 +117,9 @@ public class TacletBuilderManipulators {
             @Override
             public TypeComparisonCondition build(Object[] arguments, List<String> parameters,
                     boolean negated) {
-                if (negated)
+                if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
+                }
                 return new TypeComparisonCondition((TypeResolver) arguments[0],
                     (TypeResolver) arguments[1], DISJOINTMODULONULL);
             }
@@ -130,8 +139,9 @@ public class TacletBuilderManipulators {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
-                if (negated)
+                if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
+                }
                 KeYJavaType kjt = (KeYJavaType) arguments[1];
                 tacletBuilder.addVarsNew((SchemaVariable) arguments[0], kjt);
             }
@@ -142,17 +152,20 @@ public class TacletBuilderManipulators {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
-                if (negated)
+                if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
+                }
                 SchemaVariable sv = (SchemaVariable) arguments[0];
                 Sort sort = (Sort) arguments[1];
                 // TODO weigl tacletBuilder.addVarsNew(sv, sort);
             }
         };
 
+    public static final TacletBuilderCommand NEW_LOCAL_VARS = new ConstructorBasedBuilder(
+        "newLocalVars", NewLocalVarsCondition.class, SV, SV, SV, SV);
 
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
-        public NotFreeInTacletBuilderCommand(@Nonnull ArgumentType... argumentsTypes) {
+        public NotFreeInTacletBuilderCommand(@NonNull ArgumentType... argumentsTypes) {
             super("notFreeIn", argumentsTypes);
         }
 
@@ -184,8 +197,9 @@ public class TacletBuilderManipulators {
             @Override
             public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                     List<String> parameters, boolean negated) {
-                if (negated)
+                if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
+                }
                 tacletBuilder.addVarsNew((SchemaVariable) arguments[0],
                     (SchemaVariable) arguments[1]);
 
@@ -196,8 +210,9 @@ public class TacletBuilderManipulators {
             @Override
             public void apply(TacletBuilder<?> tb, Object[] arguments, List<String> parameters,
                     boolean negated) {
-                if (negated)
+                if (negated) {
                     throw new IllegalArgumentException("Negation is not supported");
+                }
                 tb.addVarsNewDependingOn((SchemaVariable) arguments[0],
                     (SchemaVariable) arguments[1]);
             }
@@ -254,7 +269,7 @@ public class TacletBuilderManipulators {
         new ConstructorBasedBuilder("differentFields", DifferentFields.class, SV, SV);
     public static final AbstractConditionBuilder SAME_OBSERVER =
         new ConstructorBasedBuilder("sameObserver", SameObserverCondition.class, PV, PV);
-    public static AbstractConditionBuilder applyUpdateOnRigid = new ConstructorBasedBuilder(
+    public static final AbstractConditionBuilder applyUpdateOnRigid = new ConstructorBasedBuilder(
         "applyUpdateOnRigid", ApplyUpdateOnRigidCondition.class, USV, SV, SV);
     public static final AbstractConditionBuilder DROP_EFFECTLESS_ELEMENTARIES =
         new ConstructorBasedBuilder("dropEffectlessElementaries",
@@ -266,6 +281,8 @@ public class TacletBuilderManipulators {
         new ConstructorBasedBuilder("subFormulas", SubFormulaCondition.class, FSV);
     public static final AbstractConditionBuilder STATIC_FIELD =
         new ConstructorBasedBuilder("isStaticField", StaticFieldCondition.class, FSV);
+    public static final AbstractConditionBuilder MODEL_FIELD =
+        new ConstructorBasedBuilder("isModelField", ModelFieldCondition.class, FSV);
     public static final AbstractConditionBuilder SUBFORMULA =
         new ConstructorBasedBuilder("hasSubFormulas", SubFormulaCondition.class, FSV);
     public static final TacletBuilderCommand DROP_EFFECTLESS_STORES = new ConstructorBasedBuilder(
@@ -282,7 +299,7 @@ public class TacletBuilderManipulators {
     static class JavaTypeToSortConditionBuilder extends AbstractConditionBuilder {
         private final boolean elmen;
 
-        public JavaTypeToSortConditionBuilder(@Nonnull String triggerName, boolean forceElmentary) {
+        public JavaTypeToSortConditionBuilder(@NonNull String triggerName, boolean forceElmentary) {
             super(triggerName, SV, SORT);
             this.elmen = forceElmentary;
         }
@@ -290,7 +307,7 @@ public class TacletBuilderManipulators {
         @Override
         public VariableCondition build(Object[] arguments, List<String> parameters,
                 boolean negated) {
-            SchemaVariable v = (SchemaVariable) arguments[0];
+            var v = (OperatorSV) arguments[0];
             Sort s = (Sort) arguments[1];
             if (!(s instanceof GenericSort)) {
                 throw new IllegalArgumentException("Generic sort is expected. Got: " + s);
@@ -352,13 +369,15 @@ public class TacletBuilderManipulators {
     // region Registry
     static {
         register(SAME_OBSERVER, SIMPLIFY_ITE_UPDATE, ABSTRACT_OR_INTERFACE, SAME, IS_SUBTYPE,
-            STRICT, DISJOINT_MODULO_NULL, NEW_JAVATYPE, NEW_VAR, FREE_1, FREE_2, FREE_3, FREE_4,
+            STRICT, DISJOINT_MODULO_NULL, NEW_JAVATYPE, NEW_VAR, NEW_LOCAL_VARS, FREE_1, FREE_2,
+            FREE_3, FREE_4,
             FREE_5, NEW_TYPE_OF, NEW_DEPENDING_ON, FREE_LABEL_IN_VARIABLE, DIFFERENT, FINAL,
             ENUM_CONST, LOCAL_VARIABLE, ARRAY_LENGTH, ARRAY, REFERENCE_ARRAY, MAY_EXPAND_METHOD_2,
             MAY_EXPAND_METHOD_3, STATIC_METHOD, THIS_REFERENCE, REFERENCE, ENUM_TYPE,
             CONTAINS_ASSIGNMENT, FIELD_TYPE, STATIC_REFERENCE, DIFFERENT_FIELDS, SAME_OBSERVER,
             applyUpdateOnRigid, DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE, SUBFORMULAS,
-            STATIC_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE, META_DISJOINT,
+            STATIC_FIELD, MODEL_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,
+            META_DISJOINT,
             IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT, IS_IN_STRICTFP);
         register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT, GET_INVARIANT, GET_FREE_INVARIANT,
             GET_VARIANT, IS_LABELED);

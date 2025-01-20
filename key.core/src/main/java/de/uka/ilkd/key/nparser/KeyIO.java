@@ -1,4 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -13,21 +24,13 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
 
@@ -46,14 +49,12 @@ public class KeyIO {
 
     private final Services services;
     private final NamespaceSet nss;
-    @Nullable
-    private Namespace<SchemaVariable> schemaNamespace;
-    @Nullable
-    private List<BuildingIssue> warnings;
+    private @Nullable Namespace<SchemaVariable> schemaNamespace;
+    private List<BuildingIssue> warnings = new LinkedList<>();
     private AbbrevMap abbrevMap;
 
 
-    public KeyIO(@Nonnull Services services, @Nonnull NamespaceSet nss) {
+    public KeyIO(@NonNull Services services, @NonNull NamespaceSet nss) {
         this.services = services;
         this.nss = nss;
     }
@@ -74,7 +75,7 @@ public class KeyIO {
      * @return a valid term
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @Nonnull Term parseExpression(@Nonnull String expr) {
+    public @NonNull Term parseExpression(@NonNull String expr) {
         return parseExpression(CharStreams.fromString(expr));
     }
 
@@ -85,7 +86,7 @@ public class KeyIO {
      * @return a valid term
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @Nonnull Term parseExpression(@Nonnull CharStream stream) {
+    public @NonNull Term parseExpression(@NonNull CharStream stream) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(stream);
         return interpretExpression(ctx);
     }
@@ -93,8 +94,9 @@ public class KeyIO {
     private Term interpretExpression(KeyAst.Term ctx) {
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
         visitor.setAbbrevMap(abbrevMap);
-        if (schemaNamespace != null)
+        if (schemaNamespace != null) {
             visitor.setSchemaVariables(schemaNamespace);
+        }
         Term t = (Term) ctx.accept(visitor);
         warnings = visitor.getBuildingIssues();
         return t;
@@ -108,11 +110,13 @@ public class KeyIO {
      * @return a valid sequent
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @Nonnull Sequent parseSequence(@Nonnull CharStream stream) {
+    public @NonNull Sequent parseSequent(@NonNull CharStream stream) {
         KeyAst.Seq ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
-        if (schemaNamespace != null)
+        visitor.setAbbrevMap(abbrevMap);
+        if (schemaNamespace != null) {
             visitor.setSchemaVariables(schemaNamespace);
+        }
         Sequent seq = (Sequent) ctx.accept(visitor);
         warnings = visitor.getBuildingIssues();
         return seq;
@@ -168,23 +172,29 @@ public class KeyIO {
     public List<Taclet> findTaclets(KeyAst.File ctx) {
         TacletPBuilder visitor = new TacletPBuilder(services, nss);
         ctx.accept(visitor);
+        warnings.addAll(visitor.getBuildingIssues());
         return visitor.getTopLevelTaclets();
     }
 
     /**
      * @param ctx
+     * @return
      */
-    public void evalDeclarations(KeyAst.File ctx) {
+    public List<BuildingIssue> evalDeclarations(KeyAst.File ctx) {
         DeclarationBuilder declBuilder = new DeclarationBuilder(services, nss);
         ctx.accept(declBuilder);
+        warnings.addAll(declBuilder.getBuildingIssues());
+        return declBuilder.getBuildingIssues();
     }
 
     /**
      * @param ctx
      */
-    public void evalFuncAndPred(KeyAst.File ctx) {
+    public List<BuildingIssue> evalFuncAndPred(KeyAst.File ctx) {
         FunctionPredicateBuilder visitor = new FunctionPredicateBuilder(services, nss);
         ctx.accept(visitor);
+        warnings.addAll(visitor.getBuildingIssues());
+        return visitor.getBuildingIssues();
     }
 
 
@@ -200,13 +210,11 @@ public class KeyIO {
         return abbrevMap;
     }
 
-    @Nullable
     public List<BuildingIssue> getWarnings() {
         return warnings;
     }
 
-    @Nullable
-    public List<BuildingIssue> resetWarnings() {
+    public @Nullable List<BuildingIssue> resetWarnings() {
         var w = warnings;
         warnings = new LinkedList<>();
         return w;
@@ -238,8 +246,9 @@ public class KeyIO {
         }
 
         public List<Taclet> loadComplete() throws IOException {
-            if (ctx.isEmpty())
+            if (ctx.isEmpty()) {
                 parseFile();
+            }
             loadDeclarations();
             loadSndDegreeDeclarations();
             activateLDTs();
@@ -252,8 +261,9 @@ public class KeyIO {
         }
 
         public ProblemFinder loadCompleteProblem() throws IOException {
-            if (ctx.isEmpty())
+            if (ctx.isEmpty()) {
                 parseFile();
+            }
             loadDeclarations();
             loadSndDegreeDeclarations();
             activateLDTs();
@@ -262,12 +272,13 @@ public class KeyIO {
         }
 
         public Loader parseFile() throws IOException {
-            if (!ctx.isEmpty())
+            if (!ctx.isEmpty()) {
                 return this;
+            }
             long start = System.currentTimeMillis();
-            if (resource != null)
+            if (resource != null) {
                 ctx = parseFiles(resource);
-            else {
+            } else {
                 KeyAst.File c = ParsingFacade.parseFile(content);
                 ctx.add(c);
             }
@@ -316,18 +327,20 @@ public class KeyIO {
         }
 
         public ProblemFinder loadProblem() {
-            if (ctx.isEmpty())
+            if (ctx.isEmpty()) {
                 throw new IllegalStateException();
+            }
             ProblemFinder pf = new ProblemFinder(services, nss);
             ctx.get(0).accept(pf);
             return pf;
         }
 
         public List<Taclet> loadTaclets() {
-            if (ctx.isEmpty())
+            if (ctx.isEmpty()) {
                 throw new IllegalStateException();
+            }
             List<TacletPBuilder> parsers = ctx.stream().map(it -> new TacletPBuilder(services, nss))
-                    .collect(Collectors.toList());
+                    .toList();
             long start = System.currentTimeMillis();
             List<Taclet> taclets = new ArrayList<>(2048);
             for (int i = 0; i < ctx.size(); i++) {

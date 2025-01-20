@@ -1,16 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +22,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * these tests are used to control if the collision mechanisms work correct. Collisions may be:
- * collisions between variablesv, with the context or or inside formula- and termsvs
+ * these tests are used to control if the collision mechanisms work correctly. Collisions may be:
+ * collisions between variablesv, with the context or inside formula- and termsvs
  */
 public class TestCollisionResolving {
 
@@ -43,9 +47,7 @@ public class TestCollisionResolving {
         Node node = new Node(proof, seq);
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(null);
-        RuleAppIndex ruleAppIndex =
-            new RuleAppIndex(tacletIndex, builtInRuleAppIndex, proof.getServices());
-        goal = new Goal(node, ruleAppIndex);
+        goal = new Goal(node, tacletIndex, builtInRuleAppIndex, proof.getServices());
     }
 
     @AfterEach
@@ -60,8 +62,8 @@ public class TestCollisionResolving {
         // the term has to be built manually because we have to ensure
         // object equality of the LogicVariable x
         LogicVariable x = new LogicVariable(new Name("x"), s);
-        Function p = new Function(new Name("p"), Sort.FORMULA, s);
-        Function q = new Function(new Name("q"), Sort.FORMULA, s);
+        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
+        JFunction q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, s);
 
         Term t_x = services.getTermFactory().createTerm(x);
         Term t_p_x = services.getTermFactory().createTerm(p, new Term[] { t_x }, null, null);
@@ -97,8 +99,8 @@ public class TestCollisionResolving {
         // the term has to be built manually because we have to ensure
         // object equality of the LogicVariable x
         LogicVariable x = new LogicVariable(new Name("x"), s);
-        Function p = new Function(new Name("p"), Sort.FORMULA, s);
-        Function q = new Function(new Name("q"), Sort.FORMULA, s);
+        JFunction p = new JFunction(new Name("p"), JavaDLTheory.FORMULA, s);
+        JFunction q = new JFunction(new Name("q"), JavaDLTheory.FORMULA, s);
 
         TermBuilder tb = services.getTermBuilder();
 

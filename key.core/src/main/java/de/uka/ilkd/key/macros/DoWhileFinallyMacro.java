@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -10,11 +11,13 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * The abstract class DoWhileFinallyMacro can be used to create compound macros which apply the
- * macro given by {@link getProofMacro()} as long the given bound of steps is not reached yet, the
- * condition given by {@link getCondition()} holds, and the macro is applicable. When this becomes
- * false and the step bound is not reached yet, the macro given by {@link getAltProofMacro()} is
+ * macro given by {@link #getProofMacro()} as long the given bound of steps is not reached yet, the
+ * condition given by {@link #getCondition()} holds, and the macro is applicable. When this becomes
+ * false and the step bound is not reached yet, the macro given by {@link #getAltProofMacro()} is
  * applied.
  *
  * @author Michael Kirsten
@@ -56,7 +59,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception {
+            throws Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         int steps = getMaxSteps(proof);
         final ProofMacro macro = getProofMacro();

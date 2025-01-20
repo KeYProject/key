@@ -4,7 +4,7 @@
       <statement name="int magicNumber = magic(123);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_magic = magic(123) catch(exc_0)
 pre: 123 &lt; 0 | 123 &gt;= 0
-post: (   123 &lt; 0
+post:   (   123 &lt; 0
    -&gt;   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
       &amp; java.lang.Exception::instance(exc_0) = TRUE)
 &amp; (   123 &gt;= 0
@@ -12,7 +12,7 @@ post: (   123 &lt; 0
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_magic" exceptionTerm="exc_0" contractParameters="Z(3(2(1(#))))" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
-               <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
+               <statement name="return magicNumber + magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractFixedNormalPostTest.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>

@@ -1,8 +1,11 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.io;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This class implements a data location that describes aJava source code file.
@@ -51,9 +54,16 @@ public class DataFileLocation implements DataLocation {
     }
 
     /**
-     * returns a URL-like string representation of the location in the form " <type>:
-     * <location-specific-name>", i.e. file:/bin/sh url:http://mywww/myfile
-     * zip:recoder.zip:recoder/java/JavaProgramFactory.class
+     * returns a URL-like string representation of the location in the form
+     *
+     * <pre>
+     * {@code
+     * <type>:<location-specific-name>"
+     * },
+     * </pre>
+     *
+     * i.e.
+     * {@code file:/bin/sh url:http://mywww/myfile zip:recoder.zip:recoder/java/JavaProgramFactory.class}
      */
     public String toString() {
         return getType() + ":" + file.getPath();
@@ -96,7 +106,7 @@ public class DataFileLocation implements DataLocation {
      *         input stream from the according data object.
      */
     public Reader getReader() throws IOException {
-        return new FileReader(file);
+        return new FileReader(file, StandardCharsets.UTF_8);
     }
 
     /**
@@ -152,7 +162,7 @@ public class DataFileLocation implements DataLocation {
      *         output stream from the according data object.
      */
     public Writer getWriter() throws IOException {
-        return new FileWriter(file);
+        return new FileWriter(file, StandardCharsets.UTF_8);
     }
 
     /**

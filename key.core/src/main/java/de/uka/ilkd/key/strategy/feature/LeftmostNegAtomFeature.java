@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
@@ -30,22 +33,26 @@ public class LeftmostNegAtomFeature extends AbstractBetaFeature {
             final Operator op = subTerm.op();
 
             if (it.getChild() == 0) {
-                if (op == Junctor.NOT || op == Junctor.IMP)
+                if (op == Junctor.NOT || op == Junctor.IMP) {
                     positive = !positive;
-                else if (op == Equality.EQV)
+                } else if (op == Equality.EQV) {
                     return BinaryFeature.ZERO_COST; // TODO
+                }
 
                 continue;
             }
 
             if (op == (positive ? Junctor.OR : Junctor.AND)) {
-                if (containsNegAtom(subTerm.sub(0), positive, caches))
+                if (containsNegAtom(subTerm.sub(0), positive, caches)) {
                     return BinaryFeature.TOP_COST;
+                }
             } else if (positive && op == Junctor.IMP) {
-                if (containsNegAtom(subTerm.sub(0), false, caches))
+                if (containsNegAtom(subTerm.sub(0), false, caches)) {
                     return BinaryFeature.TOP_COST;
-            } else if (op == Equality.EQV)
+                }
+            } else if (op == Equality.EQV) {
                 return BinaryFeature.ZERO_COST; // TODO
+            }
         }
 
         return BinaryFeature.ZERO_COST;

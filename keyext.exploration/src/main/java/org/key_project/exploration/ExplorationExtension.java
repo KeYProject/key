@@ -1,4 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
+
+import java.awt.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -9,6 +19,7 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.gui.prooftree.GUIAbstractTreeNode;
 import de.uka.ilkd.key.gui.prooftree.Style;
 import de.uka.ilkd.key.gui.prooftree.Styler;
@@ -19,16 +30,11 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+
 import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationStepsList;
 
-import javax.annotation.Nonnull;
-import javax.swing.*;
-import java.awt.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Entry point for the Proof Exploration Extension.
@@ -38,7 +44,8 @@ import java.util.List;
  */
 @KeYGuiExtension.Info(name = "Exploration",
     description = "Author: Sarah Grebing <grebing@ira.uka.de>, Alexander Weigl <weigl@ira.uka.de>",
-    experimental = false, optional = true, priority = 10000)
+    experimental = true, optional = true, priority = 10000)
+@HelpInfo(path = "/user/Exploration/")
 public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.MainMenu,
         KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine, ProofDisposedListener {
@@ -69,16 +76,14 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         }
     };
 
-    @Nonnull
     @Override
-    public List<Action> getContextActions(@Nonnull KeYMediator mediator,
-            @Nonnull ContextMenuKind kind, @Nonnull Object underlyingObject) {
+    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
-    @Nonnull
     @Override
-    public JToolBar getToolbar(MainWindow mainWindow) {
+    public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         if (explorationToolbar == null) {
             explorationToolbar = new JToolBar();
             explorationToolbar.add(new JCheckBox(new ToggleExplorationAction(model, mainWindow)));
@@ -118,17 +123,16 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
     }
 
-    private void initLeftPanel(@Nonnull MainWindow window) {
+    private void initLeftPanel(@NonNull MainWindow window) {
         leftPanel = new ExplorationStepsList(window);
         leftPanel.setEnabled(model.isExplorationModeSelected());
         model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE,
             e -> leftPanel.setEnabled(model.isExplorationModeSelected()));
     }
 
-    @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
-            @Nonnull KeYMediator mediator) {
+    public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window,
+            @NonNull KeYMediator mediator) {
         if (leftPanel == null) {
             initLeftPanel(window);
         }
@@ -146,7 +150,7 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
     }
 
     @Override
-    public @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         return Arrays.asList(new ToggleExplorationAction(model, mainWindow),
             new ShowInteractiveBranchesAction(model, mainWindow));
     }
@@ -166,30 +170,20 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
 
 class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
-    public static final ColorSettings.ColorProperty DARK_TURQOUIS_COLOR =
-        ColorSettings.define("[proofTree]turqois", "", new Color(19, 110, 128));
     public static final ColorSettings.ColorProperty DARK_PURPLE_COLOR =
         ColorSettings.define("[proofTree]darkPurple", "", new Color(112, 17, 191));
     public static final ColorSettings.ColorProperty LIGHT_PURPLE_COLOR =
         ColorSettings.define("[proofTree]lightPurple", "", new Color(165, 146, 191));
 
     @Override
-    public void style(@Nonnull Style style, GUIAbstractTreeNode treeNode) {
+    public void style(@NonNull Style style, GUIAbstractTreeNode treeNode) {
         Node node = treeNode.getNode();
-        ExplorationNodeData data;
-        try {
-            data = node.lookup(ExplorationNodeData.class);
+        ExplorationNodeData data = node.lookup(ExplorationNodeData.class);
 
-            if (data != null) {
-                style.set(Style.KEY_COLOR_BORDER, DARK_PURPLE_COLOR.get());
-                style.set(Style.KEY_COLOR_BACKGROUND, LIGHT_PURPLE_COLOR.get());
-                style.set(Style.KEY_TOOLTIP, "Exploration Action Performed");
-
-            } else {
-                style.set(Style.KEY_COLOR_BORDER, null);
-            }
-        } catch (IllegalStateException e) {
-            style.set(Style.KEY_COLOR_BORDER, null);
+        if (data != null) {
+            style.border = DARK_PURPLE_COLOR.get();
+            style.background = LIGHT_PURPLE_COLOR.get();
+            style.tooltip.setTitle("Exploration Action Performed");
         }
     }
 }

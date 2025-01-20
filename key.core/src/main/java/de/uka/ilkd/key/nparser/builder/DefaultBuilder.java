@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.ResourceBundle;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -7,21 +15,22 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.util.Pair;
-import org.antlr.v4.runtime.ParserRuleContext;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.Pair;
+
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Helper class for are visitor that requires a namespaces and services. Also it provides the
@@ -35,7 +44,7 @@ import java.util.ResourceBundle;
 public class DefaultBuilder extends AbstractBuilder<Object> {
     public static final String LIMIT_SUFFIX = "$lmtd";
 
-    private static ResourceBundle bundle =
+    private static final ResourceBundle bundle =
         ResourceBundle.getBundle("de.uka.ilkd.key.nparser.builder.resources");
 
     protected final Services services;
@@ -46,12 +55,6 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     public DefaultBuilder(Services services, NamespaceSet nss) {
         this.services = services;
         this.nss = nss;
-    }
-
-    protected void semanticErrorMsg(String label, ParserRuleContext ctx, Object... args) {
-        String msg = bundle.getString(label);
-        MessageFormat formatter = new MessageFormat(msg);
-        semanticError(ctx, formatter.format(args));
     }
 
     @Override
@@ -82,13 +85,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
     protected Named lookup(Name n) {
-        final Namespace[] lookups =
+        final Namespace<?>[] lookups =
             { programVariables(), variables(), schemaVariables(), functions() };
         return doLookup(n, lookups);
     }
 
-    protected <T> T doLookup(Name n, Namespace... lookups) {
-        for (Namespace lookup : lookups) {
+    protected <T> T doLookup(Name n, Namespace<?>... lookups) {
+        for (Namespace<?> lookup : lookups) {
             Object l;
             if (lookup != null && (l = lookup.lookup(n)) != null) {
                 try {
@@ -119,10 +122,11 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     @Override
     public Sort visitArg_sorts_or_formula_helper(KeYParser.Arg_sorts_or_formula_helperContext ctx) {
-        if (ctx.FORMULA() != null)
-            return Sort.FORMULA;
-        else
-            return (Sort) accept(ctx.sortId());
+        if (ctx.FORMULA() != null) {
+            return JavaDLTheory.FORMULA;
+        } else {
+            return accept(ctx.sortId());
+        }
     }
 
     /*
@@ -140,7 +144,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             Sort sort) {
         Name name = new Name(varfuncName);
         Operator[] operators =
-            new Operator[] { schemaVariables().lookup(name), variables().lookup(name),
+            new Operator[] { (OperatorSV) schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
                 functions().lookup(name), AbstractTermTransformer.name2metaop(varfuncName),
 
@@ -156,7 +160,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             Name fqName =
                 new Name((sort != null ? sort.toString() : sortName) + "::" + varfuncName);
             operators =
-                new Operator[] { schemaVariables().lookup(fqName), variables().lookup(fqName),
+                new Operator[] { (OperatorSV) schemaVariables().lookup(fqName),
+                    variables().lookup(fqName),
                     programVariables().lookup(new ProgramElementName(fqName.toString())),
                     functions().lookup(fqName),
                     AbstractTermTransformer.name2metaop(fqName.toString()) };
@@ -169,6 +174,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
             SortDependingFunction firstInstance =
                 SortDependingFunction.getFirstInstance(new Name(varfuncName), getServices());
+            if (sort == null)
+                semanticError(ctx, "Could not find sort: %s", sortName);
             if (firstInstance != null) {
                 SortDependingFunction v = firstInstance.getInstanceFor(sort, getServices());
                 if (v != null) {
@@ -228,7 +235,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return namespaces().sorts();
     }
 
-    protected Namespace<Function> functions() {
+    protected Namespace<JFunction> functions() {
         return namespaces().functions();
     }
 
@@ -355,20 +362,19 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     public KeYJavaType visitKeyjavatype(KeYParser.KeyjavatypeContext ctx) {
         boolean array = false;
-        String type = visitSimple_ident_dots(ctx.simple_ident_dots());
+        StringBuilder type = new StringBuilder(visitSimple_ident_dots(ctx.simple_ident_dots()));
         for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) {
             array = true;
-            type += "[]";
+            type.append("[]");
         }
-        KeYJavaType kjt = getJavaInfo().getKeYJavaType(type);
+        KeYJavaType kjt = getJavaInfo().getKeYJavaType(type.toString());
 
         // expand to "java.lang"
         if (kjt == null) {
             try {
                 String guess = "java.lang." + type;
                 kjt = getJavaInfo().getKeYJavaType(guess);
-            } catch (Exception e) {
-                kjt = null;
+            } catch (Exception ignored) {
             }
         }
 
@@ -378,14 +384,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 JavaBlock jb = getJavaInfo().readJavaBlock("{" + type + " k;}");
                 kjt = ((VariableDeclaration) ((StatementBlock) jb.program()).getChildAt(0))
                         .getTypeReference().getKeYJavaType();
-            } catch (Exception e) {
-                kjt = null;
+            } catch (Exception ignored) {
             }
         }
 
         // try as sort without Java type (neede e.g. for "Heap")
         if (kjt == null) {
-            Sort sort = lookupSort(type);
+            Sort sort = lookupSort(type.toString());
             if (sort != null) {
                 kjt = new KeYJavaType(null, sort);
             }

@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.java.*;
@@ -61,7 +63,7 @@ public class ClassInitializer extends JavaDeclaration
 
     public ClassInitializer(Static modifier, StatementBlock body) {
         if (modifier != null) {
-            ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
+            ASTList<DeclarationSpecifier> mods = new ASTArrayList<>(1);
             mods.add(modifier);
             setDeclarationSpecifiers(mods);
         }
@@ -173,10 +175,12 @@ public class ClassInitializer extends JavaDeclaration
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null)
+        if (declarationSpecifiers != null) {
             result += declarationSpecifiers.size();
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -198,8 +202,9 @@ public class ClassInitializer extends JavaDeclaration
             index -= len;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -226,7 +231,7 @@ public class ClassInitializer extends JavaDeclaration
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */

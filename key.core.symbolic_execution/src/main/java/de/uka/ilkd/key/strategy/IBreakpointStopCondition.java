@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
 import java.util.Set;
@@ -17,19 +20,19 @@ public interface IBreakpointStopCondition extends StopCondition {
      *
      * @param breakpoint The {@link IBreakpoint} to add.
      */
-    public void addBreakpoint(IBreakpoint breakpoint);
+    void addBreakpoint(IBreakpoint breakpoint);
 
     /**
      * Removes an {@link IBreakpoint}.
      *
      * @param breakpoint The {@link IBreakpoint} to remove.
      */
-    public void removeBreakpoint(IBreakpoint breakpoint);
+    void removeBreakpoint(IBreakpoint breakpoint);
 
     /**
      * Returns all available {@link IBreakpoint}s.
      *
      * @return The available {@link IBreakpoint}s.
      */
-    public Set<IBreakpoint> getBreakpoints();
+    Set<IBreakpoint> getBreakpoints();
 }

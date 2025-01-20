@@ -1,24 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
+import de.uka.ilkd.key.nparser.KeyAst;
+
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.antlr.v4.runtime.RuleContext;
 
 /**
  * A JML assert/assume statement.
  */
 public class TextualJMLAssertStatement extends TextualJMLConstruct {
+    private final KeyAst.Expression context;
+    private final Kind kind;
 
-    private LabeledParserRuleContext context;
-    private Kind kind;
-
-    public TextualJMLAssertStatement(Kind kind, LabeledParserRuleContext clause) {
+    public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause) {
         super(ImmutableSLList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;
     }
 
-    public LabeledParserRuleContext getContext() {
+    public KeyAst.Expression getContext() {
         return context;
     }
 
@@ -47,21 +51,24 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
     }
 
     public String getClauseText() {
-        var builder = new StringBuilder();
-        ruleContextToText(builder, context.first);
-        return builder.substring(kind.toString().length());
+        return context.getText();
+        /*
+         * var builder = new StringBuilder();
+         * ruleContextToText(builder, context);
+         * return builder.substring(kind.toString().length());
+         */
     }
 
     public Kind getKind() {
         return kind;
     }
 
-    public static enum Kind {
+    public enum Kind {
         ASSERT("assert"), ASSUME("assume");
 
-        private String name;
+        private final String name;
 
-        private Kind(String name) {
+        Kind(String name) {
             this.name = name;
         }
 
@@ -69,5 +76,5 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         public String toString() {
             return name;
         }
-    };
+    }
 }

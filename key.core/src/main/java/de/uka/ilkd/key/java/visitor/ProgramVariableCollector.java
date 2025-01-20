@@ -1,16 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
-
-import de.uka.ilkd.key.java.statement.JmlAssert;
-import org.key_project.util.collection.ImmutableList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.statement.JmlAssert;
+import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -23,13 +27,15 @@ import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
 import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used collect all
  * LocationVariables and optional function locations.
  */
 public class ProgramVariableCollector extends JavaASTVisitor {
 
-    private final LinkedHashSet<LocationVariable> result = new LinkedHashSet<LocationVariable>();
+    private final LinkedHashSet<LocationVariable> result = new LinkedHashSet<>();
 
     /**
      * collects all program variables occurring in the AST <tt>root</tt> using this constructor is
@@ -92,9 +98,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
         final ArrayList<AbstractionPredicate> preds =
             pamc.getAbstractionPredicates(atPres, services);
-        preds.forEach(pred -> {
-            pred.getPredicateFormWithPlaceholder().second.execPostOrder(tpvc);
-        });
+        preds.forEach(pred -> pred.getPredicateFormWithPlaceholder().second.execPostOrder(tpvc));
 
         result.addAll(tpvc.result());
     }
@@ -122,11 +126,20 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             }
         }
 
-        // modifies
+        // modifiable
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term mod = x.getModifies(heap, selfTerm, atPres, services);
-            if (mod != null) {
-                mod.execPostOrder(tpvc);
+            Term modifiable = x.getModifiable(heap, selfTerm, atPres, services);
+            if (modifiable != null) {
+                modifiable.execPostOrder(tpvc);
+            }
+        }
+
+        // free modifiable
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            Term freeModifiable = x.getFreeModifiable(heap, selfTerm, atPres, services);
+            if (freeModifiable != null) {
+                freeModifiable.execPostOrder(tpvc);
             }
         }
 
@@ -184,9 +197,9 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term modifiesClause = x.getModifiesClause(heap, services);
-            if (modifiesClause != null) {
-                modifiesClause.execPostOrder(collector);
+            Term modifiableClause = x.getModifiableClause(heap, services);
+            if (modifiableClause != null) {
+                modifiableClause.execPostOrder(collector);
             }
         }
         ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
@@ -230,9 +243,9 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term modifiesClause = x.getModifiesClause(heap, services);
-            if (modifiesClause != null) {
-                modifiesClause.execPostOrder(collector);
+            Term modifiableClause = x.getModifiableClause(heap, services);
+            if (modifiableClause != null) {
+                modifiableClause.execPostOrder(collector);
             }
         }
         ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
@@ -250,26 +263,33 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         result.addAll(collector.result());
     }
 
-    @Override
-    public void performActionOnJmlAssertCondition(final Term x) {
-        if (x == null) {
-            throw new IllegalStateException("JML assert is incomplete");
-        }
-        TermProgramVariableCollector tpvc = services.getFactory().create(services);
-        x.execPostOrder(tpvc);
-        result.addAll(tpvc.result());
-    }
 
     @Override
     public void performActionOnJmlAssert(final JmlAssert x) {
+        handleJmlStatement(x);
+    }
+
+    @Override
+    public void performActionOnSetStatement(SetStatement x) {
+        handleJmlStatement(x);
+    }
+
+    private void handleJmlStatement(Statement x) {
         TermProgramVariableCollector tpvc = services.getFactory().create(services);
-        for (Term v : x.getVars().atPres.values()) {
+        var spec =
+            Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+        for (Term v : spec.vars().atPres.values()) {
             v.execPostOrder(tpvc);
         }
-        for (Term v : x.getVars().atBefores.values()) {
+        for (Term v : spec.vars().atBefores.values()) {
             v.execPostOrder(tpvc);
+        }
+
+        for (Term term : spec.terms()) {
+            term.execPostOrder(tpvc);
         }
         result.addAll(tpvc.result());
-
     }
+
+
 }

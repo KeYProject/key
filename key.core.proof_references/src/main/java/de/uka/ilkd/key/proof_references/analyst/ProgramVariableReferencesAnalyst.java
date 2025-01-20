@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.LinkedHashSet;
@@ -31,12 +34,12 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
         if (node.getAppliedRuleApp() != null && node.getNodeInfo() != null) {
             SourceElement statement = node.getNodeInfo().getActiveStatement();
             if (statement instanceof CopyAssignment) {
-                LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+                LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
                 listReferences(node, (CopyAssignment) statement,
                     services.getJavaInfo().getArrayLength(), result, true);
                 return result;
             } else if (statement instanceof If) {
-                LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
+                LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<>();
                 listReferences(node, ((If) statement).getExpression(),
                     services.getJavaInfo().getArrayLength(), result, false);
                 return result;
@@ -63,12 +66,11 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
             ProgramVariable pv = (ProgramVariable) pe;
             if (pv.isMember()) {
                 DefaultProofReference<ProgramVariable> reference =
-                    new DefaultProofReference<ProgramVariable>(IProofReference.ACCESS, node,
+                    new DefaultProofReference<>(IProofReference.ACCESS, node,
                         (ProgramVariable) pe);
                 ProofReferenceUtil.merge(toFill, reference);
             }
-        } else if (pe instanceof FieldReference) {
-            FieldReference fr = (FieldReference) pe;
+        } else if (pe instanceof FieldReference fr) {
             ReferencePrefix ref = fr.getReferencePrefix();
             if (ref != null) {
                 listReferences(node, ref, arrayLength, toFill, includeExpressionContainer);
@@ -76,11 +78,10 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
             ProgramVariable pv = fr.getProgramVariable();
             if (pv != arrayLength) {
                 DefaultProofReference<ProgramVariable> reference =
-                    new DefaultProofReference<ProgramVariable>(IProofReference.ACCESS, node, pv);
+                    new DefaultProofReference<>(IProofReference.ACCESS, node, pv);
                 ProofReferenceUtil.merge(toFill, reference);
             }
-        } else if (includeExpressionContainer && pe instanceof ExpressionContainer) {
-            ExpressionContainer ec = (ExpressionContainer) pe;
+        } else if (includeExpressionContainer && pe instanceof ExpressionContainer ec) {
             for (int i = ec.getChildCount() - 1; i >= 0; i--) {
                 ProgramElement element = ec.getChildAt(i);
                 listReferences(node, element, arrayLength, toFill, includeExpressionContainer);

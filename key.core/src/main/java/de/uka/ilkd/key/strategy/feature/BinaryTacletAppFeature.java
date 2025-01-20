@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -24,9 +27,12 @@ public abstract class BinaryTacletAppFeature extends BinaryFeature {
         nonTacletValue = p_nonTacletValue;
     }
 
-    final protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (app instanceof TacletApp)
-            return filter((TacletApp) app, pos, goal);
+    @Override
+    final protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
+        if (app instanceof TacletApp) {
+            return filter((TacletApp) app, pos, goal, mState);
+        }
         return nonTacletValue;
     }
 
@@ -37,7 +43,9 @@ public abstract class BinaryTacletAppFeature extends BinaryFeature {
      * @param app the TacletApp
      * @param pos position where <code>app</code> is to be applied
      * @param goal the goal on which <code>app</code> is to be applied
+     * @param mState the MutableState used to store modifiable information
      * @return true iff the the result of the feature is supposed to be zero.
      */
-    protected abstract boolean filter(TacletApp app, PosInOccurrence pos, Goal goal);
+    protected abstract boolean filter(TacletApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState);
 }

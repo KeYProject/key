@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 
 import java.util.Iterator;
@@ -39,14 +42,11 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
     @Override
     public AbstractDomainElement join(AbstractDomainElement elem1, AbstractDomainElement elem2) {
 
-        if (!(elem1 instanceof SignAnalysisDomainElem)
-                || !(elem2 instanceof SignAnalysisDomainElem)) {
+        if (!(elem1 instanceof SignAnalysisDomainElem a)
+                || !(elem2 instanceof SignAnalysisDomainElem b)) {
             throw new IllegalArgumentException(
                 "Expected arguments of the abstract domain of sign analysis.");
         }
-
-        SignAnalysisDomainElem a = (SignAnalysisDomainElem) elem1;
-        SignAnalysisDomainElem b = (SignAnalysisDomainElem) elem2;
 
         if (a.isTop() || b.isTop()) {
             return Top.getInstance();
@@ -120,7 +120,7 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
 
     @Override
     public Iterator<AbstractDomainElement> iterator() {
-        return new Iterator<AbstractDomainElement>() {
+        return new Iterator<>() {
 
             int pos = 0;
             final int size = ABSTRACT_DOMAIN_ELEMS.length;
@@ -136,7 +136,8 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
             }
 
             @Override
-            public void remove() {}
+            public void remove() {
+            }
         };
     }
 

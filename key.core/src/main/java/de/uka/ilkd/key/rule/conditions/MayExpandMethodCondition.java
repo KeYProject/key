@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
+
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -12,13 +17,12 @@ import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import org.key_project.util.collection.ImmutableArray;
 
-import java.util.Map;
+import org.key_project.logic.SyntaxElement;
+import org.key_project.util.collection.ImmutableArray;
 
 
 /**
@@ -77,7 +81,6 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     /**
      * Instantiate a new variable condition.
      *
-     * @param negation {@code true} iff the condition is to be negated
      * @param receiver program schema var for the receiver, may be null for class-local calls
      * @param methname non-null program schema var for the methodname
      * @param args non-null program schema var for the arguments of the call
@@ -102,13 +105,13 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         for (int i = 0; i < a.size(); i++) {
             result[i] = (Expression) a.get(i);
         }
-        return new ImmutableArray<Expression>(result);
+        return new ImmutableArray<>(result);
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute subst, SVInstantiations svInst,
+    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
             Services services) {
         Map<String, String> tacletOptions =
             services.getProof().getSettings().getChoiceSettings().getDefaultChoices();

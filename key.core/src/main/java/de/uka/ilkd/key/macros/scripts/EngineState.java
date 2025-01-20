@@ -1,14 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.logic.Semisequent;
+import java.io.File;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.macros.scripts.meta.Converter;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
-import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyIO;
-import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
@@ -27,6 +33,12 @@ import java.util.LinkedList;
 import java.util.Observer;
 import java.util.Optional;
 
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableList;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NonNull;
+
 /**
  * @author Alexander Weigl
  * @version 1 (28.03.17)
@@ -35,14 +47,13 @@ public class EngineState {
     public static final Logger LOGGER = LoggerFactory.getLogger(EngineState.class);
 
     private final Proof proof;
-    private AbbrevMap abbrevMap = new AbbrevMap();
+    private final AbbrevMap abbrevMap = new AbbrevMap();
     /**
      * nullable
      */
-    private Observer observer;
+    private Consumer<ProofScriptEngine.Message> observer;
     private File baseFileName = new File(".");
     private final ValueInjector valueInjector = createDefaultValueInjector();
-
 
     private Goal goal;
     private Node lastSetGoalNode;
@@ -201,7 +212,7 @@ public class EngineState {
                                           wrong.
      */
     @SuppressWarnings("unused")
-    public Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
+    public @NonNull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
         if (proof.closed()) {
             throw new ProofAlreadyClosedException("The proof is closed already");
         }
@@ -223,11 +234,11 @@ public class EngineState {
         }
 
         newGoal = findGoalFromRoot(rootNodeForSearch, checkAutomatic);
-        lastSetGoalNode = newGoal.node();
-
         if (newGoal == null) {
             throw new ScriptException("There must be an open goal at this point");
         }
+
+        lastSetGoalNode = newGoal.node();
 
         return newGoal;
     }
@@ -255,7 +266,7 @@ public class EngineState {
     }
 
     private Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
-        final Deque<Node> choices = new LinkedList<Node>();
+        final Deque<Node> choices = new LinkedList<>();
 
         Goal result = null;
         Node node = rootNode;
@@ -269,20 +280,16 @@ public class EngineState {
             int childCount = node.childrenCount();
 
             switch (childCount) {
-                case 0:
+            case 0 -> {
                     result = getGoal(proof.openGoals(), node);
-                    if (!checkAutomatic || result.isAutomatic()) {
+                if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
                         // We found our goal
                         break loop;
                     }
                     node = choices.pollLast();
-                    break;
-
-                case 1:
-                    node = node.child(0);
-                    break;
-
-                default:
+            }
+            case 1 -> node = node.child(0);
+            default -> {
                     Node next = null;
                     for (int i = 0; i < childCount; i++) {
                         Node child = node.child(i);
@@ -296,29 +303,38 @@ public class EngineState {
                     }
                     assert next != null;
                     node = next;
-                    break;
+            }
             }
         }
 
         return result;
     }
 
-    public Term toTerm(String string) throws ParserException, ScriptException {
-        KeyIO io = new KeyIO(proof.getServices(), getFirstOpenAutomaticGoal().getLocalNamespaces());
-        io.setAbbrevMap(abbrevMap);
-        Term formula = io.parseExpression(string);
-        return formula;
+
+    public Term toTerm(String string, Sort sort) throws ParserException, ScriptException {
+        final var io = getKeyIO();
+        var term = io.parseExpression(string);
+        if (sort == null || term.sort().equals(sort))
+            return term;
+        else
+            throw new IllegalStateException(
+                "Unexpected sort for term: " + term + ". Expected: " + sort);
     }
 
-    public Sort toSort(String sortName) throws ParserException, ScriptException {
+    private @NonNull KeyIO getKeyIO() throws ScriptException {
+        Services services = proof.getServices();
+        KeyIO io = new KeyIO(services, getFirstOpenAutomaticGoal().getLocalNamespaces());
+        io.setAbbrevMap(abbrevMap);
+        return io;
+    }
+
+    public Sort toSort(String sortName) throws ScriptException {
         return (getFirstOpenAutomaticGoal() == null ? getProof().getServices().getNamespaces()
                 : getFirstOpenAutomaticGoal().getLocalNamespaces()).sorts().lookup(sortName);
     }
 
     public Sequent toSequent(String sequent) throws ParserException, ScriptException {
-        KeyIO io = new KeyIO(proof.getServices(), getFirstOpenAutomaticGoal().getLocalNamespaces());
-        io.setAbbrevMap(getAbbreviations());
-        return io.parseSequence(sequent);
+        return getKeyIO().parseSequent(CharStreams.fromString(sequent));
     }
 
     public int getMaxAutomaticSteps() {
@@ -336,11 +352,11 @@ public class EngineState {
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
 
-    public Observer getObserver() {
+    public Consumer<ProofScriptEngine.Message> getObserver() {
         return observer;
     }
 
-    public void setObserver(Observer observer) {
+    public void setObserver(Consumer<ProofScriptEngine.Message> observer) {
         this.observer = observer;
     }
 

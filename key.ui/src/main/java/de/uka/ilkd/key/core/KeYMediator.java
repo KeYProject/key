@@ -1,61 +1,47 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
-import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
+import de.uka.ilkd.key.gui.UserActionListener;
+import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
-import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.RuleAppListener;
-import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
-import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
-import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
-import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
+
+import org.key_project.proof.LocationVariableTracker;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The {@link KeYMediator} provides control logic for the user interface implemented in Swing.
@@ -66,24 +52,31 @@ import org.key_project.util.lookup.Lookup;
 public class KeYMediator {
 
     /** The user interface */
-    private AbstractMediatorUserInterfaceControl ui;
+    private final AbstractMediatorUserInterfaceControl ui;
 
     /** the notation info used to print sequents */
     private final NotationInfo notationInfo;
 
     /** listenerList with to gui listeners */
-    private EventListenerList listenerList = new EventListenerList();
+    private final EventListenerList listenerList = new EventListenerList();
 
     /** listens to the proof */
-    private KeYMediatorProofListener proofListener;
+    private final KeYMediatorProofListener proofListener;
 
     /** listens to the ProofTree */
-    private KeYMediatorProofTreeListener proofTreeListener;
+    private final KeYMediatorProofTreeListener proofTreeListener;
 
     /**
      * current proof and node the user works with. All user interaction is relative to this model
      */
-    private KeYSelectionModel keySelectionModel;
+    private final KeYSelectionModel keySelectionModel;
+
+    /**
+     * Registered proof load listeners.
+     *
+     * @see #fireProofLoaded(Proof)
+     */
+    private final Collection<Consumer<Proof>> proofLoadListeners = new ArrayList<>();
 
     private TacletFilter filterForInteractiveProving;
 
@@ -95,12 +88,19 @@ public class KeYMediator {
     /**
      * Currently opened proofs.
      */
-    private final DefaultListModel<Proof> currentlyOpenedProofs = new DefaultListModel<>();
+    private final List<Proof> currentlyOpenedProofs = new CopyOnWriteArrayList<>();
 
     /**
      * boolean flag indicating if the GUI is in auto mode
      */
     private boolean inAutoMode = false;
+
+    /**
+     * Currently activated listeners for user actions. Notified whenever a user action is applied.
+     *
+     * @see #fireActionPerformed(UserAction)
+     */
+    private final Collection<UserActionListener> userActionListeners = new ArrayList<>();
 
     /**
      * creates the KeYMediator with a reference to the application's main frame and the current
@@ -112,9 +112,21 @@ public class KeYMediator {
         notationInfo = new NotationInfo();
         proofListener = new KeYMediatorProofListener();
         proofTreeListener = new KeYMediatorProofTreeListener();
-        keySelectionModel = new KeYSelectionModel();
+        keySelectionModel = new KeYSelectionModel(this);
 
         ui.getProofControl().addAutoModeListener(proofListener);
+
+        registerProofLoadListener(LocationVariableTracker::handleProofLoad);
+    }
+
+    /**
+     * Register a proof load listener. Will be called whenever a new proof is loaded, but before
+     * it is replayed. The listener MUST be able to accept the same proof twice!
+     *
+     * @param listener callback
+     */
+    public synchronized void registerProofLoadListener(Consumer<Proof> listener) {
+        proofLoadListeners.add(listener);
     }
 
     /**
@@ -124,82 +136,6 @@ public class KeYMediator {
      */
     public NotationInfo getNotationInfo() {
         return notationInfo;
-    }
-
-    /**
-     * returns the variable namespace
-     *
-     * @return the variable namespace
-     */
-    public Namespace<QuantifiableVariable> var_ns() {
-        NamespaceSet namespaces = namespaces();
-        return namespaces != null ? namespaces.variables() : null;
-    }
-
-    /**
-     * returns the program variable namespace
-     *
-     * @return the program variable namespace
-     */
-    public Namespace<IProgramVariable> progVar_ns() {
-        NamespaceSet namespaces = namespaces();
-        return namespaces != null ? namespaces.programVariables() : null;
-    }
-
-    /**
-     * returns the function namespace
-     *
-     * @return the function namespace
-     */
-    public Namespace<Function> func_ns() {
-        NamespaceSet namespaces = namespaces();
-        return namespaces != null ? namespaces.functions() : null;
-    }
-
-    /**
-     * returns the sort namespace
-     *
-     * @return the sort namespace
-     */
-    public Namespace<Sort> sort_ns() {
-        NamespaceSet namespaces = namespaces();
-        return namespaces != null ? namespaces.sorts() : null;
-    }
-
-    /**
-     * returns the heuristics namespace
-     *
-     * @return the heuristics namespace
-     */
-    public Namespace<RuleSet> heur_ns() {
-        NamespaceSet namespaces = namespaces();
-        return namespaces != null ? namespaces.ruleSets() : null;
-    }
-
-    /**
-     * returns the choice namespace
-     *
-     * @return the choice namespace
-     */
-    public Namespace<Choice> choice_ns() {
-        NamespaceSet namespaces = namespaces();
-        return namespaces != null ? namespaces.choices() : null;
-    }
-
-    /**
-     * returns the namespace set
-     *
-     * @return the namespace set
-     */
-    public NamespaceSet namespaces() {
-        Proof selectedProof = getSelectedProof();
-        return selectedProof != null ? selectedProof.getNamespaces() : null;
-    }
-
-    /** returns the JavaInfo with the java type information */
-    public JavaInfo getJavaInfo() {
-        Proof selectedProof = getSelectedProof();
-        return selectedProof != null ? selectedProof.getJavaInfo() : null;
     }
 
     /** returns the Services with the java service classes */
@@ -242,12 +178,16 @@ public class KeYMediator {
     public void setBack(Node node) {
         getUI().getProofControl().pruneTo(node);
         finishSetBack(node.proof());
+        keySelectionModel.setSelectedNode(node);
     }
 
     public void setBack(Goal goal) {
         if (getSelectedProof() != null) {
             getUI().getProofControl().pruneTo(goal);
-            finishSetBack(goal.proof());
+            final Proof proof = goal.proof();
+            finishSetBack(proof);
+            Node node = goal.node() == proof.root() ? goal.node() : goal.node().parent();
+            keySelectionModel.setSelectedNode(node);
         }
     }
 
@@ -274,29 +214,22 @@ public class KeYMediator {
 
     /**
      * Selects the specified proof and initializes it.
+     * <br/>
+     * This method is called by the selection model, which fires the event.
+     * The method itself does not fire
+     * {@link KeYSelectionListener#selectedProofChanged(KeYSelectionEvent)}
      *
-     * @param p the proof to select.
+     * @param newProof the proof to select.
+     * @param previousProof the previously selected proof
      */
-    public void setProof(Proof p) {
-        final Proof pp = p;
-        if (SwingUtilities.isEventDispatchThread()) {
-            setProofHelper(pp);
-        } else {
-            Runnable swingProzac = new Runnable() {
-                @Override
-                public void run() {
-                    setProofHelper(pp);
-                }
-            };
-            ThreadUtilities.invokeAndWait(swingProzac);
+    void setProof(Proof newProof, Proof previousProof) {
+        if (previousProof == newProof) {
+            return;
         }
-    }
 
-    private void setProofHelper(Proof newProof) {
-        Proof oldProof = getSelectedProof();
-        if (oldProof != null) {
-            oldProof.removeProofTreeListener(proofTreeListener);
-            oldProof.removeRuleAppListener(proofListener);
+        if (previousProof != null) {
+            previousProof.removeProofTreeListener(proofTreeListener);
+            previousProof.removeRuleAppListener(proofListener);
         }
         if (newProof != null) {
             notationInfo.setAbbrevMap(newProof.abbreviations());
@@ -310,8 +243,6 @@ public class KeYMediator {
         }
 
         OneStepSimplifier.refreshOSS(newProof);
-
-        keySelectionModel.setSelectedProof(newProof);
     }
 
     /**
@@ -468,7 +399,7 @@ public class KeYMediator {
     }
 
     /**
-     * Fires the shut down event.
+     * Fires the shut-down event.
      */
     public synchronized void fireShutDown(EventObject e) {
         Object[] listeners = listenerList.getListenerList();
@@ -480,12 +411,25 @@ public class KeYMediator {
     }
 
     /**
+     * Fire the proof loaded event.
+     *
+     * @param p the proof that was just loaded and is about to be replayed
+     */
+    public synchronized void fireProofLoaded(Proof p) {
+        if (p == null) {
+            return;
+        }
+        for (Consumer<Proof> listener : proofLoadListeners) {
+            listener.accept(p);
+        }
+    }
+
+    /**
      * returns the current selected proof
      *
      * @return the current selected proof
-     * @see #getProof()
      */
-    public Proof getSelectedProof() {
+    public @Nullable Proof getSelectedProof() {
         return keySelectionModel.getSelectedProof();
     }
 
@@ -554,52 +498,76 @@ public class KeYMediator {
         goalsClosedByAutoMode = 0;
     }
 
-    public void stopInterface(boolean fullStop) {
+    public synchronized void stopInterface(boolean fullStop) {
         final boolean b = fullStop;
-        Runnable interfaceSignaller = new Runnable() {
-            @Override
-            public void run() {
-                ui.notifyAutoModeBeingStarted();
-                if (b) {
-                    inAutoMode = true;
-                    getUI().getProofControl()
-                            .fireAutoModeStarted(new ProofEvent(getSelectedProof())); // TODO: Is
-                                                                                      // this
-                                                                                      // wrong use
-                                                                                      // of
-                                                                                      // auto mode
-                                                                                      // really
-                                                                                      // required?
-                }
+        Runnable interfaceSignaller = () -> {
+            ui.notifyAutoModeBeingStarted();
+            if (b) {
+                inAutoMode = true;
             }
         };
         ThreadUtilities.invokeAndWait(interfaceSignaller);
     }
 
-    public void startInterface(boolean fullStop) {
+    public synchronized void startInterface(boolean fullStop) {
         final boolean b = fullStop;
-        Runnable interfaceSignaller = new Runnable() {
-            @Override
-            public void run() {
-                if (b) {
-                    inAutoMode = false;
-                    getUI().getProofControl()
-                            .fireAutoModeStopped(new ProofEvent(getSelectedProof())); // TODO: Is
-                                                                                      // this
-                                                                                      // wrong use
-                                                                                      // of
-                                                                                      // auto mode
-                                                                                      // really
-                                                                                      // required?
-                }
-                ui.notifyAutomodeStopped();
-                if (getSelectedProof() != null) {
-                    keySelectionModel.fireSelectedProofChanged();
-                }
+        Runnable interfaceSignaller = () -> {
+            if (b) {
+                inAutoMode = false;
             }
+            ui.notifyAutomodeStopped();
         };
         ThreadUtilities.invokeOnEventQueue(interfaceSignaller);
     }
+
+    /**
+     * performs the standard preparations for starting automode
+     * <ol>
+     * <li>call {@code this.stopInterface(fullstop)}</li>
+     * <li>call {@code getUI().getProofControl().fireAutoModeStarted(proof)}</li>
+     * <li>call {@code this.setInteractive(interactive)}</li>
+     * </ol>
+     *
+     * @param proof the {@link Proof} to be worked on
+     * @param fullStop if a full freeze of the interface is requested
+     * @param interactive whether the needed taclet index is for interactove or automatic use
+     *        (normally false)
+     */
+    public void initiateAutoMode(Proof proof, boolean fullStop, boolean interactive) {
+        stopInterface(fullStop);
+        getUI().getProofControl().fireAutoModeStarted(new ProofEvent(proof));
+        setInteractive(interactive);
+    }
+
+    /**
+     * performs the standard preparations for starting automode
+     * <ol>
+     * <li>call {@code this.startInterface(fullstop)}</li>
+     * <li>call {@code getUI().getProofControl().fireAutoModeStopped(proof)}</li>
+     * <li>call {@code this.setInteractive(interactive)}</li>
+     * <li>select a node/proof by running the given selector (null means the default selection is
+     * used)</li>
+     * </ol>
+     *
+     * @param proof the {@link Proof} to be worked on
+     * @param fullStop if a full freeze of the interface is requested
+     * @param interactive whether the needed taclet index is for interactive or automatic use shoul
+     *        be selected
+     *        (normally true)
+     * @param selection a Runnable that selects the correct node after unfreezing the interface
+     */
+    public void finishAutoMode(Proof proof, boolean fullStop, boolean interactive,
+            Runnable selection) {
+        setInteractive(interactive);
+        startInterface(fullStop);
+        getUI().getProofControl().fireAutoModeStopped(new ProofEvent(proof));
+        if (selection == null) {
+            keySelectionModel.defaultSelection();
+        } else {
+            selection.run();
+        }
+    }
+
 
     /**
      * Checks if the auto mode is currently running.
@@ -610,8 +578,7 @@ public class KeYMediator {
         return inAutoMode;
     }
 
-    @Nullable
-    private Lookup userData;
+    private @Nullable Lookup userData;
 
     /**
      * Retrieves a user-defined data.
@@ -657,16 +624,16 @@ public class KeYMediator {
     }
 
     /**
-     * Get the assocated lookup of user-defined data.
+     * Get the associated lookup of user-defined data.
      *
      * @return
      */
-    public @Nonnull Lookup getUserData() {
-        if (userData == null)
+    public @NonNull Lookup getUserData() {
+        if (userData == null) {
             userData = new Lookup();
+        }
         return userData;
     }
-
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
         private boolean pruningInProcess;
@@ -685,12 +652,9 @@ public class KeYMediator {
 
         @Override
         public void proofPruned(final ProofTreeEvent e) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (!e.getSource().find(getSelectedNode())) {
-                        keySelectionModel.setSelectedNode(e.getNode());
-                    }
+            SwingUtilities.invokeLater(() -> {
+                if (!e.getSource().find(getSelectedNode())) {
+                    keySelectionModel.setSelectedNode(e.getNode());
                 }
             });
             OneStepSimplifier.refreshOSS(e.getSource());
@@ -708,23 +672,7 @@ public class KeYMediator {
         }
 
         @Override
-        public void proofStructureChanged(ProofTreeEvent e) {
-            if (isInAutoMode() || pruningInProcess) {
-                return;
-            }
-            Proof p = e.getSource();
-            if (p == getSelectedProof()) {
-                Node sel_node = getSelectedNode();
-                if (!p.find(sel_node)) {
-                    keySelectionModel.defaultSelection();
-                } else {
-                    // %%% hack does need to be done proper
-                    // needed top update that the selected node nay have
-                    // changed its status
-                    keySelectionModel.setSelectedNode(sel_node);
-                }
-            }
-        }
+        public void proofStructureChanged(ProofTreeEvent e) {}
     }
 
     private final class KeYMediatorProofListener implements RuleAppListener, AutoModeListener {
@@ -756,31 +704,12 @@ public class KeYMediator {
         }
     }
 
-    class KeYMediatorSelectionListener implements KeYSelectionListener {
-        /** focused node has changed */
-        @Override
-        public void selectedNodeChanged(KeYSelectionEvent e) {
-            // empty
-        }
-
-        /**
-         * the selected proof has changed (e.g. a new proof has been loaded)
-         */
-        @Override
-        public void selectedProofChanged(KeYSelectionEvent e) {
-            setProof(e.getSource().getSelectedProof());
-        }
-    }
-
     /*
      * Disable certain actions until a proof is loaded.
      */
     public void enableWhenProofLoaded(final Action a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-            }
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
@@ -797,9 +726,6 @@ public class KeYMediator {
     public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-            }
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
@@ -861,96 +787,6 @@ public class KeYMediator {
     // return ui;
     // }
 
-    public boolean processDelayedCut(final Node invokedNode) {
-        if (ensureProofLoaded()) {
-            final String result =
-                CheckedUserInput.showAsDialog("Cut Formula", "Please supply a formula:", null, "",
-                    new InspectorForDecisionPredicates(getSelectedProof().getServices(),
-                        invokedNode, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
-                        DelayedCutProcessor.getApplicationChecks()),
-                    true);
-
-            if (result == null) {
-                return false;
-            }
-
-            Term formula =
-                InspectorForDecisionPredicates.translate(getSelectedProof().getServices(), result);
-
-            DelayedCutProcessor processor = new DelayedCutProcessor(getSelectedProof(), invokedNode,
-                formula, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
-            processor.add(new DelayedCutListener() {
-
-                @Override
-                public void eventRebuildingTree(final int currentTacletNumber,
-                        final int totalNumber) {
-
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            ui.taskStarted(new DefaultTaskStartedInfo(TaskKind.Other,
-                                "Rebuilding...", totalNumber));
-                            ui.taskProgress(currentTacletNumber);
-
-                        }
-                    });
-                }
-
-                @Override
-                public void eventEnd(DelayedCut cutInformation) {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            ui.resetStatus(this);
-                            KeYMediator.this.startInterface(true);
-                        }
-                    });
-
-                }
-
-                @Override
-                public void eventCutting() {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            ui.taskStarted(
-                                new DefaultTaskStartedInfo(TaskKind.Other, "Cutting...", 0));
-                        }
-                    });
-
-                }
-
-                @Override
-                public void eventException(Throwable throwable) {
-                    KeYMediator.this.startInterface(true);
-
-                    throwable.printStackTrace();
-                    KeYMediator.this.notify(new ExceptionFailureEvent(
-                        "The cut could" + "not be processed successfully. In order to "
-                            + "preserve consistency the proof is pruned."
-                            + " For more information see details or output of your console.",
-                        throwable));
-
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            getSelectedProof().pruneProof(invokedNode);
-                        }
-                    });
-                }
-            });
-            this.stopInterface(true);
-
-            Thread thread = new Thread(processor, "DelayedCutListener");
-            thread.start();
-        }
-        return true;
-
-    }
 
     /**
      * Returns the {@link AutoSaver} to use.
@@ -967,9 +803,28 @@ public class KeYMediator {
      * You can use this instance directly inside your components or add a listener to observe
      * changes.
      *
-     * @see DefaultListModel#addListDataListener
      */
-    public @Nonnull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
+    public @NonNull List<Proof> getCurrentlyOpenedProofs() {
         return currentlyOpenedProofs;
+    }
+
+    /**
+     * Add another listener for user actions.
+     *
+     * @param listener listener object
+     */
+    public void addUserActionListener(UserActionListener listener) {
+        userActionListeners.add(listener);
+    }
+
+    /**
+     * Notify all user action listeners about a performed action.
+     *
+     * @param action the user action
+     */
+    public void fireActionPerformed(UserAction action) {
+        for (UserActionListener listener : userActionListeners) {
+            listener.actionPerformed(action);
+        }
     }
 }

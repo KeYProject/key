@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration.actions;
+
+import java.awt.event.ActionEvent;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -6,9 +12,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.Icons;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 /**
  * @author Alexander Weigl
@@ -20,15 +23,18 @@ public class ShowInteractiveBranchesAction extends KeyAction {
     public ShowInteractiveBranchesAction(ExplorationModeModel model, MainWindow mainWindow) {
         this.model = model;
         setName("Hide justification");
-        setTooltip("Exploration actions are \noften done using a cut. Choose to hide\n "
-            + "the second cut-branches from the view \nto focus on the actions. Uncheck to focus on these branches.");
+        setTooltip("""
+                Exploration actions are\s
+                often done using a cut. Choose to hide
+                 the second cut-branches from the view\s
+                to focus on the actions. Uncheck to focus on these branches.""");
         setMenuPath(ToggleExplorationAction.MENU_PATH);
         putValue(CHECKBOX, true);
 
         model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE,
             e -> updateEnable());
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                .addSettingsListener(e -> updateEnable());
+                .addPropertyChangeListener(e -> updateEnable());
         updateEnable();
     }
 

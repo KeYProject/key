@@ -1,29 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.operator.Divide;
-import de.uka.ilkd.key.java.expression.operator.GreaterOrEquals;
-import de.uka.ilkd.key.java.expression.operator.GreaterThan;
-import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.expression.operator.Minus;
-import de.uka.ilkd.key.java.expression.operator.Modulo;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.Plus;
-import de.uka.ilkd.key.java.expression.operator.Times;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.util.ExtList;
 
 public final class FloatLDT extends LDT implements FloatingPointLDT {
 
@@ -31,39 +24,39 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     public static final Name FLOATLIT_NAME = new Name("FP");
     public static final Name NEGATIVE_LITERAL = new Name("javaUnaryMinusFloat");
 
-    private final Function floatLit;
-    private final Function lessThan;
-    private final Function greaterThan;
-    private final Function greaterOrEquals;
-    private final Function lessOrEquals;
+    private final JFunction floatLit;
+    private final JFunction lessThan;
+    private final JFunction greaterThan;
+    private final JFunction greaterOrEquals;
+    private final JFunction lessOrEquals;
 
-    private final Function eqFloat;
+    private final JFunction eqFloat;
 
-    private final Function javaUnaryMinusFloat;
-    private final Function javaAddFloat;
-    private final Function javaSubFloat;
-    private final Function javaMulFloat;
-    private final Function javaDivFloat;
-    private final Function javaModFloat;
+    private final JFunction javaUnaryMinusFloat;
+    private final JFunction javaAddFloat;
+    private final JFunction javaSubFloat;
+    private final JFunction javaMulFloat;
+    private final JFunction javaDivFloat;
+    private final JFunction javaModFloat;
 
-    private final Function javaMinFloat;
-    private final Function javaMaxFloat;
+    private final JFunction javaMinFloat;
+    private final JFunction javaMaxFloat;
 
-    private final Function addFloatIEEE;
-    private final Function subFloatIEEE;
-    private final Function mulFloatIEEE;
-    private final Function divFloatIEEE;
-    private final Function absFloat;
-    private final Function negFloat;
+    private final JFunction addFloatIEEE;
+    private final JFunction subFloatIEEE;
+    private final JFunction mulFloatIEEE;
+    private final JFunction divFloatIEEE;
+    private final JFunction absFloat;
+    private final JFunction negFloat;
 
-    private final Function isNormal;
-    private final Function isSubnormal;
-    private final Function isNaN;
-    private final Function isZero;
-    private final Function isNice;
-    private final Function isInfinite;
-    private final Function isNegative;
-    private final Function isPositive;
+    private final JFunction isNormal;
+    private final JFunction isSubnormal;
+    private final JFunction isNaN;
+    private final JFunction isZero;
+    private final JFunction isNice;
+    private final JFunction isInfinite;
+    private final JFunction isNegative;
+    private final JFunction isPositive;
 
     public FloatLDT(TermServices services) {
         super(NAME, services);
@@ -130,12 +123,13 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     public Term translateLiteral(Literal lit, Services services) {
         assert lit instanceof FloatLiteral : "Literal '" + lit + "' is not a float literal.";
         String s = ((FloatLiteral) lit).getValue();
-        Float flValue = Float.parseFloat(s);
+        float flValue = Float.parseFloat(s);
         return services.getTermBuilder().fpTerm(flValue);
     }
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services services,
+    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+            Services services,
             ExecutionContext ec) {
         if (op instanceof GreaterThan) {
             return getGreaterThan();
@@ -163,51 +157,33 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public Function getFunctionFor(String op, Services services) {
-        switch (op) {
-        case "gt":
-            return getGreaterThan();
-        case "geq":
-            return getGreaterOrEquals();
-        case "lt":
-            return getLessThan();
-        case "leq":
-            return getLessOrEquals();
-        case "div":
-            return getDiv();
-        case "mul":
-            return getMul();
-        case "add":
-            return getAdd();
-        case "sub":
-            return getSub();
-        case "neg":
-            return getNeg();
+    public JFunction getFunctionFor(String op, Services services) {
+        return switch (op) {
+        case "gt" -> getGreaterThan();
+        case "geq" -> getGreaterOrEquals();
+        case "lt" -> getLessThan();
+        case "leq" -> getLessOrEquals();
+        case "div" -> getDiv();
+        case "mul" -> getMul();
+        case "add" -> getAdd();
+        case "sub" -> getSub();
+        case "neg" -> getNeg();
         // Floating point extensions with "\fp_"
-        case "nan":
-            return getIsNaN();
-        case "zero":
-            return getIsZero();
-        case "infinite":
-            return getIsInfinite();
-        case "nice":
-            return getIsNice();
-        case "abs":
-            return getAbs();
-        case "negative":
-            return getIsNegative();
-        case "positive":
-            return getIsPositive();
-        case "subnormal":
-            return getIsSubnormal();
-        case "normal":
-            return getIsNormal();
-        }
-        return null;
+        case "nan" -> getIsNaN();
+        case "zero" -> getIsZero();
+        case "infinite" -> getIsInfinite();
+        case "nice" -> getIsNice();
+        case "abs" -> getAbs();
+        case "negative" -> getIsNegative();
+        case "positive" -> getIsPositive();
+        case "subnormal" -> getIsSubnormal();
+        case "normal" -> getIsNormal();
+        default -> null;
+        };
     }
 
     @Override
-    public boolean hasLiteralFunction(Function f) {
+    public boolean hasLiteralFunction(JFunction f) {
         return containsFunction(f) && (f.arity() == 0);
     }
 
@@ -233,7 +209,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_FLOAT;
         } else {
@@ -241,116 +217,116 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
         }
     }
 
-    public Function getFloatSymbol() {
+    public JFunction getFloatSymbol() {
         return floatLit;
     }
 
-    public Function getLessThan() {
+    public JFunction getLessThan() {
         return lessThan;
     }
 
-    public Function getGreaterThan() {
+    public JFunction getGreaterThan() {
         return greaterThan;
     }
 
-    public Function getLessOrEquals() {
+    public JFunction getLessOrEquals() {
         return lessOrEquals;
     }
 
-    public Function getGreaterOrEquals() {
+    public JFunction getGreaterOrEquals() {
         return greaterOrEquals;
     }
 
-    public Function getEquals() {
+    public JFunction getEquals() {
         return eqFloat;
     }
 
-    public Function getJavaUnaryMinus() {
+    public JFunction getJavaUnaryMinus() {
         return javaUnaryMinusFloat;
     }
 
-    public Function getJavaAdd() {
+    public JFunction getJavaAdd() {
         return javaAddFloat;
     }
 
-    public Function getJavaSub() {
+    public JFunction getJavaSub() {
         return javaSubFloat;
     }
 
-    public Function getJavaMul() {
+    public JFunction getJavaMul() {
         return javaMulFloat;
     }
 
-    public Function getJavaDiv() {
+    public JFunction getJavaDiv() {
         return javaDivFloat;
     }
 
-    public Function getJavaMod() {
+    public JFunction getJavaMod() {
         return javaModFloat;
     }
 
-    public Function getJavaMin() {
+    public JFunction getJavaMin() {
         return javaMinFloat;
     }
 
-    public Function getJavaMax() {
+    public JFunction getJavaMax() {
         return javaMaxFloat;
     }
 
-    public Function getIsNormal() {
+    public JFunction getIsNormal() {
         return isNormal;
     }
 
-    public Function getIsSubnormal() {
+    public JFunction getIsSubnormal() {
         return isSubnormal;
     }
 
-    public Function getIsNaN() {
+    public JFunction getIsNaN() {
         return isNaN;
     }
 
-    public Function getIsZero() {
+    public JFunction getIsZero() {
         return isZero;
     }
 
     @Override
-    public Function getIsNice() {
+    public JFunction getIsNice() {
         return isNice;
     }
 
-    public Function getIsInfinite() {
+    public JFunction getIsInfinite() {
         return isInfinite;
     }
 
-    public Function getIsPositive() {
+    public JFunction getIsPositive() {
         return isPositive;
     }
 
-    public Function getIsNegative() {
+    public JFunction getIsNegative() {
         return isNegative;
     }
 
-    public Function getAdd() {
+    public JFunction getAdd() {
         return addFloatIEEE;
     }
 
-    public Function getSub() {
+    public JFunction getSub() {
         return subFloatIEEE;
     }
 
-    public Function getMul() {
+    public JFunction getMul() {
         return mulFloatIEEE;
     }
 
-    public Function getDiv() {
+    public JFunction getDiv() {
         return divFloatIEEE;
     }
 
-    public Function getAbs() {
+    public JFunction getAbs() {
         return absFloat;
     }
 
-    public Function getNeg() {
+    public JFunction getNeg() {
         return negFloat;
     }
 

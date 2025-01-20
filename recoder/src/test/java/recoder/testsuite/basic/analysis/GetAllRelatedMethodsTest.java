@@ -1,7 +1,15 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.testsuite.basic.analysis;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Method;
 import recoder.abstraction.Type;
@@ -10,13 +18,8 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.testsuite.basic.BasicTestsSuite;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-@Ignore
+@Disabled
 public class GetAllRelatedMethodsTest {
     final static String PACKAGE = "testdata.";
     CrossReferenceSourceInfo xrsi;
@@ -26,7 +29,7 @@ public class GetAllRelatedMethodsTest {
         String name = PACKAGE + localname;
         ClassType ct = ni.getClassType(name);
         if (ct == null) {
-            fail("Could not load test data " + name);
+            Assertions.fail("Could not load test data " + name);
         }
         return ct;
     }
@@ -62,18 +65,18 @@ public class GetAllRelatedMethodsTest {
 
     private void checkRelatedMethodsCount(ClassType ct, String methodName, int expectedNumber) {
         List<Method> ml =
-            MethodKit.getAllRelatedMethods(ni, xrsi, ct, methodName, new ArrayList<Type>(0));
+            MethodKit.getAllRelatedMethods(ni, xrsi, ct, methodName, new ArrayList<>(0));
         if (ml.size() != expectedNumber) {
             System.err.println("Aha");
         }
-        assertEquals(methodName, expectedNumber, ml.size());
-        checkSignatures(ml, methodName, new ArrayList<Type>(0));
+        Assertions.assertEquals(expectedNumber, ml.size(), methodName);
+        checkSignatures(ml, methodName, new ArrayList<>(0));
     }
 
     private void checkSignatures(List<Method> ml, String methodName, List<Type> signature) {
         for (Method method : ml) {
-            assertEquals(method.getName(), methodName);
-            assertEquals(method.getSignature(), signature);
+            Assertions.assertEquals(method.getName(), methodName);
+            Assertions.assertEquals(method.getSignature(), signature);
         }
     }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -15,7 +18,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 public class PosInSequent {
 
     private Range bounds;
-    private boolean sequent;
+    private final boolean sequent;
     private PosInOccurrence posInOcc = null;
 
     private Range firstJavaStatementRange = null;
@@ -107,8 +110,9 @@ public class PosInSequent {
      * returns a string representation of this PosInSequent
      */
     public String toString() {
-        if (isSequent())
+        if (isSequent()) {
             return "Whole Sequent";
-        return "" + posInOcc;
+        }
+        return String.valueOf(posInOcc);
     }
 }

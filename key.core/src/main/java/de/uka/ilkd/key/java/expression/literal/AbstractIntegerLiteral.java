@@ -1,12 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression.literal;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
+
+import org.key_project.logic.Name;
+import org.key_project.util.ExtList;
 
 /**
  * This class is a superclass for integer literals (Int, Long, Char). It provides a getValue()
@@ -48,12 +49,10 @@ public abstract class AbstractIntegerLiteral extends Literal {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o.getClass() == this.getClass())) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
         return ((AbstractIntegerLiteral) o).getValue() == getValue();

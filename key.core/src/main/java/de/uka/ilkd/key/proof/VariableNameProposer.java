@@ -1,24 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Proposes names for variables (except program variables).
@@ -49,7 +53,7 @@ public class VariableNameProposer implements InstantiationProposer {
                 previousProposals);
         } else if (var instanceof VariableSV) {
             return getNameProposalForVariableSV(app, var, services, previousProposals);
-        } else if (var.sort() == ProgramSVSort.LABEL) {
+        } else if (var instanceof ProgramSV psv && psv.sort() == ProgramSVSort.LABEL) {
             return getNameProposalForLabel(app, var, services, undoAnchor, previousProposals);
         } else {
             return null;
@@ -104,11 +108,11 @@ public class VariableNameProposer implements InstantiationProposer {
             if (inst instanceof Term) {
                 result = ((Term) inst).op().name().toString();
             } else {
-                result = "" + inst;
+                result = String.valueOf(inst);
             }
         } else {
             // ... otherwise use the name of the SkolemTermSV
-            result = "" + p_var.name();
+            result = String.valueOf(p_var.name());
         }
 
         // remove characters that should better not turn up in identifiers
@@ -197,8 +201,9 @@ public class VariableNameProposer implements InstantiationProposer {
         ProgramElement contextProgram =
             app.matchConditions().getInstantiations().getContextInstantiation().contextProgram();
 
-        if (contextProgram == null)
+        if (contextProgram == null) {
             contextProgram = new StatementBlock();
+        }
 
         final LabelCollector lc = new LabelCollector(contextProgram, services);
 

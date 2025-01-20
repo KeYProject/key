@@ -1,12 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
-
-import antlr.ASTFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import de.uka.ilkd.key.settings.Configuration;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class StrategyProperties extends Properties {
 
@@ -27,7 +31,7 @@ public final class StrategyProperties extends Properties {
     public static final String LOOP_OPTIONS_KEY = "LOOP_OPTIONS_KEY";
     public static final String LOOP_EXPAND = "LOOP_EXPAND";
     public static final String LOOP_EXPAND_BOUNDED = "LOOP_EXPAND_BOUNDED"; // Used for test
-                                                                            // generation chrisg
+    // generation chrisg
     public static final String LOOP_INVARIANT = "LOOP_INVARIANT";
     public static final String LOOP_SCOPE_INVARIANT = "LOOP_SCOPE_INVARIANT";
     public static final String LOOP_SCOPE_INV_TACLET = "LOOP_SCOPE_INV_TACLET";
@@ -147,12 +151,12 @@ public final class StrategyProperties extends Properties {
     public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF =
         "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF";
 
-    private static final long serialVersionUID = -4647245742912258421L;
+    private static final String CATEGORY = "StrategyProperty";
 
     /**
      * Section key for storage file to identify strategy settings
      */
-    private static final String STRATEGY_PROPERTY = "[StrategyProperty]";
+    private static final String STRATEGY_PROPERTY = "[" + CATEGORY + "]";
 
     private static final String USER_TACLETS_OPTIONS_KEY_BASE = "USER_TACLETS_OPTIONS_KEY";
 
@@ -180,7 +184,6 @@ public final class StrategyProperties extends Properties {
         SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
         SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF,
         SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF };
-
 
     private static final Properties DEFAULT_MAP = new Properties();
     private static final Logger LOGGER = LoggerFactory.getLogger(StrategyProperties.class);
@@ -340,7 +343,7 @@ public final class StrategyProperties extends Properties {
         if (o == null) {
             o = (String) DEFAULT_MAP.get(key);
             // remove this line if always satisfied. add another assignment if not.
-            assert o == getUniqueString(o);
+            assert o.equals(getUniqueString(o));
         }
         return o;
     }
@@ -350,7 +353,7 @@ public final class StrategyProperties extends Properties {
      *        <code>stringPool</code>.
      * @return Returns the same string but possibly with a different but unique object identity.
      */
-    private final static String getUniqueString(String in) {
+    private static String getUniqueString(String in) {
         for (String id : STRING_POOL) {
             if (id.equals(in)) {
                 return id;
@@ -366,6 +369,29 @@ public final class StrategyProperties extends Properties {
             + " properties stored with a different KeY version. This setting"
             + " is ignored, default value is taken!", in);
         return null;
+    }
+
+    public static StrategyProperties read(Configuration category) {
+        category = category.getOrCreateSection("options");
+        StrategyProperties sp = new StrategyProperties();
+        for (Map.Entry<Object, Object> entry : DEFAULT_MAP.entrySet()) {
+            final var def = entry.getValue();
+            final var obj = category.get(entry.getKey().toString());
+            if (obj != null && def.getClass() == obj.getClass()) {
+                sp.put(entry.getKey(), obj);
+            }
+        }
+        return sp;
+    }
+
+    public void write(Configuration category) {
+        category = category.getOrCreateSection("options");
+        for (Map.Entry<Object, Object> entry : entrySet()) {
+            final var value = entry.getValue();
+            if (value != null) {
+                category.set(entry.getKey().toString(), value);
+            }
+        }
     }
 
 
@@ -429,4 +455,6 @@ public final class StrategyProperties extends Properties {
         }
         return result;
     }
+
+
 }

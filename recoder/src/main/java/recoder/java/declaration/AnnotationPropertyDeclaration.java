@@ -1,8 +1,7 @@
-/*
- * Created on 27.05.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.abstraction.AnnotationProperty;
@@ -34,8 +33,7 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
      * @param modifiers
      * @param returnType
      * @param name
-     * @param parameters
-     * @param exceptions
+     * @param defaultValue
      */
     public AnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers,
             TypeReference returnType, Identifier name, Expression defaultValue) {
@@ -74,8 +72,9 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (defaultValue != null)
+        if (defaultValue != null) {
             defaultValue.setExpressionContainer(this);
+        }
     }
 
     /*
@@ -93,8 +92,9 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
      * @see recoder.java.ExpressionContainer#getExpressionAt(int)
      */
     public Expression getExpressionAt(int index) {
-        if (index == 0 && defaultValue != null)
+        if (index == 0 && defaultValue != null) {
             return defaultValue;
+        }
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
@@ -107,8 +107,9 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
     }
 
     public ProgramElement getChildAt(int index) {
-        if (index == super.getChildCount() && defaultValue != null)
+        if (index == super.getChildCount() && defaultValue != null) {
             return defaultValue;
+        }
         return super.getChildAt(index); // might throw ArrayIndexOutOfBoundsException
     }
 
@@ -119,8 +120,9 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
     public int getChildPositionCode(ProgramElement child) {
         // role 0-7: see MethodDeclaration
         // role 8: default value
-        if (child == defaultValue)
+        if (child == defaultValue) {
             return 8;
+        }
         return super.getChildPositionCode(child);
     }
 
@@ -141,8 +143,9 @@ public class AnnotationPropertyDeclaration extends MethodDeclaration
     }
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
+        }
         if (p == defaultValue) {
             Expression r = (Expression) q;
             defaultValue = r;

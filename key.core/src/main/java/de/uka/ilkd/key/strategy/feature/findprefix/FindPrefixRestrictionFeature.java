@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 
 /**
@@ -50,7 +54,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
         private final Modifier modifier;
 
 
-        private PositionModifier(Modifier modifier) {
+        PositionModifier(Modifier modifier) {
             this.modifier = modifier;
         }
 
@@ -103,7 +107,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         // apply the position modifiers

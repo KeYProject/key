@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.bean;
 
 import java.beans.PropertyChangeEvent;
@@ -5,6 +8,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import org.key_project.util.java.ArrayUtil;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Implements the basic methods that a Java bean should have and is the default implementation of
@@ -17,7 +22,8 @@ public class Bean implements IBean {
     /**
      * The used {@link PropertyChangeSupport}.
      */
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    @SuppressWarnings("nullness") // TODO Check with Werner Dietl why this is so.
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     /**
      * Returns the used {@link PropertyChangeSupport}.
@@ -126,8 +132,8 @@ public class Bean implements IBean {
      * @param oldValue The old value.
      * @param newValue The new value.
      */
-    protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue,
-            Object newValue) {
+    protected void fireIndexedPropertyChange(String propertyName, int index,
+            @Nullable Object oldValue, @Nullable Object newValue) {
         pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
 

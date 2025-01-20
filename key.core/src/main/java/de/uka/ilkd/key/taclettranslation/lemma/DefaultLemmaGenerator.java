@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.HashMap;
@@ -6,33 +9,21 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * The default lemma generator: Supports only certain types of taclets. If a taclet is not
@@ -42,7 +33,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
     // Describes how a schema variable is mapped to another operator, e.g.
     // logical variable.
-    private HashMap<SchemaVariable, Term> mapping = new LinkedHashMap<SchemaVariable, Term>();
+    private final HashMap<SchemaVariable, Term> mapping = new LinkedHashMap<>();
 
     @Override
     public TacletFormula translate(Taclet taclet, TermServices services) {
@@ -51,7 +42,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             throw new IllegalTacletException(result);
         }
         Term formula = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
-        formula = rebuild(taclet, formula, services, new LinkedHashSet<QuantifiableVariable>());
+        formula = rebuild(taclet, formula, services, new LinkedHashSet<>());
         result = checkForIllegalOps(formula, taclet, false);
         if (result != null) {
             throw new IllegalTacletException(result);
@@ -69,8 +60,9 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
     public static String checkTaclet(final Taclet taclet) {
         String result = checkForIllegalConditions(taclet);
-        if (result != null)
+        if (result != null) {
             return result;
+        }
         TacletVisitor visitor = new TacletVisitor() {
 
             @Override
@@ -84,8 +76,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             @Override
             public String visit(Taclet taclet, boolean visitAddrules) {
 
-                if (taclet instanceof RewriteTaclet) {
-                    RewriteTaclet rwTaclet = (RewriteTaclet) taclet;
+                if (taclet instanceof RewriteTaclet rwTaclet) {
                     Sequent assumptions = rwTaclet.ifSequent();
                     int appRestr = rwTaclet.getApplicationRestriction();
                     if (!assumptions.isEmpty() && appRestr == 0) {
@@ -115,7 +106,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     public static String checkForIllegalOps(Term formula, Taclet owner,
             boolean schemaVarsAreAllowed) {
         if ((!schemaVarsAreAllowed && formula.op() instanceof SchemaVariable)
-                || formula.op() instanceof Modality || formula.op() instanceof ModalOperatorSV
+                || formula.op() instanceof Modality
                 || formula.op() instanceof ProgramSV || formula.op() instanceof SkolemTermSV
                 || formula.op() instanceof UpdateSV) {
             return "The given taclet " + owner.name()
@@ -221,14 +212,15 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * for JavaCard Dynamic Logic.) This method is used for both Formula schema variables and Term
      * schema variables.
      */
-    private Term createSimpleInstantiation(Taclet owner, SchemaVariable sv, TermServices services) {
+    private Term createSimpleInstantiation(Taclet owner, OperatorSV sv, TermServices services) {
         ImmutableSet<SchemaVariable> prefix = owner.getPrefix(sv).prefix();
 
         Sort[] argSorts = computeArgSorts(prefix, services);
         Term[] args = computeArgs(owner, prefix, services);
         Name name = createUniqueName(services, "f_" + sv.name().toString());
 
-        Function function = new Function(name, replaceSort(sv.sort(), services), argSorts);
+        JFunction function =
+            new JFunction(name, replaceSort(sv.sort(), services), argSorts);
         return services.getTermBuilder().func(function, args);
     }
 
@@ -239,8 +231,9 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     private Sort[] computeArgSorts(ImmutableSet<SchemaVariable> svSet, TermServices services) {
         Sort[] argSorts = new Sort[svSet.size()];
         int i = 0;
-        for (SchemaVariable sv : svSet) {
-            argSorts[i] = replaceSort(sv.sort(), services);
+        for (var sv : svSet) {
+            if (sv instanceof OperatorSV asv)
+                argSorts[i] = replaceSort(asv.sort(), services);
             i++;
         }
         return argSorts;
@@ -250,7 +243,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             TermServices services) {
         Term[] args = new Term[svSet.size()];
         int i = 0;
-        for (SchemaVariable sv : svSet) {
+        for (var sv : svSet) {
             args[i] = getInstantiation(owner, sv, services);
             i++;
         }
@@ -264,7 +257,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             HashSet<QuantifiableVariable> boundedVariables) {
         Term[] newSubs = new Term[term.arity()];
         int i = 0;
-        LinkedList<QuantifiableVariable> qvars = new LinkedList<QuantifiableVariable>();
+        LinkedList<QuantifiableVariable> qvars = new LinkedList<>();
         for (QuantifiableVariable qvar : term.boundVars()) {
             boundedVariables.add(qvar);
             if (qvar instanceof VariableSV) {
@@ -286,7 +279,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         Operator newOp = replaceOp(term.op(), services);
 
         return services.getTermFactory().createTerm(newOp, newSubs,
-            new ImmutableArray<QuantifiableVariable>(qvars), term.javaBlock());
+            new ImmutableArray<>(qvars), null);
     }
 
     /**

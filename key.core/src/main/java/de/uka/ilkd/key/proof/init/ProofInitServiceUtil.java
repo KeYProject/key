@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
@@ -114,7 +117,7 @@ public final class ProofInitServiceUtil {
      * @return All available {@link DefaultProfileResolver}.
      */
     private static Map<String, DefaultProfileResolver> createDefaultProfileResolver() {
-        Map<String, DefaultProfileResolver> result = new HashMap<String, DefaultProfileResolver>();
+        Map<String, DefaultProfileResolver> result = new HashMap<>();
         Iterator<DefaultProfileResolver> iter =
             ClassLoaderUtil.loadServices(DefaultProfileResolver.class).iterator();
         while (iter.hasNext()) {

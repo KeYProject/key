@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.statement;
 
 import recoder.java.*;
@@ -118,14 +120,18 @@ public abstract class LoopStatement extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (inits != null)
+        if (inits != null) {
             result += inits.size();
-        if (guard != null)
+        }
+        if (guard != null) {
             result++;
-        if (updates != null)
+        }
+        if (updates != null) {
             result += updates.size();
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -148,8 +154,9 @@ public abstract class LoopStatement extends JavaStatement
         }
         if (isCheckedBeforeIteration()) {
             if (guard != null) {
-                if (index == 0)
+                if (index == 0) {
                     return guard;
+                }
                 index--;
             }
         }
@@ -161,14 +168,16 @@ public abstract class LoopStatement extends JavaStatement
             index -= len;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         if (!isCheckedBeforeIteration()) {
             if (guard != null) {
-                if (index == 0)
+                if (index == 0) {
                     return guard;
+                }
                 index--;
             }
         }
@@ -208,7 +217,7 @@ public abstract class LoopStatement extends JavaStatement
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
@@ -275,8 +284,9 @@ public abstract class LoopStatement extends JavaStatement
 
     public int getExpressionCount() {
         int result = 0;
-        if (guard != null)
+        if (guard != null) {
             result += 1;
+        }
         if (inits != null) {
             for (int i = inits.size() - 1; i >= 0; i -= 1) {
                 if (inits.get(i) instanceof Expression) {

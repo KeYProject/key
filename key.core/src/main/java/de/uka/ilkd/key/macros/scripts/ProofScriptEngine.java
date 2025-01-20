@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
@@ -18,13 +21,17 @@ import org.antlr.v4.runtime.misc.Interval;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Observer;
-import java.util.ServiceLoader;
+import java.util.*;
+import java.util.function.Consumer;
+
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,10 +64,10 @@ public class ProofScriptEngine {
      */
     private EngineState stateMap;
 
-    private Observer commandMonitor;
+    private Consumer<Message> commandMonitor;
 
     public ProofScriptEngine(File file) throws IOException {
-        this.script = ParsingFacade.parseScript(file);
+        this.script = Files.readString(file.toPath());
         this.initiallySelectedGoal = null;
     }
 
@@ -81,7 +88,7 @@ public class ProofScriptEngine {
 
     private static Map<String, ProofScriptCommand<?>> loadCommands() {
         Map<String, ProofScriptCommand<?>> result = new HashMap<>();
-        ServiceLoader<ProofScriptCommand> loader = ServiceLoader.load(ProofScriptCommand.class);
+        var loader = ServiceLoader.load(ProofScriptCommand.class);
 
         for (ProofScriptCommand<?> cmd : loader) {
             result.put(cmd.getName(), cmd);
@@ -130,10 +137,12 @@ public class ProofScriptEngine {
                 cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'";
             }
 
+            final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
             if (commandMonitor != null
                     && stateMap.isEchoOn()
                     && commandContext.AT() == null) {
-                commandMonitor.update(null, cmd);
+                commandMonitor
+                        .accept(new ExecuteInfo(cmd, start, firstNode.serialNr()));
             }
 
             try {
@@ -144,12 +153,11 @@ public class ProofScriptEngine {
                             + BuilderHelpers.getPosition(commandContext));
                 }
 
-                if (commandContext.AT() == null && stateMap.isEchoOn()) {
-                    LOGGER.info("{}: {}", ++cnt, cmd);
-                }
-
                 Object o = command.evaluateArguments(stateMap, argMap);
-                final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
+                if (commandContext.AT() == null && stateMap.isEchoOn()) {
+                    LOGGER.debug("[{}] goal: {}, source line: {}, command: {}", ++cnt,
+                        firstNode.serialNr(), parsed.start().getPosition().line(), cmd);
+                }
                 command.execute(uiControl, o, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
             } catch (InterruptedException ie) {
@@ -220,11 +228,20 @@ public class ProofScriptEngine {
      *
      * @param monitor the monitor to set
      */
-    public void setCommandMonitor(Observer monitor) {
+    public void setCommandMonitor(Consumer<Message> monitor) {
         this.commandMonitor = monitor;
     }
 
-    public static ProofScriptCommand getCommand(String commandName) {
+    public static ProofScriptCommand<?> getCommand(String commandName) {
         return COMMANDS.get(commandName);
+    }
+
+    public interface Message {
+    }
+
+    public record EchoMessage(String message) implements Message {
+    }
+
+    public record ExecuteInfo(String command, Location location, int nodeSerial) implements Message {
     }
 }

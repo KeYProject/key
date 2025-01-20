@@ -1,16 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.reference;
 
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.ExtList;
 
 
 public class FieldReference extends VariableReference
@@ -19,19 +17,24 @@ public class FieldReference extends VariableReference
     /**
      * Reference prefix.
      */
-    protected ReferencePrefix prefix;
+    protected final ReferencePrefix prefix;
 
 
     protected FieldReference() {
         prefix = null;
     }
 
-    public FieldReference(ProgramVariable pv, ReferencePrefix prefix) {
-        super(pv);
-        initPrefix(pv, prefix);
+    protected FieldReference(ReferencePrefix prefix) {
+        this.prefix = prefix;
     }
 
-    private void initPrefix(ProgramVariable pv, ReferencePrefix prefix) {
+    public FieldReference(ProgramVariable pv, ReferencePrefix prefix) {
+        this(pv, prefix, PositionInfo.UNDEFINED);
+    }
+
+    public FieldReference(ExtList children, ReferencePrefix prefix) {
+        super(children);
+        final ProgramVariable pv = getProgramVariable();
         if (prefix == null && !pv.isStatic() && pv.isMember()) {
             this.prefix = new ThisReference();
         } else {
@@ -39,16 +42,13 @@ public class FieldReference extends VariableReference
         }
     }
 
-    public FieldReference(ExtList children, ReferencePrefix prefix) {
-        super(children);
-        initPrefix(getProgramVariable(), prefix);
-    }
-
-
     public FieldReference(ProgramVariable pv, ReferencePrefix prefix, PositionInfo pi) {
         super(pv, pi);
-        initPrefix(pv, prefix);
-
+        if (prefix == null && !pv.isStatic() && pv.isMember()) {
+            this.prefix = new ThisReference();
+        } else {
+            this.prefix = prefix;
+        }
     }
 
     /**
@@ -58,10 +58,12 @@ public class FieldReference extends VariableReference
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null)
+        if (prefix != null) {
             result++;
-        if (variable != null)
+        }
+        if (variable != null) {
             result++;
+        }
         return result;
     }
 
@@ -74,13 +76,15 @@ public class FieldReference extends VariableReference
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
             index--;
         }
         if (variable != null) {
-            if (index == 0)
+            if (index == 0) {
                 return variable;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -173,11 +177,6 @@ public class FieldReference extends VariableReference
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
         return (prefix == null) ? variable : prefix.getFirstElementIncludingBlocks();
-    }
-
-    /** pretty print */
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printFieldReference(this);
     }
 
 

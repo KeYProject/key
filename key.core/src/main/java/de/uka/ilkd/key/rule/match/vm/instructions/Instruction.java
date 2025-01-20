@@ -1,29 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 
-/** enum encoding the instructions of the matching vm */
+import org.key_project.util.collection.ImmutableArray;
+
+/** Class encoding the instructions of the matching vm */
 public abstract class Instruction<OP extends Operator> implements MatchInstruction {
 
     public static Instruction<Operator> matchOp(Operator op) {
-        return new MatchOpIdentityInstruction<Operator>(op);
+        return new MatchOpIdentityInstruction<>(op);
     }
 
     public static Instruction<SortDependingFunction> matchSortDependingFunction(
@@ -31,9 +24,13 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
         return new MatchSortDependingFunctionInstruction(op);
     }
 
-    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchModalOperatorSV(
+    public static MatchModalOperatorSVInstruction matchModalOperatorSV(
             ModalOperatorSV sv) {
         return new MatchModalOperatorSVInstruction(sv);
+    }
+
+    public static MatchModalityInstruction matchModalOperator(Modality mod) {
+        return new MatchModalityInstruction(mod);
     }
 
     public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchFormulaSV(
@@ -96,7 +93,7 @@ public abstract class Instruction<OP extends Operator> implements MatchInstructi
      *        matches of this schemavariable)
      * @param services the {@link Services}
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with
-     *         the pair {@link (sv, instantiationCandidate)} added
+     *         the pair {@code (sv, instantiationCandidate)} added
      */
     public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond,
             Services services);

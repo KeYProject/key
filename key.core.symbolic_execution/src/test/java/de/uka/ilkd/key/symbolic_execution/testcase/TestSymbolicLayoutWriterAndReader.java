@@ -1,21 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import javax.xml.parsers.ParserConfigurationException;
 
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.*;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutWriter;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
+
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableSLList;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  * Tests {@link SymbolicLayoutWriter} and {@link SymbolicLayoutReader}

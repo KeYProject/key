@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.model;
 
 import java.util.LinkedList;
@@ -13,11 +16,11 @@ public class Heap {
     /**
      * The name of the heap.
      */
-    String name;
+    final String name;
     /**
      * The contained objects.
      */
-    List<ObjectVal> objects;
+    final List<ObjectVal> objects;
 
     /**
      * Creates a new heap with the given name.
@@ -26,7 +29,7 @@ public class Heap {
      */
     public Heap(String name) {
         this.name = name;
-        objects = new LinkedList<ObjectVal>();
+        objects = new LinkedList<>();
     }
 
     /**
@@ -41,13 +44,13 @@ public class Heap {
 
 
     public String toString() {
-        String result = "Heap " + name + "\n";
+        StringBuilder result = new StringBuilder("Heap " + name + "\n");
 
         for (ObjectVal o : objects) {
-            result += o + "\n";
+            result.append(o).append("\n");
         }
 
-        return result;
+        return result.toString();
 
     }
 
@@ -72,8 +75,7 @@ public class Heap {
      */
     public boolean equals(Object that) {
 
-        if (that instanceof Heap) {
-            Heap thatHeap = (Heap) that;
+        if (that instanceof Heap thatHeap) {
             return thatHeap.name.equals(name);
         }
 

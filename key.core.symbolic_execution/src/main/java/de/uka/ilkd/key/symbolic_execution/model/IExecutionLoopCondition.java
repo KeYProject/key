@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.Expression;
@@ -25,12 +28,12 @@ public interface IExecutionLoopCondition extends IExecutionBlockStartNode<JavaSt
      *
      * @return The executed loop expression.
      */
-    public Expression getGuardExpression();
+    Expression getGuardExpression();
 
     /**
      * Returns the code position of the executed loop expression ({@link #getGuardExpression()}).
      *
      * @return The code of the executed loop expression.
      */
-    public PositionInfo getGuardExpressionPositionInfo();
+    PositionInfo getGuardExpressionPositionInfo();
 }

@@ -1,16 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
+
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import org.key_project.logic.op.Function;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 // W I P
 public class SumProdHandler implements SMTHandler {
@@ -18,10 +20,10 @@ public class SumProdHandler implements SMTHandler {
     private Function bsumOp, bprodOp;
 
     // key is the term to identify the bsum, value is the name used for that function.
-    private final HashMap<Term, SExpr> usedBsumTerms = new LinkedHashMap();
+    private final Map<Term, SExpr> usedBsumTerms = new LinkedHashMap<>();
 
     // key is the term to identify the bprod, value is the name used for that function.
-    private final HashMap<Term, SExpr> usedBprodTerms = new LinkedHashMap();
+    private final Map<Term, SExpr> usedBprodTerms = new LinkedHashMap<>();
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
@@ -42,7 +44,7 @@ public class SumProdHandler implements SMTHandler {
         Operator op = term.op();
         if (op == bsumOp) {
             for (Term t : usedBsumTerms.keySet()) {
-                if (t.equalsModRenaming(term)) {
+                if (t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
                     return usedBsumTerms.get(t);
                 }
             }
@@ -56,7 +58,7 @@ public class SumProdHandler implements SMTHandler {
             return ret;
         } else if (op == bprodOp) {
             for (Term t : usedBprodTerms.keySet()) {
-                if (t.equalsModRenaming(term)) {
+                if (t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
                     return usedBprodTerms.get(t);
                 }
             }

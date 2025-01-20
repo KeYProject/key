@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.LinkedHashMap;
@@ -5,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;
@@ -13,18 +17,13 @@ import recoder.convenience.TreeWalker;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
 import recoder.java.ProgramElement;
-import recoder.java.declaration.EnumConstantDeclaration;
-import recoder.java.declaration.EnumConstantSpecification;
-import recoder.java.declaration.EnumDeclaration;
-import recoder.java.declaration.MemberDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.reference.FieldReference;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.java.statement.Case;
 import recoder.kit.ProblemReport;
 import recoder.kit.TypeKit;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  *
@@ -54,12 +53,12 @@ public class EnumClassBuilder extends RecoderModelTransformer {
     /**
      * a mapping of enums to the newly created class declarations.
      */
-    Map<EnumDeclaration, EnumClassDeclaration> substitutes = new LinkedHashMap<>();
+    final Map<EnumDeclaration, EnumClassDeclaration> substitutes = new LinkedHashMap<>();
 
     /**
      * a mapping of constant references in switch-statements and their substitutes.
      */
-    Map<FieldReference, UncollatedReferenceQualifier> caseSubstitutes = new LinkedHashMap<>();
+    final Map<FieldReference, UncollatedReferenceQualifier> caseSubstitutes = new LinkedHashMap<>();
 
     /**
      * find all enum declarations and make their substitutes. find all case usages of enum constants
@@ -76,8 +75,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
             TreeWalker tw = new TreeWalker(unit);
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
-                if (pe instanceof EnumDeclaration) {
-                    EnumDeclaration ed = (EnumDeclaration) pe;
+                if (pe instanceof EnumDeclaration ed) {
                     addCases(ed);
                     EnumClassDeclaration ecd = new EnumClassDeclaration(ed);
                     substitutes.put(ed, ecd);

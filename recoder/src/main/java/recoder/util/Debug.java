@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 import java.io.*;
@@ -31,10 +33,10 @@ public class Debug {
      */
     // protected static PrintWriter output = new PrintWriter(System.err);
     protected static PrintStream output = System.err;
-    static String ERROR_MESSAGE = "Error: ";
-    static String RESTRICTION_MESSAGE = "Restriction: ";
-    static String INFO_MESSAGE = "Info: ";
-    static String ASSERTION_MESSAGE = "Assertion failed: ";
+    static final String ERROR_MESSAGE = "Error: ";
+    static final String RESTRICTION_MESSAGE = "Restriction: ";
+    static final String INFO_MESSAGE = "Info: ";
+    static final String ASSERTION_MESSAGE = "Assertion failed: ";
     /**
      * Debugging print functions. Maintains an option table to steer debug printout.
      */
@@ -61,8 +63,8 @@ public class Debug {
         if (value == null) {
             return false;
         }
-        for (int i = 0; i < NEGATIVE_VALUES.length; i++) {
-            if (NEGATIVE_VALUES[i].equalsIgnoreCase(value)) {
+        for (String negativeValue : NEGATIVE_VALUES) {
+            if (negativeValue.equalsIgnoreCase(value)) {
                 return false;
             }
         }

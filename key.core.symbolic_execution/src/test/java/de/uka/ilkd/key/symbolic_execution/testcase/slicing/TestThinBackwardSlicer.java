@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase.slicing;
+
+import java.io.File;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.SourceElement;
@@ -19,17 +24,17 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.slicing.ThinBackwardSlicer;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 
 /**
@@ -46,74 +51,74 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestThinBackwardSlicer.class);
 
     /**
-     * Tests slicing on the example {@code blockContractAssignableLocationNotRequested}.
+     * Tests slicing on the example {@code blockContractModifiableLocationNotRequested}.
      *
      * @throws Exception Occurred Exception.
      */
     @Test
-    public void testBlockContractAssignableLocationNotRequested() throws Exception {
+    public void testBlockContractModifiableLocationNotRequested() throws Exception {
         doSlicingTest(
-            "/slicing/blockContractAssignableLocationNotRequested/BlockContractAssignableLocationNotRequested.proof",
+            "/slicing/blockContractModifiableLocationNotRequested/BlockContractModifiableLocationNotRequested.proof",
             new ReturnSelector(122), true, 109, 14, 12);
     }
 
     /**
-     * Tests slicing on the example {@code blockContractAssignableRequestedLocation}.
+     * Tests slicing on the example {@code blockContractModifiableRequestedLocation}.
      *
      * @throws Exception Occurred Exception.
      */
     @Test
-    public void testBlockContractAssignableRequestedLocation() throws Exception {
+    public void testBlockContractModifiableRequestedLocation() throws Exception {
         doSlicingTest(
-            "/slicing/blockContractAssignableRequestedLocation/BlockContractAssignableRequestedLocation.proof",
+            "/slicing/blockContractModifiableRequestedLocation/BlockContractModifiableRequestedLocation.proof",
             new ReturnSelector(111), true, 23);
     }
 
     /**
-     * Tests slicing on the example {@code blockContractAssignableEverything}.
+     * Tests slicing on the example {@code blockContractModifiableEverything}.
      *
      * @throws Exception Occurred Exception.
      */
     @Test
-    public void testBlockContractAssignableEverything() throws Exception {
+    public void testBlockContractModifiableEverything() throws Exception {
         doSlicingTest(
-            "/slicing/blockContractAssignableEverything/BlockContractAssignableEverything.proof",
+            "/slicing/blockContractModifiableEverything/BlockContractModifiableEverything.proof",
             new ReturnSelector(97), true, 23);
     }
 
     /**
-     * Tests slicing on the example {@code methodContractAssignableLocationNotRequested}.
+     * Tests slicing on the example {@code methodContractModifiableLocationNotRequested}.
      *
      * @throws Exception Occurred Exception.
      */
     @Test
-    public void testMethodContractAssignableLocationNotRequested() throws Exception {
+    public void testMethodContractModifiableLocationNotRequested() throws Exception {
         doSlicingTest(
-            "/slicing/methodContractAssignableLocationNotRequested/MethodContractAssignableLocationNotRequested.proof",
+            "/slicing/methodContractModifiableLocationNotRequested/MethodContractModifiableLocationNotRequested.proof",
             new ReturnSelector(29), true, 14, 12);
     }
 
     /**
-     * Tests slicing on the example {@code methodContractAssignableRequestedLocation}.
+     * Tests slicing on the example {@code methodContractModifiableRequestedLocation}.
      *
      * @throws Exception Occurred Exception.
      */
     @Test
-    public void testMethodContractAssignableRequestedLocation() throws Exception {
+    public void testMethodContractModifiableRequestedLocation() throws Exception {
         doSlicingTest(
-            "/slicing/methodContractAssignableRequestedLocation/MethodContractAssignableRequestedLocation.proof",
+            "/slicing/methodContractModifiableRequestedLocation/MethodContractModifiableRequestedLocation.proof",
             new ReturnSelector(29), true, 23);
     }
 
     /**
-     * Tests slicing on the example {@code methodContractAssignableEverything}.
+     * Tests slicing on the example {@code methodContractModifiableEverything}.
      *
      * @throws Exception Occurred Exception.
      */
     @Test
-    public void testMethodContractAssignableEverything() throws Exception {
+    public void testMethodContractModifiableEverything() throws Exception {
         doSlicingTest(
-            "/slicing/methodContractAssignableEverything/MethodContractAssignableExample.proof",
+            "/slicing/methodContractModifiableEverything/MethodContractModifiableExample.proof",
             new ReturnSelector(29), true, 23);
     }
 

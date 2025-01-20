@@ -1,18 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -20,14 +18,13 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+
+import org.key_project.logic.Named;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -63,7 +60,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
         super(initConfig,
             ContractFactory.generateContractName(contract.getPODisplayName(), contract.getKJT(),
                 contract.getTarget(), contract.getTarget().getContainerType(),
-                contract.getTarget().getStartPosition().getLine()));
+                contract.getTarget().getStartPosition().line()));
         this.contract = contract;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
@@ -98,10 +95,9 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof SymbolicExecutionPO)) {
+        if (!(po instanceof SymbolicExecutionPO cPO)) {
             return false;
         }
-        final SymbolicExecutionPO cPO = (SymbolicExecutionPO) po;
         return contract.equals(cPO.contract);
     }
 
@@ -156,8 +152,8 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
      * {@inheritDoc}
      */
     @Override
-    protected Modality getTerminationMarker() {
-        return getContract().getModality();
+    protected Modality.JavaModalityKind getTerminationMarker() {
+        return getContract().getModalityKind();
     }
 
 
@@ -174,11 +170,14 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
-        super.fillSaveProperties(properties);
-        properties.setProperty("Non-interference contract", contract.getName());
+    public Configuration createLoaderConfig() {
+        var c = super.createLoaderConfig();
+        c.set("Non-interference contract", contract.getName());
+        return c;
     }
 
     @Override
@@ -257,8 +256,8 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
     @Override
     @Deprecated
-    protected Term getPre(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
+    protected Term getPre(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
@@ -267,9 +266,9 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
     @Override
     @Deprecated
-    protected Term getPost(List<LocationVariable> modHeaps, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
-            ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
+    protected Term getPost(List<LocationVariable> modHeaps, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+            LocationVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
@@ -279,7 +278,8 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
     @Override
     @Deprecated
     protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
@@ -287,8 +287,8 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
     @Override
     @Deprecated
-    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Services services) {
+    protected Term generateMbyAtPreDef(LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }

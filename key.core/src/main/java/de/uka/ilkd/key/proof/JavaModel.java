@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.io.File;
@@ -9,6 +12,9 @@ import de.uka.ilkd.key.proof.init.Includes;
 
 public final class JavaModel {
 
+    /**
+     * Directory of Java source files. May be null if the proof doesn't refer to any Java code.
+     */
     private final String modelDir;
     private final String modelTag;
     private final String descr;
@@ -51,25 +57,25 @@ public final class JavaModel {
     private JavaModel(String modelDir, List<File> classPathEntries, File bootClassPath,
             Includes includes, File initialFile) {
         this.modelDir = (new File(modelDir)).getAbsolutePath();
-        this.modelTag = "KeY_" + Long.valueOf((new java.util.Date()).getTime());
+        this.modelTag = "KeY_" + (new Date()).getTime();
         this.descr = "model " + (new File(modelDir)).getName() + "@"
             + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (classPathEntries != null && !classPathEntries.isEmpty()) {
             for (File f : classPathEntries) {
-                sb.append("\"" + f.getAbsolutePath() + "\", ");
+                sb.append("\"").append(f.getAbsolutePath()).append("\", ");
             }
             sb.setLength(sb.length() - 2);
         }
         this.classPath = sb.toString();
         this.classPathEntries = classPathEntries;
         this.bootClassPath = bootClassPath == null ? null : bootClassPath.getAbsolutePath();
-        StringBuffer sb2 = new StringBuffer();
+        StringBuilder sb2 = new StringBuilder();
         if (includes != null) {
             List<File> includeList = includes.getFiles();
             if (!includeList.isEmpty()) {
                 for (File f : includeList) {
-                    sb2.append("\"" + f.getAbsolutePath() + "\", ");
+                    sb2.append("\"").append(f.getAbsolutePath()).append("\", ");
                 }
                 sb2.setLength(sb2.length() - 2);
             }

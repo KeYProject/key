@@ -1,9 +1,7 @@
-/*
- * Created on 23.11.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.ModelException;
@@ -49,8 +47,9 @@ public class TypeParameterDeclaration extends TypeDeclaration
      */
     protected TypeParameterDeclaration(TypeParameterDeclaration proto) {
         super(proto);
-        if (proto.bound != null)
+        if (proto.bound != null) {
             bound = proto.bound.deepClone();
+        }
         makeParentRoleValid();
     }
 
@@ -69,8 +68,9 @@ public class TypeParameterDeclaration extends TypeDeclaration
      * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceAt(int)
      */
     public TypeReference getTypeReferenceAt(int index) {
-        if (index == 0 && bound != null)
+        if (index == 0 && bound != null) {
             return bound.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
@@ -90,8 +90,9 @@ public class TypeParameterDeclaration extends TypeDeclaration
      */
     public ProgramElement getChildAt(int index) {
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (bound != null) {
@@ -108,11 +109,13 @@ public class TypeParameterDeclaration extends TypeDeclaration
     public int getChildPositionCode(ProgramElement child) {
         // 0 : name
         // 1(idx) : bound
-        if (child == name)
+        if (child == name) {
             return 0;
+        }
         int idx = bound.indexOf(child);
-        if (idx != -1)
+        if (idx != -1) {
             return (idx << 4) | 1;
+        }
         return -1;
     }
 
@@ -123,12 +126,14 @@ public class TypeParameterDeclaration extends TypeDeclaration
      * recoder.java.ProgramElement)
      */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
+        }
         if (p == name) {
             name = (Identifier) q;
-            if (name != null)
+            if (name != null) {
                 name.setParent(this);
+            }
             return true;
         }
         if (bound != null) {
@@ -169,15 +174,17 @@ public class TypeParameterDeclaration extends TypeDeclaration
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
         if (bound != null) {
-            for (TypeReference tr : bound)
+            for (TypeReference tr : bound) {
                 tr.setParent(this);
+            }
         }
     }
 
     @Override
     public void validate() throws ModelException {
-        if (members != null && members.size() != 0)
+        if (members != null && members.size() != 0) {
             throw new ModelException("No members allowed in TypeParameter");
+        }
     }
 
     public boolean isInterface() {
@@ -240,8 +247,9 @@ public class TypeParameterDeclaration extends TypeDeclaration
 
     @Override
     public SourceElement getLastElement() {
-        if (bound != null)
+        if (bound != null) {
             return bound.get(bound.size() - 1);
+        }
         return name;
     }
 

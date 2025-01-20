@@ -1,20 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.testgen.ReflectionClassCreator;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 public class OracleGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(OracleGenerator.class);
@@ -198,7 +206,7 @@ public class OracleGenerator {
 
     private void findConstants(Set<Term> constants, Term term) {
         LOGGER.debug("FindConstants: {} cls {} ", term, term.getClass().getName());
-        if (term.op() instanceof Function && term.arity() == 0) {
+        if (term.op() instanceof JFunction && term.arity() == 0) {
             constants.add(term);
         }
         if (term.op() instanceof ProgramVariable) {
@@ -229,23 +237,21 @@ public class OracleGenerator {
             OracleTerm left = generateOracle(term.sub(0), initialSelect);
             OracleTerm right = generateOracle(term.sub(1), initialSelect);
             String javaOp = ops.get(op);
+            return switch (javaOp) {
+            case EQUALS -> eq(left, right);
+            case AND -> and(left, right);
+            case OR -> or(left, right);
+            default ->
+                // Todo wiesler: What is this for? No field nor method of OracleBinTerm has any
+                // usages
+                new OracleBinTerm(javaOp, left, right);
+            };
 
-            switch (javaOp) {
-            case EQUALS:
-                return eq(left, right);
-            case AND:
-                return and(left, right);
-            case OR:
-                return or(left, right);
-            }
-
-            return new OracleBinTerm(javaOp, left, right);
         } // negation
         else if (op == Junctor.NOT) {
             OracleTerm sub = generateOracle(term.sub(0), initialSelect);
-            if (sub instanceof OracleUnaryTerm) {
-                OracleUnaryTerm neg = (OracleUnaryTerm) sub;
-                return neg.getSub();
+            if (sub instanceof OracleUnaryTerm neg) {
+                return neg.sub();
             }
             return new OracleUnaryTerm(sub, Op.Neg);
         }
@@ -263,8 +269,7 @@ public class OracleGenerator {
             return new OracleBinTerm(OR, notLeft, right);
         }
         // quantifiable variable
-        else if (op instanceof QuantifiableVariable) {
-            QuantifiableVariable qop = (QuantifiableVariable) op;
+        else if (op instanceof QuantifiableVariable qop) {
             return new OracleVariable(qop.name().toString(), qop.sort());
         }
         // integers
@@ -298,12 +303,11 @@ public class OracleGenerator {
             return new OracleMethodCall(method, args);
         }
         // functions
-        else if (op instanceof Function) {
+        else if (op instanceof JFunction) {
             return translateFunction(term, initialSelect);
         }
         // program variables
-        else if (op instanceof ProgramVariable) {
-            ProgramVariable var = (ProgramVariable) op;
+        else if (op instanceof ProgramVariable var) {
             return new OracleConstant(var.name().toString(), var.sort());
         } else {
             LOGGER.debug("Could not translate: {}", term);
@@ -336,8 +340,7 @@ public class OracleGenerator {
             OracleTerm o = generateOracle(term.sub(0), initialSelect);
             return new OracleConstant(o + ".length", term.sort());
         } else if (name.endsWith("::<inv>")) {
-            if (fun instanceof IObserverFunction) {
-                IObserverFunction obs = (IObserverFunction) fun;
+            if (fun instanceof IObserverFunction obs) {
 
                 Sort s = obs.getContainerType().getSort();
                 OracleMethod m;
@@ -374,8 +377,7 @@ public class OracleGenerator {
             }
         } else if (name.endsWith("::instance")) {
 
-            if (fun instanceof SortDependingFunction) {
-                SortDependingFunction sdf = (SortDependingFunction) fun;
+            if (fun instanceof SortDependingFunction sdf) {
                 Sort s = sdf.getSortDependingOn();
 
 
@@ -467,7 +469,7 @@ public class OracleGenerator {
         Term field = term.sub(2);
         OracleTerm fldTerm = generateOracle(field, true);
         String fieldName = fldTerm.toString();
-        fieldName = fieldName.substring(fieldName.lastIndexOf(":") + 1);
+        fieldName = fieldName.substring(fieldName.lastIndexOf(':') + 1);
         fieldName = fieldName.replace("$", "");
 
         String value;
@@ -585,8 +587,7 @@ public class OracleGenerator {
     private OracleMethod createIfThenElseMethod(Term term, boolean initialSelect) {
 
         String methodName = generateMethodName();
-        List<OracleVariable> args = new LinkedList<>();
-        args.addAll(methodArgs);
+        List<OracleVariable> args = new LinkedList<>(methodArgs);
         OracleTerm cond = generateOracle(term.sub(0), initialSelect);
         OracleTerm trueCase = generateOracle(term.sub(1), initialSelect);
         OracleTerm falseCase = generateOracle(term.sub(2), initialSelect);
@@ -606,7 +607,7 @@ public class OracleGenerator {
 
     private String getSetName(Sort s) {
 
-        if (s.equals(Sort.FORMULA)) {
+        if (s.equals(JavaDLTheory.FORMULA)) {
             return TestCaseGenerator.ALL_BOOLS;
         } else if (s.equals(services.getTypeConverter().getIntegerLDT().targetSort())) {
             return TestCaseGenerator.ALL_INTS;
@@ -679,7 +680,7 @@ public class OracleGenerator {
     private static OracleTerm neg(OracleTerm t) {
 
         if (t instanceof OracleUnaryTerm) {
-            return ((OracleUnaryTerm) t).getSub();
+            return ((OracleUnaryTerm) t).sub();
         } else {
             return new OracleUnaryTerm(t, Op.Neg);
         }

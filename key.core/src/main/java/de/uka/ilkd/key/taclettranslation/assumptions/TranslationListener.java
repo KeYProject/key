@@ -1,11 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * Listener for the classes which implement <code>TacletTranslator</code>. Use this interface to get
@@ -18,7 +22,7 @@ public interface TranslationListener {
      *
      * @param sort the sort that has been found.
      */
-    public void eventSort(Sort sort);
+    void eventSort(Sort sort);
 
     /**
      * Called when the translator finds a term that has a quantified variable. You can use this
@@ -26,7 +30,7 @@ public interface TranslationListener {
      *
      * @param var the quantified variable that has been found.
      */
-    public void eventQuantifiedVariable(QuantifiableVariable var);
+    void eventQuantifiedVariable(QuantifiableVariable var);
 
     /**
      * Called when the translator finds a schema variable of type formula. You can use this event to
@@ -34,7 +38,7 @@ public interface TranslationListener {
      *
      * @param formula
      */
-    public void eventFormulaSV(SchemaVariable formula);
+    void eventFormulaSV(SchemaVariable formula);
 
     /**
      * Called when the translator can not instantiate a generic sort with a particular sort in the
@@ -48,6 +52,6 @@ public interface TranslationListener {
      * @return return <code>true</code> if you want to terminate the translation of the taclet,
      *         otherwise <code>false<code>.
      */
-    public boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, Term term);
+    boolean eventInstantiationFailure(GenericSort dest, Sort sort, Taclet t, Term term);
 
 }

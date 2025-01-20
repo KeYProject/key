@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java;
 
 import recoder.java.reference.*;
@@ -66,9 +68,8 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Creates a static Import.
      *
-     * @param t
-     * @param multi
-     * @param isStatic
+     * @param t the psckage of the type to be imported
+     * @param id the name of the imported type
      */
     public Import(TypeReference t, Identifier id) {
         setReference(t);
@@ -120,16 +121,18 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (staticIdentifier != null)
+        if (staticIdentifier != null) {
             staticIdentifier.setParent(this);
+        }
         if (reference instanceof TypeReference) {
             ((TypeReference) reference).setParent(this);
         } else if (reference instanceof PackageReference) {
             ((PackageReference) reference).setParent(this);
         } else if (reference instanceof UncollatedReferenceQualifier) {
             ((UncollatedReferenceQualifier) reference).setParent(this);
-        } else
+        } else {
             throw new IllegalStateException("Unknown reference type encountered");
+        }
     }
 
     /**
@@ -205,10 +208,12 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (reference != null)
+        if (reference != null) {
             result++;
-        if (staticIdentifier != null)
+        }
+        if (staticIdentifier != null) {
             result++;
+        }
         return result;
     }
 
@@ -221,12 +226,14 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (reference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return reference;
+            }
             index--;
         }
-        if (index == 0 && staticIdentifier != null)
+        if (index == 0 && staticIdentifier != null) {
             return staticIdentifier;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -325,7 +332,7 @@ public class Import extends JavaNonTerminalProgramElement
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */

@@ -1,10 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -14,12 +14,15 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * <p>
  * This class is a specialization of {@link ProgramVariableCollector} which returns as result
  * ({@link #result()}) used {@link LocationVariable} which are undeclared, but used in the given
- * {@link ProgramElement.
+ * {@link ProgramElement}.
  * </p>
  * <p>
  * Declared {@link LocationVariable}s are:
@@ -36,8 +39,8 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     /**
      * Contains the found declared {@link IProgramVariable}s.
      */
-    private LinkedHashSet<IProgramVariable> declaredVariables =
-        new LinkedHashSet<IProgramVariable>();
+    private final LinkedHashSet<IProgramVariable> declaredVariables =
+        new LinkedHashSet<>();
 
     /**
      * Contains the super result.
@@ -132,19 +135,13 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     public LinkedHashSet<LocationVariable> result() {
         if (undeclaredVariables == null) {
             // Create result Set
-            undeclaredVariables = new LinkedHashSet<LocationVariable>();
+            undeclaredVariables = new LinkedHashSet<>();
             // Add all found variables
             undeclaredVariables.addAll(getAllVariables());
             // Remove all declared variables
             undeclaredVariables.removeAll(getDeclaredVariables());
             // Remove all fields (members)
-            Iterator<LocationVariable> iter = undeclaredVariables.iterator();
-            while (iter.hasNext()) {
-                LocationVariable next = iter.next();
-                if (next.isMember()) {
-                    iter.remove();
-                }
-            }
+            undeclaredVariables.removeIf(ProgramVariable::isMember);
         }
         return undeclaredVariables;
     }

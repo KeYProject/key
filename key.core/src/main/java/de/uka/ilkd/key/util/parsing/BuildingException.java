@@ -1,14 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.MiscTools;
-import org.antlr.v4.runtime.IntStream;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
-import java.net.URL;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -37,10 +41,11 @@ public class BuildingException extends RuntimeException implements HasLocation {
 
     private static String getPosition(Token t) {
         if (t != null) {
-            return t.getTokenSource().getSourceName() + ":" + t.getLine() + ":"
-                + t.getCharPositionInLine();
-        } else
+            var p = Position.fromToken(t);
+            return t.getTokenSource().getSourceName() + ":" + p.line() + ":" + p.column();
+        } else {
             return "";
+        }
     }
 
     public BuildingException(ParserRuleContext ctx, Throwable ex) {
@@ -52,21 +57,11 @@ public class BuildingException extends RuntimeException implements HasLocation {
         return getMessage() + " (" + getPosition(offendingSymbol) + ")";
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() throws MalformedURLException {
         if (offendingSymbol != null) {
-            var source = offendingSymbol.getTokenSource().getSourceName();
-            URL url = null;
-            if (!IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
-                url = MiscTools.parseURL(source);
-            }
-            return new Location(url, offendingSymbol.getLine(),
-                /*
-                 * Location is assumed to be 1-based in line and column, while ANTLR generates
-                 * 1-based line and 0-based column numbers!
-                 */
-                offendingSymbol.getCharPositionInLine() + 1);
+            URI uri = MiscTools.getURIFromTokenSource(offendingSymbol.getTokenSource());
+            return new Location(uri, Position.fromToken(offendingSymbol));
         }
         return null;
     }

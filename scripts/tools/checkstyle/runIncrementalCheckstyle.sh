@@ -5,7 +5,7 @@ cd `dirname $0`
 HOME_DIR=`readlink -f ../../..`
 DIFF_FILE=$HOME_DIR/checkstyle-diff.txt
 
-MERGE_BASE=`git merge-base HEAD origin/master`
+MERGE_BASE=`git merge-base HEAD origin/main`
 OPTIONS=""
 
 javac -cp checkstyle-10.6.0-all.jar -d . -sourcepath $HOME_DIR \

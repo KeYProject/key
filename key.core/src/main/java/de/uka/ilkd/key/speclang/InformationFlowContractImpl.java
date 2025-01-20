@@ -1,11 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
 import de.uka.ilkd.key.java.Services;
@@ -16,12 +17,13 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 
@@ -40,8 +42,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     /** The original free precondition. */
     private final Term origFreePre;
     private final Term origMby;
-    private final Term origMod;
-    private final Modality modality;
+    private final Term origModifiable;
+    private final Modality.JavaModalityKind modality;
     private final Term origSelf;
     private final ImmutableList<Term> origParams;
     private final Term origResult;
@@ -52,29 +54,32 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final ImmutableList<InfFlowSpec> origInfFlowSpecs;
 
     /**
-     * If a method is strictly pure, it has no modifies clause which could anonymised.
+     * If a method is strictly pure, it has no modifiable clause which could anonymised.
      *
-     * @see #hasModifiesClause()
+     * @see #hasModifiableClause()
      */
-    final boolean hasRealModifiesClause;
+    final boolean hasRealModifiableClause;
 
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
-    protected InformationFlowContractImpl(String baseName, String name, KeYJavaType forClass,
-            IProgramMethod pm, KeYJavaType specifiedIn, Modality modality, Term pre, Term freePre,
-            Term mby, Term mod, boolean hasRealMod, Term self, ImmutableList<Term> params,
+    private InformationFlowContractImpl(
+            String baseName, String name, KeYJavaType forClass,
+            IProgramMethod pm, KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind,
+            Term pre, Term freePre,
+            Term mby, Term modifiable, boolean hasRealModifiable, Term self,
+            ImmutableList<Term> params,
             Term result, Term exc, Term heapAtPre, Term dep,
             ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved, int id) {
         assert baseName != null;
         assert forClass != null;
         assert pm != null;
-        assert modality != null;
+        assert modalityKind != null;
         assert pre != null;
         assert freePre != null;
-        assert mod != null;
+        assert modifiable != null;
         assert (self == null) == pm.isStatic();
         assert params != null;
         // assert params.size() == pm.getParameterDeclarationCount();
@@ -100,15 +105,15 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         this.origPre = pre;
         this.origFreePre = freePre;
         this.origMby = mby;
-        this.origMod = mod;
+        this.origModifiable = modifiable;
         this.origSelf = self;
         this.origParams = params;
         this.origResult = result;
         this.origExc = exc;
         this.origAtPre = heapAtPre;
         this.id = id;
-        this.modality = modality;
-        this.hasRealModifiesClause = hasRealMod;
+        this.modality = modalityKind;
+        this.hasRealModifiableClause = hasRealModifiable;
         this.toBeSaved = toBeSaved;
         this.origDep = dep;
         this.origInfFlowSpecs = infFlowSpecs;
@@ -116,11 +121,12 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     public InformationFlowContractImpl(String baseName, KeYJavaType forClass, IProgramMethod pm,
-            KeYJavaType specifiedIn, Modality modality, Term pre, Term freePre, Term mby, Term mod,
-            boolean hasRealMod, Term self, ImmutableList<Term> params, Term result, Term exc,
+            KeYJavaType specifiedIn, Modality.JavaModalityKind modalityKind, Term pre, Term freePre,
+            Term mby, Term modifiable,
+            boolean hasRealModifiable, Term self, ImmutableList<Term> params, Term result, Term exc,
             Term heapAtPre, Term dep, ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved) {
-        this(baseName, null, forClass, pm, specifiedIn, modality, pre, freePre, mby, mod,
-            hasRealMod, self, params, result, exc, heapAtPre, dep, infFlowSpecs, toBeSaved,
+        this(baseName, null, forClass, pm, specifiedIn, modalityKind, pre, freePre, mby, modifiable,
+            hasRealModifiable, self, params, result, exc, heapAtPre, dep, infFlowSpecs, toBeSaved,
             INVALID_ID);
     }
 
@@ -132,8 +138,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract map(UnaryOperator<Term> op, Services services) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-            op.apply(origPre), op.apply(origFreePre), op.apply(origMby), op.apply(origMod),
-            hasRealModifiesClause, origSelf,
+            op.apply(origPre), op.apply(origFreePre), op.apply(origMby), op.apply(origModifiable),
+            hasRealModifiableClause, origSelf,
             origParams.stream().map(op).collect(ImmutableList.collector()), op.apply(origResult),
             op.apply(origExc), op.apply(origAtPre), op.apply(origDep),
             origInfFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
@@ -189,8 +195,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getMod() {
-        return origMod;
+    public Term getModifiable() {
+        return origModifiable;
     }
 
 
@@ -201,7 +207,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Modality getModality() {
+    public Modality.JavaModalityKind getModalityKind() {
         return modality;
     }
 
@@ -242,7 +248,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     public boolean isReadOnlyContract() {
-        return origMod.toString().equals("empty");
+        return origModifiable.toString().equals("empty");
     }
 
 
@@ -253,13 +259,14 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public boolean hasModifiesClause() {
-        return hasRealModifiesClause;
+    public boolean hasModifiableClause() {
+        return hasRealModifiableClause;
     }
 
 
     @Override
     public boolean hasInfFlowSpec() {
+        // TODO (KIT): This is always true (except null)
         return !(origInfFlowSpecs == InfFlowSpec.EMPTY_INF_FLOW_SPEC);
     }
 
@@ -272,8 +279,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     public String getHTMLBody(Services services) {
         return "<html>" + getHTMLSignature() + getHTMLFor(origPre, "pre", services)
-            + getHTMLFor(origFreePre, "free_pre", services) + getHTMLFor(origMod, "mod", services)
-            + (hasRealModifiesClause ? "" : "<b>, creates no new objects</b>")
+            + getHTMLFor(origFreePre, "free_pre", services)
+            + getHTMLFor(origModifiable, "modifiable", services)
+            + (hasRealModifiableClause ? "" : "<b>, creates no new objects</b>")
             + getHTMLFor(origMby, "measured-by", services) + "<br><b>termination</b> " + modality
             + getHTMLFor(origInfFlowSpecs, "determines", services) + "</html>";
     }
@@ -313,7 +321,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
 
-    protected String getHTMLFor(Term originalTerm, String htmlName, Services services) {
+    private String getHTMLFor(Term originalTerm, String htmlName, Services services) {
         if (originalTerm == null) {
             return "";
         } else {
@@ -324,47 +332,48 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     private String getHTMLFor(Iterable<Term> originalTerms, Services services) {
-        String result;
+        StringBuilder result;
         final Iterator<Term> it = originalTerms.iterator();
         if (!it.hasNext()) {
-            result = LogicPrinter.quickPrintTerm(services.getTermBuilder().empty(), services);
+            result = new StringBuilder(
+                LogicPrinter.quickPrintTerm(services.getTermBuilder().empty(), services));
         } else {
-            result = "";
+            result = new StringBuilder();
         }
         while (it.hasNext()) {
             Term term = it.next();
             final String quickPrint = LogicPrinter.quickPrintTerm(term, services);
-            result += LogicPrinter.escapeHTML(quickPrint, false);
+            result.append(LogicPrinter.escapeHTML(quickPrint, false));
             if (it.hasNext()) {
-                result += ", ";
+                result.append(", ");
             }
         }
-        return result;
+        return result.toString();
     }
 
 
     private String getHTMLFor(ImmutableList<InfFlowSpec> originalInfFlowSpecs, String htmlName,
             Services services) {
-        String infFlowSpecString = "";
+        StringBuilder infFlowSpecString = new StringBuilder();
         if (hasInfFlowSpec()) {
-            infFlowSpecString = "<br><b>" + htmlName + "</b> ";
+            infFlowSpecString = new StringBuilder("<br><b>" + htmlName + "</b> ");
             Iterator<InfFlowSpec> it = originalInfFlowSpecs.iterator();
             while (it.hasNext()) {
                 final InfFlowSpec infFlowSpec = it.next();
-                infFlowSpecString += getHTMLFor(infFlowSpec.postExpressions, services);
-                infFlowSpecString +=
-                    " <b>by</b> " + getHTMLFor(infFlowSpec.preExpressions, services);
+                infFlowSpecString.append(getHTMLFor(infFlowSpec.postExpressions, services));
+                infFlowSpecString.append(" <b>by</b> ")
+                        .append(getHTMLFor(infFlowSpec.preExpressions, services));
                 if (!infFlowSpec.newObjects.isEmpty()) {
-                    infFlowSpecString +=
-                        ", <b>new objects</b> " + getHTMLFor(infFlowSpec.newObjects, services);
+                    infFlowSpecString.append(", <b>new objects</b> ")
+                            .append(getHTMLFor(infFlowSpec.newObjects, services));
                 }
                 if (it.hasNext()) {
-                    infFlowSpecString += "<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                        + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "<b>and</b> ";
+                    infFlowSpecString.append("<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                        + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "<b>and</b> ");
                 }
             }
         }
-        return infFlowSpecString;
+        return infFlowSpecString.toString();
     }
 
 
@@ -372,13 +381,14 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public String toString() {
         // TODO: all fields should be printed!!
         return name + ":: kjt: " + forClass + "; pm: " + pm + "; modality: " + modality + "; pre: "
-            + origPre + "; origFreePre: " + origFreePre + "; mby: " + origMby + "; mod: " + origMod
+            + origPre + "; origFreePre: " + origFreePre + "; mby: " + origMby + "; modifiable: "
+            + origModifiable
             + "; selfVar: " + origSelf + "; paramVars: " + origParams + "; id:" + id;
     }
 
 
     @Override
-    public final ContractPO createProofObl(InitConfig initConfig) {
+    public ContractPO createProofObl(InitConfig initConfig) {
         return (ContractPO) createProofObl(initConfig, this);
     }
 
@@ -394,7 +404,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
     @Override
-    public final ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
+    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
             boolean addSymbolicExecutionLabel) {
         if (addSymbolicExecutionLabel) {
             throw new IllegalStateException("Symbolic Execution API is not supported.");
@@ -436,7 +446,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract setID(int newId) {
         return new InformationFlowContractImpl(baseName, null, forClass, pm, specifiedIn, modality,
-            origPre, origFreePre, origMby, origMod, hasRealModifiesClause, origSelf, origParams,
+            origPre, origFreePre, origMby, origModifiable, hasRealModifiableClause, origSelf,
+            origParams,
             origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, newId);
     }
 
@@ -445,7 +456,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public InformationFlowContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         return new InformationFlowContractImpl(baseName, null, newKJT, (IProgramMethod) newPM,
-            specifiedIn, modality, origPre, origFreePre, origMby, origMod, hasRealModifiesClause,
+            specifiedIn, modality, origPre, origFreePre, origMby, origModifiable,
+            hasRealModifiableClause,
             origSelf, origParams, origResult, origExc, origAtPre, origDep, origInfFlowSpecs,
             toBeSaved, id);
     }
@@ -454,23 +466,27 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract setName(String name) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-            origPre, origFreePre, origMby, origMod, hasRealModifiesClause, origSelf, origParams,
+            origPre, origFreePre, origMby, origModifiable, hasRealModifiableClause, origSelf,
+            origParams,
             origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, id);
     }
 
 
     @Override
-    public InformationFlowContract setModality(Modality modality) {
-        return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-            origPre, origFreePre, origMby, origMod, hasRealModifiesClause, origSelf, origParams,
+    public InformationFlowContract setModality(Modality.JavaModalityKind modalityKind) {
+        return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn,
+            modalityKind,
+            origPre, origFreePre, origMby, origModifiable, hasRealModifiableClause, origSelf,
+            origParams,
             origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, id);
     }
 
 
     @Override
-    public InformationFlowContract setModifies(Term modifies) {
+    public InformationFlowContract setModifiable(Term modifiable) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-            origPre, origFreePre, origMby, modifies, hasRealModifiesClause, origSelf, origParams,
+            origPre, origFreePre, origMby, modifiable, hasRealModifiableClause, origSelf,
+            origParams,
             origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, id);
     }
 
@@ -489,7 +505,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     public boolean equals(Contract c) {
-        if (c == null || !(c instanceof InformationFlowContract)) {
+        if (!(c instanceof InformationFlowContract ifc)) {
             return false;
         }
         assert name != null;
@@ -498,16 +514,15 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert modality != null;
         assert origPre != null;
         assert origFreePre != null;
-        assert origMod != null;
+        assert origModifiable != null;
         assert origParams != null;
         assert origDep != null;
         assert origInfFlowSpecs != null;
-        InformationFlowContract ifc = (InformationFlowContract) c;
         return name.equals(ifc.getName()) && forClass.equals(ifc.getKJT())
-                && pm.equals(ifc.getTarget()) && modality.equals(ifc.getModality())
+                && pm.equals(ifc.getTarget()) && modality.equals(ifc.getModalityKind())
                 && origPre.equals(ifc.getPre()) && origFreePre.equals(ifc.getFreePre())
                 && (origMby != null ? origMby.equals(ifc.getMby()) : ifc.getMby() == null)
-                && origMod.equals(ifc.getMod())
+                && origModifiable.equals(ifc.getModifiable())
                 && (origSelf != null ? origSelf.equals(ifc.getSelf()) : ifc.getSelf() == null)
                 && origParams.equals(ifc.getParams())
                 && (origResult != null ? origResult.equals(ifc.getResult())
@@ -556,18 +571,18 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     @Deprecated
-    public Term getPre(LocationVariable heap, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
+    public Term getPre(LocationVariable heap, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
     @Override
     @Deprecated
-    public Term getPre(List<LocationVariable> heapContext, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
+    public Term getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
 
@@ -594,7 +609,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     @Deprecated
-    public Term getMby(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+    public Term getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services) {
         throw new UnsupportedOperationException(
             "Not supported any more. " + "Please use the POSnippetFactory instead.");
@@ -618,9 +633,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getDep(LocationVariable heap, boolean atPre, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
+    public Term getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         return null;
     }
 
@@ -639,13 +654,13 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public Term getAssignable(LocationVariable heap) {
+    public Term getModifiable(LocationVariable heap) {
         return null;
     }
 
 
     @Override
-    public Term getAccessible(ProgramVariable heap) {
+    public Term getAccessible(LocationVariable heap) {
         return null;
     }
 

@@ -1,27 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class is used to resolve arithmetic operations to {@link SLExpression}s. These are overladed
  * for different primitive types.
- *
+ * <p>
  * It delegates to the {@link JMLOperatorHandler}s registered in the class.
- *
+ * <p>
  * Numeric promotion plays into it, too.
  *
  * @author Alexander Weigl
@@ -94,19 +95,38 @@ public class OverloadedOperatorHandler {
     }
 
     private final List<JMLOperatorHandler> handlers = new ArrayList<>();
+    private final IntegerHandler integerHandler;
 
-    public OverloadedOperatorHandler(Services services, SLExceptionFactory exc) {
+    public OverloadedOperatorHandler(Services services, SpecMathMode specMathMode) {
+        this.integerHandler = new IntegerHandler(services, specMathMode);
+
         handlers.add(new BinaryBooleanHandler(services));
-        // handlers.add(new SequenceHandler(services));
-        // handlers.add(new LocSetHandler(services));
-        handlers.add(new IntegerHandler(services));
+        handlers.add(new SequenceHandler(services));
+        handlers.add(new LocSetHandler(services));
+        handlers.add(this.integerHandler);
         handlers.add(new FloatHandler(services));
         handlers.add(new DoubleHandler(services));
         // handlers.add(new RealHandler(services));
     }
 
-    @Nullable
-    public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+    /**
+     * Sets the spec math mode and returns the previous mode
+     *
+     * @param specMathMode new spec math mode
+     * @return old spec math mode
+     */
+    public SpecMathMode replaceSpecMathMode(SpecMathMode specMathMode) {
+        return integerHandler.replaceSpecMathMode(specMathMode);
+    }
+
+    /**
+     * @return the spec math mode
+     */
+    public SpecMathMode getSpecMathMode() {
+        return integerHandler.getSpecMathMode();
+    }
+
+    public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
             throws SLTranslationException {
         for (JMLOperatorHandler handler : handlers) {
             var term = handler.build(op, left, right);
@@ -127,10 +147,12 @@ public class OverloadedOperatorHandler {
             tb = services.getTermBuilder();
         }
 
-        @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
+            if (right == null) {
+                return null;
+            }
             if (left.getTerm().sort() == ldtSequence.targetSort()
                     && right.getTerm().sort() == ldtSequence.targetSort()) {
                 if (op == JMLOperator.ADD) {
@@ -150,30 +172,25 @@ public class OverloadedOperatorHandler {
             tb = services.getTermBuilder();
         }
 
-        @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
                 throws SLTranslationException {
+            if (right == null) {
+                return null;
+            }
             final var l = left.getTerm();
             final var r = right.getTerm();
             if (l.sort() == ldt.targetSort() && r.sort() == ldt.targetSort()) {
-                switch (op) {
-                case ADD:
-                case BITWISE_OR:
-                    return new SLExpression(tb.union(l, r));
-                case SUBTRACT:
-                    return new SLExpression(tb.setMinus(l, r));
-                case BITWISE_AND:
-                    return new SLExpression(tb.intersect(l, r));
-                case LT:
-                    return new SLExpression(tb.subset(l, r));
-                case LTE:
-                    return new SLExpression(tb.and(tb.subset(l, r), tb.equals(l, r)));
-                case GT:
-                    return new SLExpression(tb.subset(r, l));
-                case GTE:
-                    return new SLExpression(tb.and(tb.subset(r, l), tb.equals(l, r)));
-                }
+                return switch (op) {
+                case ADD, BITWISE_OR -> new SLExpression(tb.union(l, r));
+                case SUBTRACT -> new SLExpression(tb.setMinus(l, r));
+                case MULT, BITWISE_AND -> new SLExpression(tb.intersect(l, r));
+                case LT -> new SLExpression(tb.and(tb.subset(l, r), tb.not(tb.equals(l, r))));
+                case LTE -> new SLExpression(tb.subset(l, r));
+                case GT -> new SLExpression(tb.and(tb.subset(r, l), tb.not(tb.equals(l, r))));
+                case GTE -> new SLExpression(tb.subset(r, l));
+                default -> null;
+                };
             }
             return null;
         }
@@ -188,23 +205,21 @@ public class OverloadedOperatorHandler {
             tb = services.getTermBuilder();
         }
 
-        @Nullable
         @Override
-        public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
-                throws SLTranslationException {
-            if ((left.getTerm().sort() == sortBoolean || left.getTerm().sort() == Sort.FORMULA)
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right) {
+            if ((left.getTerm().sort() == sortBoolean
+                    || left.getTerm().sort() == JavaDLTheory.FORMULA)
                     && (right.getTerm().sort() == sortBoolean
-                            || right.getTerm().sort() == Sort.FORMULA)) {
+                            || right.getTerm().sort() == JavaDLTheory.FORMULA)) {
                 final var t1 = tb.convertToFormula(left.getTerm());
                 final var t2 = tb.convertToFormula(right.getTerm());
-                switch (op) {
-                case BITWISE_AND:
-                    return new SLExpression(tb.and(t1, t2));
-                case BITWISE_OR:
-                    return new SLExpression(tb.or(t1, t2));
-                case BITWISE_XOR:
-                    return new SLExpression(tb.or(tb.and(t1, tb.not(t2)), tb.and(tb.not(t1), t2)));
-                }
+                return switch (op) {
+                case BITWISE_AND -> new SLExpression(tb.and(t1, t2));
+                case BITWISE_OR -> new SLExpression(tb.or(t1, t2));
+                case BITWISE_XOR -> new SLExpression(
+                    tb.or(tb.and(t1, tb.not(t2)), tb.and(tb.not(t1), t2)));
+                default -> null;
+                };
             }
             return null;
         }

@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase;
+
+import java.io.File;
+import java.util.Iterator;
+import java.util.Map;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -11,13 +18,11 @@ import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+
 import org.junit.jupiter.api.*;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Iterator;
-
 import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * Tests for {@link SymbolicExecutionTreeBuilder},
@@ -181,37 +186,37 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     }
 
     /**
-     * Tests example: /set/blockContractAssignableEverything
+     * Tests example: /set/blockContractModifiableEverything
      */
     @Test
-    public void testBlockContractAssignableEverything() throws Exception {
+    public void testBlockContractModifiableEverything() throws Exception {
         doSETTestAndDispose(testCaseDirectory,
-            "/set/blockContractAssignableEverything/test/BlockContractAssignableEverything.proof",
-            "/set/blockContractAssignableEverything/oracle/BlockContractAssignableEverything.xml",
+            "/set/blockContractModifiableEverything/test/BlockContractModifiableEverything.proof",
+            "/set/blockContractModifiableEverything/oracle/BlockContractModifiableEverything.xml",
             false, false, true, true, false, false, false, false, false, false, false, false,
             false);
     }
 
     /**
-     * Tests example: /set/blockContractAssignableLocationNotRequested
+     * Tests example: /set/blockContractModifiableLocationNotRequested
      */
     @Test
-    public void testBlockContractAssignableLocationNotRequested() throws Exception {
+    public void testBlockContractModifiableLocationNotRequested() throws Exception {
         doSETTestAndDispose(testCaseDirectory,
-            "/set/blockContractAssignableLocationNotRequested/test/BlockContractAssignableLocationNotRequested.proof",
-            "/set/blockContractAssignableLocationNotRequested/oracle/BlockContractAssignableLocationNotRequested.xml",
+            "/set/blockContractModifiableLocationNotRequested/test/BlockContractModifiableLocationNotRequested.proof",
+            "/set/blockContractModifiableLocationNotRequested/oracle/BlockContractModifiableLocationNotRequested.xml",
             false, false, true, true, false, false, false, false, false, false, false, false,
             false);
     }
 
     /**
-     * Tests example: /set/blockContractAssignableRequestedLocation
+     * Tests example: /set/blockContractModifiableRequestedLocation
      */
     @Test
-    public void testBlockContractAssignableRequestedLocation() throws Exception {
+    public void testBlockContractModifiableRequestedLocation() throws Exception {
         doSETTestAndDispose(testCaseDirectory,
-            "/set/blockContractAssignableRequestedLocation/test/BlockContractAssignableRequestedLocation.proof",
-            "/set/blockContractAssignableRequestedLocation/oracle/BlockContractAssignableRequestedLocation.xml",
+            "/set/blockContractModifiableRequestedLocation/test/BlockContractModifiableRequestedLocation.proof",
+            "/set/blockContractModifiableRequestedLocation/oracle/BlockContractModifiableRequestedLocation.xml",
             false, false, true, true, false, false, false, false, false, false, false, false,
             false);
     }
@@ -535,7 +540,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     @Test
     public void testSymbolicExecutionCompletionsTest() throws Exception {
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
             String javaPathInBaseDir =
@@ -1874,14 +1879,14 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             assertNotSame(thenPosition, elsePosition);
             assertNotSame(PositionInfo.UNDEFINED, thenPosition);
             assertNotSame(PositionInfo.UNDEFINED, elsePosition);
-            assertEquals(6, thenPosition.getStartPosition().getLine());
-            assertEquals(21, thenPosition.getStartPosition().getColumn());
-            assertEquals(6, thenPosition.getEndPosition().getLine());
-            assertEquals(24, thenPosition.getEndPosition().getColumn());
-            assertEquals(9, elsePosition.getStartPosition().getLine());
-            assertEquals(17, elsePosition.getStartPosition().getColumn());
-            assertEquals(9, elsePosition.getEndPosition().getLine());
-            assertEquals(20, elsePosition.getEndPosition().getColumn());
+            assertEquals(6, thenPosition.getStartPosition().line());
+            assertEquals(21, thenPosition.getStartPosition().column());
+            assertEquals(6, thenPosition.getEndPosition().line());
+            assertEquals(24, thenPosition.getEndPosition().column());
+            assertEquals(9, elsePosition.getStartPosition().line());
+            assertEquals(17, elsePosition.getStartPosition().column());
+            assertEquals(9, elsePosition.getEndPosition().line());
+            assertEquals(20, elsePosition.getEndPosition().column());
         } finally {
             env.dispose();
         }

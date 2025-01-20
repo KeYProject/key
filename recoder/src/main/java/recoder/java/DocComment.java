@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java;
 
 /**
@@ -52,17 +54,6 @@ public class DocComment extends Comment {
 
     public DocComment deepClone() {
         return new DocComment(this);
-    }
-
-    /**
-     * Factory method that creates a tag info object that can analyze this comment.
-     *
-     * @return a tag info object describing the tags in this comment.
-     * @see recoder.java.TagInfo
-     */
-
-    public TagInfo createTagInfo() {
-        return new TagInfo(this);
     }
 
     public void accept(SourceVisitor v) {

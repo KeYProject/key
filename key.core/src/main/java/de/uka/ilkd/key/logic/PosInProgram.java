@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
@@ -133,8 +136,9 @@ public class PosInProgram {
      * same position
      */
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
+        }
 
         if (obj == null || this.getClass() != obj.getClass()) {
             return false;

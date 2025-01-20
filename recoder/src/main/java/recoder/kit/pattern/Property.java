@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.pattern;
 
 import recoder.ModelElement;
@@ -89,16 +91,21 @@ public class Property implements DesignPattern {
      */
     public int getParticipantCount() {
         int res = 0;
-        if (field != null)
+        if (field != null) {
             res += 1;
-        if (getter != null)
+        }
+        if (getter != null) {
             res += 1;
-        if (setter != null)
+        }
+        if (setter != null) {
             res += 1;
-        if (indexedGetter != null)
+        }
+        if (indexedGetter != null) {
             res += 1;
-        if (indexedSetter != null)
+        }
+        if (indexedSetter != null) {
             res += 1;
+        }
         return res;
     }
 
@@ -111,28 +118,33 @@ public class Property implements DesignPattern {
      */
     public ModelElement getParticipantAt(int index) {
         if (field != null) {
-            if (index == 0)
+            if (index == 0) {
                 return field;
+            }
             index -= 1;
         }
         if (getter != null) {
-            if (index == 0)
+            if (index == 0) {
                 return getter;
+            }
             index -= 1;
         }
         if (setter != null) {
-            if (index == 0)
+            if (index == 0) {
                 return setter;
+            }
             index -= 1;
         }
         if (indexedGetter != null) {
-            if (index == 0)
+            if (index == 0) {
                 return indexedGetter;
+            }
             index -= 1;
         }
         if (indexedSetter != null) {
-            if (index == 0)
+            if (index == 0) {
                 return indexedSetter;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

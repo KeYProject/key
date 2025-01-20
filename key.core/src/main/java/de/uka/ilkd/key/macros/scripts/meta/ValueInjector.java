@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts.meta;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
@@ -10,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
 /**
  * @author Alexander Weigl
@@ -48,7 +53,7 @@ public class ValueInjector {
      * @throws NoSpecifiedConverterException unknown type for the current converter map
      * @throws ConversionException an converter could not translate the given value in arguments
      */
-    public static <T> T injection(ProofScriptCommand<?> command, T obj,
+    public static <T> T injection(ProofScriptCommand<T> command, T obj,
             Map<String, Object> arguments) throws ArgumentRequiredException,
             InjectionReflectionException, NoSpecifiedConverterException, ConversionException {
         return getInstance().inject(command, obj, arguments);
@@ -106,16 +111,16 @@ public class ValueInjector {
      * @see Option
      * @see Flag
      */
-    public <T> T inject(ProofScriptCommand<?> command, T obj, Map<String, Object> arguments)
+    public <T> T inject(ProofScriptCommand<T> command, T obj, Map<String, Object> arguments)
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
-        List<ProofScriptArgument> meta =
+        List<ProofScriptArgument<T>> meta =
             ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
-        List<ProofScriptArgument> varArgs = new ArrayList<>(meta.size());
+        List<ProofScriptArgument<T>> varArgs = new ArrayList<>(meta.size());
 
         List<String> usedKeys = new ArrayList<>();
 
-        for (ProofScriptArgument<?> arg : meta) {
+        for (ProofScriptArgument<T> arg : meta) {
             if (arg.hasVariableArguments()) {
                 varArgs.add(arg);
             } else {
@@ -124,7 +129,7 @@ public class ValueInjector {
             }
         }
 
-        for (ProofScriptArgument<?> vararg : varArgs) {
+        for (ProofScriptArgument<T> vararg : varArgs) {
             final Map<String, Object> map = getStringMap(obj, vararg);
             final int prefixLength = vararg.getName().length();
             for (Map.Entry<String, Object> e : arguments.entrySet()) {
@@ -164,7 +169,7 @@ public class ValueInjector {
             if (meta.isRequired()) {
                 throw new ArgumentRequiredException(String.format(
                     "Argument %s:%s is required, but %s was given. " + "For comamnd class: '%s'",
-                    meta.getName(), meta.getField().getType(), val, meta.getCommand().getClass()),
+                    meta.getName(), meta.getField().getType(), null, meta.getCommand().getClass()),
                     meta);
             }
         } else {
@@ -196,7 +201,7 @@ public class ValueInjector {
             return converter.convert(val);
         } catch (Exception e) {
             throw new ConversionException(String.format("Could not convert value %s (%s) to type %s",
-                val, val.getClass(), meta.getField().getType()), e, meta);
+                val, val.getClass(), meta.getField().getType().getName()), e, meta);
         }
     }
 

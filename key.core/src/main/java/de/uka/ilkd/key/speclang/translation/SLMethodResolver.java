@@ -1,19 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.translation;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.HeapContext;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -46,11 +49,12 @@ public final class SLMethodResolver extends SLExpressionResolver {
         if (containingType == null) {
             return null;
         }
-        ImmutableList<SLExpression> ps = parameters.getParameters();
-        for (LocationVariable h : HeapContext.getModHeaps(services, false)) {
+        ImmutableList<SLExpression> ps = parameters.parameters();
+        for (LocationVariable h : HeapContext.getModifiableHeaps(services, false)) {
             while (ps.size() > 0
-                    && ps.head().getTerm().op().name().toString().startsWith(h.name().toString()))
+                    && ps.head().getTerm().op().name().toString().startsWith(h.name().toString())) {
                 ps = ps.tail();
+            }
         }
 
         ImmutableList<KeYJavaType> signature =
@@ -67,7 +71,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             if (et != null && pm == null) {
                 containingType = et.getKeYJavaType();
                 if (recTerm != null) {
-                    final Function fieldSymbol =
+                    final JFunction fieldSymbol =
                         services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(et, services);
                     recTerm = services.getTermBuilder().dot(et.sort(), recTerm, fieldSymbol);
                 }
@@ -80,15 +84,15 @@ public final class SLMethodResolver extends SLExpressionResolver {
             return null;
         }
 
-        List<LocationVariable> heaps = new ArrayList<LocationVariable>();
+        List<LocationVariable> heaps = new ArrayList<>();
         int hc = 0;
-        for (LocationVariable h : HeapContext.getModHeaps(services, false)) {
+        for (LocationVariable h : HeapContext.getModifiableHeaps(services, false)) {
             if (hc >= pm.getHeapCount(services)) {
                 break;
             }
             heaps.add(h);
         }
-        ImmutableList<SLExpression> params = parameters.getParameters();
+        ImmutableList<SLExpression> params = parameters.parameters();
         int i = 0;
         Term[] subs = new Term[params.size() - pm.getHeapCount(services)
                 + pm.getStateCount() * pm.getHeapCount(services) + (pm.isStatic() ? 0 : 1)];
@@ -113,7 +117,8 @@ public final class SLMethodResolver extends SLExpressionResolver {
         for (SLExpression slExpression : params) {
             // Remember: parameters.isLisOfTerm() is true!
             final Term term = slExpression.getTerm();
-            subs[i] = term.sort() == Sort.FORMULA ? services.getTermBuilder().convertToBoolean(term)
+            subs[i] = term.sort() == JavaDLTheory.FORMULA
+                    ? services.getTermBuilder().convertToBoolean(term)
                     : term;
             i++;
         }

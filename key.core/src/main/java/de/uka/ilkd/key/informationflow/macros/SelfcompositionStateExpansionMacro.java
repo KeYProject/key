@@ -1,12 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.macros;
 
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
@@ -21,6 +21,10 @@ import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The macro SelfcompositionStateExpansionMacro applies rules to extract the self-composed states
@@ -66,12 +70,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio,
             Goal goal) {
         String ruleName = ruleApp.rule().name().toString();
-        if ("andLeft".equals(ruleName)
-                && pio.sequentFormula().formula().op() instanceof UpdateApplication) {
-            return false;
-        } else {
-            return true;
-        }
+        return !"andLeft".equals(ruleName)
+                || !(pio.sequentFormula().formula().op() instanceof UpdateApplication);
     }
 
 
@@ -124,14 +124,15 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
                     && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
                 JavaCardDLStrategyFactory strategyFactory = new JavaCardDLStrategyFactory();
                 Strategy javaDlStrategy =
                     strategyFactory.create(goal.proof(), new StrategyProperties());
-                RuleAppCost costs = javaDlStrategy.computeCost(ruleApp, pio, goal);
+                RuleAppCost costs = javaDlStrategy.computeCost(ruleApp, pio, goal, mState);
                 if ("orLeft".equals(name)) {
                     costs = costs.add(NumberRuleAppCost.create(100));
                 }

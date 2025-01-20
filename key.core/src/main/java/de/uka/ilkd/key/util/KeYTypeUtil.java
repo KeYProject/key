@@ -1,10 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
@@ -15,6 +14,11 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.CollectionUtil;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides utility methods which makes it easier to analyze the type hierarchy of
@@ -57,7 +61,7 @@ public final class KeYTypeUtil {
      * @param type The type.
      * @return The parent package/type or {@code null} if it has no one.
      */
-    public static String getParentName(Services services, KeYJavaType type) {
+    public static @Nullable String getParentName(Services services, @Nullable KeYJavaType type) {
         return type != null ? getParentName(services, type.getFullName()) : null;
     }
 
@@ -68,7 +72,7 @@ public final class KeYTypeUtil {
      * @param fullName The name of the current package/type.
      * @return The parent package/type or {@code null} if it has no one.
      */
-    private static String getParentName(Services services, String fullName) {
+    private static @Nullable String getParentName(Services services, String fullName) {
         int lastSeparator = fullName.lastIndexOf(PACKAGE_SEPARATOR);
         if (lastSeparator >= 0) {
             String parentName = fullName.substring(0, lastSeparator);
@@ -104,7 +108,7 @@ public final class KeYTypeUtil {
      * @param fullName The full name of the requested {@link KeYJavaType}.
      * @return The found {@link KeYJavaType} or {@code null} if no type exist with the given name.
      */
-    public static KeYJavaType getType(Services services, String fullName) {
+    public static @Nullable KeYJavaType getType(Services services, String fullName) {
         try {
             return services.getJavaInfo().getKeYJavaType(fullName);
         } catch (Exception e) {
@@ -143,31 +147,28 @@ public final class KeYTypeUtil {
      * @param implicitConstructor The implicit constructor.
      * @return The found explicit constructor or {@code null} if not available.
      */
-    public static IProgramMethod findExplicitConstructor(Services services,
+    public static @Nullable IProgramMethod findExplicitConstructor(Services services,
             final IProgramMethod implicitConstructor) {
         if (services != null && implicitConstructor != null) {
             ImmutableList<IProgramMethod> pms =
                 services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
-            return CollectionUtil.search(pms, new IFilter<IProgramMethod>() {
-                @Override
-                public boolean select(IProgramMethod element) {
-                    if (implicitConstructor.getParameterDeclarationCount() == element
-                            .getParameterDeclarationCount()) {
-                        Iterator<ParameterDeclaration> implicitIter =
-                            implicitConstructor.getParameters().iterator();
-                        Iterator<ParameterDeclaration> elementIter =
-                            element.getParameters().iterator();
-                        boolean sameTypes = true;
-                        while (sameTypes && implicitIter.hasNext() && elementIter.hasNext()) {
-                            ParameterDeclaration implicitNext = implicitIter.next();
-                            ParameterDeclaration elementNext = elementIter.next();
-                            sameTypes = implicitNext.getTypeReference()
-                                    .equals(elementNext.getTypeReference());
-                        }
-                        return sameTypes;
-                    } else {
-                        return false;
+            return CollectionUtil.search(pms, element -> {
+                if (implicitConstructor.getParameterDeclarationCount() == element
+                        .getParameterDeclarationCount()) {
+                    Iterator<ParameterDeclaration> implicitIter =
+                        implicitConstructor.getParameters().iterator();
+                    Iterator<ParameterDeclaration> elementIter =
+                        element.getParameters().iterator();
+                    boolean sameTypes = true;
+                    while (sameTypes && implicitIter.hasNext() && elementIter.hasNext()) {
+                        ParameterDeclaration implicitNext = implicitIter.next();
+                        ParameterDeclaration elementNext = elementIter.next();
+                        sameTypes = implicitNext.getTypeReference()
+                                .equals(elementNext.getTypeReference());
                     }
+                    return sameTypes;
+                } else {
+                    return false;
                 }
             });
         } else {
@@ -208,9 +209,8 @@ public final class KeYTypeUtil {
     public static String resolveType(Type type) {
         if (type instanceof KeYJavaType) {
             return resolveType(((KeYJavaType) type).getJavaType());
-        } else if (type instanceof ArrayType) {
-            ArrayType arrayType = (ArrayType) type;
-            StringBuffer sb = new StringBuffer();
+        } else if (type instanceof ArrayType arrayType) {
+            StringBuilder sb = new StringBuilder();
             sb.append(resolveType(arrayType.getBaseType()));
             for (int i = 0; i < arrayType.getDimension(); i++) {
                 sb.append("[]");

@@ -1,15 +1,13 @@
-/*
- * Created on 23.11.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.abstraction;
+
+import java.util.List;
 
 import recoder.ModelException;
 import recoder.service.ProgramModelInfo;
-
-import java.util.List;
 
 /**
  * A parameterized type, meaning a generic type plus actual type arguments. All query calls are
@@ -27,10 +25,12 @@ public class ParameterizedType implements ClassType {
      */
     public ParameterizedType(ClassType genericType, List<? extends TypeArgument> typeArgs) {
         super();
-        if (genericType == null)
+        if (genericType == null) {
             throw new NullPointerException();
-        if (typeArgs == null)
+        }
+        if (typeArgs == null) {
             throw new NullPointerException();
+        }
         this.genericType = genericType;
         this.typeArgs = typeArgs;
     }

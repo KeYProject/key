@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.rulefilter;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Filter that selects taclets using the method <code>admissible</code> of the <code>Taclet</code>
@@ -21,7 +24,7 @@ public class IHTacletFilter extends TacletFilter {
     private final ImmutableList<RuleSet> heuristics;
 
 
-    private final HashMap<Taclet, Boolean> filterCache = new LinkedHashMap<Taclet, Boolean>(2000);
+    private final HashMap<Taclet, Boolean> filterCache = new LinkedHashMap<>(2000);
 
 
 

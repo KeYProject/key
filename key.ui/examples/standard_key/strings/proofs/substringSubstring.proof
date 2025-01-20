@@ -206,7 +206,7 @@
       (rule "allRight" (formula "1") (inst "sk=c_0") (userinteraction))
       (rule "impRight" (formula "1") (userinteraction))
       (rule "andLeft" (formula "1") (userinteraction))
-      (rule "inChar" (formula "1") (userinteraction))
+      (rule "expandInChar" (formula "1") (userinteraction))
       (rule "true_left" (formula "1") (userinteraction))
       (rule "allRight" (formula "2") (inst "sk=i_1") (userinteraction))
       (rule "allRight" (formula "2") (inst "sk=j_1") (userinteraction))

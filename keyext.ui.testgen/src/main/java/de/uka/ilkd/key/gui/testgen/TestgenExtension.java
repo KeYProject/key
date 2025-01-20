@@ -1,4 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.testgen;
+
+import java.awt.event.KeyEvent;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -7,14 +17,8 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeSettings;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.macros.TestGenMacro;
-import javax.annotation.Nonnull;
 
-import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl
@@ -35,7 +39,7 @@ public class TestgenExtension
     }
 
     @Override
-    public @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
+    public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         init(mainWindow);
         return Arrays.asList(actionCounterExample, actionTestGeneration);
     }
@@ -43,17 +47,12 @@ public class TestgenExtension
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
         init(window);
-        if (KeyStrokeManager.FKEY_MACRO_SCHEME) {
-            KeyStrokeSettings.defineDefault(TestGenMacro.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
-        } else {
-            KeyStrokeSettings.defineDefault(TestGenMacro.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyStrokeManager.MULTI_KEY_MASK));
-        }
+        KeyStrokeSettings.defineDefault(TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,
+            KeyStrokeManager.MULTI_KEY_MASK));
     }
 
     @Override
-    public @Nonnull JToolBar getToolbar(MainWindow mainWindow) {
+    public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar tb = new JToolBar("test generation");
         tb.add(actionCounterExample);
         tb.add(actionTestGeneration);

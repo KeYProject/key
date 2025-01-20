@@ -1,10 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
+
+import java.util.*;
 
 import de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
 import de.uka.ilkd.key.java.recoderext.expression.literal.RealLiteral;
 import de.uka.ilkd.key.util.Debug;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.*;
 import recoder.java.*;
@@ -18,13 +24,11 @@ import recoder.java.reference.VariableReference;
 import recoder.kit.TwoPassTransformation;
 import recoder.service.DefaultCrossReferenceSourceInfo;
 
-import java.util.*;
-
 /**
  * The Java DL requires some implicit fields, that are available in each Java class. The name of the
  * implicit fields is usually enclosed between two angle brackets. To access the fields in a uniform
  * way, they are added as usual fields to the classes, in particular this allows us to parse them in
- * more easier. For further information see also
+ * easier. For further information see also
  * <ul>
  * <li>{@link ImplicitFieldAdder}</li>
  * <li>{@link CreateObjectBuilder}</li>
@@ -35,11 +39,11 @@ import java.util.*;
  * transformation set has been outsourced to a transformation cache.
  */
 public abstract class RecoderModelTransformer extends TwoPassTransformation {
-    protected CrossReferenceServiceConfiguration services;
-    protected TransformerCache cache;
+    protected final CrossReferenceServiceConfiguration services;
+    protected final TransformerCache cache;
 
     /**
-     * creates a transormder for the recoder model
+     * creates a transformer for the recoder model
      *
      * @param services the CrossReferenceServiceConfiguration to access model information
      * @param cache a cache object that stores information which is needed by and common to many
@@ -63,45 +67,33 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
         if (type instanceof ClassType || type instanceof ArrayType) {
             return new NullLiteral();
         } else if (type instanceof PrimitiveType) {
-            switch (type.getName()) {
-            case "boolean":
-                return new BooleanLiteral(false);
-            case "byte":
-            case "short":
-            case "int":
-            case "\\bigint":
-                return new IntLiteral(0);
-            case "long":
-                return new LongLiteral(0);
-            case "\\real":
-                return new RealLiteral();
-            case "char":
-                return new CharLiteral((char) 0);
-            case "float":
-                return new FloatLiteral(0.0F);
-            case "double":
-                return new DoubleLiteral(0.0D);
-            case "\\locset":
-                return EmptySetLiteral.INSTANCE;
-            case "\\seq":
-                return EmptySeqLiteral.INSTANCE;
-            case "\\set":
-                return new DLEmbeddedExpression("emptySet", Collections.emptyList());
-            case "\\free":
-                return new DLEmbeddedExpression("atom", Collections.emptyList());
-            case "\\map":
-                return EmptyMapLiteral.INSTANCE;
-            default:
-                if (type.getName().startsWith("\\dl_")) {
-                    // The default value of a type is resolved later, then we know the Sort of the
-                    // type
-                    return new DLEmbeddedExpression(
-                        "\\dl_DEFAULT_VALUE_" + type.getName().substring(4),
-                        Collections.emptyList());
+            return switch (type.getName()) {
+                case "boolean" -> new BooleanLiteral(false);
+                case "byte", "short", "int", "\\bigint" -> new IntLiteral(0);
+                case "long" -> new LongLiteral(0);
+                case "\\real" -> new RealLiteral();
+                case "char" -> new CharLiteral((char) 0);
+                case "float" -> new FloatLiteral(0.0F);
+                case "double" -> new DoubleLiteral(0.0D);
+                case "\\locset" -> EmptySetLiteral.INSTANCE;
+                case "\\seq" -> EmptySeqLiteral.INSTANCE;
+                case "\\set" -> new DLEmbeddedExpression("emptySet", Collections.emptyList());
+                case "\\TYPE" -> new DLEmbeddedExpression("any::ssort", Collections.emptyList());
+                case "\\free" -> new DLEmbeddedExpression("atom", Collections.emptyList());
+                case "\\map" -> EmptyMapLiteral.INSTANCE;
+                default -> {
+                    if (type.getName().startsWith("\\dl_")) {
+                        // The default value of a type is resolved later, then we know the Sort of the
+                        // type
+                        yield  new DLEmbeddedExpression(
+                                "\\dl_DEFAULT_VALUE_" + type.getName().substring(4),
+                                Collections.emptyList());
+                    }
+                    Debug.fail("makeImplicitMembersExplicit: unknown primitive type" + type);
+                    yield null;
                 }
-            }
+            };
         }
-        Debug.fail("makeImplicitMembersExplicit: unknown primitive type" + type);
         return null;
     }
 
@@ -301,8 +293,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
         public void walk(SourceElement s) {
             s.accept(this);
-            if (s instanceof NonTerminalProgramElement) {
-                final NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+            if (s instanceof NonTerminalProgramElement pe) {
                 for (int i = 0, sz = pe.getChildCount(); i < sz; i++) {
                     walk(pe.getChildAt(i));
                 }
@@ -336,8 +327,8 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     }
 
     private static class TypeAndClassDeclarationCollector extends SourceVisitorExtended {
-        private Set<ClassDeclaration> result = new LinkedHashSet<>();
-        private Set<TypeDeclaration> types = new LinkedHashSet<>();
+        private final Set<ClassDeclaration> result = new LinkedHashSet<>();
+        private final Set<TypeDeclaration> types = new LinkedHashSet<>();
 
         public TypeAndClassDeclarationCollector() {
             super();
@@ -348,8 +339,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
             if (s instanceof TypeDeclaration) {
                 types.add((TypeDeclaration) s);
             }
-            if (s instanceof NonTerminalProgramElement) {
-                final NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+            if (s instanceof NonTerminalProgramElement pe) {
                 for (int i = 0, sz = pe.getChildCount(); i < sz; i++) {
                     walk(pe.getChildAt(i));
                 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.Services;
@@ -8,7 +11,7 @@ import de.uka.ilkd.key.logic.Term;
  * {@link ProofOblInput}.
  * <p>
  * Implementations are instantiated once via
- * {@link ProofInitServiceUtil#createOperationPOExtension(ProofOblInput)} and reused all the time.
+ * {@code ProofInitServiceUtil.createOperationPOExtension()} and reused all the time.
  * This means that {@link POExtension} are singletons and should not have a state.
  *
  * @author Martin Hentschel
@@ -20,7 +23,7 @@ public interface POExtension {
      * @param po The {@link ProofOblInput} to check.
      * @return {@code true} is supported, {@code false} is not supported.
      */
-    public boolean isPOSupported(ProofOblInput po);
+    boolean isPOSupported(ProofOblInput po);
 
     /**
      * Modifies the post condition.
@@ -31,5 +34,5 @@ public interface POExtension {
      * @return The modified post condition or the original post condition if no modifications were
      *         performed.
      */
-    public Term modifyPostTerm(InitConfig proofConfig, Services services, Term postTerm);
+    Term modifyPostTerm(InitConfig proofConfig, Services services, Term postTerm);
 }

@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.expression.operator;
 
 import recoder.java.Expression;
@@ -70,10 +72,12 @@ public class Instanceof extends TypeOperator {
 
     public int getChildCount() {
         int result = 0;
-        if (children != null)
+        if (children != null) {
             result += children.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
+        }
         return result;
     }
 
@@ -99,8 +103,9 @@ public class Instanceof extends TypeOperator {
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

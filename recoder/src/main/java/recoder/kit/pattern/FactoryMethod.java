@@ -1,7 +1,11 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.ModelElement;
 import recoder.ModelException;
 import recoder.ParserException;
@@ -19,6 +23,7 @@ import recoder.list.generic.ASTList;
  * Not done yet: Should use semantical entities instead of syntactical ~Declarations.
  */
 public class FactoryMethod implements DesignPattern {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FactoryMethod.class);
 
     private MethodDeclaration producer;
 
@@ -63,7 +68,7 @@ public class FactoryMethod implements DesignPattern {
             this.product = product.getFactory()
                     .parseConstructorDeclaration("public " + product.getName() + "(){}");
         } catch (ParserException pe) {
-            System.err.println(pe); // this should never happen
+            LOGGER.warn("Failed to parse method", pe);
         }
         createProducer();
     }
@@ -82,13 +87,13 @@ public class FactoryMethod implements DesignPattern {
         try {
             clone = factory.parseConstructorDeclaration(product.toSource());
         } catch (ParserException pe) {
-            System.err.println(pe); // this should never happen
+            LOGGER.warn("Failed to parse method", pe);
         }
         Identifier name = clone.getIdentifier();
         producer = factory.createMethodDeclaration(clone.getDeclarationSpecifiers(),
             factory.createTypeReference(name), factory.createIdentifier("create" + name.getText()),
             clone.getParameters(), clone.getThrown());
-        ASTList<Statement> statements = new ASTArrayList<Statement>(1);
+        ASTList<Statement> statements = new ASTArrayList<>(1);
         statements.add(factory.createReturn(MethodKit.createNew(clone)));
         producer.setBody(factory.createStatementBlock(statements));
     }
@@ -118,10 +123,12 @@ public class FactoryMethod implements DesignPattern {
      */
     public int getParticipantCount() {
         int res = 0;
-        if (producer != null)
+        if (producer != null) {
             res += 1;
-        if (product != null)
+        }
+        if (product != null) {
             res += 1;
+        }
         return res;
     }
 

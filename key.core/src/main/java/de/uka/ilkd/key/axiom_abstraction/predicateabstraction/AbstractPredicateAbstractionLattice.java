@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
@@ -5,12 +8,12 @@ import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
+import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * A super class for predicates abstraction lattices. Implements basic join functionality and a
@@ -94,11 +97,11 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
      *
      * @author Dominic Scheurer
      */
-    protected abstract class AbstractPredicateLatticeIterator
+    protected abstract static class AbstractPredicateLatticeIterator
             implements Iterator<AbstractDomainElement> {
 
         private final ArrayList<ArrayList<ImmutableFixedLengthBitSet>> bitSetsByNumZeroes =
-            new ArrayList<ArrayList<ImmutableFixedLengthBitSet>>();
+            new ArrayList<>();
 
         /**
          * Constructs a new {@link AbstractPredicateLatticeIterator}; initializes the bit sets for
@@ -114,7 +117,7 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
 
             // Initialize the list.
             for (int i = 0; i < numApplPreds + 1; i++) {
-                bitSetsByNumZeroes.add(new ArrayList<ImmutableFixedLengthBitSet>());
+                bitSetsByNumZeroes.add(new ArrayList<>());
             }
 
             // bitSet initially represents the number 0.

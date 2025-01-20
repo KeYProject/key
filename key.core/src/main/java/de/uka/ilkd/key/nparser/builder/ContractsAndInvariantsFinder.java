@@ -1,11 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -14,10 +20,8 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
-import javax.annotation.Nonnull;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This visitor finds all contracts and invariant clauses in {@link KeyAst}.
@@ -31,18 +35,18 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     private final List<ClassInvariant> invariants = new ArrayList<>();
 
 
-    private ParsableVariable selfVar;
+    private LocationVariable selfVar;
 
     public ContractsAndInvariantsFinder(Services services, NamespaceSet nss) {
         super(services, nss);
         declarationBuilder = new DeclarationBuilder(services, nss);
     }
 
-    public @Nonnull List<Contract> getContracts() {
+    public @NonNull List<Contract> getContracts() {
         return contracts;
     }
 
-    public @Nonnull List<ClassInvariant> getInvariants() {
+    public @NonNull List<ClassInvariant> getInvariants() {
         return invariants;
     }
 
@@ -66,11 +70,11 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         namespaces().setProgramVariables(new Namespace<>(oldProgVars));
         declarationBuilder.visitProg_var_decls(ctx.prog_var_decls());
         Term fma = accept(ctx.fma);
-        Term modifiesClause = accept(ctx.modifiesClause);
+        Term modifiableClause = accept(ctx.modifiableClause);
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {
             FunctionalOperationContract dlOperationContract =
-                dsf.createDLOperationContract(contractName, fma, modifiesClause);
+                dsf.createDLOperationContract(contractName, fma, modifiableClause);
             contracts.add(dlOperationContract);
         } catch (ProofInputException e) {
             semanticError(ctx, e.getMessage());
@@ -84,7 +88,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     @Override
     public Object visitInvariants(KeYParser.InvariantsContext ctx) {
         Namespace<QuantifiableVariable> orig = variables();
-        selfVar = (ParsableVariable) ctx.selfVar.accept(this);
+        selfVar = (LocationVariable) ctx.selfVar.accept(this);
         ctx.one_invariant().forEach(it -> it.accept(this));
         unbindVars(orig);
         return null;

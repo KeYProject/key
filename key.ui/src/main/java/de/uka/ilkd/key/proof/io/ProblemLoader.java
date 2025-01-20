@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
-
 import javax.swing.SwingWorker;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -12,13 +14,14 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 /**
  * This class extends the functionality of the {@link AbstractProblemLoader}. It allows to do the
- * loading process as {@link SwingWorker3} {@link Thread} and it opens the proof obligation browser
+ * loading process as {@link SwingWorker} {@link Thread} and it opens the proof obligation browser
  * it is not possible to instantiate a proof configured by the opened file.
  *
  * @author Martin Hentschel
@@ -57,18 +60,20 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
         }
 
         long runTime = System.currentTimeMillis() - currentTime;
+        if (message != null) {
+            final String errorMessage = "Failed to load "
+                + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+            mediator.notify(new ExceptionFailureEvent(errorMessage, message));
+            mediator.getUI().reportStatus(this, errorMessage);
+        }
         fireTaskFinished(runTime, message);
     }
 
     private Throwable doWork() {
         try {
-            load();
+            load(mediator::fireProofLoaded);
             return null;
         } catch (Exception exception) {
-            final String errorMessage = "Failed to load "
-                + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
-            mediator.notify(new ExceptionFailureEvent(errorMessage, exception));
-            mediator.getUI().reportStatus(this, errorMessage);
             return exception;
         }
     }
@@ -101,19 +106,20 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
     /**
      * Launch a loading process asynchronously (on a swingworker thread).
      *
-     * The start is announced by invoking {@link ProverTaskListener#taskStarted(String, int)} on the
+     * The start is announced by invoking {@link ProverTaskListener#taskStarted(TaskStartedInfo)} on
+     * the
      * registered listener.
      *
      * Termination is announced by invoking
      * {@link ProverTaskListener#taskFinished(TaskFinishedInfo)} on the registered listener.
      */
     public void runAsynchronously() {
-        final SwingWorker<Throwable, Void> worker = new SwingWorker<Throwable, Void>() {
+        final SwingWorker<Throwable, Void> worker = new SwingWorker<>() {
 
             private long runTime;
 
             @Override
-            protected Throwable doInBackground() throws Exception {
+            protected Throwable doInBackground() {
                 long currentTime = System.currentTimeMillis();
                 final Throwable message = doWork();
                 runTime = System.currentTimeMillis() - currentTime;
@@ -122,7 +128,6 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
             @Override
             protected void done() {
-                mediator.startInterface(true);
                 Throwable message = null;
                 try {
                     message = get();
@@ -130,7 +135,17 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
                     // catch exception if something has been thrown in the meantime
                     message = exception;
                 } finally {
+                    mediator.startInterface(true);
+                    if (message != null) {
+                        final String errorMessage = "Failed to load "
+                            + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+                        mediator.notify(new ExceptionFailureEvent(errorMessage, message));
+                        mediator.getUI().reportStatus(this, errorMessage);
+                    }
                     fireTaskFinished(runTime, message);
+                    if (mediator.getSelectedProof() != null) {
+                        mediator.getSelectionModel().defaultSelection();
+                    }
                 }
             }
         };

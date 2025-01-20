@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -9,6 +10,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 public class SetsSmallerThanFeature extends SmallerThanFeature {
@@ -32,9 +35,9 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
 
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        final Term leftTerm = left.toTerm(app, pos, goal);
-        final Term rightTerm = right.toTerm(app, pos, goal);
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        final Term leftTerm = left.toTerm(app, pos, goal, mState);
+        final Term rightTerm = right.toTerm(app, pos, goal, mState);
 
         return origLessThan(leftTerm, rightTerm, pos, goal);
     }

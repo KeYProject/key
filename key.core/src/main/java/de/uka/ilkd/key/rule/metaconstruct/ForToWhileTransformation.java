@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
-
-import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -15,6 +16,8 @@ import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+
+import org.key_project.util.ExtList;
 
 /**
  * This transformation is used to transform a for-loop into a while-loop.
@@ -46,8 +49,9 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
         if (replaceBreakWithNoLabel == 0) {
             // most outer for loop
 
-            if (changeList.getFirst() == CHANGED)
+            if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
+            }
 
             ILoopInit inits = null;
             IForUpdates updates = null;
@@ -80,7 +84,7 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
 
             final int updateSize = (updates == null ? 0 : updates.size());
 
-            Statement innerBlockStatements[] = new Statement[updateSize + 1];
+            Statement[] innerBlockStatements = new Statement[updateSize + 1];
             innerBlockStatements[0] = body;
             if (updates != null) {
                 for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
@@ -90,7 +94,7 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             }
 
             final int initSize = (inits == null ? 0 : inits.size());
-            Statement outerBlockStatements[] = new Statement[initSize + 1];
+            Statement[] outerBlockStatements = new Statement[initSize + 1];
 
             if (inits != null) {
                 for (int copyStatements = 0; copyStatements < initSize; copyStatements++) {

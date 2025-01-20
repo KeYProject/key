@@ -1,17 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
-
-import de.uka.ilkd.key.gui.TaskTree;
-import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
+
+import org.key_project.util.java.IOUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * @author bruns
  */
 public final class QuickSaveAction extends MainWindowAction {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuickSaveAction.class);
     private static final long serialVersionUID = -7084304175671744403L;
 
     /** The OS's tmp directory. */
@@ -52,17 +53,20 @@ public final class QuickSaveAction extends MainWindowAction {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final String filename = QUICK_SAVE_PATH;
             final Proof proof = mainWindow.getMediator().getSelectedProof();
-            try {
-                new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
-                final String status = "File quicksaved: " + filename;
-                mainWindow.setStatusLine(status);
-                LOGGER.debug(status);
-            } catch (IOException x) {
+
+            String status = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
+
+            if (status == null) {
+                // success case
+                status = "File quicksaved: " + filename;
+            } else {
                 mainWindow.popupWarning(
-                    "Quicksaving file " + filename + " failed:\n" + x.getMessage(),
+                    "Quicksaving file " + filename + " failed:\n" + status,
                     "Quicksave failed");
-                LOGGER.debug("Quicksaving file {} failed.", filename, x);
+                LOGGER.debug("Quicksaving file {} failed.", filename, status);
             }
+            mainWindow.setStatusLine(status);
+            LOGGER.debug(status);
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");
         }

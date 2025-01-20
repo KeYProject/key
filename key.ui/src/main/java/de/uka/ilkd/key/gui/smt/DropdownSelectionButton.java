@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt;
 
 
@@ -6,7 +9,6 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
-
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -174,7 +176,7 @@ public class DropdownSelectionButton {
      * @return the currently selected actions in the selection component
      */
     public Action[] getSelectedItems() {
-        return selectedItems.toArray(new Action[selectedItems.size()]);
+        return selectedItems.toArray(new Action[0]);
     }
 
     /**
@@ -510,7 +512,7 @@ public class DropdownSelectionButton {
          * True iff action and selection button of the DropdownSelectionButton should stay enabled
          * when calling {@link #setSelectedItem(Action)} with this EmptyAction as the parameter.
          */
-        private boolean leaveButtonsEnabled;
+        private final boolean leaveButtonsEnabled;
 
         /**
          * Create a new EmptyAction with text "empty".

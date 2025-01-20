@@ -1,23 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
+
+import java.util.*;
 
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.Visitor;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import org.key_project.util.collection.ImmutableArray;
+
+import org.key_project.logic.Visitor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.*;
 
 
 /**
@@ -134,10 +138,10 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final void register(Function f, Services services) {
-        Namespace<Function> functionNames = services.getNamespaces().functions();
+    final void register(JFunction f, Services services) {
+        Namespace<JFunction> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
-            assert f.sort() != Sort.UPDATE;
+            assert f.sort() != JavaDLTheory.UPDATE;
             functionNames.addSafely(f);
         }
     }
@@ -150,7 +154,7 @@ abstract class ReplaceAndRegisterMethod {
         }
         final OpReplacer op =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        term = TermLabel.removeIrrelevantLabels(term, services.getTermFactory());
+        term = TermLabelManager.removeIrrelevantLabels(term, services.getTermFactory());
         return op.replace(term);
     }
 
@@ -160,7 +164,7 @@ abstract class ReplaceAndRegisterMethod {
         return qvVisitor.getResult();
     }
 
-    private static final class QuantifiableVariableVisitor implements Visitor {
+    private static final class QuantifiableVariableVisitor implements Visitor<Term> {
         private final HashSet<QuantifiableVariable> vars = new LinkedHashSet<>();
 
         @Override
@@ -170,9 +174,9 @@ abstract class ReplaceAndRegisterMethod {
 
         @Override
         public void visit(Term visited) {
-            final ImmutableArray<QuantifiableVariable> boundVars = visited.boundVars();
-            for (QuantifiableVariable var : boundVars)
-                vars.add(var);
+            for (var boundVar : visited.boundVars()) {
+                vars.add(boundVar);
+            }
         }
 
         @Override

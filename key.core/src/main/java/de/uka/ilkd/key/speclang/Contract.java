@@ -1,28 +1,30 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * A contractual agreement about an ObserverFunction.
  */
 public interface Contract extends SpecificationElement {
 
-    public static final int INVALID_ID = Integer.MIN_VALUE;
+    int INVALID_ID = Integer.MIN_VALUE;
 
     /**
      *
@@ -39,23 +41,24 @@ public interface Contract extends SpecificationElement {
      * (inheritance!), all instances have the same id. The id is either non-negative or equal to
      * INVALID_ID.
      */
-    public int id();
+    int id();
 
     /**
      * Returns the contracted function symbol.
      */
-    public IObserverFunction getTarget();
+    IObserverFunction getTarget();
 
     /**
      * Tells whether the contract contains a measured_by clause.
      */
-    public boolean hasMby();
+    boolean hasMby();
 
     /**
-     * Returns the original ProgramVariables to replace them easier. The second list consists of the
+     * Returns the original LocationVariables to replace them easier. The second list consists of
+     * the
      * parameters.
      */
-    public OriginalVariables getOrigVars();
+    OriginalVariables getOrigVars();
 
     /**
      * Returns the precondition of the contract.
@@ -67,9 +70,9 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return precondition
      */
-    public Term getPre(LocationVariable heap, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services);
+    Term getPre(LocationVariable heap, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the precondition of the contract.
@@ -81,9 +84,9 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return precondition
      */
-    public Term getPre(List<LocationVariable> heapContext, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services);
+    Term getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the precondition of the contract.
@@ -96,7 +99,7 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the precondition
      */
-    public Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
+    Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services);
 
     /**
@@ -110,7 +113,7 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the precondition
      */
-    public Term getPre(List<LocationVariable> heapContext, Map<LocationVariable, Term> heapTerms,
+    Term getPre(List<LocationVariable> heapContext, Map<LocationVariable, Term> heapTerms,
             Term selfTerm, ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
             Services services);
 
@@ -125,9 +128,9 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the dependency set
      */
-    public Term getDep(LocationVariable heap, boolean atPre, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services);
+    Term getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the dependency set of the contract.
@@ -141,21 +144,21 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the dependency set
      */
-    public Term getDep(LocationVariable heap, boolean atPre, Term heapTerm, Term selfTerm,
+    Term getDep(LocationVariable heap, boolean atPre, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services);
 
-    public Term getRequires(LocationVariable heap);
+    Term getRequires(LocationVariable heap);
 
-    public Term getAssignable(LocationVariable heap);
+    Term getModifiable(LocationVariable heap);
 
-    public Term getAccessible(ProgramVariable heap);
+    Term getAccessible(LocationVariable heap);
 
-    public Term getGlobalDefs();
+    Term getGlobalDefs();
 
-    public Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
+    Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Services services);
 
-    public Term getMby();
+    Term getMby();
 
     /**
      * Returns the measured_by clause of the contract.
@@ -165,7 +168,7 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the measured-by term
      */
-    public Term getMby(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+    Term getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services);
 
     /**
@@ -178,7 +181,7 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the measured-by term
      */
-    public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
+    Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services);
 
     /**
@@ -187,7 +190,7 @@ public interface Contract extends SpecificationElement {
      * @param services services instance
      * @return the html representation
      */
-    public String getHTMLText(Services services);
+    String getHTMLText(Services services);
 
     /**
      * Returns the contract in pretty plain text format.
@@ -195,7 +198,7 @@ public interface Contract extends SpecificationElement {
      * @param services services instance
      * @return the plain text representation
      */
-    public String getPlainText(Services services);
+    String getPlainText(Services services);
 
     /**
      * Tells whether, on saving a proof where this contract is available, the contract should be
@@ -204,9 +207,9 @@ public interface Contract extends SpecificationElement {
      *
      * @return see above
      */
-    public boolean toBeSaved();
+    boolean toBeSaved();
 
-    public boolean transactionApplicableContract();
+    boolean transactionApplicableContract();
 
     /**
      * Returns a parseable String representation of the contract. Precondition: toBeSaved() must be
@@ -215,7 +218,7 @@ public interface Contract extends SpecificationElement {
      * @param services the services instance
      * @return the (parseable) String representation
      */
-    public String proofToString(Services services);
+    String proofToString(Services services);
 
     /**
      * Returns a proof obligation to the passed initConfig.
@@ -223,7 +226,7 @@ public interface Contract extends SpecificationElement {
      * @param initConfig the initial configuration
      * @return the proof obligation
      */
-    public ContractPO createProofObl(InitConfig initConfig);
+    ContractPO createProofObl(InitConfig initConfig);
 
     /**
      * Lookup the proof obligation belonging to the contract in the specification repository.
@@ -231,7 +234,7 @@ public interface Contract extends SpecificationElement {
      * @param services the services instance
      * @return the proof obligation according to the specification repository
      */
-    public ProofOblInput getProofObl(Services services);
+    ProofOblInput getProofObl(Services services);
 
     /**
      * Returns a proof obligation to the passed contract and initConfig.
@@ -240,7 +243,7 @@ public interface Contract extends SpecificationElement {
      * @param contract the contract
      * @return the proof obligation
      */
-    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract);
+    ProofOblInput createProofObl(InitConfig initConfig, Contract contract);
 
     /**
      * Returns a proof obligation to the passed contract and initConfig.
@@ -250,7 +253,7 @@ public interface Contract extends SpecificationElement {
      * @param supportSymbolicExecutionAPI boolean saying whether symbolic execution api is supported
      * @return the proof obligation
      */
-    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
+    ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
             boolean supportSymbolicExecutionAPI);
 
     /**
@@ -259,7 +262,7 @@ public interface Contract extends SpecificationElement {
      * @param newId the new id value
      * @return an identical contract with the new id
      */
-    public Contract setID(int newId);
+    Contract setID(int newId);
 
     /**
      * Returns a contract which is identical to this contract except that the KeYJavaType and
@@ -269,14 +272,14 @@ public interface Contract extends SpecificationElement {
      * @param newPM the new observer function
      * @return an identical contract with the new KJT and PM (see above)
      */
-    public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+    Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
     /**
      * Returns technical name for the contract type.
      *
      * @return the technical name
      */
-    public String getTypeName();
+    String getTypeName();
 
     /**
      * Checks if a self variable is originally provided.
@@ -284,10 +287,10 @@ public interface Contract extends SpecificationElement {
      * @return {@code true} self variable is originally provided, {@code false} no self variable
      *         available.
      */
-    public boolean hasSelfVar();
+    boolean hasSelfVar();
 
     @Override
-    public Contract map(UnaryOperator<Term> op, Services services);
+    Contract map(UnaryOperator<Term> op, Services services);
 
     /**
      * Class for storing the original variables without always distinguishing several different
@@ -297,13 +300,13 @@ public interface Contract extends SpecificationElement {
      *
      * @author Michael Kirsten
      */
-    final public class OriginalVariables {
+    final class OriginalVariables {
 
-        public final ProgramVariable self;
-        public final ProgramVariable result;
-        public final ProgramVariable exception;
-        public final Map<LocationVariable, ProgramVariable> atPres;
-        public final ImmutableList<ProgramVariable> params;
+        public final LocationVariable self;
+        public final LocationVariable result;
+        public final LocationVariable exception;
+        public final Map<LocationVariable, LocationVariable> atPres;
+        public final ImmutableList<LocationVariable> params;
 
         /**
          * Create new instance of original variables
@@ -315,18 +318,18 @@ public interface Contract extends SpecificationElement {
          * @param paramVars the original parameter variables
          */
         @SuppressWarnings("unchecked")
-        public OriginalVariables(ProgramVariable selfVar, ProgramVariable resVar,
-                ProgramVariable excVar,
-                Map<? extends LocationVariable, ? extends ProgramVariable> atPreVars,
-                ImmutableList<? extends ProgramVariable> paramVars) {
+        public OriginalVariables(LocationVariable selfVar, LocationVariable resVar,
+                LocationVariable excVar,
+                Map<LocationVariable, LocationVariable> atPreVars,
+                ImmutableList<LocationVariable> paramVars) {
             this.self = selfVar;
             this.result = resVar;
             this.exception = excVar;
-            this.atPres = (Map<LocationVariable, ProgramVariable>) atPreVars;
+            this.atPres = (Map<LocationVariable, LocationVariable>) atPreVars;
             if (paramVars == null) {
-                this.params = ImmutableSLList.<ProgramVariable>nil();
+                this.params = ImmutableSLList.nil();
             } else {
-                this.params = (ImmutableList<ProgramVariable>) paramVars;
+                this.params = (ImmutableList<LocationVariable>) paramVars;
             }
         }
 
@@ -336,7 +339,7 @@ public interface Contract extends SpecificationElement {
          * @param newParams
          * @return the changed original variables
          */
-        public OriginalVariables add(ImmutableList<ProgramVariable> newParams) {
+        public OriginalVariables add(ImmutableList<LocationVariable> newParams) {
             return new OriginalVariables(self, result, exception, atPres, newParams);
         }
     }

@@ -1,12 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
+
+import java.net.MalformedURLException;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-import recoder.parser.ParseException;
 
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
+import org.jspecify.annotations.Nullable;
+import recoder.parser.ParseException;
 
 /**
  * This exception extends recoder's {@link ParseException} by a filename.
@@ -34,19 +38,18 @@ public class ParseExceptionInFile extends ParseException implements HasLocation 
         return filename;
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() throws MalformedURLException {
         // This kind of exception has a filename but no line/col information
         // Retrieve the latter from the cause. location remains null if
         // no line/col is available in cause.
-        Location location = null;
         if (getCause() != null) {
-            location = ExceptionTools.getLocation(getCause());
-            if (location != null) {
-                location = new Location(getFilename(), location.getLine(), location.getColumn());
+            var location = ExceptionTools.getLocation(getCause());
+            if (location == null) {
+                return null;
             }
+            return Location.fromFileName(getFilename(), location.getPosition());
         }
-        return location;
+        return null;
     }
 }

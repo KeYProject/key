@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicObject;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * <p>
@@ -21,26 +25,26 @@ public interface ISymbolicObject extends ISymbolicAssociationValueContainer {
      *
      * @return The name of this object.
      */
-    public Term getName();
+    Term getName();
 
     /**
      * Returns the name of this object as human readable {@link String}.
      *
      * @return The name of this object as human readable {@link String}.
      */
-    public String getNameString();
+    String getNameString();
 
     /**
      * Returns the type of this object.
      *
      * @return The type of this object.
      */
-    public Sort getType();
+    Sort getType();
 
     /**
      * Returns the type of this object as human readable string.
      *
      * @return The type of this object as human readable string.
      */
-    public String getTypeString();
+    String getTypeString();
 }

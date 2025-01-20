@@ -1,13 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.EventObject;
-
-import javax.swing.JCheckBoxMenuItem;
+import java.beans.PropertyChangeListener;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 /**
@@ -28,12 +29,7 @@ public class ToggleSourceViewTooltipAction extends MainWindowAction {
     // private static final long serialVersionUID = -3352122484627890921L;
 
     /** Listens to changes to the view settings to call {@link #updateSelectedState()}. */
-    private final SettingsListener viewSettingsListener = new SettingsListener() {
-        @Override
-        public void settingsChanged(EventObject e) {
-            updateSelectedState();
-        }
-    };
+    private final PropertyChangeListener viewSettingsListener = e -> updateSelectedState();
 
     /**
      * Create a new action.
@@ -45,7 +41,7 @@ public class ToggleSourceViewTooltipAction extends MainWindowAction {
         setName(NAME);
         setTooltip(TOOL_TIP);
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                .addSettingsListener(viewSettingsListener);
+                .addPropertyChangeListener(viewSettingsListener);
         updateSelectedState();
     }
 

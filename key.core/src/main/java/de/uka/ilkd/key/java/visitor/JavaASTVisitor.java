@@ -1,7 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
-
-import de.uka.ilkd.key.logic.Term;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.*;
@@ -28,6 +28,8 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
+import org.key_project.util.collection.ImmutableSet;
+
 /**
  * Extends the JavaASTWalker to use the visitor mechanism. The methods inherited by the Visitor
  * interface are all implemented that they call the method
@@ -52,9 +54,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     protected void walk(ProgramElement node) {
-        if (node instanceof JmlAssert) {
-            performActionOnJmlAssertCondition(((JmlAssert) node).getCond());
-        }
         super.walk(node);
         if (node instanceof LoopStatement && services != null) {
             LoopSpecification li =
@@ -77,7 +76,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         } else if (node instanceof MergePointStatement && services != null) {
             ImmutableSet<MergeContract> mcs =
                 services.getSpecificationRepository().getMergeContracts((MergePointStatement) node);
-            mcs.forEach(mc -> performActionOnMergeContract(mc));
+            mcs.forEach(this::performActionOnMergeContract);
         }
     }
 
@@ -228,6 +227,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnSeqPut(SeqPut x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x) {
         doDefaultAction(x);
     }
@@ -315,6 +319,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnCopyAssignment(CopyAssignment x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnSetStatement(SetStatement x) {
         doDefaultAction(x);
     }
 
@@ -735,6 +744,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnSubtype(Subtype x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnSuperArrayDeclaration(SuperArrayDeclaration x) {
         doDefaultAction(x);
     }
@@ -957,10 +971,5 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     @Override
     public void performActionOnJmlAssert(JmlAssert x) {
         doDefaultAction(x);
-    }
-
-    @Override
-    public void performActionOnJmlAssertCondition(final Term cond) {
-        // empty
     }
 }

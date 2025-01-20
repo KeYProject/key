@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
-
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 
 public class AllCommand extends AbstractCommand<Map<String, Object>> {
 

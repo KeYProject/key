@@ -1,6 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -21,19 +23,23 @@ public class CopyToClipboardAction extends MainWindowAction {
     public CopyToClipboardAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Copy to clipboard");
-        setTooltip("Copy a selected sequent term into your default clipboard.\n"
-            + "This functionality may depend on your window manager or installed clipboard managers.\n"
-            + "The default clipboard is not the 'middle click clipboard' on X window systems.");
+        setTooltip(
+            """
+                    Copy a selected sequent term into your default clipboard.
+                    This functionality may depend on your window manager or installed clipboard managers.
+                    The default clipboard is not the 'middle click clipboard' on X window systems.""");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         CurrentGoalView goalView = mainWindow.getGoalView();
-        if (goalView == null)
+        if (goalView == null) {
             return;
+        }
         PosInSequent pis = goalView.getMousePosInSequent();
-        if (pis == null)
+        if (pis == null) {
             return;
+        }
         GuiUtilities.copyHighlightToClipboard(goalView, pis);
     }
 }

@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.java.ObjectUtil;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.collection.ImmutableArray;
 
 public class Access {
     /**
@@ -47,7 +51,7 @@ public class Access {
     public Access(Term... dimensionExpressions) {
         assert dimensionExpressions != null;
         this.programVariable = null;
-        this.dimensionExpressions = new ImmutableArray<Term>(dimensionExpressions);
+        this.dimensionExpressions = new ImmutableArray<>(dimensionExpressions);
     }
 
     /**
@@ -94,10 +98,9 @@ public class Access {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Access) {
-            Access other = (Access) obj;
-            return ObjectUtil.equals(programVariable, other.getProgramVariable())
-                    && ObjectUtil.equals(dimensionExpressions, other.getDimensionExpressions());
+        if (obj instanceof Access other) {
+            return Objects.equals(programVariable, other.getProgramVariable())
+                    && Objects.equals(dimensionExpressions, other.getDimensionExpressions());
         } else {
             return false;
         }

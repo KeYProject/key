@@ -1,4 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.EventObject;
+import java.util.List;
+import java.util.WeakHashMap;
+import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -13,38 +32,26 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.EventObject;
-import java.util.List;
-import java.util.WeakHashMap;
 
 public class GoalList extends JList<Goal> implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoalList.class);
 
     public static final Icon GOAL_LIST_ICON = IconFontSwing
-            .buildIcon(FontAwesomeSolid.FLAG_CHECKERED, MainWindowTabbedPane.TAB_ICON_SIZE);
-    /**
-     *
-     */
+            .buildIcon(FontAwesomeSolid.FLAG_CHECKERED, MainWindow.TAB_ICON_SIZE);
+
+    @Serial
     private static final long serialVersionUID = 1632264315383703798L;
     private final static ImageIcon keyIcon = IconFactory.keyHole(20, 20);
     private final static Icon disabledGoalIcon = IconFactory.keyHoleInteractive(20, 20);
@@ -61,22 +68,17 @@ public class GoalList extends JList<Goal> implements TabPanel {
     /**
      * interactive prover listener
      */
-    private GoalListInteractiveListener interactiveListener;
+    private final GoalListInteractiveListener interactiveListener;
     /**
      * KeYSelection-Listener
      */
-    private GoalListSelectionListener selectionListener;
+    private final GoalListSelectionListener selectionListener;
     /**
      * listens to gui events
      */
-    private GoalListGUIListener guiListener;
+    private final GoalListGUIListener guiListener;
 
     public GoalList(KeYMediator mediator) {
-        this();
-        setMediator(mediator);
-    }
-
-    public GoalList() {
         interactiveListener = new GoalListInteractiveListener();
         selectionListener = new GoalListSelectionListener();
         guiListener = new GoalListGUIListener();
@@ -106,10 +108,11 @@ public class GoalList extends JList<Goal> implements TabPanel {
         updateUI();
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
             KeYGuiExtension.KeyboardShortcuts.GOAL_LIST);
+        setMediator(mediator);
     }
 
     @Override
-    public String getTitle() {
+    public @NonNull String getTitle() {
         return "Goals";
     }
 
@@ -119,7 +122,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
     }
 
     @Override
-    public JComponent getComponent() {
+    public @NonNull JComponent getComponent() {
         return new JScrollPane(this);
     }
 
@@ -156,38 +159,29 @@ public class GoalList extends JList<Goal> implements TabPanel {
     }
 
     private void register() {
-        mediator().addKeYSelectionListener(selectionListener);
+        mediator.addKeYSelectionListener(selectionListener);
         // This method delegates the request only to the UserInterfaceControl
         // which implements the functionality.
         // No functionality is allowed in this method body!
-        mediator().getUI().getProofControl().addAutoModeListener(interactiveListener);
-        mediator().addGUIListener(guiListener);
+        mediator.getUI().getProofControl().addAutoModeListener(interactiveListener);
+        mediator.addGUIListener(guiListener);
     }
 
     private void unregister() {
-        if (mediator() != null) {
-            mediator().removeKeYSelectionListener(selectionListener);
+        if (mediator != null) {
+            mediator.removeKeYSelectionListener(selectionListener);
             // This method delegates the request only to the UserInterfaceControl
             // which implements the functionality.
             // No functionality is allowed in this method body!
-            mediator().getUI().getProofControl().removeAutoModeListener(interactiveListener);
-            mediator().removeGUIListener(guiListener);
+            mediator.getUI().getProofControl().removeAutoModeListener(interactiveListener);
+            mediator.removeGUIListener(guiListener);
         }
-    }
-
-    public void removeNotify() { // not used?
-        // unregister();
-        // super.removeNotify();
-    }
-
-    private KeYMediator mediator() {
-        return mediator;
     }
 
     private void goalChosen() {
         Goal goal = getSelectedValue();
         if (goal != null) {
-            mediator().goalChosen(goal);
+            mediator.goalChosen(goal);
         }
     }
 
@@ -203,11 +197,12 @@ public class GoalList extends JList<Goal> implements TabPanel {
         // is selected
         clearSelection();
 
-        if (mediator() != null) {
+        if (mediator != null) {
             try {
-                final Goal selGoal = mediator().getSelectedGoal();
-                if (selGoal != null)
+                final Goal selGoal = mediator.getSelectedGoal();
+                if (selGoal != null) {
                     setSelectedValue(selGoal, true);
+                }
             } catch (IllegalStateException e) {
                 // this exception occurs if no proof is loaded
                 // do nothing
@@ -221,10 +216,22 @@ public class GoalList extends JList<Goal> implements TabPanel {
     private String seqToString(Sequent seq) {
         String res = seqToString.get(seq);
         if (res == null) {
-            LogicPrinter sp = new LogicPrinter(new ProgramPrinter(null),
-                mediator().getNotationInfo(), mediator().getServices(), true);
+            LogicPrinter sp =
+                SequentViewLogicPrinter.purePrinter(mediator.getNotationInfo(),
+                    mediator.getServices(),
+                    new VisibleTermLabels() {
+                        @Override
+                        public boolean contains(TermLabel label) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean contains(Name name) {
+                            return false;
+                        }
+                    }); // do not print term labels
             sp.printSequent(seq);
-            res = sp.toString().replace('\n', ' ');
+            res = sp.result().replace('\n', ' ');
             res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
 
             seqToString.put(seq, res);
@@ -233,6 +240,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
     }
 
     private static class GoalListModel extends AbstractListModel<Goal> {
+        @Serial
         private static final long serialVersionUID = 3754243473284250930L;
         /**
          * listens to the proof
@@ -245,7 +253,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          *
          */
-        private List<Goal> goals;
+        private final List<Goal> goals;
         /**
          * is used to indicate if the model has to be updated
          */
@@ -272,14 +280,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         }
 
         /**
-         * returns true if the model respond to changes in the proof immediately
-         */
-        public boolean isAttentive() {
-            return attentive;
-        }
-
-        /**
-         * Sets whether this object should respond to changes in the the proof immediately.
+         * Sets whether this object should respond to changes in the proof immediately.
          */
         private void setAttentive(boolean b) {
             if ((b != attentive) && (proof != null) && !proof.isDisposed()) {
@@ -329,6 +330,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
         class GoalListProofTreeListener implements ProofTreeListener, java.io.Serializable {
 
+            @Serial
             private static final long serialVersionUID = 3090011700136463120L;
 
             private boolean pruningInProcess;
@@ -367,11 +369,12 @@ public class GoalList extends JList<Goal> implements TabPanel {
             }
 
             /**
-             * invoked if the list of goals changed (goals were added, removed etc.
+             * invoked if the list of goals changed (goals were added, removed etc.)
              */
             public void proofGoalRemoved(ProofTreeEvent e) {
-                if (pruningInProcess)
+                if (pruningInProcess) {
                     return;
+                }
                 remove(e.getGoal());
             }
 
@@ -379,8 +382,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
              * invoked if the current goal of the proof changed
              */
             public void proofGoalsAdded(ProofTreeEvent e) {
-                if (pruningInProcess)
+                if (pruningInProcess) {
                     return;
+                }
                 add(e.getGoals());
             }
 
@@ -388,25 +392,21 @@ public class GoalList extends JList<Goal> implements TabPanel {
              * invoked if the current goal of the proof changed
              */
             public void proofGoalsChanged(ProofTreeEvent e) {
-                if (pruningInProcess)
+                if (pruningInProcess) {
                     return;
+                }
                 clear();
                 add(e.getGoals());
             }
 
             public void proofStructureChanged(ProofTreeEvent e) {
-                if (pruningInProcess)
+                if (pruningInProcess) {
                     return;
+                }
                 clear();
                 add(e.getSource().openGoals());
             }
 
-            public void smtDataUpdate(ProofTreeEvent e) {
-            }
-
-            @Override
-            public void notesChanged(ProofTreeEvent e) {
-            }
         }
     }
 
@@ -416,10 +416,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
      * @author Richard Bubel
      */
     private final class DisableSingleGoal extends DisableGoal {
-
-        /**
-         *
-         */
+        @Serial
         private static final long serialVersionUID = -2035187175105625072L;
 
         DisableSingleGoal() {
@@ -446,7 +443,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         @Override
         public Iterable<Goal> getGoalList() {
             final Goal selectedObject = getSelectedValue();
-            final ArrayList<Goal> selectedGoals = new ArrayList<Goal>();
+            final ArrayList<Goal> selectedGoals = new ArrayList<>();
 
             if (selectedObject != null) {
                 selectedGoals.add(selectedObject);
@@ -468,10 +465,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
      * @author Richard Bubel
      */
     private final class DisableOtherGoals extends DisableGoal {
-
-        /**
-         *
-         */
+        @Serial
         private static final long serialVersionUID = 4077876260098617901L;
 
         DisableOtherGoals() {
@@ -501,9 +495,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
             final List<Goal> selectedGoals = new ArrayList<>();
 
             for (int i = 0, sz = getModel().getSize(); i < sz; i++) {
-                final Object o = getModel().getElementAt(i);
+                final Goal o = getModel().getElementAt(i);
                 if (o != null && o != selectedObject) {
-                    selectedGoals.add((Goal) o);
+                    selectedGoals.add(o);
                 }
             }
             return selectedGoals;
@@ -531,9 +525,8 @@ public class GoalList extends JList<Goal> implements TabPanel {
     }
 
     private class GoalListGUIListener implements GUIListener, java.io.Serializable {
-        /**
-         *
-         */
+
+        @Serial
         private static final long serialVersionUID = -1826501525753975124L;
 
         /**
@@ -579,20 +572,14 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          * invoked if automatic execution of heuristics has started
          */
-        public void autoModeStarted(ProofEvent e) {
-            if (goalListModel.isAttentive()) {
-                mediator().removeKeYSelectionListener(selectionListener);
-            }
+        public synchronized void autoModeStarted(ProofEvent e) {
             goalListModel.setAttentive(false);
         }
 
         /**
          * invoked if automatic execution of heuristics has stopped
          */
-        public void autoModeStopped(ProofEvent e) {
-            if (!goalListModel.isAttentive()) {
-                mediator().addKeYSelectionListener(selectionListener);
-            }
+        public synchronized void autoModeStopped(ProofEvent e) {
             goalListModel.setAttentive(true);
         }
 
@@ -603,10 +590,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
      * used to prevent the display of goals that appear closed for the present user constraint.
      */
     private class SelectingGoalListModel extends AbstractListModel<Goal> {
-
-        /**
-         *
-         */
+        @Serial
         private static final long serialVersionUID = 7395134147866131926L;
         private final GoalListModel delegate;
         /**
@@ -631,8 +615,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
         }
 
         public Goal getElementAt(int i) {
-            if (i < 0 || i >= getSize())
+            if (i < 0 || i >= getSize()) {
                 return null;
+            }
             return delegate.getElementAt(getDelegateIndex(i));
         }
 
@@ -656,9 +641,8 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
         private boolean isHiddenGoal(final Goal goal) {
             return proof != null
-                    && /*
-                        * that afterwards should always be false as goals exist only for open nodes
-                        */goal.node().isClosed();
+                    && // that afterwards should always be false as goals exist only for open nodes
+                    goal.node().isClosed();
         }
 
         private void setup() {
@@ -684,8 +668,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
             for (int i = delegateBegin; i < delegateEnd; ++i) {
                 final Goal goal = delegate.getElementAt(i);
-                if (!isHiddenGoal(goal))
+                if (!isHiddenGoal(goal)) {
                     entries.add(ind++, i);
+                }
             }
 
             return ind;
@@ -712,8 +697,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
             // an usable algorithm for this purpose in the Java library?)
 
             for (int res = 0; res != entries.size(); ++res) {
-                if (getDelegateIndex(res) >= delegateIndex)
+                if (getDelegateIndex(res) >= delegateIndex) {
                     return res;
+                }
             }
             return entries.size();
         }
@@ -723,8 +709,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
          * amount
          */
         private void shiftTail(int begin, int amount) {
-            for (; begin != entries.size(); ++begin)
+            for (; begin != entries.size(); ++begin) {
                 entries.set(begin, getDelegateIndex(begin) + amount);
+            }
         }
 
         private int delegateSizeChange() {
@@ -758,10 +745,10 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
                 updateDelegateSize();
 
-                final int changeBegin = begin;
                 final int changeEnd = end - 1;
-                if (changeEnd >= changeBegin)
-                    fireContentsChanged(this, changeBegin, changeEnd);
+                if (changeEnd >= begin) {
+                    fireContentsChanged(this, begin, changeEnd);
+                }
             }
 
             public void intervalAdded(ListDataEvent e) {
@@ -773,8 +760,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
                 final int addBegin = end - (entries.size() - oldSize);
                 final int addEnd = end - 1;
-                if (addEnd >= addBegin)
+                if (addEnd >= addBegin) {
                     fireIntervalAdded(this, addBegin, addEnd);
+                }
             }
 
             public void intervalRemoved(ListDataEvent e) {
@@ -784,20 +772,17 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
                 updateDelegateSize();
 
-                final int remBegin = begin;
                 final int remEnd = begin + (oldSize - entries.size()) - 1;
-                if (remEnd >= remBegin)
-                    fireIntervalRemoved(this, remBegin, remEnd);
+                if (remEnd >= begin) {
+                    fireIntervalRemoved(this, begin, remEnd);
+                }
             }
         }
 
     }
 
     private class IconCellRenderer extends DefaultListCellRenderer implements java.io.Serializable {
-
-        /**
-         *
-         */
+        @Serial
         private static final long serialVersionUID = -8178991338906184819L;
 
         public IconCellRenderer() {
@@ -826,7 +811,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 statusIcon = ((Goal) value).isLinked() ? linkedGoalIcon
                         : ((Goal) value).isAutomatic() ? keyIcon : disabledGoalIcon;
             } else {
-                valueStr = "" + value;
+                valueStr = String.valueOf(value);
                 statusIcon = keyIcon;
             }
 

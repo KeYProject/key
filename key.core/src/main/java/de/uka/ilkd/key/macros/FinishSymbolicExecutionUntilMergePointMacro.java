@@ -1,42 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.Branch;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.Case;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.CatchAllStatement;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.Finally;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.SynchronizedBlock;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -47,6 +21,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule application until a
@@ -63,8 +41,8 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  */
 public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMacro {
 
-    private HashSet<ProgramElement> blockElems = new HashSet<ProgramElement>();
-    private HashSet<JavaBlock> alreadySeen = new HashSet<JavaBlock>();
+    private HashSet<ProgramElement> blockElems = new HashSet<>();
+    private final HashSet<JavaBlock> alreadySeen = new HashSet<>();
 
     private UserInterfaceControl uic = null;
 
@@ -130,7 +108,6 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
                     // Do single proof step
                     new OneStepProofMacro().applyTo(uic, goal.node(), null,
                         DUMMY_PROVER_TASK_LISTENER); // TODO Change
-                } catch (InterruptedException e) {
                 } catch (Exception e) {
                 }
 
@@ -208,6 +185,10 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
                 return false;
             }
 
+            if (FinishSymbolicExecutionMacro.isForbiddenRule(app.rule())) {
+                return false;
+            }
+
             if (hasBreakPoint(goal.sequent().succedent())) {
                 return false;
             }
@@ -253,7 +234,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          */
         private HashSet<ProgramElement> findMergePoints(StatementBlock toSearch,
                 Services services) {
-            HashSet<ProgramElement> result = new HashSet<ProgramElement>();
+            HashSet<ProgramElement> result = new HashSet<>();
             ImmutableArray<? extends Statement> stmts = toSearch.getBody();
 
             if (stmts.size() > 0) {
@@ -326,7 +307,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             public void performActionOnBreak(Break x) {
                 containsBreak = true;
             }
-        };
+        }
 
         /**
          * Returns the bodies for various compound statements like if, try, case, etc. If there is
@@ -361,7 +342,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             } else if (elem instanceof SynchronizedBlock) {
                 return getBodies((SynchronizedBlock) elem);
             } else {
-                return new LinkedList<StatementBlock>();
+                return new LinkedList<>();
             }
         }
 
@@ -373,9 +354,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(If elem) {
-            LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
 
-            result.addAll(getBodies(elem.getThen()));
+            LinkedList<StatementBlock> result = new LinkedList<>(getBodies(elem.getThen()));
 
             if (elem.getElse() != null) {
                 result.addAll(getBodies(elem.getElse()));
@@ -391,7 +371,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Then elem) {
-            LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+            LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement thenBody = elem.getBody();
             if (thenBody instanceof StatementBlock) {
@@ -408,7 +388,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Else elem) {
-            LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+            LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement elseBody = elem.getBody();
             if (elseBody instanceof StatementBlock) {
@@ -426,12 +406,12 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Try elem) {
-            LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+            LinkedList<StatementBlock> result = new LinkedList<>();
 
             if (elem instanceof Try) {
-                Statement tryBody = elem.getBody();
+                StatementBlock tryBody = elem.getBody();
                 if (tryBody instanceof StatementBlock) {
-                    result.add((StatementBlock) tryBody);
+                    result.add(tryBody);
                 }
 
                 ImmutableArray<Branch> branches = elem.getBranchList();
@@ -450,11 +430,11 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Catch elem) {
-            LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+            LinkedList<StatementBlock> result = new LinkedList<>();
 
-            Statement catchBody = elem.getBody();
+            StatementBlock catchBody = elem.getBody();
             if (catchBody instanceof StatementBlock) {
-                result.add((StatementBlock) catchBody);
+                result.add(catchBody);
             }
 
             return result;
@@ -467,11 +447,11 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Finally elem) {
-            LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+            LinkedList<StatementBlock> result = new LinkedList<>();
 
-            Statement finallyBody = elem.getBody();
+            StatementBlock finallyBody = elem.getBody();
             if (finallyBody instanceof StatementBlock) {
-                result.add((StatementBlock) finallyBody);
+                result.add(finallyBody);
             }
 
             return result;
@@ -484,11 +464,11 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(MethodFrame elem) {
-            LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+            LinkedList<StatementBlock> result = new LinkedList<>();
 
-            Statement methodFrameBody = elem.getBody();
+            StatementBlock methodFrameBody = elem.getBody();
             if (methodFrameBody instanceof StatementBlock) {
-                result.add((StatementBlock) methodFrameBody);
+                result.add(methodFrameBody);
             }
 
             return result;
@@ -501,7 +481,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(Case elem) {
-            LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+            LinkedList<StatementBlock> result = new LinkedList<>();
 
             ImmutableArray<Statement> caseBodies = elem.getBody();
             for (Statement body : caseBodies) {
@@ -520,7 +500,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(CatchAllStatement elem) {
-            LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+            LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement catchBody = elem.getBody();
             if (catchBody instanceof StatementBlock) {
@@ -537,7 +517,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(LabeledStatement elem) {
-            LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+            LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement thenBody = elem.getBody();
             if (thenBody instanceof StatementBlock) {
@@ -554,7 +534,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(LoopStatement elem) {
-            LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+            LinkedList<StatementBlock> result = new LinkedList<>();
 
             Statement thenBody = elem.getBody();
             if (thenBody instanceof StatementBlock) {
@@ -571,11 +551,11 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
          * @return The bodies for the given source element.
          */
         private LinkedList<StatementBlock> getBodies(SynchronizedBlock elem) {
-            LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+            LinkedList<StatementBlock> result = new LinkedList<>();
 
-            Statement thenBody = elem.getBody();
+            StatementBlock thenBody = elem.getBody();
             if (thenBody instanceof StatementBlock) {
-                result.add((StatementBlock) thenBody);
+                result.add(thenBody);
             }
 
             return result;

@@ -1,24 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge.procedures;
-
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
 
 /**
  * Rule that merges two sequents based on a specified set of abstract domain lattices. If no lattice
@@ -70,7 +73,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
         if (lattice != null) {
 
             AbstractDomainElement mergeElem = null;
-            LinkedHashSet<Term> sideConditions = new LinkedHashSet<Term>();
+            LinkedHashSet<Term> sideConditions = new LinkedHashSet<>();
 
             assert v.op() instanceof ProgramVariable;
 
@@ -91,9 +94,9 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
                 mergeElem = lattice.join(abstrElem1, abstrElem2);
             }
 
-            Function newSkolemConst =
+            JFunction newSkolemConst =
                 getNewSkolemConstantForPrefix(mergeElem.toString(), valueInState1.sort(), services);
-            LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+            LinkedHashSet<Name> newNames = new LinkedHashSet<>();
             newNames.add(newSkolemConst.name());
 
             newConstraints =
@@ -116,10 +119,10 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
 
         } else {
 
-            return new ValuesMergeResult(DefaultImmutableSet.<Term>nil(),
+            return new ValuesMergeResult(DefaultImmutableSet.nil(),
                 MergeByIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
                     distinguishingFormula, services),
-                new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
+                new LinkedHashSet<>(), new LinkedHashSet<>());
 
         }
 

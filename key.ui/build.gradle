@@ -7,27 +7,32 @@ plugins {
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
     // https://imperceptiblethoughts.com/shadow/
-    id 'com.github.johnrengelman.shadow' version "7.1.1"
+    id 'com.github.johnrengelman.shadow' version "8.1.1"
 }
+
+description "User interface for the deductive verification of Java programs"
 
 dependencies {
     implementation project(":key.core")
-    implementation project(":key.core:rifl")
+    implementation project(":key.core.rifl")
 
     implementation project(":key.core.proof_references")
     implementation project(":key.core.symbolic_execution")
     implementation project(":key.removegenerics")
 
-    api 'com.miglayout:miglayout-swing:11.0'
+    api 'com.miglayout:miglayout-swing:11.4.2'
 
     //logging implementation used by the slf4j
-    implementation 'ch.qos.logback:logback-classic:1.2.10'
+    implementation 'ch.qos.logback:logback-classic:1.5.15'
 
-    api 'org.dockingframes:docking-frames-common:1.1.3p1'
-    api 'org.dockingframes:docking-frames-core:1.1.3p1'
+    api 'org.key-project:docking-frames-common:1.1.3p1'
+    api 'org.key-project:docking-frames-core:1.1.3p1'
 
     runtimeOnly project(":keyext.ui.testgen")
+    runtimeOnly project(":keyext.caching")
     runtimeOnly project(":keyext.exploration")
+    runtimeOnly project(":keyext.slicing")
+    runtimeOnly project(":keyext.proofmanagement")
 }
 
 task createExamplesZip(type: Zip) {
@@ -57,12 +62,13 @@ application {
 
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
+    //systemProperties["slf4j.detectLoggerNameMismatch"] = true
     //systemProperties["KeyDebugFlag"] = "on"
     //args "--experimental"
 
     // this can be used to solve a problem where the OS hangs during debugging of popup menus
     // (see https://docs.oracle.com/javase/10/troubleshoot/awt.htm#JSTGD425)
-    //jvmArgs += "-Dsun.awt.disablegrab=true"
+    jvmArgs += "-Dsun.awt.disablegrab=true"
 }
 
 task runWithProfiler(type: JavaExec) {
@@ -99,7 +105,7 @@ List<String> scanReadmeFiles() {
     for (String line : Files.readAllLines(examplesIndex)) {
         line = line.trim()
         if (line.isEmpty() || line.startsWith("#")) {
-            continue;
+            continue
         }
 
         def readme = Paths.get(projectDir.toString(), "examples",
@@ -110,9 +116,9 @@ List<String> scanReadmeFiles() {
         // default file.
         result.add(dir + "project.key")
         for (String rmLine : Files.readAllLines(readme)) {
-            if(rmLine.startsWith("#")) continue;
+            if(rmLine.startsWith("#")) continue
             def parts = rmLine.split("=", 2)
-            if (parts.length < 2) break;
+            if (parts.length < 2) break
             def key = parts[0].trim()
             if(key.containsIgnoreCase("file")) {
                 def filename = parts[1].trim()

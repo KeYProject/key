@@ -1,22 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.ProgramPrefixUtil;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Loop scope block. TODO
@@ -45,10 +40,11 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     /**
-     * TODO
+     * creates a loop-scope block
      *
-     * @param e
-     * @param body
+     * @param iProgramVariable the IProgramVariable to indicate whether the scope should be left
+     *        or continuued
+     * @param body the StatementBlock inside the loop scope (the actual loop body)
      */
     public LoopScopeBlock(IProgramVariable iProgramVariable, StatementBlock body) {
         this.indexPV = iProgramVariable;
@@ -111,7 +107,7 @@ public class LoopScopeBlock extends JavaStatement
     @Override
     public PosInProgram getFirstActiveChildPos() {
         return getStatementCount() == 0 ? PosInProgram.TOP
-                : PosInProgram.TOP.down(getChildCount() - 1).down(0);
+                : PosInProgram.TOP.down(this.getChildCount() - 1).down(0);
     }
 
     /**
@@ -156,10 +152,12 @@ public class LoopScopeBlock extends JavaStatement
     @Override
     public int getChildCount() {
         int result = 0;
-        if (indexPV != null)
+        if (indexPV != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -173,13 +171,15 @@ public class LoopScopeBlock extends JavaStatement
     @Override
     public ProgramElement getChildAt(int index) {
         if (indexPV != null) {
-            if (index == 0)
+            if (index == 0) {
                 return indexPV;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -234,10 +234,5 @@ public class LoopScopeBlock extends JavaStatement
     @Override
     public void visit(Visitor v) {
         v.performActionOnLoopScopeBlock(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printLoopScopeBlock(this);
     }
 }

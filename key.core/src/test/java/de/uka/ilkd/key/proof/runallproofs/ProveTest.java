@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -7,15 +14,15 @@ import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ProveTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProveTest.class);
 
-    protected boolean verbose = Boolean.getBoolean("prooftests.verbose");
+    protected final boolean verbose = Boolean.getBoolean("prooftests.verbose");
     protected String baseDirectory = "";
     protected String statisticsFile = "tmp.csv";
     protected String name = "unnamed_tests";
@@ -66,44 +73,55 @@ public class ProveTest {
     }
 
     private void runKey(String file, TestProperty testProperty) throws Exception {
+        File keyFile = new File(file);
+
+        // a name for this run. helps to find it in the mass of logger
+        final var caseId = "%s|%d".formatted(keyFile.getName(), keyFile.hashCode());
+
+        LOGGER.info("{}: Run Test: {} with {}", caseId, file, testProperty);
+
         // Initialize KeY settings.
-        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(globalSettings);
-        if (localSettings != null && !"".equals(localSettings)) {
+        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(globalSettings);
+        if (localSettings != null && !localSettings.isEmpty()) {
             // local settings must be complete to have desired effect
-            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(localSettings);
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(localSettings);
         }
 
-        File keyFile = new File(file);
-        assertTrue(keyFile.exists(), "File " + keyFile + " does not exists");
+        LOGGER.info("({}) Active Settings: {}", caseId,
+            ProofSettings.DEFAULT_SETTINGS.settingsToString());
 
-        // Name resolution for the available KeY file.
-        debugOut("Now processing file %s", keyFile);
+        assertTrue(keyFile.exists(), "File " + keyFile + " does not exists");
 
         // File that the created proof will be saved to.
         File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
+
+        LOGGER.info("({}) Proof will be saved to: {}", caseId, proofFile);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = null;
         Proof loadedProof = null;
         boolean success;
         try {
+            LOGGER.info("({}) Start proving", caseId);
             // Initialize KeY environment and load proof.
             var pair =
                 load(keyFile);
+            LOGGER.info("({}) Proving done", caseId);
+
             env = pair.first;
             var script= pair.second;
             loadedProof = env.getLoadedProof();
 
             AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
             if (replayResult.hasErrors() && verbose) {
-                LOGGER.info("... error(s) while loading");
+                LOGGER.info("({}) {} Error(s) while loading", caseId, replayResult.getErrorList());
                 for (Throwable error : replayResult.getErrorList()) {
-                    error.printStackTrace();
+                    LOGGER.info("({}) Error", caseId, error);
                 }
             }
 
             if (testProperty == TestProperty.NOTLOADABLE) {
                 assertTrue(replayResult.hasErrors(),
-                    "Loading problem file succeded but it shouldn't");
+                    "Loading problem file succeeded but it shouldn't");
                 success = true;
             } else {
                 assertFalse(replayResult.hasErrors(), "Loading problem file failed");
@@ -111,15 +129,17 @@ public class ProveTest {
                 // For a reload test we are done at this point. Loading was successful.
                 if (testProperty == TestProperty.LOADABLE) {
                     success = true;
-                    debugOut("... success: loaded");
+                    LOGGER.info("({}) Success: loaded", caseId);
                 } else {
                     autoMode(env, loadedProof, script);
                     boolean closed = loadedProof.closed();
                     success = (testProperty == TestProperty.PROVABLE) == closed;
-                    debugOut("... finished proof: " + (closed ? "closed." : "open goal(s)"));
+                    LOGGER.info("({}) Finished proof: {}", caseId,
+                        (closed ? "closed." : "open goal(s)"));
                     appendStatistics(loadedProof, keyFile);
-                    if (success)
+                    if (success) {
                         reload(proofFile, loadedProof);
+                    }
                 }
             }
         } finally {
@@ -131,7 +151,8 @@ public class ProveTest {
             }
         }
 
-        String message = String.format("%sVerifying property \"%s\"%sfor file: %s",
+        String message = String.format("(%s) %sVerifying property \"%s\"%sfor file: %s",
+            caseId,
             success ? "pass: " : "FAIL: ", testProperty.toString().toLowerCase(),
             success ? " was successful " : " failed ", keyFile);
 
@@ -147,7 +168,7 @@ public class ProveTest {
         if (reloadEnabled) {
             System.err.println("Test reloadability.");
             // Save the available proof to a temporary file.
-            loadedProof.saveToFile(proofFile);
+            ProofSaver.saveToFile(proofFile, loadedProof);
             boolean reloadedClosed = reloadProof(proofFile);
 
             assertEquals(loadedProof.closed(), reloadedClosed,
@@ -203,7 +224,7 @@ public class ProveTest {
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
                 for (Throwable ex : errorList) {
-                    ex.printStackTrace();
+                    LOGGER.error("Error", ex);
                 }
                 throw errorList.get(0);
             }
@@ -242,7 +263,7 @@ public class ProveTest {
                 statisticsFile.appendStatistics(loadedProof, keyFile);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to append stats", e);
         }
     }
 

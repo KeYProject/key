@@ -1,16 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
@@ -21,7 +19,12 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 /**
  * Extracts used {@link ClassAxiom} and {@link ClassInvariant}s.
@@ -62,23 +65,22 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
                         }
                     }
                 }
-                if (found instanceof PartialInvAxiom) {
+                if (found instanceof PartialInvAxiom axiom) {
                     // Invariant was applied
-                    PartialInvAxiom axiom = (PartialInvAxiom) found;
                     DefaultProofReference<ClassInvariant> reference =
-                        new DefaultProofReference<ClassInvariant>(IProofReference.USE_INVARIANT,
+                        new DefaultProofReference<>(IProofReference.USE_INVARIANT,
                             node, axiom.getInv());
                     LinkedHashSet<IProofReference<?>> result =
-                        new LinkedHashSet<IProofReference<?>>();
+                        new LinkedHashSet<>();
                     result.add(reference);
                     return result;
                 } else if (found != null) {
                     // ClassAxiom was applied
                     DefaultProofReference<ClassAxiom> reference =
-                        new DefaultProofReference<ClassAxiom>(IProofReference.USE_AXIOM, node,
+                        new DefaultProofReference<>(IProofReference.USE_AXIOM, node,
                             found);
                     LinkedHashSet<IProofReference<?>> result =
-                        new LinkedHashSet<IProofReference<?>>();
+                        new LinkedHashSet<>();
                     result.add(reference);
                     return result;
                 } else {

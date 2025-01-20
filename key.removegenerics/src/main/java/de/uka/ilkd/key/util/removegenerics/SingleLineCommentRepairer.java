@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.removegenerics;
 
 import java.util.List;
@@ -29,7 +32,7 @@ public class SingleLineCommentRepairer {
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
             List<Comment> comments = pe.getComments();
-            if (comments != null)
+            if (comments != null) {
                 for (Comment comment : comments) {
                     if (comment instanceof SingleLineComment && comment.isPrefixed()) {
                         SourceElement first = pe.getFirstElement();
@@ -42,6 +45,7 @@ public class SingleLineCommentRepairer {
                         first.setRelativePosition(relpos);
                     }
                 }
+            }
         }
     }
 

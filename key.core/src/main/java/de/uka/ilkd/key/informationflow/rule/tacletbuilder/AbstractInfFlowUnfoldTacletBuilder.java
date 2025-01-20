@@ -1,20 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
 import java.util.Iterator;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.RewriteTaclet;
@@ -23,7 +21,12 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 
 /**
@@ -79,7 +82,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
         // collect quantifiable variables of the find term and replacewith term
         // and replace all quantifiable variables by schema variables
-        Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
+        Map<QuantifiableVariable, VariableSV> quantifiableVarsToSchemaVars =
             collectQuantifiableVariables(schemaFind, services);
         quantifiableVarsToSchemaVars
                 .putAll(collectQuantifiableVariables(schemaReplaceWith, services));
@@ -89,7 +92,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
         // create taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =
-            new RewriteTacletBuilder<RewriteTaclet>();
+            new RewriteTacletBuilder<>();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
@@ -131,7 +134,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         Term selfAtPostSV = (poVars.pre.self == poVars.post.self ? selfAtPreSV
                 : createTermSV(poVars.post.self, schemaPrefix, services));
 
-        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.nil();
         Iterator<Term> appDataPreLocalVarsIt = poVars.pre.localVars.iterator();
         Iterator<Term> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
         for (Term appDataPostLocalVar : poVars.post.localVars) {
@@ -185,7 +188,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
     private static Term replace(Term term, StateVars origVars, StateVars schemaVars,
             Services services) {
-        LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
+        LinkedHashMap<Term, Term> map = new LinkedHashMap<>();
 
         Pair<StateVars, StateVars> vars = filter(origVars, schemaVars);
         origVars = vars.first;
@@ -206,7 +209,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             }
         }
         OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
-        term = TermLabel.removeIrrelevantLabels(term, services.getTermFactory());
+        term = TermLabelManager.removeIrrelevantLabels(term, services.getTermFactory());
         Term result = or.replace(term);
 
         return result;
@@ -216,7 +219,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
     private static Pair<StateVars, StateVars> filter(StateVars origVars, StateVars schemaVars) {
         schemaVars = filterSchemaVars(origVars, schemaVars);
         origVars = filterSchemaVars(schemaVars, origVars);
-        return new Pair<StateVars, StateVars>(origVars, schemaVars);
+        return new Pair<>(origVars, schemaVars);
     }
 
 
@@ -240,7 +243,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         if (origVars.localVars == null) {
             localVars = null;
         } else if (origVars.localVars.isEmpty()) {
-            localVars = ImmutableSLList.<Term>nil();
+            localVars = ImmutableSLList.nil();
         }
         if (origVars.result == null) {
             result = null;

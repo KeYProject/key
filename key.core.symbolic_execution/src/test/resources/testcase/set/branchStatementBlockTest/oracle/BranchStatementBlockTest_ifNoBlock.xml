@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="&lt;call BranchStatementBlockTest.ifNoBlock(x,y)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (x&lt;y)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+   <methodCall name="&lt;call BranchStatementBlockTest.ifNoBlock(x, y)&gt;" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x &lt; y)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="gt(y,x)" pathCondition="gt(y,x)" pathConditionChanged="true" branchCondition="gt(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return x;" pathCondition="gt(y,x)" pathConditionChanged="false">
-               <methodReturn name="&lt;return of ifNoBlock&gt;" signature="&lt;return of BranchStatementBlockTest.ifNoBlock(x,y)&gt;" pathCondition="gt(y,x)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="gt(y,x)">
+               <methodReturn name="&lt;return of ifNoBlock&gt;" signature="&lt;return of BranchStatementBlockTest.ifNoBlock(x, y)&gt;" pathCondition="gt(y,x)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="gt(y,x)">
                   <termination name="&lt;end&gt;" pathCondition="gt(y,x)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
@@ -13,7 +13,7 @@
          </branchCondition>
          <branchCondition name="leq(y,x)" pathCondition="leq(y,x)" pathConditionChanged="true" branchCondition="leq(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return y;" pathCondition="leq(y,x)" pathConditionChanged="false">
-               <methodReturn name="&lt;return of ifNoBlock&gt;" signature="&lt;return of BranchStatementBlockTest.ifNoBlock(x,y)&gt;" pathCondition="leq(y,x)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="leq(y,x)">
+               <methodReturn name="&lt;return of ifNoBlock&gt;" signature="&lt;return of BranchStatementBlockTest.ifNoBlock(x, y)&gt;" pathCondition="leq(y,x)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="leq(y,x)">
                   <termination name="&lt;end&gt;" pathCondition="leq(y,x)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>

@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
@@ -12,7 +13,7 @@ public class TransactionStatement extends JavaStatement {
     public static final String[] names = { "#beginJavaCardTransaction",
         "#commitJavaCardTransaction", "#finishJavaCardTransaction", "#abortJavaCardTransaction" };
 
-    private int type;
+    private final int type;
 
     public TransactionStatement(int type) {
         super();
@@ -40,10 +41,6 @@ public class TransactionStatement extends JavaStatement {
         return 0;
     }
 
-    public void prettyPrint(de.uka.ilkd.key.java.PrettyPrinter p) throws java.io.IOException {
-        p.printTransactionStatement(this);
-    }
-
     public int getPrecedence() {
         return 13;
     }
@@ -52,13 +49,16 @@ public class TransactionStatement extends JavaStatement {
         return names[type - 1];
     }
 
+    @Override
     public boolean equals(Object o) {
-        if (o != null && o instanceof TransactionStatement) {
-            return ((TransactionStatement) o).type == this.type;
+        if (o == this) {
+            return true;
         }
-        return false;
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+        return ((TransactionStatement) o).type == this.type;
     }
-
 
     public MatchConditions match(SourceData source, MatchConditions conditions) {
         if (this.equals(source.getSource())) {
@@ -67,10 +67,4 @@ public class TransactionStatement extends JavaStatement {
         }
         return null;
     }
-
-    public boolean equalsModRenaming(SourceElement source, NameAbstractionTable nat) {
-        return this.equals(source);
-    }
-
-
 }

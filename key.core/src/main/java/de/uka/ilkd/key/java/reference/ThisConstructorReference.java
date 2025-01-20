@@ -1,11 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.reference;
+
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.visitor.Visitor;
 
 
 /**
@@ -61,12 +63,6 @@ public class ThisConstructorReference extends SpecialConstructorReference {
     @Override
     public void visit(Visitor v) {
         v.performActionOnThisConstructorReference(this);
-    }
-
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printThisConstructorReference(this);
     }
 
 

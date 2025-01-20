@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.translation;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -11,11 +12,10 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
+
+import org.key_project.logic.TermCreationException;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Resolver for attributes (i.e., fields).
@@ -78,10 +78,15 @@ public final class SLAttributeResolver extends SLExpressionResolver {
 
         Term recTerm = receiver.getTerm();
 
-        // <inv> is special case (because it's really a predicate, not a boolean attribute)
+        // <inv> and <inv_free> are special cases
+        // (because they're predicates, not boolean attributes)
         if (name.equals("<inv>") && receiver.isTerm()) {
             return new SLExpression(services.getTermBuilder().inv(receiver.getTerm()));
         }
+        if (name.equals("<inv_free>") && receiver.isTerm()) {
+            return new SLExpression(services.getTermBuilder().invFree(receiver.getTerm()));
+        }
+
 
         ProgramVariable attribute = null;
         try {
@@ -101,7 +106,8 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                 if (et != null && attribute == null) {
                     containingType = et.getKeYJavaType();
                     if (recTerm != null) {
-                        final Function thisFieldSymbol = heapLDT.getFieldSymbolForPV(et, services);
+                        final JFunction thisFieldSymbol =
+                            heapLDT.getFieldSymbolForPV(et, services);
                         recTerm =
                             services.getTermBuilder().dot(et.sort(), recTerm, thisFieldSymbol);
                     }
@@ -123,7 +129,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                     attribute.getKeYJavaType());
             } else {
                 try {
-                    final Function fieldSymbol =
+                    final JFunction fieldSymbol =
                         heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
                     Term attributeTerm;
                     if (attribute.isStatic()) {

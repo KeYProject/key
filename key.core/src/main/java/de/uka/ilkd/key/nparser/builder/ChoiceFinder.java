@@ -1,13 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
+import java.util.*;
+
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeYParser;
-import javax.annotation.Nonnull;
 
-import java.util.*;
+import org.key_project.logic.Name;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This visitor gathers the choice information in {@link de.uka.ilkd.key.nparser.KeyAst.File} and
@@ -18,14 +23,14 @@ import java.util.*;
  * @see ChoiceInformation
  */
 public class ChoiceFinder extends AbstractBuilder<Object> {
-    @Nonnull
-    private final ChoiceInformation choiceInformation;
+
+    private final @NonNull ChoiceInformation choiceInformation;
 
     public ChoiceFinder() {
         choiceInformation = new ChoiceInformation();
     }
 
-    public ChoiceFinder(@Nonnull ChoiceInformation choiceInformation) {
+    public ChoiceFinder(@NonNull ChoiceInformation choiceInformation) {
         this.choiceInformation = choiceInformation;
     }
 
@@ -44,9 +49,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String category = ctx.category.getText();
         List<String> options = new ArrayList<>(ctx.optionDecl().size());
-        ctx.optionDecl().forEach(it -> {
-            options.add(it.IDENT.getText());
-        });
+        ctx.optionDecl().forEach(it -> options.add(it.IDENT.getText()));
         if (options.isEmpty()) {
             options.add("on");
             options.add("off");
@@ -79,8 +82,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         return c;
     }
 
-    @Nonnull
-    public ChoiceInformation getChoiceInformation() {
+    public @NonNull ChoiceInformation getChoiceInformation() {
         return choiceInformation;
     }
 

@@ -1,15 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
-
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.smt.SMTTranslationException;
-import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import de.uka.ilkd.key.smt.SMTTranslationException;
+import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * This class is a collection of static functions to construct SExpr objects.
@@ -52,14 +55,11 @@ public class SExprs {
      * @return an SExpr equivalent to the conjunction of the clauses.
      */
     public static SExpr and(List<SExpr> clauses) {
-        switch (clauses.size()) {
-        case 0:
-            return TRUE;
-        case 1:
-            return clauses.get(0);
-        default:
-            return new SExpr("and", Type.BOOL, clauses);
-        }
+        return switch (clauses.size()) {
+        case 0 -> TRUE;
+        case 1 -> clauses.get(0);
+        default -> new SExpr("and", Type.BOOL, clauses);
+        };
     }
 
     /**
@@ -140,19 +140,19 @@ public class SExprs {
 
         if (type == Type.UNIVERSE) {
             // Use the injection to go to universe
-            if (orgType.injection == null) {
+            if (orgType.injection() == null) {
                 throw new SMTTranslationException(
                     "Cannot inject from " + orgType + " into U: " + exp);
             }
-            return new SExpr(orgType.injection, type, exp);
+            return new SExpr(orgType.injection(), type, exp);
         }
 
         if (orgType == Type.UNIVERSE) {
             // Use the projection to go to other type
-            if (type.projection == null) {
+            if (type.projection() == null) {
                 throw new SMTTranslationException("Cannot project from U to " + type + ": " + exp);
             }
-            return new SExpr(type.projection, type, exp);
+            return new SExpr(type.projection(), type, exp);
         }
 
         throw new SMTTranslationException(
@@ -186,6 +186,22 @@ public class SExprs {
      */
     public static SExpr patternSExpr(SExpr e, SExpr... patterns) {
         return patternSExpr(e, Arrays.asList(patterns));
+    }
+
+    /**
+     * Wrap the provided expression with a name label.
+     * Result is {@code (e :named name)}.
+     *
+     * @param e expression
+     * @param name label
+     * @return the named expr
+     */
+    public static SExpr named(SExpr e, String name) {
+        ArrayList<SExpr> children = new ArrayList<>();
+        children.add(e);
+        children.add(new SExpr(":named", Type.VERBATIM));
+        children.add(new SExpr(name));
+        return new SExpr("!", e.getType(), children);
     }
 
     /**
@@ -268,7 +284,7 @@ public class SExprs {
         if (collected.isEmpty()) {
             return matrix;
         } else {
-            return patternSExpr(matrix, collected.toArray(new SExpr[collected.size()]));
+            return patternSExpr(matrix, collected.toArray(new SExpr[0]));
         }
     }
 

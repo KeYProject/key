@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
@@ -12,7 +15,7 @@ public class SeqReverse extends ADTPrefixConstruct {
     private static final long serialVersionUID = -4836079248155746383L;
 
     public SeqReverse(Expression e) {
-        children = new ASTArrayList<Expression>(getArity());
+        children = new ASTArrayList<>(getArity());
         children.add(e);
         makeParentRoleValid();
     }

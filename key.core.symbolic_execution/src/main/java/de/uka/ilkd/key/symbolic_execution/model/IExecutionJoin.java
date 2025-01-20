@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.SourceElement;
@@ -23,12 +26,12 @@ public interface IExecutionJoin extends IExecutionNode<SourceElement> {
      *
      * @return {@code true} is verified, {@code false} is not verified.
      */
-    public boolean isWeakeningVerified();
+    boolean isWeakeningVerified();
 
     /**
      * Checks if the weakening verification is supported.
      *
      * @return {@code true} supported, {@code false} not supported.
      */
-    public boolean isWeakeningVerificationSupported();
+    boolean isWeakeningVerificationSupported();
 }

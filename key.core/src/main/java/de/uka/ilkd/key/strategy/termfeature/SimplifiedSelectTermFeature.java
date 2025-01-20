@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 
 public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
@@ -22,16 +26,16 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter(Term t, Services services) {
-        Boolean isSelectOp = heapLDT.getSortOfSelect(t.op()) != null;
+    protected boolean filter(Term t, MutableState mState, Services services) {
+        boolean isSelectOp = heapLDT.getSortOfSelect(t.op()) != null;
         return // either the operator is not a select operator
         !isSelectOp ||
         // or the heap term of the select operator is the base heap
         // or another primitive heap variable
-                primitiveHeapTermFeature.filter(t.sub(0), services) ||
+                primitiveHeapTermFeature.filter(t.sub(0), mState, services) ||
                 // or the heap term of the select operator is an anon heap symbol
                 // (for instance an anonHeap function)
-                (t.sub(0).op() instanceof Function && t.sub(0).op().arity() == 0
+                (t.sub(0).op() instanceof JFunction && t.sub(0).op().arity() == 0
                         && t.sub(0).hasLabels()
                         && t.sub(0).containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL));
 

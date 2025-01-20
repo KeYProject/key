@@ -1,18 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 
 public final class ModelMethodExecution extends ClassAxiom {
@@ -47,18 +50,18 @@ public final class ModelMethodExecution extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || this.getClass() != o.getClass())
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
+        }
         final ModelMethodExecution other = (ModelMethodExecution) o;
 
-        if (!name.equals(other.name))
+        if (!name.equals(other.name)) {
             return false;
-        if (!target.equals(other.target))
+        }
+        if (!target.equals(other.target)) {
             return false;
-        if (!kjt.equals(other.kjt))
-            return false;
-
-        return true;
+        }
+        return kjt.equals(other.kjt);
     }
 
     @Override
@@ -81,7 +84,7 @@ public final class ModelMethodExecution extends ClassAxiom {
 
     @Override
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
-        return DefaultImmutableSet.<Pair<Sort, IObserverFunction>>nil();
+        return DefaultImmutableSet.nil();
     }
 
     @Override

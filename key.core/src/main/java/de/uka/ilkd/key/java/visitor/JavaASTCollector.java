@@ -1,21 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
+
+import de.uka.ilkd.key.java.ProgramElement;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.ProgramElement;
-
 /**
  * Walks through a java AST in depth-left-fist-order. You can set the type of nodes you want to
- * collect and then start the walker. The found nodes of the given type are returned as a
- * IList<JavaProgramElement>
+ * collect and then {@link #start()} the walker. The found nodes of the given type are returned as a
+ * list of {@link ProgramElement}.
  */
 public class JavaASTCollector extends JavaASTWalker {
 
     /** the type of nodes to be collected */
-    private Class<?> type;
+    private final Class<?> type;
     /** the list of found elements */
-    private ImmutableList<ProgramElement> resultList = ImmutableSLList.<ProgramElement>nil();
+    private ImmutableList<ProgramElement> resultList = ImmutableSLList.nil();
 
     /**
      * create the JavaASTWalker

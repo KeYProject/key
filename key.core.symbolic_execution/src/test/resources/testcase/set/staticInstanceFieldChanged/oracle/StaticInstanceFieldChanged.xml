@@ -9,7 +9,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="nextInstance.dvalue=new DirectValue ();" pathCondition="true" pathConditionChanged="false">
+      <statement name="nextInstance.dvalue = new DirectValue();" pathCondition="true" pathConditionChanged="false">
          <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
@@ -93,7 +93,7 @@
                         </variable>
                      </value>
                   </variable>
-                  <statement name="nextInstance.dvalue.value=24;" pathCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathConditionChanged="false">
+                  <statement name="nextInstance.dvalue.value = 24;" pathCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathConditionChanged="false">
                      <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         </value>
@@ -114,7 +114,7 @@
                            </variable>
                         </value>
                      </variable>
-                     <statement name="instance.value=42;" pathCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathConditionChanged="false">
+                     <statement name="instance.value = 42;" pathCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathConditionChanged="false">
                         <variable name="self" isArrayIndex="false">
                            <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            </value>
@@ -164,7 +164,7 @@
                                  </variable>
                               </value>
                            </variable>
-                           <statement name="return instance.value+nextInstance.dvalue.value;" pathCondition="and(not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null)),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false">
+                           <statement name="return instance.value + nextInstance.dvalue.value;" pathCondition="and(not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null)),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false">
                               <variable name="self" isArrayIndex="false">
                                  <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  </value>

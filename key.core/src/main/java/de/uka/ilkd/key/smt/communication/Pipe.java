@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.communication;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This interface describes a pipe for sending messages to or receiving them from an external SMT
@@ -17,7 +21,7 @@ public interface Pipe {
      * @param message the message to send
      * @throws IOException if an I/O error occurs
      */
-    void sendMessage(@Nonnull String message) throws IOException;
+    void sendMessage(@NonNull String message) throws IOException;
 
     /**
      * Reads a message from the external process. This method blocks until there is a further
@@ -35,7 +39,7 @@ public interface Pipe {
      *
      * @return the data sent between KeY and solver until now
      */
-    @Nonnull
+    @NonNull
     SolverCommunication getSolverCommunication();
 
     /**

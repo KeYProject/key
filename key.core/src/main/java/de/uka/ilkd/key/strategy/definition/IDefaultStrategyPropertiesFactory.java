@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.definition;
 
 import de.uka.ilkd.key.strategy.Strategy;
@@ -13,18 +16,13 @@ public interface IDefaultStrategyPropertiesFactory {
     /**
      * The default implementation.
      */
-    public static IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
-        new IDefaultStrategyPropertiesFactory() {
-            @Override
-            public StrategyProperties createDefaultStrategyProperties() {
-                return new StrategyProperties();
-            }
-        };
+    IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
+        StrategyProperties::new;
 
     /**
      * Creates new default {@link StrategyProperties}.
      *
      * @return The new default {@link StrategyProperties}.
      */
-    public StrategyProperties createDefaultStrategyProperties();
+    StrategyProperties createDefaultStrategyProperties();
 }

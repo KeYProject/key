@@ -1,6 +1,10 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit;
+
+import java.util.Map;
 
 import recoder.ProgramFactory;
 import recoder.convenience.TreeWalker;
@@ -12,8 +16,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
 import recoder.util.Debug;
-
-import java.util.Map;
 
 /**
  * This utility class provides queries, factory methods and transformations on abstract entities
@@ -197,8 +199,7 @@ public class MiscKit {
      * </CODE> if there is no such element.
      */
     public static ProgramElement checkParentLinks(ProgramElement root) {
-        if (root instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement nt = (NonTerminalProgramElement) root;
+        if (root instanceof NonTerminalProgramElement nt) {
             for (int s = nt.getChildCount(), i = 0; i < s; i += 1) {
                 ProgramElement child = nt.getChildAt(i);
                 if (child.getASTParent() != nt) {
@@ -280,7 +281,7 @@ public class MiscKit {
         Debug.assertNonnull(parent, child);
         ASTList<Import> list = parent.getImports();
         if (list == null) {
-            parent.setImports(new ASTArrayList<Import>(child));
+            parent.setImports(new ASTArrayList<>(child));
         } else {
             if (asHead) {
                 list.add(0, child);
@@ -331,7 +332,7 @@ public class MiscKit {
         Debug.assertNonnull(parent, child);
         ASTList<Statement> list = parent.getBody();
         if (list == null) {
-            parent.setBody(new ASTArrayList<Statement>(child));
+            parent.setBody(new ASTArrayList<>(child));
         } else {
             if (asHead) {
                 list.add(0, child);
@@ -428,4 +429,3 @@ public class MiscKit {
     }
 
 }
-

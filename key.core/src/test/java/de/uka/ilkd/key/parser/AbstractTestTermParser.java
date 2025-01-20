@@ -1,20 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
+
+import java.io.File;
+import java.io.IOException;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
-import java.io.File;
-import java.io.IOException;
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -43,7 +47,7 @@ public class AbstractTestTermParser {
         return nss.sorts().lookup(new Name(name));
     }
 
-    protected Function lookup_func(String name) {
+    protected JFunction lookup_func(String name) {
         return nss.functions().lookup(new Name(name));
     }
 
@@ -81,11 +85,11 @@ public class AbstractTestTermParser {
      *
      * @param t The {@link Term} that will be converted.
      */
-    protected String printTerm(Term t) throws IOException {
-        LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services);
+    protected String printTerm(Term t) {
+        LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
         lp.getNotationInfo().setHidePackagePrefix(false);
         lp.printTerm(t);
-        return lp.toString();
+        return lp.result();
     }
 
     /**
@@ -101,14 +105,17 @@ public class AbstractTestTermParser {
         assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""), message);
     }
 
-    protected void verifyPrettyPrinting(String expectedPrettySyntax, Term expectedParseResult)
-            throws IOException {
+    protected void verifyPrettyPrinting(String expectedPrettySyntax, Term expectedParseResult) {
         // check whether pretty-printing the parsed term yields the original pretty syntax again
         String printedSyntax = printTerm(expectedParseResult);
-        String message = "\nAssertion failed while pretty-printing a term:\n" + expectedParseResult
-            + "\nExpected pretty-syntax is: \"" + expectedPrettySyntax
-            + "\"\nBut pretty-printing resulted in: \"" + printedSyntax
-            + "\"\n(whitespaces are ignored during comparison of the above strings)\n";
+        String message = ("""
+
+                Assertion failed while pretty-printing a term:
+                %s
+                Expected pretty-syntax is: "%s"
+                But pretty-printing resulted in: "%s"
+                (whitespaces are ignored during comparison of the above strings)
+                """).formatted(expectedParseResult, expectedPrettySyntax, printedSyntax);
         assertEqualsIgnoreWhitespaces(message, expectedPrettySyntax, printedSyntax);
     }
 
@@ -132,7 +139,6 @@ public class AbstractTestTermParser {
      * @param verboseSyntax {@link Term} in verbose syntax.
      * @param optionalStringRepresentations Optionally, additional String representations will be
      *        tested for correct parsing.
-     * @throws IOException
      */
     protected void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax,
             String verboseSyntax, String... optionalStringRepresentations) throws Exception {
@@ -149,7 +155,6 @@ public class AbstractTestTermParser {
      * @param expectedParseResult Expected result after parsing {@code expectedPrettySyntax}.
      * @param optionalStringRepresentations Optionally, additional String representations will be
      *        tested for correct parsing.
-     * @throws IOException
      */
     protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax,
             Term expectedParseResult, String... optionalStringRepresentations) throws Exception {

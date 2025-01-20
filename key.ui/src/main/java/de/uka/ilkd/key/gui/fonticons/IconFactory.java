@@ -1,15 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.fonticons;
 
-import de.uka.ilkd.key.util.Debug;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.swing.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class IconFactory {
     public static final IconFontProvider QUIT = new IconFontProvider(FontAwesomeSolid.WINDOW_CLOSE);
@@ -48,6 +50,10 @@ public final class IconFactory {
     public static final IconFontProvider INTERACTIVE =
         new IconFontProvider(FontAwesomeSolid.HAND_POINT_RIGHT);
     public static final IconFontProvider SCRIPT = new IconFontProvider(FontAwesomeSolid.SCROLL);
+    public static final IconFontProvider BACKREFERENCE =
+        new IconFontProvider(FontAwesomeSolid.BACKWARD);
+    public static final IconFontProvider BACKREFERENCE_ARROW =
+        new IconFontProvider(FontAwesomeSolid.ARROWS_TO_EYE);
     public static final IconFontProvider PRUNE = new IconFontProvider(FontAwesomeSolid.CUT);
     public static final IconFontProvider GOAL_BACK =
         new IconFontProvider(FontAwesomeSolid.BACKSPACE);
@@ -72,6 +78,18 @@ public final class IconFactory {
     public static final IconFontProvider ORIGIN_ICON = new IconFontProvider(FontAwesomeSolid.ROUTE);
     public static final IconFontProvider WINDOW_ICON =
         new IconFontProvider(FontAwesomeSolid.WINDOW_RESTORE);
+    /**
+     * Icon for the proof slicing extension.
+     * Used in the title of the extension panel.
+     */
+    public static final IconFontProvider SLICE_ICON =
+        new IconFontProvider(FontAwesomeSolid.ALIGN_JUSTIFY);
+    /**
+     * Icon for proof steps marked as useless.
+     * Used in the proof tree panel.
+     */
+    public static final IconFontProvider USELESS_APP_ICON =
+        new IconFontProvider(FontAwesomeSolid.TIMES);
 
     /**
      * PLUS SQUARED
@@ -130,7 +148,7 @@ public final class IconFactory {
         new IconFontProvider(FontAwesomeSolid.ANGLE_DOWN);
     public static final IconFontProvider SEARCH_HIGHLIGHT =
         new IconFontProvider(FontAwesomeSolid.HIGHLIGHTER);
-    public static final IconFontProvider ABONDON = new IconFontProvider(FontAwesomeSolid.TRASH_ALT);
+    public static final IconFontProvider ABANDON = new IconFontProvider(FontAwesomeSolid.TRASH_ALT);
     public static final IconFontProvider SEARCH_HIDE =
         new IconFontProvider(FontAwesomeSolid.LOW_VISION);
     public static final IconFontProvider SEARCH_NEXT =
@@ -140,21 +158,21 @@ public final class IconFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IconFactory.class);
 
-    private static Image keyHole = getImage("images/ekey-mono.gif");
-    private static Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
-    private static Image keyHoleInteractive = getImage("images/keyinteractive.gif");
-    private static Image keyHoleLinked = getImage("images/keylinked.gif");
-    private static Image keyLogo = getImage("images/key-color.png");
+    private static final Image keyHole = getImage("images/ekey-mono.gif");
+    private static final Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
+    private static final Image keyCachedClosed = getImage("images/closed-cached.png");
+    private static final Image keyHoleInteractive = getImage("images/keyinteractive.gif");
+    private static final Image keyHoleLinked = getImage("images/keylinked.gif");
+    private static final Image keyLogo = getImage("images/key-color.png");
     private static final Image keyLogoShadow = getImage("images/key-shadow.png");
     // The following should be updated with every major version step.
-    // private static final Image keyVersionLogo = getImage("images/key-shadow-2.8.png");
-    private static final Image keyVersionLogo = getImage("images/key-shadow-2.10.png");
-    private static Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
-    private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
+    private static final Image keyVersionLogo = getImage("images/key-shadow-2.12.png");
+    private static final Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
+    private static final Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
 
-    private static Image junit = getImage("images/toolbar/junit_logo.png");
-    private static Image jml = getImage("images/toolbar/jml.png");
-    private static Image uml = getImage("images/toolbar/uml.png");
+    private static final Image junit = getImage("images/toolbar/junit_logo.png");
+    private static final Image jml = getImage("images/toolbar/jml.png");
+    private static final Image uml = getImage("images/toolbar/uml.png");
 
     // private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
     // private static Image scriptAppLogo = getImage("images/scriptAppLogo.png");
@@ -162,49 +180,46 @@ public final class IconFactory {
     // private static Image testgenerationImage = getImage("images/toolbar/tg.png");
     // private static Image heatmapImage = getImage("images/toolbar/heatmap.png");
 
-    private static HashMap<String, Icon> cache = new HashMap<String, Icon>();
+    private static final HashMap<String, Icon> cache = new HashMap<>();
 
     private IconFactory() {
     }
 
     public static Image getImage(String s) {
-        ImageIcon ii = createImageIcon(IconFactory.class, s);
+        ImageIcon ii = createImageIcon(s);
         return ii != null ? ii.getImage() : null;
     }
 
     /**
-     * Creates an icon from an image contained in a resource. The resource is fist search using the
-     * package name of the given class and if the resource is not found the package name of its
-     * superclass is used recursively.
+     * Creates an icon from an image contained in a resource.
      *
-     * @param cl the Class the resource is looked for
      * @param filename String the name of the file to search (only relative pathname to the path of
-     *        the calling class)
+     *        this class)
      * @return the newly created image
      */
-    private static ImageIcon createImageIcon(Class<?> cl, String filename) {
+    private static ImageIcon createImageIcon(String filename) {
         filename = "/de/uka/ilkd/key/gui/" + filename;
-        URL iconURL = cl.getResource(filename);
-        LOGGER.debug("Load Resource:" + filename + " of class " + cl);
-        if (iconURL == null && cl.getSuperclass() != null) {
-            return createImageIcon(cl.getSuperclass(), filename);
-        } else if (iconURL == null && cl.getSuperclass() == null) {
+        URL iconURL = IconFactory.class.getResource(filename);
+        if (iconURL == null) {
             // error message Resource not found
-            LOGGER.warn("No image resource " + filename + " found");
+            LOGGER.warn("No resource " + filename + " found");
             return null;
         } else {
-            LOGGER.trace("Done.");
+            LOGGER.trace("Loaded resource: " + filename);
             return new ImageIcon(iconURL);
         }
     }
 
     private static ImageIcon scaleIcon(Image im, int x, int y) {
+        if (im.getWidth(null) == x && im.getHeight(null) == y) {
+            return new ImageIcon(im);
+        }
         Image scaledim = im.getScaledInstance(x, y, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledim);
     }
 
     public static Icon abandon(int x) {
-        return ABONDON.load(x);
+        return ABANDON.load(x);
     }
 
     public static Icon configure(int x) {
@@ -294,8 +309,8 @@ public final class IconFactory {
         return scaleIcon(keyHole, x, y);
     }
 
-    public static Icon keyHoleClosed(int x) {
-        return GOAL_CLOSED.load(x);
+    public static Icon keyHoleClosed(int height) {
+        return GOAL_CLOSED.load(height);
         // return scaleIcon(GOAL_CLOSED, x, y);
     }
 
@@ -309,6 +324,10 @@ public final class IconFactory {
 
     public static ImageIcon keyHoleAlmostClosed(int x, int y) {
         return scaleIcon(keyHoleAlmostClosed, x, y);
+    }
+
+    public static ImageIcon keyCachedClosed(int x, int y) {
+        return scaleIcon(keyCachedClosed, x, y);
     }
 
     public static ImageIcon keyHoleInteractive(int x, int y) {
@@ -437,6 +456,14 @@ public final class IconFactory {
     public static Icon editFile(int size) {
         return EDIT.load(size);
         // return scaleIcon(editFile, size, size);
+    }
+
+    /**
+     * @param size desired icon size
+     * @return the icon to use for useless proof steps
+     */
+    public static Icon uselessAppLogo(int size) {
+        return USELESS_APP_ICON.load(size);
     }
 
     public static Icon interactiveAppLogo(int size) {

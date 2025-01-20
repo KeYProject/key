@@ -1,11 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -45,7 +45,10 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 /**
  *
@@ -180,7 +183,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * <p>
      * The rules which use this meta construct must ensure that exp is of type Iterable.
      *
-     * @see #makeIterableForLoop(LocalVariableDeclaration, Expression, Statement)
+     * @see #makeIterableForLoop(EnhancedFor, Services)
      *
      * @see ProgramTransformer#transform(de.uka.ilkd.key.java.ProgramElement, Services,
      *      SVInstantiations)
@@ -437,9 +440,9 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         Optional<Term> maybeVariant = Optional.ofNullable(rawInv.getInternalVariant());
         final Map<LocationVariable, Term> newInvs = //
-            new LinkedHashMap<LocationVariable, Term>(rawInv.getInternalInvariants());
+            new LinkedHashMap<>(rawInv.getInternalInvariants());
         final Map<LocationVariable, Term> newFreeInvs = //
-            new LinkedHashMap<LocationVariable, Term>(rawInv.getInternalFreeInvariants());
+            new LinkedHashMap<>(rawInv.getInternalFreeInvariants());
 
         // replace index
         updateInvs(newInvs, tb.index(), loopIdxVar, services);
@@ -471,7 +474,7 @@ public class EnhancedForElimination extends ProgramTransformer {
             final ProgramVariable replaceWith, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         invs.entrySet().stream().filter(entry -> entry.getValue() != null)
-                .map(entry -> new Pair<LocationVariable, Term>(entry.getKey(),
+                .map(entry -> new Pair<>(entry.getKey(),
                     GenericTermReplacer.replace(entry.getValue(), termToReplace::equals,
                         t -> tb.var(replaceWith), services)))
                 .forEach(p -> invs.put(p.first, p.second));

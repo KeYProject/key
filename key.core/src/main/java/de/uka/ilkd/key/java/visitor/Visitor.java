@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.*;
@@ -10,8 +13,8 @@ import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.SetStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -76,6 +79,8 @@ public interface Visitor {
     void performActionOnSeqSub(SeqSub x);
 
     void performActionOnSeqReverse(SeqReverse x);
+
+    void performActionOnSeqPut(SeqPut seqPut);
 
     void performActionOnDLEmbeddedExpression(DLEmbeddedExpression x);
 
@@ -180,6 +185,8 @@ public interface Visitor {
     void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x);
 
     void performActionOnCopyAssignment(CopyAssignment x);
+
+    void performActionOnSetStatement(SetStatement x);
 
     void performActionOnDivideAssignment(DivideAssignment x);
 
@@ -363,7 +370,7 @@ public interface Visitor {
 
     void performActionOnTransactionStatement(TransactionStatement transSt);
 
-    public void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
+    void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
 
     void performActionOnExec(Exec exec);
 
@@ -400,14 +407,5 @@ public interface Visitor {
      */
     void performActionOnJmlAssert(JmlAssert jmlAssert);
 
-    /**
-     * Performs action on the condition of a JML assert statement.
-     *
-     * Note: if you don't extend JavaASTVisitor or something else that calls this methode for you,
-     * you have to call it yourself, e.g. in {@link #performActionOnJmlAssert} if needed.
-     *
-     * @param cond the condition to perform an action on (may be {@code null} if the JML assert
-     *        wasn't finished)
-     */
-    void performActionOnJmlAssertCondition(final Term cond);
+    void performActionOnSubtype(Subtype subtype);
 }

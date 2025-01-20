@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.removegenerics;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -22,11 +25,11 @@ import recoder.service.CrossReferenceSourceInfo;
 
 public class ResolveTypeReference extends GenericResolutionTransformation {
 
-    private TypeReference reference;
+    private final TypeReference reference;
 
     private TypeReference replaceWith;
 
-    private CrossReferenceSourceInfo sourceInfo;
+    private final CrossReferenceSourceInfo sourceInfo;
 
     public ResolveTypeReference(TypeReference reference, CrossReferenceServiceConfiguration sc) {
         super(sc);

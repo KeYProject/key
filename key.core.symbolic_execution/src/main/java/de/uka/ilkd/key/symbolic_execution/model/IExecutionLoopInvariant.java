@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.SourceElement;
@@ -25,19 +28,19 @@ public interface IExecutionLoopInvariant extends IExecutionNode<SourceElement> {
      *
      * @return The used {@link LoopSpecification}.
      */
-    public LoopSpecification getLoopInvariant();
+    LoopSpecification getLoopInvariant();
 
     /**
      * Returns the loop statement which is simulated by its loop invariant.
      *
      * @return The loop statement which is simulated by its loop invariant.
      */
-    public While getLoopStatement();
+    While getLoopStatement();
 
     /**
      * Checks if the loop invariant is initially valid.
      *
      * @return {@code true} initially valid, {@code false} initially invalid.
      */
-    public boolean isInitiallyValid();
+    boolean isInitiallyValid();
 }

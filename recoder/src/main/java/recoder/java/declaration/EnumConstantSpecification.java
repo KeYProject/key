@@ -1,9 +1,7 @@
-/*
- * Created on 27.10.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.ModelException;
@@ -45,7 +43,7 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
 
     /**
      * @param name
-     * @param init
+     * @param ref
      */
     public EnumConstantSpecification(Identifier name, EnumConstructorReference ref) {
         super(name);
@@ -58,8 +56,9 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
      */
     public EnumConstantSpecification(EnumConstantSpecification proto) {
         super(proto);
-        if (proto.ref != null)
+        if (proto.ref != null) {
             ref = proto.ref.deepClone();
+        }
     }
 
     public void accept(SourceVisitor v) {
@@ -76,8 +75,9 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (ref != null)
+        if (ref != null) {
             ref.setParent(this);
+        }
     }
 
     @Override
@@ -104,8 +104,9 @@ public class EnumConstantSpecification extends FieldSpecification implements Enu
     @Override
     public void validate() throws ModelException {
         super.validate();
-        if (ref == null)
+        if (ref == null) {
             throw new ModelException("EnumConstructorReference not set in " + getFullName());
+        }
     }
 
     @Override

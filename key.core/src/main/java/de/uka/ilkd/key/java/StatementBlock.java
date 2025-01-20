@@ -1,9 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.ArrayList;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
@@ -14,10 +14,12 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+
 /**
  * Statement block. taken from COMPOST and changed to achieve an immutable structure
  */
-
 public class StatementBlock extends JavaStatement implements StatementContainer,
         TypeDeclarationContainer, VariableScope, TypeScope, ProgramPrefix {
 
@@ -32,7 +34,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
 
     public StatementBlock() {
-        body = new ImmutableArray<Statement>();
+        body = new ImmutableArray<>();
         prefixLength = 1;
         innerMostMethodFrame = null;
     }
@@ -43,10 +45,9 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      *
      * @param children an ExtList that contains the children
      */
-
     public StatementBlock(ExtList children) {
         super(children);
-        body = new ImmutableArray<Statement>(children.collect(Statement.class));
+        body = new ImmutableArray<>(children.collect(Statement.class));
 
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
@@ -64,21 +65,40 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
 
     public StatementBlock(Statement as) {
-        this(new ImmutableArray<Statement>(as));
+        this(new ImmutableArray<>(as));
     }
 
     public StatementBlock(Statement... body) {
-        this(new ImmutableArray<Statement>(body));
+        this(new ImmutableArray<>(body));
     }
 
     @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        return super.equalsModRenaming(se, nat)
-                && (this.getStartPosition().equals(Position.UNDEFINED) || // why do we care here
-                                                                          // about position info and
-                                                                          // nowhere else?
-                        se.getStartPosition().equals(Position.UNDEFINED)
-                        || this.getStartPosition().getLine() == se.getStartPosition().getLine());
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+
+        final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) o;
+        if (jnte.getChildCount() != getChildCount()) {
+            return false;
+        }
+
+        for (int i = 0, cc = getChildCount(); i < cc; i++) {
+            if (!getChildAt(i).equals(jnte.getChildAt(i))) {
+                return false;
+            }
+        }
+
+        return (this.getStartPosition().equals(Position.UNDEFINED) || // why do we care here
+                                                                      // about position info and
+                                                                      // nowhere else?
+                                                                      // We also care in
+                                                                      // LoopStatement
+                jnte.getStartPosition().equals(Position.UNDEFINED)
+                || this.getStartPosition().line() == jnte.getStartPosition().line());
     }
 
     /** computes the prefix elements for the given array of statment block */
@@ -92,17 +112,14 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
             prefix.add(current);
         }
 
-        return new ImmutableArray<ProgramPrefix>(prefix);
+        return new ImmutableArray<>(prefix);
     }
-
-
 
     /**
      * Get body.
      *
      * @return the statement array wrapper.
      */
-
     public ImmutableArray<? extends Statement> getBody() {
         return body;
     }
@@ -111,13 +128,11 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         return body.isEmpty();
     }
 
-
     /**
      * Returns the number of children of this node.
      *
      * @return an int giving the number of children of this node
      */
-
     public int getChildCount() {
         return body.size();
     }
@@ -129,7 +144,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      * @return the program element at the given position
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
-
     public ProgramElement getChildAt(int index) {
         if (body != null) {
             return body.get(index);
@@ -142,12 +156,11 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      *
      * @return the number of statements.
      */
-
     public int getStatementCount() {
         return body.size();
     }
 
-    /*
+    /**
      * Return the statement at the specified index in this node's "virtual" statement array.
      *
      * @param index an index for a statement.
@@ -156,7 +169,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      *
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
-
     public Statement getStatementAt(int index) {
         if (body != null) {
             return body.get(index);
@@ -169,7 +181,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      *
      * @return the number of type declarations.
      */
-
     public int getTypeDeclarationCount() {
         int count = 0;
         if (body != null) {
@@ -182,7 +193,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         return count;
     }
 
-    /*
+    /**
      * Return the type declaration at the specified index in this node's "virtual" type declaration
      * array.
      *
@@ -192,7 +203,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      *
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
-
     public TypeDeclaration getTypeDeclarationAt(int index) {
         if (body != null) {
             int s = body.size();
@@ -219,26 +229,22 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         v.performActionOnStatementBlock(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printStatementBlock(this);
-    }
-
-
     public SourceElement getFirstElement() {
-        if (isEmpty())
+        if (isEmpty()) {
             return this;
+        }
         final SourceElement e = getBody().get(0);
         return (e instanceof StatementBlock) ? e.getFirstElement() : e;
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-        if (isEmpty())
+        if (isEmpty()) {
             return this;
-        else
+        } else {
             return getBody().get(0);
+        }
     }
-
 
     @Override
     public boolean hasNextPrefixElement() {

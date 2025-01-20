@@ -1,6 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
+
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -14,8 +18,8 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
     private final LabeledParserRuleContext inv;
 
 
-    public TextualJMLInitially(ImmutableList<String> mods, LabeledParserRuleContext inv) {
-        super(mods);
+    public TextualJMLInitially(ImmutableList<JMLModifier> modifiers, LabeledParserRuleContext inv) {
+        super(modifiers);
         assert inv != null;
         this.inv = inv;
         setPosition(inv);
@@ -33,16 +37,15 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLInitially)) {
+        if (!(o instanceof TextualJMLInitially ci)) {
             return false;
         }
-        TextualJMLInitially ci = (TextualJMLInitially) o;
-        return mods.equals(ci.mods) && inv.equals(ci.inv);
+        return modifiers.equals(ci.modifiers) && inv.equals(ci.inv);
     }
 
 
     @Override
     public int hashCode() {
-        return mods.hashCode() + inv.hashCode();
+        return modifiers.hashCode() + inv.hashCode();
     }
 }

@@ -1,11 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.api;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Sequent;
@@ -16,6 +17,8 @@ import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * This API class offers methods to apply script commands and match commands
  *
@@ -25,7 +28,7 @@ import de.uka.ilkd.key.proof.Node;
 public class ScriptApi {
     private final ProofApi api;
     private final EngineState state;
-    private Matcher matcher;
+    private final Matcher matcher;
 
     public ScriptApi(ProofApi proofApi) {
         api = proofApi;
@@ -53,7 +56,8 @@ public class ScriptApi {
     /**
      * Execute ScriptCommand onto goal node
      *
-     * @param command to be applied with parameters set
+     * @param call to be applied with parameters set
+     * @param onNode the starting node
      * @return List of new proof goals (possibly empty) Should throw an Exception if command not
      *         applicable?
      */

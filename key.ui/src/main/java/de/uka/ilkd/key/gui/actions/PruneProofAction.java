@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -5,8 +8,8 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -40,7 +43,6 @@ public final class PruneProofAction extends MainWindowAction {
         putValue(NAME, "Prune Proof");
         putValue(SMALL_ICON, IconFactory.pruneLogo(MainWindow.TOOLBAR_ICON_SIZE));
         putValue(SHORT_DESCRIPTION, "Prune the tree below the selected node.");
-        lookupAcceleratorKey();
     }
 
     /**

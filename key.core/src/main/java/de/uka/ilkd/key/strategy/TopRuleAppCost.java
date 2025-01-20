@@ -1,6 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Singleton implementation of the <code>RuleAppCost</code> interface, which denotes a maximum cost
@@ -10,9 +13,10 @@ public class TopRuleAppCost implements RuleAppCost {
 
     private TopRuleAppCost() {}
 
-    public int compareTo(@Nonnull RuleAppCost o) {
-        if (o instanceof TopRuleAppCost)
+    public int compareTo(@NonNull RuleAppCost o) {
+        if (o instanceof TopRuleAppCost) {
             return 0;
+        }
         return 1;
     }
 
@@ -33,21 +37,20 @@ public class TopRuleAppCost implements RuleAppCost {
      * @param cost2 the other costs
      * @return this instance
      */
-    public final RuleAppCost add(@Nonnull RuleAppCost cost2) {
+    public final RuleAppCost add(@NonNull RuleAppCost cost2) {
         return INSTANCE;
     }
 
     /**
      * Multiply the TOP costs with given cost. TOP times any other costs results into TOP cost.
-     *
+     * <p>
      * (weigl: Dicussable whether {@code TOP times 0 = 0}?)
      *
      * @param cost - non-null {@link RuleAppCost}
      * @return this instance
      */
-    @Nonnull
     @Override
-    public RuleAppCost mul(@Nonnull RuleAppCost cost) {
+    public @NonNull RuleAppCost mul(@NonNull RuleAppCost cost) {
         return this;
     }
 

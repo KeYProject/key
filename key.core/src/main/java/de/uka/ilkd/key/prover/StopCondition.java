@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.prover;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -14,16 +17,16 @@ import de.uka.ilkd.key.settings.StrategySettings;
  * </p>
  * <p>
  * The first check is done before a rule is applied on a {@link Goal} via
- * {@link #isGoalAllowed(ApplyStrategy, int, long, Proof, GoalChooser, long, int, Goal)}. If this
+ * {@link #isGoalAllowed(int, long, Proof, long, int, Goal)}. If this
  * method returns {@code false} the strategy stops and the reason shown to the user is computed via
- * {@link #getGoalNotAllowedMessage(ApplyStrategy, int, long, Proof, GoalChooser, long, int, Goal)}.
+ * {@link #getGoalNotAllowedMessage(int, long, Proof, long, int, Goal)}.
  * </p>
  * <p>
  * The second check is after a rule was applied via
- * {@link #shouldStop(ApplyStrategy, int, long, Proof, GoalChooser, long, int, SingleRuleApplicationInfo)}.
+ * {@link #shouldStop(int, long, Proof, long, int, SingleRuleApplicationInfo)}.
  * If this method returns {@code true} the strategy stops and the reason shown to the user is
  * computed via
- * {@link #getStopMessage(ApplyStrategy, int, long, Proof, GoalChooser, long, int, SingleRuleApplicationInfo)}.
+ * {@link #getStopMessage(int, long, Proof, long, int, SingleRuleApplicationInfo)}.
  * </p>
  * <p>
  * <b>Attention: </b> It is possible that an {@link StopCondition} has to check one {@link Goal}
@@ -45,7 +48,7 @@ public interface StopCondition {
      * @param proof The current {@link Proof}.
      * @return The maximal amount of work or {@code 0} if it is unknown.
      */
-    public int getMaximalWork(int maxApplications, long timeout, Proof proof);
+    int getMaximalWork(int maxApplications, long timeout, Proof proof);
 
     /**
      * Checks if it is allowed to apply the next rule on the selected {@link Goal} chosen by the
@@ -63,12 +66,12 @@ public interface StopCondition {
      * @return {@code true} rule application is allowed, {@code false} rule application is not
      *         allowed so stop apply strategy
      */
-    public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
+    boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
             int countApplied, Goal goal);
 
     /**
      * Returns the reason why the previous check via
-     * {@link #isGoalAllowed(ApplyStrategy, int, long, Proof, GoalChooser, long, int, Goal)} has
+     * {@link #isGoalAllowed(int, long, Proof, long, int, Goal)} has
      * stopped the apply strategy.
      *
      * @param maxApplications The defined maximal number of rules to apply. Can be different to
@@ -80,9 +83,9 @@ public interface StopCondition {
      *        {@link System#currentTimeMillis()}
      * @param countApplied The number of already applied rules.
      * @param goal The current {@link Goal} on which the next rule will be applied.
-     * @return
+     * @return description of the reason why automatic proof search has stopped
      */
-    public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof,
+    String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof,
             long startTime, int countApplied, Goal goal);
 
     /**
@@ -100,12 +103,12 @@ public interface StopCondition {
      * @param singleRuleApplicationInfo An optional {@link SingleRuleApplicationInfo}.
      * @return {@code true} stop strategy, {@code false} continue strategy and apply next rule.
      */
-    public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime,
+    boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo);
 
     /**
-     * Returns a human readable message which explains why the previous
-     * {@link #shouldStop(ApplyStrategy, Proof, GoalChooser, long, int, SingleRuleApplicationInfo)}
+     * Returns a human-readable message which explains why the previous
+     * {@link #shouldStop(int, long, Proof, long, int, SingleRuleApplicationInfo)}
      * has stopped the strategy.
      *
      * @param maxApplications The defined maximal number of rules to apply. Can be different to
@@ -117,8 +120,8 @@ public interface StopCondition {
      *        {@link System#currentTimeMillis()}
      * @param countApplied The number of already applied rules.
      * @param singleRuleApplicationInfo An optional {@link SingleRuleApplicationInfo}.
-     * @return The human readable message which explains the stop reason.
+     * @return The human-readable message which explains the stop reason.
      */
-    public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
+    String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo);
 }

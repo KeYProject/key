@@ -1,20 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.extension.impl;
 
-import java.awt.Component;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.function.ToIntFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.swing.Action;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JPopupMenu;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -23,6 +19,7 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Facade for retrieving the GUI extensions.
@@ -32,11 +29,10 @@ import de.uka.ilkd.key.pp.PosInSequent;
  */
 public final class KeYGuiExtensionFacade {
     private static final Set<String> forbiddenPlugins = new HashSet<>();
-    private static List<Extension> extensions = new LinkedList<>();
+    private static List<Extension<?>> extensions = new LinkedList<>();
     // private static Map<Class<?>, List<Object>> extensionCache = new HashMap<>();
 
     // region panel extension
-    // @SuppressWarnings("todo")
     public static Stream<TabPanel> getAllPanels(MainWindow window) {
         return getLeftPanel().stream()
                 .flatMap(it -> it.getPanels(window, window.getMediator()).stream());
@@ -75,8 +71,6 @@ public final class KeYGuiExtensionFacade {
 
     /**
      * Adds all registered and activated {@link KeYGuiExtension.MainMenu} to the given menuBar.
-     *
-     * @return a menu
      */
     public static void addExtensionsToMainMenu(MainWindow mainWindow, JMenuBar menuBar) {
         JMenu menu = new JMenu("Extensions");
@@ -88,18 +82,7 @@ public final class KeYGuiExtensionFacade {
 
     }
 
-    /*
-     * public static Optional<Action> getMainMenuExtensions(String name) {
-     * Spliterator<KeYGuiExtension.MainMenu> iter =
-     * ServiceLoader.load(KeYGuiExtension.MainMenu.class).spliterator(); return
-     * StreamSupport.stream(iter, false) .flatMap(it -> it.getMainMenuActions(mainWindow).stream())
-     * .filter(Objects::nonNull) .filter(it -> it.getValue(Action.NAME).equals(name)) .findAny(); }
-     */
-
     // region Menu Helper
-    private static void sortActionsIntoMenu(List<Action> actions, JMenuBar menuBar) {
-        actions.forEach(act -> sortActionIntoMenu(act, menuBar, new JMenu()));
-    }
 
     private static Iterator<String> getMenuPath(Action act) {
         Object path = act.getValue(KeyAction.PATH);
@@ -227,6 +210,7 @@ public final class KeYGuiExtensionFacade {
      */
     public static List<JToolBar> createToolbars(MainWindow mainWindow) {
         return getToolbarExtensions().stream().map(it -> it.getToolbar(mainWindow))
+                .peek(x -> x.setFloatable(false))
                 .collect(Collectors.toList());
     }
 
@@ -239,11 +223,29 @@ public final class KeYGuiExtensionFacade {
         return getExtensionInstances(KeYGuiExtension.ContextMenu.class);
     }
 
+    /**
+     * Create a context menu with extension-provided actions for the specified kind and underlying
+     * object.
+     * <p>
+     * If the underlying object is a proof, this will also include the usual actions.
+     * </p>
+     *
+     * @param kind what kind of object the context menu is built on
+     * @param underlyingObject the object the context menu is built on
+     * @param mediator the KeY mediator
+     * @return populated context menu
+     */
     public static JPopupMenu createContextMenu(ContextMenuKind kind, Object underlyingObject,
             KeYMediator mediator) {
         JPopupMenu menu = new JPopupMenu();
+        if (underlyingObject instanceof Proof proof) {
+            for (Component comp : MainWindow.getInstance().createProofMenu(proof)
+                    .getMenuComponents()) {
+                menu.add(comp);
+            }
+        }
         List<Action> content = getContextMenuItems(kind, underlyingObject, mediator);
-        content.forEach(menu::add);
+        content.forEach(it -> sortActionIntoMenu(it, menu));
         return menu;
     }
 
@@ -311,7 +313,7 @@ public final class KeYGuiExtensionFacade {
     }
     // endregion
 
-    public static List<Extension> getExtensions() {
+    public static List<Extension<?>> getExtensions() {
         if (extensions.isEmpty()) {
             loadExtensions();
         }
@@ -374,9 +376,9 @@ public final class KeYGuiExtensionFacade {
     // region Term tool tip
 
     /**
-     * Retrieves all known implementations of the {@link KeYStatusBarExtension}.
+     * Retrieves all known implementations of the {@link KeYGuiExtension.Tooltip}.
      *
-     * @return all known implementations of the {@link KeYStatusBarExtension}.
+     * @return all known implementations of the {@link KeYGuiExtension.Tooltip}.
      */
     public static List<KeYGuiExtension.Tooltip> getTooltipExtensions() {
         return getExtensionInstances(KeYGuiExtension.Tooltip.class);
@@ -431,7 +433,7 @@ public final class KeYGuiExtensionFacade {
         @Override
         public int compare(Action o1, Action o2) {
             int a = getPriority(o1);
-            int b = getPriority(o1);
+            int b = getPriority(o2);
             return a - b;
         }
 

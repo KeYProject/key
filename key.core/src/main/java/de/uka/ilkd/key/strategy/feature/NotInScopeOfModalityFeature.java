@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -21,7 +24,7 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
 
     private NotInScopeOfModalityFeature() {}
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         Debug.assertFalse(pos == null, "Feature is only applicable to rules with find");
 
         return !inScopeOfModality(pos);
@@ -33,11 +36,13 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
         while (it.next() != -1) {
             final Operator op = it.getSubTerm().op();
 
-            if (op instanceof Modality)
+            if (op instanceof Modality) {
                 return true;
+            }
             if (op instanceof UpdateApplication) {
-                if (it.getChild() == UpdateApplication.targetPos())
+                if (it.getChild() == UpdateApplication.targetPos()) {
                     return true;
+                }
             }
         }
 

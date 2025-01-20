@@ -1,6 +1,10 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.convenience;
+
+import java.util.List;
 
 import recoder.ModelElement;
 import recoder.NamedModelElement;
@@ -14,8 +18,6 @@ import recoder.java.SourceElement.Position;
 import recoder.java.reference.ReferencePrefix;
 import recoder.kit.UnitKit;
 import recoder.util.Debug;
-
-import java.util.List;
 
 /**
  * Create textual descriptions of program elements, program model elements or lists thereof. This
@@ -254,7 +256,8 @@ public class Format {
 
     private static void append(Position pos, int columns, StringBuffer buf) {
         int k = 1;
-        for (int i = columns; i > 1; i -= 1, k *= 10);
+        for (int i = columns; i > 1; i -= 1, k *= 10) {
+        }
         int line = -1;
         int col = -1;
         if (pos != Position.UNDEFINED) {
@@ -282,13 +285,13 @@ public class Format {
 
     /**
      * Formats a list of model elements. Each element is formatted according to the format string by
-     * a call to {@link #toString(String, String, String, String, ModelElementList)}using
+     * a call to {@link #toString(String, String, String, String, List)} using
      * <CODE>"(", ", ", ")"</CODE> formatting.
      *
      * @param formatText the format text, containing tags.
      * @param l the list to be formatted.
      * @return a textual representation of the list.
-     * @see #toString(String, String, String, String, ModelElementList)
+     * @see #toString(String, String, String, String, List)
      */
     public static String toString(String formatText, List<? extends ModelElement> l) {
         return toString(formatText, "(", ", ", ")", l);
@@ -311,7 +314,7 @@ public class Format {
         if (l == null) {
             return null;
         }
-        StringBuffer sb = new StringBuffer(64);
+        StringBuilder sb = new StringBuilder(64);
         sb.append(header);
         int s = l.size();
         if (s > 0) {
@@ -326,11 +329,12 @@ public class Format {
     }
 
     /**
-     * Formats a source element using a default format. The default format string is <CODE>"\"%s\"
+     * Formats a source element using a default format.
+     * The default format string is {@code "\"%s\"@%p [%f]"}
      *
-     * &#64;param se the source element to be formatted.
-     * &#64;return a textual representation of the source element.
-     * &#64;%p [%f]"</CODE>.
+     * @param se the source element to be formatted.
+     * @return a textual representation of the source element.
+     *
      */
     public static String toString(ProgramElement se) {
         return toString("\"%s\" @%p [%f]", se);
@@ -338,14 +342,13 @@ public class Format {
 
     /**
      * Formats a program element list using a default format. The default format string is
-     * <CODE>"\"%s\"
+     * {@code "\"%s\" @%p"}
      *
-     * &#64;param l the list to be formatted.
-     * &#64;return a textual representation of the list.
-     * &#64;%p"</CODE>.
+     * @param l the list to be formatted.
+     * @return a textual representation of the list.
+     *
      */
     public static String toString(List<? extends ModelElement> l) {
         return toString("\"%s\" @%p", l);
     }
 }
-

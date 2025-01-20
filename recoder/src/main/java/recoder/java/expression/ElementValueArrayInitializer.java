@@ -1,9 +1,7 @@
-/*
- * Created on 17.12.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.expression;
 
 import recoder.java.*;
@@ -34,8 +32,9 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement
      */
     protected ElementValueArrayInitializer(ElementValueArrayInitializer proto) {
         super(proto);
-        if (proto.elementValues != null)
+        if (proto.elementValues != null) {
             this.elementValues = proto.elementValues.deepClone();
+        }
     }
 
     /*
@@ -98,8 +97,9 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement
      * @see recoder.java.ExpressionContainer#getExpressionAt(int)
      */
     public Expression getExpressionAt(int index) {
-        if (elementValues != null)
+        if (elementValues != null) {
             return elementValues.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -128,11 +128,13 @@ public class ElementValueArrayInitializer extends JavaNonTerminalProgramElement
      */
     public int getChildPositionCode(ProgramElement child) {
         // 0(IDX): elementValues
-        if (elementValues == null)
+        if (elementValues == null) {
             return -1;
+        }
         int idx = elementValues.indexOf(child);
-        if (idx != -1)
+        if (idx != -1) {
             return idx << 4;
+        }
         return -1;
     }
 

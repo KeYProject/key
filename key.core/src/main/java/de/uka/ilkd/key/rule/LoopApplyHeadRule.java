@@ -1,15 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -21,6 +19,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhileTransformation;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -58,7 +63,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
     public static final Name NAME = new Name("Loop Apply Head");
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp application)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp application)
             throws RuleAbortException {
         assert application instanceof LoopApplyHeadBuiltInRuleApp;
         LoopApplyHeadBuiltInRuleApp ruleApp = (LoopApplyHeadBuiltInRuleApp) application;
@@ -72,14 +77,14 @@ public class LoopApplyHeadRule implements BuiltInRule {
 
         TermBuilder tb = services.getTermBuilder();
         AbstractLoopContractRule.Instantiation instantiation = ruleApp.instantiation;
-        Modality modality = instantiation.modality;
-        Term update = instantiation.update;
-        Term target = instantiation.formula;
+        Modality modality = instantiation.modality();
+        Term update = instantiation.update();
+        Term target = instantiation.formula();
 
         JavaBlock newJavaBlock;
         newJavaBlock = JavaBlock.createJavaBlock(
             (StatementBlock) new ProgramElementReplacer(target.javaBlock().program(), services)
-                    .replace(instantiation.statement, headAndBlock));
+                    .replace(instantiation.statement(), headAndBlock));
 
         for (LoopContract c : contracts) {
             LoopContract newContract = c.replaceEnhancedForVariables(block, services);
@@ -92,7 +97,8 @@ public class LoopApplyHeadRule implements BuiltInRule {
 
         Goal result = goal.split(1).head();
         result.changeFormula(
-            new SequentFormula(tb.apply(update, tb.prog(modality, newJavaBlock, target.sub(0)))),
+            new SequentFormula(
+                tb.apply(update, tb.prog(modality.kind(), newJavaBlock, target.sub(0)))),
             ruleApp.pio);
         return ImmutableSLList.<Goal>nil().append(goal);
     }

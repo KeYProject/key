@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.ArrayList;
@@ -14,10 +17,11 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+
+import org.key_project.logic.sort.Sort;
 
 public class ThrownExceptionFeature extends BinaryFeature {
 
@@ -35,7 +39,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @param services the Services
      */
     private ThrownExceptionFeature(String[] p_filteredExceptions, Services services) {
-        final List<Sort> filtered = new ArrayList<Sort>();
+        final List<Sort> filtered = new ArrayList<>();
 
         final JavaInfo javaInfo = services.getJavaInfo();
 
@@ -45,7 +49,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
                 filtered.add(nullPointer.getSort());
             }
         }
-        filteredExceptions = filtered.toArray(new Sort[filtered.size()]);
+        filteredExceptions = filtered.toArray(new Sort[0]);
     }
 
     private boolean blockedExceptions(Sort excType) {
@@ -57,7 +61,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
         return false;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return app instanceof TacletApp && filter(pos.subTerm(), goal.proof().getServices(),
             ((TacletApp) app).instantiations().getExecutionContext());
     }
@@ -65,8 +69,8 @@ public class ThrownExceptionFeature extends BinaryFeature {
     protected boolean filter(Term term, Services services, ExecutionContext ec) {
         if (term.op() instanceof Modality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
-            return fstActive instanceof Throw && blockedExceptions(
-                ((Throw) fstActive).getExpressionAt(0).getKeYJavaType(services, ec).getSort());
+            return fstActive instanceof Throw fstThrow && blockedExceptions(
+                fstThrow.getExpressionAt(0).getKeYJavaType(services, ec).getSort());
         }
         return false;
     }
@@ -78,8 +82,9 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @return the first executable statement
      */
     private ProgramElement getFirstExecutableStatement(Term term) {
-        if (term.javaBlock().isEmpty())
+        if (term.javaBlock().isEmpty()) {
             return null;
+        }
 
         final ProgramElement jb = term.javaBlock().program();
         final ProgramElement fstActive;

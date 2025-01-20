@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.removegenerics;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -8,7 +11,7 @@ import recoder.list.generic.ASTList;
 
 class ResolveMethodDeclaration extends GenericResolutionTransformation {
 
-    private MethodDeclaration declaration;
+    private final MethodDeclaration declaration;
 
     public ResolveMethodDeclaration(MethodDeclaration declaration,
             CrossReferenceServiceConfiguration sc) {
@@ -31,8 +34,9 @@ class ResolveMethodDeclaration extends GenericResolutionTransformation {
     @Override
     public void transform() {
 
-        if (getProblemReport() == IDENTITY)
+        if (getProblemReport() == IDENTITY) {
             return;
+        }
 
         declaration.setTypeParameters(null);
 

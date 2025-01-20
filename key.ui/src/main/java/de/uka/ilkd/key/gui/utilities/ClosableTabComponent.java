@@ -1,13 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
-import java.awt.Dimension;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.UIManager;
+import java.awt.*;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
@@ -36,7 +33,7 @@ public class ClosableTabComponent extends JPanel {
         JButton button = new JButton(IconFactory.quit(16));
         button.setContentAreaFilled(false);
         button.setPreferredSize(new Dimension(16, 16));
-        button.addActionListener(closeAction::actionPerformed);
+        button.addActionListener(closeAction);
         add(button);
     }
 }

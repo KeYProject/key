@@ -1,16 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
 import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.NotUniqueException;
-
-import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * A lattice for all predicates accepting the given sort. This lattice consists of 2^n + 1 elements,
@@ -28,7 +31,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbstractionLattice {
     public static final String PREDICATE_NAME_CONBINATION_STRING = "_AND_";
 
-    private List<AbstractionPredicate> predicates = new ArrayList<AbstractionPredicate>();
+    private List<AbstractionPredicate> predicates = new ArrayList<>();
 
     /**
      * Constructs a new {@link ConjunctivePredicateAbstractionLattice} for the given list of
@@ -57,8 +60,8 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
          * The join result is a PredicateAbstractionDomainElement constructed of the intersection of
          * the respective predicates.
          */
-        return super.join(a, b, (set1, set2) -> (set1.intersect(set2)),
-            set -> new ConjunctivePredicateAbstractionDomainElement(set));
+        return super.join(a, b, ImmutableSet::intersect,
+            ConjunctivePredicateAbstractionDomainElement::new);
     }
 
     /**
@@ -94,7 +97,7 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
 
     @Override
     public int hashCode() {
-        return 31 * 1 + predicates.hashCode();
+        return 31 + predicates.hashCode();
     }
 
     /*
@@ -128,7 +131,7 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
             // should be) never initialized with a null list. The lines below
             // fix this issue locally.
             if (predicates == null) {
-                predicates = new ArrayList<AbstractionPredicate>();
+                predicates = new ArrayList<>();
             }
         }
 
@@ -160,7 +163,7 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
             }
 
             ImmutableSet<AbstractionPredicate> predicatesForElem =
-                DefaultImmutableSet.<AbstractionPredicate>nil();
+                DefaultImmutableSet.nil();
 
             ImmutableFixedLengthBitSet currBitSet = getBitSetsByNumZeroes().get(nrZeroes).get(idx);
 

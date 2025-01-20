@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.LinkedList;
@@ -30,12 +33,12 @@ public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
     public OuterBreakContinueAndReturnCollector(final ProgramElement root,
             final List<Label> alwaysInnerLabels, final Services services) {
         super(root, services);
-        breaks = new LinkedList<Break>();
-        continues = new LinkedList<Continue>();
-        returns = new LinkedList<Return>();
-        labels = new Stack<Label>();
+        breaks = new LinkedList<>();
+        continues = new LinkedList<>();
+        returns = new LinkedList<>();
+        labels = new Stack<>();
         labels.addAll(alwaysInnerLabels);
-        frames = new Stack<MethodFrame>();
+        frames = new Stack<>();
     }
 
     public List<Break> getBreaks() {

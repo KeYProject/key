@@ -1,37 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.util;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -52,11 +32,16 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.profile.SimplifyTermProfile;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
-import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.symbolic_execution.rule.ResultsAndCondition;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * Provides utility methods for side proofs.
@@ -129,13 +114,13 @@ public final class SymbolicExecutionSideProofUtil {
             methodTreatment, loopTreatment, queryTreatment, splittingOption);
         try {
             // Extract results and conditions from side proof
-            List<Pair<Term, Node>> conditionsAndResultsMap = new LinkedList<Pair<Term, Node>>();
+            List<Pair<Term, Node>> conditionsAndResultsMap = new LinkedList<>();
             for (Goal resultGoal : info.getProof().openGoals()) {
                 if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
                     throw new IllegalStateException("Not all applicable rules are applied.");
                 }
                 Sequent sequent = resultGoal.sequent();
-                List<Term> results = new LinkedList<Term>();
+                List<Term> results = new LinkedList<>();
                 for (SequentFormula sf : sequent.antecedent()) {
                     if (sf.formula().containsLabel(label)) {
                         Term result = sf.formula();
@@ -155,7 +140,7 @@ public final class SymbolicExecutionSideProofUtil {
                 } else {
                     result = services.getTermBuilder().or(results);
                 }
-                conditionsAndResultsMap.add(new Pair<Term, Node>(result, resultGoal.node()));
+                conditionsAndResultsMap.add(new Pair<>(result, resultGoal.node()));
             }
             return conditionsAndResultsMap;
         } finally {
@@ -184,7 +169,8 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
-    public static List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services,
+    public static List<ResultsAndCondition> computeResultsAndConditions(
+            Services services,
             Proof proof, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
             Operator operator, String description, String methodTreatment, String loopTreatment,
             String queryTreatment, String splittingOption, boolean addNamesToServices)
@@ -197,19 +183,18 @@ public final class SymbolicExecutionSideProofUtil {
             Set<Operator> relevantThingsInSequentToProve =
                 extractRelevantThings(info.getProof().getServices(), sequentToProve);
             // Extract results and conditions from side proof
-            List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
-                new LinkedList<Triple<Term, Set<Term>, Node>>();
+            List<ResultsAndCondition> conditionsAndResultsMap = new LinkedList<>();
             for (Goal resultGoal : info.getProof().openGoals()) {
                 if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
                     throw new IllegalStateException("Not all applicable rules are applied.");
                 }
                 Sequent sequent = resultGoal.sequent();
                 boolean newPredicateIsSequentFormula = isOperatorASequentFormula(sequent, operator);
-                Set<Term> resultConditions = new LinkedHashSet<Term>();
+                Set<Term> resultConditions = new LinkedHashSet<>();
                 Term result = null;
                 for (SequentFormula sf : sequent.antecedent()) {
                     if (newPredicateIsSequentFormula) {
-                        if (sf.formula().op() == operator) {
+                        if (Operator.opEquals(sf.formula().op(), operator)) {
                             throw new IllegalStateException(
                                 "Result predicate found in antecedent.");
                         } else {
@@ -230,7 +215,7 @@ public final class SymbolicExecutionSideProofUtil {
                 }
                 for (SequentFormula sf : sequent.succedent()) {
                     if (newPredicateIsSequentFormula) {
-                        if (sf.formula().op() == operator) {
+                        if (Operator.opEquals(sf.formula().op(), operator)) {
                             if (result != null) {
                                 throw new IllegalStateException(
                                     "Result predicate found multiple times in succedent.");
@@ -260,8 +245,8 @@ public final class SymbolicExecutionSideProofUtil {
                 if (result == null) {
                     result = services.getTermBuilder().ff();
                 }
-                conditionsAndResultsMap.add(
-                    new Triple<Term, Set<Term>, Node>(result, resultConditions, resultGoal.node()));
+                conditionsAndResultsMap
+                        .add(new ResultsAndCondition(result, resultConditions, resultGoal.node()));
             }
             return conditionsAndResultsMap;
         } finally {
@@ -276,7 +261,7 @@ public final class SymbolicExecutionSideProofUtil {
 
     private static Term constructResultIfContained(Services services, Term term,
             Operator operator) {
-        if (term.op() == operator) {
+        if (Operator.opEquals(term.op(), operator)) {
             return term.sub(0);
         } else {
             Term result = null;
@@ -286,7 +271,7 @@ public final class SymbolicExecutionSideProofUtil {
                 i++;
             }
             if (result != null) {
-                List<Term> newSubs = new LinkedList<Term>();
+                List<Term> newSubs = new LinkedList<>();
                 for (int j = 0; j < term.arity(); j++) {
                     if (j == i - 1) {
                         newSubs.add(result);
@@ -295,7 +280,7 @@ public final class SymbolicExecutionSideProofUtil {
                     }
                 }
                 result = services.getTermFactory().createTerm(term.op(),
-                    new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(),
+                    new ImmutableArray<>(newSubs), term.boundVars(),
                     term.getLabels());
             }
             return result;
@@ -303,12 +288,8 @@ public final class SymbolicExecutionSideProofUtil {
     }
 
     private static boolean isOperatorASequentFormula(Sequent sequent, final Operator operator) {
-        return CollectionUtil.search(sequent, new IFilter<SequentFormula>() {
-            @Override
-            public boolean select(SequentFormula element) {
-                return element.formula().op() == operator;
-            }
-        }) != null;
+        return CollectionUtil.search(sequent,
+            element -> Operator.opEquals(element.formula().op(), operator)) != null;
     }
 
     /**
@@ -319,17 +300,14 @@ public final class SymbolicExecutionSideProofUtil {
      * @param term The {@link Term} to check its {@link Name}s.
      */
     public static void addNewNamesToNamespace(Services services, Term term) {
-        final Namespace<Function> functions = services.getNamespaces().functions();
+        final Namespace<JFunction> functions = services.getNamespaces().functions();
         final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
         // LogicVariables are always local bound
-        term.execPreOrder(new DefaultVisitor() {
-            @Override
-            public void visit(Term visited) {
-                if (visited.op() instanceof Function) {
-                    functions.add((Function) visited.op());
-                } else if (visited.op() instanceof IProgramVariable) {
-                    progVars.add((IProgramVariable) visited.op());
-                }
+        term.execPreOrder((DefaultVisitor) visited -> {
+            if (visited.op() instanceof JFunction) {
+                functions.add((JFunction) visited.op());
+            } else if (visited.op() instanceof IProgramVariable) {
+                progVars.add((IProgramVariable) visited.op());
             }
         });
     }
@@ -359,11 +337,11 @@ public final class SymbolicExecutionSideProofUtil {
     }
 
     /**
-     * Utility method used by {@link QuerySideProofRule#containsModalityOrQuery(Term)}.
+     * Utility method used by {@link #containsModalityOrQuery(Term)}.
      *
      * @author Martin Hentschel
      */
-    protected static class ContainsModalityOrQueryVisitor extends DefaultVisitor {
+    protected static class ContainsModalityOrQueryVisitor implements DefaultVisitor {
         /**
          * The result.
          */
@@ -402,14 +380,11 @@ public final class SymbolicExecutionSideProofUtil {
      */
     public static Set<Operator> extractRelevantThings(final Services services,
             Sequent sequentToProve) {
-        final Set<Operator> result = new HashSet<Operator>();
+        final Set<Operator> result = new HashSet<>();
         for (SequentFormula sf : sequentToProve) {
-            sf.formula().execPreOrder(new DefaultVisitor() {
-                @Override
-                public void visit(Term visited) {
-                    if (isRelevantThing(services, visited)) {
-                        result.add(visited.op());
-                    }
+            sf.formula().execPreOrder((DefaultVisitor) visited -> {
+                if (isRelevantThing(services, visited)) {
+                    result.add(visited.op());
                 }
             });
         }
@@ -428,10 +403,10 @@ public final class SymbolicExecutionSideProofUtil {
      * @param term The {@link Term} to check.
      * @return {@code true} is relevant thing, {@code false} is not relevant.
      */
-    protected static boolean isRelevantThing(Services services, Term term) {
+    private static boolean isRelevantThing(Services services, Term term) {
         if (term.op() instanceof IProgramVariable) {
             return true;
-        } else if (term.op() instanceof Function) {
+        } else if (term.op() instanceof JFunction) {
             HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             if (SymbolicExecutionUtil.isHeap(term.op(), heapLDT)) {
                 return true;
@@ -509,20 +484,20 @@ public final class SymbolicExecutionSideProofUtil {
 
     /**
      * Utility class used by
-     * {@link QuerySideProofRule#containsIrrelevantThings(Services, SequentFormula, Set)}.
+     * {@link #containsIrrelevantThings(Services, SequentFormula, Set)}.
      *
      * @author Martin Hentschel
      */
-    protected static class ContainsIrrelevantThingsVisitor extends DefaultVisitor {
+    protected static class ContainsIrrelevantThingsVisitor implements DefaultVisitor {
         /**
          * The {@link Services} to use.
          */
-        private Services services;
+        private final Services services;
 
         /**
          * The relevant things.
          */
-        private Set<Operator> relevantThings;
+        private final Set<Operator> relevantThings;
 
         /**
          * The result.
@@ -718,13 +693,10 @@ public final class SymbolicExecutionSideProofUtil {
     public static Term extractOperatorTerm(Node node, final Operator operator) {
         assert node != null;
         // Search formula with the given operator in sequent (or in some cases below the updates)
-        SequentFormula sf = CollectionUtil.search(node.sequent(), new IFilter<SequentFormula>() {
-            @Override
-            public boolean select(SequentFormula element) {
-                Term term = element.formula();
-                term = TermBuilder.goBelowUpdates(term);
-                return ObjectUtil.equals(term.op(), operator);
-            }
+        SequentFormula sf = CollectionUtil.search(node.sequent(), element -> {
+            Term term = element.formula();
+            term = TermBuilder.goBelowUpdates(term);
+            return Objects.equals(term.op(), operator);
         });
         if (sf != null) {
             Term term = sf.formula();

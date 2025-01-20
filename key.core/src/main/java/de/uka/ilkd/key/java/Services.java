@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
@@ -6,33 +9,26 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.logic.InnerVariableNamer;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.proof.Counter;
-import de.uka.ilkd.key.proof.JavaModel;
-import de.uka.ilkd.key.proof.NameRecorder;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Name;
 import org.key_project.util.lookup.Lookup;
 
 /**
- * this is a collection of common services to the KeY prover. Services include information on the
+ * This is a collection of common services to the KeY prover. Services include information on the
  * underlying Java model and a converter to transform Java program elements to logic (where
  * possible) and back.
  */
-public class Services implements TermServices {
+public class Services implements TermServices, LogicServices {
     /**
      * the proof
      */
@@ -47,7 +43,7 @@ public class Services implements TermServices {
      * used to determine whether an expression is a compile-time constant and if so the type and
      * result of the expression
      */
-    private ConstantExpressionEvaluator cee;
+    private final ConstantExpressionEvaluator cee;
 
     /**
      * used to convert types, expressions and so on to logic elements (in special into to terms or
@@ -68,7 +64,7 @@ public class Services implements TermServices {
     /**
      * map of names to counters
      */
-    private HashMap<String, Counter> counters;
+    private final HashMap<String, Counter> counters;
 
     /**
      * specification repository
@@ -83,12 +79,9 @@ public class Services implements TermServices {
     private NameRecorder nameRecorder;
 
     private ITermProgramVariableCollectorFactory factory =
-        new ITermProgramVariableCollectorFactory() {
-            @Override
-            public TermProgramVariableCollector create(Services services) {
-                return new TermProgramVariableCollector(services);
-            }
-        };
+        TermProgramVariableCollector::new;
+
+    private OriginTermLabelFactory originFactory;
 
     private final Profile profile;
 
@@ -105,7 +98,7 @@ public class Services implements TermServices {
     public Services(Profile profile) {
         assert profile != null;
         this.profile = profile;
-        this.counters = new LinkedHashMap<String, Counter>();
+        this.counters = new LinkedHashMap<>();
         this.caches = new ServiceCaches();
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
@@ -150,6 +143,7 @@ public class Services implements TermServices {
         this.caches = s.caches;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+        this.originFactory = s.originFactory;
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -157,7 +151,6 @@ public class Services implements TermServices {
         result.setNamespaces(namespaces);
         return result;
     }
-
 
     /**
      * Returns the TypeConverter associated with this Services object.
@@ -171,6 +164,9 @@ public class Services implements TermServices {
         typeconverter = tc;
     }
 
+    public JavaDLTheory getJavaDLTheory() {
+        return typeconverter.getJavaDLTheory();
+    }
 
     /**
      * Returns the ConstantExpressionEvaluator associated with this Services object.
@@ -253,6 +249,7 @@ public class Services implements TermServices {
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
+        s.originFactory = originFactory;
         return s;
     }
 
@@ -272,7 +269,7 @@ public class Services implements TermServices {
      * @return The created deep copy with new {@link Counter} instances.
      */
     private HashMap<String, Counter> copyCounters() {
-        HashMap<String, Counter> result = new LinkedHashMap<String, Counter>();
+        HashMap<String, Counter> result = new LinkedHashMap<>();
         for (Entry<String, Counter> entry : counters.entrySet()) {
             result.put(entry.getKey(), entry.getValue().copy());
         }
@@ -292,7 +289,7 @@ public class Services implements TermServices {
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
-
+        s.originFactory = originFactory;
         return s;
     }
 
@@ -313,33 +310,28 @@ public class Services implements TermServices {
         proof = p_proof;
     }
 
-
-    public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
-        ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s =
-            new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
-        s.proof = p_proof;
-        s.specRepos = specRepos;
-        s.setTypeConverter(getTypeConverter().copy(s));
-        s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
-        s.setJavaModel(getJavaModel());
-
-        return s;
-    }
-
-
     /*
      * returns an existing named counter, creates a new one otherwise
      */
     public Counter getCounter(String name) {
         Counter c = counters.get(name);
-        if (c != null)
+        if (c != null) {
             return c;
+        }
         c = new Counter(name);
         counters.put(name, c);
         return c;
+    }
+
+    /**
+     * Reset all counters associated with this service.
+     * Only use this method if the proof is empty!
+     */
+    public void resetCounters() {
+        if (proof.root().childrenCount() > 0) {
+            throw new IllegalStateException("tried to reset counters on non-empty proof");
+        }
+        counters.clear();
     }
 
     /**
@@ -352,7 +344,6 @@ public class Services implements TermServices {
         return namespaces;
     }
 
-
     /**
      * sets the namespaces of known predicates, functions, variables
      *
@@ -362,7 +353,6 @@ public class Services implements TermServices {
         this.namespaces = namespaces;
     }
 
-
     /**
      * Returns the proof to which this object belongs, or null if it does not belong to any proof.
      */
@@ -371,7 +361,7 @@ public class Services implements TermServices {
     }
 
     public interface ITermProgramVariableCollectorFactory {
-        public TermProgramVariableCollector create(Services services);
+        TermProgramVariableCollector create(Services services);
     }
 
     /**
@@ -381,6 +371,21 @@ public class Services implements TermServices {
      */
     public Profile getProfile() {
         return profile;
+    }
+
+    /**
+     * returns the {@link JavaModel} with all path information
+     *
+     * @return the {@link JavaModel} on which this services is based on
+     */
+    public JavaModel getJavaModel() {
+        return javaModel;
+    }
+
+
+    public void setJavaModel(JavaModel javaModel) {
+        assert this.javaModel == null;
+        this.javaModel = javaModel;
     }
 
     /**
@@ -408,7 +413,7 @@ public class Services implements TermServices {
 
     /**
      * Returns the {@link TermBuilder} used to create {@link Term}s. Same as
-     * {@link #getTermBuilder(true).
+     * <code>getTermBuilder(true)</code>>.
      *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
@@ -431,27 +436,41 @@ public class Services implements TermServices {
         return factory;
     }
 
-
     public void setFactory(ITermProgramVariableCollectorFactory factory) {
         this.factory = factory;
     }
 
 
+    // =================================================================================================================
+    // =================================================================================================================
+
+    // Origin label specific methods; these should eventually be moved out of the services class
+    // when doing that we must take care not to introduce dependencies to ProofSettings or similar
+    // in places
+    // where that should not occur
+
     /**
-     * returns the {@link JavaModel} with all path information
+     * sets the factory for origin term labels
      *
-     * @return the {@link JavaModel} on which this services is based on
+     * @param originFactory the {@OriginTermLabelFactory} to use, if null is passed, origin labels
+     *        should not be created
      */
-    public JavaModel getJavaModel() {
-        return javaModel;
+    public void setOriginFactory(OriginTermLabelFactory originFactory) {
+        this.originFactory = originFactory;
     }
 
-
-    public void setJavaModel(JavaModel javaModel) {
-        assert this.javaModel == null;
-        this.javaModel = javaModel;
+    /**
+     * return the factory for origin term labels
+     *
+     * @return the OriginTermLabelFactory to use or null if origin labels should not be created
+     */
+    public OriginTermLabelFactory getOriginFactory() {
+        return originFactory;
     }
+    // =================================================================================================================
+    // =================================================================================================================
 
+    // TODO: Ask weigl whether this is still needed
     public Lookup createLookup() {
         Lookup lookup = new Lookup();
         lookup.register(getJavaInfo());

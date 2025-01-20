@@ -1,13 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -22,6 +20,11 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 public abstract class TacletLoader {
 
@@ -41,12 +44,12 @@ public abstract class TacletLoader {
     /**
      * get the set of axioms from the axiom files if applicable.
      */
-    public abstract ImmutableSet<Taclet> loadAxioms();
+    public abstract ImmutableSet<Taclet> loadAxioms() throws ProofInputException;
 
     /**
      * get the set of taclets to examine (either from the system or from a file)
      */
-    public abstract ImmutableList<Taclet> loadTaclets();
+    public abstract ImmutableList<Taclet> loadTaclets() throws ProofInputException;
 
     /**
      * get the taclet base which is considered fix (?)
@@ -68,17 +71,17 @@ public abstract class TacletLoader {
      * Taclets are stored in ImmutableSets which fortunately enough still have a fixed order due to
      * their implementation using immutable lists.
      *
-     * @param taclet the taclet for which PO will be generated. Remove all taclets after this
-     *        taclet.
-     *
      * @param initConfig the initial config from which the taclet to prove and all following taclets
      *        have been removed.
+     * @param tacletToProve the taclet for which PO will be generated. Remove all taclets after this
+     *        taclet.
+     *
      */
 
     public void manageAvailableTaclets(InitConfig initConfig, Taclet tacletToProve) {
         ImmutableList<Taclet> sysTaclets = initConfig.getTaclets();
 
-        ImmutableList<Taclet> newTaclets = ImmutableSLList.<Taclet>nil();
+        ImmutableList<Taclet> newTaclets = ImmutableSLList.nil();
         HashMap<Taclet, TacletBuilder<? extends Taclet>> map = initConfig.getTaclet2Builder();
         boolean tacletfound = false;
         for (Taclet taclet : sysTaclets) {
@@ -149,21 +152,17 @@ public abstract class TacletLoader {
                 loader.listener);
         }
 
-        private void prepareKeYFile(File file) {
+        private void prepareKeYFile(File file) throws ProofInputException {
             KeYFile keyFileDefs = new KeYFile(file.getName(), file, monitor, profile);
-            try {
-                if (initConfig != null) {
-                    problemInitializer.readEnvInput(keyFileDefs, initConfig);
-                } else {
-                    initConfig = problemInitializer.prepare(keyFileDefs);
-                }
-            } catch (ProofInputException e) {
-                throw new RuntimeException(e);
+            if (initConfig != null) {
+                problemInitializer.readEnvInput(keyFileDefs, initConfig);
+            } else {
+                initConfig = problemInitializer.prepare(keyFileDefs);
             }
         }
 
         @Override
-        public ImmutableList<Taclet> loadTaclets() {
+        public ImmutableList<Taclet> loadTaclets() throws ProofInputException {
 
             // No axioms file:
             if (initConfig == null) {
@@ -180,7 +179,7 @@ public abstract class TacletLoader {
         }
 
         @Override
-        public ImmutableSet<Taclet> loadAxioms() {
+        public ImmutableSet<Taclet> loadAxioms() throws ProofInputException {
             ImmutableSet<Taclet> axioms = DefaultImmutableSet.nil();
             for (File f : filesForAxioms) {
                 prepareKeYFile(f);
@@ -222,12 +221,7 @@ public abstract class TacletLoader {
 
         @Override
         public ImmutableList<Taclet> loadTaclets() {
-            try {
-                return getProofEnvForTaclets().getInitConfigForEnvironment().getTaclets();
-            } catch (Throwable e) {
-                throw new RuntimeException(e);
-            }
-
+            return getProofEnvForTaclets().getInitConfigForEnvironment().getTaclets();
         }
 
         @Override

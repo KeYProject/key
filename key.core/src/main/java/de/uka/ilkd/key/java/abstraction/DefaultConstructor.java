@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.abstraction;
 
 import org.key_project.util.ExtList;
@@ -17,7 +20,7 @@ public class DefaultConstructor implements Constructor {
     // ???use ProgramElementName instead of name?????
     public DefaultConstructor(ExtList children) {
         name = children.get(String.class);
-        parentIsPublic = children.get(Boolean.class).booleanValue();
+        parentIsPublic = children.get(Boolean.class);
     }
 
     /**

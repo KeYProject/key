@@ -1,18 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
+
+import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletAssumesModel;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 
 /**
  * this dialog appears if a rule is selected to be applied and the rule has an if sequent. The
@@ -188,7 +192,7 @@ public class TacletIfSelectionDialog extends JPanel {
          */
         private static final long serialVersionUID = -7145932915948630147L;
         private final Services services;
-        private DefaultListCellRenderer cellRenderer = new DefaultListCellRenderer();
+        private final DefaultListCellRenderer cellRenderer = new DefaultListCellRenderer();
 
         public IfComboRenderer(Services services) {
             this.services = services;

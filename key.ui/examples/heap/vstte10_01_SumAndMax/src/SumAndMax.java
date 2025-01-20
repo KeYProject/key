@@ -22,7 +22,7 @@ class SumAndMax {
           @   && (\forall int i; 0 <= i && i < k; a[i] <= max)
           @   && (k == 0 ==> max == 0)          
           @   && (k > 0 ==> (\exists int i; 0 <= i && i < k; max == a[i]))
-          @   && sum == (\sum int i; 0 <= i && i< k; a[i])
+          @   && sum == (\sum int i; 0 <= i && i < k; a[i])
           @   && sum <= k * max;
           @
           @  assignable sum, max;

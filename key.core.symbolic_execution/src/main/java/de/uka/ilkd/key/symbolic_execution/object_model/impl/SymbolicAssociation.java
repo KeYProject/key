@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import de.uka.ilkd.key.java.Services;
@@ -127,7 +130,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
      */
     @Override
     public String getName() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (isArrayRange()) {
             sb.append("[");
             if (getArrayStartIndex() != null) {

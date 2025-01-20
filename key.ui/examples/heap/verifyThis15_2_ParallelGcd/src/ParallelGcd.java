@@ -8,7 +8,7 @@ public class ParallelGcd {
       @ && (a < b ==> (\result == gcd(a, b - a)))
       @ && (b < a ==> (\result == gcd(a - b, b)));
       @ assignable \strictly_nothing;
-      @ public static model two_state int gcd(int a, int b);
+      @ public static model two_state \bigint gcd(\bigint a, \bigint b);
     */
 
     /*@ public behavior

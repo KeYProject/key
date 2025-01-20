@@ -1,14 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class represents a sequent. A sequent consists of an antecedent and succedent. As a sequent
@@ -21,7 +25,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  */
 public class Sequent implements Iterable<SequentFormula> {
 
-    public static final Sequent EMPTY_SEQUENT = new NILSequent();
+    public static final Sequent EMPTY_SEQUENT = NILSequent.INSTANCE;
 
     /**
      * creates a new Sequent with empty succedent
@@ -172,6 +176,28 @@ public class Sequent implements Iterable<SequentFormula> {
             composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
+    /**
+     * Replace a formula at the specified index.
+     *
+     * @param formulaNr where to replace the formula
+     * @param replacement the new sequent formula
+     * @return a SequentChangeInfo which contains the new sequent and information which formulas
+     *         have been added or removed
+     */
+    public SequentChangeInfo replaceFormula(int formulaNr, SequentFormula replacement) {
+        checkFormulaIndex(formulaNr);
+        formulaNr--;
+        boolean inAntec = formulaNr < antecedent.size();
+
+        Semisequent seq = inAntec ? antecedent : succedent;
+        int idx = inAntec ? formulaNr : formulaNr - antecedent.size();
+
+        final SemisequentChangeInfo semiCI = seq.replace(idx, replacement);
+
+        return SequentChangeInfo.createSequentChangeInfo(inAntec, semiCI,
+            composeSequent(inAntec, semiCI.semisequent()), this);
+    }
+
     /** returns semisequent of the antecedent to work with */
     public Semisequent antecedent() {
         return antecedent;
@@ -248,11 +274,12 @@ public class Sequent implements Iterable<SequentFormula> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Sequent)) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Sequent o1)) {
             return false;
         }
-
-        final Sequent o1 = (Sequent) o;
         return antecedent.equals(o1.antecedent) && succedent.equals(o1.succedent);
     }
 
@@ -279,10 +306,28 @@ public class Sequent implements Iterable<SequentFormula> {
             "Ghost formula " + cfma + " in sequent " + this + " [antec=" + inAntec + "]");
     }
 
+    /**
+     * Computes the position of the given {@link PosInOccurrence} on the proof sequent.
+     *
+     * @param pio the position
+     * @return an integer strictly greater than zero for the position of the given sequent formula
+     *         on the proof sequent.
+     */
+    public int formulaNumberInSequent(PosInOccurrence pio) {
+        var inAntec = pio.isInAntec();
+        var formula = pio.sequentFormula();
+        return formulaNumberInSequent(inAntec, formula);
+    }
+
+    /**
+     * Get a sequent formula by its position in the sequent.
+     * The first formula has number 1.
+     *
+     * @param formulaNumber formula number
+     * @return the sequent formula at that position
+     */
     public SequentFormula getFormulabyNr(int formulaNumber) {
-        if (formulaNumber <= 0 || formulaNumber > size()) {
-            throw new RuntimeException("No formula nr. " + formulaNumber + " in seq. " + this);
-        }
+        checkFormulaIndex(formulaNumber);
         if (formulaNumber <= antecedent.size()) {
             return antecedent.get(formulaNumber - 1);
         }
@@ -311,7 +356,12 @@ public class Sequent implements Iterable<SequentFormula> {
         return new SequentIterator(antecedent(), succedent());
     }
 
+    /**
+     * @param formulaNumber formula number (1-based)
+     * @return whether that formula is in the antecedent
+     */
     public boolean numberInAntec(int formulaNumber) {
+        checkFormulaIndex(formulaNumber);
         return formulaNumber <= antecedent.size();
     }
 
@@ -373,7 +423,11 @@ public class Sequent implements Iterable<SequentFormula> {
         return false;
     }
 
-    static class NILSequent extends Sequent {
+    private static final class NILSequent extends Sequent {
+        private static final NILSequent INSTANCE = new NILSequent();
+
+        private NILSequent() {
+        }
 
         @Override
         public boolean isEmpty() {
@@ -483,5 +537,18 @@ public class Sequent implements Iterable<SequentFormula> {
      */
     public ImmutableList<SequentFormula> asList() {
         return antecedent.asList().append(succedent.asList());
+    }
+
+    /**
+     * Check that the provided formula number is a 1-based index and in bounds.
+     * Throws an {@link IllegalArgumentException} otherwise.
+     *
+     * @param formulaNumber the formula number
+     */
+    private void checkFormulaIndex(int formulaNumber) {
+        if (formulaNumber <= 0 || formulaNumber > size()) {
+            throw new IllegalArgumentException(
+                "No formula nr. " + formulaNumber + " in seq. " + this);
+        }
     }
 }

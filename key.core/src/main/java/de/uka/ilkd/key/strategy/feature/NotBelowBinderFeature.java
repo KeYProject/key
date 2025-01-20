@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -18,7 +21,7 @@ public class NotBelowBinderFeature extends BinaryFeature {
 
     private NotBelowBinderFeature() {}
 
-    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         Debug.assertFalse(pos == null, "Feature is only applicable to rules with find");
 
         return !belowBinder(pos);
@@ -30,8 +33,9 @@ public class NotBelowBinderFeature extends BinaryFeature {
         while (it.next() != -1) {
             final Term t = it.getSubTerm();
 
-            if (t.varsBoundHere(it.getChild()).size() > 0)
+            if (t.varsBoundHere(it.getChild()).size() > 0) {
                 return true;
+            }
         }
 
         return false;

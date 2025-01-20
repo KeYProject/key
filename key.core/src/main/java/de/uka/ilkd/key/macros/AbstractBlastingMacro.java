@@ -1,10 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -13,7 +14,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -22,9 +22,8 @@ import de.uka.ilkd.key.logic.SortCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -40,6 +39,11 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableList;
 
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
@@ -95,10 +99,9 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }
 
     private List<SequentFormula> createFormulae(Services services, Set<Sort> sorts) {
-        List<SequentFormula> result = new LinkedList<SequentFormula>();
+        List<SequentFormula> result = new LinkedList<>();
 
         JavaInfo info = services.getJavaInfo();
-        TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
         SpecificationRepository spec = services.getSpecificationRepository();
 
         Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
@@ -201,7 +204,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
+                MutableState mState) {
 
             if (app.rule() instanceof OneStepSimplifier) {
                 return NumberRuleAppCost.getZeroCost();
@@ -215,7 +219,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 return NumberRuleAppCost.create(10);
             } else if (app.rule().name().toString().equals("pullOut")) {
                 Term t = pio.subTerm();
-                if (t.op() instanceof Function) {
+                if (t.op() instanceof JFunction) {
                     if (getAllowedPullOut().contains(t.op().name().toString())) {
                         return NumberRuleAppCost.create(1000);
                     }

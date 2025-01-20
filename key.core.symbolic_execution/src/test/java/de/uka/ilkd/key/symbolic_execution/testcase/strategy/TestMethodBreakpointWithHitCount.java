@@ -1,12 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
 import java.io.IOException;
-import java.util.HashMap;
-
+import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -18,12 +17,15 @@ import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.MethodBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
+import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
+
 public class TestMethodBreakpointWithHitCount extends AbstractSymbolicExecutionTestCase {
     @Test // weigl not prev. activated
     public void testBreakpointStopCondition() throws ProofInputException, IOException,
             ParserConfigurationException, SAXException, ProblemLoaderException {
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
             // Define test settings

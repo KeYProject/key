@@ -1,19 +1,17 @@
-/*
- * Created on 04.01.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.abstraction;
-
-import recoder.ModelException;
-import recoder.service.ProgramModelInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import recoder.ModelException;
+import recoder.service.ProgramModelInfo;
+
 /**
- * Represents an intersection type, which was introduced in java 5. See JLS, 3rd edition, �4.9 for
+ * Represents an intersection type, which was introduced in java 5. See JLS, 3rd edition, §4.9 for
  * details.
  *
  * @author Tobias Gutzmann
@@ -32,10 +30,11 @@ public class IntersectionType implements ClassType {
     }
 
     public String getFullName() {
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         for (int i = 0; i < types.size(); i++) {
-            if (i != 0)
+            if (i != 0) {
                 res.append(" & ");
+            }
             res.append(types.get(i).getFullName());
         }
         return res.toString();
@@ -66,10 +65,11 @@ public class IntersectionType implements ClassType {
      * @see recoder.NamedModelElement#getName()
      */
     public String getName() {
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         for (int i = 0; i < types.size(); i++) {
-            if (i != 0)
+            if (i != 0) {
                 res.append(" & ");
+            }
             res.append(types.get(i).getName());
         }
         return res.toString();
@@ -104,14 +104,14 @@ public class IntersectionType implements ClassType {
     }
 
     public List<ClassType> getSupertypes() {
-        List<ClassType> res = new ArrayList<ClassType>();
+        List<ClassType> res = new ArrayList<>();
         boolean addedObject = false;
-        for (int i = 0; i < types.size(); i++) {
-            Type t = types.get(i);
+        for (Type t : types) {
             if (t instanceof ClassType) {
                 res.add((ClassType) t);
-                if (t.getFullName().equals("java.lang.Object"))
+                if (t.getFullName().equals("java.lang.Object")) {
                     addedObject = true;
+                }
             }
             if (t instanceof ArrayType && !addedObject) {
                 res.add(pmi.getServiceConfiguration().getNameInfo().getJavaLangObject());

@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
-
-import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -15,7 +16,9 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.*;
+import org.key_project.util.collection.Pair;
 
 /**
  * Class whose objects represent an index of taclet apps for one particular position within a
@@ -73,7 +76,7 @@ public class TermTacletAppIndex {
      */
     private static ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence pos,
             RuleFilter filter, Services services, TacletIndex tacletIndex) {
-        ImmutableList<NoPosTacletApp> tacletInsts = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> tacletInsts = ImmutableSLList.nil();
         if (pos.isTopLevel()) {
             if (pos.isInAntec()) {
                 tacletInsts = tacletInsts.prepend(antecTaclet(pos, filter, services, tacletIndex));
@@ -132,7 +135,7 @@ public class TermTacletAppIndex {
                 indexCache.descend(localTerm, i));
         }
 
-        return new ImmutableArray<TermTacletAppIndex>(result);
+        return new ImmutableArray<>(result);
     }
 
 
@@ -285,7 +288,10 @@ public class TermTacletAppIndex {
         final Term newTerm = pos.subTerm();
         final Operator newOp = newTerm.op();
 
-        if (newOp instanceof Modality && newOp == term.op() && newTerm.sub(0).equals(term.sub(0))) {
+        if (newOp instanceof Modality mod
+                && term.op() instanceof Modality termMod
+                && mod.kind() == termMod.kind()
+                && newTerm.sub(0).equals(term.sub(0))) {
             // only the program within a modal operator has changed, but not the
             // formula after the modal operator. in this case, the formula after
             // the modality does not have to be rematched. also consider
@@ -476,7 +482,7 @@ public class TermTacletAppIndex {
     private ImmutableList<TacletApp> collectTacletApps(PosInOccurrence pos, RuleFilter p_filter,
             Services services) {
 
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
         final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow =
             collectAllTacletAppsHereAndBelow(pos, ImmutableSLList.nil());
@@ -603,7 +609,7 @@ public class TermTacletAppIndex {
      */
     public static ImmutableList<NoPosTacletApp> filter(RuleFilter p_filter,
             ImmutableList<NoPosTacletApp> taclets) {
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
 
         for (final NoPosTacletApp app : taclets) {
             if (p_filter.filter(app.taclet())) {

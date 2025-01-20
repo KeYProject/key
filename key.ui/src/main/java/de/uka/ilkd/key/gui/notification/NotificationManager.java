@@ -1,11 +1,10 @@
-/*
- * Created on 17.03.2005
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.notification;
 
 import java.util.EnumMap;
 import java.util.Map;
-
 import javax.swing.JFrame;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -22,13 +21,13 @@ import de.uka.ilkd.key.proof.ProofEvent;
 public class NotificationManager {
 
     /** list of notification tasks */
-    private Map<NotificationEventID, NotificationTask> notificationTasks =
-        new EnumMap<NotificationEventID, NotificationTask>(NotificationEventID.class);
+    private final Map<NotificationEventID, NotificationTask> notificationTasks =
+        new EnumMap<>(NotificationEventID.class);
 
     /** true if we are currently in automode */
     private boolean autoMode = false;
 
-    private NotificationListener notificationListener;
+    private final NotificationListener notificationListener;
 
     public void setDefaultNotification(JFrame comp) {
         notificationTasks.clear();

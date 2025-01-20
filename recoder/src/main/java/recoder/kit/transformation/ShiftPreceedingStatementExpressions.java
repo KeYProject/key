@@ -1,6 +1,11 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
@@ -13,9 +18,6 @@ import recoder.java.reference.VariableReference;
 import recoder.kit.*;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that ensures that the given expression is evaluated first during execution of the
@@ -178,8 +180,8 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
                 exTypes[i] = si.getType(ex);
             }
             String[] varNames = VariableKit.getNewVariableNames(si, exTypes, expression);
-            tempVarDecls = new ArrayList<Statement>(exSize);
-            tempVarRefs = new ArrayList<VariableReference>(exSize);
+            tempVarDecls = new ArrayList<>(exSize);
+            tempVarRefs = new ArrayList<>(exSize);
 
             for (int i = 0; i < exSize; i += 1) {
                 // create local temporary variable declarations for remaining
@@ -235,8 +237,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
                 // logic contained in loop control
             }
             // insert variable declarations into statement block
-            for (int i = 0; i < tempSize; i += 1) {
-                Statement child = tempVarDecls.get(i);
+            for (Statement child : tempVarDecls) {
                 destination.add(destIndex, child);
                 child.setStatementContainer(((Statement) parent).getStatementContainer());
                 if (isVisible()) {
@@ -254,10 +255,9 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
                 // preceeding.getExpression(i).getASTParent()));
                 replace(preceeding.get(i), tempVarRefs.get(i));
             }
-        } else if (parent instanceof FieldSpecification) {
+        } else if (parent instanceof FieldSpecification fs) {
             ProgramFactory f = getProgramFactory();
             // create class initializer and insert it before the field
-            FieldSpecification fs = (FieldSpecification) parent;
             StatementBlock body = f.createStatementBlock();
             // add variable declarations
             for (int i = 0; i < tempSize; i += 1) {

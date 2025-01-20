@@ -4,12 +4,12 @@
       <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
-   <methodCall name="&lt;call self.main(a,b)&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main(a, b)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="a.value=2;" pathCondition="true" pathConditionChanged="false">
+      <statement name="a.value = 2;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="AliasTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
@@ -34,7 +34,7 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <statement name="b.value=3;" pathCondition="true" pathConditionChanged="false">
+         <statement name="b.value = 3;" pathCondition="true" pathConditionChanged="false">
             <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="AliasTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                </value>
@@ -61,7 +61,7 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <statement name="return a.value+b.value;" pathCondition="true" pathConditionChanged="false">
+            <statement name="return a.value + b.value;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="AliasTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   </value>
@@ -88,13 +88,13 @@
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a,b)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a, b)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
 	Z(6(#)) {equals(b,a)}, 
 	Z(5(#)) {not(equals(b,a))}
 as result of main&gt;" signatureIncludingReturnValue="&lt;return 
 	Z(6(#)) {equals(b,a)}, 
 	Z(5(#)) {not(equals(b,a))}
-as result of self.main(a,b)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
+as result of self.main(a, b)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <methodReturnValue name="Z(6(#)) {equals(b,a)}" returnValueString="Z(6(#))" hasCondition="true" conditionString="equals(b,a)">
                   </methodReturnValue>
                   <methodReturnValue name="Z(5(#)) {not(equals(b,a))}" returnValueString="Z(5(#))" hasCondition="true" conditionString="not(equals(b,a))">

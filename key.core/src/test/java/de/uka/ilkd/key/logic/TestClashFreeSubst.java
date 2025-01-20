@@ -1,20 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
+
+import java.io.IOException;
+import java.util.Stack;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableSLList;
-
-import java.io.IOException;
-import java.util.Stack;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -49,8 +57,16 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         r2k.parseSpecialClasses();
 
         parseDecls(
-            "\\sorts { srt; }\n" + "\\functions {\n" + "  srt f(srt);\n" + "  srt g(srt,srt);\n"
-                + "}\n" + "\\predicates {\n" + "  p(srt);\n" + "  q(srt,srt);\n" + "}");
+            """
+                    \\sorts { srt; }
+                    \\functions {
+                      srt f(srt);
+                      srt g(srt,srt);
+                    }
+                    \\predicates {
+                      p(srt);
+                      q(srt,srt);
+                    }""");
 
         srt = lookup_sort("srt");
 
@@ -83,8 +99,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         return s;
     }
 
-    public Function lookup_func(String name) {
-        Function f = nss.functions().lookup(new Name(name));
+    public JFunction lookup_func(String name) {
+        JFunction f = nss.functions().lookup(new Name(name));
         if (f == null) {
             throw new RuntimeException("Function named " + name + " not found");
         }
@@ -107,7 +123,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         return v.getResult();
     }
 
-    private class ToMultiVisitor extends DefaultVisitor {
+    private class ToMultiVisitor implements DefaultVisitor {
         private final Stack<Term> subStack;
 
         ToMultiVisitor() {

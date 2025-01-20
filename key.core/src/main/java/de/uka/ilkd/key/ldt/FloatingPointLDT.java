@@ -1,58 +1,63 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
 
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
+
+import org.key_project.logic.op.Function;
 
 public interface FloatingPointLDT {
 
-    public Function getLessThan();
+    JFunction getLessThan();
 
-    public Function getGreaterThan();
+    JFunction getGreaterThan();
 
-    public Function getLessOrEquals();
+    JFunction getLessOrEquals();
 
-    public Function getGreaterOrEquals();
+    JFunction getGreaterOrEquals();
 
-    public Function getEquals();
+    JFunction getEquals();
 
-    public Function getJavaUnaryMinus();
+    JFunction getJavaUnaryMinus();
 
-    public Function getJavaAdd();
+    JFunction getJavaAdd();
 
-    public Function getJavaSub();
+    JFunction getJavaSub();
 
-    public Function getJavaMul();
+    JFunction getJavaMul();
 
-    public Function getJavaDiv();
+    JFunction getJavaDiv();
 
-    public Function getJavaMod();
+    JFunction getJavaMod();
 
-    public Function getJavaMin();
+    Function getJavaMin();
 
-    public Function getJavaMax();
+    Function getJavaMax();
 
-    public Function getIsNormal();
+    Function getIsNormal();
 
-    public Function getIsSubnormal();
+    Function getIsSubnormal();
 
-    public Function getIsNaN();
+    Function getIsNaN();
 
-    public Function getIsZero();
+    Function getIsZero();
 
-    public Function getIsNice();
+    Function getIsNice();
 
-    public Function getIsInfinite();
+    Function getIsInfinite();
 
-    public Function getIsPositive();
+    Function getIsPositive();
 
-    public Function getIsNegative();
+    Function getIsNegative();
 
-    public Function getAdd();
+    JFunction getAdd();
 
-    public Function getSub();
+    JFunction getSub();
 
-    public Function getMul();
+    JFunction getMul();
 
-    public Function getDiv();
+    JFunction getDiv();
 
-    public Function getAbs();
+    Function getAbs();
 }

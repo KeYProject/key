@@ -1,19 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.MiscTools;
-import org.antlr.v4.runtime.*;
-import org.key_project.util.java.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.java.StringUtil;
+
+import org.antlr.v4.runtime.*;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An ANTLR4 error listener that stores the errors internally. You can disable the additional
@@ -58,7 +65,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
                 "offendedSymbol is null. Use SyntaxErrorReporter only in Parsers");
         }
         SyntaxError se = new SyntaxError(recognizer, line, tok, charPositionInLine, msg,
-            tok.getTokenSource().getSourceName(), stack);
+            MiscTools.getURIFromTokenSource(tok.getTokenSource()), stack);
 
         if (logger != null) {
             logger.warn("[syntax-error] {}:{}:{}: {} {} ({})", se.source, line, charPositionInLine,
@@ -85,8 +92,9 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      * @see #hasErrors()
      */
     public void throwException() {
-        if (hasErrors())
+        if (hasErrors()) {
             throw new ParserException("", errors);
+        }
     }
 
 
@@ -129,11 +137,11 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         final Token offendingSymbol;
         final int charPositionInLine;
         final String msg;
-        final String source;
+        final URI source;
         final String stack;
 
         public SyntaxError(Recognizer<?, ?> recognizer, int line, Token offendingSymbol,
-                int charPositionInLine, String msg, String source, String stack) {
+                int charPositionInLine, String msg, URI source, String stack) {
             this.recognizer = recognizer;
             this.line = line;
             this.offendingSymbol = offendingSymbol;
@@ -187,7 +195,9 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         public Location getLocation() throws MalformedURLException {
             if (!errors.isEmpty()) {
                 SyntaxError e = errors.get(0);
-                return new Location(MiscTools.parseURL(e.source), e.line, e.charPositionInLine);
+                // e.charPositionInLine is 0 based!
+                return new Location(e.source,
+                    Position.fromOneZeroBased(e.line, e.charPositionInLine));
             }
             return null;
         }

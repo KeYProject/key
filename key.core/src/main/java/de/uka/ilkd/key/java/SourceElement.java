@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.equality.EqualsModProperty;
+import de.uka.ilkd.key.logic.equality.Property;
+
+import org.key_project.logic.SyntaxElement;
 
 /**
  * A source element is a piece of syntax. It does not necessarily have a semantics, at least none
@@ -11,7 +15,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
  * to achieve an immutable structure
  */
 
-public interface SourceElement extends SVSubstitute {
+public interface SourceElement extends SyntaxElement, EqualsModProperty<SourceElement> {
 
 
     /**
@@ -66,7 +70,7 @@ public interface SourceElement extends SVSubstitute {
      *
      * @return the relative position of the primary token.
      */
-    Position getRelativePosition();
+    recoder.java.SourceElement.Position getRelativePosition();
 
     /** complete position information */
     PositionInfo getPositionInfo();
@@ -81,15 +85,6 @@ public interface SourceElement extends SVSubstitute {
     void visit(Visitor v);
 
     /**
-     * Pretty print.
-     *
-     * @param w a pretty printer.
-     * @exception IOException occasionally thrown.
-     */
-    void prettyPrint(PrettyPrinter w) throws java.io.IOException;
-
-
-    /**
      * This method returns true if two program parts are equal modulo renaming. The equality is
      * mainly a syntactical equality with some exceptions: if a variable is declared we abstract
      * from the name of the variable, so the first declared variable gets e.g. the name decl_1, the
@@ -100,8 +95,16 @@ public interface SourceElement extends SVSubstitute {
      * seen as {int decl_1; decl_1=0;} for the first one but {int decl_1; i=0;} for the second one.
      * These are not syntactical equal, therefore false is returned.
      */
-    boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat);
+    @Override
+    default <V> boolean equalsModProperty(Object o, Property<SourceElement> property, V... v) {
+        if (!(o instanceof SourceElement)) {
+            return false;
+        }
+        return property.equalsModThisProperty(this, (SourceElement) o, v);
+    }
 
-
-
+    @Override
+    default int hashCodeModProperty(Property<SourceElement> property) {
+        return property.hashCodeModThisProperty(this);
+    }
 }

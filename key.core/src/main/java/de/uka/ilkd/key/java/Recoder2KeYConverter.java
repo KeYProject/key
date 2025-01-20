@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.lang.reflect.Constructor;
@@ -8,12 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -31,22 +28,21 @@ import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;
@@ -54,6 +50,7 @@ import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.io.DataLocation;
 import recoder.java.NonTerminalProgramElement;
+import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
 
@@ -62,17 +59,17 @@ import static java.lang.String.format;
 /**
  * Objects of this class can be used to transform an AST returned by the recoder library to the
  * corresponding yet immutable KeY data structures.
- *
+ * <p>
  * Call the method process() to convert an arbitrary object.
- *
+ * <p>
  * The method callConvert is used to perform a run-time dispatch upon the parameters.
- *
+ * <p>
  * The actual conversion is done in convert-methods which must be declared public due to the used
  * reflection method lookup function.
- *
+ * <p>
  * There is a general method {@link #callConvert(recoder.java.ProgramElement)} that does the job in
  * general. Several special cases must be treated separately.
- *
+ * <p>
  * This code used to be part of {@link Recoder2KeY} and has been 'out-sourced'.
  *
  * @author mattias ulbrich
@@ -97,7 +94,7 @@ public class Recoder2KeYConverter {
 
     public CompilationUnit processCompilationUnit(recoder.java.CompilationUnit cu,
             DataLocation context) {
-        currentClassURI = MiscTools.extractURI(context);
+        currentClassURI = MiscTools.extractURI(context).orElse(null);
         Object result = process(cu);
         currentClassURI = null;
 
@@ -119,13 +116,13 @@ public class Recoder2KeYConverter {
     /**
      * caches access to methods for reflection. It is a HashMap<Class, Method>
      */
-    private final HashMap<Class<?>, Method> methodCache = new LinkedHashMap<Class<?>, Method>(400);
+    private final HashMap<Class<?>, Method> methodCache = new LinkedHashMap<>(400);
 
     /**
      * caches constructor access for reflection. It is a HashMap<Class, Constructor>
      */
     private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache =
-        new LinkedHashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>>(400);
+        new LinkedHashMap<>(400);
 
     /**
      * Hashmap from <code>recoder.java.declaration.FieldSpecification</code> to
@@ -133,16 +130,16 @@ public class Recoder2KeYConverter {
      * Access to this map is performed via the method
      * <code>getProgramVariableForFieldSpecification</code>
      */
-    private HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping =
-        new LinkedHashMap<recoder.java.declaration.FieldSpecification, ProgramVariable>();
+    private final HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping =
+        new LinkedHashMap<>();
 
     /**
      * methodsDeclaring contains the recoder method declarations as keys that have been started to
      * convert but are not yet finished. The mapped value is the reference to the later completed
      * IProgramMethod.
      */
-    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring =
-        new LinkedHashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod>();
+    private final HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring =
+        new LinkedHashMap<>();
 
     /**
      * locClass2finalVar stores the final variables that need to be passed to the constructor of an
@@ -163,7 +160,7 @@ public class Recoder2KeYConverter {
     /**
      * the associated Recoder2KeY object
      */
-    private Recoder2KeY rec2key;
+    private final Recoder2KeY rec2key;
 
     /**
      * The namespaces are here to provide some conversion functions access to previously defined
@@ -200,7 +197,7 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * retrieve the recoder<->key mapping from the associated Recoder2KeY.
+     * retrieve the recoder {@code <->} key mapping from the associated Recoder2KeY.
      *
      * @return the mapping, not null.
      */
@@ -221,10 +218,10 @@ public class Recoder2KeYConverter {
 
     /**
      * convert a recoder ProgramElement to a corresponding KeY data structure entity.
-     *
+     * <p>
      * Almost always the returned type carries the same Classname but in a KeY rather than a recoder
      * package.
-     *
+     * <p>
      * Determines the right convert method using reflection
      *
      * @param pe the recoder.java.JavaProgramElement to be converted, not null.
@@ -235,8 +232,9 @@ public class Recoder2KeYConverter {
      */
     protected Object callConvert(recoder.java.ProgramElement pe) throws ConvertException {
 
-        if (pe == null)
+        if (pe == null) {
             throw new ConvertException("cannot convert 'null'");
+        }
 
         Class<?> contextClass = pe.getClass();
         Method m = methodCache.get(contextClass);
@@ -246,7 +244,7 @@ public class Recoder2KeYConverter {
             Class<?>[] context = new Class<?>[] { contextClass };
 
             // remember all superclasses for the cache
-            LinkedList<Class<?>> l = new LinkedList<Class<?>>();
+            LinkedList<Class<?>> l = new LinkedList<>();
 
             while (m == null && context[0] != null) {
                 l.add(contextClass);
@@ -254,14 +252,14 @@ public class Recoder2KeYConverter {
                 try {
                     m = getClass().getMethod("convert", context);
                 } catch (NoSuchMethodException nsme) {
-                    LOGGER.debug("convert method not found for: " + context[0]);
                     context[0] = contextClass = context[0].getSuperclass();
                 }
             }
 
-            if (m == null)
+            if (m == null) {
                 throw new ConvertException(
-                    "Could not find convert method for class " + pe.getClass());
+                    "Could not find convert method for class or superclasses of " + pe.getClass());
+            }
 
             for (Class<?> aL : l) {
                 methodCache.put(aL, m);
@@ -308,7 +306,7 @@ public class Recoder2KeYConverter {
     /**
      * iterate over all children and call convert upon them. Gather the resulting KeY structures in
      * an ExtList.
-     *
+     * <p>
      * In addition to the child ast-branches, all comments are gathered also.
      *
      * @param pe the NonTerminalProgramElement that needs its children before being converted
@@ -323,8 +321,8 @@ public class Recoder2KeYConverter {
         // convert all comments for pe
         ASTList<recoder.java.Comment> l = pe.getComments();
         if (l != null) {
-            for (int i = 0, sz = l.size(); i < sz; i++) {
-                children.add(convert(l.get(i)));
+            for (recoder.java.Comment comment : l) {
+                children.add(convert(comment));
             }
         }
 
@@ -355,8 +353,8 @@ public class Recoder2KeYConverter {
         ExtList children = new ExtList();
         ASTList<recoder.java.Comment> l = pe.getComments();
         if (l != null) {
-            for (int i = 0, sz = l.size(); i < sz; i++) {
-                children.add(convert(l.get(i)));
+            for (recoder.java.Comment comment : l) {
+                children.add(convert(comment));
             }
         }
         return children;
@@ -371,8 +369,9 @@ public class Recoder2KeYConverter {
     private ExtList collectChildrenAndComments(recoder.java.ProgramElement pe) {
         ExtList ret = new ExtList();
 
-        if (pe instanceof recoder.java.NonTerminalProgramElement)
+        if (pe instanceof recoder.java.NonTerminalProgramElement) {
             ret.addAll(collectChildren((NonTerminalProgramElement) pe));
+        }
         ret.addAll(collectComments(pe));
 
         return ret;
@@ -385,48 +384,38 @@ public class Recoder2KeYConverter {
      * @return the newly created PositionInfo
      */
     private PositionInfo positionInfo(recoder.java.SourceElement se) {
-        Position relPos =
-            new Position(se.getRelativePosition().getLine(), se.getRelativePosition().getColumn());
-        Position startPos =
-            new Position(se.getStartPosition().getLine(), se.getStartPosition().getColumn());
-        Position endPos =
-            new Position(se.getEndPosition().getLine(), se.getEndPosition().getColumn());
-        if ((!inLoopInit))
+        var relPos = se.getRelativePosition();
+        var startPos = Position.fromSEPosition(se.getStartPosition());
+        var endPos = Position.fromSEPosition(se.getEndPosition());
+        if ((!inLoopInit)) {
             return new PositionInfo(relPos, startPos, endPos, currentClassURI);
-        else
+        } else {
             return new PositionInfo(relPos, startPos, endPos);
-
+        }
     }
 
     /**
      * @return a literal constant representing the value of <code>p_er</code>
      */
     private Literal getLiteralFor(recoder.service.ConstantEvaluator.EvaluationResult p_er) {
-        switch (p_er.getTypeCode()) {
-        case recoder.service.ConstantEvaluator.BOOLEAN_TYPE:
-            return BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
-        case recoder.service.ConstantEvaluator.CHAR_TYPE:
-            return new CharLiteral(p_er.getChar());
-        case recoder.service.ConstantEvaluator.DOUBLE_TYPE:
-            return new DoubleLiteral(p_er.getDouble());
-        case recoder.service.ConstantEvaluator.FLOAT_TYPE:
-            return new FloatLiteral(p_er.getFloat());
-        case recoder.service.ConstantEvaluator.BYTE_TYPE:
-            return new IntLiteral(p_er.getByte());
-        case recoder.service.ConstantEvaluator.SHORT_TYPE:
-            return new IntLiteral(p_er.getShort());
-        case recoder.service.ConstantEvaluator.INT_TYPE:
-            return new IntLiteral(p_er.getInt());
-        case recoder.service.ConstantEvaluator.LONG_TYPE:
-            return new LongLiteral(p_er.getLong());
-        case recoder.service.ConstantEvaluator.STRING_TYPE:
-            if (p_er.getString() == null)
-                return NullLiteral.NULL;
-            return new StringLiteral("\"" + p_er.getString() + "\"");
-        default:
-            throw new ConvertException(
-                "Don't know how to handle type " + p_er.getTypeCode() + " of " + p_er);
-        }
+        return switch (p_er.getTypeCode()) {
+            case recoder.service.ConstantEvaluator.BOOLEAN_TYPE -> BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
+            case recoder.service.ConstantEvaluator.CHAR_TYPE -> new CharLiteral(p_er.getChar());
+            case recoder.service.ConstantEvaluator.DOUBLE_TYPE -> new DoubleLiteral(p_er.getDouble());
+            case recoder.service.ConstantEvaluator.FLOAT_TYPE -> new FloatLiteral(p_er.getFloat());
+            case recoder.service.ConstantEvaluator.BYTE_TYPE -> new IntLiteral(p_er.getByte());
+            case recoder.service.ConstantEvaluator.SHORT_TYPE -> new IntLiteral(p_er.getShort());
+            case recoder.service.ConstantEvaluator.INT_TYPE -> new IntLiteral(p_er.getInt());
+            case recoder.service.ConstantEvaluator.LONG_TYPE -> new LongLiteral(p_er.getLong());
+            case recoder.service.ConstantEvaluator.STRING_TYPE -> {
+                if (p_er.getString() == null) {
+                    yield NullLiteral.NULL;
+                }
+                yield new StringLiteral("\"" + p_er.getString() + "\"");
+            }
+            default -> throw new ConvertException(
+                    "Don't know how to handle type " + p_er.getTypeCode() + " of " + p_er);
+        };
     }
 
 
@@ -438,7 +427,7 @@ public class Recoder2KeYConverter {
      *         of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = ImmutableSLList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
@@ -469,9 +458,9 @@ public class Recoder2KeYConverter {
 
     /**
      * The default procedure.
-     *
+     * <p>
      * It iterates over all children, calls convert upon them
-     *
+     * <p>
      * collect all children, convert them. Create a new instance of the corresponding KeY class and
      * call its constructor with the list of children.
      *
@@ -498,14 +487,15 @@ public class Recoder2KeYConverter {
             return result;
         } catch (Exception e) {
             final String className = class_.toString().substring(6);
-            final StringBuffer sb = new StringBuffer(className);
+            final StringBuilder sb = new StringBuilder(className);
             sb.append('(');
             for (Object p : parameter) {
                 sb.append(p.toString());
                 sb.append(',');
             }
-            if (sb.charAt(sb.length() - 1) == ',')
+            if (sb.charAt(sb.length() - 1) == ',') {
                 sb.deleteCharAt(sb.length() - 1);
+            }
             sb.append(')');
             final String constructorName = sb.toString();
             LOGGER.debug("recoder2key: invocation of constructor {} failed.", constructorName, e);
@@ -534,7 +524,7 @@ public class Recoder2KeYConverter {
             LOGGER.debug("There is an AST class {} missing at KeY.", className, cnfe);
             throw new ConvertException(
                 "Recoder2KeYConverter could not find a conversion from RecodeR "
-                    + recoderClass.getClass() + ".\n"
+                    + recoderClass + ".\n"
                     + "Maybe you have added a class to package key.java.recoderext and did not add the equivalent to key.java.expression or its subpackages."
                     + "\nAt least there is no class named " + className + ".",
                 cnfe);
@@ -547,7 +537,7 @@ public class Recoder2KeYConverter {
         }
     }
 
-    private static int RECODER_PREFIX_LENGTH = "recoder.".length();
+    private static final int RECODER_PREFIX_LENGTH = "recoder.".length();
 
     /**
      * constructs the name of the corresponding KeYClass. Expected prefixes are either recoder or
@@ -571,7 +561,7 @@ public class Recoder2KeYConverter {
 
     /**
      * determines the right standard constructor of the KeYClass.
-     *
+     * <p>
      * Use a cache to only look up classes once.
      *
      * @param recoderClass the Class of the recoder AST object
@@ -584,7 +574,7 @@ public class Recoder2KeYConverter {
             result = constructorCache.get(recoderClass);
 
             if (result == null) {
-                result = getKeYClass(recoderClass).getConstructor(new Class[] { ExtList.class });
+                result = getKeYClass(recoderClass).getConstructor(ExtList.class);
                 constructorCache.put(recoderClass, result);
             }
         } catch (NoSuchMethodException nsme) {
@@ -596,7 +586,7 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * store an element to the recoder<->key mapping.
+     * store an element to the recoder {@code <->} key mapping.
      *
      * @param r the recoder element (not null)
      * @param k the key element (not null)
@@ -728,6 +718,11 @@ public class Recoder2KeYConverter {
         return new SeqReverse(children);
     }
 
+    public SeqPut convert(de.uka.ilkd.key.java.recoderext.adt.SeqPut e) {
+        ExtList children = collectChildren(e);
+        return new SeqPut(children);
+    }
+
     public EmptyMapLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral e) {
         return EmptyMapLiteral.INSTANCE;
     }
@@ -782,7 +777,7 @@ public class Recoder2KeYConverter {
         }
 
 
-        Function named = namespaceSet.functions().lookup(new Name(name));
+        JFunction named = namespaceSet.functions().lookup(new Name(name));
 
         if (named == null) {
             // TODO provide position information?!
@@ -854,7 +849,14 @@ public class Recoder2KeYConverter {
 
     /** convert a recoder Identifier to a KeY Identifier */
     public ProgramElementName convert(recoder.java.Identifier id) {
-        return VariableNamer.parseName(id.getText(), collectComments(id).collect(Comment.class));
+        final NonTerminalProgramElement parent = id.getParent();
+        if (parent instanceof recoder.java.reference.VariableReference ||
+                parent instanceof recoder.java.declaration.VariableSpecification) {
+            return VariableNamer.parseName(id.getText(),
+                collectComments(id).collect(Comment.class));
+        } else {
+            return new ProgramElementName(id.getText(), collectComments(id).collect(Comment.class));
+        }
     }
 
     public ProgramElementName convert(ImplicitIdentifier id) {
@@ -909,7 +911,7 @@ public class Recoder2KeYConverter {
             keyArgs = new Expression[0];
         }
 
-        final MethodReference mr = new MethodReference(new ImmutableArray<Expression>(keyArgs),
+        final MethodReference mr = new MethodReference(new ImmutableArray<>(keyArgs),
             methodName, invocationTarget);
 
         return new MethodBodyStatement(bodySource, resultVar, mr);
@@ -945,7 +947,7 @@ public class Recoder2KeYConverter {
      * @return the converted statement
      */
     public JmlAssert convert(de.uka.ilkd.key.java.recoderext.JmlAssert ja) {
-        return new JmlAssert(ja.getKind(), ja.getCondition(), positionInfo(ja), services);
+        return new JmlAssert(ja.getKind(), ja.getCondition(), positionInfo(ja));
     }
 
     // ------------------- declaration ---------------------
@@ -1026,7 +1028,7 @@ public class Recoder2KeYConverter {
                 .getContainingClassType((recoder.abstraction.Member) cd);
 
         final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
-        Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
+        Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
         final KeYJavaType containerKJT = getKeYJavaType(cont);
         IProgramMethod result = new ProgramMethod(consDecl, containerKJT, KeYJavaType.VOID_TYPE,
             positionInfo(cd), heapSort, heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
@@ -1045,7 +1047,7 @@ public class Recoder2KeYConverter {
             new ConstructorDeclaration(children, dc.getContainingClassType().isInterface());
         recoder.abstraction.ClassType cont = dc.getContainingClassType();
         final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
-        Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
+        Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
         final KeYJavaType containerKJT = getKeYJavaType(cont);
         IProgramMethod result =
             new ProgramMethod(consDecl, containerKJT, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
@@ -1124,8 +1126,12 @@ public class Recoder2KeYConverter {
 
             final ProgramElementName name =
                 VariableNamer.parseName(makeAdmissibleName(recoderVarSpec.getName()));
+            var isGhost = containsModifier(recoderVarSpec.getParent(),
+                de.uka.ilkd.key.java.recoderext.Ghost.class);
+            var isFinal = recoderVarSpec.isFinal();
+
             final ProgramVariable pv =
-                new LocationVariable(name, getKeYJavaType(recoderType), recoderVarSpec.isFinal());
+                new LocationVariable(name, getKeYJavaType(recoderType), isGhost, isFinal);
             varSpec = new VariableSpecification(collectChildren(recoderVarSpec), pv,
                 recoderVarSpec.getDimensions(), pv.getKeYJavaType());
 
@@ -1177,7 +1183,7 @@ public class Recoder2KeYConverter {
                         .getContainingClassType((recoder.abstraction.Member) md);
 
             final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
-            Sort heapSort = heapLDT == null ? Sort.ANY : heapLDT.targetSort();
+            Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
             final KeYJavaType containerType = getKeYJavaType(cont);
             assert containerType != null;
             final Type returnType = md.getReturnType();
@@ -1227,6 +1233,18 @@ public class Recoder2KeYConverter {
         return varSpec;
     }
 
+    private static boolean containsModifier(recoder.java.declaration.JavaDeclaration fs,
+            Class<? extends DeclarationSpecifier> cls) {
+        ASTList<DeclarationSpecifier> specifiers = fs.getDeclarationSpecifiers();
+        int s = (specifiers == null) ? 0 : specifiers.size();
+        for (int i = 0; i < s; i += 1) {
+            if (cls.isInstance(specifiers.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * this is needed by #convert(FieldSpecification).
      */
@@ -1253,20 +1271,16 @@ public class Recoder2KeYConverter {
                 final Literal compileTimeConstant =
                     getCompileTimeConstantInitializer(recoderVarSpec);
 
-                boolean isModel = false;
+                boolean isModel = containsModifier(recoderVarSpec.getParent(),
+                    de.uka.ilkd.key.java.recoderext.Model.class);
                 boolean isFinal = recoderVarSpec.isFinal();
-                for (recoder.java.declaration.Modifier mod : recoderVarSpec.getParent()
-                        .getModifiers()) {
-                    if (mod instanceof de.uka.ilkd.key.java.recoderext.Model) {
-                        isModel = true;
-                        break;
-                    }
-                }
+                boolean isGhost = containsModifier(recoderVarSpec.getParent(),
+                    de.uka.ilkd.key.java.recoderext.Ghost.class);
 
                 if (compileTimeConstant == null) {
                     pv = new LocationVariable(pen, getKeYJavaType(recoderType),
                         getKeYJavaType(recContainingClassType), recoderVarSpec.isStatic(), isModel,
-                        false, isFinal);
+                        isGhost, isFinal);
                 } else {
                     pv = new ProgramConstant(pen, getKeYJavaType(recoderType),
                         getKeYJavaType(recContainingClassType), recoderVarSpec.isStatic(),
@@ -1293,8 +1307,9 @@ public class Recoder2KeYConverter {
             recoder.java.declaration.FieldSpecification recoderVarSpec) {
 
         // Necessary condition: the field is static and final
-        if (!recoderVarSpec.isFinal() || !recoderVarSpec.isStatic())
+        if (!recoderVarSpec.isFinal() || !recoderVarSpec.isStatic()) {
             return null;
+        }
 
         recoder.java.Expression init = recoderVarSpec.getInitializer();
 
@@ -1305,10 +1320,10 @@ public class Recoder2KeYConverter {
                 new recoder.service.ConstantEvaluator.EvaluationResult();
 
             try {
-                if (ce.isCompileTimeConstant(init, er))
+                if (ce.isCompileTimeConstant(init, er)) {
                     return getLiteralFor(er);
-            } catch (NumberFormatException t) {
-            } catch (java.lang.ArithmeticException t) {
+                }
+            } catch (NumberFormatException | ArithmeticException t) {
             }
         }
 
@@ -1344,8 +1359,7 @@ public class Recoder2KeYConverter {
         }
         throw new PosConvertException(
             "recoder2key: Qualifier " + urq.getName() + " not resolvable.",
-            urq.getFirstElement().getStartPosition().getLine(),
-            urq.getFirstElement().getStartPosition().getColumn() - 1);
+            Position.fromSEPosition(urq.getFirstElement().getStartPosition()));
     }
 
     /**
@@ -1474,7 +1488,7 @@ public class Recoder2KeYConverter {
                         ? ((recoder.java.CompilationUnit) tdc).getOriginalDataLocation()
                         : null;
 
-                currentClassURI = MiscTools.extractURI(loc);
+                currentClassURI = MiscTools.extractURI(loc).orElse(null);
                 pm = convert((recoder.java.declaration.MethodDeclaration) method);
                 // because of cycles when reading recursive programs
                 currentClassURI = oldCurrent;
@@ -1497,7 +1511,7 @@ public class Recoder2KeYConverter {
 
         return new MethodReference(children,
             pm == null ? new ProgramElementName(mr.getName()) : pm.getProgramElementName(), prefix,
-            positionInfo(mr), (String) null);
+            positionInfo(mr), null);
     }
 
     // --------------Special treatment because of ambiguities ----------
@@ -1597,8 +1611,8 @@ public class Recoder2KeYConverter {
         ASTList<recoder.java.Expression> recLoopUpdates = ls.getUpdates();
         inLoopInit = true;
         if (recLoopUpdates != null) {
-            for (int i = 0, sz = recLoopUpdates.size(); i < sz; i++) {
-                updates.add(callConvert(recLoopUpdates.get(i)));
+            for (recoder.java.Expression recLoopUpdate : recLoopUpdates) {
+                updates.add(callConvert(recLoopUpdate));
             }
             inLoopInit = false;
             return new ForUpdates(updates, positionInfo(ls));
@@ -1728,7 +1742,7 @@ public class Recoder2KeYConverter {
         }
 
         if (rp == null) {
-            return new New(arguments, maybeAnonClass, (ReferencePrefix) null);
+            return new New(arguments, maybeAnonClass, null);
         } else {
             return new New(arguments, maybeAnonClass, (ReferencePrefix) callConvert(rp));
         }
@@ -1768,6 +1782,11 @@ public class Recoder2KeYConverter {
 
     public CopyAssignment convert(recoder.java.expression.operator.CopyAssignment arg) {
         return new CopyAssignment(collectChildrenAndComments(arg));
+    }
+
+    public SetStatement convert(
+            de.uka.ilkd.key.java.recoderext.SetStatement arg) {
+        return new SetStatement(arg.getParserContext(), positionInfo(arg));
     }
 
     public TransactionStatement convert(de.uka.ilkd.key.java.recoderext.TransactionStatement tr) {
@@ -1982,7 +2001,7 @@ public class Recoder2KeYConverter {
         if (arg.getMethodContext() != null) {
             JavaInfo jInfo = services.getJavaInfo();
 
-            ImmutableList<KeYJavaType> paramTypes = ImmutableSLList.<KeYJavaType>nil();
+            ImmutableList<KeYJavaType> paramTypes = ImmutableSLList.nil();
             for (recoder.java.reference.TypeReference tr : arg.getMethodContext().getParamTypes()) {
                 TypeReference keyTR = convert(tr);
                 paramTypes = paramTypes.append(keyTR.getKeYJavaType());

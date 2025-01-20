@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
@@ -11,7 +14,7 @@ public interface InfFlowPOSnippetFactory {
     /**
      * The snippets which can be produced by this factory.
      */
-    public static enum Snippet {
+    enum Snippet {
         // ( {s1}respects = {s2}respects
         // & {s1}declassifies = {s2}declassifies )
         // -> {s1_post}respects = {s2_post}respects
@@ -52,9 +55,9 @@ public interface InfFlowPOSnippetFactory {
         Snippet(Class<?> c) {
             this.c = c;
         }
-    };
+    }
 
 
-    public Term create(Snippet snippet) throws UnsupportedOperationException;
+    Term create(Snippet snippet) throws UnsupportedOperationException;
 
 }

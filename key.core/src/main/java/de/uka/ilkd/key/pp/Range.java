@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 /**
@@ -81,9 +84,6 @@ public class Range {
         if (end != other.end) {
             return false;
         }
-        if (start != other.start) {
-            return false;
-        }
-        return true;
+        return start == other.start;
     }
 }

@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.net.URI;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * <p>
@@ -29,6 +32,8 @@ public class ProofJavaSourceCollection {
 
     /** @see #getRelevantFiles() */
     private ImmutableSet<URI> relevantFiles = DefaultImmutableSet.nil();
+
+    public ProofJavaSourceCollection() {}
 
     /**
      * <p>

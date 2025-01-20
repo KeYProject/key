@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.mgt;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -11,7 +14,7 @@ public class EnvNode extends DefaultMutableTreeNode implements TaskTreeNode {
      *
      */
     private static final long serialVersionUID = 5739765420005738444L;
-    private ProofEnvironment env;
+    private final ProofEnvironment env;
 
     public EnvNode(ProofEnvironment e) {
         super(e);

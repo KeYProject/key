@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.extension.api;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.GoalList;
@@ -7,11 +15,6 @@ import de.uka.ilkd.key.gui.StrategySelectionView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
-
-import javax.swing.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
 
 /**
  * Adapter for {@link KeYGuiExtension.KeyboardShortcuts} interface.
@@ -26,20 +29,27 @@ public abstract class KeyboardShortcutAdapter implements KeYGuiExtension.Keyboar
     @Override
     public final Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
             JComponent component) {
-        if (Objects.equals(SEQUENT_VIEW, componentId))
+        if (Objects.equals(SEQUENT_VIEW, componentId)) {
             return getShortcuts(mediator, (SequentView) component);
-        if (Objects.equals(GOAL_LIST, componentId))
+        }
+        if (Objects.equals(GOAL_LIST, componentId)) {
             return getShortcuts(mediator, (GoalList) component);
-        if (Objects.equals(PROOF_TREE_VIEW, componentId))
+        }
+        if (Objects.equals(PROOF_TREE_VIEW, componentId)) {
             return getShortcuts(mediator, (ProofTreeView) component);
-        if (Objects.equals(MAIN_WINDOW, componentId))
+        }
+        if (Objects.equals(MAIN_WINDOW, componentId)) {
             return getShortcutsMainWindow(mediator, (JPanel) component);
-        if (Objects.equals(INFO_VIEW, componentId))
+        }
+        if (Objects.equals(INFO_VIEW, componentId)) {
             return getShortcuts(mediator, (InfoView) component);
-        if (Objects.equals(STRATEGY_SELECTION_VIEW, componentId))
+        }
+        if (Objects.equals(STRATEGY_SELECTION_VIEW, componentId)) {
             return getShortcuts(mediator, (StrategySelectionView) component);
-        if (Objects.equals(SOURCE_VIEW, componentId))
+        }
+        if (Objects.equals(SOURCE_VIEW, componentId)) {
             return getShortcuts(mediator, (SourceView) component);
+        }
 
         return fallbackShortcuts(mediator, componentId, component);
     }

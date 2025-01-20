@@ -1,24 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
+
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.literal.NullLiteral;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.NamedProgramElement;
-import de.uka.ilkd.key.java.ParentIsInterfaceDeclaration;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.TypeScope;
-import de.uka.ilkd.key.java.VariableScope;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.Constructor;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Method;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +36,19 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     protected final boolean isLibrary;
 
+    /**
+     * JML modifiers of a type
+     *
+     * @param strictlyPure strictly pure
+     * @param pure pure
+     * @param nullableByDefault nullable by default
+     * @param specMathMode spec math mode
+     */
+    public record JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
+            SpecMathMode specMathMode) {}
+
+    protected final JMLModifiers jmlModifiers;
+
 
     public TypeDeclaration() {
         this.name = null;
@@ -46,6 +56,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
         this.members = null;
         this.parentIsInterfaceDeclaration = false;
         this.isLibrary = false;
+        this.jmlModifiers = new JMLModifiers(false, false, false, null);
     }
 
     /**
@@ -63,6 +74,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
         this.members = new ImmutableArray<>(members);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
         this.isLibrary = isLibrary;
+        this.jmlModifiers = JMLInfoExtractor.parseClass(this);
     }
 
     /**
@@ -84,6 +96,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             this.parentIsInterfaceDeclaration = false;
         }
         this.isLibrary = isLibrary;
+        this.jmlModifiers = JMLInfoExtractor.parseClass(this);
     }
 
     /**
@@ -96,7 +109,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     }
 
     public SourceElement getFirstElement() {
-        if (modArray != null && (modArray.size() > 0)) {
+        if (modArray != null && (!modArray.isEmpty())) {
             return modArray.get(0);
         } else {
             return this;
@@ -106,6 +119,10 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     public SourceElement getLastElement() {
         // end of member block
         return this;
+    }
+
+    public JMLModifiers getJmlModifiers() {
+        return jmlModifiers;
     }
 
     /**
@@ -342,7 +359,8 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     public boolean equals(Object o) {
         if (o instanceof TypeDeclaration) {
             return ((TypeDeclaration) o).fullName.equals(fullName);
-        } else
+        } else {
             return false;
+        }
     }
 }

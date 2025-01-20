@@ -1,14 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util;
 
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.jspecify.annotations.Nullable;
 
 /**
- * extends java.util.LinkedList in order to collect elements according to their type
+ * Extends java.util.LinkedList in order to collect elements according to their type.
+ * Has facilities to get elements of a certain type ({@link #get(Class)}, {@link #collect(Class)}).
  */
-public class ExtList extends LinkedList<Object> {
+public final class ExtList extends LinkedList<Object> {
 
     private static final long serialVersionUID = 9182017368310263908L;
 
@@ -18,8 +24,7 @@ public class ExtList extends LinkedList<Object> {
 
     public ExtList(Object[] a) {
         super();
-        for (Object o : a)
-            add(o);
+        this.addAll(Arrays.asList(a));
     }
 
     /** copies list to array (array has type of cl) */
@@ -38,7 +43,7 @@ public class ExtList extends LinkedList<Object> {
      */
     @SuppressWarnings("unchecked")
     public <T> T[] collect(Class<T> cl) {
-        LinkedList<T> colls = new LinkedList<T>();
+        LinkedList<T> colls = new LinkedList<>();
         for (Object next : this) {
             if (cl.isInstance(next) && (next != null)) {
                 colls.add((T) next);
@@ -56,10 +61,8 @@ public class ExtList extends LinkedList<Object> {
      * @return the first element with type cl in list
      */
     @SuppressWarnings("unchecked")
-    public <T> T get(Class<T> cl) {
-        Iterator<Object> it = iterator();
-        while (it.hasNext()) {
-            Object next = it.next();
+    public <T> @Nullable T get(Class<T> cl) {
+        for (Object next : this) {
             if (cl.isInstance(next) && (next != null)) {
                 return (T) next;
             }
@@ -76,7 +79,7 @@ public class ExtList extends LinkedList<Object> {
      * @return the first element with type cl in list
      */
     @SuppressWarnings("unchecked")
-    public <T> T removeFirstOccurrence(Class<T> cl) {
+    public <T> @Nullable T removeFirstOccurrence(Class<T> cl) {
         Iterator<Object> it = iterator();
         while (it.hasNext()) {
             Object next = it.next();

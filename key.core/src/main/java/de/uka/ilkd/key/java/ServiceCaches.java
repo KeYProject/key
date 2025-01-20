@@ -1,14 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.key_project.util.LRUCache;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
@@ -20,9 +20,15 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
+import de.uka.ilkd.key.strategy.feature.AppliedRuleAppsNameCache;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Pair;
 
 /**
  * <p>
@@ -73,7 +79,7 @@ public class ServiceCaches {
      * The cache used by {@link TermTacletAppIndexCacheSet} instances.
      */
     private final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache =
-        new LRUCache<CacheKey, TermTacletAppIndex>(MAX_TERM_TACLET_APP_INDEX_ENTRIES);
+        new LRUCache<>(MAX_TERM_TACLET_APP_INDEX_ENTRIES);
 
     /*
      * Table of formulas which could be splitted using the beta rule This is the cache the method
@@ -81,56 +87,56 @@ public class ServiceCaches {
      *
      * keys: Term values: TermInfo
      */
-    private final LRUCache<Term, TermInfo> betaCandidates = new LRUCache<Term, TermInfo>(1000);
+    private final LRUCache<Term, TermInfo> betaCandidates = new LRUCache<>(1000);
 
     private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
-        new LRUCache<PosInOccurrence, RuleAppCost>(1000);
+        new LRUCache<>(1000);
 
     private final LRUCache<Operator, Integer> introductionTimeCache =
-        new LRUCache<Operator, Integer>(10000);
+        new LRUCache<>(10000);
 
-    private final LRUCache<Term, Monomial> monomialCache = new LRUCache<Term, Monomial>(2000);
+    private final LRUCache<Term, Monomial> monomialCache = new LRUCache<>(2000);
 
-    private final LRUCache<Term, Polynomial> polynomialCache = new LRUCache<Term, Polynomial>(2000);
+    private final LRUCache<Term, Polynomial> polynomialCache = new LRUCache<>(2000);
 
     /**
      * a <code>HashMap</code> from <code>Term</code> to <code>TriggersSet</code> uses to cache all
      * created TriggersSets
      */
-    private final Map<Term, TriggersSet> triggerSetCache = new LRUCache<Term, TriggersSet>(1000);
+    private final Map<Term, TriggersSet> triggerSetCache = new LRUCache<>(1000);
 
     /**
      * Map from <code>Term</code>(allTerm) to <code>ClausesGraph</code>
      */
-    private final Map<Term, ClausesGraph> graphCache = new LRUCache<Term, ClausesGraph>(1000);
+    private final Map<Term, ClausesGraph> graphCache = new LRUCache<>(1000);
 
     /**
      * Cache used by the TermFactory to avoid unnecessary creation of terms
      */
-    private final Map<Term, Term> termCache = new LRUCache<Term, Term>(20000);
+    private final Map<Term, Term> termCache = new LRUCache<>(20000);
 
     /**
      * Cache used by TypeComparisonCondition
      */
     private final Map<Sort, Map<Sort, Boolean>> disjointnessCache =
-        new WeakHashMap<Sort, Map<Sort, Boolean>>();
+        new WeakHashMap<>();
 
     /**
      * Cache used by HandleArith for caching formatted terms
      */
-    private final LRUCache<Term, Term> formattedTermCache = new LRUCache<Term, Term>(5000);
+    private final LRUCache<Term, Term> formattedTermCache = new LRUCache<>(5000);
 
     /**
      * Caches used bu HandleArith to cache proof results
      */
-    private final LRUCache<Term, Term> provedByArithFstCache = new LRUCache<Term, Term>(5000);
+    private final LRUCache<Term, Term> provedByArithFstCache = new LRUCache<>(5000);
 
     private final LRUCache<Pair<Term, Term>, Term> provedByArithSndCache =
-        new LRUCache<Pair<Term, Term>, Term>(5000);
+        new LRUCache<>(5000);
 
     /** Cache used by the exhaustive macro */
     private final Map<Node, PosInOccurrence> exhaustiveMacroCache =
-        new WeakHashMap<Node, PosInOccurrence>();
+        new WeakHashMap<>();
 
     /** Cache used by the ifinstantiator */
     private final IfInstantiationCachePool ifInstantiationCache = new IfInstantiationCachePool();
@@ -138,6 +144,13 @@ public class ServiceCaches {
     /** Cache used IfFormulaInstSeq */
     private final IfFormulaInstantiationCache ifFormulaInstantiationCache =
         new IfFormulaInstantiationCache();
+
+    /** applied rule apps name cache */
+    private final AppliedRuleAppsNameCache appliedRuleAppsNameCache =
+        new AppliedRuleAppsNameCache();
+
+    /** Cache used by EqualityConstraint to speed up meta variable search */
+    private final LRUCache<Term, ImmutableSet<Metavariable>> mvCache = new LRUCache<>(2000);
 
 
     /**
@@ -207,6 +220,14 @@ public class ServiceCaches {
 
     public final IfFormulaInstantiationCache getIfFormulaInstantiationCache() {
         return ifFormulaInstantiationCache;
+    }
+
+    public AppliedRuleAppsNameCache getAppliedRuleAppsNameCache() {
+        return appliedRuleAppsNameCache;
+    }
+
+    public LRUCache<Term, ImmutableSet<Metavariable>> getMVCache() {
+        return mvCache;
     }
 
 }

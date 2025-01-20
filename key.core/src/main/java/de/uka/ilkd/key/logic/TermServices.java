@@ -1,4 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
+
 
 /**
  * This interface defines the basic functionalities of services required to construct {@link Term}s.
@@ -12,14 +16,14 @@ public interface TermServices {
      *
      * @return the proof specific namespaces
      */
-    public abstract NamespaceSet getNamespaces();
+    NamespaceSet getNamespaces();
 
     /**
      * Returns the {@link TermBuilder} used to create {@link Term}s.
      *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
-    public abstract TermBuilder getTermBuilder();
+    TermBuilder getTermBuilder();
 
     /**
      *
@@ -30,13 +34,13 @@ public interface TermServices {
      *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
-    public abstract TermBuilder getTermBuilder(boolean withCache);
+    TermBuilder getTermBuilder(boolean withCache);
 
     /**
      * Returns the {@link TermBuilder} used to create {@link Term}s.
      *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
-    public abstract TermFactory getTermFactory();
+    TermFactory getTermFactory();
 
 }

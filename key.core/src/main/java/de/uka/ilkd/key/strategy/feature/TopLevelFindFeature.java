@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -27,8 +30,9 @@ public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
             if (!pos.isTopLevel()) {
                 final PIOPathIterator it = pos.iterator();
                 while (it.next() != -1) {
-                    if (!(it.getSubTerm().op() instanceof UpdateApplication))
+                    if (!(it.getSubTerm().op() instanceof UpdateApplication)) {
                         return false;
+                    }
                 }
             }
 
@@ -72,7 +76,7 @@ public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
         }
     };
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
         return checkPosition(pos);
     }

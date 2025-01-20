@@ -1,11 +1,7 @@
-/**
- * This class encapsulates updates of a for loop
- */
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ExpressionContainer;
@@ -14,10 +10,16 @@ import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+
+/**
+ * This class encapsulates updates of a for loop
+ */
 public class ForUpdates extends JavaNonTerminalProgramElement
         implements ExpressionContainer, IForUpdates {
 
-    ImmutableArray<Expression> updates;
+    final ImmutableArray<Expression> updates;
 
     public ForUpdates(ImmutableArray<Expression> exprarr) {
         updates = exprarr;
@@ -29,7 +31,7 @@ public class ForUpdates extends JavaNonTerminalProgramElement
         for (int i = 0; i < exps.length; i++) {
             exps[i] = (Expression) ups.get(i);
         }
-        updates = new ImmutableArray<Expression>(exps);
+        updates = new ImmutableArray<>(exps);
     }
 
 

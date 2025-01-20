@@ -1,77 +1,42 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.translation;
+
+import java.net.MalformedURLException;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-import org.antlr.v4.runtime.ParserRuleContext;
 
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
+import org.jspecify.annotations.Nullable;
 
 public class SLTranslationException extends ProofInputException implements HasLocation {
-    private final String fileName;
-    private final Position pos;
+    protected final Location location;
 
-    public SLTranslationException(String message, Throwable cause, String fileName, Position pos) {
+    public SLTranslationException(String message, Throwable cause, Location location) {
         super(message, cause);
-        if (fileName == null)
+        if (location == null) {
             throw new IllegalArgumentException();
-        if (pos == null)
-            throw new IllegalArgumentException();
-        this.fileName = fileName;
-        this.pos = pos;
+        }
+        this.location = location;
     }
 
-    public SLTranslationException(String message, String fileName, Position pos, Throwable cause) {
-        this(message, cause, fileName, pos);
+    public SLTranslationException(String message, Location location, Throwable cause) {
+        this(message, cause, location);
     }
 
-    public SLTranslationException(String message, String fileName, Position pos) {
-        this(message, null, fileName, pos);
-    }
-
-    public SLTranslationException(String message, String fileName, int line, int column) {
-        this(message, null, fileName, new Position(line, column));
+    public SLTranslationException(String message, Location location) {
+        this(message, null, location);
     }
 
     public SLTranslationException(String message) {
-        this(message, null, "no file", Position.UNDEFINED);
+        this(message, null, new Location(null, Position.UNDEFINED));
     }
 
-    public SLTranslationException(String message, Throwable cause) {
-        this(message);
-    }
-
-    public SLTranslationException(String message, ParserRuleContext expr) {
-        this(message, expr.start.getTokenSource().getSourceName(),
-            new Position(expr.start.getLine(), expr.start.getCharPositionInLine()));
-    }
-
-    public SLTranslationException(String message, LabeledParserRuleContext expr) {
-        this(message, expr.first);
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public Position getPosition() {
-        return pos;
-    }
-
-    public int getLine() {
-        return pos.getLine();
-    }
-
-    public int getColumn() {
-        return pos.getColumn();
-    }
-
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
-        return new Location(getFileName(), getLine(), getColumn());
+    public @Nullable Location getLocation() throws MalformedURLException {
+        return location;
     }
 }

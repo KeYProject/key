@@ -1,13 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.Shape;
-
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
+import java.awt.*;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
@@ -16,6 +13,9 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Class BracketMatchingTextArea provides a GUI TextArea component which automatically
@@ -33,6 +33,7 @@ import javax.swing.text.JTextComponent;
  * @author mulbrich
  */
 public class BracketMatchingTextArea extends JTextArea implements CaretListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BracketMatchingTextArea.class);
 
     /**
      * The Constant serialVersionUID needed for serialisation reasons
@@ -193,8 +194,9 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
 
             if (OPENING_PARENS.indexOf(charOn) != -1) {
                 end = findMatchingClose(dot);
-                if (end > 0)
+                if (end > 0) {
                     end++;
+                }
                 begin = dot;
             } else if (CLOSING_PARENS.indexOf(charBefore) != -1) {
                 end = dot;
@@ -217,7 +219,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
                 resetHighlights();
             }
         } catch (BadLocationException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Caret update failed", ex);
             try {
                 resetHighlights();
             } catch (BadLocationException ex2) {
@@ -251,13 +253,15 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         String text = getText();
 
         do {
-            if (OPENING_PARENS.indexOf(text.charAt(dot)) != -1)
+            if (OPENING_PARENS.indexOf(text.charAt(dot)) != -1) {
                 count++;
-            else if (CLOSING_PARENS.indexOf(text.charAt(dot)) != -1)
+            } else if (CLOSING_PARENS.indexOf(text.charAt(dot)) != -1) {
                 count--;
+            }
 
-            if (count == 0)
+            if (count == 0) {
                 return dot;
+            }
 
             dot++;
         } while (dot < text.length());
@@ -278,13 +282,15 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         String text = getText();
 
         do {
-            if (OPENING_PARENS.indexOf(text.charAt(dot)) != -1)
+            if (OPENING_PARENS.indexOf(text.charAt(dot)) != -1) {
                 count--;
-            else if (CLOSING_PARENS.indexOf(text.charAt(dot)) != -1)
+            } else if (CLOSING_PARENS.indexOf(text.charAt(dot)) != -1) {
                 count++;
+            }
 
-            if (count == 0)
+            if (count == 0) {
                 return dot;
+            }
 
             dot--;
         } while (dot >= 0);
@@ -321,8 +327,9 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
 
             // dont render if empty
-            if (offs0 == offs1)
+            if (offs0 == offs1) {
                 return;
+            }
 
             Rectangle alloc = bounds.getBounds();
             try {

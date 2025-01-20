@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
+import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -18,7 +20,12 @@ import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
+import org.key_project.util.collection.ImmutableList;
+
 public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
+    public static final AtomicLong PERF_APPLY = new AtomicLong();
+    public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
+    public static final AtomicLong PERF_TERM_LABELS = new AtomicLong();
 
     public NoFindTacletExecutor(NoFindTaclet taclet) {
         super(taclet);
@@ -78,20 +85,28 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
 
             SequentChangeInfo currentSequent = newSequentsIt.next();
 
+            var timeApply = System.nanoTime();
             applyAdd(termLabelState, gt.sequent(), currentSequent, services, mc, goal, ruleApp);
 
             applyAddrule(gt.rules(), currentGoal, services, mc);
 
             applyAddProgVars(gt.addedProgVars(), currentSequent, currentGoal,
                 tacletApp.posInOccurrence(), services, mc);
+            PERF_APPLY.getAndAdd(System.nanoTime() - timeApply);
 
+            var timeTermLabels = System.nanoTime();
             TermLabelManager.mergeLabels(currentSequent, services);
+            timeTermLabels = System.nanoTime() - timeTermLabels;
 
+            var timeSetSequent = System.nanoTime();
             currentGoal.setSequent(currentSequent);
+            PERF_SET_SEQUENT.getAndAdd(System.nanoTime() - timeSetSequent);
 
             currentGoal.setBranchLabel(gt.name());
+            timeTermLabels = System.nanoTime() + timeTermLabels;
             TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(),
                 ruleApp.rule(), currentGoal, null, null);
+            PERF_TERM_LABELS.getAndAdd(System.nanoTime() - timeTermLabels);
         }
 
         return newGoals;

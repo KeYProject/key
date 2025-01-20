@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -26,6 +27,8 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This class encapsulates the registration of a proof for a given problem. It then starts a proof
@@ -113,7 +116,7 @@ public class ProofStarter {
 
     private long timeout = -1L;
 
-    private ProverTaskListener ptl;
+    private final ProverTaskListener ptl;
 
     private AutoSaver autoSaver;
 
@@ -122,7 +125,7 @@ public class ProofStarter {
     /**
      * creates an instance of the ProofStarter
      *
-     * @param the ProofEnvironment in which the proof shall be performed
+     * @param useAutoSaver boolean indicating whether the proof shall be auto saved
      */
     public ProofStarter(boolean useAutoSaver) {
         this(null, useAutoSaver);
@@ -131,7 +134,8 @@ public class ProofStarter {
     /**
      * creates an instance of the ProofStarter
      *
-     * @param the ProofEnvironment in which the proof shall be performed
+     * @param ptl the ProverTaskListener to be informed about certain events
+     * @param useAutoSaver boolean indicating whether the proof shall be auto saved
      */
     public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
         this.ptl = ptl;
@@ -222,7 +226,7 @@ public class ProofStarter {
             if (strategy == null) {
                 StrategyFactory factory = profile.getDefaultStrategyFactory();
                 StrategyProperties sp = factory.getSettingsDefinition()
-                        .getDefaultPropertiesFactory().createDefaultStrategyProperties();;
+                        .getDefaultPropertiesFactory().createDefaultStrategyProperties();
                 strategy = factory.create(proof, sp);
             }
 

@@ -26,3 +26,11 @@ aa%bb*cc < -123
 1f <= 2f
 2d > 1d
 seqEmpty + seqEmpty
+\emptyset
+∅
+∅ ∪ ∅
+∅ ∪ ∅ ∩ ∅ = (∅ ∪ ∅) ∩ ∅
+\emptyset ∪ ∅ \cap ∅ = (∅ \cup ∅) ∩ ∅
+∅ ⊆ \emptyset
+\emptyset ∖ \emptyset
+(∅ ∊ ∅) & true

@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase;
+
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -8,15 +16,11 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -110,8 +114,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
         for (SiteProofThread<?> thread : threads) {
             // Make sure that no exception is thrown.
             if (thread.getException() != null) {
-                thread.getException().printStackTrace();
-                Assertions.fail(thread.getException().getMessage());
+                Assertions.fail(thread.getException());
             }
             // Make sure that something was computed in site proofs.
             Assertions.assertNotNull(thread.getResult());

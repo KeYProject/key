@@ -1,26 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 
 /**
@@ -40,7 +33,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
  */
 public class MethodBodyStatement extends JavaNonTerminalProgramElement
         implements Statement, NonTerminalProgramElement {
-
 
     /**
      * the variable the result of the method execution is assigned to if the method is declared void
@@ -64,7 +56,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     /**
      * indicates whether this stands for the specification of a method rather than the concrete body
      */
-    private boolean useSpecification;
+    private final boolean useSpecification;
 
     /**
      * Construct a method body shortcut
@@ -78,6 +70,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         this.bodySource = bodySource;
         this.resultVar = resultVar;
         this.methodReference = methodReference;
+        this.useSpecification = false;
 
         assert methodReference != null : "Missing methodreference";
         assert methodReference.getReferencePrefix() != null
@@ -97,6 +90,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
                 : "Method reference of a method body statement needs an "
                     + "explicit reference prefix.";
         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
+        this.useSpecification = false;
     }
 
     public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
@@ -169,12 +163,15 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int i = 0;
-        if (bodySource != null)
+        if (bodySource != null) {
             i++;
-        if (resultVar != null)
+        }
+        if (resultVar != null) {
             i++;
-        if (methodReference != null)
+        }
+        if (methodReference != null) {
             i++;
+        }
         return i;
     }
 
@@ -233,10 +230,6 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
      */
     public void visit(Visitor v) {
         v.performActionOnMethodBodyStatement(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printMethodBodyStatement(this);
     }
 
     public IProgramVariable getResultVariable() {

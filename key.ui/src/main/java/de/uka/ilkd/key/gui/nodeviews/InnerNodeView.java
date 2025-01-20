@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Color;
-import java.awt.Insets;
-
-import javax.swing.JTextArea;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
@@ -11,25 +13,21 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
-import de.uka.ilkd.key.proof.event.ProofDisposedListener;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.smt.SMTRuleApp;
+
+import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,34 +51,40 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
     private InitialPositionTable posTable;
 
-    private InnerNodeViewListener listener;
+    private final InnerNodeViewListener listener;
 
     public final JTextArea tacletInfo;
 
-    Node node;
+    private Node node;
+    private final RuleApp ruleApp;
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
+        this(node.proof(), node, node.getAppliedRuleApp(), node.sequent(), mainWindow);
+    }
+
+    public InnerNodeView(Proof proof, Node node, RuleApp ruleApp, Sequent sequent,
+            MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
-        node.proof().addProofDisposedListener(this);
+        this.ruleApp = ruleApp;
+        proof.addProofDisposedListener(this);
         this.listener = new InnerNodeViewListener(this);
 
         filter = new IdentitySequentPrintFilter();
-        getFilter().setSequent(node.sequent());
-        setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
-            mainWindow.getMediator().getNotationInfo(), mainWindow.getMediator().getServices(),
-            getVisibleTermLabels()));
+        getFilter().setSequent(sequent);
+        setLogicPrinter(
+            SequentViewLogicPrinter.positionPrinter(mainWindow.getMediator().getNotationInfo(),
+                mainWindow.getMediator().getServices(), getVisibleTermLabels()));
         setSelectionColor(SELECTION_COLOR.get());
         setBackground(INACTIVE_BACKGROUND_COLOR);
 
         tacletInfo = new JTextArea(
-            TacletDescriber.getTacletDescription(mainWindow.getMediator(), node, getFilter()));
+            TacletDescriber.getTacletDescription(mainWindow.getMediator(), ruleApp,
+                SequentView.getLineWidth()));
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
             new EmptyBorder(new Insets(4, 0, 0, 0))));
         tacletInfo.setEditable(false);
-
-        // updateUI();
     }
 
     static final HighlightPainter RULEAPP_HIGHLIGHTER =
@@ -121,10 +125,9 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
             return;
         }
         for (final IfFormulaInstantiation inst2 : ifs) {
-            if (!(inst2 instanceof IfFormulaInstSeq)) {
+            if (!(inst2 instanceof IfFormulaInstSeq inst)) {
                 continue;
             }
-            final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
             final PosInOccurrence pos = new PosInOccurrence(inst.getConstrainedFormula(),
                 PosInTerm.getTopLevel(), inst.inAntec());
             highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
@@ -133,8 +136,21 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
     private void highlightIfInsts(IBuiltInRuleApp bapp) throws BadLocationException {
         final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
-        for (PosInOccurrence pio : ifs) {
-            highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
+        if (bapp instanceof SMTRuleApp && ifs.isEmpty()) {
+            /*
+             * Special case for SMTRuleApp: If no unsat core is used, we highlight all formulas.
+             * For the moment, we do not store all formulas as ifInstantiations, since that would
+             * clutter saved proofs very much.
+             */
+            for (int i = 0; i < node.sequent().size(); i++) {
+                PosInOccurrence pio = PosInOccurrence.findInSequent(node.sequent(), i + 1,
+                    PosInTerm.getTopLevel());
+                highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
+            }
+        } else {
+            for (PosInOccurrence pio : ifs) {
+                highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
+            }
         }
     }
 
@@ -157,6 +173,38 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
             // something concerning highlighting does not work in the future, here could
             // be a starting place to find the mistake.
             getHighlighter().addHighlight(r.start() + 1, r.end() + 1, light);
+
+            // scroll the active formula into view
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    ImmutableList<Integer> pathTop =
+                        posTable.pathForPosition(pos.topLevel(), getFilter());
+                    if (pathTop == null) {
+                        return;
+                    }
+                    Range rFormula = posTable.rangeForPath(pathTop);
+                    Rectangle2D rect = modelToView2D(rFormula.start() + 1);
+                    Rectangle2D rectTerm = modelToView2D(r.start() + 1);
+
+                    Rectangle visible = getVisibleRect();
+                    if (rect != null && visible != null
+                            && !visible.contains(rectTerm.getMinX(), rectTerm.getMinY())) {
+                        // scroll into view: first check if the sub-term is visible if we would
+                        // scroll to the top of the sequent formula
+                        if (rectTerm.getMinY() - rect.getMinY() > visible.getHeight()) {
+                            // it isn't: center the sub-term in view
+                            int y = (int) (rectTerm.getMinY() - visible.getHeight() / 2.0);
+                            MainWindow.getInstance().scrollTo(y);
+                        } else {
+                            // it is: scroll to the sequent formula
+                            MainWindow.getInstance().scrollTo((int) rect.getMinY());
+                        }
+                    }
+                } catch (BadLocationException e) {
+                    LOGGER.warn("could not scroll active formula into view ", e);
+                }
+            });
+
             return r;
         } else {
             return null;
@@ -167,30 +215,32 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     @Override
     public String getTitle() {
         // If a leaf becomes an inner node, it is already closed.
-        if (node.leaf()) {
+        if (node != null && node.leaf()) {
             return "Closed Goal";
         }
         return "Inner Node";
     }
 
     @Override
-    public final synchronized void printSequent() {
+    public synchronized void printSequent() {
+        var time = System.nanoTime();
+        getHighlighter().removeAllHighlights();
         removeMouseListener(listener);
 
         setLineWidth(computeLineWidth());
-        getLogicPrinter().update(getFilter(), getLineWidth());
-        setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
-        posTable = getLogicPrinter().getInitialPositionTable();
-        RuleApp app = node.getAppliedRuleApp();
+        updateSequent(node);
+        posTable = getInitialPositionTable();
 
-        if (app != null) {
-            highlightRuleAppPosition(app);
+        if (ruleApp != null) {
+            highlightRuleAppPosition(ruleApp);
         }
 
         updateHidingProperty();
         updateHeatMapHighlights();
 
         addMouseListener(listener);
+        var after = System.nanoTime();
+        LOGGER.debug("Total printSequent took " + (after - time) / 1e6 + "ms");
     }
 
     @Override

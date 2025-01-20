@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.LinkedHashSet;
@@ -31,5 +34,5 @@ public interface IProofReferencesAnalyst {
      * @return The found {@link IProofReference} or {@code null}/empty set if the applied rule is
      *         not supported.
      */
-    public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services);
+    LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services);
 }

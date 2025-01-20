@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
 
@@ -9,15 +12,15 @@ import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.sort.Sort;
 
 
 /**
@@ -25,7 +28,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  */
 public final class TypeComparisonCondition extends VariableConditionAdapter {
 
-    public static enum Mode {
+    public enum Mode {
         NOT_SAME, /* checks if sorts are not same */
         SAME, /* checks if sorts are same */
         IS_SUBTYPE, /* checks subtype relationship */
@@ -69,7 +72,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute subst, SVInstantiations svInst,
+    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
             Services services) {
 
         if (!fst.isComplete(var, subst, svInst, services)
@@ -91,25 +94,20 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 
         if (!proxy1 && !proxy2) {
             // This is the standard case where no proxy sorts are involved
-            switch (mode) {
-            case SAME:
-                return fstSort == sndSort;
-            case NOT_SAME:
-                return fstSort != sndSort;
-            case IS_SUBTYPE:
-                return fstSort.extendsTrans(sndSort);
-            case STRICT_SUBTYPE:
-                return fstSort != sndSort && fstSort.extendsTrans(sndSort);
-            case NOT_IS_SUBTYPE:
-                return !fstSort.extendsTrans(sndSort);
-            case DISJOINTMODULONULL:
-                return checkDisjointness(fstSort, sndSort, services);
-            }
+            return switch (mode) {
+            case SAME -> fstSort == sndSort;
+            case NOT_SAME -> fstSort != sndSort;
+            case IS_SUBTYPE -> fstSort.extendsTrans(sndSort);
+            case STRICT_SUBTYPE -> fstSort != sndSort && fstSort.extendsTrans(sndSort);
+            case NOT_IS_SUBTYPE -> !fstSort.extendsTrans(sndSort);
+            case DISJOINTMODULONULL -> checkDisjointness(fstSort, sndSort, services);
+            };
         } else {
             switch (mode) {
-            case SAME:
+            case SAME -> {
                 return fstSort == sndSort;
-            case IS_SUBTYPE:
+            }
+            case IS_SUBTYPE -> {
                 if (proxy2) {
                     return false;
                 }
@@ -122,7 +120,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                     }
                 }
                 return false;
-            case STRICT_SUBTYPE:
+            }
+            case STRICT_SUBTYPE -> {
                 if (proxy2) {
                     return false;
                 }
@@ -135,13 +134,12 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                     }
                 }
                 return false;
-
-            case NOT_SAME:
-            case DISJOINTMODULONULL:
-            case NOT_IS_SUBTYPE:
+            }
+            case NOT_SAME, DISJOINTMODULONULL, NOT_IS_SUBTYPE -> {
                 // There are cases where - based on the bounds - true could be returned.
                 // Implement them if needed. There is the Null type to consider as subtype.
                 return false;
+            }
             }
         }
 
@@ -185,7 +183,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         }
 
         if (map == null) {
-            map = new WeakHashMap<Sort, Boolean>();
+            map = new WeakHashMap<>();
             map.put(s2, b);
         } else {
             synchronized (map) {
@@ -245,8 +243,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                 // otherwise, we just check whether *currently* there is
                 // some common subsort
                 result = true;
-                for (Named n : services.getNamespaces().sorts().allElements()) {
-                    final Sort s = (Sort) n;
+                for (Sort n : services.getNamespaces().sorts().allElements()) {
+                    final Sort s = n;
                     if (!(s instanceof NullSort) && s.extendsTrans(fstSort)
                             && s.extendsTrans(sndSort)) {
                         result = false;
@@ -264,21 +262,14 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
 
     @Override
     public String toString() {
-        switch (mode) {
-        case SAME:
-            return "\\same(" + fst + ", " + snd + ")";
-        case NOT_SAME:
-            return "\\not\\same(" + fst + ", " + snd + ")";
-        case IS_SUBTYPE:
-            return "\\sub(" + fst + ", " + snd + ")";
-        case STRICT_SUBTYPE:
-            return "\\strict\\sub(" + fst + ", " + snd + ")";
-        case NOT_IS_SUBTYPE:
-            return "\\not\\sub(" + fst + ", " + snd + ")";
-        case DISJOINTMODULONULL:
-            return "\\disjointModuloNull(" + fst + ", " + snd + ")";
-        default:
-            return "invalid type comparison mode";
-        }
+        return switch (mode) {
+        case SAME -> "\\same(" + fst + ", " + snd + ")";
+        case NOT_SAME -> "\\not\\same(" + fst + ", " + snd + ")";
+        case IS_SUBTYPE -> "\\sub(" + fst + ", " + snd + ")";
+        case STRICT_SUBTYPE -> "\\strict\\sub(" + fst + ", " + snd + ")";
+        case NOT_IS_SUBTYPE -> "\\not\\sub(" + fst + ", " + snd + ")";
+        case DISJOINTMODULONULL -> "\\disjointModuloNull(" + fst + ", " + snd + ")";
+        default -> "invalid type comparison mode";
+        };
     }
 }

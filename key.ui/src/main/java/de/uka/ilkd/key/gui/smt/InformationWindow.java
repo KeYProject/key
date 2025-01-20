@@ -1,17 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt;
+
+import java.awt.*;
+import java.util.Collection;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Element;
 
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-import org.key_project.util.java.StringUtil;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.Element;
-import java.awt.*;
-import java.util.Collection;
+import org.key_project.util.java.StringUtil;
 
 
 /**
@@ -24,18 +28,19 @@ public class InformationWindow extends JDialog {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String CE_HELP = "Bounded Counterexample Finder for KeY Proof Obligations"
-        + "\n\n"
-        + "- Shows a bounded model which satisfies the negation of the selected proof obligation"
-        + "\n" + "- Only proof obligations without modalities are supported" + "\n"
-        + "- The OneStepSimplifier neeeds to be activated, otherwise updates need to be handled manually beforehand"
-        + "\n"
-        + "- Double click ond location set, sequence and object nodes(inside a heap) to extend them"
-        + "\n" + "- Choose bit sizes in Options -> SMT Solvers" + "\n"
-        + "- We have identified the following sources for spurious counterexample:" + "\n"
-        + "   - Chosen bit sizes too small. Example: Bit size of Integer is 3 but literal 9 appears in proof obligation."
-        + "\n" + "   - Finite type instances: Example: There is no maximum integer." + "\n"
-        + "   - Removal of axioms. Example: There is a location set which contains location (o, f)";
+    public static final String CE_HELP =
+        """
+                Bounded Counterexample Finder for KeY Proof Obligations
+
+                - Shows a bounded model which satisfies the negation of the selected proof obligation
+                - Only proof obligations without modalities are supported
+                - The OneStepSimplifier neeeds to be activated, otherwise updates need to be handled manually beforehand
+                - Double click ond location set, sequence and object nodes(inside a heap) to extend them
+                - Choose bit sizes in Options -> SMT Solvers
+                - We have identified the following sources for spurious counterexample:
+                   - Chosen bit sizes too small. Example: Bit size of Integer is 3 but literal 9 appears in proof obligation.
+                   - Finite type instances: Example: There is no maximum integer.
+                   - Removal of axioms. Example: There is a location set which contains location (o, f)""";
 
 
     public static class Information {
@@ -79,7 +84,7 @@ public class InformationWindow extends JDialog {
         this.getContentPane().add(getTabbedPane());
         this.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        this.setLocationByPlatform(true);
+        this.setLocationRelativeTo(parent);
         this.setVisible(true);
     }
 
@@ -131,11 +136,11 @@ public class InformationWindow extends JDialog {
             public String getText() {
                 int caretPosition = content.getDocument().getLength();
                 Element root = content.getDocument().getDefaultRootElement();
-                String text = "1" + StringUtil.NEW_LINE;
+                StringBuilder text = new StringBuilder("1" + StringUtil.NEW_LINE);
                 for (int i = 2; i < root.getElementIndex(caretPosition) + 2; i++) {
-                    text += i + StringUtil.NEW_LINE;
+                    text.append(i).append(StringUtil.NEW_LINE);
                 }
-                return text;
+                return text.toString();
             }
 
             @Override

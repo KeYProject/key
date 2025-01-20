@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
-import java.util.Observer;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
@@ -28,9 +30,9 @@ public class EchoCommand extends AbstractCommand<EchoCommand.Parameters> {
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
             throws ScriptException, InterruptedException {
-        final Observer obs = state.getObserver();
+        var obs = state.getObserver();
         if (obs != null) {
-            obs.update(null, args.message);
+            obs.accept(new ProofScriptEngine.EchoMessage(args.message));
         }
     }
 

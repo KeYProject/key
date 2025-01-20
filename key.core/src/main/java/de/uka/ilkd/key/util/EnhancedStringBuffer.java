@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 /**
@@ -92,17 +95,14 @@ public class EnhancedStringBuffer {
                 res.append('s');
             } else {
                 long min = sec / 60;
-                if (min < 120) {
-                    res.append(min);
-                    res.append("min");
-                } else {
+                if (min >= 120) {
                     final long h = min / 60;
                     min %= 60;
                     res.append(h);
                     res.append("h ");
-                    res.append(min);
-                    res.append("min");
                 }
+                res.append(min);
+                res.append("min");
             }
         }
         return res;
@@ -112,15 +112,17 @@ public class EnhancedStringBuffer {
      * Format an integer human-readable (i.e., using decimal separators)
      */
     public static EnhancedStringBuffer format(long number) {
-        String tmp = "" + number;
+        String tmp = String.valueOf(number);
         EnhancedStringBuffer res = new EnhancedStringBuffer();
         for (int i = tmp.length() - 1; i >= 0; i--) {
             res.prepend(tmp.charAt(i));
-            if ((tmp.length() - 1 - i) % 3 == 2)
+            if ((tmp.length() - 1 - i) % 3 == 2) {
                 res.prepend(',');
+            }
         }
-        if (res.length() > 0 && res.charAt(0) == ',')
+        if (res.length() > 0 && res.charAt(0) == ',') {
             res.deleteCharAt(0);
+        }
         return res;
     }
 

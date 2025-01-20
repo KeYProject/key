@@ -9,7 +9,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="array=new int[n];" pathCondition="true" pathConditionChanged="false">
+      <statement name="array = new int[n];" pathCondition="true" pathConditionChanged="false">
          <variable name="n" isArrayIndex="false">
             <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
@@ -18,7 +18,7 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <statement name="array[0]=100;" pathCondition="true" pathConditionChanged="false">
+         <statement name="array[0] = 100;" pathCondition="true" pathConditionChanged="false">
             <variable name="n" isArrayIndex="false">
                <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
@@ -39,7 +39,7 @@
                   </variable>
                </value>
             </variable>
-            <statement name="array[1]=array[2];" pathCondition="true" pathConditionChanged="false">
+            <statement name="array[1] = array[2];" pathCondition="true" pathConditionChanged="false">
                <variable name="n" isArrayIndex="false">
                   <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
@@ -62,7 +62,7 @@
                      </variable>
                   </value>
                </variable>
-               <statement name="array[3]=array[0];" pathCondition="true" pathConditionChanged="false">
+               <statement name="array[3] = array[0];" pathCondition="true" pathConditionChanged="false">
                   <variable name="n" isArrayIndex="false">
                      <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>

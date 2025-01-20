@@ -10,10 +10,12 @@ java.lang.ClassCastException
 java.lang.CloneNotSupportedException
 java.lang.Cloneable
 java.lang.Comparable
+java.lang.Double
 java.lang.Enum
 java.lang.Error
 java.lang.Exception
 java.lang.ExceptionInInitializerError
+java.lang.Float
 java.lang.IllegalArgumentException
 java.lang.IndexOutOfBoundsException
 java.lang.Integer

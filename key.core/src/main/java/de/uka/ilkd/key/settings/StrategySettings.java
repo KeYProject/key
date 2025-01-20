@@ -1,6 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import de.uka.ilkd.key.logic.Name;
+import java.util.Objects;
+import java.util.Properties;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
@@ -8,30 +13,34 @@ import de.uka.ilkd.key.prover.impl.AppliedRuleStopCondition;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.logic.Name;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.EventObject;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Properties;
 
-
-public class StrategySettings implements Settings, Cloneable {
+public class StrategySettings extends AbstractSettings {
     public static final Logger LOGGER = LoggerFactory.getLogger(StrategySettings.class);
 
-    private static final String STRATEGY_KEY = "[Strategy]ActiveStrategy";
-    private static final String STEPS_KEY = "[Strategy]MaximumNumberOfAutomaticApplications";
-    private static final String TIMEOUT_KEY = "[Strategy]Timeout";
+    public static final String CATEGORY = "Strategy";
 
-    private final LinkedList<SettingsListener> listenerList = new LinkedList<>();
+    public static final String STRATEGY_KEY = "ActiveStrategy";
+    public static final String STEPS_KEY = "MaximumNumberOfAutomaticApplications";
+    public static final String TIMEOUT_KEY = "Timeout";
+    private static final String PROP_STRATEGY_PROPERTIES = "strategyProperties";
+
 
     private Name activeStrategy;
 
-    /** maximal number of automatic rule applications before an interaction is required */
-    private int maxSteps = -1;
+    /**
+     * maximal number of automatic rule applications before an interaction is required
+     */
+    private int maxSteps = 10000;
 
-    /** maximal time in ms after which automatic rule application is aborted */
+    /**
+     * maximal time in ms after which automatic rule application is aborted
+     */
     private long timeout = -1;
 
     private StrategyProperties strategyProperties = new StrategyProperties();
@@ -64,10 +73,9 @@ public class StrategySettings implements Settings, Cloneable {
      * @param mSteps maximal amount of heuristic steps
      */
     public void setMaxSteps(int mSteps) {
-        if (maxSteps != mSteps) {
-            maxSteps = mSteps;
-            fireSettingsChanged();
-        }
+        var old = maxSteps;
+        maxSteps = mSteps;
+        firePropertyChange(STEPS_KEY, old, maxSteps);
     }
 
     /**
@@ -85,10 +93,9 @@ public class StrategySettings implements Settings, Cloneable {
      * @param name
      */
     public void setStrategy(Name name) {
-        if (!name.equals(activeStrategy)) {
-            activeStrategy = name;
-            fireSettingsChanged();
-        }
+        var old = this.activeStrategy;
+        activeStrategy = name;
+        firePropertyChange(STRATEGY_KEY, old, activeStrategy);
     }
 
     /*
@@ -97,9 +104,9 @@ public class StrategySettings implements Settings, Cloneable {
      * @see de.uka.ilkd.key.gui.Settings#readSettings(java.util.Properties)
      */
     public void readSettings(Properties props) {
-        String numString = props.getProperty(STEPS_KEY);
-        String strategyString = props.getProperty(STRATEGY_KEY);
-        String timeoutString = props.getProperty(TIMEOUT_KEY);
+        String numString = props.getProperty("[" + CATEGORY + "]" + STEPS_KEY);
+        String strategyString = props.getProperty("[" + CATEGORY + "]" + STRATEGY_KEY);
+        String timeoutString = props.getProperty("[" + CATEGORY + "]" + TIMEOUT_KEY);
 
         long localTimeout = -1;
         int numSteps = 10000;
@@ -131,13 +138,19 @@ public class StrategySettings implements Settings, Cloneable {
         }
 
         // set strategy options
-        strategyProperties = StrategyProperties.read(props);
+        setStrategyProperties(StrategyProperties.read(props));
 
         // set max steps
-        maxSteps = numSteps;
+        setMaxSteps(numSteps);
 
         // set time out
-        this.timeout = localTimeout;
+        setTimeout(localTimeout);
+    }
+
+    private void setStrategyProperties(StrategyProperties props) {
+        var old = strategyProperties;
+        strategyProperties = props;
+        firePropertyChange(PROP_STRATEGY_PROPERTIES, old, strategyProperties);
     }
 
     /*
@@ -147,43 +160,70 @@ public class StrategySettings implements Settings, Cloneable {
      */
     public void writeSettings(Properties props) {
         if (getStrategy() == null) {
-            // It would be bedder to return the name of the default factory defined by the profile
+            // It would be better to return the name of the default factory defined by the profile
             // used by the proof
-            // in which this strategysettings is used or just not to save the strategy because it is
+            // in which this strategy settings is used or just not to save the strategy because it
+            // is
             // not defined.
             setStrategy(JavaCardDLStrategyFactory.NAME);
         }
         if (maxSteps < 0) {
             setMaxSteps(10000);
         }
-        props.setProperty(STRATEGY_KEY, getStrategy().toString());
-        props.setProperty(STEPS_KEY, String.valueOf(getMaxSteps()));
-
-        props.setProperty(TIMEOUT_KEY, String.valueOf(getTimeout()));
+        props.setProperty("[" + CATEGORY + "]" + STRATEGY_KEY, getStrategy().toString());
+        props.setProperty("[" + CATEGORY + "]" + STEPS_KEY, String.valueOf(getMaxSteps()));
+        props.setProperty("[" + CATEGORY + "]" + TIMEOUT_KEY, String.valueOf(getTimeout()));
         strategyProperties.write(props);
     }
 
-    /**
-     * sends the message that the state of this setting has been changed to its registered listeners
-     * (not thread-safe)
-     */
-    protected void fireSettingsChanged() {
-        for (SettingsListener aListenerList : listenerList) {
-            aListenerList.settingsChanged(new EventObject(this));
+    @Override
+    public void readSettings(Configuration props) {
+        props = props.getSection(CATEGORY);
+        if (props == null) {
+            return;
         }
+
+        try {
+            setMaxSteps(props.getInt(STEPS_KEY));
+        } catch (NumberFormatException | NullPointerException e) {
+            LOGGER.debug("StrategySettings: failure while converting the string "
+                + "with the allowed steps of heuristics applications to int."
+                + "Use default value 1000 instead."
+                + "\nThe String that has been tried to convert was {}", props.get(STEPS_KEY));
+        }
+
+        try {
+            setTimeout(props.getInt(TIMEOUT_KEY));
+        } catch (NumberFormatException | NullPointerException e) {
+            LOGGER.debug("StrategySettings: failure while converting the string "
+                + "with rule application timeout. "
+                + "\nThe String that has been tried to convert was {}", props.get(TIMEOUT_KEY));
+        }
+
+        // set active strategy
+        var strategy = props.getString(STRATEGY_KEY);
+        if (strategy != null) {
+            activeStrategy = new Name(strategy);
+        }
+
+        setStrategyProperties(StrategyProperties.read(props));
     }
 
-    /**
-     * adds a listener to the settings object
-     *
-     * @param l the listener
-     */
-    public void addSettingsListener(SettingsListener l) {
-        listenerList.add(l);
-    }
+    @Override
+    public void writeSettings(Configuration props) {
+        props = props.getOrCreateSection(CATEGORY);
+        if (getStrategy() == null) {
+            setStrategy(JavaCardDLStrategyFactory.NAME);
+        }
+        if (maxSteps < 0) {
+            setMaxSteps(10000);
+        }
 
-    public void removeSettingsListener(SettingsListener l) {
-        listenerList.remove(l);
+        props.set(STRATEGY_KEY, getStrategy().toString());
+        props.set(STEPS_KEY, getMaxSteps());
+        props.set(TIMEOUT_KEY, getTimeout());
+
+        strategyProperties.write(props);
     }
 
     /**
@@ -197,10 +237,9 @@ public class StrategySettings implements Settings, Cloneable {
      * sets the strategy properties if different from current ones
      */
     public void setActiveStrategyProperties(StrategyProperties p) {
-        if (!p.equals(strategyProperties)) {
-            this.strategyProperties = (StrategyProperties) p.clone();
-            fireSettingsChanged();
-        }
+        var old = this.strategyProperties;
+        this.strategyProperties = (StrategyProperties) p.clone();
+        firePropertyChange(PROP_STRATEGY_PROPERTIES, old, this.strategyProperties);
     }
 
     /**
@@ -219,10 +258,9 @@ public class StrategySettings implements Settings, Cloneable {
      * @param timeout a long specifying the timeout in ms
      */
     public void setTimeout(long timeout) {
-        if (timeout != this.timeout) {
-            this.timeout = timeout;
-            fireSettingsChanged();
-        }
+        var old = this.timeout;
+        this.timeout = timeout;
+        firePropertyChange(TIMEOUT_KEY, old, timeout);
     }
 
     /**

@@ -1,12 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression.literal;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Int literal.
@@ -39,7 +41,7 @@ public class IntLiteral extends AbstractIntegerLiteral {
      */
     public IntLiteral(int value) {
         this.value = value;
-        this.valueStr = ("" + value).intern();
+        this.valueStr = (String.valueOf(value)).intern();
     }
 
     /**
@@ -76,11 +78,6 @@ public class IntLiteral extends AbstractIntegerLiteral {
     @Override
     public void visit(Visitor v) {
         v.performActionOnIntLiteral(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printIntLiteral(this);
     }
 
     @Override

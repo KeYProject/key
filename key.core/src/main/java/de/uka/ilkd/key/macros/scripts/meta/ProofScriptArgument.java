@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts.meta;
 
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-
 import java.lang.reflect.Field;
+import java.util.Objects;
+
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
 /**
  * @author Alexander Weigl
@@ -86,10 +90,10 @@ public class ProofScriptArgument<T> {
         if (flag != that.flag) {
             return false;
         }
-        if (command != null ? !command.equals(that.command) : that.command != null) {
+        if (!Objects.equals(command, that.command)) {
             return false;
         }
-        if (name != null ? !name.equals(that.name) : that.name != null) {
+        if (!Objects.equals(name, that.name)) {
             return false;
         }
         return type == that.type;

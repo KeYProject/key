@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.api;
-
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.proof.Node;
 
 import java.util.List;
 import java.util.Set;
+
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.proof.Node;
 
 /**
  * Object that represents one result goal of a script command It holds a reference to its parent

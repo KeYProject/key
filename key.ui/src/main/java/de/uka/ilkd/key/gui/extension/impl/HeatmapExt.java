@@ -1,20 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.extension.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
 import de.uka.ilkd.key.gui.actions.HeatmapToggleAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
-import net.miginfocom.layout.CC;
 
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.miginfocom.layout.CC;
 
 /**
  * Extension adapter for Heatmap
@@ -27,7 +31,7 @@ import java.util.Map;
     experimental = false)
 public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         KeYGuiExtension.Toolbar, KeYGuiExtension.Settings {
-    private List<Action> actions = new ArrayList<>(2);
+    private final List<Action> actions = new ArrayList<>(2);
     private HeatmapToggleAction toggleAction;
     private HeatmapSettingsAction settingsAction;
 
@@ -100,31 +104,39 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
     enum HeatmapMode {
         DEFAULT("No heatmaps", "No heatmaps are shown.", false, false, false),
         SF_AGE("Sequent formulae up to age",
-                "All sequent formulae that have been added or changed in the last k steps are highlighted. \n"
-                    + "More recent formulae will have a stronger highlight. It is possible that less \n"
-                    + "than k formulae are highlighted, e.g. if one formula has changed multiple times.\n",
+                """
+                        All sequent formulae that have been added or changed in the last k steps are highlighted.\s
+                        More recent formulae will have a stronger highlight. It is possible that less\s
+                        than k formulae are highlighted, e.g. if one formula has changed multiple times.
+                        """,
                 true, true, false),
         SF_NEWEST("Newest sequent formulae",
-                "All formulae in the sequent are sorted by how new they are, i.e., how recently they have\n"
-                    + " been added or changed. The first k formulae of the sorted list are highlighted\n"
-                    + "according to their position in the list,\n"
-                    + " with the most recent formula receiving the strongest highlight.\n",
+                """
+                        All formulae in the sequent are sorted by how new they are, i.e., how recently they have
+                         been added or changed. The first k formulae of the sorted list are highlighted
+                        according to their position in the list,
+                         with the most recent formula receiving the strongest highlight.
+                        """,
                 true, true, true),
         TERMS_AGE("Terms up to age",
-                "All terms that have been added or changed in the last k steps are highlighted. \n"
-                    + "More recent terms will have a stronger highlight. It is possible that less than \n"
-                    + "k terms are highlighted, e.g. if one term has changed multiple times.",
+                """
+                        All terms that have been added or changed in the last k steps are highlighted.\s
+                        More recent terms will have a stronger highlight. It is possible that less than\s
+                        k terms are highlighted, e.g. if one term has changed multiple times.""",
                 true, false, false),
         TERMS_NEWEST("Newest terms",
-                "All terms in the sequent are sorted by how new they are, i.e., how recently they\n"
-                    + "have been added or changed. The first k terms of the sorted list are highlighted\n"
-                    + "according to their position in the list,\n"
-                    + " with the most recent term receiving the strongest highlight.",
+                """
+                        All terms in the sequent are sorted by how new they are, i.e., how recently they
+                        have been added or changed. The first k terms of the sorted list are highlighted
+                        according to their position in the list,
+                         with the most recent term receiving the strongest highlight.""",
                 true, false, true);
 
         final String text;
         final String desc;
-        boolean enableHeatmap, sequent, newest;
+        final boolean enableHeatmap;
+        final boolean sequent;
+        final boolean newest;
 
 
         HeatmapMode(String shortText, String description, boolean enableHeatmap, boolean sequent,
@@ -141,7 +153,7 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
         }
     }
 
-    private Map<HeatmapMode, JRadioButton> map = new HashMap<>();
+    private final Map<HeatmapMode, JRadioButton> map = new HashMap<>();
 
     HeatmapSettingsProvider() {
         setHeaderText("Heatmap Options");
@@ -181,7 +193,7 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         final ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         for (Map.Entry<HeatmapMode, JRadioButton> entry : map.entrySet()) {
             HeatmapMode mode = entry.getKey();

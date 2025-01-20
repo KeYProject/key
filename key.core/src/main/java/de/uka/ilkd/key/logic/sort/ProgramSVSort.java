@@ -1,10 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.sort;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.DefaultImmutableSet;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
@@ -39,15 +39,17 @@ import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Switch;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * Special "sorts" used for schema variables matching program constructs (class ProgramSV). Not
  * really sorts in the theoretical meaning of the word.
  */
-public abstract class ProgramSVSort extends AbstractSort {
+public abstract class ProgramSVSort extends SortImpl {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgramSVSort.class);
 
     // Keeps the mapping of ProgramSVSort names to
@@ -123,6 +125,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort TYPE = new TypeReferenceSort();
 
     public static final ProgramSVSort TYPENOTPRIMITIVE = new TypeReferenceNotPrimitiveSort();
+    public static final ProgramSVSort TYPE_PRIMITIVE = new TypeReferencePrimitiveSort();
 
     public static final ProgramSVSort CLASSREFERENCE = new MetaClassReferenceSort();
 
@@ -275,7 +278,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     // --------------------------------------------------------------------------
 
     public ProgramSVSort(Name name) {
-        super(name, DefaultImmutableSet.<Sort>nil(), false);
+        super(name, DefaultImmutableSet.nil(), false, "", "");
         NAME2SORT.put(name, this);
     }
 
@@ -331,8 +334,7 @@ public abstract class ProgramSVSort extends AbstractSort {
                 return true;
             }
 
-            if (pe instanceof FieldReference) {
-                FieldReference fr = (FieldReference) pe;
+            if (pe instanceof FieldReference fr) {
 
                 // we allow only static field references with a
                 // sequence of PVs or TypeRef
@@ -363,11 +365,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         public ProgramVariableSort() {
             super(new Name("Variable"));
-        }
-
-        @Override
-        public boolean canStandFor(Term t) {
-            return t.op() instanceof ProgramVariable;
         }
 
         @Override
@@ -461,11 +458,6 @@ public abstract class ProgramSVSort extends AbstractSort {
         }
 
         @Override
-        public boolean canStandFor(Term t) {
-            return true;
-        }
-
-        @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
             if (pe instanceof Negative) {
                 return ((Negative) pe).getChildAt(0) instanceof Literal;
@@ -488,9 +480,8 @@ public abstract class ProgramSVSort extends AbstractSort {
                     || pe instanceof SetMinus || pe instanceof AllFields || pe instanceof AllObjects
                     || pe instanceof SeqSingleton || pe instanceof SeqConcat
                     || pe instanceof SeqLength || pe instanceof SeqGet || pe instanceof SeqIndexOf
-                    || pe instanceof SeqSub || pe instanceof SeqReverse) {
-                if (pe instanceof NonTerminalProgramElement) {
-                    final NonTerminalProgramElement npe = (NonTerminalProgramElement) pe;
+                    || pe instanceof SeqSub || pe instanceof SeqReverse || pe instanceof SeqPut) {
+                if (pe instanceof NonTerminalProgramElement npe) {
                     for (int i = 0, childCount = npe.getChildCount(); i < childCount; i++) {
                         if (!canStandFor(npe.getChildAt(i), services)) {
                             return false;
@@ -519,11 +510,8 @@ public abstract class ProgramSVSort extends AbstractSort {
         /* Will not match on MetaClassReference variables */
         @Override
         public boolean canStandFor(ProgramElement check, Services services) {
-            if (!super.canStandFor(check, services)
-                    || CLASSREFERENCE.canStandFor(check, services)) {
-                return false;
-            }
-            return true;
+            return super.canStandFor(check, services)
+                    && !CLASSREFERENCE.canStandFor(check, services);
         }
     }
 
@@ -834,8 +822,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
-            if (pe instanceof MethodReference) {
-                MethodReference mr = (MethodReference) pe;
+            if (pe instanceof MethodReference mr) {
                 // FIX to bug #1223 (according to CS)
                 /*
                  * if (mr.getReferencePrefix() instanceof SuperReference || mr.getReferencePrefix()
@@ -891,6 +878,30 @@ public abstract class ProgramSVSort extends AbstractSort {
         @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
             return (check instanceof TypeReference);
+        }
+    }
+
+    /**
+     * This sort represents a type of program schema variables that matches byte,
+     * char, short, int, and long.
+     */
+    private static final class TypeReferencePrimitiveSort extends ProgramSVSort {
+        public TypeReferencePrimitiveSort() {
+            super(new Name("PrimitiveType"));
+        }
+
+        @Override
+        protected boolean canStandFor(ProgramElement check, Services services) {
+            if (!(check instanceof TypeReference)) {
+                return false;
+            }
+            return ((TypeReference) (check)).getKeYJavaType()
+                    .getJavaType() instanceof PrimitiveType;
+        }
+
+        @Override
+        public ProgramSVSort createInstance(String parameter) {
+            return TYPE_PRIMITIVE;
         }
     }
 
@@ -1115,8 +1126,9 @@ public abstract class ProgramSVSort extends AbstractSort {
             if (kjt != null) {
                 final Type type = kjt.getJavaType();
                 for (PrimitiveType forbidden_type : forbidden_types) {
-                    if (type == forbidden_type)
+                    if (type == forbidden_type) {
                         return false;
+                    }
                 }
             }
             return true;
@@ -1308,7 +1320,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     public ProgramElement getSVWithSort(ExtList l, Class<?> alternative) {
         for (final Object o : l) {
-            if (o instanceof SchemaVariable && (((SchemaVariable) o).sort() == this)) {
+            if (o instanceof ProgramSV psv && (psv.sort() == this)) {
                 return (ProgramElement) o;
             } else if ((alternative.isInstance(o)) && (!(o instanceof SchemaVariable))) {
                 return (ProgramElement) o;

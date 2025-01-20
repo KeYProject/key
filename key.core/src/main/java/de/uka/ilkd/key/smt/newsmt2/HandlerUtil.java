@@ -1,17 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.mgt.ProofStatus;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
-import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import org.key_project.logic.op.SortedOperator;
+import org.key_project.logic.sort.Sort;
 
 /**
  * A collection of static methods that {@link SMTHandler}s are likely to use.
@@ -43,11 +45,12 @@ public class HandlerUtil {
     public static final SMTHandlerProperty.BooleanProperty NO_QUANTIFIERS = new BooleanProperty(
         "NoQuantifiers", "Reduce the number of introduced universal quantifiers", "TODO");
 
+    /* add global handler properties here */
     /**
      * This lists the handler properties that do not belong to a particular SMT handler.
      */
     public static final List<? extends SMTHandlerProperty<?>> GLOBAL_PROPERTIES =
-        Arrays.asList(/* add global handler properties here */);
+        List.of();
 
     private HandlerUtil() {
         throw new Error("do not instantiate");
@@ -61,7 +64,7 @@ public class HandlerUtil {
      * @return an SExpr of type {@code (declare-fun ...)}
      */
     public static SExpr funDeclaration(SortedOperator op, String name) {
-        String sortString = op.sort() == Sort.FORMULA ? "Bool" : "U";
+        String sortString = op.sort() == JavaDLTheory.FORMULA ? "Bool" : "U";
         SExpr signature = new SExpr(Collections.nCopies(op.arity(), new SExpr("U")));
         return new SExpr("declare-fun", new SExpr(name), signature, new SExpr(sortString));
     }

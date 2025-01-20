@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.io.File;
@@ -5,9 +8,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -25,6 +25,11 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +78,7 @@ public class LemmataHandler implements TacletFilter {
             }
 
             @Override
-            public void stopped(ProofAggregate pa, ImmutableSet<Taclet> taclets,
+            public void stopped(@Nullable ProofAggregate pa, ImmutableSet<Taclet> taclets,
                     boolean addAsAxioms) {
                 if (pa == null) {
                     println("There is no taclet to be proven.");
@@ -118,7 +123,7 @@ public class LemmataHandler implements TacletFilter {
     }
 
     private Collection<File> createFilesForAxioms(Collection<String> filenames) {
-        Collection<File> list = new LinkedList<File>();
+        Collection<File> list = new LinkedList<>();
         for (String filename : filenames) {
             list.add(new File(filename));
         }

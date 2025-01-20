@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
+
+import java.io.File;
+import java.util.Iterator;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -16,12 +22,10 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.ProofStarter;
+
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import javax.annotation.Nonnull;
-import java.io.File;
-import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -308,8 +312,7 @@ public class MergeRuleTests {
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
-    @Nonnull
-    public static Proof loadProof(File directory, String proofFileName) {
+    public static @NonNull Proof loadProof(File directory, String proofFileName) {
         File proofFile = new File(directory, proofFileName);
         assertTrue(proofFile.exists(),
             "Proof file: " + proofFile.getAbsolutePath() + " could not be found!");
@@ -322,8 +325,7 @@ public class MergeRuleTests {
 
             return proof;
         } catch (ProblemLoaderException e) {
-            e.printStackTrace();
-            Assertions.fail("Proof could not be loaded:\n" + e.getMessage());
+            Assertions.fail("Proof could not be loaded", e);
             return null;
         }
     }

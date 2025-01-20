@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
@@ -8,11 +11,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -21,21 +26,21 @@ import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
-import de.uka.ilkd.key.nparser.DebugKeyLexer;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Task tree panel, showing all currently opened proofs.
+ * Usually located in the top left panel.
+ */
 public class TaskTree extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
 
@@ -44,45 +49,76 @@ public class TaskTree extends JPanel {
      */
     private static final long serialVersionUID = -6084969108377936099L;
 
-    private JTree delegateView;
+    private final JTree delegateView;
 
     /** the KeYMediator */
-    private KeYMediator mediator;
+    private final KeYMediator mediator;
 
     /** listener for mouse events of this gui component */
-    private MouseListener mouseListener = new TaskTreeMouseListener();
+    private final MouseListener mouseListener = new TaskTreeMouseListener();
 
     /** listener to the prof tree events */
-    private ProofTreeListener proofTreeListener = new TaskTreeProofTreeListener();
+    private final ProofTreeListener proofTreeListener = new TaskTreeProofTreeListener();
+
+    private final TreeSelectionListener selectionListener = new TreeSelectionListener() {
+        /**
+         * listen to changes in the delegateView {@link JTree} selections and initiate switch
+         * between proofs if necessary
+         *
+         * @param e the event that characterizes the change.
+         */
+        @Override
+        public void valueChanged(TreeSelectionEvent e) {
+            if (e.getSource() == delegateView) {
+                problemChosen();
+            }
+        }
+    };
 
     /** the list model to be used */
-    private TaskTreeModel model = new TaskTreeModel();
+    private final TaskTreeModel model = new TaskTreeModel();
 
     public TaskTree(KeYMediator mediator) {
         super();
         this.mediator = mediator;
         mediator.addKeYSelectionListener(new TaskTreeSelectionListener());
+        mediator.getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
+            // unregister completely when automode starts
+            // reduce unnecessary event propagation and handling when in automode
+            @Override
+            public void autoModeStopped(ProofEvent e) {
+                if (e.getSource() != null) { // == null can happen after problem loading
+                    e.getSource().addProofTreeListener(proofTreeListener);
+                }
+            }
+
+            @Override
+            public void autoModeStarted(ProofEvent e) {
+                if (e.getSource() != null) { // == null can happen after problem loading
+                    e.getSource().removeProofTreeListener(proofTreeListener);
+                }
+            }
+        });
+
         delegateView = new JTree();
         delegateView.setModel(model);
         delegateView.setCellRenderer(new TaskTreeIconCellRenderer());
         delegateView.addMouseListener(mouseListener);
+        delegateView.addTreeSelectionListener(selectionListener);
         this.setLayout(new BorderLayout());
         this.add(delegateView, BorderLayout.CENTER);
         delegateView.setShowsRootHandles(false);
         delegateView.setRootVisible(false);
         delegateView.putClientProperty("JTree.lineStyle", "Horizontal");
+        ToolTipManager.sharedInstance().registerComponent(delegateView);
     }
 
-    JTree jtree() {
-        return delegateView;
-    }
-
-    public void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
+    public synchronized void addProof(de.uka.ilkd.key.proof.ProofAggregate plist) {
         TaskTreeNode bp = model.addProof(plist);
         Proof[] proofs = plist.getProofs();
         for (Proof proof : proofs) {
             proof.addProofTreeListener(proofTreeListener);
-            mediator.getCurrentlyOpenedProofs().addElement(proof);
+            mediator.getCurrentlyOpenedProofs().add(proof);
         }
         delegateView.validate();
         delegateView.scrollPathToVisible(new TreePath(bp.getPath()));
@@ -98,7 +134,7 @@ public class TaskTree extends JPanel {
         removeTask(taskForProof);
     }
 
-    public void removeTask(TaskTreeNode tn) {
+    public synchronized void removeTask(TaskTreeNode tn) {
         model.removeTask(tn);
         mediator.notify(new AbandonTaskEvent());
         for (int i = 0; i < tn.allProofs().length; i++) {
@@ -111,9 +147,9 @@ public class TaskTree extends JPanel {
 
         if (path != null) {
             TaskTreeNode tn0 = (TaskTreeNode) path.getLastPathComponent();
-            mediator.setProof(tn0.proof());
+            mediator.getSelectionModel().setSelectedProof(tn0.proof());
         } else {
-            mediator.setProof(null);
+            mediator.getSelectionModel().setSelectedProof(null);
         }
     }
 
@@ -142,22 +178,24 @@ public class TaskTree extends JPanel {
     /** returns all selected basic tasks */
     public BasicTask[] getAllSelectedBasicTasks() {
         TreePath[] paths = delegateView.getSelectionModel().getSelectionPaths();
-        if (paths == null)
+        if (paths == null) {
             return new BasicTask[0];
-        final List<BasicTask> result = new LinkedList<BasicTask>();
+        }
+        final List<BasicTask> result = new LinkedList<>();
         for (TreePath path : paths) {
             if (path.getLastPathComponent() instanceof BasicTask) {
                 result.add((BasicTask) path.getLastPathComponent());
             }
         }
-        return result.toArray(new BasicTask[result.size()]);
+        return result.toArray(new BasicTask[0]);
     }
 
     /** called when the user has clicked on a problem */
     private void problemChosen() {
         TaskTreeNode prob = getSelectedTask();
-        if (prob != null && prob.proof() != null && mediator != null) {
-            mediator.setProof(prob.proof());
+        if (prob != null && prob.proof() != null && mediator != null &&
+                mediator.getSelectedProof() != prob.proof()) {
+            mediator.getSelectionModel().setSelectedProof(prob.proof());
         }
     }
 
@@ -175,18 +213,16 @@ public class TaskTree extends JPanel {
      * @return {@code true} proof is available in model, {@code false} proof is not available in
      *         model.
      */
-    public boolean containsProof(Proof proof) {
+    public synchronized boolean containsProof(Proof proof) {
         boolean contains = false;
         int i = 0;
         while (!contains && i < model.getChildCount(model.getRoot())) {
             Object rootChild = model.getChild(model.getRoot(), i);
-            if (rootChild instanceof EnvNode) {
-                EnvNode envNode = (EnvNode) rootChild;
+            if (rootChild instanceof EnvNode envNode) {
                 int j = 0;
                 while (!contains && j < envNode.getChildCount()) {
                     Object envChild = envNode.getChildAt(j);
-                    if (envChild instanceof TaskTreeNode) {
-                        TaskTreeNode taskChild = (TaskTreeNode) envChild;
+                    if (envChild instanceof TaskTreeNode taskChild) {
                         contains = taskChild.proof() == proof;
                     }
                     j++;
@@ -202,15 +238,14 @@ public class TaskTree extends JPanel {
      *
      * @param proof The proof to remove.
      */
-    public void removeProof(Proof proof) {
+    public synchronized void removeProof(Proof proof) {
         if (proof != null) {
             ProofEnvironment env = proof.getEnv();
             // Search EnvNode which contains the environment of the given proof.
             EnvNode envNode = null;
             for (int i = 0; i < model.getChildCount(model.getRoot()); i++) {
                 Object child = model.getChild(model.getRoot(), i);
-                if (child instanceof EnvNode) {
-                    EnvNode envChild = (EnvNode) child;
+                if (child instanceof EnvNode envChild) {
                     if (env != null ? env.equals(envChild.getProofEnv())
                             : envChild.getProofEnv() == null) {
                         envNode = envChild;
@@ -221,8 +256,7 @@ public class TaskTree extends JPanel {
             if (envNode != null) {
                 for (int i = 0; i < envNode.getChildCount(); i++) {
                     Object child = envNode.getChildAt(i);
-                    if (child instanceof TaskTreeNode) {
-                        TaskTreeNode taskChild = (TaskTreeNode) child;
+                    if (child instanceof TaskTreeNode taskChild) {
                         if (taskChild.proof() == proof) {
                             removeTask(taskChild);
                         }
@@ -238,8 +272,8 @@ public class TaskTree extends JPanel {
      */
     class TaskTreeMouseListener extends MouseAdapter {
 
+        @Override
         public void mouseClicked(MouseEvent e) {
-            problemChosen();
             checkPopup(e);
         }
 
@@ -248,12 +282,30 @@ public class TaskTree extends JPanel {
             checkPopup(e);
         }
 
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            checkPopup(e);
+        }
+
+        /**
+         * Checks whether the popup menu should be shown and does so if necessary.
+         * <br>
+         * <b>Important:</b><br>
+         * For the platform specific popup trigger to work, we need to check the popup in pressed,
+         * released, and clicked event. For example, on Windows the e.isPopupTrigger() information
+         * is only available in the released event.
+         *
+         * @param e the mouse event that may create the popup
+         */
         private void checkPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
-                JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                    DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(), mediator);
-                if (menu.getComponentCount() > 0) {
-                    menu.show(TaskTree.this, e.getX(), e.getY());
+                TreePath selPath = delegateView.getPathForLocation(e.getX(), e.getY());
+                if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask task) {
+                    Proof p = task.proof();
+                    delegateView.setSelectionPath(selPath);
+                    JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
+                        DefaultContextMenuKind.PROOF_LIST, p, mediator);
+                    menu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         }
@@ -263,7 +315,7 @@ public class TaskTree extends JPanel {
     /**
      * a prooftree listener, so that it is known when the proof has closed
      */
-    class TaskTreeProofTreeListener extends ProofTreeAdapter {
+    class TaskTreeProofTreeListener implements ProofTreeListener {
 
         /**
          * invoked if all goals of the proof are closed
@@ -273,33 +325,36 @@ public class TaskTree extends JPanel {
         }
 
         /**
-         * invoked if the list of goals changed (goals were added, removed etc.
+         * invoked if a proof has been pruned, potentially reopening branches
          */
-        public void proofGoalRemoved(ProofTreeEvent e) {
+        public void proofPruned(ProofTreeEvent e) {
+            delegateView.repaint();
         }
 
-        /** invoked if the current goal of the proof changed */
-        public void proofGoalsAdded(ProofTreeEvent e) {
-        }
-
-        /** invoked if the current goal of the proof changed */
-        public void proofGoalsChanged(ProofTreeEvent e) {
+        /**
+         * The structure of the proof has changed radically. Any client should rescan the whole
+         * proof
+         * tree.
+         */
+        public void proofStructureChanged(ProofTreeEvent e) {
+            delegateView.repaint();
         }
     } // end of prooftreelistener
 
 
-    static class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer
+    private static final class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer
             implements java.io.Serializable {
         private static final long serialVersionUID = 2423935787625012908L;
-        static final Icon keyIcon = IconFactory.keyHole(20, 20);
-        static final Icon keyClosedIcon = IconFactory.keyHoleClosed(20);
-        static final Icon keyAlmostClosedIcon = IconFactory.keyHoleAlmostClosed(20, 20);
+        private static final Icon KEY_ICON = IconFactory.keyHole(20, 20);
+        private static final Icon KEY_CLOSED_ICON = IconFactory.keyHoleClosed(20);
+        private static final Icon KEY_ALMOST_CLOSED_ICON = IconFactory.keyHoleAlmostClosed(20, 20);
+        private static final Icon KEY_CACHED_CLOSED_ICON = IconFactory.keyCachedClosed(20, 20);
 
 
-        public TaskTreeIconCellRenderer() {
-            setToolTipText("Task");
+        private TaskTreeIconCellRenderer() {
         }
 
+        @Override
         public Component getTreeCellRendererComponent(JTree list, Object value, boolean selected,
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
             Object newValue;
@@ -308,23 +363,32 @@ public class TaskTree extends JPanel {
             } else {
                 newValue = value;
             }
-            DefaultTreeCellRenderer sup =
-                (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(list, newValue,
-                    selected, expanded, leaf, row, hasFocus);
-            sup.setIcon(null);
+            super.getTreeCellRendererComponent(list, newValue, selected, expanded, leaf, row,
+                hasFocus);
+            setIcon(null);
             if (value instanceof TaskTreeNode) {
                 ProofStatus ps = ((TaskTreeNode) value).getStatus();
                 if (ps != null) {
-                    if (ps.getProofClosed())
-                        sup.setIcon(keyClosedIcon);
-                    if (ps.getProofClosedButLemmasLeft())
-                        sup.setIcon(keyAlmostClosedIcon);
-                    if (ps.getProofOpen())
-                        sup.setIcon(keyIcon);
+                    if (ps.getProofClosedButLemmasLeft()) {
+                        setIcon(KEY_ALMOST_CLOSED_ICON);
+                        setToolTipText("Closed proof (depends on other contracts)");
+                    }
+                    if (ps.getProofClosedByCache()) {
+                        setIcon(KEY_CACHED_CLOSED_ICON);
+                        setToolTipText("Closed proof (using proof cache)");
+                    }
+                    if (ps.getProofClosed()) {
+                        setIcon(KEY_CLOSED_ICON);
+                        setToolTipText("Closed proof");
+                    }
+                    if (ps.getProofOpen()) {
+                        setIcon(KEY_ICON);
+                        setToolTipText("Open proof");
+                    }
                 }
 
             }
-            return sup;
+            return this;
         }
     }
 
@@ -343,7 +407,7 @@ public class TaskTree extends JPanel {
                 return;
             }
             TaskTreeNode ttn = model.getTaskForProof(e.getSource().getSelectedProof());
-            jtree().setSelectionPath(new TreePath(ttn.getPath()));
+            delegateView.setSelectionPath(new TreePath(ttn.getPath()));
             validate();
         }
 

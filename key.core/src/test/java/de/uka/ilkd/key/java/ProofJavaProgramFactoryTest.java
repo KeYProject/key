@@ -1,13 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 import de.uka.ilkd.key.java.recoderext.Ghost;
-import de.uka.ilkd.key.proof.runallproofs.Function;
+import de.uka.ilkd.key.java.recoderext.SetStatement;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.util.helper.FindResources;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.helper.FindResources;
-import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.abstraction.Method;
@@ -22,18 +33,9 @@ import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.TypeDeclaration;
-import recoder.java.expression.operator.CopyAssignment;
-import recoder.java.reference.VariableReference;
 import recoder.java.statement.EmptyStatement;
 import recoder.java.statement.For;
 import recoder.list.generic.ASTList;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 /**
  * @author Alexander Weigl
@@ -90,13 +92,11 @@ public class ProofJavaProgramFactoryTest {
 
         StatementBlock loopBody = (StatementBlock) forLoop.getBody();
 
-        CopyAssignment ghost3 = (CopyAssignment) loopBody.getStatementAt(3);
-        VariableReference var3 = (VariableReference) ghost3.getChildAt(0);
-        Assertions.assertEquals("k0_old", var3.getName());
+        var ghost3 = (SetStatement) loopBody.getStatementAt(3);
+        Assertions.assertEquals("set k0_old = k0;", ghost3.getParserContext().getText());
 
-        CopyAssignment ghost4 = (CopyAssignment) loopBody.getStatementAt(5);
-        VariableReference var4 = (VariableReference) ghost4.getChildAt(0);
-        Assertions.assertEquals("k1_old", var4.getName());
+        var ghost4 = (SetStatement) loopBody.getStatementAt(5);
+        Assertions.assertEquals("set k1_old = k1;", ghost4.getParserContext().getText());
 
         EmptyStatement empty1 = (EmptyStatement) loopBody.getStatementAt(4);
         EmptyStatement lastStatementInForLoop =
@@ -118,16 +118,16 @@ public class ProofJavaProgramFactoryTest {
         MethodDeclaration m = (MethodDeclaration) ofib.get();
         assertContainsComment(m, it -> it.startsWith("/*@ public normal_behavior"));
 
-        CopyAssignment assign1 = (CopyAssignment) m.getBody().getStatementAt(0);
-        VariableReference var1 = (VariableReference) assign1.getChildAt(0);
-        Assertions.assertEquals("message", var1.getName());
+        var assign1 = (SetStatement) m.getBody().getStatementAt(0);
+        var var1 = assign1.getParserContext();
+        Assertions.assertEquals("set message = arg0;", var1.getText());
 
         EmptyStatement empty1 = (EmptyStatement) m.getBody().getStatementAt(1);
         assertContainsComment(empty1, it -> it.equals("//@ set message = arg0;"));
 
-        CopyAssignment assign2 = (CopyAssignment) m.getBody().getStatementAt(2);
-        VariableReference var2 = (VariableReference) assign2.getChildAt(0);
-        Assertions.assertEquals("cause", var2.getName());
+        var assign2 = (SetStatement) m.getBody().getStatementAt(2);
+        var var2 = assign2.getParserContext();
+        Assertions.assertEquals("set cause = arg1;", var2.getText());
 
         EmptyStatement empty2 = (EmptyStatement) m.getBody().getStatementAt(3);
         assertContainsComment(empty2, it -> it.equals("//@ set cause = arg1;"));
@@ -138,9 +138,10 @@ public class ProofJavaProgramFactoryTest {
     @Test
     public void testAttachCommentsCompilationUnit_SmansEtAlArrayList() throws IOException {
         File inputFile = new File("../key.ui/examples/heap/SmansEtAl/src/ArrayList.java");
+        // Regenerate this file by copying the console output
         File expectedFile = new File(FindResources.getTestResourcesDirectory(),
             "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_SmansEtAlArrayList.txt");
-        String expected = IOUtil.readFrom(expectedFile);
+        String expected = StringUtil.replaceNewlines(IOUtil.readFrom(expectedFile), "\n");
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         // Optional<Method> ofib = findMethod(cu, "Steinhoefel1", "fib");
@@ -154,9 +155,10 @@ public class ProofJavaProgramFactoryTest {
     @Test
     public void testAttachCommentsCompilationUnit_LockSpec() throws IOException {
         File inputFile = new File("../key.ui/examples/heap/permissions/lockspec/src/LockSpec.java");
+        // Regenerate this file by copying the console output
         File expectedFile = new File(FindResources.getTestResourcesDirectory(),
             "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_LockSpec.txt");
-        String expected = IOUtil.readFrom(expectedFile);
+        String expected = StringUtil.replaceNewlines(IOUtil.readFrom(expectedFile), "\n");
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         String out = getActualResult(cu);
@@ -166,20 +168,22 @@ public class ProofJavaProgramFactoryTest {
 
 
     private String getActualResult(CompilationUnit cu) {
-        Function<String, String> prepareComment =
-            it -> it.substring(0, Math.min(50, it.length())).replace('\n', ' ').trim();
-
-        StringWriter out = new StringWriter();
-        PrintWriter actual = new PrintWriter(out);
+        StringBuilder out = new StringBuilder();
         TreeWalker walker = new TreeWalker(cu);
         while (walker.next()) {
             ProgramElement pe = walker.getProgramElement();
             ASTList<Comment> b = pe.getComments();
             if (b != null && !b.isEmpty()) {
-                actual.format("(%d/%d) -- %s\n", pe.getStartPosition().getLine(),
-                    pe.getEndPosition().getLine(), pe.getClass().getName());
+                out.append("(")
+                        .append(pe.getStartPosition().getLine())
+                        .append("/")
+                        .append(pe.getEndPosition().getLine())
+                        .append(") -- ");
+                out.append(pe.getClass().getName()).append("\n");
                 for (Comment comment : pe.getComments()) {
-                    actual.format("  * %s\n", prepareComment.apply(comment.getText()));
+                    var text = StringUtil.replaceNewlines(comment.getText(), " ");
+                    text = text.substring(0, Math.min(50, text.length())).trim();
+                    out.append("  * ").append(text).append("\n");
                 }
             }
         }
@@ -213,8 +217,7 @@ public class ProofJavaProgramFactoryTest {
     private Optional<Method> findMethod(CompilationUnit cu, String className, String methodName) {
         for (int i = 0; i < cu.getTypeDeclarationCount(); i++) {
             TypeDeclaration td = cu.getTypeDeclarationAt(i);
-            if (td instanceof ClassDeclaration) {
-                ClassDeclaration clazz = (ClassDeclaration) td;
+            if (td instanceof ClassDeclaration clazz) {
                 if (clazz.getName().equals(className)) {
                     return clazz.getMethods().stream().filter(it -> it.getName().equals(methodName))
                             .findFirst();

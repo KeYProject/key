@@ -1,26 +1,29 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserBuilder;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.JmlAssertRule;
 import de.uka.ilkd.key.rule.LoopApplyHeadRule;
 import de.uka.ilkd.key.rule.LoopContractExternalRule;
 import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
+import de.uka.ilkd.key.rule.ObserverToUpdateRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.Rule;
@@ -36,6 +39,7 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -94,32 +98,34 @@ public class JavaProfile extends AbstractProfile {
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
         result =
             result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL)));
+                new SingletonLabelFactory<>(ParameterlessTermLabel.ANON_HEAP_LABEL)));
         result = result.prepend(new TermLabelConfiguration(
             ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME,
-            new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)));
+            new SingletonLabelFactory<>(ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)));
         result = result.prepend(
             new TermLabelConfiguration(ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
+                new SingletonLabelFactory<>(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
         result = result.prepend(
             new TermLabelConfiguration(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(
+                new SingletonLabelFactory<>(
                     ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)));
         result = result.prepend(
             new TermLabelConfiguration(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(
+                new SingletonLabelFactory<>(
                     ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)));
         result = result.prepend(new TermLabelConfiguration(
             ParameterlessTermLabel.UNDEFINED_VALUE_LABEL_NAME,
-            new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
+            new SingletonLabelFactory<>(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
         result = result.prepend(new TermLabelConfiguration(
             ParameterlessTermLabel.SELF_COMPOSITION_LABEL_NAME,
-            new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)));
+            new SingletonLabelFactory<>(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)));
         result = result.prepend(
             new TermLabelConfiguration(ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
+                new SingletonLabelFactory<>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
         result = result.prepend(new TermLabelConfiguration(OriginTermLabel.NAME,
-            new OriginTermLabelFactory(), originTermLabelPolicyList, null, null, null, null,
+            new OriginTermLabelFactory(), originTermLabelPolicyList,
+            null, null,
+            null, null,
             originTermLabelRefactorings, null));
 
         result =
@@ -150,7 +156,9 @@ public class JavaProfile extends AbstractProfile {
                 .prepend(UseDependencyContractRule.INSTANCE).prepend(getOneStepSimpilifier())
                 .prepend(QueryExpand.INSTANCE).prepend(MergeRule.INSTANCE)
                 .prepend(LoopApplyHeadRule.INSTANCE).prepend(JmlAssertRule.ASSERT_INSTANCE)
-                .prepend(JmlAssertRule.ASSUME_INSTANCE);
+                .prepend(JmlAssertRule.ASSUME_INSTANCE)
+                .prepend(SetStatementRule.INSTANCE)
+                .prepend(ObserverToUpdateRule.INSTANCE);
 
         // contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!

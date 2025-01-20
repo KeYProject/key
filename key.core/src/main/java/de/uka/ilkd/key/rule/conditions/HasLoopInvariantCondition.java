@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Optional;
@@ -12,13 +15,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.SyntaxElement;
 
 /**
  * Checks whether a loop has an invariant (either normal or "free").
@@ -35,7 +39,7 @@ public class HasLoopInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
@@ -55,10 +59,13 @@ public class HasLoopInvariantCondition implements VariableCondition {
         final Term selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
-        final Modality modality = (Modality) svInst.getInstantiation(modalitySV);
+        // TODO: handle exception!
+        final Modality.JavaModalityKind modalityKind =
+            (Modality.JavaModalityKind) svInst.getInstantiation(modalitySV);
 
         boolean hasInv = false;
-        for (final LocationVariable heap : MiscTools.applicableHeapContexts(modality, services)) {
+        for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,
+            services)) {
             final Optional<Term> maybeInvInst = Optional.ofNullable(
                 loopSpec.getInvariant(heap, selfTerm, loopSpec.getInternalAtPres(), services));
             final Optional<Term> maybeFreeInvInst = Optional.ofNullable(
@@ -73,6 +80,6 @@ public class HasLoopInvariantCondition implements VariableCondition {
 
     @Override
     public String toString() {
-        return "\\hasInvariant(" + loopStmtSV + ")";
+        return "\\hasInvariant(" + loopStmtSV + "," + modalitySV + ")";
     }
 }

@@ -1,6 +1,13 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import recoder.ProgramFactory;
 import recoder.ServiceConfiguration;
@@ -24,11 +31,6 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * this class implements basic functions for type reference handling.
@@ -81,7 +83,7 @@ public class VariableKit {
      * guess.
      *
      * @param sc the service configuration to be used
-     * @param sde the element that defines the scope
+     * @param context the element that defines the scope
      * @param guess the variable name to be used if possible. If a variable with that name already
      *        exists, the method uses suffix numbers.
      * @param t the type of the variable to be declared.
@@ -136,7 +138,7 @@ public class VariableKit {
     // returns a set of local variable names declared within the scope of the
     // given context and of inner scopes.
     private static Set<String> collectInnerVariables(ProgramElement context) {
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         while (context != null && !(context instanceof VariableScope)) {
             context = context.getASTParent();
         }
@@ -277,8 +279,7 @@ public class VariableKit {
             both: for (int i = 1, s = sups.size(); i < s; i += 1) {
                 ClassType sup = sups.get(i);
                 List<? extends Field> flist = sup.getFields();
-                for (int j = 0, t = flist.size(); j < t; j += 1) {
-                    Field candid = flist.get(j);
+                for (Field candid : flist) {
                     if (varname.equals(candid.getName())) {
                         if (candid == v && si.isVisibleFor(candid, ctxClass)) {
                             // access by "super.", then
@@ -325,7 +326,7 @@ public class VariableKit {
     public static List<VariableReference> getReferences(CrossReferenceSourceInfo xr, Variable v,
             NonTerminalProgramElement root, boolean scanTree) {
         Debug.assertNonnull(xr, v, root);
-        List<VariableReference> result = new ArrayList<VariableReference>();
+        List<VariableReference> result = new ArrayList<>();
         if (scanTree) {
             TreeWalker tw = new TreeWalker(root);
             while (tw.next(VariableReference.class)) {
@@ -336,8 +337,7 @@ public class VariableKit {
             }
         } else {
             List<? extends VariableReference> refs = xr.getReferences(v);
-            for (int i = 0, s = refs.size(); i < s; i += 1) {
-                VariableReference vr = refs.get(i);
+            for (VariableReference vr : refs) {
                 if (MiscKit.contains(root, vr)) {
                     result.add(vr);
                 }
@@ -361,4 +361,3 @@ public class VariableKit {
     }
 
 }
-

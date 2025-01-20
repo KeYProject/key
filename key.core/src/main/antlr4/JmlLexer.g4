@@ -1,11 +1,7 @@
 
 lexer grammar JmlLexer;
 
-@header {
-import java.util.Collection;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-}
+@header {}
 
 @members{
    // needed for double literals and ".."
@@ -48,15 +44,13 @@ NO_STATE: 'no_state' ;
 NOWARN: 'nowarn';
 NULLABLE: 'nullable';
 NULLABLE_BY_DEFAULT: 'nullable_by_default';
-SPEC_SAVE_MATH: 'spec_save_math';
-CODE_SAVE_MATH: 'code_save_math';
+SPEC_SAFE_MATH: 'spec_safe_math';
 SPEC_BIGINT_MATH: 'spec_bigint_math';
 SPEC_JAVA_MATH: 'spec_java_math';
 SPEC_PROTECTED: 'spec_protected';
 SPEC_PUBLIC: 'spec_public';
 GHOST: 'ghost' /*-> pushMode(expr)*/;
 SPEC_NAME: 'name'; // ???
-SPEC_SAFE_MATH: 'spec_safe_math';
 STATIC: 'static';
 STRICTFP: 'strictfp';
 STRICTLY_PURE: 'strictly_pure';
@@ -80,8 +74,22 @@ fragment Pfree: '_free'?;       //suffix
 ACCESSIBLE: 'accessible' Pred -> pushMode(expr);
 ASSERT: 'assert' Pred  -> pushMode(expr);
 ASSUME: 'assume' Pred -> pushMode(expr);
-ASSIGNABLE: 'assignable' Pred -> pushMode(expr);
-ASSIGNS: 'assigns' Pred -> pushMode(expr);
+/**
+ * The name 'assignable' is kept here for legacy reasons.
+ * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+ */
+ASSIGNABLE
+    : ('assignable' | 'assigns'  | 'assigning' |
+       'modifiable' | 'modifies' | 'modifying' |
+       'writable'   | 'writes'   | 'writing') (Pfree|Pred) -> pushMode(expr);
+/**
+ * The name 'assignable' is kept here for legacy reasons.
+ * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+ */
+LOOP_ASSIGNABLE
+    : ('loop_assignable' | 'loop_assigns' | 'loop_assigning' |
+       'loop_modifiable' | 'loop_modifies' | 'loop_modifying' |
+       'loop_writable' | 'loop_writes' | 'loop_writing') (Pfree|Pred) -> pushMode(expr);
 AXIOM: 'axiom' -> pushMode(expr);
 BREAKS: 'breaks' -> pushMode(expr);
 CAPTURES: 'captures' Pred -> pushMode(expr);
@@ -93,7 +101,7 @@ DECREASING: ('decreasing' | 'decreases' | 'loop_variant') Pred -> pushMode(expr)
 DETERMINES: 'determines' -> pushMode(expr);
 DIVERGES: 'diverges' Pred -> pushMode(expr);
 //DURATION: 'duration' Pred -> pushMode(expr);
-ENSURES: ('ensures' (Pfree|Pred) | 'post' Pred )-> pushMode(expr);
+ENSURES: ('ensures' | 'post') (Pfree|Pred) -> pushMode(expr);
 FOR_EXAMPLE: 'for_example' -> pushMode(expr);
 //FORALL: 'forall' -> pushMode(expr); //?
 HELPER: 'helper';
@@ -101,9 +109,9 @@ IMPLIES_THAT: 'implies_that' -> pushMode(expr);
 IN: 'in' Pred -> pushMode(expr);
 INITIALLY: 'initially' -> pushMode(expr);
 INSTANCE: 'instance';
-INVARIANT: 'invariant' Pred -> pushMode(expr);
+INVARIANT: 'invariant' (Pfree|Pred) -> pushMode(expr);
 LOOP_CONTRACT: 'loop_contract';
-LOOP_INVARIANT: ('loop_invariant' (Pfree|Pred) | 'maintaining' Pred) -> pushMode(expr);
+LOOP_INVARIANT: ('loop_invariant' | 'maintaining') (Pfree|Pred) -> pushMode(expr);
 LOOP_DETERMINES: 'loop_determines';  // internal translation for 'determines' in loop invariants
 LOOP_SEPARATES: 'loop_separates';  //KeY extension, deprecated
 MAPS: 'maps' Pred -> pushMode(expr);
@@ -111,8 +119,6 @@ MEASURED_BY: 'measured_by' Pred -> pushMode(expr);
 MERGE_POINT: 'merge_point';
 MERGE_PROC: 'merge_proc';
 MERGE_PARAMS: 'merge_params' -> pushMode(expr);
-MODIFIABLE: 'modifiable' Pred -> pushMode(expr);
-MODIFIES: 'modifies' Pred -> pushMode(expr);
 MONITORED: 'monitored' -> pushMode(expr);
 MONITORS_FOR: 'monitors_for' -> pushMode(expr);
 //OLD: 'old' -> pushMode(expr);
@@ -120,7 +126,7 @@ MONITORS_FOR: 'monitors_for' -> pushMode(expr);
 //PRE: 'pre' Pred -> pushMode(expr);
 READABLE: 'readable';
 REPRESENTS: 'represents' Pred -> pushMode(expr);
-REQUIRES: ('requires' (Pfree|Pred) | 'pre' Pred) -> pushMode(expr);
+REQUIRES: ('requires'| 'pre') (Pfree|Pred) -> pushMode(expr);
 RETURN: 'return' -> pushMode(expr);
 RETURNS: 'returns' -> pushMode(expr);
 RESPECTS: 'respects' -> pushMode(expr);
@@ -183,7 +189,7 @@ DEPENDS: 'depends';  // internal translation for 'accessible' on model fields
 
 /* JML and JML* keywords */
 /*ACCESSIBLE: 'accessible';
-ASSIGNABLE: 'assignable';
+MODIFIABLE: 'modifiable';
 BREAKS: 'breaks';
 CONTINUES: 'continues';
 DECREASES: 'decreases'; // internal translation for 'measured_by'
@@ -237,7 +243,9 @@ INDEXOF: '\\seq_indexOf';  //KeY extension, not official JML
 INTERSECT: '\\intersect';  //KeY extension, not official JML
 INTO: '\\into';
 INV: '\\inv';  //KeY extension, not official JML
+INV_FREE: '\\inv_free';  //KeY extension, not official JML
 INVARIANT_FOR: '\\invariant_for';
+INVARIANT_FREE_FOR: '\\invariant_free_for';  //KeY extension, not official JML
 IN_DOMAIN: '\\in_domain';  //KeY extension, not official JML
 IS_FINITE: '\\is_finite';  //KeY extension, not official JML
 IS_INITIALIZED: '\\is_initialized';
@@ -267,6 +275,9 @@ NOT_MODIFIED: '\\not_modified';
 NOT_SPECIFIED: '\\not_specified';
 NUM_OF: '\\num_of';
 OLD: '\\old';
+JAVA_MATH: '\\java_math';
+SAFE_MATH: '\\safe_math';
+BIGINT_MATH: '\\bigint_math';
 PERMISSION: '\\permission';
 PRE: '\\pre';
 PRODUCT: '\\product';
@@ -281,7 +292,7 @@ SEQCONCAT: '\\seq_concat';  //KeY extension, not official JML
 SEQDEF: '\\seq_def';  //KeY extension, not official JML
 SEQEMPTY: '\\seq_empty';  //KeY extension, not official JML
 SEQGET: '\\seq_get';  //KeY extension, not official JML
-SEQREPLACE: '\\seq_put';  //KeY extension, not official JML
+SEQREPLACE: '\\seq_upd';  //KeY extension, not official JML
 SEQREVERSE: '\\seq_reverse';  //KeY extension, not official JML
 SEQSINGLETON: '\\seq_singleton';  //KeY extension, not official JML
 SEQSUB: '\\seq_sub';  //KeY extension, not official JML
@@ -289,6 +300,7 @@ SETMINUS: '\\set_minus';  //KeY extension, not official JML
 SINGLETON: '\\singleton';  //KeY extension, not official JML
 SPACE: '\\space';
 STATIC_INVARIANT_FOR: '\\static_invariant_for';  //KeY extension, not official JML
+STATIC_INVARIANT_FREE_FOR: '\\static_invariant_free_for';  //KeY extension, not official JML
 STRICTLY_NOTHING: '\\strictly_nothing';  //KeY extension, not official JML
 STRING_EQUAL: '\\string_equal';  //KeY extension, not official JML
 SUBSET: '\\subset';

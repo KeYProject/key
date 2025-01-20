@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.HashMap;
@@ -19,7 +22,7 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
-    private static Map<String, ProofMacro> macroMap = loadMacroMap();
+    private static final Map<String, ProofMacro> macroMap = loadMacroMap();
 
     public MacroCommand() {
         super(Parameters.class);
@@ -27,7 +30,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
 
     private static Map<String, ProofMacro> loadMacroMap() {
         ServiceLoader<ProofMacro> loader = ServiceLoader.load(ProofMacro.class);
-        Map<String, ProofMacro> result = new HashMap<String, ProofMacro>();
+        Map<String, ProofMacro> result = new HashMap<>();
 
         for (ProofMacro proofMacro : loader) {
             String commandName = proofMacro.getScriptCommandName();
@@ -129,7 +132,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
         for (int i = 1; i < sequent.size() + 1; i++) {
             final boolean matchesRegex = formatTermString(
                 LogicPrinter.quickPrintTerm(sequent.getFormulabyNr(i).formula(), services))
-                        .matches(".*" + matchRegEx + ".*");
+                    .matches(".*" + matchRegEx + ".*");
             if (matchesRegex) {
                 if (matched) {
                     throw new ScriptException("More than one occurrence of a matching term.");

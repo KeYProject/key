@@ -1,18 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
-import bibliothek.gui.dock.common.CLocation;
-import bibliothek.gui.dock.common.DefaultMultipleCDockable;
-import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import javax.swing.*;
+
+import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
+import bibliothek.gui.dock.common.CLocation;
+import bibliothek.gui.dock.common.DefaultMultipleCDockable;
+import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
 
 /**
  * @author Alexander Weigl
@@ -68,8 +74,16 @@ public class SequentViewDock extends DefaultMultipleCDockable {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (node != null) // TODO Check if also proof needs to be set!
-                sequentView.getMainWindow().getMediator().getSelectionModel().setSelectedNode(node);
+            KeYSelectionModel selectionModel =
+                sequentView.getMainWindow().getMediator().getSelectionModel();
+            if (node != null) {
+                // may be necessary to switch to that proof
+                Proof proof = node.proof();
+                if (selectionModel.getSelectedProof() != proof) {
+                    selectionModel.setSelectedProof(proof);
+                }
+                selectionModel.setSelectedNode(node);
+            }
         }
     }
 }

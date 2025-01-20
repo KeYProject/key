@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.Expression;
@@ -151,12 +154,15 @@ public class MethodCallStatement extends JavaStatement
 
     public int getChildCount() {
         int result = 0;
-        if (resultVar != null)
+        if (resultVar != null) {
             result++;
-        if (ec != null)
+        }
+        if (ec != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -170,18 +176,21 @@ public class MethodCallStatement extends JavaStatement
 
     public ProgramElement getChildAt(int index) {
         if (resultVar != null) {
-            if (index == 0)
+            if (index == 0) {
                 return resultVar;
+            }
             index--;
         }
         if (ec != null) {
-            if (index == 0)
+            if (index == 0) {
                 return ec;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

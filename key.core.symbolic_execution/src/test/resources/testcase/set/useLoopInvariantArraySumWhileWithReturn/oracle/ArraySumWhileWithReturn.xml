@@ -7,15 +7,15 @@
             <callStackEntry path="/0"/>
             <loopInvariant name="invariant: (  (i &gt;= 0
  &amp; i &lt;= array.length)&lt;&lt;SC&gt;&gt;
- &amp; result = javaCastInt(bsum{int j;}(0, i, array[j])))&lt;&lt;SC&gt;&gt;;
-variant: javaSubInt(array.length, i)
+ &amp; result = bsum{int j;}(0, i, array[j]))&lt;&lt;SC&gt;&gt;;
+variant: array.length - i
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
-               <branchStatement name="if (array==null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+               <branchStatement name="if (array == null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                   <callStackEntry path="/0"/>
                   <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <callStackEntry path="/0"/>
-                     <statement name="returnExpr=0;" pathCondition="equals(array,null)" pathConditionChanged="false">
+                     <statement name="returnExpr = 0;" pathCondition="equals(array,null)" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
                         <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of ArraySumWhileWithReturn.sum(array)&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(array,null)">
                            <callStackEntry path="/0"/>
@@ -27,11 +27,11 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                   </branchCondition>
                   <branchCondition name="not(equals(array,null))" pathCondition="not(equals(array,null))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <callStackEntry path="/0"/>
-                     <branchStatement name="if (i==array.length)" pathCondition="not(equals(array,null))" pathConditionChanged="false" blockOpened="true">
+                     <branchStatement name="if (i == array.length)" pathCondition="not(equals(array,null))" pathConditionChanged="false" blockOpened="true">
                         <callStackEntry path="/0"/>
                         <branchCondition name="equals(length(array),i_0)" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="true" branchCondition="equals(length(array),i_0)" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <callStackEntry path="/0"/>
-                           <statement name="returnExpr=result;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false">
+                           <statement name="returnExpr = result;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
                               <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of ArraySumWhileWithReturn.sum(array)&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))">
                                  <callStackEntry path="/0"/>
@@ -44,7 +44,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                         </branchCondition>
                         <branchCondition name="not(equals(length(array),i_0))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),i_0))))" pathConditionChanged="true" branchCondition="not(equals(length(array),i_0))" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <callStackEntry path="/0"/>
-                           <statement name="result+=array[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),i_0))))" pathConditionChanged="false">
+                           <statement name="result += array[i];" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),i_0))))" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
                               <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),i_0))))" pathConditionChanged="false">
                                  <callStackEntry path="/0"/>

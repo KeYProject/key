@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Map;
-import java.util.Stack;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 
 public class ScriptTreeParser {
 
@@ -12,33 +15,29 @@ public class ScriptTreeParser {
 
         ScriptNode root = null;
         ScriptNode last = null;
-        Stack<ScriptNode> branchStack = new Stack<>();
+        ArrayDeque<ScriptNode> branchStack = new ArrayDeque<>();
 
-        ScriptLineParser lineParser = new ScriptLineParser(reader);
+        ScriptLineParser lineParser = new ScriptLineParser(reader, null);
 
         while (true) {
 
-            int from = lineParser.getPosition();
-            Map<String, String> command = lineParser.parseCommand();
-            int to = lineParser.getPosition();
+            int from = lineParser.getOffset();
+            var command = lineParser.parseCommand();
+            int to = lineParser.getOffset();
 
             if (command == null) {
                 return root;
             }
 
-            switch (command.get(ScriptLineParser.COMMAND_KEY)) {
-            case "branches":
-                branchStack.push(last);
-                break;
-            case "next":
-                last = branchStack.peek();
-                break;
-            case "end":
+            switch (command.args().get(ScriptLineParser.COMMAND_KEY)) {
+            case "branches" -> branchStack.push(last);
+            case "next" -> last = branchStack.peek();
+            case "end" -> {
                 last = null;
                 branchStack.pop();
-                break;
-            default:
-                ScriptNode node = new ScriptNode(last, command, from, to);
+            }
+            default -> {
+                ScriptNode node = new ScriptNode(last, command.args(), from, to);
                 if (root == null) {
                     root = node;
                 } else if (last == null) {
@@ -47,7 +46,7 @@ public class ScriptTreeParser {
                     last.addNode(node);
                 }
                 last = node;
-                break;
+            }
             }
         }
 
@@ -55,7 +54,8 @@ public class ScriptTreeParser {
 
     public static void main(String[] args) throws IOException, ScriptException {
 
-        ScriptNode root = ScriptTreeParser.parse(new InputStreamReader(System.in));
+        ScriptNode root =
+            ScriptTreeParser.parse(new InputStreamReader(System.in, StandardCharsets.UTF_8));
 
         root.dump(0);
 

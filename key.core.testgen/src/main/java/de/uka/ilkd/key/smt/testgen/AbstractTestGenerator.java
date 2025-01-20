@@ -1,13 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.testgen;
 
 import java.io.IOException;
 import java.util.*;
-
-import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
-import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.smt.solvertypes.SolverType;
-import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.Choice;
@@ -31,15 +28,22 @@ import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.model.Model;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
+
+import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,7 +159,7 @@ public abstract class AbstractTestGenerator {
         final ProofDependentSMTSettings pdSettings = proof.getSettings().getSMTSettings().clone();
         final NewSMTTranslationSettings newSettings =
             new NewSMTTranslationSettings(proof.getSettings().getNewSMTSettings());
-        pdSettings.invariantForall = settings.invariantForAll();
+        pdSettings.setInvariantForall(settings.invariantForAll());
         // invoke z3 for counterexamples
         final DefaultSMTSettings smtsettings =
             new DefaultSMTSettings(pdSettings, piSettings, newSettings, proof);
@@ -392,7 +396,7 @@ public abstract class AbstractTestGenerator {
                 if (res == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
                     unknown++;
                     if (solver.getException() != null) {
-                        solver.getException().printStackTrace();
+                        LOGGER.warn("Solver returned exception", solver.getException());
                     }
                 } else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
                     solvedPaths++;

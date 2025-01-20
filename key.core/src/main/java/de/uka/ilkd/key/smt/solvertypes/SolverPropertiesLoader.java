@@ -1,19 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.solvertypes;
-
-import de.uka.ilkd.key.settings.SettingsConverter;
-import de.uka.ilkd.key.smt.communication.Z3Socket;
-import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
-import org.key_project.util.reflection.ClassLoaderUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.smt.communication.Z3Socket;
+import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
+
+import org.key_project.util.reflection.ClassLoaderUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides static SolverType objects to be reused and saves the properties to .props files. Used to
@@ -86,7 +91,7 @@ public class SolverPropertiesLoader {
      * The default {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}, if none is given
      * in the .props file: {@link de.uka.ilkd.key.smt.communication.Z3Socket}.
      */
-    private static final String DEFAULT_MESSAGE_HANDLER =
+    private static final String DEFAULT_SOLVER_SOCKET =
         "de.uka.ilkd.key.smt.communication.Z3Socket";
     /**
      * The default message DELIMITERS, if none are given in the .props file.
@@ -162,9 +167,16 @@ public class SolverPropertiesLoader {
     private static final String PREAMBLE_FILE = "preamble";
 
     /**
+     * All supported keys for solver props files.
+     */
+    private static final String[] SUPPORTED_KEYS = { NAME, VERSION, COMMAND, PARAMS, DELIMITERS,
+        INFO, MIN_VERSION, LEGACY, TIMEOUT, SOLVER_SOCKET_CLASS, TRANSLATOR_CLASS,
+        HANDLER_NAMES, HANDLER_OPTIONS, PREAMBLE_FILE };
+
+    /**
      * If a props file does not contain a solver NAME or two files have the same NAME, unique names
      * have to be created because interacting with the solvers later requires uniqueness. The
-     * counters are used for uniqueness.
+     * counters are used for uniqueness across the solvers of this loader.
      */
     private static final Map<String, Integer> NAME_COUNTERS = new HashMap<>();
 
@@ -176,21 +188,23 @@ public class SolverPropertiesLoader {
             return name;
         }
         // if NAME was already used, use <NAME>_<counter> as NAME and increase counter afterwards
-        StringBuilder nameBuilder = new StringBuilder();
-        nameBuilder.append(name);
-        nameBuilder.append("_");
-        nameBuilder.append(counter);
+        String nameBuilder = name +
+            "_" +
+            counter;
         counter++;
         NAME_COUNTERS.put(name, counter);
         // <NAME>_<counter> is now also a NAME that has been used and must be unique
-        return uniqueName(nameBuilder.toString());
+        return uniqueName(nameBuilder);
     }
 
     /**
      * Initializes {@link #SOLVERS} using the given hardcoded properties if that list is empty,
      * otherwise just returns the existing list.
+     * The solver type names are unique across the returned list.
+     * Note that care may have to be taken for the names to be globally unique
+     * (see {@link SolverTypes}).
      *
-     * @return true iff SOLVERS was freshly initialized using the given solverProperties
+     * @return a copy of the created list of solver types
      */
     public Collection<SolverType> getSolvers() {
         if (SOLVERS.isEmpty()) {
@@ -208,7 +222,7 @@ public class SolverPropertiesLoader {
     }
 
     /**
-     * @return a copy of LEGACY_SOLVERS
+     * @return a copy of the created list of legacy solvers
      */
     public Collection<SolverType> getLegacySolvers() {
         getSolvers();
@@ -257,7 +271,7 @@ public class SolverPropertiesLoader {
         // the solver socket used for communication with the created solver
         try {
             String socketClassName = SettingsConverter.readRawString(props, SOLVER_SOCKET_CLASS,
-                DEFAULT_MESSAGE_HANDLER);
+                DEFAULT_SOLVER_SOCKET);
             solverSocketClass = ClassLoaderUtil.getClassforName(socketClassName);
         } catch (ClassNotFoundException e) {
             solverSocketClass = Z3Socket.class;
@@ -285,7 +299,8 @@ public class SolverPropertiesLoader {
             SolverPropertiesLoader.HANDLER_OPTIONS, SPLIT, new String[0]);
 
         // the solver specific preamble, may be null
-        preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
+        preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null,
+            SolverPropertiesLoader.class.getClassLoader());
 
         // create the solver type
         return new SolverTypeImplementation(name, info, params, command, version, minVersion,
@@ -310,16 +325,31 @@ public class SolverPropertiesLoader {
                     }
                     // load solvers from this single solvers.txt
                     Collection<Properties> props = new ArrayList<>();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-                    List<String> propsNames = reader.lines().collect(Collectors.toList());
+                    BufferedReader reader =
+                        new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+                    List<String> propsNames = reader.lines().toList();
                     for (String fileName : propsNames.stream().filter(n -> n.endsWith(".props"))
-                            .collect(Collectors.toList())) {
+                            .toList()) {
                         Properties solverProp = new Properties();
                         InputStream propsFile =
                             SolverPropertiesLoader.class.getResourceAsStream(fileName);
                         try {
                             solverProp.load(propsFile);
                             props.add(solverProp);
+                            // Create a warning if unsupported keys occur in the loaded file.
+                            Collection<String> unsupportedKeys = SettingsConverter
+                                    .unsupportedPropertiesKeys(solverProp, SUPPORTED_KEYS);
+                            if (!unsupportedKeys.isEmpty()) {
+                                StringBuilder msg = new StringBuilder(
+                                    "Properties file " + fileName
+                                        + " contains unsupported keys: {");
+                                for (String key : unsupportedKeys) {
+                                    msg.append(key);
+                                    msg.append(", ");
+                                }
+                                msg.replace(msg.length() - 2, msg.length(), "}");
+                                LOGGER.warn(msg.toString());
+                            }
                         } catch (Exception e) {
                             // every possible exception should be caught as loading the files
                             // should not break key

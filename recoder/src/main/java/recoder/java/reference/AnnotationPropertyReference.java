@@ -1,9 +1,7 @@
-/*
- * Created on 10.06.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.reference;
 
 import recoder.java.*;
@@ -80,8 +78,9 @@ public class AnnotationPropertyReference extends JavaNonTerminalProgramElement
     }
 
     public ProgramElement getChildAt(int index) {
-        if (ident != null && index == 0)
+        if (ident != null && index == 0) {
             return ident;
+        }
         throw new ArrayIndexOutOfBoundsException(index);
     }
 
@@ -93,8 +92,9 @@ public class AnnotationPropertyReference extends JavaNonTerminalProgramElement
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == ident) {
             ident = (Identifier) q;
-            if (ident != null)
+            if (ident != null) {
                 ident.setParent(this);
+            }
             return true;
         }
         return false;
@@ -110,8 +110,9 @@ public class AnnotationPropertyReference extends JavaNonTerminalProgramElement
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (ident != null)
+        if (ident != null) {
             ident.setParent(this);
+        }
     }
 
     public int getExpressionCount() {

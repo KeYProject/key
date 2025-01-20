@@ -1,26 +1,25 @@
-/*
- * Created on 27.05.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.bytecode;
+
+import java.util.List;
 
 import recoder.abstraction.AnnotationUse;
 import recoder.abstraction.ElementValuePair;
-
-import java.util.List;
 
 /**
  * @author gutzmann
  */
 public class AnnotationUseInfo implements AnnotationUse {
-    protected List<ElementValuePair> elementValuePairs;
+    protected final List<ElementValuePair> elementValuePairs;
 
-    protected String fullAnnotationTypeName;
+    protected final String fullAnnotationTypeName;
 
     /**
-     * @param accessFlags
-     * @param name
+     * @param fullName name of the annotation
+     * @param evpl
      */
     public AnnotationUseInfo(String fullName, List<ElementValuePair> evpl) {
         super();
@@ -33,11 +32,12 @@ public class AnnotationUseInfo implements AnnotationUse {
     }
 
     private String getParamStr() {
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         boolean first = true;
         for (ElementValuePair evp : elementValuePairs) {
-            if (!first)
+            if (!first) {
                 res.append(",");
+            }
             first = false;
             res.append(evp.toString());
         }

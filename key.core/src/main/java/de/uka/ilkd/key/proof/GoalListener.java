@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+
+import org.key_project.util.collection.ImmutableList;
 
 /** interface to be implemented by a goal listener */
 public interface GoalListener {

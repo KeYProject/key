@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 import java.util.HashSet;
@@ -15,7 +17,7 @@ import java.util.Set;
  */
 public class Marker implements Cloneable {
 
-    private final Set<Object> marks = new HashSet<Object>();
+    private final Set<Object> marks = new HashSet<>();
 
     public void mark(Object o) {
         marks.add(o);

@@ -1,13 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
+
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.util.parsing.LocatableException;
+
 import recoder.java.Expression;
 import recoder.java.reference.UncollatedReferenceQualifier;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * @author Alexander Weigl
@@ -25,7 +28,7 @@ public final class ParserUtil {
                 || expr instanceof UncollatedReferenceQualifier || expr instanceof SuperReference) {
             return;
         }
-        Location loc = new Location((URL) null, tok.beginLine, tok.beginColumn);
+        Location loc = new Location(null, Position.fromToken(tok));
         throw new LocatableException("Given non-reference as parameter for \\singleton", loc);
     }
 }

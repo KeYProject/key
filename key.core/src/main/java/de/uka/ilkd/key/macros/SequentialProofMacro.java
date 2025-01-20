@@ -1,11 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -17,10 +16,12 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros which sequentially
  * apply macros one after the other. This works only for macros which use
- * {@link KeYMediator#startAutoMode()}.
+ * {@code KeYMediator.startAutoMode()}.
  *
  * <p>
  * Since {@link ProofMacro}s run asynchronously, the start of the next macro must be performed in a
@@ -76,14 +77,14 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception {
-        final List<Node> initNodes = new ArrayList<Node>(goals.size());
+            throws Exception {
+        final List<Node> initNodes = new ArrayList<>(goals.size());
         for (Goal goal : goals) {
             initNodes.add(goal.node());
         }
         final ImmutableList<Goal> gs = initNodes.isEmpty() ? proof.openEnabledGoals()
                 : proof.getSubtreeEnabledGoals(initNodes.get(0));
-        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, gs, proof, false);
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, gs, proof);
         for (final ProofMacro macro : getProofMacros()) {
             // reverse to original nodes
             for (Node initNode : initNodes) {
@@ -93,9 +94,12 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
                     pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
                     synchronized (macro) {
                         // wait for macro to terminate
-                        info = macro.applyTo(uic, initNode, posInOcc, pml);
+                        try {
+                            info = macro.applyTo(uic, initNode, posInOcc, pml);
+                        } finally {
+                            pml.taskFinished(info);
+                        }
                     }
-                    pml.taskFinished(info);
                     info = new ProofMacroFinishedInfo(this, info);
                 }
             }
@@ -114,6 +118,6 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
             assert proofMacros != null;
             assert proofMacros.length > 0;
         }
-        return Collections.unmodifiableList(Arrays.asList(proofMacros));
+        return List.of(proofMacros);
     }
 }

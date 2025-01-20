@@ -1,16 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.ObjectUtil;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -26,7 +19,10 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 /**
  * Extracts the current state and represents it as {@link IExecutionVariable}s.
@@ -130,7 +126,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      */
     public IExecutionVariable[] analyse() throws ProofInputException {
         Collection<StateExecutionVariable> variables = allStateVariables.values();
-        return variables.toArray(new StateExecutionVariable[variables.size()]);
+        return variables.toArray(new StateExecutionVariable[0]);
     }
 
     /**
@@ -321,109 +317,67 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * Utility class representing a parent definition.
      *
+     * @param parent   The parent.
+     * @param goalNode The {@link Node} on which this result is based on.
      * @author Martin Hentschel
      */
-    private static final class ParentDef {
-        /**
-         * The parent.
-         */
-        private final Term parent;
-
-        /**
-         * The {@link Node} on which this result is based on.
-         */
-        private final Node goalNode;
-
+        private record ParentDef(Term parent, Node goalNode) {
         /**
          * Constructor.
          *
-         * @param parent The parent.
+         * @param parent   The parent.
          * @param goalNode The {@link Node} on which this result is based on.
          */
-        public ParentDef(Term parent, Node goalNode) {
-            this.parent = parent;
-            this.goalNode = goalNode;
+        private ParentDef {
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof ParentDef) {
-                ParentDef other = (ParentDef) obj;
-                return ObjectUtil.equals(parent, other.parent)
-                        && ObjectUtil.equals(goalNode, other.goalNode);
-            } else {
-                return false;
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean equals(Object obj) {
+                if (obj instanceof ParentDef other) {
+                    return Objects.equals(parent, other.parent)
+                            && Objects.equals(goalNode, other.goalNode);
+                } else {
+                    return false;
+                }
             }
-        }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int hashCode() {
-            int result = 17;
-            result = 31 * result + (parent != null ? parent.hashCode() : 0);
-            result = 31 * result + (goalNode != null ? goalNode.hashCode() : 0);
-            return result;
-        }
     }
 
     /**
      * Utility class representing a location.
      *
+     * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is used instead.
+     * @param arrayIndex      The array index or {@code null} if a {@link ProgramVariable} is used instead.
      * @author Martin Hentschel
      */
-    private static final class LocationDef {
-        /**
-         * The {@link ProgramVariable} or {@code null} if an array index is used instead.
-         */
-        private final ProgramVariable programVariable;
-
-        /**
-         * The array index or {@code null} if a {@link ProgramVariable} is used instead.
-         */
-        private final Term arrayIndex;
-
+        private record LocationDef(ProgramVariable programVariable, Term arrayIndex) {
         /**
          * Constructor.
          *
          * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is
-         *        used instead.
-         * @param arrayIndex The array index or <code>null</code>, if a {@link ProgramVariable} is
-         *        used instead.
+         *                        used instead.
+         * @param arrayIndex      The array index or <code>null</code>, if a {@link ProgramVariable} is
+         *                        used instead.
          */
-        public LocationDef(ProgramVariable programVariable, Term arrayIndex) {
-            this.programVariable = programVariable;
-            this.arrayIndex = arrayIndex;
+        private LocationDef {
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof LocationDef) {
-                LocationDef other = (LocationDef) obj;
-                return programVariable == other.programVariable
-                        && ObjectUtil.equals(arrayIndex, other.arrayIndex);
-            } else {
-                return false;
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean equals(Object obj) {
+                if (obj instanceof LocationDef other) {
+                    return programVariable == other.programVariable
+                            && Objects.equals(arrayIndex, other.arrayIndex);
+                } else {
+                    return false;
+                }
             }
-        }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int hashCode() {
-            int result = 17;
-            result = 31 * result + (programVariable != null ? programVariable.hashCode() : 0);
-            result = 31 * result + (arrayIndex != null ? arrayIndex.hashCode() : 0);
-            return result;
-        }
     }
 
     /**
@@ -487,7 +441,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 assert variable != null;
                 createValues(variable, pairsList, firstPair, childrenInfo, values,
                     ImmutableSLList.nil());
-                variable.values = values.toArray(new IExecutionValue[values.size()]);
+                variable.values = values.toArray(new IExecutionValue[0]);
             }
             return values;
         }
@@ -558,7 +512,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public IExecutionValue[] getValues() throws ProofInputException {
-            return values.toArray(new IExecutionValue[values.size()]);
+            return values.toArray(new IExecutionValue[0]);
         }
 
         /**
@@ -710,7 +664,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public ExtractedExecutionVariable[] getChildVariables() {
-            return childVariables.toArray(new ExtractedExecutionVariable[childVariables.size()]);
+            return childVariables.toArray(new ExtractedExecutionVariable[0]);
         }
 
         /**

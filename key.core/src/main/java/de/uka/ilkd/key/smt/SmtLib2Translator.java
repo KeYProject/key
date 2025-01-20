@@ -1,17 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.sort.Sort;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
+
+import de.uka.ilkd.key.java.Services;
+
+import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The translation for the SMT2-format. It nearly the same as for the SMT1-format.
  */
 @SuppressWarnings("unused") // used via reflection by the legacy solver types
 public class SmtLib2Translator extends AbstractSMTTranslator {
+    // FIXME: StringBuilder::equals does not what you think it does! It is not overwritten!
     private static final StringBuilder INTSTRING = new StringBuilder("Int");
 
     private static final StringBuilder BOOL = new StringBuilder("Bool");
@@ -106,7 +111,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
          * method (currently AUFNIRA).
          */
         // if (getConfig().mentionLogic()) {
-        result.append("(set-logic " + settings.getLogic() + " )\n");
+        result.append("(set-logic ").append(settings.getLogic()).append(" )\n");
         // }
         result.append("(set-option :print-success true) \n");
         result.append("(set-option :produce-unsat-cores true)\n");
@@ -286,7 +291,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     private void createSortDeclaration(ArrayList<StringBuilder> types, StringBuilder result) {
         result.append("\n" + GAP + "; Declaration of sorts.\n");
         for (StringBuilder type : types) {
-            if (!(type == INTSTRING || type.equals(INTSTRING))) {
+            if (!(type == INTSTRING || type.compareTo(INTSTRING) == 0)) {
                 createSortDeclaration(type, result);
             }
         }

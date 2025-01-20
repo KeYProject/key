@@ -1,11 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.njml;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Externalize algorithm to decide whether a JML comment is active given a set of enabled keys.
@@ -25,7 +31,8 @@ public class JmlMarkerDecision {
      */
     public JmlMarkerDecision(JmlLexer lexer) {
         this.lexer = lexer;
-        enabledKeys.add("key");
+        setEnabledKeys(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getJmlEnabledKeys());
     }
 
     /**
@@ -34,7 +41,7 @@ public class JmlMarkerDecision {
      *
      * @param markers a collection of keys without prefix ([+-])
      */
-    public void setEnabledKeys(@Nonnull Collection<String> markers) {
+    public void setEnabledKeys(@NonNull Collection<String> markers) {
         this.enabledKeys = markers.stream().map(String::toLowerCase).collect(Collectors.toSet());
     }
 
@@ -88,8 +95,9 @@ public class JmlMarkerDecision {
 
         try {
             // matching the expected start of the comment
-            if (consume(expectedCommentStart))
+            if (consume(expectedCommentStart)) {
                 return false;
+            }
 
             // consume until '@' is hit, or else it is not a JML comment
             StringBuilder markerBuilder = new StringBuilder();

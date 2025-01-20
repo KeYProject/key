@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
@@ -13,11 +16,11 @@ import de.uka.ilkd.key.java.SourceElement;
  */
 public class LabelCollector extends JavaASTVisitor {
 
-    private HashSet<Label> labels;
+    private final HashSet<Label> labels;
 
     public LabelCollector(ProgramElement root, Services services) {
         super(root, services);
-        this.labels = new LinkedHashSet<Label>(20);
+        this.labels = new LinkedHashSet<>(20);
     }
 
     public boolean contains(Label l) {

@@ -1,29 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.key_project.util.collection.ImmutableList;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -33,7 +27,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
     private Term mbyAtPre;
 
-    private DependencyContract contract;
+    private final DependencyContract contract;
 
     private InitConfig proofConfig;
     private TermBuilder tb;
@@ -55,8 +49,8 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Term buildFreePre(List<LocationVariable> heaps, ProgramVariable selfVar,
-            KeYJavaType selfKJT, ImmutableList<ProgramVariable> paramVars, Term wellFormedHeaps,
+    private Term buildFreePre(List<LocationVariable> heaps, LocationVariable selfVar,
+            KeYJavaType selfKJT, ImmutableList<LocationVariable> paramVars, Term wellFormedHeaps,
             Services services) throws ProofInputException {
         // "self != null"
         final Term selfNotNull =
@@ -87,7 +81,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = tb.tt();
-        for (ProgramVariable paramVar : paramVars) {
+        for (var paramVar : paramVars) {
             paramsOK = tb.and(paramsOK, tb.reachableValue(paramVar));
         }
 
@@ -125,27 +119,32 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             target = javaInfo.getToplevelPM(contract.getKJT(), (IProgramMethod) target);
             // FIXME: for some reason the above method call returns null now and then, the following
             // line (hopefully) is a work-around
-            if (target == null)
+            if (target == null) {
                 target = contract.getTarget();
+            }
+        }
+        if (target.getType() == KeYJavaType.VOID_TYPE) {
+            throw new ProofInputException(
+                "Dependency contracts are currently not supported for void methods");
         }
 
         final Services proofServices = postInit();
 
         // prepare variables
-        final ProgramVariable selfVar =
+        final LocationVariable selfVar =
             !contract.getTarget().isStatic() ? tb.selfVar(contract.getKJT(), true) : null;
-        final ImmutableList<ProgramVariable> paramVars = tb.paramVars(target, true);
+        final ImmutableList<LocationVariable> paramVars = tb.paramVars(target, true);
 
         final boolean twoState = (contract.getTarget().getStateCount() == 2);
         final int heapCount = contract.getTarget().getHeapCount(proofServices);
 
         final Map<LocationVariable, LocationVariable> preHeapVars =
-            new LinkedHashMap<LocationVariable, LocationVariable>();
+            new LinkedHashMap<>();
         final Map<LocationVariable, LocationVariable> preHeapVarsReverse =
-            new LinkedHashMap<LocationVariable, LocationVariable>();
-        List<LocationVariable> heaps = new LinkedList<LocationVariable>();
+            new LinkedHashMap<>();
+        List<LocationVariable> heaps = new LinkedList<>();
         int hc = 0;
-        for (LocationVariable h : HeapContext.getModHeaps(proofServices, false)) {
+        for (LocationVariable h : HeapContext.getModifiableHeaps(proofServices, false)) {
             if (hc >= heapCount) {
                 break;
             }
@@ -190,7 +189,8 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             }
             // prepare anon heap
             final Name anonHeapName = new Name(tb.newName("anon_" + h.toString()));
-            final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
+            final JFunction anonHeapFunc =
+                new JFunction(anonHeapName, heapLDT.targetSort());
             register(anonHeapFunc, proofServices);
             final Term anonHeap =
                 tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
@@ -201,7 +201,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
                 wellFormedHeaps = tb.and(wellFormedHeaps, wellFormedAnonHeap);
             }
             // prepare update
-            final boolean atPre = preHeapVars.values().contains(h);
+            final boolean atPre = preHeapVars.containsValue(h);
             final Term dep = getContract().getDep(atPre ? preHeapVarsReverse.get(h) : h, atPre,
                 selfVar, paramVars, preHeapVars, proofServices);
             final Term changedHeap = tb.anon(tb.var(h), tb.setMinus(tb.allLocs(), dep), anonHeap);
@@ -257,10 +257,9 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof DependencyContractPO)) {
+        if (!(po instanceof DependencyContractPO cPO)) {
             return false;
         }
-        DependencyContractPO cPO = (DependencyContractPO) po;
         return contract.equals(cPO.contract);
     }
 
@@ -294,47 +293,14 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
     /**
      * {@inheritDoc}
+     *
+     * @return
      */
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
-        super.fillSaveProperties(properties);
-        properties.setProperty("contract", contract.getName());
-    }
-
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
-        String contractName = properties.getProperty("contract");
-        int proofNum = 0;
-        String baseContractName = null;
-        int ind = -1;
-        for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
-            ind = contractName.indexOf("." + tag);
-            if (ind > 0) {
-                break;
-            }
-            proofNum++;
-        }
-        if (ind == -1) {
-            baseContractName = contractName;
-            proofNum = 0;
-        } else {
-            baseContractName = contractName.substring(0, ind);
-        }
-        final Contract contract = initConfig.getServices().getSpecificationRepository()
-                .getContractByName(baseContractName);
-        if (contract == null) {
-            throw new RuntimeException("Contract not found: " + baseContractName);
-        } else {
-            return new LoadedPOContainer(contract.createProofObl(initConfig, contract), proofNum);
-        }
+    public Configuration createLoaderConfig() {
+        var c = super.createLoaderConfig();
+        c.set("contract", contract.getName());
+        return c;
     }
 
 

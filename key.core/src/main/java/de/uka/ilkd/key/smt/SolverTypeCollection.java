@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
-
-import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 /**
  * Stores a set of solver types. This class can be used in order to encapsulate multiple solvers.
@@ -13,7 +16,7 @@ import java.util.LinkedList;
 public class SolverTypeCollection implements Iterable<SolverType> {
     public final static SolverTypeCollection EMPTY_COLLECTION = new SolverTypeCollection();
 
-    private LinkedList<SolverType> types = new LinkedList<SolverType>();
+    private final LinkedList<SolverType> types = new LinkedList<>();
     private String name = "";
     private int minUsableSolver = 1;
 
@@ -52,10 +55,9 @@ public class SolverTypeCollection implements Iterable<SolverType> {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof SolverTypeCollection)) {
+        if (!(o instanceof SolverTypeCollection stc)) {
             return false;
         }
-        SolverTypeCollection stc = (SolverTypeCollection) o;
         return name.equals(stc.name) && minUsableSolver == stc.minUsableSolver
                 && types.equals(stc.types);
     }
@@ -84,7 +86,6 @@ public class SolverTypeCollection implements Iterable<SolverType> {
                 usableCount++;
             }
         }
-
         return usableCount >= minUsableSolver;
     }
 
@@ -93,22 +94,22 @@ public class SolverTypeCollection implements Iterable<SolverType> {
     }
 
     public String toString() {
-        String s = "";
+        StringBuilder s = new StringBuilder();
 
         int i = 0;
         for (SolverType type : types) {
             if (type.isInstalled(false)) {
                 if (i > 0) {
-                    s += ", ";
+                    s.append(", ");
                 }
-                s += type.getName();
+                s.append(type.getName());
                 i++;
             }
         }
-        if (s.isEmpty()) {
+        if (s.length() == 0) {
             return "No solver available.";
         }
-        return s;
+        return s.toString();
     }
 
     @Override

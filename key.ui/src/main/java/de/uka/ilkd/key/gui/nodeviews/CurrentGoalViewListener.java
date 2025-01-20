@@ -1,25 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Point;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceAdapter;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.InvalidDnDOperationException;
+import java.awt.*;
+import java.awt.dnd.*;
 import java.awt.event.MouseEvent;
-
-import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-
-import org.key_project.util.collection.ImmutableList;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Listener for a {@link CurrentGoalView}.
@@ -114,7 +109,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     public void mouseEntered(MouseEvent me) {
     }
 
-    public final synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
+    public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
         modalDragNDropEnabled = allowDragNDrop;
     }
 
@@ -125,7 +120,9 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     @Override
     public void dragGestureRecognized(DragGestureEvent dgEvent) {
         final Object oldHighlight = getSequentView().getCurrentHighlight();
-        getSequentView().setCurrentHighlight(getSequentView().dndHighlight);
+        Object dndHighlight =
+            getSequentView().createColorHighlight(SequentView.DND_HIGHLIGHT_COLOR.get());
+        getSequentView().setCurrentHighlight(dndHighlight);
         hideMenu(menu);
         Point dragOrigin = dgEvent.getDragOrigin();
         PosInSequent localMousePos = getSequentView().getPosInSequent(dragOrigin);
@@ -139,7 +136,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
                         public void dragDropEnd(DragSourceDropEvent event) {
                             // Enable updating the subterm
                             // highlightning ...
-                            getSequentView().disableHighlight(getSequentView().dndHighlight);
+                            getSequentView().disableHighlight(dndHighlight);
                             getSequentView().setCurrentHighlight(oldHighlight);
                         }
                     });
@@ -147,7 +144,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
                 // system not in proper dnd state
                 // Enable updating the subterm
                 // highlightning ...
-                getSequentView().disableHighlight(getSequentView().dndHighlight);
+                getSequentView().disableHighlight(dndHighlight);
                 getSequentView().setCurrentHighlight(oldHighlight);
             }
         }

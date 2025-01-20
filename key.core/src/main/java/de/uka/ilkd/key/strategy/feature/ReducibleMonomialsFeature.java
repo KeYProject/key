@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
@@ -37,9 +40,9 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         };
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        final Term dividendT = dividend.toTerm(app, pos, goal);
-        final Term divisorT = divisor.toTerm(app, pos, goal);
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        final Term dividendT = dividend.toTerm(app, pos, goal, mState);
+        final Term divisorT = divisor.toTerm(app, pos, goal, mState);
 
         final Services services = goal.proof().getServices();
         final Monomial mDividend = Monomial.create(dividendT, services);

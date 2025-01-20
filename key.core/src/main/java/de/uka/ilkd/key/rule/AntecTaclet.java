@@ -1,15 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.ChoiceExpr;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.executor.javadl.AntecTacletExecutor;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * An AntecTaclet represents a taclet whose find part has to match a top level formula in the
@@ -26,11 +29,11 @@ public class AntecTaclet extends FindTaclet {
      * @param applPart contains the application part of an Taclet that is the if-sequent, the
      *        variable conditions
      * @param goalTemplates a list of goal descriptions.
-     * @param heuristics a list of heurisics for the Taclet
-     * @param attrs attributes for the Taclet; these are boolean values indicating a noninteractive
+     * @param heuristics a list of heuristics for the Taclet
+     * @param attrs attributes for the Taclet; these are boolean values indicating a non-interactive
      *        or recursive use of the Taclet.
      * @param find the find term of the Taclet
-     * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the prefix for each
+     * @param prefixMap a ImmutableMap that contains the prefix for each
      *        SchemaVariable in the Taclet
      */
     public AntecTaclet(Name name, TacletApplPart applPart,

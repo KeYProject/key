@@ -1,9 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.communication;
 
-import org.key_project.util.java.IOUtil;
-
-import javax.annotation.Nonnull;
 import java.io.*;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class is responsible for starting external processes:
@@ -20,12 +22,12 @@ public class ExternalProcessLauncher {
     /**
      * the store of all messages send to and received from the external process
      */
-    private final @Nonnull SolverCommunication session;
+    private final @NonNull SolverCommunication session;
 
     /**
      * the delimiters which separate the messages
      */
-    private final @Nonnull String[] messageDelimiters;
+    private final @NonNull String[] messageDelimiters;
 
     /**
      * the external process
@@ -43,8 +45,8 @@ public class ExternalProcessLauncher {
      * @param session the store for the messages send to and received from the process
      * @param messageDelimiters delimiters which separate the messages
      */
-    public ExternalProcessLauncher(@Nonnull SolverCommunication session,
-            @Nonnull String[] messageDelimiters) {
+    public ExternalProcessLauncher(@NonNull SolverCommunication session,
+            @NonNull String[] messageDelimiters) {
         this.session = session;
         this.messageDelimiters = messageDelimiters;
     }
@@ -75,7 +77,9 @@ public class ExternalProcessLauncher {
      */
     public void stop() {
         if (process != null) {
-            process.destroy();
+            // make sure the solver process is properly killed,
+            // otherwise it may consume excessive CPU and RAM
+            process.destroyForcibly();
         }
         // TODO: where to close the pipe?
         // pipe.close();

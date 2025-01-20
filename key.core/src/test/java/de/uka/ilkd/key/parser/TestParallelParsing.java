@@ -1,15 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
+
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * This TestCase tests the parallel usage of {@link de.uka.ilkd.key.nparser.KeYParser} and

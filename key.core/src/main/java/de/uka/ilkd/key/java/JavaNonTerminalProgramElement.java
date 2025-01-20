@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
+
+import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Top level implementation of a Java {@link NonTerminalProgramElement}. taken from COMPOST and
@@ -53,35 +55,26 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
         return -1;
     }
 
-
-    /**
-     * commented in interface SourceElement. Overwrites the default method implementation in
-     * ProgramElement by descending down to the children.
-     */
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-
-        if (se == this) {
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
             return true;
-        } else if (se == null || this.getClass() != se.getClass()) {
+        }
+        if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
 
-        final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) se;
+        final JavaNonTerminalProgramElement jnte = (JavaNonTerminalProgramElement) o;
         if (jnte.getChildCount() != getChildCount()) {
             return false;
         }
 
         for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equalsModRenaming(jnte.getChildAt(i), nat)) {
+            if (!getChildAt(i).equals(jnte.getChildAt(i))) {
                 return false;
             }
         }
         return true;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
     }
 
     @Override
@@ -98,16 +91,11 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
 
-        LOGGER.debug("Program match start (template {}, source {})", this, src); // this.toString().equals("e")
-
         if (src == null) {
             return null;
         }
 
         if (src.getClass() != this.getClass()) {
-            LOGGER.debug("Incompatible AST nodes (template {}, source {})", this, src);
-            LOGGER.debug("Incompatible AST nodes (template {}, source {})", this.getClass(),
-                src.getClass());
             return null;
         }
 
@@ -161,7 +149,6 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
         final NonTerminalProgramElement ntSrc = (NonTerminalProgramElement) source.getElement();
 
         if (!compatibleBlockSize(source.getChildPos(), ntSrc.getChildCount())) {
-            LOGGER.debug("Source has unmatched elements.");
             return null;
         }
 

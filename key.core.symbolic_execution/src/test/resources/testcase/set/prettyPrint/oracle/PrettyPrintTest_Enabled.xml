@@ -9,7 +9,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <branchStatement name="if (x&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+      <branchStatement name="if (x &gt;= 0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <variable name="x" isArrayIndex="false">
             <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
@@ -122,7 +122,7 @@ termination: diamond" pathCondition="x&lt;&lt;origin(&quot;requires (implicit)&q
             </variable>
             <callStackEntry path="/0"/>
             <loopInvariant name="invariant: x &lt;= -1;
-variant: javaSubInt(0, x)
+variant: 0 - x
 mod: false" pathCondition="x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; &lt; 0" pathConditionChanged="false" initiallyValid="true">
                <variable name="x" isArrayIndex="false">
                   <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
@@ -156,7 +156,7 @@ mod: false" pathCondition="x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quo
                      </value>
                   </variable>
                   <callStackEntry path="/0"/>
-                  <loopCondition name="x&lt;-1" pathCondition="  x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; &lt;= -1
+                  <loopCondition name="x &lt; -1;" pathCondition="  x&lt;&lt;origin(&quot;requires (implicit)&quot;, &quot;[]&quot;)&gt;&gt; &lt;= -1
 &amp; x_0 &lt;= -2" pathConditionChanged="false" blockOpened="false">
                      <variable name="x" isArrayIndex="false">
                         <value name="x {true}" typeString="int" valueString="x_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">

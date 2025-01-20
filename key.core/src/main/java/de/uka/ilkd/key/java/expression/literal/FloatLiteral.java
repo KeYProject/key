@@ -1,17 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression.literal;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.logic.Name;
+
+import org.key_project.logic.Name;
+import org.key_project.util.ExtList;
 
 /**
  * Float literal.
@@ -34,7 +34,7 @@ public class FloatLiteral extends Literal {
      */
 
     public FloatLiteral(float value) {
-        this.value = "" + value;
+        this.value = String.valueOf(value);
     }
 
     /**
@@ -59,11 +59,12 @@ public class FloatLiteral extends Literal {
         this.value = value;
     }
 
-    /**
-     * tests if equals
-     */
-    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o instanceof FloatLiteral)) {
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
         return ((FloatLiteral) o).getValue().equals(getValue());
@@ -72,10 +73,6 @@ public class FloatLiteral extends Literal {
     @Override
     protected int computeHashCode() {
         return 37 * super.computeHashCode() + getValue().hashCode();
-    }
-
-    public boolean equals(Object o) {
-        return super.equals(o);
     }
 
     /**
@@ -96,10 +93,6 @@ public class FloatLiteral extends Literal {
      */
     public void visit(Visitor v) {
         v.performActionOnFloatLiteral(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printFloatLiteral(this);
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {

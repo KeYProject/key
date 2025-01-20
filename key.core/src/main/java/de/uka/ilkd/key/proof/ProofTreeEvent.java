@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import org.key_project.util.collection.ImmutableList;
@@ -10,10 +13,10 @@ import org.key_project.util.collection.ImmutableSLList;
 
 public class ProofTreeEvent {
 
-    private Proof source;
+    private final Proof source;
     private Node node;
     private Goal goal;
-    private ImmutableList<Goal> goals = ImmutableSLList.<Goal>nil();
+    private ImmutableList<Goal> goals = ImmutableSLList.nil();
 
     /**
      * Create ProofTreeEvent for an event that happens at the specified node.

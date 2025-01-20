@@ -1,25 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
+
+import java.util.Collections;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.conditions.SameObserverCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.DependencyContractImpl;
+
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.Collections;
 
 
 /**
@@ -59,7 +62,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * This constructor is probably only called from {@link AbstractTermTransformer}.
      */
     public ObserverEqualityMetaConstruct() {
-        super(new Name(NAME), 2, Sort.FORMULA);
+        super(new Name(NAME), 2, JavaDLTheory.FORMULA);
     }
 
     /**
@@ -86,12 +89,10 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         Term termExt = term.sub(0);
         Term termBase = term.sub(1);
 
-        if (!(termExt.op() instanceof IObserverFunction)
-                || !(termBase.op() instanceof IObserverFunction)) {
+        if (!(termExt.op() instanceof IObserverFunction obs1)
+                || !(termBase.op() instanceof IObserverFunction obs2)) {
             throw new IllegalArgumentException("\\sameObserver must be true for " + NAME);
         }
-        IObserverFunction obs1 = (IObserverFunction) termExt.op();
-        IObserverFunction obs2 = (IObserverFunction) termBase.op();
 
         if (obs1 != obs2) {
             throw new IllegalArgumentException("\\sameObserver must be true");
@@ -143,8 +144,8 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         Term result = tb.all(varObj,
             tb.all(varFld,
                 tb.imp(tb.elementOf(ov, fv, mod),
-                    tb.equals(tb.select(Sort.ANY, smaller.sub(0), ov, fv),
-                        tb.select(Sort.ANY, larger.sub(0), ov, fv)))));
+                    tb.equals(tb.select(JavaDLTheory.ANY, smaller.sub(0), ov, fv),
+                        tb.select(JavaDLTheory.ANY, larger.sub(0), ov, fv)))));
 
         return result;
     }

@@ -1,4 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.api;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -8,12 +16,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYTypeUtil;
-import org.key_project.util.collection.ImmutableSet;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This class serves as a facade to all functionalities that are needed for proof management, i.e.,
@@ -22,7 +26,7 @@ import java.util.Set;
  * @author Sarah Grebing.
  */
 public class ProofManagementApi {
-    private KeYEnvironment<?> currentEnv;
+    private final KeYEnvironment<?> currentEnv;
     private final List<Contract> proofContracts = new ArrayList<>();
     private HashSet<String> ruleNames;
 
@@ -41,8 +45,9 @@ public class ProofManagementApi {
      *         exception here)
      */
     public List<Contract> getProofContracts() {
-        if (proofContracts.isEmpty())
+        if (proofContracts.isEmpty()) {
             buildContracts();
+        }
         return proofContracts;
     }
 

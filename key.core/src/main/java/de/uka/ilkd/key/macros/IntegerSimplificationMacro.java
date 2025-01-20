@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
 import java.util.Set;
@@ -32,7 +35,7 @@ public class IntegerSimplificationMacro extends AbstractPropositionalExpansionMa
             + "It applies only non-splitting simplification rules.";
     }
 
-    private static final Set<String> ADMITTED_RULES_SET = asSet(new String[] { "add_eq_back",
+    private static final Set<String> ADMITTED_RULES_SET = asSet("add_eq_back",
         "add_eq_back_2", "add_eq_back_2_fst_comm", "add_eq_back_3", "add_less_back",
         "add_less_back_zero_1", "add_less_back_zero_1_comm", "add_less_back_zero_2",
         "add_less_back_zero_2_comm", "add_literals", "add_sub_elim_left", "add_sub_elim_right",
@@ -56,7 +59,7 @@ public class IntegerSimplificationMacro extends AbstractPropositionalExpansionMa
         "translateJavaCastChar", "translateJavaCastInt", "translateJavaCastLong",
         "translateJavaCastShort", "translateJavaDivInt", "translateJavaDivLong", "translateJavaMod",
         "translateJavaMulInt", "translateJavaMulLong", "translateJavaSubInt",
-        "translateJavaSubLong", "translateJavaUnaryMinusInt", "translateJavaUnaryMinusLong" });
+        "translateJavaSubLong", "translateJavaUnaryMinusInt", "translateJavaUnaryMinusLong");
 
     @Override
     protected Set<String> getAdmittedRuleNames() {

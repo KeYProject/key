@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.logic.Term;
@@ -28,14 +31,14 @@ public interface IExecutionVariable extends IExecutionElement {
      *
      * @return The {@link IProgramVariable} which contains the represented value.
      */
-    public IProgramVariable getProgramVariable();
+    IProgramVariable getProgramVariable();
 
     /**
      * Returns the index in the parent array if an array cell value is represented.
      *
      * @return The index in the parent array or {@code null} if no array cell value is represented.
      */
-    public Term getArrayIndex();
+    Term getArrayIndex();
 
     /**
      * Returns the human readable index in the parent array if an array cell value is represented.
@@ -43,35 +46,35 @@ public interface IExecutionVariable extends IExecutionElement {
      * @return The human readable index in the parent array or {@code null} if no array cell value
      *         is represented.
      */
-    public String getArrayIndexString();
+    String getArrayIndexString();
 
     /**
      * Checks if the current value is part of a parent array.
      *
      * @return {@code true} is array cell value, {@code false} is a "normal" value.
      */
-    public boolean isArrayIndex();
+    boolean isArrayIndex();
 
     /**
      * Returns the optional additional condition considered during value computation.
      *
      * @return The optional additional condition considered during value computation.
      */
-    public Term getAdditionalCondition();
+    Term getAdditionalCondition();
 
     /**
      * Returns the parent {@link IExecutionValue} if available.
      *
      * @return The parent {@link IExecutionValue} if available and {@code null} otherwise.
      */
-    public IExecutionValue getParentValue();
+    IExecutionValue getParentValue();
 
     /**
      * Returns the possible values of this {@link IExecutionVariable}.
      *
      * @return The possible values of this {@link IExecutionVariable}.
      */
-    public IExecutionValue[] getValues() throws ProofInputException;
+    IExecutionValue[] getValues() throws ProofInputException;
 
     /**
      * Creates recursive a term which can be used to determine the value of
@@ -79,5 +82,5 @@ public interface IExecutionVariable extends IExecutionElement {
      *
      * @return The created term.
      */
-    public Term createSelectTerm();
+    Term createSelectTerm();
 }

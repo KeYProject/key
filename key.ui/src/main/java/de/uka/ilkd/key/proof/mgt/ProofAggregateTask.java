@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.mgt;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -13,9 +16,9 @@ public class ProofAggregateTask extends DefaultMutableTreeNode implements TaskTr
      *
      */
     private static final long serialVersionUID = 2292876929382788414L;
-    private TaskTreeNode[] proofs;
-    private ProofAggregate proofList;
-    private String descr;
+    private final TaskTreeNode[] proofs;
+    private final ProofAggregate proofList;
+    private final String descr;
 
     public ProofAggregateTask(ProofAggregate ps) {
         super(ps);

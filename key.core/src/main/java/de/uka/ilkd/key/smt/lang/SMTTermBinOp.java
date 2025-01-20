@@ -1,14 +1,15 @@
-/**
- * Created on: Mar 17, 2011
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.lang;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -19,8 +20,8 @@ import java.util.List;
 public class SMTTermBinOp extends SMTTerm {
     private static final Logger LOGGER = LoggerFactory.getLogger(SMTTermBinOp.class);
 
-    private static HashMap<Op, String> bvSymbols;
-    private static HashMap<Op, String> intSymbols;
+    private static Map<Op, String> bvSymbols;
+    private static Map<Op, String> intSymbols;
 
     public enum OpProperty {
         NONE, LEFTASSOC, RIGHTASSOC, FULLASSOC, CHAINABLE, PAIRWISE
@@ -52,33 +53,20 @@ public class SMTTermBinOp extends SMTTerm {
     }
 
     public static OpProperty getProperty(SMTTermBinOp.Op op) {
-
-
-        switch (op) {
-        case AND:
-        case OR:
-        case PLUS:
-        case MUL:
-            return OpProperty.FULLASSOC;
-        case MINUS:
-        case XOR:
-        case DIV:
-            return OpProperty.LEFTASSOC;
-        case IMPLIES:
-            return OpProperty.RIGHTASSOC;
-        case EQUALS:
-            /* case LT: case LTE: case GT: case GTE: */ return OpProperty.CHAINABLE;
-        case DISTINCT:
-            return OpProperty.PAIRWISE;
-        default:
-            return OpProperty.NONE;
-        }
-
+        return switch (op) {
+        case AND, OR, PLUS, MUL -> OpProperty.FULLASSOC;
+        case MINUS, XOR, DIV -> OpProperty.LEFTASSOC;
+        case IMPLIES -> OpProperty.RIGHTASSOC;
+        case EQUALS ->
+            /* case LT: case LTE: case GT: case GTE: */ OpProperty.CHAINABLE;
+        case DISTINCT -> OpProperty.PAIRWISE;
+        default -> OpProperty.NONE;
+        };
     }
 
     private static void initMaps() {
         // bitvec
-        bvSymbols = new HashMap<SMTTermBinOp.Op, String>();
+        bvSymbols = new HashMap<>();
         bvSymbols.put(Op.IFF, "iff");
         bvSymbols.put(Op.IMPLIES, "=>");
         bvSymbols.put(Op.EQUALS, "=");
@@ -112,7 +100,7 @@ public class SMTTermBinOp extends SMTTerm {
         bvSymbols.put(Op.BVSGE, "bvsge");
 
         // int
-        intSymbols = new HashMap<SMTTermBinOp.Op, String>();
+        intSymbols = new HashMap<>();
         intSymbols.put(Op.IFF, "iff");
         intSymbols.put(Op.IMPLIES, "=>");
         intSymbols.put(Op.EQUALS, "=");
@@ -133,7 +121,7 @@ public class SMTTermBinOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getQuantVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
         vars.addAll(left.getQuantVars());
         vars.addAll(right.getQuantVars());
         return vars;
@@ -142,7 +130,7 @@ public class SMTTermBinOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getUQVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
         vars.addAll(left.getUQVars());
         vars.addAll(right.getUQVars());
         return vars;
@@ -151,7 +139,7 @@ public class SMTTermBinOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getEQVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
         vars.addAll(left.getEQVars());
         vars.addAll(right.getEQVars());
         return vars;
@@ -160,7 +148,7 @@ public class SMTTermBinOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
         vars.addAll(left.getVars());
         vars.addAll(right.getVars());
         return vars;
@@ -169,40 +157,29 @@ public class SMTTermBinOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTSort sort() {
+        return switch (operator) {
+            case PLUS, MINUS, MUL, DIV, REM, BVASHR, BVSHL, BVSMOD, BVSREM -> {
+                if (!left.sort().equals(right.sort())) {
 
-        switch (operator) {
-        case PLUS:
-        case MINUS:
-        case MUL:
-        case DIV:
-        case REM:
-        case BVASHR:
-        case BVSHL:
-        case BVSMOD:
-        case BVSREM:
-            if (!left.sort().equals(right.sort())) {
+                    String error = "Unexpected: binary operation with two diff. arg sorts";
+                    error += "\n";
+                    error += this.toSting() + "\n";
+                    error += "Left sort: " + left.sort() + "\n";
+                    error += "Right sort: " + right.sort() + "\n";
+                    throw new RuntimeException(error);
 
-                String error = "Unexpected: binary operation with two diff. arg sorts";
-                error += "\n";
-                error += this.toSting() + "\n";
-                error += "Left sort: " + left.sort() + "\n";
-                error += "Right sort: " + right.sort() + "\n";
-                throw new RuntimeException(error);
-
+                }
+                yield left.sort();
             }
-
-
-            return left.sort();
-        default:
-            return SMTSort.BOOL;
-        }
+            default -> SMTSort.BOOL;
+        };
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean occurs(SMTTermVariable a) {
         for (int i = 0; i < getQuantVars().size(); i++) {
-            if (!a.getId().equals(((SMTTermVariable) getQuantVars().get(i)).getId())) {
+            if (!a.getId().equals(getQuantVars().get(i).getId())) {
                 return true;
             }
         }
@@ -225,8 +202,9 @@ public class SMTTermBinOp extends SMTTerm {
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
 
-        if (this.equals(a))
+        if (this.equals(a)) {
             return b;
+        }
 
         return left.substitute(a, b).binOp(operator, right.substitute(a, b)); // TODO
     }
@@ -240,8 +218,6 @@ public class SMTTermBinOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTTerm instantiate(SMTTermVariable a, SMTTerm b) {
-        // return new TermBinOp(operator, (Term) left.instantiate(a, b), (Term) right.instantiate(a,
-        // b)); //TODO
         return left.instantiate(a, b).binOp(operator, right.instantiate(a, b));
     }
 
@@ -277,12 +253,13 @@ public class SMTTermBinOp extends SMTTerm {
     @Override
     public boolean equals(Object term) {
 
-        if (this == term)
+        if (this == term) {
             return true;
+        }
 
-        if (!(term instanceof SMTTermBinOp))
+        if (!(term instanceof SMTTermBinOp bt)) {
             return false;
-        SMTTermBinOp bt = (SMTTermBinOp) term;
+        }
 
         return this.operator.equals(bt.operator) && this.left.equals(bt.left)
                 && this.right.equals(bt.right);
@@ -290,8 +267,9 @@ public class SMTTermBinOp extends SMTTerm {
 
     public boolean equals(SMTTermBinOp bt) {
 
-        if (this == bt)
+        if (this == bt) {
             return true;
+        }
 
         return this.operator.equals(bt.operator) && this.left.equals(bt.left)
                 && this.right.equals(bt.right);
@@ -355,10 +333,8 @@ public class SMTTermBinOp extends SMTTerm {
 
     public String toString(int nestPos) {
         LOGGER.warn("Warning: somehow a binop was created. {}", this.getOperator());
-        StringBuffer tab = new StringBuffer("");
-        for (int i = 0; i < nestPos; i++) {
-            tab = tab.append(" ");
-        }
+        StringBuilder tab = new StringBuilder();
+        tab.append(" ".repeat(Math.max(0, nestPos)));
         String symbol = getSymbol(operator, left);
 
 
@@ -375,44 +351,44 @@ public class SMTTermBinOp extends SMTTerm {
 
         if (property.equals(OpProperty.LEFTASSOC)) {
 
-            List<SMTTerm> args = new LinkedList<SMTTerm>();
+            List<SMTTerm> args = new LinkedList<>();
             extractArgsLeft(this, args);
-            String argsString = "";
+            StringBuilder argsString = new StringBuilder();
             for (SMTTerm arg : args) {
-                argsString += arg.toString(nestPos + 1) + "\n";
+                argsString.append(arg.toString(nestPos + 1)).append("\n");
 
             }
             return tab + "(" + symbol + "\n" + argsString + tab + ")";
         } else if (property.equals(OpProperty.RIGHTASSOC)) {
-            List<SMTTerm> args = new LinkedList<SMTTerm>();
+            List<SMTTerm> args = new LinkedList<>();
             extractArgsRight(this, args);
 
-            String argsString = "";
+            StringBuilder argsString = new StringBuilder();
             for (SMTTerm arg : args) {
-                argsString += arg.toString(nestPos + 1) + "\n";
+                argsString.append(arg.toString(nestPos + 1)).append("\n");
 
             }
             return tab + "(" + symbol + "\n" + argsString + tab + ")";
         } else if (property.equals(OpProperty.FULLASSOC)) {
-            List<SMTTerm> args = new LinkedList<SMTTerm>();
+            List<SMTTerm> args = new LinkedList<>();
             extractArgs(this, args);
-            String chainString = "";
+            StringBuilder chainString = new StringBuilder();
             // if we have an and operation, then we have to check for chainable ops among the
             // arguments
 
             if (this.operator.equals(Op.AND)) {
                 List<String> chainStrings = checkChainable(nestPos, args);
-                if (chainStrings.size() == 1 && args.size() == 0) {
+                if (chainStrings.size() == 1 && args.isEmpty()) {
                     return tab + chainStrings.get(0);
                 }
                 for (String s : chainStrings) {
-                    chainString += " " + tab + s + "\n";
+                    chainString.append(" ").append(tab).append(s).append("\n");
                 }
             }
 
-            String argsString = "";
+            StringBuilder argsString = new StringBuilder();
             for (SMTTerm arg : args) {
-                argsString += arg.toString(nestPos + 1) + "\n";
+                argsString.append(arg.toString(nestPos + 1)).append("\n");
             }
             return tab + "(" + symbol + "\n" + argsString + chainString + tab + ")";
         } else {
@@ -424,8 +400,8 @@ public class SMTTermBinOp extends SMTTerm {
     }
 
     private List<List<SMTTerm>> searchChains(List<SMTTerm> args, List<Op> ops) {
-        List<SMTTerm> chainables = new LinkedList<SMTTerm>();
-        List<List<SMTTerm>> result = new LinkedList<List<SMTTerm>>();
+        List<SMTTerm> chainables = new LinkedList<>();
+        List<List<SMTTerm>> result = new LinkedList<>();
         for (SMTTerm arg : args) {
             if (isChainableBinOp(arg) && !chainables.contains(arg)) {
                 int start = args.indexOf(arg);
@@ -442,7 +418,7 @@ public class SMTTermBinOp extends SMTTerm {
 
     private List<SMTTerm> extractChain(int start, List<SMTTerm> args, List<Op> ops,
             List<SMTTerm> chainables) {
-        List<SMTTerm> chain = new LinkedList<SMTTerm>();
+        List<SMTTerm> chain = new LinkedList<>();
         SMTTermBinOp first = (SMTTermBinOp) args.get(start);
         chainables.add(first);
         Op op = first.getOperator();
@@ -452,48 +428,41 @@ public class SMTTermBinOp extends SMTTerm {
         int i = start + 1;
         for (; i < args.size(); ++i) {
             SMTTerm arg = args.get(i);
-            if (arg instanceof SMTTermBinOp && ((SMTTermBinOp) arg).getOperator().equals(op)) {
-                SMTTermBinOp binarg = (SMTTermBinOp) arg;
+            if (arg instanceof SMTTermBinOp binarg
+                    && ((SMTTermBinOp) arg).getOperator().equals(op)) {
                 if (binarg.getLeft().equals(chain.get(chain.size() - 1))) {
                     chain.add(binarg.getRight());
                     chainables.add(arg);
                 }
 
-            } else
+            } else {
                 break;
+            }
         }
 
         return chain;
     }
 
-    /**
-     * @param nestPos
-     * @param args
-     * @return
-     */
     private List<String> checkChainable(int nestPos, List<SMTTerm> args) {
-        List<Op> ops = new LinkedList<SMTTermBinOp.Op>();
+        List<Op> ops = new LinkedList<>();
         List<List<SMTTerm>> chains = searchChains(args, ops);
-        List<String> chainStrings = new LinkedList<String>();
+        List<String> chainStrings = new LinkedList<>();
         for (int i = 0; i < chains.size(); ++i) {
             List<SMTTerm> chain = chains.get(i);
             Op op = ops.get(i);
-            String chainString = "(" + getSymbol(op, chain.get(0));
+            StringBuilder chainString = new StringBuilder("(" + getSymbol(op, chain.get(0)));
             for (SMTTerm t : chain) {
-                chainString += " " + t.toString(nestPos);
+                chainString.append(" ").append(t.toString(nestPos));
             }
-            chainString += ")";
-            chainStrings.add(chainString);
+            chainString.append(")");
+            chainStrings.add(chainString.toString());
         }
         return chainStrings;
     }
 
-    /**
-     * @return
-     */
     private String getSymbol(Op operator, SMTTerm first) {
         boolean isInt = first.sort().equals(SMTSort.INT) && first.sort().getBitSize() == -1;
-        String symbol = null;
+        String symbol;
         if (isInt) {
             symbol = intSymbols.get(operator);
         } else {

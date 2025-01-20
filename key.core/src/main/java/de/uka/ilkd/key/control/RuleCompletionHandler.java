@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.control;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
@@ -19,7 +22,7 @@ public interface RuleCompletionHandler {
      *        automatically
      * @param goal the Goal where to apply
      */
-    public void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal);
+    void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal);
 
     /**
      * completes rule applications of built in rules
@@ -31,5 +34,5 @@ public interface RuleCompletionHandler {
      *        automatically
      * @return a complete app or null if no completion was possible
      */
-    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced);
+    IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced);
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.SourceElement;
@@ -16,7 +19,7 @@ public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IEx
      *
      * @return The call of the now returned method.
      */
-    public IExecutionMethodCall getMethodCall();
+    IExecutionMethodCall getMethodCall();
 
     /**
      * Returns a human readable signature which describes this element.
@@ -24,7 +27,7 @@ public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IEx
      * @return The human readable signature which describes this element.
      * @throws ProofInputException Occurred Exception.
      */
-    public String getSignature() throws ProofInputException;
+    String getSignature() throws ProofInputException;
 
     /**
      * Returns the condition under which this method return is reached from the calling
@@ -33,7 +36,7 @@ public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IEx
      * @return The method return condition to reach this node from its {@link IExecutionMethodCall}
      *         as {@link Term}.
      */
-    public Term getMethodReturnCondition() throws ProofInputException;
+    Term getMethodReturnCondition() throws ProofInputException;
 
     /**
      * Returns the human readable condition under which this method return is reached from the
@@ -42,12 +45,12 @@ public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IEx
      * @return The human readable method return condition to reach this node from its
      *         {@link IExecutionMethodCall}.
      */
-    public String getFormatedMethodReturnCondition() throws ProofInputException;
+    String getFormattedMethodReturnCondition() throws ProofInputException;
 
     /**
      * Returns the variable value pairs of the state when the method has been called.
      *
      * @return The variable value pairs.
      */
-    public IExecutionVariable[] getCallStateVariables() throws ProofInputException;
+    IExecutionVariable[] getCallStateVariables() throws ProofInputException;
 }

@@ -1,12 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
-
 import javax.swing.JFrame;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This menu item groups all taclets which allow to insert class invariants
@@ -52,8 +54,9 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
         }
 
         final ImmutableList<TacletGoalTemplate> goalTemplates = t.goalTemplates();
-        if (goalTemplates.size() != 1)
+        if (goalTemplates.size() != 1) {
             return null;
+        }
         return goalTemplates.head().sequent();
     }
 
@@ -61,7 +64,7 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
      * show the taclets sorted
      */
     protected Collection<TacletAppListItem> createInsertionList() {
-        return new TreeSet<TacletAppListItem>(new Lexicographical());
+        return new TreeSet<>(new Lexicographical());
     }
 
 

@@ -1,18 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
-
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import org.antlr.v4.runtime.ParserRuleContext;
-import javax.annotation.Nonnull;
-import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.speclang.LoopContract;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Objects of this type represent the various JML specification constructs in textual, unprocessed
@@ -20,9 +26,8 @@ import java.util.Map;
  */
 public abstract class TextualJMLConstruct {
 
-    protected final ImmutableList<String> mods;
-    private Position approxPos = Position.UNDEFINED;
-    private String sourceFile = null;
+    protected final ImmutableList<JMLModifier> modifiers;
+    private Location location = new Location(null, Position.UNDEFINED);
     private boolean loopContract;
 
     /**
@@ -30,13 +35,13 @@ public abstract class TextualJMLConstruct {
      */
     protected String name;
 
-    public TextualJMLConstruct(ImmutableList<String> mods) {
-        assert mods != null;
-        this.mods = mods;
+    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers) {
+        assert specModifiers != null;
+        this.modifiers = specModifiers;
     }
 
-    public TextualJMLConstruct(ImmutableList<String> mods, String name) {
-        this(mods);
+    public TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers, String name) {
+        this(specModifiers);
         this.name = name;
     }
 
@@ -56,24 +61,17 @@ public abstract class TextualJMLConstruct {
         this.loopContract = loopContract;
     }
 
-    public final ImmutableList<String> getMods() {
-        return mods;
+    public final ImmutableList<JMLModifier> getModifiers() {
+        return modifiers;
     }
 
     /**
-     * Return the approximate position of this construct. This is usually the position of the
+     * Return the approximate location of this construct. This is usually the position of the
      * specification line parsed first. Implementations can set it using <code>setPosition</code> or
      * <code>addGeneric</code>.
      */
-    public Position getApproxPosition() {
-        return approxPos;
-    }
-
-    /**
-     * Return the source file name where this construct appears.
-     */
-    public String getSourceFileName() {
-        return sourceFile;
+    public Location getLocation() {
+        return location;
     }
 
     /**
@@ -84,15 +82,13 @@ public abstract class TextualJMLConstruct {
      * @param ps set position of the construct
      */
     protected void setPosition(PositionedString ps) {
-        if (sourceFile == null) {
-            approxPos = ps.pos;
-            sourceFile = ps.fileName;
+        if (location == null) {
+            location = ps.location;
         }
     }
 
     protected void setPosition(ParserRuleContext ps) {
-        sourceFile = ps.start.getTokenSource().getSourceName();
-        approxPos = new Position(ps.start.getLine(), ps.start.getCharPositionInLine());
+        location = Location.fromToken(ps.start);
     }
 
     protected void setPosition(LabeledParserRuleContext ps) {
@@ -106,19 +102,19 @@ public abstract class TextualJMLConstruct {
      */
     @Deprecated
     protected void addGeneric(Map<String, ImmutableList<LabeledParserRuleContext>> item,
-            @Nonnull LabeledParserRuleContext ps) {
+            @NonNull LabeledParserRuleContext ps) {
         String t = ps.first.getText();
-        if (!t.startsWith("<") || t.startsWith("<inv>")) {
+        if (!t.startsWith("<") || t.startsWith("<inv>") || t.startsWith("<inv_free>")) {
             ImmutableList<LabeledParserRuleContext> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());
             l = l.append(ps);
             item.put(HeapLDT.BASE_HEAP_NAME.toString(), l);
             return;
         }
-        List<String> hs = new ArrayList<String>();
-        while (t.startsWith("<") && !t.startsWith("<inv>")) {
+        List<String> hs = new ArrayList<>();
+        while (t.startsWith("<") && !t.startsWith("<inv>") && !t.startsWith("<inv_free>")) {
             for (Name heapName : HeapLDT.VALID_HEAP_NAMES) {
                 for (String hName : new String[] { heapName.toString(),
-                    heapName.toString() + "AtPre" }) {
+                    heapName + "AtPre" }) {
                     String h = "<" + hName + ">";
                     if (t.startsWith(h)) {
                         hs.add(hName);

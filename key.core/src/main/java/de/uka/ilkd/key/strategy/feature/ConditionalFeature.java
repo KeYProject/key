@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -19,11 +22,13 @@ public class ConditionalFeature implements Feature {
         elseFeature = p_elseFeature;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (cond.filter(app.rule()))
-            return thenFeature.computeCost(app, pos, goal);
-        else
-            return elseFeature.computeCost(app, pos, goal);
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
+        if (cond.filter(app.rule())) {
+            return thenFeature.computeCost(app, pos, goal, mState);
+        } else {
+            return elseFeature.computeCost(app, pos, goal, mState);
+        }
     }
 
     /**

@@ -1,13 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
+
+import java.io.IOException;
+import java.util.stream.Stream;
+
+import org.key_project.util.Streams;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.key_project.util.Streams;
-
-import java.io.IOException;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -19,8 +23,10 @@ public class SMTBeautifierTest {
         Assumptions.assumeTrue(r1 != null);
         Assumptions.assumeTrue(r2 != null);
 
-        String[] smt = Streams.toString(r1).split("; *----+");
-        String[] expected = Streams.toString(r2).split("; *----+");
+        String[] smt =
+            Streams.toString(r1).replaceAll(System.lineSeparator(), "\n").split("; *----+");
+        String[] expected =
+            Streams.toString(r2).replaceAll(System.lineSeparator(), "\n").split("; *----+");
         assertEquals(smt.length, expected.length, "The two files must have same number of clauses");
         var b = Stream.<Arguments>builder();
         for (int i = 0; i < smt.length; i++) {

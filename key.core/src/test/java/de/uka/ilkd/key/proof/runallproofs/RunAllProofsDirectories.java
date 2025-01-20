@@ -1,10 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.runallproofs;
-
-import org.key_project.util.helper.FindResources;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.Date;
+
+import org.key_project.util.helper.FindResources;
 
 /**
  * Initialising directories for runallproofs is a bit tricky since doing it statically results
@@ -25,8 +27,11 @@ public class RunAllProofsDirectories implements Serializable {
     public static final File EXAMPLE_DIR = FindResources.getExampleDirectory();
     public static final File RUNALLPROOFS_DIR = FindResources.getTestResultForRunAllProofs();
 
-    public RunAllProofsDirectories(Date runStart) {
-        RUNALLPROOFS_DIR.mkdirs();
+    public RunAllProofsDirectories() {
+        init();
     }
 
+    public static void init() {
+        RUNALLPROOFS_DIR.mkdirs();
+    }
 }

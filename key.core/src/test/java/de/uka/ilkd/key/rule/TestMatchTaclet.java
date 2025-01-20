@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
+
+import java.io.File;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -8,23 +13,21 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.io.File;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -326,7 +329,7 @@ public class TestMatchTaclet {
         Sort osort3 = new SortImpl(new Name("os3"), osort1);
         Sort osort4 = new SortImpl(new Name("os4"),
             DefaultImmutableSet.<Sort>nil().add(osort2).add(osort3), false);
-        Function v4 = new Function(new Name("v4"), osort4, new Sort[0]);
+        JFunction v4 = new JFunction(new Name("v4"), osort4, new Sort[0]);
         Term match = TB.tf().createTerm(v4);
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestMatchTaclet_subsort_termSV").taclet();
@@ -344,7 +347,7 @@ public class TestMatchTaclet {
         Sort osort3 = new SortImpl(new Name("os3"), osort1);
         Sort osort4 = new SortImpl(new Name("os4"),
             DefaultImmutableSet.<Sort>nil().add(osort2).add(osort3), false);
-        Function aPred = TacletForTests.getFunctions().lookup(new Name("A"));
+        JFunction aPred = TacletForTests.getFunctions().lookup(new Name("A"));
         Term sub = TB.tf().createTerm(aPred);
         Term match = TB.all(new LogicVariable(new Name("lv"), osort4), sub);
         FindTaclet taclet =

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.beans.PropertyChangeListener;
@@ -6,16 +9,14 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.util.ProofUserManager;
+
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * <p>
@@ -23,7 +24,7 @@ import de.uka.ilkd.key.util.ProofUserManager;
  * proofs.
  * </p>
  * <p>
- * Side proofs are added via {@link #disposeOrStore(String, ApplyStrategyInfo)} when they are no
+ * Side proofs are added via {@link #addProof(String, Proof)} when they are no
  * longer needed. If the {@link SideProofStore} is enabled ({@link #isEnabled()}) the side
  * {@link Proof} is not disposed; instead it is added via {@link #addProof(String, Proof)} and
  * available for a later access until it is removed via {@link #removeEntries(Collection)}.
@@ -45,13 +46,13 @@ public final class SideProofStore {
     /**
      * All contained {@link Entry}s.
      */
-    private final List<Entry> entries = new LinkedList<Entry>();
+    private final List<Entry> entries = new LinkedList<>();
 
     /**
      * All available {@link ISideProofStoreListener}.
      */
     private final List<ISideProofStoreListener> listener =
-        new LinkedList<ISideProofStoreListener>();
+        new LinkedList<>();
 
     /**
      * The enabled state.
@@ -61,7 +62,7 @@ public final class SideProofStore {
     /**
      * The {@link PropertyChangeSupport}.
      */
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     /**
      * Forbid other instances.
@@ -119,7 +120,7 @@ public final class SideProofStore {
                     ProofUserManager.getInstance().removeUserAndDispose(entry.getProof(), this);
                 }
                 fireEntriesRemoved(
-                    new SideProofStoreEvent(this, entries.toArray(new Entry[entries.size()])));
+                    new SideProofStoreEvent(this, entries.toArray(new Entry[0])));
             }
         }
     }
@@ -128,7 +129,7 @@ public final class SideProofStore {
      * Removes all {@link Entry}s.
      */
     public void clearProofs() {
-        removeEntries(new LinkedList<Entry>(entries));
+        removeEntries(new LinkedList<>(entries));
     }
 
     /**
@@ -148,12 +149,8 @@ public final class SideProofStore {
      * @return The {@link Entry} with the given {@link Proof} or {@code null} if not available.
      */
     public Entry getEntry(final Proof proof) {
-        return CollectionUtil.search(entries, new IFilter<Entry>() {
-            @Override
-            public boolean select(Entry element) {
-                return element != null && element.getProof() == proof;
-            }
-        });
+        return CollectionUtil.search(entries,
+            element -> element != null && element.getProof() == proof);
     }
 
     /**
@@ -192,7 +189,7 @@ public final class SideProofStore {
      * @return All available {@link Entry}s.
      */
     public Entry[] getEntries() {
-        return entries.toArray(new Entry[entries.size()]);
+        return entries.toArray(new Entry[0]);
     }
 
     /**
@@ -223,7 +220,7 @@ public final class SideProofStore {
      * @return All registered {@link ISideProofStoreListener}.
      */
     public ISideProofStoreListener[] getProofStoreListener() {
-        return listener.toArray(new ISideProofStoreListener[listener.size()]);
+        return listener.toArray(new ISideProofStoreListener[0]);
     }
 
     /**
@@ -231,7 +228,7 @@ public final class SideProofStore {
      *
      * @param e The event.
      */
-    protected void fireEntriesAdded(SideProofStoreEvent e) {
+    private void fireEntriesAdded(SideProofStoreEvent e) {
         ISideProofStoreListener[] listener = getProofStoreListener();
         for (ISideProofStoreListener l : listener) {
             l.entriesAdded(e);
@@ -243,7 +240,7 @@ public final class SideProofStore {
      *
      * @param e The event.
      */
-    protected void fireEntriesRemoved(SideProofStoreEvent e) {
+    private void fireEntriesRemoved(SideProofStoreEvent e) {
         ISideProofStoreListener[] listener = getProofStoreListener();
         for (ISideProofStoreListener l : listener) {
             l.entriesRemoved(e);
@@ -319,7 +316,7 @@ public final class SideProofStore {
             this.description = description;
             this.proof = proof;
             DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
-            this.environment = new KeYEnvironment<DefaultUserInterfaceControl>(ui,
+            this.environment = new KeYEnvironment<>(ui,
                 proof.getInitConfig(), proof, null, null);
         }
 

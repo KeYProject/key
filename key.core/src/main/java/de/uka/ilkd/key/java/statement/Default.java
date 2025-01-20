@@ -1,12 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Default.
@@ -33,7 +35,7 @@ public class Default extends BranchImp {
      */
 
     public Default(Statement[] body) {
-        this.body = new ImmutableArray<Statement>(body);
+        this.body = new ImmutableArray<>(body);
     }
 
     /**
@@ -44,7 +46,7 @@ public class Default extends BranchImp {
      */
     public Default(ExtList children) {
         super(children);
-        this.body = new ImmutableArray<Statement>(children.collect(Statement.class));
+        this.body = new ImmutableArray<>(children.collect(Statement.class));
     }
 
     /**
@@ -54,8 +56,9 @@ public class Default extends BranchImp {
      */
     public int getChildCount() {
         int result = 0;
-        if (body != null)
+        if (body != null) {
             result += body.size();
+        }
         return result;
     }
 
@@ -118,9 +121,5 @@ public class Default extends BranchImp {
      */
     public void visit(Visitor v) {
         v.performActionOnDefault(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printDefault(this);
     }
 }

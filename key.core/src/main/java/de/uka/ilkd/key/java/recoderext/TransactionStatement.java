@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.SourceVisitor;
@@ -13,7 +16,7 @@ public class TransactionStatement extends JavaStatement {
     public static final int FINISH = 3;
     public static final int ABORT = 4;
 
-    private int type;
+    private final int type;
 
     public TransactionStatement(int type) {
         super();
@@ -65,7 +68,7 @@ public class TransactionStatement extends JavaStatement {
     }
 
     public boolean equals(Object o) {
-        if (o != null && o instanceof TransactionStatement) {
+        if (o instanceof TransactionStatement) {
             return ((TransactionStatement) o).type == this.type;
         }
         return false;

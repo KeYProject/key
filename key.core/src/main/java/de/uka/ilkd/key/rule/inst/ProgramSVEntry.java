@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.inst;
 
 import java.io.Serializable;
@@ -17,9 +20,9 @@ public class ProgramSVEntry implements Serializable {
      */
     private static final long serialVersionUID = -5837249343101979072L;
     /** the SchemaVariable */
-    private SchemaVariable key;
+    private final SchemaVariable key;
     /** the JavaProgramElement */
-    private JavaProgramElement value;
+    private final JavaProgramElement value;
 
     /**
      * creates a new entry encapsulating the SchemaVariable key and its JavaProgramElement
@@ -48,10 +51,9 @@ public class ProgramSVEntry implements Serializable {
      * @return true iff the keys and the mapped values are equal
      */
     public boolean equals(Object o) {
-        if (!(o instanceof ProgramSVEntry)) {
+        if (!(o instanceof ProgramSVEntry cmp)) {
             return false;
         }
-        final ProgramSVEntry cmp = (ProgramSVEntry) o;
         return key().equals(cmp.key()) && value().equals(cmp.value());
     }
 

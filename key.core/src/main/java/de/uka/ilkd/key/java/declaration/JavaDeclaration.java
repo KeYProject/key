@@ -1,7 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Declaration;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
@@ -21,6 +21,9 @@ import de.uka.ilkd.key.java.declaration.modifier.Transient;
 import de.uka.ilkd.key.java.declaration.modifier.TwoState;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.declaration.modifier.Volatile;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Java declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -44,7 +47,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
 
 
     public JavaDeclaration(Modifier[] mods) {
-        modArray = new ImmutableArray<Modifier>(mods);
+        modArray = new ImmutableArray<>(mods);
     }
 
 
@@ -61,7 +64,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      */
     public JavaDeclaration(ExtList children) {
         super(children);
-        modArray = new ImmutableArray<Modifier>(children.collect(Modifier.class));
+        modArray = new ImmutableArray<>(children.collect(Modifier.class));
     }
 
 

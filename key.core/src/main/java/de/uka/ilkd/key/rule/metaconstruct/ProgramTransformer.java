@@ -1,29 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.io.IOException;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * ProgramTransformers are used to describe schematic transformations that cannot be expressed by
@@ -41,9 +35,9 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         implements StatementContainer, Statement, Expression, TypeReference {
 
     /** the name of the meta construct */
-    private Name name;
+    private final Name name;
     /** the encapsulated program element */
-    private ProgramElement body;
+    private final ProgramElement body;
 
     /**
      * creates a ProgramTransformer
@@ -212,10 +206,6 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         v.performActionOnProgramMetaConstruct(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) throws IOException {
-        p.printProgramMetaConstruct(this);
-    }
-
     /** to String */
     public String toString() {
         return name + "( " + body + ");";
@@ -237,11 +227,10 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * get a list of schema variables that are needed by this entity when working given a SV
      * instantiation set.
      *
-     * @param svInst the instantiations of SV so far.
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> needs() {
-        return ImmutableSLList.<SchemaVariable>nil();
+        return ImmutableSLList.nil();
     }
 
     /**
@@ -252,7 +241,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
-        return ImmutableSLList.<SchemaVariable>nil();
+        return ImmutableSLList.nil();
     }
 
 }

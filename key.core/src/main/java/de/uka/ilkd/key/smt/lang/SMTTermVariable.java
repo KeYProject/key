@@ -1,6 +1,6 @@
-/**
- * Created on: Mar 17, 2011
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.lang;
 
 import java.util.LinkedList;
@@ -57,15 +57,17 @@ public class SMTTermVariable extends SMTTerm {
 
     @Override
     public boolean equals(Object term) {
-        if (term == null)
+        if (term == null) {
             return false;
+        }
 
-        if (this == term)
+        if (this == term) {
             return true;
+        }
 
-        if (!(term instanceof SMTTermVariable))
+        if (!(term instanceof SMTTermVariable tv)) {
             return false;
-        SMTTermVariable tv = (SMTTermVariable) term;
+        }
 
         return this.sort.equals(tv.sort) && this.id.equals(tv.id);
     }
@@ -116,7 +118,7 @@ public class SMTTermVariable extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
         vars.add(this);
         return vars;
     }

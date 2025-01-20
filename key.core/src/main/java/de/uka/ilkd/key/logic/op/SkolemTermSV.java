@@ -1,14 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.util.pp.Layouter;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.TerminalSyntaxElement;
+import org.key_project.logic.sort.Sort;
 
 /**
  * Schema variable that is instantiated with fresh Skolem constants. At the moment, such schema
  * variables have to be accompanied by a "NewDependingOn" varcond, although with the removal of the
  * meta variable mechanism, this would no longer really be necessary.
  */
-public final class SkolemTermSV extends AbstractSV {
+public final class SkolemTermSV extends OperatorSV implements TerminalSyntaxElement {
 
     /**
      * Creates a new schema variable that is used as placeholder for skolem terms.
@@ -19,7 +26,7 @@ public final class SkolemTermSV extends AbstractSV {
      */
     SkolemTermSV(Name name, Sort sort) {
         super(name, sort, true, false);
-        assert sort != Sort.UPDATE;
+        assert sort != JavaDLTheory.UPDATE;
     }
 
     @Override
@@ -27,11 +34,14 @@ public final class SkolemTermSV extends AbstractSV {
         return toString(sort().toString() + " skolem term");
     }
 
-
     @Override
-    public String proofToString() {
-        return "\\schemaVar "
-            + (sort() == Sort.FORMULA ? "\\skolemFormula" : "\\skolemTerm " + sort().name()) + " "
-            + name() + ";\n";
+    public void layout(Layouter<?> l) {
+        l.print("\\schemaVar ");
+        if (sort() == JavaDLTheory.FORMULA) {
+            l.print("\\skolemFormula");
+        } else {
+            l.print("\\skolemTerm ").print(sort().name().toString());
+        }
+        l.print(" ").print(name().toString());
     }
 }

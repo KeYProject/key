@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
@@ -17,6 +18,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * This{@link SymbolicExecutionExceptionBreakpoint} represents an exception breakpoint and is
  * responsible to tell the debugger to stop execution when the respective breakpoint is hit.
@@ -27,17 +30,17 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     /**
      * The exception to watch for
      */
-    private String exceptionName;
+    private final String exceptionName;
 
     /**
      * a Set of Nodes that represent exceptions
      */
-    private Set<Node> exceptionNodes;
+    private final Set<Node> exceptionNodes;
 
     /**
      * a list of nodes of the Symbolic Execution Tree whose children represent exceptions
      */
-    private Set<Node> exceptionParentNodes;
+    private final Set<Node> exceptionParentNodes;
 
     /**
      * a flag whether to watch for an uncaught exception
@@ -70,8 +73,8 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
             boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount) {
         super(hitCount, proof, enabled);
         this.exceptionName = exceptionName;
-        exceptionNodes = new HashSet<Node>();
-        exceptionParentNodes = new HashSet<Node>();
+        exceptionNodes = new HashSet<>();
+        exceptionParentNodes = new HashSet<>();
         this.caught = caught;
         this.uncaught = uncaught;
         this.suspendOnSubclasses = suspendOnSubclasses;
@@ -89,12 +92,10 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
             SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
             Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
-            if (activeStatement != null && activeStatement instanceof Throw && isEnabled()) {
-                Throw throwStatement = (Throw) activeStatement;
+            if (activeStatement instanceof Throw throwStatement && isEnabled()) {
                 for (int i = 0; i < throwStatement.getChildCount(); i++) {
                     SourceElement childElement = throwStatement.getChildAt(i);
-                    if (childElement instanceof LocationVariable) {
-                        LocationVariable locVar = (LocationVariable) childElement;
+                    if (childElement instanceof LocationVariable locVar) {
                         if (locVar.getKeYJavaType().getSort().toString().equals(exceptionName)
                                 && !exceptionParentNodes.contains(SETParent)) {
                             exceptionNodes.add(node);
@@ -121,7 +122,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
      * Checks if the given node is a parent of the other given node.
      *
      * @param node The {@link Node} to start search in.
-     * @param node The {@link Node} that is thought to be the parent.
+     * @param parent The {@link Node} that is thought to be the parent.
      * @return true if the parent node is one of the nodes parents
      */
     public boolean isParentNode(Node node, Node parent) {

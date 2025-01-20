@@ -4,7 +4,7 @@
       <statement name="return result(x);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_result = self.result(x) catch(exc_0)
 pre: (x &gt;= 0 &amp; self.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
-post: (result_result = javaMulInt(x, x)
+post:   (result_result = x * x
 &amp; self.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
 &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs

@@ -1,27 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.proof.init;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -62,7 +62,7 @@ public class StateVars {
         this.heap = heap;
         this.mbyAtPre = mbyAtPre;
 
-        ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> terms = ImmutableSLList.nil();
         terms = appendIfNotNull(terms, heap);
         terms = appendIfNotNull(terms, self);
         terms = appendIfNotNull(terms, guard);
@@ -72,7 +72,7 @@ public class StateVars {
         terms = appendIfNotNull(terms, mbyAtPre);
         termList = terms;
 
-        ImmutableList<Term> allTerms = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> allTerms = ImmutableSLList.nil();
         allTerms = allTerms.append(heap);
         allTerms = allTerms.append(self);
         allTerms = allTerms.append(guard);
@@ -144,7 +144,7 @@ public class StateVars {
 
     private static ImmutableList<Term> copyVariables(ImmutableList<Term> ts, String postfix,
             Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (Term t : ts) {
             result = result.append(copyVariable(t, postfix, services));
         }
@@ -176,8 +176,7 @@ public class StateVars {
         String newName = tb.newName(name);
         ProgramElementName pen = new ProgramElementName(newName);
         ProgramVariable progVar = (ProgramVariable) t.op();
-        LocationVariable newVar = new LocationVariable(pen, progVar.getKeYJavaType(),
-            progVar.getContainerType(), progVar.isStatic(), progVar.isModel());
+        LocationVariable newVar = LocationVariable.fromProgramVariable(progVar, pen);
         register(newVar, services);
         return tb.var(newVar);
     }
@@ -200,7 +199,7 @@ public class StateVars {
         if (t == null) {
             return null;
         }
-        if (!(t.op() instanceof Function)) {
+        if (!(t.op() instanceof JFunction)) {
             // Sometimes the heap term operator is a location variable (for
             // instance if it is the base heap). Create a location variable
             // in this case.
@@ -219,7 +218,7 @@ public class StateVars {
             return null;
         }
         final TermBuilder tb = services.getTermBuilder();
-        final Function newFunc = new Function(new Name(name), t.sort());
+        final JFunction newFunc = new JFunction(new Name(name), t.sort());
         register(newFunc, services);
         return tb.func(newFunc);
     }
@@ -241,7 +240,7 @@ public class StateVars {
     public static StateVars buildMethodContractPreVars(IProgramMethod pm, KeYJavaType kjt,
             Services services) {
         ImmutableArray<TermLabel> heapLabels =
-            new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL);
+            new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL);
         return new StateVars(buildSelfVar(services, pm, kjt, ""), buildParamVars(services, "", pm),
             buildResultVar(pm, services, ""), buildExceptionVar(services, "", pm),
             buildHeapFunc("AtPre", heapLabels, services), buildMbyVar("", services));
@@ -254,7 +253,7 @@ public class StateVars {
         // preVars.localVars: no local out variables
         return new StateVars(buildSelfVar(services, pm, kjt, postfix), preVars.localVars,
             buildResultVar(pm, services, postfix), buildExceptionVar(services, postfix, pm),
-            buildHeapFunc(postfix, new ImmutableArray<TermLabel>(), services), preVars.mbyAtPre);
+            buildHeapFunc(postfix, new ImmutableArray<>(), services), preVars.mbyAtPre);
     }
 
 
@@ -281,7 +280,7 @@ public class StateVars {
         Term mbyAtPre = (origPreVars.mbyAtPre == origPostVars.mbyAtPre) ? preVars.mbyAtPre
                 : copyVariable(origPostVars.mbyAtPre, postfix, services);
 
-        ImmutableList<Term> localPostVars = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localPostVars = ImmutableSLList.nil();
         Iterator<Term> origPreVarsIt = origPreVars.localVars.iterator();
         Iterator<Term> localPreVarsIt = preVars.localVars.iterator();
         for (Term origPostVar : origPostVars.localVars) {
@@ -335,7 +334,7 @@ public class StateVars {
             return tb.getBaseHeap();
         } else {
             Name heapName = new Name("heap" + postfix);
-            Function heap = new Function(heapName, heapLDT.getHeap().sort());
+            JFunction heap = new JFunction(heapName, heapLDT.getHeap().sort());
             Term heapFunc = tb.func(heap);
             register(heap, services);
             return tb.label(heapFunc, labels);
@@ -355,7 +354,7 @@ public class StateVars {
         final TermBuilder tb = services.getTermBuilder();
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         String newName = tb.newName("mbyAtPre" + postfix);
-        final Function mbyAtPreFunc = new Function(new Name(newName), intSort);
+        final JFunction mbyAtPreFunc = new JFunction(new Name(newName), intSort);
         register(mbyAtPreFunc, services);
         return tb.func(mbyAtPreFunc);
     }
@@ -376,11 +375,11 @@ public class StateVars {
     }
 
 
-    static void register(Function f, Services services) {
-        Namespace<Function> functionNames = services.getNamespaces().functions();
+    static void register(JFunction f, Services services) {
+        Namespace<JFunction> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
-            assert f.sort() != Sort.UPDATE;
-            if (f.sort() == Sort.FORMULA) {
+            assert f.sort() != JavaDLTheory.UPDATE;
+            if (f.sort() == JavaDLTheory.FORMULA) {
                 functionNames.addSafely(f);
             } else {
                 functionNames.addSafely(f);
@@ -391,7 +390,7 @@ public class StateVars {
 
     static <T> ImmutableList<T> ops(ImmutableList<Term> terms, Class<T> opClass)
             throws IllegalArgumentException {
-        ImmutableList<T> ops = ImmutableSLList.<T>nil();
+        ImmutableList<T> ops = ImmutableSLList.nil();
         for (Term t : terms) {
             ops = ops.append(t.op(opClass));
         }

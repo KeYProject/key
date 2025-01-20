@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.model;
 
 @SuppressWarnings("unused")
 public class ClassB extends ClassA {
-    private int privateField = 42;
+    private final int privateField = 42;
 
     protected int protectedField = 43;
 
@@ -10,7 +13,7 @@ public class ClassB extends ClassA {
 
     int defaultField = 45;
 
-    private String onlyInB = "B";
+    private final String onlyInB = "B";
 
     private int getPrivate() {
         return 662;

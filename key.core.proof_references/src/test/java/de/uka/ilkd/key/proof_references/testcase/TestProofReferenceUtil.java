@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.testcase;
+
+import java.io.File;
+import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -7,12 +13,11 @@ import de.uka.ilkd.key.proof_references.analyst.ContractProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.MethodBodyExpandProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.io.File;
-import java.util.LinkedHashSet;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link ProofReferenceUtil}.

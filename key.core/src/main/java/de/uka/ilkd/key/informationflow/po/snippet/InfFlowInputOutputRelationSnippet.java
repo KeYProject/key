@@ -1,17 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Generate term "self != null".
@@ -93,7 +96,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     private Term buildOutputRelation(BasicSnippetData d, ProofObligationVars vs1,
             ProofObligationVars vs2, InfFlowSpec infFlowSpec1, InfFlowSpec infFlowSpec2) {
         // build equalities for post expressions
-        ImmutableList<Term> eqAtLocs = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> eqAtLocs = ImmutableSLList.nil();
 
         Iterator<Term> postExp1It = infFlowSpec1.postExpressions.iterator();
         Iterator<Term> postExp2It = infFlowSpec2.postExpressions.iterator();
@@ -119,7 +122,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
             InfFlowSpec infFlowSpec2, BasicSnippetData d, ProofObligationVars vs1,
             ProofObligationVars vs2, Term eqAtLocsTerm) {
         // build equalities for newObjects terms
-        ImmutableList<Term> newObjEqs = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> newObjEqs = ImmutableSLList.nil();
         Iterator<Term> newObjects1It = infFlowSpec1.newObjects.iterator();
         Iterator<Term> newObjects2It = infFlowSpec2.newObjects.iterator();
         for (int i = 0; i < infFlowSpec1.newObjects.size(); i++) {
@@ -132,8 +135,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         // build isomorphism term for newObjects
         final Term newObjsSeq1 = d.tb.seq(infFlowSpec1.newObjects);
         final Term newObjsSeq2 = d.tb.seq(infFlowSpec2.newObjects);
-        final Function newObjectsIso =
-            (Function) d.services.getNamespaces().functions().lookup("newObjectsIsomorphic");
+        final JFunction newObjectsIso =
+            d.services.getNamespaces().functions().lookup("newObjectsIsomorphic");
         final Term isoTerm =
             d.tb.func(newObjectsIso, newObjsSeq1, vs1.pre.heap, newObjsSeq2, vs2.pre.heap);
 
@@ -155,10 +158,10 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     }
 
 
-    private static class SearchVisitor extends DefaultVisitor {
+    private static class SearchVisitor implements DefaultVisitor {
 
         private boolean termFound = false;
-        private Term[] searchTerms;
+        private final Term[] searchTerms;
 
         public SearchVisitor(Term... searchTerms) {
             this.searchTerms = searchTerms;

@@ -1,9 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
-import de.uka.ilkd.key.gui.MainWindow;
-
-import javax.swing.*;
 import java.util.List;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
 
 /**
  * @author Alexander Weigl
@@ -11,16 +14,16 @@ import java.util.List;
  */
 public class DefaultSettingsProvider implements SettingsProvider {
     private String description;
-    private JComponent panel;
+    private JPanel panel;
     private List<SettingsProvider> children;
-    private String keywords = "";
+    private final String keywords = "";
     private int priority;
     private Icon icon;
 
     public DefaultSettingsProvider() {
     }
 
-    public DefaultSettingsProvider(String desc, JComponent pane) {
+    public DefaultSettingsProvider(String desc, JPanel pane) {
         setDescription(desc);
         setPanel(pane);
     }
@@ -35,7 +38,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         return panel;
     }
 
@@ -71,7 +74,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
         return priority;
     }
 
-    public void setPanel(JComponent panel) {
+    public void setPanel(JPanel panel) {
         this.panel = panel;
     }
 

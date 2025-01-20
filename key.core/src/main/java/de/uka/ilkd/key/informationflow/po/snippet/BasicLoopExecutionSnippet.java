@@ -1,9 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -18,16 +18,20 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
 
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
-        if (poVars.post.self != null)
+        ImmutableList<Term> posts = ImmutableSLList.nil();
+        if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
+        }
 
         if (poVars.pre.guard != null) {
             final JavaBlock guardJb = buildJavaBlock(d).second;
@@ -39,8 +43,9 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         while (localVars.hasNext()) {
             Term i = localVars.next();
             Term o = localVarsAtPost.next();
-            if (i != null && o != null)
+            if (i != null && o != null) {
                 posts = posts.append(d.tb.equals(o, i));
+            }
         }
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
 
@@ -54,15 +59,16 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
                 "Tried to produce a " + "program-term for a loop without modality.");
         }
         // create java block
-        Modality modality = (Modality) d.get(BasicSnippetData.Key.MODALITY);
+        Modality.JavaModalityKind kind =
+            (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
         final Pair<JavaBlock, JavaBlock> jb = buildJavaBlock(d);
 
         // create program term
-        final Modality symbExecMod;
-        if (modality == Modality.BOX) {
-            symbExecMod = Modality.DIA;
+        final Modality.JavaModalityKind symbExecMod;
+        if (kind == Modality.JavaModalityKind.BOX) {
+            symbExecMod = Modality.JavaModalityKind.DIA;
         } else {
-            symbExecMod = Modality.BOX;
+            symbExecMod = Modality.JavaModalityKind.BOX;
         }
         final Term guardPreTrueTerm = d.tb.equals(vs.pre.guard, d.tb.TRUE());
         final Term guardPreFalseTerm = d.tb.equals(vs.pre.guard, d.tb.FALSE());
@@ -71,7 +77,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         final Term guardTrueBody = d.tb.imp(guardPreTrueTerm, bodyTerm);
         final Term guardFalseBody = d.tb.imp(guardPreFalseTerm, postTerm);
         final Term guardPreAndTrueTerm =
-            tb.prog(modality, jb.second, tb.and(guardPreEqTerm, guardTrueBody));
+            tb.prog(kind, jb.second, tb.and(guardPreEqTerm, guardTrueBody));
         final Term programTerm = d.tb.and(guardPreAndTrueTerm, guardFalseBody);
 
         // create update
@@ -107,6 +113,6 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         final Statement s = new MethodFrame(null, context, sb);
         final JavaBlock res = JavaBlock.createJavaBlock(new StatementBlock(s));
 
-        return new Pair<JavaBlock, JavaBlock>(res, guardJb);
+        return new Pair<>(res, guardJb);
     }
 }

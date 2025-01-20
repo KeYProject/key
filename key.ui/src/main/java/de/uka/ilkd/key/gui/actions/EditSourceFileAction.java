@@ -1,22 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.sourceview.JavaDocument;
-import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.util.ExceptionTools;
-import org.key_project.util.java.IOUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.SimpleAttributeSet;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,12 +10,32 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.SimpleAttributeSet;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.sourceview.JavaDocument;
+import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.ExceptionTools;
+
+import org.key_project.util.java.IOUtil;
+
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used by {@link de.uka.ilkd.key.gui.IssueDialog} to open the source file containing an error for
@@ -83,7 +89,9 @@ public class EditSourceFileAction extends KeyAction {
      * Moves the caret in a {@link JTextArea} to the specified position. Assumes the first position
      * in the textarea is in line 1 column 1.
      */
-    private static void textAreaGoto(JTextComponent textArea, int line, int col) {
+    private static void textAreaGoto(JTextComponent textArea, Position position) {
+        int line = position.line();
+        int col = position.column();
         String text = textArea.getText();
         int i = 0;
         while (i < text.length() && line > 1) {
@@ -126,20 +134,21 @@ public class EditSourceFileAction extends KeyAction {
             public void addNotify() {
                 super.addNotify();
                 requestFocus();
-                textAreaGoto(this, location.getLine(), location.getColumn());
+                textAreaGoto(this, location.getPosition());
             }
         };
-        String source = IOUtil.readFrom(location.getFileURL());
+        Optional<URI> file = location.getFileURI();
+        String source = IOUtil.readFrom(file.orElse(null));
         // workaround for #1641: replace all carriage returns, since JavaDocument can currently
         // not handle them
-        source = source.replace("\r", "");
+        source = source != null ? source.replace("\r", "") : "";
 
-        if (location.getFileURL().toString().endsWith(".java")) {
+        if (file.isPresent() && file.get().toString().endsWith(".java")) {
             JavaDocument doc = new JavaDocument();
             try {
                 doc.insertString(0, source, new SimpleAttributeSet());
             } catch (BadLocationException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed insert string", e);
             }
             textPane.setDocument(doc);
 
@@ -175,7 +184,7 @@ public class EditSourceFileAction extends KeyAction {
                                     textPane.setSelectionStart(start);
                                     textPane.setSelectionEnd(end);
                                 } catch (BadLocationException ex) {
-                                    ex.printStackTrace();
+                                    LOGGER.warn("Failed update document", ex);
                                 }
                                 textPane.repaint();
                             }
@@ -197,19 +206,15 @@ public class EditSourceFileAction extends KeyAction {
         return textPane;
     }
 
-    private static @Nullable File tryGetFile(@Nullable URL sourceURL) {
+    private static @Nullable File tryGetFile(@Nullable URI sourceURL) {
         File sourceFile = null;
-        if (sourceURL != null && sourceURL.getProtocol().equals("file")) {
-            try {
-                sourceFile = Paths.get(sourceURL.toURI()).toFile();
-            } catch (URISyntaxException e) {
-                LOGGER.debug("Exception", e);
-            }
+        if (sourceURL != null && sourceURL.getScheme().equals("file")) {
+            sourceFile = Paths.get(sourceURL).toFile();
         }
         return sourceFile;
     }
 
-    private JPanel createButtonPanel(final URL sourceURL, final JTextPane textPane,
+    private JPanel createButtonPanel(final URI sourceURI, final JTextPane textPane,
             final JDialog dialog) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
@@ -219,7 +224,7 @@ public class EditSourceFileAction extends KeyAction {
         ActionListener closeAction = event -> dialog.dispose();
         cancelButton.addActionListener(closeAction);
 
-        final File sourceFile = tryGetFile(sourceURL);
+        final File sourceFile = tryGetFile(sourceURI);
         if (sourceFile == null) {
             // make content read-only and show tooltips
             saveButton.setEnabled(false);
@@ -234,7 +239,7 @@ public class EditSourceFileAction extends KeyAction {
                     // workaround for #1641: replace "\n" with system dependent line separators when
                     // saving
                     String text = textPane.getText().replace("\n", System.lineSeparator());
-                    Files.write(sourceFile.toPath(), text.getBytes());
+                    Files.writeString(sourceFile.toPath(), text);
                 } catch (IOException ioe) {
                     String message = "Cannot write to file:\n" + ioe.getMessage();
                     JOptionPane.showMessageDialog(parent, message);
@@ -270,18 +275,18 @@ public class EditSourceFileAction extends KeyAction {
 
         try {
             final Location location = ExceptionTools.getLocation(exception);
-            if (!Location.isValidLocation(location)) {
+            if (location == null)
                 throw new IOException("Cannot recover file location from exception.");
-            }
+            final URI uri = location.fileUri();
 
             // indicate edit/readonly in dialog title
             String prefix;
-            if (tryGetFile(location.getFileURL()) != null) {
+            if (tryGetFile(uri) != null) {
                 prefix = "Edit ";
             } else {
                 prefix = "[Readonly] ";
             }
-            final JDialog dialog = new JDialog(parent, prefix + location.getFileURL(),
+            final JDialog dialog = new JDialog(parent, prefix + uri,
                 Dialog.ModalityType.DOCUMENT_MODAL);
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -299,7 +304,7 @@ public class EditSourceFileAction extends KeyAction {
             sourceScrollPane.setViewportView(nowrap);
             sourceScrollPane.getVerticalScrollBar().setUnitIncrement(30);
             sourceScrollPane.getHorizontalScrollBar().setUnitIncrement(30);
-            sourceScrollPane.setBorder(new TitledBorder(location.getFileURL().toString()));
+            sourceScrollPane.setBorder(new TitledBorder(uri.toString()));
 
             TextLineNumber lineNumbers = new TextLineNumber(txtSource, 2);
             sourceScrollPane.setRowHeaderView(lineNumbers);
@@ -309,7 +314,7 @@ public class EditSourceFileAction extends KeyAction {
             sourceScrollPane.setHorizontalScrollBarPolicy(
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-            JPanel buttonPanel = createButtonPanel(location.getFileURL(), txtSource, dialog);
+            JPanel buttonPanel = createButtonPanel(uri, txtSource, dialog);
 
             Container container = dialog.getContentPane();
             JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);

@@ -1,12 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.Function;
 
 
 /**
@@ -23,7 +27,7 @@ public final class DifferentFields extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
 
         if (var == var1) {
@@ -38,15 +42,11 @@ public final class DifferentFields extends VariableConditionAdapter {
     }
 
     public boolean checkHelp(Object o1, Object o2) {
-        if (o1 instanceof Term && o2 instanceof Term) {
-            final Term t1 = (Term) o1;
-            final Term t2 = (Term) o2;
+        if (o1 instanceof Term t1 && o2 instanceof Term t2) {
 
             if (t1.op() == t2.op()) {
                 return false;
-            } else if (t1.op() instanceof Function && t2.op() instanceof Function) {
-                final Function op1 = (Function) t1.op();
-                final Function op2 = (Function) t2.op();
+            } else if (t1.op() instanceof Function op1 && t2.op() instanceof Function op2) {
 
                 return op1.isUnique() && op2.isUnique();
             }

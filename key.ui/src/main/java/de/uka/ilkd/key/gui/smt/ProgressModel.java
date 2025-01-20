@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
 import java.util.ArrayList;
-
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -12,7 +14,7 @@ import javax.swing.table.AbstractTableModel;
 class ProgressModel extends AbstractTableModel {
     private static final long serialVersionUID = 1L;
 
-    private static interface Column {
+    private interface Column {
         Object getObject(int row);
 
         int getRowCount();
@@ -58,7 +60,7 @@ class ProgressModel extends AbstractTableModel {
             private Color textColor = Color.BLACK;
             private Color backgroundColor = Color.WHITE;
             private Color foregroundColor = Color.BLUE;
-            private Color selectedTextColor = Color.WHITE;
+            private final Color selectedTextColor = Color.WHITE;
 
             public int getProgress() {
                 return progress;
@@ -128,8 +130,8 @@ class ProgressModel extends AbstractTableModel {
 
         public void setEditable(boolean b) {
             isEditable = b;
-            for (int i = 0; i < data.length; i++) {
-                data[i].isEditable = b;
+            for (ProcessData datum : data) {
+                datum.isEditable = b;
             }
         }
 
@@ -141,7 +143,7 @@ class ProgressModel extends AbstractTableModel {
 
     }
 
-    private ArrayList<Column> columns = new ArrayList<Column>();
+    private final ArrayList<Column> columns = new ArrayList<>();
 
     private int rowCount = -1;
 

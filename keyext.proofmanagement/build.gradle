@@ -1,0 +1,34 @@
+plugins {
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version "8.1.1"
+}
+
+description "Management of larger verification with KeY."
+
+dependencies {
+    implementation project(':key.core')
+    implementation project(':key.ui')
+
+    implementation group: 'org.antlr', name: 'ST4', version: '4.3.4'
+}
+
+application {
+    mainClass = "org.key_project.proofmanagement.Main"
+    // for start script generated with createStartScripts
+    applicationName = "pm"
+}
+
+run {
+    // for debugging, something like this can be used:
+    //args('check', '--missing', '--settings', '--report', 'proofManagementReport.html', '--replay', '--dependency', 'pmexample2')
+    //args('merge', 'bundle1', 'bundle2.zip', 'output.zproof')
+
+    // not necessary any more with the workaround in HTMLReport
+    // needed for access of Node.getValue in string template
+    // jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED']
+}
+
+shadowJar {
+    archiveClassifier = "exe"
+    archiveBaseName = "keyext.proofmanagement"
+}

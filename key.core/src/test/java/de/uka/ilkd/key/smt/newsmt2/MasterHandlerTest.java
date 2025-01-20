@@ -1,4 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -12,30 +31,17 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.util.LineProperties;
+
+import org.key_project.util.Streams;
+
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.key_project.util.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -53,7 +59,8 @@ public class MasterHandlerTest {
      * If this variable is set when running this test class, then those cases with expected result
      * "weak_valid" will raise an exception unless they can be proved using the solver.
      * <p>
-     * Otherwise a "timeout" or "unknown" is accepted. This can be used to deal with test cases that
+     * Otherwise, a "timeout" or "unknown" is accepted. This can be used to deal with test cases
+     * that
      * should verify but do not yet do so.
      * <p>
      * (Default false)
@@ -80,7 +87,10 @@ public class MasterHandlerTest {
         Path directory = Paths.get(url.toURI());
         Assertions.assertTrue(Files.isDirectory(directory));
 
-        var files = Files.list(directory).collect(Collectors.toList());
+        List<Path> files;
+        try (var s = Files.list(directory)) {
+            files = s.collect(Collectors.toList());
+        }
         List<Arguments> result = new ArrayList<>(files.size());
         for (Path file : files) {
             try {
@@ -90,77 +100,67 @@ public class MasterHandlerTest {
                 }
             } catch (Exception e) {
                 LOGGER.error("Error reading {}", file, e);
+                // make sure faulty test cases fail
+                throw e;
             }
         }
         return result;
     }
 
-    public static class TestData {
-        public final String name;
-        public final Path path;
-        private final String translation;
-        private final LineProperties props;
+    public record TestData(String name, Path path, LineProperties props, String translation) {
 
-        public TestData(String name, Path path, LineProperties props, String translation) {
-            this.name = name;
-            this.path = path;
-            this.translation = translation;
-            this.props = props;
+            public static @Nullable TestData create(Path path) throws IOException, ProblemLoaderException {
+                var name = path.getFileName().toString();
+                var props = new LineProperties();
+                try (BufferedReader reader = Files.newBufferedReader(path)) {
+                    props.read(reader);
+                }
+
+                if ("ignore".equals(props.get("state"))) {
+                    LOGGER.info("Test case has been marked ignore");
+                    return null;
+                }
+
+                List<String> sources = props.getLines("sources");
+                List<String> lines = new ArrayList<>(props.getLines("KeY"));
+
+                if (!sources.isEmpty()) {
+                    Path srcDir = Files.createTempDirectory("SMT_key_" + name);
+                    Path tmpSrc = srcDir.resolve("src.java");
+                    Files.write(tmpSrc, sources);
+                    lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
+                }
+
+                Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
+                Files.write(tmpKey, lines);
+
+                KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
+
+                Proof proof = env.getLoadedProof();
+                Sequent sequent = proof.root().sequent();
+
+                SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
+                        ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                        proof.getSettings().getNewSMTSettings(), proof);
+
+                String updates = props.get("smt-settings");
+                if (updates != null) {
+                    Properties map = new Properties();
+                    map.load(new StringReader(updates));
+                    settings.getNewSettings().readSettings(map);
+                }
+
+                ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
+                var translation =
+                        translator.translateProblem(sequent, env.getServices(), settings).toString();
+                return new TestData(name, path, props, translation);
+            }
+
+            @Override
+            public String toString() {
+                return name;
+            }
         }
-
-        @Nullable
-        public static TestData create(Path path) throws IOException, ProblemLoaderException {
-            var name = path.getFileName().toString();
-            var props = new LineProperties();
-            try (BufferedReader reader = Files.newBufferedReader(path)) {
-                props.read(reader);
-            }
-
-            if ("ignore".equals(props.get("state"))) {
-                LOGGER.info("Test case has been marked ignore");
-                return null;
-            }
-
-            List<String> sources = props.getLines("sources");
-            List<String> lines = new ArrayList<>(props.getLines("KeY"));
-
-            if (!sources.isEmpty()) {
-                Path srcDir = Files.createTempDirectory("SMT_key_" + name);
-                Path tmpSrc = srcDir.resolve("src.java");
-                Files.write(tmpSrc, sources);
-                lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
-            }
-
-            Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
-            Files.write(tmpKey, lines);
-
-            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
-
-            Proof proof = env.getLoadedProof();
-            Sequent sequent = proof.root().sequent();
-
-            SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                proof.getSettings().getNewSMTSettings(), proof);
-
-            String updates = props.get("smt-settings");
-            if (updates != null) {
-                Properties map = new Properties();
-                map.load(new StringReader(updates));
-                settings.getNewSettings().readSettings(map);
-            }
-
-            ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
-            var translation =
-                translator.translateProblem(sequent, env.getServices(), settings).toString();
-            return new TestData(name, path, props, translation);
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
 
     @ParameterizedTest
     @MethodSource("data")
@@ -169,7 +169,7 @@ public class MasterHandlerTest {
             Path tmpSmt = Files.createTempFile("SMT_key_" + data.name, ".smt2");
             // FIXME This is beyond Java 8: add as soon as switched to Java 11:
             // Files.writeString(tmpSmt, translation);
-            Files.write(tmpSmt, data.translation.getBytes());
+            Files.writeString(tmpSmt, data.translation);
             LOGGER.info("SMT2 for {}  saved in: {}", data.name, tmpSmt);
         }
 
@@ -205,25 +205,20 @@ public class MasterHandlerTest {
         // FIXME This is a hack.
         Process proc = new ProcessBuilder("z3", "-in", "-smt2", "-T:5").start();
         OutputStream os = proc.getOutputStream();
-        os.write(data.translation.getBytes());
-        os.write("\n\n(check-sat)".getBytes());
+        os.write(data.translation.getBytes(StandardCharsets.UTF_8));
+        os.write("\n\n(check-sat)".getBytes(StandardCharsets.UTF_8));
         os.close();
 
-        String[] response = Streams.toString(proc.getInputStream()).split("\n");
+        String[] response = Streams.toString(proc.getInputStream()).split(System.lineSeparator());
 
         try {
             String lookFor = null;
             switch (expectation) {
-            case "valid":
-                lookFor = "unsat";
-                break;
-            case "fail":
-                lookFor = "(sat|timeout)";
-                break;
-            case "irrelevant":
-                break;
-            default:
-                fail("Unexpected expectation: " + expectation);
+            case "valid" -> lookFor = "unsat";
+            case "fail" -> lookFor = "(sat|timeout)";
+            case "irrelevant" -> {
+            }
+            default -> fail("Unexpected expectation: " + expectation);
             }
 
             if (lookFor != null) {

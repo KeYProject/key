@@ -1,22 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
+package de.uka.ilkd.key.rule;
+
+import de.uka.ilkd.key.logic.Sequent;
+
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * container for the application part of an Taclet. It contains an if-sequence, a list of new
  * variables and a list of variable pairs inidcating the NotFreeIn relation and a list of program
  * variables to be added to the program context.
  */
-
-package de.uka.ilkd.key.rule;
-
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.logic.Sequent;
-
 public class TacletApplPart {
 
-    private Sequent ifseq;
-    private ImmutableList<NewVarcond> varsNew;
-    private ImmutableList<NotFreeIn> varsNotFreeIn;
-    private ImmutableList<NewDependingOn> varsNewDependingOn;
-    private ImmutableList<VariableCondition> variableConditions;
+    private final Sequent ifseq;
+    private final ImmutableList<NewVarcond> varsNew;
+    private final ImmutableList<NotFreeIn> varsNotFreeIn;
+    private final ImmutableList<NewDependingOn> varsNewDependingOn;
+    private final ImmutableList<VariableCondition> variableConditions;
 
     /**
      * constructs a new TacletApplPart object with the given Sequent, a list of variables that are

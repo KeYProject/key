@@ -1,16 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
+
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.Collections;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.util.Collections;
 
 /**
  * Offers a loading of a single Java file, without considering the folder as part of a classpath.
@@ -25,8 +26,6 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
         setName("Open Single Java File...");
         // setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Browse and load a single Java file without classpath.");
-        setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
-        lookupAcceleratorKey();
     }
 
     public void actionPerformed(ActionEvent e) {

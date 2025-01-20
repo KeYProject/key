@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.LinkedHashSet;
@@ -6,10 +9,11 @@ import java.util.Set;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.logic.Visitor;
 
 
 /**
@@ -28,9 +32,8 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
     public Set<SchemaVariable> collectSchemaVariables() {
-        Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
 
-        result.addAll(collectSchemaVariables(rtb.ifSequent()));
+        Set<SchemaVariable> result = new LinkedHashSet<>(collectSchemaVariables(rtb.ifSequent()));
 
         if (rtb instanceof FindTacletBuilder) {
             result.addAll(collectSchemaVariables(rtb.getFind()));
@@ -48,9 +51,9 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
     private Set<SchemaVariable> collectSchemaVariables(Term t) {
-        final Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
+        final Set<SchemaVariable> result = new LinkedHashSet<>();
 
-        t.execPreOrder(new Visitor() {
+        t.execPreOrder(new Visitor<Term>() {
             @Override
             public boolean visitSubtree(Term visited) {
                 return true;
@@ -81,7 +84,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
     private Set<SchemaVariable> collectSchemaVariables(Sequent s) {
-        Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
+        Set<SchemaVariable> result = new LinkedHashSet<>();
 
         for (final SequentFormula cf : s) {
             result.addAll(collectSchemaVariables(cf.formula()));
@@ -92,9 +95,8 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
     private Set<SchemaVariable> collectSchemaVariables(TacletGoalTemplate templ) {
-        Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
 
-        result.addAll(collectSchemaVariables(templ.sequent()));
+        Set<SchemaVariable> result = new LinkedHashSet<>(collectSchemaVariables(templ.sequent()));
         if (templ instanceof RewriteTacletGoalTemplate) {
             result.addAll(
                 collectSchemaVariables(((RewriteTacletGoalTemplate) templ).replaceWith()));

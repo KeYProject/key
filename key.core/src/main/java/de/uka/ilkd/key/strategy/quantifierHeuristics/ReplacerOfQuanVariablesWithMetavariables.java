@@ -1,16 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableMap;
-
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.*;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.ImmutableMap;
 
 /**
  * This class is used to create metavariables for every universal variables in quantified formula
@@ -24,7 +24,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
 
     public static Substitution createSubstitutionForVars(Term allTerm, TermServices services) {
         ImmutableMap<QuantifiableVariable, Term> res =
-            DefaultImmutableMap.<QuantifiableVariable, Term>nilMap();
+            DefaultImmutableMap.nilMap();
         Term t = allTerm;
         Operator op = t.op();
         while (op instanceof Quantifier) {
@@ -34,7 +34,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
                 Metavariable mv = new Metavariable(ARBITRARY_NAME, q.sort());
                 m = services.getTermBuilder().var(mv);
             } else {
-                Function f = new Function(ARBITRARY_NAME, q.sort(), new Sort[0]);
+                JFunction f = new JFunction(ARBITRARY_NAME, q.sort(), new Sort[0]);
                 m = services.getTermBuilder().func(f);
             }
             res = res.put(q, m);

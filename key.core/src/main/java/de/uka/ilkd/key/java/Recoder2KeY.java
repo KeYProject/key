@@ -1,4 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
+
+import java.io.*;
+import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.*;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.NullType;
@@ -10,12 +19,19 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.LinkedHashMap;
+import de.uka.ilkd.key.util.parsing.HasLocation;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.ModelException;
@@ -37,12 +53,6 @@ import recoder.service.ChangeHistory;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.KeYCrossReferenceSourceInfo;
 import recoder.service.UnresolvedReferenceException;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.text.MessageFormat;
-import java.util.*;
 
 /**
  * This class is the bridge between recoder ast data structures and KeY data structures. Syntactical
@@ -175,18 +185,22 @@ public class Recoder2KeY implements JavaReader {
     private Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf,
             String classPath, KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
 
-        if (servConf == null)
+        if (servConf == null) {
             throw new IllegalArgumentException("service configuration is null");
+        }
 
-        if (rec2key == null)
+        if (rec2key == null) {
             throw new IllegalArgumentException("rec2key mapping is null");
+        }
 
-        if (nss == null)
+        if (nss == null) {
             throw new IllegalArgumentException("namespaces is null");
+        }
 
-        if (!(servConf.getProjectSettings().getErrorHandler() instanceof KeYRecoderExcHandler))
+        if (!(servConf.getProjectSettings().getErrorHandler() instanceof KeYRecoderExcHandler)) {
             throw new IllegalArgumentException(
                 "Recoder2KeY needs a KeyRecoderExcHandler as exception handler");
+        }
 
         this.services = services;
         this.servConf = servConf;
@@ -294,7 +308,7 @@ public class Recoder2KeY implements JavaReader {
         de.uka.ilkd.key.java.CompilationUnit[] result =
             new de.uka.ilkd.key.java.CompilationUnit[cUnits.size()];
         for (int i = 0, sz = cUnits.size(); i < sz; i++) {
-            LOGGER.debug("converting now {}", cUnitStrings[i]);
+            LOGGER.trace("Converting {}", cUnitStrings[i]);
             try {
                 recoder.java.CompilationUnit cu = cUnits.get(i);
                 result[i] = getConverter().processCompilationUnit(cu, cu.getDataLocation());
@@ -319,7 +333,8 @@ public class Recoder2KeY implements JavaReader {
                 Reader fr = new InputStreamReader(is, StandardCharsets.UTF_8);
                 BufferedReader br = new BufferedReader(fr)) {
             return servConf.getProgramFactory().parseCompilationUnit(br);
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            // using throwable here since TokenMgrErrors are not Exceptions ...
             throw new ParseExceptionInFile(filename, e);
         }
     }
@@ -333,7 +348,8 @@ public class Recoder2KeY implements JavaReader {
      * @throws ParseExceptionInFile exceptions are wrapped into this to provide location information
      */
     private CompilationUnit readWithoutFileRepo(String filename) throws ParseExceptionInFile {
-        try (Reader fr = new FileReader(filename); BufferedReader br = new BufferedReader(fr)) {
+        try (Reader fr = new FileReader(filename, StandardCharsets.UTF_8);
+                BufferedReader br = new BufferedReader(fr)) {
             return servConf.getProgramFactory().parseCompilationUnit(br);
         } catch (Exception e) {
             throw new ParseExceptionInFile(filename, e);
@@ -386,7 +402,7 @@ public class Recoder2KeY implements JavaReader {
             if (ex.getCause() instanceof UnresolvedReferenceException) {
                 String extraMsg = "Consider using a classpath in your input file if this is a "
                     + "classtype that cannot be resolved (see "
-                    + "https://key-project.org/docs/user/Classpath for more details).";
+                    + "https://keyproject.github.io/key-docs/user/Classpath for more details).";
                 String msg = String.format("%s%n%s", ex.getCause().getMessage(), extraMsg);
                 reportError(msg, ex);
             } else {
@@ -524,7 +540,7 @@ public class Recoder2KeY implements JavaReader {
         while (walker.step()) {
             DataLocation loc = walker.getCurrentDataLocation();
             try (InputStream is = walker.openCurrent(fileRepo);
-                    Reader isr = new InputStreamReader(is);
+                    Reader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
                     Reader f = new BufferedReader(isr)) {
 
                 recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
@@ -592,7 +608,7 @@ public class Recoder2KeY implements JavaReader {
             while (walker.step()) {
                 currentDataLocation = walker.getCurrentDataLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                        Reader isr = new InputStreamReader(is);
+                        Reader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
                         Reader f = new BufferedReader(isr)) {
 
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
@@ -612,7 +628,7 @@ public class Recoder2KeY implements JavaReader {
             while (walker.step()) {
                 currentDataLocation = walker.getCurrentDataLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                        Reader isr = new InputStreamReader(is);
+                        Reader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
                         Reader f = new BufferedReader(isr)) {
 
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
@@ -671,11 +687,10 @@ public class Recoder2KeY implements JavaReader {
 
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof MethodDeclaration) {
-                MethodDeclaration methDecl = (MethodDeclaration) pe;
+            if (pe instanceof MethodDeclaration methDecl) {
                 if (!allowed && methDecl.getBody() != null) {
                     LOGGER.warn("Method body ({}) should not be allowed: {}", methDecl.getName(),
-                        rcu.getDataLocation(), Recoder2KeY.class.getName());
+                        rcu.getDataLocation());
                 }
                 methDecl.setBody(null);
             }
@@ -689,8 +704,7 @@ public class Recoder2KeY implements JavaReader {
              * +rcu.getDataLocation(), Recoder2KeY.class.getName()); }
              * fieldSpec.setInitializer(null); }
              */
-            if (pe instanceof ClassInitializer) {
-                ClassInitializer classInit = (ClassInitializer) pe;
+            if (pe instanceof ClassInitializer classInit) {
                 if (!allowed && classInit.getBody() != null) {
                     LOGGER.warn("There should be no class initializers: {}", rcu.getDataLocation());
                 }
@@ -887,9 +901,7 @@ public class Recoder2KeY implements JavaReader {
         }
 
         for (int i = 0, sz = memberList.size(); i < sz; i++) {
-            if (memberList.get(i) instanceof recoder.java.declaration.MethodDeclaration) {
-                recoder.java.declaration.MethodDeclaration olddecl =
-                    (recoder.java.declaration.MethodDeclaration) memberList.get(i);
+            if (memberList.get(i) instanceof MethodDeclaration olddecl) {
                 if (olddecl.getName().equals(mdecl.getName())) {
                     memberList.remove(i);
                 }
@@ -963,7 +975,7 @@ public class Recoder2KeY implements JavaReader {
             classContext.setMembers(list);
         }
 
-        l: while (it.hasNext()) {
+        while (it.hasNext()) {
             VariableSpecification keyVarSpec;
             ProgramVariable var = it.next();
             if (names.contains(var.name().toString())) {
@@ -987,8 +999,9 @@ public class Recoder2KeY implements JavaReader {
 
             String typeName;
             Type javaType = var.getKeYJavaType().getJavaType();
-            if (javaType == null)
+            if (javaType == null) {
                 continue;
+            }
             typeName = javaType.getFullName();
 
 
@@ -1182,8 +1195,9 @@ public class Recoder2KeY implements JavaReader {
      * reduce the size of a string to a maximum of length.
      */
     private static String trim(String s, int length) {
-        if (s.length() > length)
+        if (s.length() > length) {
             return s.substring(0, length - 5) + "[...]";
+        }
         return s;
     }
 
@@ -1192,25 +1206,37 @@ public class Recoder2KeY implements JavaReader {
     /**
      * tries to parse recoders exception position information
      */
-    private static int[] extractPositionInfo(String errorMessage) {
+    private static @Nullable Pair<String, Position> extractPositionInfo(String errorMessage) {
         if (errorMessage == null || errorMessage.indexOf('@') == -1) {
-            return new int[0];
+            return null;
         }
+        String url = null;
+        int fileStart = errorMessage.indexOf("\"FILE:");
+        fileStart = fileStart == -1 ? errorMessage.indexOf("\"URL:") : fileStart;
+        fileStart = fileStart == -1 ? errorMessage.indexOf("\"ARCHIVE:") : fileStart;
+        if (fileStart != -1) {
+            fileStart += 1;
+            int fileEnd = errorMessage.indexOf("\"", fileStart);
+
+            url =
+                errorMessage.substring(fileStart, fileEnd == -1 ? errorMessage.length() : fileEnd);
+        }
+
         int line = -1;
         int column = -1;
         try {
-            String pos = errorMessage.substring(errorMessage.indexOf("@") + 1);
-            pos = pos.substring(0, pos.indexOf(" "));
+            String pos = errorMessage.substring(errorMessage.indexOf('@') + 1);
+            pos = pos.substring(0, pos.indexOf(' '));
             line = Integer.parseInt(pos.substring(0, pos.indexOf('/')));
             column = Integer.parseInt(pos.substring(pos.indexOf('/') + 1));
         } catch (NumberFormatException nfe) {
             LOGGER.debug(
                 "recoder2key:unresolved reference at " + "line:" + line + " column:" + column);
-            return new int[0];
+            return null;
         } catch (StringIndexOutOfBoundsException siexc) {
-            return new int[0];
+            return null;
         }
-        return new int[] { line, column };
+        return new Pair<>(url, Position.newOneBased(line, column));
     }
 
     /**
@@ -1232,10 +1258,34 @@ public class Recoder2KeY implements JavaReader {
             throw (PosConvertException) cause;
         }
 
-        int[] pos = extractPositionInfo(cause.toString());
+        Position pos = null;
+        String file = null;
+        if (cause instanceof HasLocation) {
+            try {
+                var location = ((HasLocation) cause).getLocation();
+                if (location != null) {
+                    pos = location.getPosition();
+                    file = location.getFileURI().map(Object::toString).orElse(null);
+                }
+            } catch (MalformedURLException ignored) {
+            }
+        }
+        if (pos == null) {
+            Pair<String, Position> info = extractPositionInfo(cause.toString());
+            if (info != null) {
+                pos = info.second;
+                file = info.first;
+            }
+        }
+        reportErrorWithPositionInFile(message, cause, pos, file);
+    }
+
+    public static void reportErrorWithPositionInFile(String message, Throwable cause,
+            @Nullable Position pos,
+            @Nullable String file) {
         final RuntimeException rte;
-        if (pos.length > 0) {
-            rte = new PosConvertException(message, pos[0], pos[1]);
+        if (pos != null) {
+            rte = new PosConvertException(message, pos, file);
             rte.initCause(cause);
         } else {
             rte = new ConvertException(message, cause);

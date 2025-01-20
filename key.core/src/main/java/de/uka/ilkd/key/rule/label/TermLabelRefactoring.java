@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.label;
-
-import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -8,6 +9,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.LabelCollection;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -25,7 +27,7 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 /**
  * <p>
  * A {@link TermLabelRefactoring} is used by
- * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence, Term, Rule, Goal, Term)}
+ * {@link TermLabelManager#refactorGoal(TermLabelState, Services, PosInOccurrence, Rule, Goal, Object, Term)}
  * to refactor the labels of each visited {@link Term}.
  * </p>
  * <p>
@@ -40,12 +42,15 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 public interface TermLabelRefactoring extends RuleSpecificTask {
 
     /**
-     * Determines whether any refatorings should be applied on an application of the given
+     * <p>
+     * Determines whether any refactorings should be applied on an application of the given
+     * </p>
      * {@link BuiltInRule}.
-     *
+     * <p>
      * If you perform refactorings despite this method returning false, KeY will throw an exception
      * because the formula that contains the modality in which the contract was applied does not
      * have a FormulaTag.
+     * </p>
      *
      * @param rule the rule being applied.
      * @param goal the goal on which the rule is being applied.
@@ -53,7 +58,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      *        created.
      * @return whether any refactorings should be applied on an application of the given rule.
      */
-    public static boolean shouldRefactorOnBuiltInRule(Rule rule, Goal goal, Object hint) {
+    static boolean shouldRefactorOnBuiltInRule(Rule rule, Goal goal, Object hint) {
         if (goal != null) {
             Proof proof = goal.proof();
             if ((rule instanceof WhileInvariantRule
@@ -102,7 +107,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @param tacletTerm The optional taclet {@link Term}.
      * @return The required {@link RefactoringScope}.
      */
-    public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
+    RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm);
 
@@ -124,16 +129,16 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @param term The {@link Term} which is now refactored.
      * @param labels The new labels the {@link Term} will have after the refactoring.
      */
-    public void refactorLabels(TermLabelState state, Services services,
+    void refactorLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
-            Object hint, Term tacletTerm, Term term, List<TermLabel> labels);
+            Object hint, Term tacletTerm, Term term, LabelCollection labels);
 
     /**
      * Possible refactoring scopes.
      *
      * @author Martin Hentschel
      */
-    public static enum RefactoringScope {
+    enum RefactoringScope {
         /**
          * No refactoring required.
          */

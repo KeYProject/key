@@ -1,22 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
-
-import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.logic.op.Function;
+import org.key_project.util.LRUCache;
+import org.key_project.util.collection.Pair;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
- * This class is used to prove some simple arithmetic problem which are a==b, a>=b, a<=b; Besides it
- * can be used to prove that a>=b or a<=b by knowing that c>=d or c<=d;
+ * This class is used to prove some simple arithmetic problem which are {@code a==b}, {@code a>=b},
+ * {@code a<=b}; Besides it can be used to prove that {@code a>=b} or {@code a<=b} by
+ * knowing that {@code c>=d} or {@code c<=d;}
  *
  */
 public class HandleArith {
@@ -48,7 +52,7 @@ public class HandleArith {
         final Term falseT = tb.ff();
 
         final Term arithTerm = formatArithTerm(problem, tb, integerLDT, services.getCaches());
-        if (arithTerm.equalsModIrrelevantTermLabels(falseT)) {
+        if (arithTerm.equalsModProperty(falseT, IRRELEVANT_TERM_LABELS_PROPERTY)) {
             result = provedArithEqual(problem, tb, services);
             putInTermCache(provedByArithCache, problem, result);
             return result;
@@ -122,7 +126,7 @@ public class HandleArith {
      * @return trueT if true, falseT if false, and atom if can't be prove;
      */
     public static Term provedByArith(Term problem, Term axiom, Services services) {
-        final Pair<Term, Term> key = new Pair<Term, Term>(problem, axiom);
+        final Pair<Term, Term> key = new Pair<>(problem, axiom);
         final LRUCache<Pair<Term, Term>, Term> provedByArithCache =
             services.getCaches().getProvedByArithSndCache();
         Term result;
@@ -148,7 +152,7 @@ public class HandleArith {
             }
             return problem;
         }
-        Function addfun = integerLDT.getAdd();
+        JFunction addfun = integerLDT.getAdd();
         Term arithTerm =
             tb.geq(tb.func(addfun, cd.sub(0), ab.sub(1)), tb.func(addfun, ab.sub(0), cd.sub(1)));
         Term res = provedByArith(arithTerm, services);

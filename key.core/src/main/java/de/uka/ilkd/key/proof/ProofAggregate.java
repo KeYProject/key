@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.List;
@@ -7,7 +10,7 @@ import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
 public abstract class ProofAggregate {
 
-    private String name;
+    private final String name;
 
     protected ProofAggregate(String name) {
         this.name = name;
@@ -22,10 +25,11 @@ public abstract class ProofAggregate {
     }
 
     public static ProofAggregate createProofAggregate(Proof[] proofs, String name) {
-        if (proofs.length == 0)
+        if (proofs.length == 0) {
             return null; // needed for tests
+        }
         if (proofs.length > 1) {
-            SingleProof singles[] = new SingleProof[proofs.length];
+            SingleProof[] singles = new SingleProof[proofs.length];
             for (int i = 0; i < proofs.length; i++) {
                 singles[i] = new SingleProof(proofs[i], name);
             }

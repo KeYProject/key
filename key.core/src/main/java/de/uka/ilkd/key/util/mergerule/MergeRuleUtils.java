@@ -1,64 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.mergerule;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.nparser.KeyIO;
-import javax.annotation.Nonnull;
-
-import de.uka.ilkd.key.util.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -71,6 +30,22 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.ProofStarter;
+import de.uka.ilkd.key.util.SideProofUtil;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.*;
+import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * This class encapsulates static methods used in the MergeRule implementation. The methods are
@@ -96,6 +71,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
  * @author Dominic Scheurer
  */
 public class MergeRuleUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeRuleUtils.class);
 
     // ////////////////////////////////////////////////
     // ///////////// SIMPLE AUXILIARIES ///////////////
@@ -108,11 +84,11 @@ public class MergeRuleUtils {
      * @param obj The object to wrap.
      * @return None iff obj is null, Some(obj) otherwise.
      */
-    public static <T> Option<T> wrapOption(T obj) {
+    public static <T> Optional<T> wrapOption(T obj) {
         if (obj == null) {
-            return new Option.None<T>();
+            return Optional.empty();
         } else {
-            return new Option.Some<T>(obj);
+            return Optional.of(obj);
         }
     }
 
@@ -150,7 +126,7 @@ public class MergeRuleUtils {
      * @return An {@link ArrayList} containing exactly the given element.
      */
     public static <T> ArrayList<T> singletonArrayList(T elem) {
-        ArrayList<T> result = new ArrayList<T>();
+        ArrayList<T> result = new ArrayList<>();
         result.add(elem);
         return result;
     }
@@ -169,9 +145,9 @@ public class MergeRuleUtils {
      */
     public static Term translateToFormula(final Services services, final String toTranslate) {
         try {
-            @Nonnull
+            @NonNull
             Term result = new KeyIO(services).parseExpression(toTranslate);
-            return result.sort() == Sort.FORMULA ? result : null;
+            return result.sort() == JavaDLTheory.FORMULA ? result : null;
         } catch (Throwable e) {
             return null;
         }
@@ -210,7 +186,7 @@ public class MergeRuleUtils {
      * @return Elementary updates of the supplied parallel update.
      */
     public static LinkedList<Term> getElementaryUpdates(Term u) {
-        LinkedList<Term> result = new LinkedList<Term>();
+        LinkedList<Term> result = new LinkedList<>();
 
         if (u.op() instanceof ElementaryUpdate) {
             result.add(u);
@@ -258,7 +234,7 @@ public class MergeRuleUtils {
      */
     public static HashSet<LocationVariable> getLocationVariablesHashSet(Sequent sequent,
             Services services) {
-        HashSet<LocationVariable> result = new HashSet<LocationVariable>();
+        HashSet<LocationVariable> result = new HashSet<>();
 
         for (SequentFormula f : sequent) {
             result.addAll(getLocationVariablesHashSet(f.formula(), services));
@@ -275,7 +251,7 @@ public class MergeRuleUtils {
      */
     public static HashSet<LocationVariable> getLocationVariablesHashSet(Term term,
             Services services) {
-        HashSet<LocationVariable> result = new HashSet<LocationVariable>();
+        HashSet<LocationVariable> result = new HashSet<>();
 
         if (term.op() instanceof LocationVariable) {
             result.add((LocationVariable) term.op());
@@ -299,9 +275,9 @@ public class MergeRuleUtils {
      * @return All SkolemConstants of the given term.
      */
     public static HashSet<Function> getSkolemConstants(Term term) {
-        HashSet<Function> result = new HashSet<Function>();
+        HashSet<Function> result = new HashSet<>();
 
-        if (term.op() instanceof Function && ((Function) term.op()).isSkolemConstant()) {
+        if (term.op() instanceof JFunction && ((Function) term.op()).isSkolemConstant()) {
             result.add((Function) term.op());
         } else {
             for (Term sub : term.subs()) {
@@ -320,7 +296,7 @@ public class MergeRuleUtils {
      * @return The right side in the update for the given left side. Returns a None value if the
      *         right side could not be determined.
      */
-    public static Option<Term> getUpdateRightSideForSafe(Term update, LocationVariable leftSide) {
+    public static Optional<Term> getUpdateRightSideForSafe(Term update, LocationVariable leftSide) {
         return wrapOption(getUpdateRightSideFor(update, leftSide));
     }
 
@@ -363,7 +339,7 @@ public class MergeRuleUtils {
      * @throws IllegalArgumentException if the supplied term is not a formula
      */
     public static int countAtoms(Term term) {
-        if (term.sort().equals(Sort.FORMULA)) {
+        if (term.sort().equals(JavaDLTheory.FORMULA)) {
             if (term.op() instanceof Junctor) {
                 int result = 0;
                 for (Term sub : term.subs()) {
@@ -389,7 +365,7 @@ public class MergeRuleUtils {
      * @throws IllegalArgumentException if the supplied term is not a formula
      */
     public static int countDisjunctions(Term term, boolean negated) {
-        if (term.sort().equals(Sort.FORMULA)) {
+        if (term.sort().equals(JavaDLTheory.FORMULA)) {
             if (term.op() instanceof Junctor) {
                 int result = 0;
 
@@ -425,14 +401,14 @@ public class MergeRuleUtils {
      * @param services The services object.
      * @return A new Skolem constant of the given sort with the given prefix in its name.
      */
-    public static Function getNewSkolemConstantForPrefix(String prefix, Sort sort,
+    public static JFunction getNewSkolemConstantForPrefix(String prefix, Sort sort,
             Services services) {
-        Function result = null;
+        JFunction result = null;
         String newName = "";
 
         do {
             newName = services.getTermBuilder().newName(prefix);
-            result = new Function(new Name(newName), sort, true);
+            result = new JFunction(new Name(newName), sort, true);
             services.getNamespaces().functions().add(result);
         } while (newName.equals(prefix));
 
@@ -516,10 +492,8 @@ public class MergeRuleUtils {
             HashMap<Function, LogicVariable> replMap, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        if (term.op() instanceof Function && ((Function) term.op()).isSkolemConstant()
+        if (term.op() instanceof Function constant && ((Function) term.op()).isSkolemConstant()
                 && (restrictTo == null || restrictTo.contains(term.op()))) {
-
-            Function constant = (Function) term.op();
 
             if (!replMap.containsKey(constant)) {
                 LogicVariable freshVariable = getFreshVariableForPrefix(
@@ -531,13 +505,13 @@ public class MergeRuleUtils {
 
         } else {
 
-            LinkedList<Term> transfSubs = new LinkedList<Term>();
+            LinkedList<Term> transfSubs = new LinkedList<>();
             for (Term sub : term.subs()) {
                 transfSubs.add(substConstantsByFreshVars(sub, restrictTo, replMap, services));
             }
 
             return services.getTermFactory().createTerm(term.op(),
-                new ImmutableArray<Term>(transfSubs), term.boundVars(), term.javaBlock(),
+                new ImmutableArray<>(transfSubs), term.boundVars(),
                 term.getLabels());
 
         }
@@ -602,7 +576,7 @@ public class MergeRuleUtils {
      * @return The conjunctive elements of the supplied formula.
      */
     public static ArrayList<Term> getConjunctiveElementsFor(final Term term) {
-        ArrayList<Term> result = new ArrayList<Term>();
+        ArrayList<Term> result = new ArrayList<>();
 
         if (term.op().equals(Junctor.AND)) {
             result.addAll(getConjunctiveElementsFor(term.sub(0)));
@@ -636,7 +610,7 @@ public class MergeRuleUtils {
         int newCounter = 0;
         String branchUniqueName = base;
         Iterable<IProgramVariable> progVars = intrNode.getLocalProgVars();
-        while (!isUniqueInGlobals(branchUniqueName.toString(), progVars)
+        while (!isUniqueInGlobals(branchUniqueName, progVars)
                 || (lookupVarInNS(branchUniqueName, services) != null
                         && !lookupVarInNS(branchUniqueName, services).sort().equals(var.sort()))) {
             newCounter += 1;
@@ -678,7 +652,7 @@ public class MergeRuleUtils {
             return JavaBlock.EMPTY_JAVABLOCK;
         }
 
-        if (term.subs().size() == 0 || !term.javaBlock().isEmpty()) {
+        if (term.subs().isEmpty() || !term.javaBlock().isEmpty()) {
             return term.javaBlock();
         } else {
             for (Term sub : term.subs()) {
@@ -792,7 +766,6 @@ public class MergeRuleUtils {
      *         successful.
      *
      * @see #simplify(Proof, Term, int)
-     * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
     public static Term trySimplify(final Proof parentProof, final Term term,
             boolean countDisjunctions, int timeout) {
@@ -839,7 +812,7 @@ public class MergeRuleUtils {
      *
      * @param se1 First element to check equality (mod renaming) for.
      * @param se2 Second element to check equality (mod renaming) for.
-     * @param goal The goal of the current branch (for getting branch-unique names).
+     * @param node The node of the current branch (for getting branch-unique names).
      * @param services The Services object.
      * @return true iff source elements can be matched, considering branch-unique location names.
      */
@@ -848,12 +821,13 @@ public class MergeRuleUtils {
 
         // Quick short cut for the special case where no program variables
         // have to be renamed.
-        if (se1.equalsModRenaming(se2, new NameAbstractionTable())) {
+        if (se1.equalsModProperty(se2, RENAMING_SOURCE_ELEMENT_PROPERTY,
+            new NameAbstractionTable())) {
             return true;
         }
 
         LocVarReplBranchUniqueMap replMap =
-            new LocVarReplBranchUniqueMap(node, DefaultImmutableSet.<LocationVariable>nil());
+            new LocVarReplBranchUniqueMap(node, DefaultImmutableSet.nil());
 
         ProgVarReplaceVisitor replVisitor1 =
             new ProgVarReplaceVisitor((ProgramElement) se1, replMap, services);
@@ -863,7 +837,8 @@ public class MergeRuleUtils {
         replVisitor1.start();
         replVisitor2.start();
 
-        return replVisitor1.result().equalsModRenaming(replVisitor2.result(),
+        return replVisitor1.result().equalsModProperty(replVisitor2.result(),
+            RENAMING_SOURCE_ELEMENT_PROPERTY,
             new NameAbstractionTable());
     }
 
@@ -880,7 +855,7 @@ public class MergeRuleUtils {
      * The underlying idea is based upon the observation that many path conditions that should be
      * merged are conjunctions of mostly the same elements and, in addition, formulae phi and !phi
      * that vanish after creating the disjunction of the path conditions. The corresponding valid
-     * formula is <code>(phi & psi) | (phi & !psi) <-> phi</code>
+     * formula is {@code (phi & psi) | (phi & !psi) <-> phi}
      * <p>
      *
      * For formulae that cannot be simplified by this law, the method performs two additional
@@ -893,7 +868,7 @@ public class MergeRuleUtils {
      * @param cond1 First path condition to merge.
      * @param cond2 Second path condition to merge.
      * @param services The services object.
-     * @param timeout Time in milliseconds after which the side proof is aborted.
+     * @param simplificationTimeout Time in milliseconds after which the side proof is aborted.
      * @return A path condition that is equivalent to the disjunction of the two supplied formulae,
      *         but possibly simpler.
      */
@@ -945,7 +920,7 @@ public class MergeRuleUtils {
      *         are contradicting, does not imply pathCondition2, and (2) the "rest" of
      *         pathCondition1 that is common with pathCondition2.
      */
-    public static Option<Pair<Term, Term>> getDistinguishingFormula(Term pathCondition1,
+    public static Optional<Pair<Term, Term>> getDistinguishingFormula(Term pathCondition1,
             Term pathCondition2, Services services) {
 
         return getDistinguishingFormula(getConjunctiveElementsFor(pathCondition1),
@@ -956,7 +931,7 @@ public class MergeRuleUtils {
     /**
      * @see #getDistinguishingFormula(Term, Term, Services)
      */
-    public static Option<Pair<Term, Term>> getDistinguishingFormula(
+    public static Optional<Pair<Term, Term>> getDistinguishingFormula(
             ArrayList<Term> conjElemsPathCond1, ArrayList<Term> conjElemsPathCond2,
             Services services) {
 
@@ -970,14 +945,14 @@ public class MergeRuleUtils {
         final LinkedHashSet<Term> equalElements = commonAndSpecific.common;
 
         if (cond1SpecificElems.isEmpty() || cond2SpecificElems.isEmpty()) {
-            return new Option.None<>();
+            return Optional.empty();
         }
 
         Term theOneDistinguishingTerm = null;
         for (final Term t : cond1SpecificElems) {
             List<Term> distCandidates = cond2SpecificElems.stream()
                     .filter(t1 -> t1.equals(tb.not(t)) || t.equals(tb.not(t1)))
-                    .collect(Collectors.toList());
+                    .toList();
             if (!distCandidates.isEmpty()) {
                 // Just take the first, any one should be good enough, at least
                 // with the present knowledge
@@ -985,7 +960,7 @@ public class MergeRuleUtils {
             }
         }
 
-        return new Option.Some<Pair<Term, Term>>(new Pair<Term, Term>(
+        return Optional.of(new Pair<>(
             theOneDistinguishingTerm != null ? theOneDistinguishingTerm
                     : joinConjuctiveElements(cond1SpecificElems, services),
             joinConjuctiveElements(equalElements, services)));
@@ -1002,12 +977,13 @@ public class MergeRuleUtils {
      */
     public static boolean pathConditionsAreDistinguishable(Term pathCondition1, Term pathCondition2,
             Services services) {
-        Option<Pair<Term, Term>> distinguishingAndEqualFormula1 =
+        Optional<Pair<Term, Term>> distinguishingAndEqualFormula1 =
             getDistinguishingFormula(pathCondition1, pathCondition2, services);
-        Option<Pair<Term, Term>> distinguishingAndEqualFormula2 =
+        Optional<Pair<Term, Term>> distinguishingAndEqualFormula2 =
             getDistinguishingFormula(pathCondition2, pathCondition1, services);
 
-        return distinguishingAndEqualFormula1.isSome() || distinguishingAndEqualFormula2.isSome();
+        return distinguishingAndEqualFormula1.isPresent()
+                || distinguishingAndEqualFormula2.isPresent();
     }
 
     /**
@@ -1038,27 +1014,29 @@ public class MergeRuleUtils {
     }
 
     /**
-     * Converts a sequent (given by goal & pos in occurrence) to an SE state (U,C). Thereby, all
+     * Converts a sequent (given by {@link Goal} and {@link PosInOccurrence}) to an SE state (U,C).
+     * Thereby, all
      * program variables occurring in the symbolic state are replaced by branch-unique
      * correspondents in order to enable merging of different branches declaring local variables.
      * <p>
      *
-     * @param goal Current goal.
+     * @param node Current node.
      * @param pio Position of update-program counter formula in goal.
      * @param services The services object.
      * @return An SE state (U,C).
-     * @see #sequentToSETriple(Goal, PosInOccurrence, Services)
+     * @see #sequentToSETriple(Node, PosInOccurrence, Services)
      */
     public static SymbolicExecutionState sequentToSEPair(Node node, PosInOccurrence pio,
             Services services) {
 
         SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(node, pio, services);
 
-        return new SymbolicExecutionState(triple.first, triple.second, node);
+        return new SymbolicExecutionState(triple.symbolicState(), triple.pathCondition(), node);
     }
 
     /**
-     * Converts a sequent (given by goal & pos in occurrence) to an SE state (U,C,p). Thereby, all
+     * Converts a sequent (given by {@link Goal} and {@link PosInOccurrence}) to an SE state
+     * (U,C,p). Thereby, all
      * program variables occurring in the program counter and in the symbolic state are replaced by
      * branch-unique correspondents in order to enable merging of different branches declaring local
      * variables.
@@ -1071,7 +1049,7 @@ public class MergeRuleUtils {
      * not effected by the switch to branch-unique names. However, merged nodes are then of course
      * potentially different from their predecessors concerning the involved local variable symbols.
      *
-     * @param goal Current goal.
+     * @param node Current node.
      * @param pio Position of update-program counter formula in goal.
      * @param services The services object.
      * @return An SE state (U,C,p).
@@ -1120,11 +1098,12 @@ public class MergeRuleUtils {
             final Node node = sequentInfo.getGoal().node();
             final Services services = sequentInfo.getGoal().proof().getServices();
 
-            Triple<Term, Term, Term> partnerSEState =
+            SymbolicExecutionStateWithProgCnt partnerSEState =
                 sequentToSETriple(node, sequentInfo.getPio(), services);
 
             result = result.prepend(
-                new SymbolicExecutionState(partnerSEState.first, partnerSEState.second, node));
+                new SymbolicExecutionState(partnerSEState.symbolicState(),
+                    partnerSEState.pathCondition(), node));
         }
 
         return result;
@@ -1150,21 +1129,21 @@ public class MergeRuleUtils {
 
         // This goal
         final Collection<Operator> thisGoalSymbols = new ArrayList<>();
-        final Goal thisGoal = proof.getGoal(mergeState.getCorrespondingNode());
+        final Goal thisGoal = proof.getOpenGoal(mergeState.getCorrespondingNode());
         final NamespaceSet thisGoalNamespaces = thisGoal.getLocalNamespaces();
         thisGoalSymbols.addAll(thisGoalNamespaces.programVariables().allElements());
         thisGoalSymbols.addAll(thisGoalNamespaces.functions().allElements());
         final List<Name> thisGoalNames =
-            thisGoalSymbols.parallelStream().map(pv -> pv.name()).collect(Collectors.toList());
+            thisGoalSymbols.parallelStream().map(Named::name).collect(Collectors.toList());
 
         // Partner goal
         final Collection<Operator> partnerGoalSymbols = new ArrayList<>();
-        final Goal partnerGoal = proof.getGoal(mergePartnerState.getCorrespondingNode());
+        final Goal partnerGoal = proof.getOpenGoal(mergePartnerState.getCorrespondingNode());
         final NamespaceSet partnerGoalNamespaces = partnerGoal.getLocalNamespaces();
         partnerGoalSymbols.addAll(partnerGoalNamespaces.programVariables().allElements());
         partnerGoalSymbols.addAll(partnerGoalNamespaces.functions().allElements());
         final List<Name> partnerGoalNames =
-            partnerGoalSymbols.parallelStream().map(pv -> pv.name()).collect(Collectors.toList());
+            partnerGoalSymbols.parallelStream().map(Named::name).collect(Collectors.toList());
 
         // Construct intersection: Common names
         thisGoalNames.retainAll(partnerGoalNames);
@@ -1174,39 +1153,35 @@ public class MergeRuleUtils {
 
             final List<Operator> problematicOps =
                 partnerGoalSymbols.parallelStream().filter(pv -> thisGoalNames.contains(pv.name()))
-                        .filter(pv -> !thisGoalSymbols.contains(pv)).collect(Collectors.toList());
+                        .filter(pv -> !thisGoalSymbols.contains(pv)).toList();
 
             // Loop over all problematic operators and rename them in the
             // partner state.
             for (Operator partnerStateOp : problematicOps) {
                 final Operator mergeStateOp = thisGoalSymbols.parallelStream()
                         .filter(s -> s.name().equals(partnerStateOp.name()))
-                        .collect(Collectors.toList()).get(0);
+                        .toList().get(0);
 
                 Operator newOp1;
                 Operator newOp2;
-                if (partnerStateOp instanceof Function) {
-                    newOp1 = ((Function) mergeStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                thisGoal.getLocalNamespaces())));
-                    thisGoalNamespaces.functions().add((Function) newOp1);
+                if (partnerStateOp instanceof JFunction partnerFun) {
+                    newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                        thisGoal.getLocalNamespaces())), (JFunction) mergeStateOp);
+                    thisGoalNamespaces.functions().add((JFunction) newOp1);
                     thisGoalNamespaces.flushToParent();
 
-                    newOp2 = ((Function) partnerStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                thisGoal.getLocalNamespaces())));
-                    thisGoalNamespaces.functions().add((Function) newOp2);
+                    newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                        thisGoal.getLocalNamespaces())), partnerFun);
+                    thisGoalNamespaces.functions().add((JFunction) newOp2);
                     thisGoalNamespaces.flushToParent();
-                } else if (partnerStateOp instanceof LocationVariable) {
-                    newOp1 = ((LocationVariable) mergeStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                thisGoal.getLocalNamespaces())));
+                } else if (partnerStateOp instanceof LocationVariable partnerLV) {
+                    newOp1 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                        thisGoal.getLocalNamespaces())), (LocationVariable) mergeStateOp);
                     thisGoalNamespaces.programVariables().add((LocationVariable) newOp1);
                     thisGoalNamespaces.flushToParent();
 
-                    newOp2 = ((LocationVariable) partnerStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                thisGoal.getLocalNamespaces())));
+                    newOp2 = rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                        thisGoal.getLocalNamespaces())), partnerLV);
                     thisGoalNamespaces.programVariables().add((LocationVariable) newOp2);
                     thisGoalNamespaces.flushToParent();
                 } else {
@@ -1285,7 +1260,7 @@ public class MergeRuleUtils {
                 + "\" is already known to the system.<br/>\n" + "Plase choose a fresh one.");
         }
 
-        return new Pair<Sort, Name>(sort, name);
+        return new Pair<>(sort, name);
     }
 
     /**
@@ -1304,7 +1279,7 @@ public class MergeRuleUtils {
             ArrayList<Pair<Sort, Name>> registeredPlaceholders, NamespaceSet localNamespaces,
             Services services) throws ParserException {
         DefaultTermParser parser = new DefaultTermParser();
-        Term formula = parser.parse(new StringReader(input), Sort.FORMULA, services,
+        Term formula = parser.parse(new StringReader(input), JavaDLTheory.FORMULA, services,
             localNamespaces, services.getProof().abbreviations());
 
         ImmutableSet<LocationVariable> containedLocVars =
@@ -1361,8 +1336,37 @@ public class MergeRuleUtils {
             elementaries = elementaries.prepend(tb.elementary(tb.var(loc), tb.var(newVar)));
         }
 
-        return new Pair<Term, ImmutableSet<QuantifiableVariable>>(
+        return new Pair<>(
             tb.apply(tb.parallel(elementaries), term), freeVars);
+    }
+
+    /**
+     * Returns an equivalent function with the new name.
+     *
+     * @param newName the new name
+     * @param old the function to be renamed
+     * @return equivalent operator with the new name
+     */
+    private static JFunction rename(Name newName, JFunction old) {
+        return new JFunction(newName, old.sort(), old.argSorts(), old.whereToBind(),
+            old.isUnique(), old.isSkolemConstant());
+    }
+
+    /**
+     * Returns an equivalent variable with the new name.
+     *
+     * @param newName the new name
+     * @param lv the location variable to be renamed
+     * @return equivalent operator with the new name
+     */
+    public static LocationVariable rename(Name newName, LocationVariable lv) {
+        if (lv.getKeYJavaType() != null) {
+            return new LocationVariable(new ProgramElementName(newName.toString()),
+                lv.getKeYJavaType(),
+                lv.getContainerType(), lv.isStatic(), lv.isModel());
+        } else {
+            return new LocationVariable(new ProgramElementName(newName.toString()), lv.sort());
+        }
     }
 
     /**
@@ -1374,7 +1378,7 @@ public class MergeRuleUtils {
      */
     private static Term joinListToAndTerm(ImmutableList<SequentFormula> formulae,
             Services services) {
-        if (formulae.size() == 0) {
+        if (formulae.isEmpty()) {
             return services.getTermBuilder().tt();
         } else if (formulae.size() == 1) {
             return formulae.head().formula();
@@ -1540,7 +1544,7 @@ public class MergeRuleUtils {
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
             // internal error
-            pie.printStackTrace();
+            LOGGER.warn("Internal error", pie);
         }
         return false;
     }
@@ -1562,14 +1566,14 @@ public class MergeRuleUtils {
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
             // internal error
-            pie.printStackTrace();
+            LOGGER.warn("Internal error", pie);
         }
         return false;
     }
 
     /**
      * Simplifies the given {@link Term} in a side proof with splits. This code has been copied from
-     * {@link SymbolicExecutionUtil} and only been slightly modified (to allow for splitting the
+     * {@code SymbolicExecutionUtil} and only been slightly modified (to allow for splitting the
      * proof).
      *
      * @param parentProof The parent {@link Proof}.
@@ -1578,7 +1582,6 @@ public class MergeRuleUtils {
      * @return The simplified {@link Term}.
      * @throws ProofInputException Occurred Exception.
      *
-     * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
     private static Term simplify(Proof parentProof, Term term, int timeout)
             throws ProofInputException {
@@ -1633,10 +1636,13 @@ public class MergeRuleUtils {
 
     /**
      * Tells whether a name is unique in the passed list of global variables.
+     * <p>
+     * (see also {@code VariableNamer.isUniqueInGlobals(String, Iterable)})
+     * </p>
      *
      * @param name The name to check uniqueness for.
      * @param globals The global variables for the givan branch.
-     * @see VariableNamer#isUniqueInGlobals(String, Iterable)
+     *
      */
     private static boolean isUniqueInGlobals(String name, Iterable<IProgramVariable> globals) {
         for (final IProgramVariable n : globals) {
@@ -1687,12 +1693,8 @@ public class MergeRuleUtils {
      */
     private static CommonAndSpecificSubformulasResult commonAndSpecificSubformulas(
             final ArrayList<Term> cond1, final ArrayList<Term> cond2, Services services) {
-
-        java.util.function.Function<ArrayList<Term>, LinkedHashSet<Term>> conjElemsSet = //
-            t -> t.stream().collect(Collectors.toCollection(() -> new LinkedHashSet<Term>()));
-
-        final LinkedHashSet<Term> cond1ConjElems = conjElemsSet.apply(cond1);
-        final LinkedHashSet<Term> cond2ConjElems = conjElemsSet.apply(cond2);
+        final LinkedHashSet<Term> cond1ConjElems = new LinkedHashSet<>(cond1);
+        final LinkedHashSet<Term> cond2ConjElems = new LinkedHashSet<>(cond2);
 
         // Calculate the equal elements (i.e., the intersection)
         final LinkedHashSet<Term> equalElements = new LinkedHashSet<>(cond1ConjElems);
@@ -1718,11 +1720,11 @@ public class MergeRuleUtils {
      * @author Dominic Scheurer
      */
     static class TermWrapperFactory {
-        private ArrayList<Term> wrappedTerms = new ArrayList<Term>();
+        private final ArrayList<Term> wrappedTerms = new ArrayList<>();
 
         public TermWrapper wrapTerm(Term term) {
             for (Term existingTerm : wrappedTerms) {
-                if (existingTerm.equalsModRenaming(term)) {
+                if (existingTerm.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
                     return new TermWrapper(term, existingTerm.hashCode());
                 }
             }
@@ -1733,142 +1735,56 @@ public class MergeRuleUtils {
     }
 
     /**
-     *
      * TODO
      *
      * @author Dominic Scheurer
      */
-    private static class CommonAndSpecificSubformulasResult {
-        public final LinkedHashSet<Term> specific1, specific2, common;
-
-        public CommonAndSpecificSubformulasResult(LinkedHashSet<Term> specific1,
-                LinkedHashSet<Term> specific2, LinkedHashSet<Term> common) {
-            this.specific1 = specific1;
-            this.specific2 = specific2;
-            this.common = common;
-        }
+    private record CommonAndSpecificSubformulasResult(LinkedHashSet<Term> specific1,
+            LinkedHashSet<Term> specific2,
+            LinkedHashSet<Term> common) {
     }
 
     /**
-     * Simple term wrapper for comparing terms modulo renaming.
-     *
-     * @author Dominic Scheurer
-     * @see TermWrapperFactory
-     */
-    static class TermWrapper {
-        private Term term;
-        private int hashcode;
-
-        public TermWrapper(Term term, int hashcode) {
-            this.term = term;
-            this.hashcode = hashcode;
-        }
-
-        public Term getTerm() {
-            return term;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return obj instanceof TermWrapper
-                    && term.equalsModRenaming(((TermWrapper) obj).getTerm());
-        }
-
-        @Override
-        public int hashCode() {
-            return hashcode;
-        }
-
-        @Override
-        public String toString() {
-            return term.toString();
-        }
-
-        /**
-         * Adds the wrapped content of the Iterable object into the given target collection.
+         * Simple term wrapper for comparing terms modulo renaming.
          *
-         * @param target The collection to insert the wrapped terms into.
-         * @param wrappedCollection Iterable to transform.
-         * @return The target collection with inserted terms.
+         * @author Dominic Scheurer
+         * @see TermWrapperFactory
          */
-        public static <T extends Collection<Term>> T toTermList(T target,
-                Iterable<TermWrapper> wrappedCollection) {
-            Iterator<TermWrapper> it = wrappedCollection.iterator();
+        record TermWrapper(Term term, int hashcode) {
 
-            while (it.hasNext()) {
-                target.add(it.next().getTerm());
-            }
-
-            return target;
-        }
-    }
-
-    /**
-     * A simple Scala-like option type: Either Some(value) or None.
-     *
-     * @author Dominic Scheurer
-     *
-     * @param <T> Type for the content of the option.
-     */
-    public static abstract class Option<T> {
-        static class Some<T> extends Option<T> {
-            private T value;
-
-            public Some(T value) {
-                assert value != null
-                        : "Wrappign null values in a Some is not allowed. Consider a None instead.";
-
-                this.value = value;
+        @Override
+            public boolean equals(Object obj) {
+                return obj instanceof TermWrapper
+                        && term.equalsModProperty(((TermWrapper) obj).term(), RENAMING_TERM_PROPERTY);
             }
 
             @Override
-            public T getValue() {
-                return value;
-            }
-        }
-
-        static class None<T> extends Option<T> {
-        }
-
-        public boolean isSome() {
-            return this instanceof Some;
-        }
-
-        /**
-         * Returns the value of this object if is a Some; otherwise, an exception is thrown.
-         *
-         * @return The value of this object.
-         * @throws IllegalAccessError If this object is a None.
-         */
-        public T getValue() {
-            if (isSome()) {
-                return ((Some<T>) this).getValue();
-            } else {
-                throw new IllegalAccessError("Cannot otain a value from a None object.");
-            }
-        }
-
-        /**
-         * For Some values, the equality of the wrapped objects is used. A None value is not equal
-         * to any other object besides itself.
-         */
-        @Override
-        public boolean equals(Object obj) {
-            if (!(obj instanceof Option)) {
-                return false;
+            public int hashCode() {
+                return hashcode;
             }
 
-            @SuppressWarnings("unchecked")
-            final Option<T> opt = (Option<T>) obj;
-
-            if (!isSome() || !opt.isSome()) {
-                // A None is not equal to anything besides itself.
-                return this == obj;
+            @Override
+            public String toString() {
+                return term.toString();
             }
 
-            return (getValue().equals(opt.getValue()));
+            /**
+             * Adds the wrapped content of the Iterable object into the given target collection.
+             *
+             * @param target            The collection to insert the wrapped terms into.
+             * @param wrappedCollection Iterable to transform.
+             * @return The target collection with inserted terms.
+             */
+            public static <T extends Collection<Term>> T toTermList(T target,
+                                                                    Iterable<TermWrapper> wrappedCollection) {
+
+                for (TermWrapper termWrapper : wrappedCollection) {
+                    target.add(termWrapper.term());
+                }
+
+                return target;
+            }
         }
-    }
 
     /**
      * Visitor for collecting program locations in a Java block.
@@ -1908,7 +1824,7 @@ public class MergeRuleUtils {
      * @author Dominic Scheurer
      */
     private static class CollectLocationVariablesVisitorHashSet extends JavaASTVisitor {
-        private HashSet<LocationVariable> variables = new HashSet<LocationVariable>();
+        private final HashSet<LocationVariable> variables = new HashSet<>();
 
         public CollectLocationVariablesVisitorHashSet(ProgramElement root, Services services) {
             super(root, services);
@@ -1937,19 +1853,19 @@ public class MergeRuleUtils {
     /**
      * Map for renaming variables to their branch-unique names. Putting things into this map has
      * absolutely no effect; the get method just relies on the
-     * {@link LocationVariable#getBranchUniqueName()} method of the respective location variable.
+     * {@link #getBranchUniqueLocVar} method.
      * Therefore, this map is also a singleton object.
      *
      * @author Dominic Scheurer
      */
     private static class LocVarReplBranchUniqueMap
-            extends HashMap<ProgramVariable, ProgramVariable> {
+            extends HashMap<LocationVariable, LocationVariable> {
         private static final long serialVersionUID = 2305410114265133879L;
 
         private final Node node;
         private final ImmutableSet<LocationVariable> doNotRename;
-        private final HashMap<LocationVariable, ProgramVariable> cache =
-            new HashMap<LocationVariable, ProgramVariable>();
+        private final HashMap<LocationVariable, LocationVariable> cache =
+            new HashMap<>();
 
         public LocVarReplBranchUniqueMap(Node goal, ImmutableSet<LocationVariable> doNotRename) {
             this.node = goal;
@@ -1972,9 +1888,8 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public ProgramVariable get(Object key) {
-            if (key instanceof LocationVariable) {
-                LocationVariable var = (LocationVariable) key;
+        public LocationVariable get(Object key) {
+            if (key instanceof LocationVariable var) {
 
                 if (doNotRename.contains(var)) {
                     return var;
@@ -1984,7 +1899,7 @@ public class MergeRuleUtils {
                     return cache.get(var);
                 }
 
-                final ProgramVariable result = getBranchUniqueLocVar(var, node);
+                final LocationVariable result = getBranchUniqueLocVar(var, node);
                 cache.put(var, result);
 
                 return result;
@@ -1994,27 +1909,27 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public ProgramVariable put(ProgramVariable key, ProgramVariable value) {
+        public LocationVariable put(LocationVariable key, LocationVariable value) {
             return null;
         }
 
         @Override
-        public ProgramVariable remove(Object key) {
+        public LocationVariable remove(Object key) {
             return null;
         }
 
         @Override
-        public Set<ProgramVariable> keySet() {
+        public Set<LocationVariable> keySet() {
             return null;
         }
 
         @Override
-        public Collection<ProgramVariable> values() {
+        public Collection<LocationVariable> values() {
             return null;
         }
 
         @Override
-        public Set<java.util.Map.Entry<ProgramVariable, ProgramVariable>> entrySet() {
+        public Set<java.util.Map.Entry<LocationVariable, LocationVariable>> entrySet() {
             return null;
         }
     }

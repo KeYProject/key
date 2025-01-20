@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call StaticContractTest.mainConstructor()&gt;" pathCondition="true" pathConditionChanged="false">
-      <statement name="IntWrapper w = new IntWrapper (42);" pathCondition="true" pathConditionChanged="false">
+      <statement name="IntWrapper w = new IntWrapper(42);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="self = new IntWrapper(42) catch(exc_0)
-post: (self.value = 42
+post:   (self.value = 42
 &amp; self.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
 &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs

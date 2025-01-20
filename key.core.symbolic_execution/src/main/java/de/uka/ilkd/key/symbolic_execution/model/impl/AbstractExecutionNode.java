@@ -1,14 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
@@ -20,16 +18,14 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicLayoutExtractor;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLink;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * Provides a basic implementation of {@link IExecutionNode}.
@@ -46,7 +42,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     /**
      * Contains all child {@link IExecutionNode}s.
      */
-    private final List<IExecutionNode<?>> children = new LinkedList<IExecutionNode<?>>();
+    private final List<IExecutionNode<?>> children = new LinkedList<>();
 
     /**
      * The contained call stack.
@@ -67,7 +63,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * The variable value pairs of the current state under given conditions.
      */
     private final Map<Term, IExecutionVariable[]> conditionalVariables =
-        new HashMap<Term, IExecutionVariable[]>();
+        new HashMap<>();
 
     /**
      * The used {@link ExecutionNodeSymbolicLayoutExtractor}.
@@ -88,13 +84,13 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * The already computed block completion conditions.
      */
     private final Map<IExecutionBlockStartNode<?>, Term> blockCompletionConditions =
-        new HashMap<IExecutionBlockStartNode<?>, Term>();
+        new HashMap<>();
 
     /**
-     * The already computed human readable block completion conditions.
+     * The already computed human-readable block completion conditions.
      */
-    private final Map<IExecutionBlockStartNode<?>, String> formatedBlockCompletionConditions =
-        new HashMap<IExecutionBlockStartNode<?>, String>();
+    private final Map<IExecutionBlockStartNode<?>, String> formattedBlockCompletionConditions =
+        new HashMap<>();
 
     /**
      * The up to know discovered outgoing links.
@@ -139,7 +135,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      */
     @Override
     public AbstractExecutionNode<?>[] getChildren() {
-        return children.toArray(new AbstractExecutionNode[children.size()]);
+        return children.toArray(new AbstractExecutionNode[0]);
     }
 
     /**
@@ -428,7 +424,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
         if (completedBlock != null && completedBlocks.contains(completedBlock)) {
             completedBlocks = completedBlocks.removeAll(completedBlock);
             blockCompletionConditions.remove(completedBlock);
-            formatedBlockCompletionConditions.remove(completedBlock);
+            formattedBlockCompletionConditions.remove(completedBlock);
         }
     }
 
@@ -451,7 +447,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     @Override
     public String getFormatedBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode)
             throws ProofInputException {
-        String result = formatedBlockCompletionConditions.get(completedNode);
+        String result = formattedBlockCompletionConditions.get(completedNode);
         if (result == null) {
             result = (String) lazyComputeBlockCompletionCondition(completedNode, true);
         }
@@ -459,23 +455,23 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     }
 
     /**
-     * Computes the condition lazily when {@link #getBlockCompletionCondition(IExecutionNode)} or
-     * {@link #getFormatedBlockCompletionCondition(IExecutionNode)} is called the first time.
+     * Computes the condition lazily when {@link #getBlockCompletionCondition} or
+     * {@link #getFormatedBlockCompletionCondition} is called the first time.
      *
      * @param completedNode The completed {@link IExecutionNode} for which the condition is
      *        requested.
-     * @param returnFormatedCondition {@code true} formated condition is returned, {@code false}
+     * @param returnFormattedCondition {@code true} formatted condition is returned, {@code false}
      *        {@link Term} is returned.
      * @throws ProofInputException Occurred Exception
      */
     protected Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode,
-            boolean returnFormatedCondition) throws ProofInputException {
+            boolean returnFormattedCondition) throws ProofInputException {
         final InitConfig initConfig = getInitConfig();
         if (initConfig != null && // Otherwise Proof is disposed.
                 completedBlocks.contains(completedNode)) {
             final Services services = initConfig.getServices();
             // Collect branch conditions
-            List<Term> bcs = new LinkedList<Term>();
+            List<Term> bcs = new LinkedList<>();
             AbstractExecutionNode<?> parent = getParent();
             while (parent != null && parent != completedNode) {
                 if (parent instanceof IExecutionBranchCondition) {
@@ -490,16 +486,16 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
             // Add current branch condition to path
             Term condition = services.getTermBuilder().and(bcs);
             // Simplify path condition
-            if (getSettings().isSimplifyConditions()) {
+            if (getSettings().simplifyConditions()) {
                 condition = SymbolicExecutionUtil.simplify(initConfig, getProof(), condition);
             }
             condition = SymbolicExecutionUtil.improveReadability(condition, services);
             // Format path condition
-            String formatedCondition = formatTerm(condition, services);
+            String formattedCondition = formatTerm(condition, services);
             // Update maps
             blockCompletionConditions.put(completedNode, condition);
-            formatedBlockCompletionConditions.put(completedNode, formatedCondition);
-            return returnFormatedCondition ? formatedCondition : condition;
+            formattedBlockCompletionConditions.put(completedNode, formattedCondition);
+            return returnFormattedCondition ? formattedCondition : condition;
         } else {
             return null;
         }
@@ -538,12 +534,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      */
     @Override
     public IExecutionLink getOutgoingLink(final IExecutionNode<?> target) {
-        return CollectionUtil.search(outgoingLinks, new IFilter<IExecutionLink>() {
-            @Override
-            public boolean select(IExecutionLink element) {
-                return element.getTarget() == target;
-            }
-        });
+        return CollectionUtil.search(outgoingLinks, element -> element.getTarget() == target);
     }
 
     /**
@@ -559,12 +550,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      */
     @Override
     public IExecutionLink getIncomingLink(final IExecutionNode<?> source) {
-        return CollectionUtil.search(incomingLinks, new IFilter<IExecutionLink>() {
-            @Override
-            public boolean select(IExecutionLink element) {
-                return element.getSource() == source;
-            }
-        });
+        return CollectionUtil.search(incomingLinks, element -> element.getSource() == source);
     }
 
     /**

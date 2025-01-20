@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call StaticContractTest.mainBooleanResultUnused(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <operationContract name="result_booleanResult = booleanResult(x) catch(exc_0)
-post: result_booleanResult
+post:     result_booleanResult
   = \if (!x = TRUE)  \then (TRUE)  \else (FALSE)
 &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs

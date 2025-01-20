@@ -1,15 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation;
 
 
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NoFindTaclet;
@@ -19,6 +19,9 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Translates a rewrite taclet to a formula.
@@ -32,7 +35,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
     static private final int SUCC = 1;
 
 
-    private static enum TacletSections {
+    private enum TacletSections {
         REPLACE, ADD, ASSUM, FIND;
 
         public Term getDefaultValue(TermServices services) {
@@ -59,13 +62,14 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
         }
         Term add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
-        if (add == null)
+        if (add == null) {
             add = TacletSections.ADD.getDefaultValue(services);
-        if (replace == null)
+        }
+        if (replace == null) {
             replace = TacletSections.REPLACE.getDefaultValue(services);
+        }
 
-        Term term = tb.imp(tb.equals(find, replace), add);
-        return term;
+        return tb.imp(tb.equals(find, replace), add);
     }
 
     /**
@@ -90,37 +94,33 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
         Term add = template.sequent() != null ? translate(template.sequent(), services)
                 : TacletSections.ADD.getDefaultValue(services);
-        if (add == null)
+        if (add == null) {
             add = TacletSections.ADD.getDefaultValue(services);
-        if (replace == null)
+        }
+        if (replace == null) {
             replace = TacletSections.REPLACE.getDefaultValue(services);
+        }
 
         assert polarity == 0 || add == TacletSections.ADD.getDefaultValue(services)
                 : "add() commands not allowed in polarity rules (syntactically forbidden)";
 
-        Term term = tb.imp(translateEquivalence(find, replace, polarity, services), add);
-        return term;
+        return tb.imp(translateEquivalence(find, replace, polarity, services), add);
 
     }
 
     private Term translateEquivalence(Term find, Term replace, int polarity,
             TermServices services) {
         TermBuilder tb = services.getTermBuilder();
-        switch (polarity) {
-        case 0:
-            return tb.equals(find, replace);
-        case 1:
-            return tb.imp(replace, find);
-        case -1:
-            return tb.imp(find, replace);
-        default:
-            throw new IllegalArgumentException();
-        }
+        return switch (polarity) {
+        case 0 -> tb.equals(find, replace);
+        case 1 -> tb.imp(replace, find);
+        case -1 -> tb.imp(find, replace);
+        default -> throw new IllegalArgumentException();
+        };
     }
 
     private Term translateReplaceAndAddSequent(TacletGoalTemplate template, int type,
             TermServices services) {
-
         TermBuilder tb = services.getTermBuilder();
         Sequent replace = null;
         if (template instanceof AntecSuccTacletGoalTemplate) {
@@ -137,8 +137,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
         if (rep == null) {
             rep = TacletSections.REPLACE.getDefaultValue(services);
         }
-        Term term = tb.or(rep, add);
-        return term;
+        return tb.or(rep, add);
     }
 
     /**
@@ -156,10 +155,10 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
                 assum = TacletSections.ASSUM.getDefaultValue(services);
 
         // translate the find pattern.
-        if (taclet instanceof FindTaclet) {
-            FindTaclet findTaclet = (FindTaclet) taclet;
-            if (getFindFromTaclet(findTaclet) != null)
+        if (taclet instanceof FindTaclet findTaclet) {
+            if (getFindFromTaclet(findTaclet) != null) {
                 find = getFindFromTaclet(findTaclet);
+            }
         }
 
         // translate the replace and add patterns of the taclet.
@@ -173,9 +172,8 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
             } else if (taclet instanceof SuccTaclet) {
                 list = list.append(translateReplaceAndAddSequent(template, SUCC, services));
 
-            } else if (taclet instanceof RewriteTaclet) {
-                RewriteTaclet rwTaclet = (RewriteTaclet) taclet;
-                if (rwTaclet.find().sort().equals(Sort.FORMULA)) {
+            } else if (taclet instanceof RewriteTaclet rwTaclet) {
+                if (rwTaclet.find().sort().equals(JavaDLTheory.FORMULA)) {
                     int polarity = getPolarity(rwTaclet);
                     list = list.append(
                         translateReplaceAndAddFormula(template, find, polarity, services));
@@ -209,7 +207,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
     /**
      * Retrieve the "find" Term from a FindTaclet.
-     *
+     * <p>
      * Originally, this simply calls {@link FindTaclet#find()}. Overriding classes may choose to
      * garnish the result with additional information.
      *

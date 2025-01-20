@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po;
 
 import java.util.HashMap;
@@ -37,9 +40,9 @@ public class IFProofObligationVars {
         this.symbExecVars = symbExecVars;
 
         assert symbExecVars != null;
-        infFlowToSymbExecVarsMaps = new HashMap<ProofObligationVars, Map<Term, Term>>();
-        infFlowToSymbExecVarsMaps.put(c1, new HashMap<Term, Term>());
-        infFlowToSymbExecVarsMaps.put(c2, new HashMap<Term, Term>());
+        infFlowToSymbExecVarsMaps = new HashMap<>();
+        infFlowToSymbExecVarsMaps.put(c1, new HashMap<>());
+        infFlowToSymbExecVarsMaps.put(c2, new HashMap<>());
         linkSymbExecVarsToCopies();
     }
 
@@ -63,7 +66,12 @@ public class IFProofObligationVars {
     private void linkStateVarsToCopies(StateVars ifVars, StateVars seVars, Map<Term, Term> map) {
         final Iterator<Term> ifVarsIt = ifVars.termList.iterator();
         for (final Term symbTerm : seVars.termList) {
-            final Term ifTerm = ifVarsIt.next();
+            final Term ifTerm;
+            if (ifVarsIt.hasNext()) {
+                ifTerm = ifVarsIt.next();
+            } else {
+                ifTerm = null;
+            }
             if (symbTerm != null) {
                 map.put(symbTerm, ifTerm);
             }

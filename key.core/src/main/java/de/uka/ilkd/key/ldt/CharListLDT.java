@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ldt;
-
-import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.Expression;
@@ -10,14 +11,16 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.JFunction;
 
-import javax.annotation.Nullable;
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.util.ExtList;
+
+import org.jspecify.annotations.Nullable;
 
 
 public final class CharListLDT extends LDT {
@@ -32,11 +35,11 @@ public final class CharListLDT extends LDT {
     // LexPathOrdering and into CharListNotation!
 
     // functions
-    private final Function clIndexOfChar;
+    private final JFunction clIndexOfChar;
     private final Function clIndexOfCl;
-    private final Function clLastIndexOfChar;
+    private final JFunction clLastIndexOfChar;
     private final Function clLastIndexOfCl;
-    private final Function clReplace;
+    private final JFunction clReplace;
     private final Function clTranslateInt;
     private final Function clRemoveZeros;
     private final Function clHashCode;
@@ -53,7 +56,7 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
     public CharListLDT(TermServices services) {
-        super(NAME, (Sort) services.getNamespaces().sorts().lookup(SeqLDT.NAME), services);
+        super(NAME, services.getNamespaces().sorts().lookup(SeqLDT.NAME), services);
         clIndexOfChar = addFunction(services, "clIndexOfChar");
         clIndexOfCl = addFunction(services, "clIndexOfCl");
         clLastIndexOfChar = addFunction(services, "clLastIndexOfChar");
@@ -74,27 +77,28 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
     private String translateCharTerm(Term t) {
-        char charVal = 0;
-        int intVal = 0;
-        String result = printlastfirst(t.sub(0)).toString();
+        char charVal;
+        int intVal;
+        String result = printLastFirst(t.sub(0)).toString();
         try {
             intVal = Integer.parseInt(result);
             charVal = (char) intVal;
-            if (intVal - charVal != 0)
+            if (intVal - charVal != 0) {
                 throw new NumberFormatException(); // overflow!
+            }
 
         } catch (NumberFormatException ex) {
             throw new ConvertException(result + " is not of type char");
         }
-        return "" + charVal;
+        return String.valueOf(charVal);
     }
 
 
-    private StringBuffer printlastfirst(Term t) {
+    private StringBuffer printLastFirst(Term t) {
         if (t.op().arity() == 0) {
             return new StringBuffer();
         } else {
-            return printlastfirst(t.sub(0)).append(t.op().name().toString());
+            return printLastFirst(t.sub(0)).append(t.op().name().toString());
         }
     }
 
@@ -105,7 +109,7 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
 
-    public Function getClIndexOfChar() {
+    public JFunction getClIndexOfChar() {
         return clIndexOfChar;
     }
 
@@ -115,7 +119,7 @@ public final class CharListLDT extends LDT {
     }
 
 
-    public Function getClLastIndexOfChar() {
+    public JFunction getClLastIndexOfChar() {
         return clLastIndexOfChar;
     }
 
@@ -125,7 +129,7 @@ public final class CharListLDT extends LDT {
     }
 
 
-    public Function getClReplace() {
+    public JFunction getClReplace() {
         return clReplace;
     }
 
@@ -213,7 +217,7 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
+    public JFunction getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
             ExecutionContext ec) {
         assert false;
         return null;
@@ -221,14 +225,14 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public boolean hasLiteralFunction(Function f) {
+    public boolean hasLiteralFunction(JFunction f) {
         return false;
     }
 
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        final StringBuffer result = new StringBuffer("");
+        final StringBuilder result = new StringBuilder();
         Term term = t;
         while (term.op().arity() != 0) {
             result.append(translateCharTerm(term.sub(0)));
@@ -239,20 +243,17 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         assert false;
         return null;
     }
 
-    @Nullable
     @Override
-    public Function getFunctionFor(String operationName, Services services) {
-        switch (operationName) {
+    public @Nullable JFunction getFunctionFor(String operationName, Services services) {
         // This is not very elegant; but seqConcat is actually in the SeqLDT.
-        case "add":
+        if (operationName.equals("add")) {
             return services.getNamespaces().functions().lookup("seqConcat");
-        default:
-            return null;
         }
+        return null;
     }
 }

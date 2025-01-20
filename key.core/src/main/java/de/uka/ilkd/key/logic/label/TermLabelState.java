@@ -1,12 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
+
+import org.key_project.logic.Name;
 
 /**
  * A {@link TermLabelState} is used to share information between participants which manage
@@ -18,7 +22,7 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
  * </ul>
  * <p>
  * Exactly one {@link TermLabelState} instance is created in each
- * {@link Rule#apply(de.uka.ilkd.key.proof.Goal, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.rule.RuleApp)}
+ * {@code Rule.apply(...)}
  * implementation and passed to each performed {@link TermLabelManager} call during rule application
  * and thus passed to the participants.
  *
@@ -29,7 +33,7 @@ public class TermLabelState {
      * Stores for each {@link TermLabel} {@link Name} the state.
      */
     private final Map<Name, Map<Object, Object>> labelStateMap =
-        new HashMap<Name, Map<Object, Object>>();
+        new HashMap<>();
 
     /**
      * Constructor.
@@ -46,11 +50,8 @@ public class TermLabelState {
      */
     public Map<Object, Object> getLabelState(Name termLabelName) {
         synchronized (labelStateMap) {
-            Map<Object, Object> result = labelStateMap.get(termLabelName);
-            if (result == null) {
-                result = new HashMap<Object, Object>();
-                labelStateMap.put(termLabelName, result);
-            }
+            Map<Object, Object> result =
+                labelStateMap.computeIfAbsent(termLabelName, k -> new HashMap<>());
             return result;
         }
     }

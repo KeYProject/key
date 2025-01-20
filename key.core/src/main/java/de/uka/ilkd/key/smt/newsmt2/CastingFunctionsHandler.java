@@ -1,13 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.Properties;
+
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
-import java.util.Properties;
+import org.key_project.logic.sort.Sort;
 
 /**
  * This SMT translation handler takes care of those sort-depending functions f whose return type is
@@ -30,15 +35,15 @@ public class CastingFunctionsHandler implements SMTHandler {
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) {
-        this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet(Sort.ANY, services);
-        this.select = services.getTypeConverter().getHeapLDT().getSelect(Sort.ANY, services);
+        this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet(JavaDLTheory.ANY, services);
+        this.select =
+            services.getTypeConverter().getHeapLDT().getSelect(JavaDLTheory.ANY, services);
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 
     @Override
     public boolean canHandle(Operator op) {
-        if (op instanceof SortDependingFunction) {
-            SortDependingFunction sdf = (SortDependingFunction) op;
+        if (op instanceof SortDependingFunction sdf) {
             return seqGet.isSimilar(sdf) || select.isSimilar(sdf);
         }
         return false;
@@ -53,7 +58,7 @@ public class CastingFunctionsHandler implements SMTHandler {
         trans.introduceSymbol(name);
         SExpr result = trans.handleAsFunctionCall(prefixedName, term);
         Sort dep = sdf.getSortDependingOn();
-        if (dep == Sort.ANY) {
+        if (dep == JavaDLTheory.ANY) {
             return result;
         } else {
             trans.addSort(dep);

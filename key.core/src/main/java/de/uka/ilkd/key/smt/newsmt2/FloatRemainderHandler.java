@@ -1,16 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import org.key_project.logic.sort.Sort;
 
 /**
  * This handler is a fallback handler that introduces a new uninterpreted function symbol with
@@ -25,15 +29,12 @@ public class FloatRemainderHandler implements SMTHandler {
     public final static String PREFIX = "float_";
     private static final String MAP_KEY = "UNKNOWN_FLOAT_THINGS";
 
-    // TODO This flag does not seem to be 100% what it is supposed to. Refactor. MU
-    private boolean enableQuantifiers;
     private Sort floatSort;
     private Sort doubleSort;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) {
-        enableQuantifiers = !HandlerUtil.NO_QUANTIFIERS.get(services);
         floatSort = services.getTypeConverter().getFloatLDT().targetSort();
         doubleSort = services.getTypeConverter().getDoubleLDT().targetSort();
 

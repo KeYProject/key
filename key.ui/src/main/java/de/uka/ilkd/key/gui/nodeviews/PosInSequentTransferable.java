@@ -1,6 +1,6 @@
-/*
- * Created on Apr 17, 2005
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.datatransfer.DataFlavor;
@@ -11,6 +11,9 @@ import java.io.IOException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class in an implementation of the {@link Transferable} interface and allows to transfer a
@@ -23,20 +26,19 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
  * </ul>
  */
 public class PosInSequentTransferable implements Transferable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PosInSequentTransferable.class);
 
     public static DataFlavor POS_IN_SEQUENT_TRANSFER;
     static {
         try {
             POS_IN_SEQUENT_TRANSFER = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType);
         } catch (ClassNotFoundException e) {
-            // POS_IN_SEQUENT_TRANSFER not supported use
-            // string flavor behaviour
-            e.printStackTrace();
+            LOGGER.info("POS_IN_SEQUENT_TRANSFER not supported, using string flavor behaviour", e);
         }
     }
 
     /** the highlighted position in the sequentview to be transferred */
-    private PosInSequent pis;
+    private final PosInSequent pis;
 
     /** the highlighted term as parseable string */
     private String stringSelection;
@@ -52,7 +54,7 @@ public class PosInSequentTransferable implements Transferable {
         this.pis = pis;
         if (!pis.isSequent()) {
             this.stringSelection =
-                ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv).toString();
+                ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv);
         }
     }
 

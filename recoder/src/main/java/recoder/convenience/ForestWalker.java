@@ -1,12 +1,14 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.convenience;
+
+import java.util.List;
 
 import recoder.java.CompilationUnit;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
-
-import java.util.List;
 
 /**
  * Walks all syntax trees from a list of compilation units in depth-first order.
@@ -15,7 +17,7 @@ import java.util.List;
  */
 public class ForestWalker extends AbstractTreeWalker {
 
-    List<CompilationUnit> unitList;
+    final List<CompilationUnit> unitList;
 
     int unitIndex;
 
@@ -39,8 +41,7 @@ public class ForestWalker extends AbstractTreeWalker {
             return next();
         }
         current = stack[--count]; // pop
-        if (current instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement nt = (NonTerminalProgramElement) current;
+        if (current instanceof NonTerminalProgramElement nt) {
             int s = nt.getChildCount();
             if (count + s >= stack.length) {
                 ProgramElement[] newStack =
@@ -56,10 +57,9 @@ public class ForestWalker extends AbstractTreeWalker {
     }
 
     public boolean equals(Object x) {
-        if (!(x instanceof ForestWalker)) {
+        if (!(x instanceof ForestWalker fw)) {
             return false;
         }
-        ForestWalker fw = (ForestWalker) x;
         if (!super.equals(x)) {
             return false;
         }

@@ -1,12 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.MapUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -25,6 +24,10 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.MapUtil;
+
 /**
  * Standard implementation of the LoopInvariant interface.
  */
@@ -42,9 +45,13 @@ public final class LoopSpecImpl implements LoopSpecification {
      */
     private final Map<LocationVariable, Term> originalFreeInvariants;
     /**
-     * The original modifies terms for each heap.
+     * The original modifiable terms for each heap.
      */
-    private final Map<LocationVariable, Term> originalModifies;
+    private final Map<LocationVariable, Term> originalModifiable;
+    /**
+     * The original free modifiable terms for each heap.
+     */
+    private final Map<LocationVariable, Term> originalFreeModifiable;
     /**
      * The original information flow specification element lists for each heap.
      */
@@ -70,7 +77,8 @@ public final class LoopSpecImpl implements LoopSpecification {
      * @param kjt the type of the class containing the method.
      * @param invariants the invariant formula for each heap.
      * @param freeInvariants the free invariant formula for each heap.
-     * @param modifies the modifies clause for each heap.
+     * @param modifiable the modifiable clause for each heap.
+     * @param freeModifiable the free modifiable clause for each heap.
      * @param infFlowSpecs low variables for information flow.
      * @param variant the variant term.
      * @param selfTerm the term used for the receiver object.
@@ -80,30 +88,33 @@ public final class LoopSpecImpl implements LoopSpecification {
      */
     public LoopSpecImpl(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt,
             Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants,
-            Map<LocationVariable, Term> modifies,
+            Map<LocationVariable, Term> modifiable,
+            Map<LocationVariable, Term> freeModifiable,
             Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant,
             Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts,
             Map<LocationVariable, Term> atPres) {
         assert loop != null;
-        // assert modifies != null;
+        // assert modifiable != null;
         // assert heapAtPre != null;
         this.loop = loop;
         this.pm = pm;
         this.kjt = kjt;
         this.originalInvariants =
-            invariants == null ? new LinkedHashMap<LocationVariable, Term>() : invariants;
+            invariants == null ? new LinkedHashMap<>() : invariants;
         this.originalFreeInvariants =
-            freeInvariants == null ? new LinkedHashMap<LocationVariable, Term>() : freeInvariants;
+            freeInvariants == null ? new LinkedHashMap<>() : freeInvariants;
         this.originalVariant = variant;
-        this.originalModifies =
-            modifies == null ? new LinkedHashMap<LocationVariable, Term>() : modifies;
+        this.originalModifiable =
+            modifiable == null ? new LinkedHashMap<>() : modifiable;
+        this.originalFreeModifiable =
+            freeModifiable == null ? new LinkedHashMap<>() : freeModifiable;
         this.originalInfFlowSpecs =
-            infFlowSpecs == null ? new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>()
+            infFlowSpecs == null ? new LinkedHashMap<>()
                     : infFlowSpecs;
         this.originalSelfTerm = selfTerm;
         this.localIns = localIns;
         this.localOuts = localOuts;
-        this.originalAtPres = atPres == null ? new LinkedHashMap<LocationVariable, Term>() : atPres;
+        this.originalAtPres = atPres == null ? new LinkedHashMap<>() : atPres;
     }
 
     /**
@@ -117,7 +128,7 @@ public final class LoopSpecImpl implements LoopSpecification {
      */
     public LoopSpecImpl(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt, Term selfTerm,
             Map<LocationVariable, Term> atPres) {
-        this(loop, pm, kjt, null, null, null, null, null, selfTerm, null, null, atPres);
+        this(loop, pm, kjt, null, null, null, null, null, null, selfTerm, null, null, atPres);
     }
 
     // -------------------------------------------------------------------------
@@ -125,8 +136,8 @@ public final class LoopSpecImpl implements LoopSpecification {
     // -------------------------------------------------------------------------
 
     private Map /* Operator, Operator, Term -> Term */<Term, Term> getReplaceMap(Term selfTerm,
-            Map<LocationVariable, Term> atPres, Services services) {
-        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
+            Map<LocationVariable, Term> atPres) {
+        final Map<Term, Term> result = new LinkedHashMap<>();
 
         // self
         if (selfTerm != null) {
@@ -157,8 +168,8 @@ public final class LoopSpecImpl implements LoopSpecification {
 
     private Map<Term, Term> getInverseReplaceMap(Term selfTerm, Map<LocationVariable, Term> atPres,
             Services services) {
-        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
-        final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
+        final Map<Term, Term> result = new LinkedHashMap<>();
+        final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres);
         for (Map.Entry<Term, Term> next : replaceMap.entrySet()) {
             result.put(next.getValue(), next.getKey());
         }
@@ -175,8 +186,11 @@ public final class LoopSpecImpl implements LoopSpecification {
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newFreeInvariants = originalFreeInvariants.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<LocationVariable, Term> newModifies = originalModifies.entrySet().stream()
+        Map<LocationVariable, Term> newModifiable = originalModifiable.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newFreeModifiable =
+            originalFreeModifiable.entrySet().stream().collect(
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, ImmutableList<InfFlowSpec>> newInfFlowSpecs =
             originalInfFlowSpecs.entrySet().stream()
                     .collect(MapUtil.collector(Map.Entry::getKey, entry -> entry.getValue().stream()
@@ -190,8 +204,9 @@ public final class LoopSpecImpl implements LoopSpecification {
         Map<LocationVariable, Term> newAtPres = originalAtPres.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
 
-        return new LoopSpecImpl(loop, pm, kjt, newInvariants, newFreeInvariants, newModifies,
-            newInfFlowSpecs, newVariant, newSelfTerm, newLocalIns, newLocalOuts, newAtPres);
+        return new LoopSpecImpl(loop, pm, kjt, newInvariants, newFreeInvariants, newModifiable,
+            newFreeModifiable, newInfFlowSpecs, newVariant, newSelfTerm, newLocalIns, newLocalOuts,
+            newAtPres);
     }
 
     @Override
@@ -203,7 +218,7 @@ public final class LoopSpecImpl implements LoopSpecification {
     public Term getInvariant(LocationVariable heap, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
+        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
         return or.replace(originalInvariants.get(heap));
     }
@@ -217,7 +232,7 @@ public final class LoopSpecImpl implements LoopSpecification {
     public Term getFreeInvariant(LocationVariable heap, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
+        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
         return or.replace(originalFreeInvariants.get(heap));
     }
@@ -228,28 +243,43 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
-    public Term getModifies(LocationVariable heap, Term selfTerm,
+    public Term getModifiable(LocationVariable heap, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
+        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return or.replace(originalModifies.get(heap));
+        return or.replace(originalModifiable.get(heap));
     }
 
     @Override
-    public Term getModifies(Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
+    public Term getModifiable(Term selfTerm, Map<LocationVariable, Term> atPres,
+            Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
+        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return or.replace(originalModifies.get(baseHeap));
+        return or.replace(originalModifiable.get(baseHeap));
+    }
+
+    @Override
+    public Term getFreeModifiable(LocationVariable heap, Term selfTerm,
+            Map<LocationVariable, Term> atPres, Services services) {
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres);
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
+        final Term originalFreeModForHeap = originalFreeModifiable.get(heap);
+        if (originalFreeModForHeap != null) {
+            return or.replace(originalFreeModForHeap);
+        } else {
+            return services.getTermBuilder().strictlyNothing();
+        }
     }
 
     @Override
     public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
+        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
         return or.replaceInfFlowSpec(originalInfFlowSpecs.get(heap));
     }
@@ -268,7 +298,7 @@ public final class LoopSpecImpl implements LoopSpecification {
     @Override
     public Term getVariant(Term selfTerm, Map<LocationVariable, Term> atPres, Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
+        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres);
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
         return or.replace(originalVariant);
     }
@@ -289,8 +319,13 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
-    public Map<LocationVariable, Term> getInternalModifies() {
-        return originalModifies;
+    public Map<LocationVariable, Term> getInternalModifiable() {
+        return originalModifiable;
+    }
+
+    @Override
+    public Map<LocationVariable, Term> getInternalFreeModifiable() {
+        return originalFreeModifiable;
     }
 
     @Override
@@ -304,68 +339,70 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
-    public Term getModifies() {
-        return originalModifies.values().iterator().next();
+    public Term getModifiable() {
+        return originalModifiable.values().iterator().next();
     }
 
     @Override
     public Map<LocationVariable, Term> getInternalAtPres() {
-        Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
         // for(LocationVariable h : originalAtPres.keySet()) {
         // result.put(h, originalAtPres.get(h));
         // }
-        result.putAll(originalAtPres);
+        Map<LocationVariable, Term> result = new LinkedHashMap<>(originalAtPres);
         return result;
     }
 
     @Override
     public LoopSpecification create(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt,
             Map<LocationVariable, Term> invariants, Map<LocationVariable, Term> freeInvariants,
-            Map<LocationVariable, Term> modifies,
+            Map<LocationVariable, Term> modifiable,
+            Map<LocationVariable, Term> freeModifiable,
             Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant,
             Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts,
             Map<LocationVariable, Term> atPres) {
-        return new LoopSpecImpl(loop, pm, kjt, invariants, freeInvariants, modifies, infFlowSpecs,
-            variant, selfTerm, localIns, localOuts, atPres);
+        return new LoopSpecImpl(loop, pm, kjt, invariants, freeInvariants, modifiable,
+            freeModifiable, infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);
     }
 
     @Override
     public LoopSpecification create(LoopStatement loop, Map<LocationVariable, Term> invariants,
-            Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifies,
+            Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifiable,
+            Map<LocationVariable, Term> freeModifiable,
             Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant,
             Term selfTerm, ImmutableList<Term> localIns, ImmutableList<Term> localOuts,
             Map<LocationVariable, Term> atPres) {
-        return create(loop, pm, kjt, invariants, freeInvariants, modifies, infFlowSpecs, variant,
-            selfTerm, localIns, localOuts, atPres);
+        return create(loop, pm, kjt, invariants, freeInvariants, modifiable, freeModifiable,
+            infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);
     }
 
     @Override
     public LoopSpecification instantiate(Map<LocationVariable, Term> invariants,
             Map<LocationVariable, Term> freeInvariants, Term variant) {
-        return configurate(invariants, freeInvariants, originalModifies, originalInfFlowSpecs,
-            variant);
+        return configurate(invariants, freeInvariants, originalModifiable, originalFreeModifiable,
+            originalInfFlowSpecs, variant);
     }
 
     @Override
     public LoopSpecification configurate(Map<LocationVariable, Term> invariants,
-            Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifies,
+            Map<LocationVariable, Term> freeInvariants, Map<LocationVariable, Term> modifiable,
+            Map<LocationVariable, Term> freeModifiable,
             Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, Term variant) {
-        return create(loop, invariants, freeInvariants, modifies, infFlowSpecs, variant,
-            originalSelfTerm, localIns, localOuts, originalAtPres);
+        return create(loop, invariants, freeInvariants, modifiable, freeModifiable, infFlowSpecs,
+            variant, originalSelfTerm, localIns, localOuts, originalAtPres);
     }
 
     @Override
     public LoopSpecification setLoop(LoopStatement loop) {
         return new LoopSpecImpl(loop, pm, kjt, originalInvariants, originalFreeInvariants,
-            originalModifies, originalInfFlowSpecs, originalVariant, originalSelfTerm, localIns,
-            localOuts, originalAtPres);
+            originalModifiable, originalFreeModifiable, originalInfFlowSpecs, originalVariant,
+            originalSelfTerm, localIns, localOuts, originalAtPres);
     }
 
     @Override
     public LoopSpecification setTarget(IProgramMethod newPM) {
         return new LoopSpecImpl(loop, newPM, kjt, originalInvariants, originalFreeInvariants,
-            originalModifies, originalInfFlowSpecs, originalVariant, originalSelfTerm, localIns,
-            localOuts, originalAtPres);
+            originalModifiable, originalFreeModifiable, originalInfFlowSpecs, originalVariant,
+            originalSelfTerm, localIns, localOuts, originalAtPres);
     }
 
     @Override
@@ -377,18 +414,18 @@ public final class LoopSpecImpl implements LoopSpecification {
         OpReplacer or =
             new OpReplacer(inverseReplaceMap, services.getTermFactory(), services.getProof());
 
-        Map<LocationVariable, Term> newInvariants = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> newInvariants = new LinkedHashMap<>();
         for (LocationVariable heap : invariants.keySet()) {
             newInvariants.put(heap, or.replace(invariants.get(heap)));
         }
 
-        Map<LocationVariable, Term> newFreeInvariants = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> newFreeInvariants = new LinkedHashMap<>();
         for (LocationVariable heap : freeInvariants.keySet()) {
             newFreeInvariants.put(heap, or.replace(freeInvariants.get(heap)));
         }
-        return new LoopSpecImpl(loop, pm, kjt, newInvariants, newFreeInvariants, originalModifies,
-            originalInfFlowSpecs, originalVariant, originalSelfTerm, localIns, localOuts,
-            originalAtPres);
+        return new LoopSpecImpl(loop, pm, kjt, newInvariants, newFreeInvariants, originalModifiable,
+            originalFreeModifiable, originalInfFlowSpecs, originalVariant, originalSelfTerm,
+            localIns, localOuts, originalAtPres);
     }
 
     @Override
@@ -399,7 +436,7 @@ public final class LoopSpecImpl implements LoopSpecification {
     @Override
     public String toString() {
         return "invariants: " + originalInvariants + "free invariants: " + originalFreeInvariants
-            + "; modifies: " + originalModifies + "; information flow specification: "
+            + "; modifiable: " + originalModifiable + "; information flow specification: "
             + originalInfFlowSpecs + "; variant: " + originalVariant + "; input parameters: "
             + localIns + "; output parameters: " + localOuts;
     }
@@ -424,29 +461,29 @@ public final class LoopSpecImpl implements LoopSpecification {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
 
-        String mods = "";
+        StringBuilder mods = new StringBuilder();
         for (LocationVariable h : heapContext) {
-            if (originalModifies.get(h) != null) {
-                String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services,
+            if (originalModifiable.get(h) != null) {
+                String printMods = LogicPrinter.quickPrintTerm(originalModifiable.get(h), services,
                     usePrettyPrinting, useUnicodeSymbols);
-                mods = mods + "\n" + "mod" + (h == baseHeap ? "" : "[" + h + "]") + ": "
-                    + printMods.trim();
+                mods.append("\n").append("mod").append(h == baseHeap ? "" : "[" + h + "]")
+                        .append(": ").append(printMods);
             }
         }
 
-        String invariants = "";
+        StringBuilder invariants = new StringBuilder();
         for (LocationVariable h : heapContext) {
             if (originalInvariants.get(h) != null) {
                 String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services,
                     usePrettyPrinting, useUnicodeSymbols);
-                invariants = invariants + "\n" + "invariant" + (h == baseHeap ? "" : "[" + h + "]")
-                    + ": " + printPosts.trim();
+                invariants.append("\n").append("invariant")
+                        .append(h == baseHeap ? "" : "[" + h + "]").append(": ").append(printPosts);
             }
         }
 
         return invariants + (originalVariant != null
                 ? ";\nvariant: " + LogicPrinter.quickPrintTerm(originalVariant, services,
-                    usePrettyPrinting, useUnicodeSymbols).trim()
+                    usePrettyPrinting, useUnicodeSymbols)
                 : ";") + mods;
     }
 
@@ -473,10 +510,10 @@ public final class LoopSpecImpl implements LoopSpecification {
     @Override
     public String getUniqueName() {
         if (pm != null) {
-            return "Loop Invariant " + getLoop().getStartPosition().getLine() + " "
+            return "Loop Invariant " + getLoop().getStartPosition().line() + " "
                 + getTarget().getUniqueName();
         } else {
-            return "Loop Invariant " + getLoop().getStartPosition().getLine() + " "
+            return "Loop Invariant " + getLoop().getStartPosition().line() + " "
                 + Math.abs(getLoop().hashCode());
         }
     }
@@ -496,21 +533,22 @@ public final class LoopSpecImpl implements LoopSpecification {
     public LoopSpecification setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         return new LoopSpecImpl(loop, (IProgramMethod) newPM, newKJT, originalInvariants,
-            originalFreeInvariants, originalModifies, originalInfFlowSpecs, originalVariant,
-            originalSelfTerm, localIns, localOuts, originalAtPres);
+            originalFreeInvariants, originalModifiable, originalFreeModifiable,
+            originalInfFlowSpecs, originalVariant, originalSelfTerm, localIns,
+            localOuts, originalAtPres);
     }
 
     @Override
     public OriginalVariables getOrigVars() {
-        Map<LocationVariable, ProgramVariable> atPreVars =
-            new LinkedHashMap<LocationVariable, ProgramVariable>();
+        Map<LocationVariable, LocationVariable> atPreVars =
+            new LinkedHashMap<>();
         for (LocationVariable h : originalAtPres.keySet()) {
-            atPreVars.put(h, (ProgramVariable) originalAtPres.get(h).op());
+            atPreVars.put(h, (LocationVariable) originalAtPres.get(h).op());
         }
-        final ProgramVariable self;
+        final LocationVariable self;
         if (this.originalSelfTerm != null
                 && this.originalSelfTerm.op() instanceof ProgramVariable) {
-            self = (ProgramVariable) this.originalSelfTerm.op();
+            self = (LocationVariable) this.originalSelfTerm.op();
         } else if (this.originalSelfTerm != null) {
             self =
                 new LocationVariable(new ProgramElementName(originalSelfTerm.op().toString()), kjt);
@@ -518,7 +556,7 @@ public final class LoopSpecImpl implements LoopSpecification {
             self = null;
         }
         return new OriginalVariables(self, null, null, atPreVars,
-            ImmutableSLList.<ProgramVariable>nil());
+            ImmutableSLList.nil());
     }
 
 }

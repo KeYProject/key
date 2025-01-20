@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Comparator;
@@ -8,16 +11,13 @@ import java.util.TreeSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.Named;
+import org.key_project.logic.SyntaxElement;
 
 public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
@@ -40,7 +40,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     }
 
     private static class ElementaryUpdateWrapper {
-        private UpdateableOperator op;
+        private final UpdateableOperator op;
 
         private Term rhs1;
         private Term rhs2;
@@ -75,26 +75,12 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     }
 
     private TreeMap<UpdateableOperator, ElementaryUpdateWrapper> createMap() {
-        return new TreeMap<UpdateableOperator, ElementaryUpdateWrapper>(
-            new Comparator<UpdateableOperator>() {
-
-                @Override
-                public int compare(UpdateableOperator o1, UpdateableOperator o2) {
-
-                    return o1.name().compareTo(o2.name());
-                }
-            });
+        return new TreeMap<>(
+            Comparator.comparing(Named::name));
     }
 
     private TreeSet<UpdateableOperator> createTree() {
-        return new TreeSet<UpdateableOperator>(new Comparator<UpdateableOperator>() {
-
-            @Override
-            public int compare(UpdateableOperator o1, UpdateableOperator o2) {
-
-                return o1.name().compareTo(o2.name());
-            }
-        });
+        return new TreeSet<>(Comparator.comparing(Named::name));
     }
 
     private void collectSingleTerm(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map,
@@ -117,7 +103,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     private boolean collect(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map,
             Term update, final boolean firstTerm, TermServices services) {
-        LinkedList<Term> updates = new LinkedList<Term>();
+        LinkedList<Term> updates = new LinkedList<>();
         TreeSet<UpdateableOperator> collected = createTree();
         updates.add(update);
         // consider only parallel updates, where each variable occurs only once on
@@ -129,8 +115,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
                 updates.add(next.sub(1));
             } else if (next.op() == UpdateJunctor.SKIP) {
                 return true;
-            } else if (next.op() instanceof ElementaryUpdate) {
-                ElementaryUpdate eu = (ElementaryUpdate) next.op();
+            } else if (next.op() instanceof ElementaryUpdate eu) {
                 if (collected.contains(eu.lhs())) {
                     return false;
                 }
@@ -167,7 +152,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions mc,
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
 

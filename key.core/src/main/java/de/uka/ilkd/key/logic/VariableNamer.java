@@ -1,20 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.ScopeDefiningElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -25,11 +16,8 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposer;
 import de.uka.ilkd.key.proof.Node;
@@ -41,6 +29,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +43,13 @@ import org.slf4j.LoggerFactory;
  * Responsible for program variable naming issues.
  */
 public abstract class VariableNamer implements InstantiationProposer {
+    /**
+     * Separator used for {@link TempIndProgramElementName} instances.
+     * This will separate the name and the index of the "temporary"
+     * program element name.
+     */
+    public static final char TEMP_INDEX_SEPARATOR = '#';
+
     private static final Logger LOGGER = LoggerFactory.getLogger(VariableNamer.class);
 
     // -------------------------------------------------------------------------
@@ -79,10 +80,10 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     protected final Services services;
 
-    protected final HashMap<ProgramVariable, ProgramVariable> map =
-        new LinkedHashMap<ProgramVariable, ProgramVariable>();
-    protected HashMap<ProgramVariable, ProgramVariable> renamingHistory =
-        new LinkedHashMap<ProgramVariable, ProgramVariable>();
+    protected final HashMap<LocationVariable, LocationVariable> map =
+        new LinkedHashMap<>();
+    protected HashMap<LocationVariable, LocationVariable> renamingHistory =
+        new LinkedHashMap<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -122,7 +123,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     }
 
 
-    public HashMap<ProgramVariable, ProgramVariable> getRenamingMap() {
+    public HashMap<LocationVariable, LocationVariable> getRenamingMap() {
         return renamingHistory;
     }
 
@@ -177,9 +178,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     protected int getMaxCounterInGlobals(String basename, Iterable<ProgramElementName> globals) {
         int result = -1;
 
-        Iterator<ProgramElementName> it = globals.iterator();
-        while (it.hasNext()) {
-            ProgramElementName name = it.next();
+        for (ProgramElementName name : globals) {
             BasenameAndIndex bai = getBasenameAndIndex(name);
             if (bai.basename.equals(basename) && bai.index > result) {
                 result = bai.index;
@@ -205,8 +204,7 @@ public abstract class VariableNamer implements InstantiationProposer {
             }
 
             protected void doAction(ProgramElement node) {
-                if (node instanceof ProgramVariable) {
-                    ProgramVariable var = (ProgramVariable) node;
+                if (node instanceof ProgramVariable var) {
                     ProgramElementName name = var.getProgramElementName();
                     if (!(name instanceof TempIndProgramElementName)) {
                         BasenameAndIndex bai = getBasenameAndIndex(name);
@@ -235,9 +233,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * tells whether a name is unique in the passed list of global variables
      */
     protected boolean isUniqueInGlobals(String name, Iterable<ProgramElementName> globals) {
-        Iterator<ProgramElementName> it = globals.iterator();
-        while (it.hasNext()) {
-            ProgramElementName n = it.next();
+        for (ProgramElementName n : globals) {
             if (n.toString().equals(name)) {
                 return false;
             }
@@ -260,8 +256,7 @@ public abstract class VariableNamer implements InstantiationProposer {
             }
 
             protected void doAction(ProgramElement node) {
-                if (node instanceof ProgramVariable) {
-                    ProgramVariable var = (ProgramVariable) node;
+                if (node instanceof ProgramVariable var) {
                     ProgramElementName varname = var.getProgramElementName();
                     if (varname.getProgramName().equals(nameToFind)) {
                         foundIt = true;
@@ -286,27 +281,13 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * creates a Globals object for use with other internal methods
      */
-    protected Iterable<ProgramElementName> wrapGlobals(ImmutableList<? extends Named> globals) {
-        List<ProgramElementName> result = new ArrayList<ProgramElementName>(globals.size());
+    protected Iterable<ProgramElementName> wrapGlobals(Iterable<? extends Named> globals) {
+        List<ProgramElementName> result = new ArrayList<>();
         for (Named named : globals) {
             result.add((ProgramElementName) named.name());
         }
         return result;
     }
-
-
-    /**
-     * creates a Globals object for use with other internal methods
-     */
-    protected Iterable<ProgramElementName> wrapGlobals(ImmutableSet<ProgramVariable> globals) {
-        List<ProgramElementName> result = new ArrayList<ProgramElementName>(globals.size());
-        for (ProgramVariable named : globals) {
-            result.add(named.getProgramElementName());
-        }
-        return result;
-    }
-
-
 
     // -------------------------------------------------------------------------
     // interface: renaming
@@ -322,7 +303,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @param posOfFind the PosInOccurrence of the currently executed program
      * @return the renamed version of the var parameter
      */
-    public abstract ProgramVariable rename(ProgramVariable var, Goal goal,
+    public abstract LocationVariable rename(LocationVariable var, Goal goal,
             PosInOccurrence posOfFind);
 
 
@@ -368,34 +349,42 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     protected ProgramElementName getNameProposalForSchemaVariable(String basename,
             SchemaVariable sv, PosInOccurrence posOfFind, PosInProgram posOfDeclaration,
-            ImmutableList<String> previousProposals) {
+            ImmutableList<String> previousProposals, Services services) {
         ProgramElementName result = null;
 
-        Sort svSort = sv.sort();
-        if (svSort == ProgramSVSort.VARIABLE) {
-            if (basename == null || "".equals(basename)) {
-                basename = DEFAULT_BASENAME;
-            }
-            int cnt =
-                getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
-                        + 1;
+        if (sv instanceof ProgramSV psv) {
+            Sort svSort = psv.sort();
 
-            result = createName(basename, cnt, null);
+            if (svSort == ProgramSVSort.VARIABLE) {
+                if (basename == null || basename.isEmpty()) {
+                    basename = DEFAULT_BASENAME;
+                }
+                int cnt =
+                    getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
+                            + 1;
 
-            // avoid using a previous proposal again
-            if (previousProposals != null) {
-                boolean collision;
-                do {
-                    collision = false;
-                    for (String previousProposal : previousProposals) {
-                        String s = previousProposal;
-                        if (s.equals(result.toString())) {
-                            result = createName(basename, ++cnt, null);
-                            collision = true;
-                            break;
+                Name tmpName = new Name(basename + (cnt == 0 ? "" : "_" + cnt));
+                while (services.getNamespaces().lookupLogicSymbol(tmpName) != null) {
+                    cnt++;
+                    tmpName = new Name(basename + "_" + cnt);
+                }
+
+                result = createName(basename, cnt, null);
+
+                // avoid using a previous proposal again
+                if (previousProposals != null) {
+                    boolean collision;
+                    do {
+                        collision = false;
+                        for (String previousProposal : previousProposals) {
+                            if (previousProposal.equals(result.toString())) {
+                                result = createName(basename, ++cnt, null);
+                                collision = true;
+                                break;
+                            }
                         }
-                    }
-                } while (collision);
+                    } while (collision);
+                }
             }
         }
 
@@ -416,7 +405,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @return the name proposal
      */
     public ProgramElementName getTemporaryNameProposal(String basename) {
-        if (basename == null || "".equals(basename)) {
+        if (basename == null || basename.isEmpty()) {
             basename = DEFAULT_BASENAME;
         }
         int cnt = services.getCounter(TEMPCOUNTER_NAME).getCountPlusPlus();
@@ -471,7 +460,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         // get the proposal
         ProgramElementName name = getNameProposalForSchemaVariable(basename, var,
-            app.posInOccurrence(), posOfDeclaration, previousProposals);
+            app.posInOccurrence(), posOfDeclaration, previousProposals, services);
         return (name == null ? null : name.toString());
     }
 
@@ -490,7 +479,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @param posOfDeclaration the PosInProgram where the name will be declared
      * @return true if the name is unique or if its uniqueness cannot be checked, else false
      */
-    public boolean isUniqueNameForSchemaVariable(String name, SchemaVariable sv,
+    public boolean isUniqueNameForSchemaVariable(String name, ProgramSV sv,
             PosInOccurrence posOfFind, PosInProgram posOfDeclaration) {
         boolean result = true;
 
@@ -522,7 +511,7 @@ public abstract class VariableNamer implements InstantiationProposer {
             Comment[] comments) {
         ProgramElementName result;
 
-        int sepPos = name.lastIndexOf(TempIndProgramElementName.SEPARATOR);
+        int sepPos = name.lastIndexOf(TEMP_INDEX_SEPARATOR);
         if (sepPos > 0) {
             String basename = name.substring(0, sepPos);
             int index = Integer.parseInt(name.substring(sepPos + 1));
@@ -575,6 +564,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     // precondition: sv.sort()==ProgramSVSort.VARIABLE
     public String getSuggestiveNameProposalForProgramVariable(SchemaVariable sv, TacletApp app,
             Services services, ImmutableList<String> previousProposals) {
+
         if (suggestive_off) {
             return getProposal(app, sv, services, null, previousProposals);
         }
@@ -582,7 +572,7 @@ public abstract class VariableNamer implements InstantiationProposer {
         String proposal;
         try {
             Iterator<TacletGoalTemplate> templs = app.taclet().goalTemplates().iterator();
-            RewriteTacletGoalTemplate rwgt = null;
+            RewriteTacletGoalTemplate rwgt;
             String name = "";
             while (templs.hasNext()) {
                 rwgt = (RewriteTacletGoalTemplate) templs.next();
@@ -595,10 +585,9 @@ public abstract class VariableNamer implements InstantiationProposer {
                     if (v.hasInitializer()) {
                         ProgramElement rhs = instantiateExpression(v.getInitializer(),
                             app.instantiations(), services);
-                        name = ProofSaver.printProgramElement(rhs).toString();
+                        name = ProofSaver.printProgramElement(rhs);
                         break;
-                    } else if (c.getStatementAt(1) instanceof CopyAssignment) {
-                        CopyAssignment p2 = (CopyAssignment) c.getStatementAt(1);
+                    } else if (c.getStatementAt(1) instanceof CopyAssignment p2) {
                         Expression lhs = p2.getExpressionAt(0);
                         if (lhs.equals(sv)) {
                             SchemaVariable rhs = (SchemaVariable) p2.getExpressionAt(1);
@@ -609,8 +598,9 @@ public abstract class VariableNamer implements InstantiationProposer {
                 }
 
             }
-            if ("".equals(name))
+            if ("".equals(name)) {
                 throw new Exception();
+            }
             proposal = "[" + name + "]";
         } catch (Exception e) {
             LOGGER.info("", e);
@@ -677,15 +667,14 @@ public abstract class VariableNamer implements InstantiationProposer {
      * temporary indexed ProgramElementName
      */
     private static class TempIndProgramElementName extends IndProgramElementName {
-        static final char SEPARATOR = '#';
-
         TempIndProgramElementName(String basename, int index, NameCreationInfo creationInfo) {
-            super(basename + SEPARATOR + index, basename, index, creationInfo);
+            super(basename + TEMP_INDEX_SEPARATOR + index, basename, index, creationInfo);
         }
 
         TempIndProgramElementName(String basename, int index, NameCreationInfo creationInfo,
                 Comment[] comments) {
-            super(basename + SEPARATOR + index, basename, index, creationInfo, comments);
+            super(basename + TEMP_INDEX_SEPARATOR + index, basename, index, creationInfo,
+                comments);
         }
     }
 
@@ -697,13 +686,13 @@ public abstract class VariableNamer implements InstantiationProposer {
         static final char SEPARATOR = '_';
 
         PermIndProgramElementName(String basename, int index, NameCreationInfo creationInfo) {
-            super(basename + (index == 0 ? "" : SEPARATOR + "" + index), basename, index,
+            super(basename + (index == 0 ? "" : SEPARATOR + String.valueOf(index)), basename, index,
                 creationInfo);
         }
 
         PermIndProgramElementName(String basename, int index, NameCreationInfo creationInfo,
                 Comment[] comments) {
-            super(basename + (index == 0 ? "" : SEPARATOR + "" + index), basename, index,
+            super(basename + (index == 0 ? "" : SEPARATOR + String.valueOf(index)), basename, index,
                 creationInfo, comments);
         }
     }

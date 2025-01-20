@@ -1,14 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
-
-import org.key_project.exploration.ExplorationModeModel;
-import org.key_project.exploration.Icons;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+
+import org.key_project.exploration.ExplorationModeModel;
+import org.key_project.exploration.Icons;
 
 /**
  * Toggles the Exploration Mode.
@@ -40,8 +43,6 @@ public class ToggleExplorationAction extends KeyAction {
                         updateEnable(mainWindow);
                     }
 
-                    @Override
-                    public void selectedNodeChanged(KeYSelectionEvent e) {}
                 });
 
         updateEnable(mainWindow);

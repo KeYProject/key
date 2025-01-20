@@ -1,9 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -13,6 +11,10 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * Default implementation of {@link ISymbolicEquivalenceClass}.
@@ -37,7 +39,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicEquivalenceClass(Services services, IModelSettings settings) {
-        this(services, ImmutableSLList.<Term>nil(), settings);
+        this(services, ImmutableSLList.nil(), settings);
     }
 
     /**
@@ -65,7 +67,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     /**
      * Adds a new {@link Term}.
      *
-     * @param value The new {@link Term} to add.
+     * @param term The new {@link Term} to add.
      */
     public void addTerm(Term term) {
         terms = terms.append(OriginTermLabel.removeOriginLabels(term, services));
@@ -98,22 +100,13 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     public Term getRepresentative() {
         // Prefer null if contained in equivalence class
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        Term nullTerm = CollectionUtil.search(terms, new IFilter<Term>() {
-            @Override
-            public boolean select(Term element) {
-                return element.op() == heapLDT.getNull();
-            }
-        });
+        Term nullTerm = CollectionUtil.search(terms, element -> element.op() == heapLDT.getNull());
         if (nullTerm != null) {
             return nullTerm;
         } else {
             // Prefer terms which are a program variable
-            Term representative = CollectionUtil.search(terms, new IFilter<Term>() {
-                @Override
-                public boolean select(Term element) {
-                    return element.op() instanceof IProgramVariable;
-                }
-            });
+            Term representative =
+                CollectionUtil.search(terms, element -> element.op() instanceof IProgramVariable);
             return representative != null ? representative : // Return term with program variable
                     terms.head(); // Return the first term
         }

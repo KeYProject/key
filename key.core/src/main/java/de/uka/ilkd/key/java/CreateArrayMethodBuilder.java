@@ -1,13 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -47,7 +46,11 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array creation and in
@@ -63,7 +66,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     // as these methods are thought to be only preliminary(we cache some
     // information here)
     private final Map<String, ProgramVariable> cache =
-        new LinkedHashMap<String, ProgramVariable>(3);
+        new LinkedHashMap<>(3);
 
     /**
      * keeps the currently used integer type
@@ -95,8 +98,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *
      * @return the statements which take the next object out of the list of available objects
      */
-    protected List<Statement> createArray(ImmutableList<Field> fields) {
-        LinkedList<Statement> result = new LinkedList<Statement>();
+    private List<Statement> createArray(ImmutableList<Field> fields) {
+        LinkedList<Statement> result = new LinkedList<>();
         ImmutableList<Field> implicitFields = filterImplicitFields(fields);
 
         // declared only in Object so we have to look there
@@ -118,8 +121,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
-    protected ImmutableList<Field> filterField(ImmutableArray<MemberDeclaration> list) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+    private ImmutableList<Field> filterField(ImmutableArray<MemberDeclaration> list) {
+        ImmutableList<Field> result = ImmutableSLList.nil();
         for (int i = list.size() - 1; i >= 0; i--) {
             MemberDeclaration pe = list.get(i);
             if (pe instanceof FieldDeclaration) {
@@ -136,8 +139,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
-    protected final ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+    private ImmutableList<Field> filterField(FieldDeclaration field) {
+        ImmutableList<Field> result = ImmutableSLList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
@@ -151,8 +154,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @param list the IList<Field> from which the implicit ones have to be selected
      * @return a list with all implicit fields found in 'list'
      */
-    protected ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+    private ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
+        ImmutableList<Field> result = ImmutableSLList.nil();
         for (Field aList : list) {
             Field field = aList;
             if (field instanceof ImplicitFieldSpecification) {
@@ -169,7 +172,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @param fields the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
-    protected ProgramVariable find(String name, ImmutableList<Field> fields) {
+    private ProgramVariable find(String name, ImmutableList<Field> fields) {
         for (Field field1 : fields) {
             Field field = field1;
             final ProgramVariable fieldVar = (ProgramVariable) field.getProgramVariable();
@@ -180,7 +183,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         return null;
     }
 
-    protected ProgramVariable findInObjectFields(String name) {
+    private ProgramVariable findInObjectFields(String name) {
         ProgramVariable var = cache.get(name);
         if (var == null && objectType.getJavaType() != null) {
             final ImmutableList<Field> objectFields = filterImplicitFields(
@@ -221,7 +224,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             heapCount);
     }
 
-    protected StatementBlock getCreateArrayBody(TypeReference arrayRef,
+    private StatementBlock getCreateArrayBody(
+            TypeReference arrayRef,
             ProgramVariable paramLength) {
 
 
@@ -230,7 +234,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             declare(new ProgramElementName("newObject"), arrayRef);
         final ProgramVariable newObject =
             (ProgramVariable) local.getVariables().get(0).getProgramVariable();
-        final LinkedList<Statement> body = new LinkedList<Statement>();
+        final LinkedList<Statement> body = new LinkedList<>();
 
         body.addLast(local);
         body.addLast(assign(newObject,
@@ -238,28 +242,31 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                 new ProgramElementName(InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                 arrayRef)));
 
-        body.add(new MethodReference(new ImmutableArray<Expression>(),
+        body.add(new MethodReference(new ImmutableArray<>(),
             new ProgramElementName(CreateArrayMethodBuilder.IMPLICIT_ARRAY_CREATION_HELPER),
             newObject));
 
         body.add(new Return(newObject));
 
-        return new StatementBlock(body.toArray(new Statement[body.size()]));
+        return new StatementBlock(body.toArray(new Statement[0]));
     }
 
     /**
-     * creates the body of method <code>&lt;createArrayHelper(int
-     * paramLength)&gt;</code> therefore it first adds the statements responsible to take the
+     * creates the body of method {@code <createArrayHelper(int
+     * paramLength)>} therefore it first adds the statements responsible to take the
      * correct one out of the list, then the arrays length attribute is set followed by a call to
-     * <code>&lt;prepare&gt;()</code> setting the arrays fields on their default value.
+     * {@code <prepare>()} setting the arrays fields on their default value.
      *
-     * @param length the final public ProgramVariable <code>length</length> of the array
-     * &#64;param fields the IList<Fields> of the current array
-     * &#64;param createTransient a boolean indicating if a transient array has
-     * to be created (this is special to JavaCard)
-     * &#64;param transientType a ProgramVariable identifying the kind of transient
-     * &#64;return the StatementBlock which is the method's body <br></br>
-     *     <code>
+     * @param length the final public ProgramVariable {@code length} of the array
+     * @param fields the ImmutableList with fields of the current array
+     * @param createTransient a boolean indicating if a transient array has
+     *        to be created (this is special to JavaCard)
+     * @param transientType a ProgramVariable identifying the kind of transient
+     * @return the StatementBlock which is the method's body <br>
+     *         </br>
+     *
+     *         <pre>
+     *  {@code
      *  {
      *    this.<nextToCreate> = this.<nextToCreate>.;
      *    this.<initialized> = false;
@@ -269,9 +276,11 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *    this.<initialized> = true;
      *    return this;
      *   }
-     *   </code>
+     *   }
+     *         </pre>
      */
-    protected StatementBlock getCreateArrayHelperBody(ProgramVariable length,
+    private StatementBlock getCreateArrayHelperBody(
+            ProgramVariable length,
             ImmutableList<Field> fields, boolean createTransient, ProgramVariable transientType) {
         assert !createTransient;
 
@@ -279,7 +288,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         final List<Statement> body = createArray(fields);
 
-        body.add(new MethodReference(new ImmutableArray<Expression>(),
+        body.add(new MethodReference(new ImmutableArray<>(),
             new ProgramElementName(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE), null));
 
         body.add(
@@ -288,7 +297,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         body.add(new Return(thisRef));
 
-        return new StatementBlock(body.toArray(new Statement[body.size()]));
+        return new StatementBlock(body.toArray(new Statement[0]));
     }
 
     /**
@@ -339,7 +348,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *
      * @return the default value of the given type according to JLS \S 4.5.5
      */
-    protected Expression getDefaultValue(Type type) {
+    private Expression getDefaultValue(Type type) {
         if (type instanceof PrimitiveType) {
             return type.getDefaultValue();
         }

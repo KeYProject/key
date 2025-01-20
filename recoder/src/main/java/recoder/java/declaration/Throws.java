@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.java.*;
@@ -48,7 +50,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      */
 
     public Throws(TypeReference exception) {
-        exceptions = new ASTArrayList<TypeReference>(1);
+        exceptions = new ASTArrayList<>(1);
         exceptions.add(exception);
         makeParentRoleValid();
     }
@@ -126,8 +128,9 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     public int getChildCount() {
         int result = 0;
-        if (exceptions != null)
+        if (exceptions != null) {
             result += exceptions.size();
+        }
         return result;
     }
 
@@ -164,7 +167,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */

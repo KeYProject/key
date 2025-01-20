@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 /**
@@ -8,14 +11,14 @@ package de.uka.ilkd.key.proof;
 public final class FormulaTag {
 
     static int counter = 0;
-    int i;
+    final int i;
 
     FormulaTag() {
         i = counter++;
     }
 
     public String toString() {
-        return "" + i;
+        return String.valueOf(i);
     }
 
 }

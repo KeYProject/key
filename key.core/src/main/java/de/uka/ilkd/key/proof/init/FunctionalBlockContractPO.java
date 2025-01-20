@@ -1,13 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -15,30 +13,25 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
-import de.uka.ilkd.key.speclang.AuxiliaryContract;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.FunctionalBlockContract;
-import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.SpecificationElement;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * A proof obligation for a {@link FunctionalBlockContract}.
@@ -50,8 +43,8 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     /**
      * Transaction tags.
      */
-    private static final Map<Boolean, String> TRANSACTION_TAGS =
-        new LinkedHashMap<Boolean, String>();
+    public static final Map<Boolean, String> TRANSACTION_TAGS =
+        new LinkedHashMap<>();
 
     static {
         TRANSACTION_TAGS.put(false, "transaction_inactive");
@@ -61,7 +54,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     /**
      * The contract from which this PO is generated.
      */
-    private FunctionalBlockContract contract;
+    private final FunctionalBlockContract contract;
 
     /**
      * The initial proof configuration.
@@ -79,56 +72,21 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     }
 
     /**
-     * Instantiates a new proof obligation with the given settings.
      *
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     * @throws IOException Occurred Exception.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
-            throws IOException {
-        String contractName = properties.getProperty("contract");
-        int proofNum = 0;
-        String baseContractName = null;
-        int ind = -1;
-        for (String tag : FunctionalBlockContractPO.TRANSACTION_TAGS.values()) {
-            ind = contractName.indexOf("." + tag);
-            if (ind > 0) {
-                break;
-            }
-            proofNum++;
-        }
-        if (ind == -1) {
-            baseContractName = contractName;
-            proofNum = 0;
-        } else {
-            baseContractName = contractName.substring(0, ind);
-        }
-        final Contract contract = initConfig.getServices().getSpecificationRepository()
-                .getContractByName(baseContractName);
-        if (contract == null) {
-            throw new RuntimeException("Contract not found: " + baseContractName);
-        } else {
-            ProofOblInput po = contract.createProofObl(initConfig);
-            return new LoadedPOContainer(po, proofNum);
-        }
-    }
-
-    /**
-     *
-     * @param localOuts a set of variables.
+     * @param localOutVariables a set of variables.
      * @param services services.
+     * @param tb the TermBuilder to be used
      * @return an anonymizing update for the specified variables.
      */
-    private static Term createLocalAnonUpdate(final ImmutableSet<ProgramVariable> localOutVariables,
+    private static Term createLocalAnonUpdate(
+            final ImmutableSet<LocationVariable> localOutVariables,
             final Services services, final TermBuilder tb) {
         Term localAnonUpdate = null;
-        for (ProgramVariable pv : localOutVariables) {
+        for (LocationVariable pv : localOutVariables) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-            final Function anonFunc = new Function(anonFuncName, pv.sort(), true);
+            final JFunction anonFunc = new JFunction(anonFuncName, pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
-            final Term elemUpd = tb.elementary((LocationVariable) pv, tb.func(anonFunc));
+            final Term elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (localAnonUpdate == null) {
                 localAnonUpdate = elemUpd;
             } else {
@@ -145,15 +103,15 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param tb a term builder.
      * @return a map from every heap to an anonymization heap.
      */
-    private static Map<LocationVariable, Function> createAnonInHeaps(
+    private static Map<LocationVariable, JFunction> createAnonInHeaps(
             final List<LocationVariable> heaps, final Services services, final TermBuilder tb) {
-        Map<LocationVariable, Function> anonHeaps =
-            new LinkedHashMap<LocationVariable, Function>(40);
+        Map<LocationVariable, JFunction> anonHeaps =
+            new LinkedHashMap<>(40);
         for (LocationVariable heap : heaps) {
             final String anonymisationName =
                 tb.newName(AuxiliaryContractBuilders.ANON_IN_PREFIX + heap.name());
-            final Function anonymisationFunction =
-                new Function(new Name(anonymisationName), heap.sort(), true);
+            final JFunction anonymisationFunction =
+                new JFunction(new Name(anonymisationName), heap.sort(), true);
             services.getNamespaces().functions().addSafely(anonymisationFunction);
             anonHeaps.put(heap, anonymisationFunction);
         }
@@ -167,17 +125,17 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param tb a term builder.
      * @return a map from every heap to an anonymization heap.
      */
-    private static Map<LocationVariable, Function> createAnonOutHeaps(
+    private static Map<LocationVariable, JFunction> createAnonOutHeaps(
             final List<LocationVariable> heaps, final FunctionalBlockContract contract,
             final Services services, final TermBuilder tb) {
-        Map<LocationVariable, Function> anonOutHeaps =
-            new LinkedHashMap<LocationVariable, Function>(40);
+        Map<LocationVariable, JFunction> anonOutHeaps =
+            new LinkedHashMap<>(40);
         for (LocationVariable heap : heaps) {
-            if (contract.hasModifiesClause(heap)) {
+            if (contract.hasModifiableClause(heap)) {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + heap.name());
-                final Function anonymisationFunction =
-                    new Function(new Name(anonymisationName), heap.sort(), true);
+                final JFunction anonymisationFunction =
+                    new JFunction(new Name(anonymisationName), heap.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 anonOutHeaps.put(heap, anonymisationFunction);
             }
@@ -194,7 +152,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @return the updates.
      */
     private static Term[] createUpdates(final BlockContract.Variables variables,
-            final List<LocationVariable> heaps, Map<LocationVariable, Function> anonHeaps,
+            final List<LocationVariable> heaps, Map<LocationVariable, JFunction> anonHeaps,
             final Services services) {
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
@@ -210,11 +168,14 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      */
     private static Term[] createPostconditions(
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
-        final Map<LocationVariable, Term> modifiesClauses =
-            conditionsAndClausesBuilder.buildModifiesClauses();
+        final Map<LocationVariable, Term> modifiableClauses =
+            conditionsAndClausesBuilder.buildModifiableClauses();
+        final Map<LocationVariable, Term> freeModifiableClauses =
+            conditionsAndClausesBuilder.buildModifiableClauses();
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term frameCondition =
-            conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
+            conditionsAndClausesBuilder.buildFrameCondition(
+                modifiableClauses, freeModifiableClauses);
         return new Term[] { postcondition, frameCondition };
     }
 
@@ -224,7 +185,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param anonHeaps the heaps used in the anonIn update.
      * @param anonOutHeaps the heaps used in the anonOut update.
      * @param localInVariables the free local variables in the block.
-     * @param localOutVariables the free local variables modified by the block.
+     * @param localOutVariables the free local variables modifiable by the block.
      * @param exceptionParameter the exception variable.
      * @param assumptions the preconditions.
      * @param postconditions the postconditions.
@@ -237,9 +198,10 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @return the validity formula for the contract.
      */
     private static Term setUpValidityTerm(final List<LocationVariable> heaps,
-            Map<LocationVariable, Function> anonHeaps, Map<LocationVariable, Function> anonOutHeaps,
-            final ImmutableSet<ProgramVariable> localInVariables,
-            final ImmutableSet<ProgramVariable> localOutVariables,
+            Map<LocationVariable, JFunction> anonHeaps,
+            Map<LocationVariable, JFunction> anonOutHeaps,
+            final ImmutableSet<LocationVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localOutVariables,
             final ProgramVariable exceptionParameter, final Term[] assumptions,
             final Term[] postconditions, final Term[] updates, final BlockContract bc,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
@@ -261,7 +223,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param heaps the heaps.
      * @param anonOutHeaps the heaps used in the anonOut update.
      * @param localInVariables the free local variables in the block.
-     * @param localOutVariables the free local variables modified by the block.
+     * @param localOutVariables the free local variables modifiable by the block.
      * @param bc the contract being applied.
      * @param configurator a goal configurator
      * @param services services.
@@ -269,9 +231,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @return the conjunction of the well-definedness formula and the validity formula.
      */
     private static Term addWdToValidityTerm(Term validity, final Term[] updates,
-            final List<LocationVariable> heaps, Map<LocationVariable, Function> anonOutHeaps,
-            final ImmutableSet<ProgramVariable> localInVariables,
-            final ImmutableSet<ProgramVariable> localOutVariables, final BlockContract bc,
+            final List<LocationVariable> heaps, Map<LocationVariable, JFunction> anonOutHeaps,
+            final ImmutableSet<LocationVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localOutVariables, final BlockContract bc,
             final GoalsConfigurator configurator, final Services services, final TermBuilder tb) {
         if (WellDefinednessCheck.isOn()) {
             final Term wdUpdate = services.getTermBuilder().parallel(updates[1], updates[2]);
@@ -291,18 +253,18 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     }
 
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
-        super.fillSaveProperties(properties);
-        properties.setProperty("contract", contract.getName());
+    public Configuration createLoaderConfig() {
+        var c = super.createLoaderConfig();
+        c.set("contract", contract.getName());
+        return c;
     }
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof FunctionalBlockContractPO)) {
+        if (!(po instanceof FunctionalBlockContractPO other)) {
             return false;
         }
 
-        FunctionalBlockContractPO other = (FunctionalBlockContractPO) po;
         return contract.equals(other.contract);
     }
 
@@ -323,10 +285,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof FunctionalBlockContractPO)) {
+        if (!(obj instanceof FunctionalBlockContractPO other)) {
             return false;
         }
-        FunctionalBlockContractPO other = (FunctionalBlockContractPO) obj;
         if (contract == null) {
             if (other.contract != null) {
                 return false;
@@ -335,24 +296,21 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             return false;
         }
         if (environmentConfig == null) {
-            if (other.environmentConfig != null) {
-                return false;
-            }
-        } else if (!environmentConfig.equals(other.environmentConfig)) {
-            return false;
+            return other.environmentConfig == null;
+        } else {
+            return environmentConfig.equals(other.environmentConfig);
         }
-        return true;
     }
 
     @Override
-    public void readProblem() throws ProofInputException {
+    public void readProblem() {
         assert proofConfig == null;
         final boolean makeNamesUnique = true;
         final Services services = postInit();
         final IProgramMethod pm = getProgramMethod();
 
         final StatementBlock block = getBlock();
-        final ProgramVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
+        final LocationVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
         register(selfVar, services);
         final Term selfTerm = selfVar == null ? null : tb.var(selfVar);
 
@@ -363,13 +321,13 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
                 false);
         }
 
-        final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
-        final ImmutableSet<ProgramVariable> localInVariables =
+        final List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
+        final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(block, services);
-        final ImmutableSet<ProgramVariable> localOutVariables =
+        final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(block, services);
 
-        Map<LocationVariable, Function> anonOutHeaps =
+        Map<LocationVariable, JFunction> anonOutHeaps =
             createAnonOutHeaps(heaps, contract, services, tb);
         final BlockContract.Variables variables =
             new VariablesCreatorAndRegistrar(null, contract.getPlaceholderVariables(), services)
@@ -388,7 +346,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         final Term[] postconditions = createPostconditions(conditionsAndClausesBuilder);
 
-        Map<LocationVariable, Function> anonHeaps = createAnonInHeaps(heaps, services, tb);
+        Map<LocationVariable, JFunction> anonHeaps = createAnonInHeaps(heaps, services, tb);
 
         final Term[] updates = createUpdates(variables, heaps, anonHeaps, services);
 
@@ -476,8 +434,12 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         final KeYJavaType kjt = getCalleeKeYJavaType();
         final TypeRef typeRef = new TypeRef(new ProgramElementName(kjt.getName()), 0, selfVar, kjt);
         final ExecutionContext ec = new ExecutionContext(typeRef, getProgramMethod(), selfVar);
+        Modality.JavaModalityKind kind = contract.getModalityKind();
+        JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock());
         final Instantiation inst =
-            new Instantiation(tb.skip(), tb.tt(), contract.getModality(), selfTerm, block, ec);
+            new Instantiation(tb.skip(), tb.tt(),
+                Modality.getModality(kind, jb),
+                selfTerm, block, ec);
         return new GoalsConfigurator(null, new TermLabelState(), inst,
             contract.getAuxiliaryContract().getLabels(), variables, null, services, null);
     }
@@ -492,9 +454,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param services services.
      * @return the preconditions.
      */
-    private Term[] createAssumptions(final IProgramMethod pm, final ProgramVariable selfVar,
+    private Term[] createAssumptions(final IProgramMethod pm, final LocationVariable selfVar,
             final List<LocationVariable> heaps,
-            final ImmutableSet<ProgramVariable> localInVariables,
+            final ImmutableSet<LocationVariable> localInVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();

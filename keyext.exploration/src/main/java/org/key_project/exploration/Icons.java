@@ -1,9 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
-import de.uka.ilkd.key.gui.fonticons.*;
-
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.fonticons.*;
 
 /**
  * Icons of the Exploration Extension

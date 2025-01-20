@@ -1,29 +1,34 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
+
+import java.io.IOException;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import de.uka.ilkd.key.util.parsing.BuildingException;
+
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTermParser extends AbstractTestTermParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestTermParser.class);
 
     private Sort elem, list;
-    private Function head, tail, nil, cons, isempty;
+    private JFunction head, tail, nil, cons, isempty;
     private LogicVariable x, y, z, xs, ys;
     private Term t_x, t_y, t_z, t_xs, t_ys;
     private Term t_headxs, t_tailys, t_nil;
@@ -42,13 +47,27 @@ public class TestTermParser extends AbstractTestTermParser {
 
     @BeforeEach
     public void setUp() throws IOException {
-        parseDecls("\\sorts { boolean; elem; list; int; int_sort; numbers;  }\n" + "\\functions {\n"
-            + "  elem head(list);\n" + "  list tail(list);\n" + "  list nil;\n"
-            + "  list cons(elem,list);\n" + "int aa ;\n" + "int bb ;\n" + "int cc ;\n"
-            + "int dd ;\n" + "int ee ;\n" + "}\n" + "\\predicates {\n" + "  isempty(list);\n"
-            + "}\n" + "\\programVariables {int globalIntPV;}"
+        if (lookup_sort("elem") == null) {// check whether declaration have already been parsed
+            parseDecls("""
+                    \\sorts { boolean; elem; list; int; int_sort; numbers;  }
+                    \\functions {
+                      elem head(list);
+                      list tail(list);
+                      list nil;
+                      list cons(elem,list);
+                    int aa ;
+                    int bb ;
+                    int cc ;
+                    int dd ;
+                    int ee ;
+                    }
+                    \\predicates {
+                      isempty(list);
+                    }
+                    \\programVariables {int globalIntPV;}"""
 
-        );
+            );
+        }
 
         elem = lookup_sort("elem");
         list = lookup_sort("list");
@@ -239,7 +258,11 @@ public class TestTermParser extends AbstractTestTermParser {
         Term t4 =
             parseTerm("\\exists int_sort ci; (\\<{ int p_y = 1;" + " {int s = 2;} }\\>" + " true ->"
                 + "\\<{ int p_y = 1;boolean p_x = 2<1;" + "while(p_x){ int s=3 ;} }\\>" + " true)");
-        assertTrue(t3.equalsModRenaming(t4), "Terms should be equalModRenaming");
+        assertTrue(t3.equalsModProperty(t4, RENAMING_TERM_PROPERTY),
+            "Terms should be equalModRenaming");
+        assertEquals(t3.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            t4.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equalModRenaming");
     }
 
     @Test
@@ -341,9 +364,11 @@ public class TestTermParser extends AbstractTestTermParser {
     @Test
     public void testAmbigiousFuncVarPred() {
         // tests bug id 216
-        String s = "\\functions {} \\predicates{mypred(int, int);}"
-            + "\n\\problem {\\forall int x; mypred(x, 0)}\n \\proof {\n" + "(branch \"dummy ID\""
-            + "(opengoal \"  ==> true  -> true \") ) }";
+        String s = """
+                \\functions {} \\predicates{mypred(int, int);}
+                \\problem {\\forall int x; mypred(x, 0)}
+                 \\proof {
+                (branch "dummy ID"(opengoal "  ==> true  -> true ") ) }""";
         try {
             parseProblem(s);
         } catch (Exception re) {

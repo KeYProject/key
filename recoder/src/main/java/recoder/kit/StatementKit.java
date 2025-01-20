@@ -1,6 +1,13 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import recoder.ProgramFactory;
 import recoder.abstraction.Type;
@@ -19,11 +26,6 @@ import recoder.service.ChangeHistory;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class StatementKit {
 
@@ -52,7 +54,7 @@ public class StatementKit {
         Debug.assertNonnull(s);
         StatementContainer con = s.getStatementContainer();
         if (con == null) {
-            ASTList<Statement> result = new ASTArrayList<Statement>();
+            ASTList<Statement> result = new ASTArrayList<>();
             result.add(s);
             return result;
         }
@@ -154,7 +156,7 @@ public class StatementKit {
                 ch.replaced(s, block);
             }
         }
-        block.setBody(new ASTArrayList<Statement>(1));
+        block.setBody(new ASTArrayList<>(1));
         block.getBody().add(s);
         block.makeParentRoleValid();
         return block;
@@ -176,8 +178,7 @@ public class StatementKit {
     public static boolean canSafelyWrapWithStatementBlock(CrossReferenceSourceInfo xr,
             Statement s) {
         Debug.assertNonnull(xr, s);
-        if (s instanceof LocalVariableDeclaration) {
-            LocalVariableDeclaration lvd = (LocalVariableDeclaration) s;
+        if (s instanceof LocalVariableDeclaration lvd) {
             List<? extends VariableSpecification> vsl = lvd.getVariables();
             for (int j = vsl.size() - 1; j >= 0; j -= 1) {
                 Variable v = vsl.get(j);
@@ -299,8 +300,7 @@ public class StatementKit {
         String idText = s.getIdentifier().getText();
         NonTerminalProgramElement parent = s.getASTParent();
         while (parent != null) {
-            if (parent instanceof LabeledStatement) {
-                LabeledStatement lstat = (LabeledStatement) parent;
+            if (parent instanceof LabeledStatement lstat) {
                 if (idText.equals(lstat.getIdentifier().getText())) {
                     return lstat;
                 }
@@ -315,14 +315,14 @@ public class StatementKit {
      * or throw statements, and the body if its exit is reachable. For other members, returns an
      * empty list.
      *
-     * @param m a member declaration.
+     * @param mdecl a member declaration.
      * @param si the SourceInfo service to use.
      * @return a list of statements that finish the member's body after execution.
      * @since 0.72
      */
     public static List<Statement> getExits(MemberDeclaration mdecl, SourceInfo si) {
         Debug.assertNonnull(mdecl, si);
-        List<Statement> result = new ArrayList<Statement>();
+        List<Statement> result = new ArrayList<>();
         StatementBlock body = null;
         if (mdecl instanceof MethodDeclaration) {
             body = ((MethodDeclaration) mdecl).getBody();
@@ -330,7 +330,7 @@ public class StatementKit {
             body = ((ClassInitializer) mdecl).getBody();
         }
         if (body == null) {
-            return new ArrayList<Statement>(0);
+            return new ArrayList<>(0);
         }
         Statement dummyExit = body.getFactory().createEmptyStatement();
         int s = (body.getBody() == null) ? 0 : body.getBody().size();
@@ -374,8 +374,8 @@ public class StatementKit {
                 throw new IllegalArgumentException();
             }
             this.si = si;
-            reached = new HashSet<Statement>();
-            stack = new ArrayList<Statement>();
+            reached = new HashSet<>();
+            stack = new ArrayList<>();
             if (parent instanceof MethodDeclaration) {
                 StatementBlock body = ((MethodDeclaration) parent).getBody();
                 if (body != null) {
@@ -400,8 +400,7 @@ public class StatementKit {
             reached.add(current);
             stack.remove(size - 1);
             successors = si.getSucceedingStatements(current);
-            for (int i = 0, s = successors.size(); i < s; i += 1) {
-                Statement f = successors.get(i);
+            for (Statement f : successors) {
                 if (f != SourceInfo.METHOD_EXIT && !reached.contains(f)) {
                     stack.add(f);
                 }
@@ -439,4 +438,3 @@ public class StatementKit {
     }
 
 }
-

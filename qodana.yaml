@@ -1,0 +1,4 @@
+version: "1.0"
+linter: jetbrains/qodana-jvm-community:2024.2
+profile:
+  path: ./.github/qodana.starter.full.xml

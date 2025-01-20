@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -12,6 +13,10 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
+import org.key_project.util.collection.ImmutableList;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
 /**
@@ -31,7 +36,8 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;
@@ -64,7 +70,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
     }
 
 
-    private class SubFormulaVisitor extends DefaultVisitor {
+    private static class SubFormulaVisitor implements DefaultVisitor {
 
         final Term potentialSub;
 
@@ -78,7 +84,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
         @Override
         public void visit(Term visited) {
-            isSubFormula |= visited.equalsModRenaming(potentialSub);
+            isSubFormula |= visited.equalsModProperty(potentialSub, RENAMING_TERM_PROPERTY);
         }
 
 

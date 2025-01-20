@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 import java.util.Iterator;
@@ -27,8 +30,8 @@ public class NameAbstractionTable {
      */
     public void add(SourceElement pe1, SourceElement pe2) {
         if (declarations0 == null) {
-            declarations0 = new LinkedList<SourceElement>();
-            declarations1 = new LinkedList<SourceElement>();
+            declarations0 = new LinkedList<>();
+            declarations1 = new LinkedList<>();
         }
 
         declarations0.add(0, pe1);

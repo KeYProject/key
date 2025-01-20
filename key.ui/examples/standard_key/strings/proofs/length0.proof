@@ -79,7 +79,7 @@
    (rule "impRight" (formula "3") (userinteraction))
    (rule "lengthCons" (formula "1") (term "0") (userinteraction))
    (rule "andLeft" (formula "2") (userinteraction))
-   (rule "inChar" (formula "2") (userinteraction))
+   (rule "expandInChar" (formula "2") (userinteraction))
    (rule "true_left" (formula "2") (userinteraction))
    (rule "impLeft" (formula "2") (userinteraction))
    (branch " Case 1"

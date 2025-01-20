@@ -1,7 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -9,14 +18,16 @@ import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.rule.RuleSet;
-import org.antlr.v4.runtime.Token;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Immutables;
+
+import org.antlr.v4.runtime.Token;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This visitor evaluates all basic (level 0) declarations. This includes:
@@ -28,7 +39,7 @@ import java.util.Map;
  * <li>Rulesets</li>
  * </ul>
  * <p>
- * These information are registered into the given {@link NamespaceSet}.
+ * This information is registered into the given {@link NamespaceSet}.
  *
  * @author Alexander Weigl
  * @version 1 (12/4/19)
@@ -36,6 +47,7 @@ import java.util.Map;
  */
 public class DeclarationBuilder extends DefaultBuilder {
     private final Map<String, String> category2Default = new HashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeclarationBuilder.class);
 
     public DeclarationBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -44,7 +56,21 @@ public class DeclarationBuilder extends DefaultBuilder {
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
         mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(),
+            ctx.datatype_decls(),
             ctx.prog_var_decls(), ctx.schema_var_decls());
+        return null;
+    }
+
+    @Override
+    public Object visitDatatype_decl(KeYParser.Datatype_declContext ctx) {
+        // boolean freeAdt = ctx.FREE() != null;
+        var name = ctx.name.getText();
+        var doc = ctx.DOC_COMMENT() != null
+                ? ctx.DOC_COMMENT().getText()
+                : null;
+        var origin = BuilderHelpers.getPosition(ctx);
+        var s = new SortImpl(new Name(name), ImmutableSet.empty(), false, doc, origin);
+        sorts().addSafely(s);
         return null;
     }
 
@@ -55,6 +81,10 @@ public class DeclarationBuilder extends DefaultBuilder {
             KeYJavaType kjt = accept(ctx.keyjavatype(i));
             assert varNames != null;
             for (String varName : varNames) {
+                if (varName.equals("null")) {
+                    semanticError(ctx.simple_ident_comma_list(i),
+                        "Function '" + varName + "' is already defined!");
+                }
                 ProgramElementName pvName = new ProgramElementName(varName);
                 Named name = lookup(pvName);
                 if (name != null) {
@@ -117,34 +147,32 @@ public class DeclarationBuilder extends DefaultBuilder {
             Name sortName = new Name(sortId);
 
             ImmutableSet<Sort> ext = sortExt == null ? ImmutableSet.empty()
-                    : DefaultImmutableSet.fromCollection(sortExt);
+                    : Immutables.createSetFrom(sortExt);
             ImmutableSet<Sort> oneOf = sortOneOf == null ? ImmutableSet.empty()
-                    : DefaultImmutableSet.fromCollection(sortOneOf);
+                    : Immutables.createSetFrom(sortOneOf);
 
             // attention: no expand to java.lang here!
-            if (sorts().lookup(sortName) == null) {
+            Sort existingSort = sorts().lookup(sortName);
+            if (existingSort == null) {
                 Sort s = null;
                 if (isGenericSort) {
                     try {
-                        var gs = new GenericSort(sortName, ext, oneOf);
-                        gs.setDocumentation(documentation);
-                        gs.setOrigin(BuilderHelpers.getPosition(idCtx));
+                        var gs = new GenericSort(sortName, ext, oneOf, documentation,
+                            BuilderHelpers.getPosition(idCtx));
                         s = gs;
                     } catch (GenericSupersortException e) {
                         semanticError(ctx, "Illegal sort given");
                     }
                 } else if (new Name("any").equals(sortName)) {
-                    s = Sort.ANY;
+                    s = JavaDLTheory.ANY;
                 } else {
                     if (isProxySort) {
-                        var ps = new ProxySort(sortName, ext);
-                        ps.setDocumentation(documentation);
-                        ps.setOrigin(BuilderHelpers.getPosition(idCtx));
+                        var ps = new ProxySort(sortName, ext, documentation,
+                            BuilderHelpers.getPosition(idCtx));
                         s = ps;
                     } else {
-                        var si = new SortImpl(sortName, ext, isAbstractSort);
-                        si.setDocumentation(documentation);
-                        si.setOrigin(BuilderHelpers.getPosition(idCtx));
+                        var si = new SortImpl(sortName, ext, isAbstractSort,
+                            documentation, BuilderHelpers.getPosition(idCtx));
                         s = si;
                     }
                 }
@@ -152,7 +180,12 @@ public class DeclarationBuilder extends DefaultBuilder {
                 sorts().add(s);
                 createdSorts.add(s);
             } else {
-                addWarning(ctx, "Sort declaration is ignored, due to collision.");
+                // weigl: agreement on KaKeY meeting: this should be ignored until we finally have
+                // local namespaces for generic sorts
+                // addWarning(ctx, "Sort declaration is ignored, due to collision.");
+                LOGGER.debug("Sort declaration of {} in {} is ignored due to collision (already "
+                    + "present in {}).", sortName, BuilderHelpers.getPosition(ctx),
+                    existingSort.getOrigin());
             }
         }
         return createdSorts;

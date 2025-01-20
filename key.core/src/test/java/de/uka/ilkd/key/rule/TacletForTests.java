@@ -1,18 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
+
+import java.io.File;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -21,9 +24,11 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.key_project.util.collection.ImmutableSLList;
 
-import java.io.File;
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -51,12 +56,12 @@ public class TacletForTests {
     private static Namespace<QuantifiableVariable> variables = null;
     private static Namespace<SchemaVariable> schemaVariables;
 
-    public static Profile profile = new JavaProfile() {
+    public static final Profile profile = new JavaProfile() {
         // we do not want normal standard rules, but ruleSetsDeclarations is needed for string
         // library (HACK)
         public RuleCollection getStandardRules() {
             return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
-                ImmutableSLList.<BuiltInRule>nil());
+                ImmutableSLList.nil());
         }
     };
 
@@ -89,14 +94,16 @@ public class TacletForTests {
     }
 
     public static InitConfig initConfig() {
-        if (initConfig == null)
+        if (initConfig == null) {
             parse();
+        }
         return initConfig.deepCopy();
     }
 
     public static Services services() {
-        if (services == null)
+        if (services == null) {
             parse();
+        }
         return services;
     }
 
@@ -146,7 +153,7 @@ public class TacletForTests {
         return nss.ruleSets();
     }
 
-    public static Namespace<Function> getFunctions() {
+    public static Namespace<JFunction> getFunctions() {
         return nss.functions();
     }
 
@@ -180,24 +187,25 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, Services services) {
-        if (termstr.equals(""))
+        if (termstr.isEmpty()) {
             return null;
+        }
 
         try {
             KeyIO io = new KeyIO(services, nss);
             // TacletForTests.getAbbrevs()
             return io.parseExpression(termstr);
         } catch (Exception e) {
-            e.printStackTrace();
-            fail("Exception occurred while parsing of " + termstr);
+            fail("Exception occurred while parsing of " + termstr, e);
             return null;
         }
 
     }
 
     public static Term parseTerm(String termstr, NamespaceSet set) {
-        if (termstr.equals(""))
+        if (termstr.isEmpty()) {
             return null;
+        }
         return new KeyIO(services(), set).parseExpression(termstr);
     }
 

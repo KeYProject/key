@@ -1,8 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple i/o forwarding thread which maps {@link InputStream}s to {@link OutputStream}s.
@@ -16,6 +22,7 @@ import java.io.OutputStream;
  * @author Mattias Ulbrich
  */
 public class IOForwarder extends Thread {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IOForwarder.class);
 
     private final InputStream from;
     private final OutputStream to;
@@ -49,7 +56,7 @@ public class IOForwarder extends Thread {
                 to.write(buffer, 0, read);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Forward failed", e);
         }
     }
 

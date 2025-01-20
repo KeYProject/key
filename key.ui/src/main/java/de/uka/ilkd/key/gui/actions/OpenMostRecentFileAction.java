@@ -1,24 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.nio.file.Path;
 
-import de.uka.ilkd.key.gui.ProofSelectionDialog;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ProofSelectionDialog;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
  * Loads the last opened file
  */
-
-public final class OpenMostRecentFileAction extends MainWindowAction {
-
-    /**
-     *
-     */
+public final class OpenMostRecentFileAction extends MainWindowAction
+        implements KeYSelectionListener {
     private static final long serialVersionUID = 4855372503837208313L;
 
     public OpenMostRecentFileAction(MainWindow mainWindow) {
@@ -26,7 +26,9 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
         setName("Reload");
         setIcon(IconFactory.openMostRecent(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Reload last opened file.");
-        setAcceleratorLetter(KeyEvent.VK_R);
+        setEnabled(mainWindow.getRecentFiles() != null
+                && mainWindow.getRecentFiles().getMostRecent() != null);
+        mainWindow.getMediator().addKeYSelectionListener(this);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -41,7 +43,6 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
                     Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
                     if (proofPath == null) {
                         // canceled by user
-                        return;
                     } else {
                         mainWindow.loadProofFromBundle(file, proofPath.toFile());
                     }
@@ -50,5 +51,10 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
                 }
             }
         }
+    }
+
+    @Override
+    public void selectedProofChanged(KeYSelectionEvent e) {
+        setEnabled(true);
     }
 }

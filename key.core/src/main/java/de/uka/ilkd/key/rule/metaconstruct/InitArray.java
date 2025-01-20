@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -16,6 +17,8 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Split an array creation expression with explicit array initializer, creating a creation
@@ -39,8 +42,10 @@ public abstract class InitArray extends ProgramTransformer {
         ArrayInitializer aInit = p_creationExpression.getArrayInitializer();
 
         if (aInit == null)
-            // nothing to do for us
+        // nothing to do for us
+        {
             return null;
+        }
 
         return aInit.getArguments();
     }
@@ -64,8 +69,9 @@ public abstract class InitArray extends ProgramTransformer {
 
         ImmutableArray<Expression> initializers = extractInitializers(p_creationExpression);
 
-        if (initializers == null)
+        if (initializers == null) {
             return p_creationExpression;
+        }
 
         KeYJavaType arrayType = p_creationExpression.getKeYJavaType();
 
@@ -85,8 +91,9 @@ public abstract class InitArray extends ProgramTransformer {
 
         ImmutableArray<Expression> initializers = extractInitializers(p_creationExpression);
 
-        if (initializers == null)
+        if (initializers == null) {
             return new ProgramVariable[0];
+        }
 
         KeYJavaType elementType = getElementType(p_creationExpression);
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
 import javax.swing.*;
@@ -8,8 +11,8 @@ import javax.swing.*;
  */
 public class InvalidSettingsInputException extends Exception {
     private static final long serialVersionUID = -7504257775646675899L;
-    private SettingsProvider panel;
-    private JComponent focusable;
+    private final SettingsProvider panel;
+    private final JComponent focusable;
 
     public InvalidSettingsInputException(SettingsProvider panel, JComponent focusable) {
         this.panel = panel;

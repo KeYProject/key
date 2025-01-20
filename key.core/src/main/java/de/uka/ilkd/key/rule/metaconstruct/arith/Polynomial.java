@@ -1,19 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 import java.util.Iterator;
 
-import org.key_project.util.LRUCache;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
+
+import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Class for analysing and modifying polynomial expressions over the integers
@@ -24,12 +27,12 @@ public class Polynomial {
      * The polynomial expression of the BigInteger constant '0'.
      */
     public final static Polynomial ZERO =
-        new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ZERO);
+        new Polynomial(ImmutableSLList.nil(), BigInteger.ZERO);
     /**
      * The polynomial expression of the BigInteger constant '1'.
      */
     public final static Polynomial ONE =
-        new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ONE);
+        new Polynomial(ImmutableSLList.nil(), BigInteger.ONE);
 
     /**
      * The BigInteger constant for the value '-1'.
@@ -46,7 +49,7 @@ public class Polynomial {
 
     public static Polynomial create(Term polyTerm, Services services) {
         final LRUCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
-        polyTerm = TermLabel.removeIrrelevantLabels(polyTerm, services);
+        polyTerm = TermLabelManager.removeIrrelevantLabels(polyTerm, services);
 
         Polynomial res;
         synchronized (cache) {
@@ -70,9 +73,9 @@ public class Polynomial {
 
     public Polynomial multiply(BigInteger c) {
         if (c.signum() == 0) {
-            return new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ZERO);
+            return new Polynomial(ImmutableSLList.nil(), BigInteger.ZERO);
         }
-        ImmutableList<Monomial> newParts = ImmutableSLList.<Monomial>nil();
+        ImmutableList<Monomial> newParts = ImmutableSLList.nil();
         for (Monomial part : parts) {
             newParts = newParts.prepend(part.multiply(c));
         }
@@ -82,10 +85,10 @@ public class Polynomial {
 
     public Polynomial multiply(Monomial m) {
         if (m.getCoefficient().signum() == 0) {
-            return new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ZERO);
+            return new Polynomial(ImmutableSLList.nil(), BigInteger.ZERO);
         }
 
-        ImmutableList<Monomial> newParts = ImmutableSLList.<Monomial>nil();
+        ImmutableList<Monomial> newParts = ImmutableSLList.nil();
         for (Monomial part : parts) {
             newParts = newParts.prepend(part.multiply(m));
         }
@@ -249,7 +252,7 @@ public class Polynomial {
 
     @Override
     public String toString() {
-        final StringBuffer res = new StringBuffer();
+        final StringBuilder res = new StringBuilder();
         res.append(constantPart);
 
         for (Monomial part : parts) {
@@ -261,7 +264,7 @@ public class Polynomial {
 
     private static class Analyser {
         public BigInteger constantPart = BigInteger.ZERO;
-        public ImmutableList<Monomial> parts = ImmutableSLList.<Monomial>nil();
+        public ImmutableList<Monomial> parts = ImmutableSLList.nil();
         private final Services services;
         private final TypeConverter tc;
         private final Operator numbers, add;

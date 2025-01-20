@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.logic.Term;
@@ -24,7 +27,7 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * @return The return value.
      * @throws ProofInputException Occurred Exception.
      */
-    public Term getReturnValue() throws ProofInputException;
+    Term getReturnValue() throws ProofInputException;
 
     /**
      * Returns the return value as human readable {@link String}.
@@ -32,7 +35,7 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * @return The return value as human readable {@link String}.
      * @throws ProofInputException Occurred Exception.
      */
-    public String getReturnValueString() throws ProofInputException;
+    String getReturnValueString() throws ProofInputException;
 
     /**
      * Checks if a condition is available via {@link #getCondition()} under which this return value
@@ -41,7 +44,7 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * @return {@code true} condition is available, {@code false} condition is not available.
      * @throws ProofInputException
      */
-    public boolean hasCondition() throws ProofInputException;
+    boolean hasCondition() throws ProofInputException;
 
     /**
      * Returns the optional condition under which the return value is valid.
@@ -49,7 +52,7 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * @return The optional condition under which the return value is valid.
      * @throws ProofInputException Occurred Exception.
      */
-    public Term getCondition() throws ProofInputException;
+    Term getCondition() throws ProofInputException;
 
     /**
      * Returns the optional condition under which the return value is valid as human readable
@@ -58,5 +61,5 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * @return The optional condition as human readable {@link String}.
      * @throws ProofInputException Occurred Exception.
      */
-    public String getConditionString() throws ProofInputException;
+    String getConditionString() throws ProofInputException;
 }

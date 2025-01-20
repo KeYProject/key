@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 import java.io.PrintStream;
@@ -41,17 +43,17 @@ public class OptionManager {
     /**
      * the registered possible options
      */
-    Vector options = new Vector();
+    final Vector options = new Vector();
 
     /**
      * maps strings to their according option objects
      */
-    java.util.Map str2opt = new HashMap();
+    final java.util.Map str2opt = new HashMap();
 
     /**
      * the mandatory options
      */
-    Vector mandatories = new Vector();
+    final Vector mandatories = new Vector();
 
     /**
      * adds the given option to the registered ones
@@ -115,10 +117,8 @@ public class OptionManager {
         }
         Object optval = null;
         switch (descr.type) {
-        case SIMPLE:
-            optval = TRUE;
-            break;
-        case SWITCH:
+        case SIMPLE -> optval = TRUE;
+        case SWITCH -> {
             if ("on".equals(sval)) {
                 optval = ON;
             } else if ("off".equals(sval)) {
@@ -126,8 +126,8 @@ public class OptionManager {
             } else {
                 throw new IllegalOptionValueException(opt, sval);
             }
-            break;
-        case BOOL:
+        }
+        case BOOL -> {
             if ("true".equals(sval)) {
                 optval = TRUE;
             } else if ("false".equals(sval)) {
@@ -135,17 +135,15 @@ public class OptionManager {
             } else {
                 throw new IllegalOptionValueException(opt, sval);
             }
-            break;
-        case NUM:
+        }
+        case NUM -> {
             try {
-                optval = new Integer(sval);
+                optval = Integer.valueOf(sval);
             } catch (NumberFormatException nfe) {
                 throw new IllegalOptionValueException(opt, sval);
             }
-            break;
-        case STRING:
-            optval = sval;
-            break;
+        }
+        case STRING -> optval = sval;
         }
         Debug.assertNonnull(optval);
         descr.values.addElement(optval);
@@ -166,7 +164,7 @@ public class OptionManager {
         // check if all mandatory arguments have been set
         for (Enumeration mand = mandatories.elements(); mand.hasMoreElements();) {
             OptionDescription descr = (OptionDescription) mand.nextElement();
-            if (descr.values.size() == 0) {
+            if (descr.values.isEmpty()) {
                 throw new MissingArgumentException(descr.shortOpt);
             }
         }
@@ -300,7 +298,7 @@ public class OptionManager {
         } else {
             try {
                 Integer i = (Integer) v; // may raise ClassCastException
-                return i.intValue(); // may raise NullPointerException
+                return i; // may raise NullPointerException
             } catch (Exception e) {
                 // nothing to de here
             }
@@ -330,7 +328,7 @@ public class OptionManager {
     /**
      * describes a single command line option.
      */
-    private class OptionDescription {
+    public static class OptionDescription {
         int type;
 
         int multiplicity;
@@ -341,7 +339,7 @@ public class OptionManager {
 
         String description;
 
-        Vector values = new Vector();
+        final Vector values = new Vector();
     }
 
 }

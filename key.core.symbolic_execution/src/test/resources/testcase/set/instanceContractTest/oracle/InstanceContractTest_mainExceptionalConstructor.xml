@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.mainExceptionalConstructor()&gt;" pathCondition="true" pathConditionChanged="false">
       <operationContract name="self_0 = new IntWrapper() catch(exc_0)
-post: !(exc_0 = null)&lt;&lt;impl&gt;&gt;
+post:   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
 &amp; (  ((   java.lang.Throwable::instance(exc_0) = TRUE
        -&gt; self_0.&lt;inv&gt;)&lt;&lt;impl&gt;&gt;)
    &amp; java.lang.Exception::instance(exc_0) = TRUE)

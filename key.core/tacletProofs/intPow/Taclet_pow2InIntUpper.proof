@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Sun Nov 27 13:58:57 CET 2022
+#Wed Apr 12 13:26:48 CEST 2023
 [Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
 [SMTSettings]invariantForall=false
@@ -10,7 +10,7 @@
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
-[Choice]DefaultChoices=JavaCard-JavaCard\\:on , Strings-Strings\\:on , assertions-assertions\\:on , bigint-bigint\\:on , floatRules-floatRules\\:strictfpOnly , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsCheckingOF , integerSimplificationRules-integerSimplificationRules\\:full , javaLoopTreatment-javaLoopTreatment\\:efficient , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , methodExpansion-methodExpansion\\:modularOnly , modelFields-modelFields\\:showSatisfiability , moreSeqRules-moreSeqRules\\:off , permissions-permissions\\:off , programRules-programRules\\:Java , reach-reach\\:on , runtimeExceptions-runtimeExceptions\\:allow , sequences-sequences\\:on , wdChecks-wdChecks\\:on , wdOperator-wdOperator\\:L
+[Choice]DefaultChoices=JavaCard-JavaCard\\:on, Strings-Strings\\:on, assertions-assertions\\:on, bigint-bigint\\:on, floatRules-floatRules\\:strictfpOnly, initialisation-initialisation\\:disableStaticInitialisation, intRules-intRules\\:arithmeticSemanticsCheckingOF, integerSimplificationRules-integerSimplificationRules\\:full, javaLoopTreatment-javaLoopTreatment\\:efficient, mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off, methodExpansion-methodExpansion\\:modularOnly, modelFields-modelFields\\:showSatisfiability, moreSeqRules-moreSeqRules\\:off, permissions-permissions\\:off, programRules-programRules\\:Java, reach-reach\\:on, runtimeExceptions-runtimeExceptions\\:allow, sequences-sequences\\:on, wdChecks-wdChecks\\:on, wdOperator-wdOperator\\:L
 [StrategyProperty]LOOP_OPTIONS_KEY=LOOP_NONE
 [StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]UseBuiltUniqueness=false
@@ -42,17 +42,15 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Sun Nov 27 13:58:57 CET 2022
-name=pow2InIntUpper
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "pow2InIntUpper",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proof {
-(keyLog "0" (keyUser "Julian" ) (keyVersion "4e4bca5387"))
-(keyLog "1" (keyUser "Julian" ) (keyVersion "b4e14ff4c5"))
+(keyLog "0" (keyUser "Julian" ) (keyVersion "80a871ca3bac8bb405ecc216fcb6fa9ef6f8a395"))
 
-(autoModeTime "127")
+(autoModeTime "0")
 
 (branch "dummy ID"
 (rule "impRight" (formula "1") (newnames "f_exp"))
@@ -77,11 +75,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
    (rule "inEqSimp_sepNegMonomial0" (formula "1"))
    (rule "polySimp_mulLiterals" (formula "1") (term "0"))
    (rule "polySimp_elimOne" (formula "1") (term "0"))
-   (rule "inEqSimp_subsumption1" (formula "3") (ifseqformula "1"))
-   (rule "leq_literals" (formula "3") (term "0"))
-    (builtin "One Step Simplification" (formula "3"))
-   (rule "true_left" (formula "3"))
-   (rule "inEqSimp_contradInEq0" (formula "1") (ifseqformula "3"))
+   (rule "inEqSimp_contradInEq0" (formula "1") (ifseqformula "4"))
    (rule "qeq_literals" (formula "1") (term "0"))
     (builtin "One Step Simplification" (formula "1"))
    (rule "closeFalse" (formula "1"))

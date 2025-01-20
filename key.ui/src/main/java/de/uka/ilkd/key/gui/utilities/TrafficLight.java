@@ -1,14 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.utilities;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
 
@@ -60,13 +56,7 @@ class TrafficLight extends JPanel {
 
     public void setGreen(boolean b) {
         isGreen = b;
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                repaint();
-            }
-        });
+        SwingUtilities.invokeLater(this::repaint);
     }
 
 }

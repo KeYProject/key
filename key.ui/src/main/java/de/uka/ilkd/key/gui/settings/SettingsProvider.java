@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
-import de.uka.ilkd.key.gui.MainWindow;
-
-import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
 
 /**
  * A settings provider is an entry in an {@link SettingsUi}.
@@ -37,7 +40,7 @@ public interface SettingsProvider {
      * @param window non-null reference
      * @return
      */
-    JComponent getPanel(MainWindow window);
+    JPanel getPanel(MainWindow window);
 
     /**
      * Tree children of your settings dialog.
@@ -92,6 +95,7 @@ public interface SettingsProvider {
 
     /**
      * Determines the order in the {@link JTree} of the settings.
+     * Higher values are shown last.
      *
      * @return
      */

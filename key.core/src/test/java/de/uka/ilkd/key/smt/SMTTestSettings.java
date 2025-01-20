@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
 import java.io.File;
@@ -79,13 +82,13 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
     @Override
     public long getMaximumInteger() {
 
-        return ProofDependentSMTSettings.getDefaultSettingsData().maxInteger;
+        return ProofDependentSMTSettings.getDefaultSettingsData().getMaxInteger();
     }
 
     @Override
     public long getMinimumInteger() {
 
-        return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
+        return ProofDependentSMTSettings.getDefaultSettingsData().getMinInteger();
     }
 
     @Override

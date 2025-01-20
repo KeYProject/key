@@ -1,6 +1,10 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit;
+
+import java.util.List;
 
 import recoder.ProgramFactory;
 import recoder.abstraction.PrimitiveType;
@@ -19,8 +23,6 @@ import recoder.service.ChangeHistory;
 import recoder.service.NameInfo;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
-
-import java.util.List;
 
 public class ExpressionKit {
 
@@ -44,8 +46,7 @@ public class ExpressionKit {
                 return true;
             }
         }
-        if (expr instanceof ExpressionContainer) {
-            ExpressionContainer con = (ExpressionContainer) expr;
+        if (expr instanceof ExpressionContainer con) {
             for (int i = 0, s = con.getExpressionCount(); i < s; i += 1) {
                 if (containsStatements(con.getExpressionAt(i))) {
                     return true;
@@ -83,7 +84,7 @@ public class ExpressionKit {
      */
     public static List<Expression> collectPreceedingExpressions(Expression x) {
         Debug.assertNonnull(x);
-        List<Expression> dest = new ASTArrayList<Expression>();
+        List<Expression> dest = new ASTArrayList<>();
         if ((x instanceof MethodReference) || (x instanceof ConstructorReference)) {
             ExpressionContainer ec = (ExpressionContainer) x;
             for (int i = 0, s = ec.getExpressionCount(); i < s; i += 1) {
@@ -174,7 +175,7 @@ public class ExpressionKit {
         }
         ProgramFactory f = x.getFactory();
         int exSize = exprs.size();
-        List<Statement> tempVarDecls = new ASTArrayList<Statement>(exSize);
+        List<Statement> tempVarDecls = new ASTArrayList<>(exSize);
         ScopeDefiningElement sde = MiscKit.getScopeDefiningElement(x);
         Type[] exTypes = new Type[exSize];
         for (int i = 0; i < exSize; i += 1) {
@@ -211,9 +212,8 @@ public class ExpressionKit {
         do {
             NonTerminalProgramElement parent = pe.getASTParent();
             Debug.assertNonnull(parent);
-            if ((parent instanceof Statement)
+            if ((parent instanceof Statement parentStatement)
                     && (((Statement) parent).getStatementContainer() != null)) {
-                Statement parentStatement = (Statement) parent;
                 destination = StatementKit.prepareStatementMutableList(parentStatement, ch);
                 destParent = parentStatement.getStatementContainer();
                 for (destIndex = 0; destination.get(destIndex) != parent; destIndex += 1) {
@@ -221,11 +221,10 @@ public class ExpressionKit {
                 }
                 break;
             }
-            if (parent instanceof FieldSpecification) {
+            if (parent instanceof FieldSpecification fs) {
                 // create class initializer and insert it before the field
-                FieldSpecification fs = (FieldSpecification) parent;
                 FieldDeclaration fd = (FieldDeclaration) fs.getParent();
-                destination = new ASTArrayList<Statement>();
+                destination = new ASTArrayList<>();
                 StatementBlock body = f.createStatementBlock(destination);
                 ClassInitializer ci;
                 if (fd.isStatic()) {
@@ -266,8 +265,8 @@ public class ExpressionKit {
         destination.addAll(destIndex, tempVarDecls);
         destParent.makeAllParentRolesValid();
         if (ch != null) {
-            for (int i = 0; i < tempVarDecls.size(); i += 1) {
-                ch.attached(tempVarDecls.get(i));
+            for (Statement tempVarDecl : tempVarDecls) {
+                ch.attached(tempVarDecl);
             }
         }
         return true;

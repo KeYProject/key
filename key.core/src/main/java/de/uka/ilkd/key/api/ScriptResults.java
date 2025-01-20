@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.api;
 
 import java.util.*;
@@ -11,7 +14,7 @@ import java.util.stream.Stream;
  * @version 1 (21.04.17)
  */
 public class ScriptResults implements List<ScriptResult> {
-    private List<ScriptResult> delegated = new ArrayList<>();
+    private final List<ScriptResult> delegated = new ArrayList<>();
 
     @Override
     public int size() {

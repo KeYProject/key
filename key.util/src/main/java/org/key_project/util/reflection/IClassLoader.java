@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.reflection;
 
 import java.util.ServiceLoader;
@@ -19,7 +22,7 @@ public interface IClassLoader {
      * @return The {@link Class} instance.
      * @throws ClassNotFoundException Occurred Exception if {@link Class} is not available.
      */
-    public Class<?> getClassforName(String className) throws ClassNotFoundException;
+    Class<?> getClassforName(String className) throws ClassNotFoundException;
 
     /**
      * Loads all configured services similar to {@link ServiceLoader#load(Class)}.
@@ -29,5 +32,5 @@ public interface IClassLoader {
      * @param service The requested service.
      * @return An {@link Iterable} with the created service instances.
      */
-    public <S> Iterable<S> loadServices(Class<?> contextClass, Class<S> service);
+    <S> Iterable<S> loadServices(Class<?> contextClass, Class<S> service);
 }

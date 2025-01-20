@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -30,13 +33,14 @@ public class LetFeature implements Feature {
         this.body = body;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        final Term outerVarContent = var.getContent();
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
+        final Term outerVarContent = var.getContent(mState);
 
-        var.setContent(value.toTerm(app, pos, goal));
-        final RuleAppCost res = body.computeCost(app, pos, goal);
+        var.setContent(value.toTerm(app, pos, goal, mState), mState);
+        final RuleAppCost res = body.computeCost(app, pos, goal, mState);
 
-        var.setContent(outerVarContent);
+        var.setContent(outerVarContent, mState);
         return res;
     }
 

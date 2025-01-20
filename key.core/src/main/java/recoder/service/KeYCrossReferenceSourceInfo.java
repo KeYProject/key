@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
 import java.lang.reflect.InvocationTargetException;
@@ -8,6 +11,28 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
+import de.uka.ilkd.key.java.recoderext.EnumClassDeclaration;
+import de.uka.ilkd.key.java.recoderext.EscapeExpression;
+import de.uka.ilkd.key.java.recoderext.ExecutionContext;
+import de.uka.ilkd.key.java.recoderext.MethodCallStatement;
+import de.uka.ilkd.key.java.recoderext.adt.AllFields;
+import de.uka.ilkd.key.java.recoderext.adt.AllObjects;
+import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
+import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
+import de.uka.ilkd.key.java.recoderext.adt.Intersect;
+import de.uka.ilkd.key.java.recoderext.adt.SeqConcat;
+import de.uka.ilkd.key.java.recoderext.adt.SeqIndexOf;
+import de.uka.ilkd.key.java.recoderext.adt.SeqLength;
+import de.uka.ilkd.key.java.recoderext.adt.SeqReverse;
+import de.uka.ilkd.key.java.recoderext.adt.SeqSingleton;
+import de.uka.ilkd.key.java.recoderext.adt.SeqSub;
+import de.uka.ilkd.key.java.recoderext.adt.SetMinus;
+import de.uka.ilkd.key.java.recoderext.adt.SetUnion;
+import de.uka.ilkd.key.java.recoderext.adt.Singleton;
+import de.uka.ilkd.key.util.ExceptionHandlerException;
+import de.uka.ilkd.key.util.SpecDataLocation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,28 +64,6 @@ import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.java.reference.VariableReference;
 import recoder.java.statement.Case;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
-import de.uka.ilkd.key.java.recoderext.EnumClassDeclaration;
-import de.uka.ilkd.key.java.recoderext.EscapeExpression;
-import de.uka.ilkd.key.java.recoderext.ExecutionContext;
-import de.uka.ilkd.key.java.recoderext.MethodCallStatement;
-import de.uka.ilkd.key.java.recoderext.adt.AllFields;
-import de.uka.ilkd.key.java.recoderext.adt.AllObjects;
-import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
-import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
-import de.uka.ilkd.key.java.recoderext.adt.Intersect;
-import de.uka.ilkd.key.java.recoderext.adt.SeqConcat;
-import de.uka.ilkd.key.java.recoderext.adt.SeqIndexOf;
-import de.uka.ilkd.key.java.recoderext.adt.SeqLength;
-import de.uka.ilkd.key.java.recoderext.adt.SeqReverse;
-import de.uka.ilkd.key.java.recoderext.adt.SeqSingleton;
-import de.uka.ilkd.key.java.recoderext.adt.SeqSub;
-import de.uka.ilkd.key.java.recoderext.adt.SetMinus;
-import de.uka.ilkd.key.java.recoderext.adt.SetUnion;
-import de.uka.ilkd.key.java.recoderext.adt.Singleton;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
-import de.uka.ilkd.key.util.SpecDataLocation;
 
 
 public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo {
@@ -74,6 +77,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     private PrimitiveType mapType;
     private PrimitiveType bigintType;
     private PrimitiveType realType;
+    private PrimitiveType typeType;
 
 
     public KeYCrossReferenceSourceInfo(ServiceConfiguration config) {
@@ -103,6 +107,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         mapType = new PrimitiveType("\\map", this);
         bigintType = new PrimitiveType("\\bigint", this);
         realType = new PrimitiveType("\\real", this);
+        typeType = new PrimitiveType("\\TYPE", this);
 
         // HEAP
         name2primitiveType.put(locsetType.getName(), locsetType);
@@ -115,6 +120,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         // JML's primitive types
         name2primitiveType.put(bigintType.getName(), bigintType);
         name2primitiveType.put(realType.getName(), realType);
+        name2primitiveType.put(typeType.getName(), typeType);
     }
 
     @Override
@@ -199,15 +205,14 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
 
 
     public void modelChanged(ChangeHistoryEvent event) {
-        List<TreeChange> changes = new ArrayList<TreeChange>();
-        changes.addAll(event.getChanges());
+        List<TreeChange> changes = new ArrayList<>(event.getChanges());
         super.modelChanged(event);
 
         for (TreeChange change : changes) {
             if (change instanceof AttachChange) {
-                ProgramElement pe = change.getCompilationUnit();
+                TypeDeclarationContainer pe = change.getCompilationUnit();
                 if (pe instanceof TypeDeclarationContainer) {
-                    TypeDeclarationContainer tdc = (TypeDeclarationContainer) pe;
+                    TypeDeclarationContainer tdc = pe;
                     for (int i = 0; i < tdc.getTypeDeclarationCount(); i++) {
                         ClassType ct = tdc.getTypeDeclarationAt(i);
                         for (ClassType superType : ct.getSupertypes()) {
@@ -244,13 +249,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
                 ClassType.class, ClassType.class);
             m.setAccessible(true);
             m.invoke(this, c1, c2);
-        } catch (IllegalAccessException e) {
-            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
-        } catch (InvocationTargetException e) {
-            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
-        } catch (SecurityException e) {
-            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
-        } catch (NoSuchMethodException e) {
+        } catch (IllegalAccessException | NoSuchMethodException | SecurityException
+                | InvocationTargetException e) {
             throw (IllegalAccessError) new IllegalAccessError().initCause(e);
         }
     }
@@ -280,34 +280,24 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
              */
             EnumConstantSpecification ecs = (EnumConstantSpecification) ((EnumDeclaration) getType(
                 ((Case) context.getASTParent()).getParent().getExpression()))
-                        .getVariableInScope(name);
-            if (ecs != null) {
-                return ecs;
-            } else {
-                // must not resolve! qualifying enum constant in case-statements is forbidden!
-                return null;
-            }
+                    .getVariableInScope(name);
+            // must not resolve! qualifying enum constant in case-statements is forbidden!
+            return ecs;
         }
 
         // 2)
         if ((context instanceof VariableReference
                 || context instanceof UncollatedReferenceQualifier)
                 && context.getASTParent() instanceof Case && getType(((Case) context.getASTParent())
-                        .getParent().getExpression()) instanceof EnumClassDeclaration) {
+                        .getParent().getExpression()) instanceof EnumClassDeclaration ecd) {
             /*
              * is it an enum class constant (after transformation)? Possible iff: 1) parent is
              * "case" and 2) switch-selector is an enum type (that way, the selector specifies the
              * scope!)
              */
-            EnumClassDeclaration ecd = ((EnumClassDeclaration) getType(
-                ((Case) context.getASTParent()).getParent().getExpression()));
             VariableSpecification vs = ecd.getVariableInScope(name);
-            if (vs != null) {
-                return vs;
-            } else {
-                // must not resolve! qualifying enum constant in case-statements is forbidden!
-                return null;
-            }
+            // must not resolve! qualifying enum constant in case-statements is forbidden!
+            return vs;
         }
 
         while (pe != null && !(pe instanceof VariableScope)
@@ -492,8 +482,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
                     break;
                 }
             }
-            if (s instanceof TypeDeclaration) {
-                TypeDeclaration td = (TypeDeclaration) s;
+            if (s instanceof TypeDeclaration td) {
                 ClassType newResult = getInheritedType(name, td);
 
                 if (newResult != null) {
@@ -579,8 +568,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     /**
      * The mapping from class names to stub compilation units.
      */
-    protected Map<String, CompilationUnit> stubClasses =
-        new LinkedHashMap<String, CompilationUnit>();
+    protected final Map<String, CompilationUnit> stubClasses =
+        new LinkedHashMap<>();
 
     /**
      * The flag which decides on the behaviour on undefined classes
@@ -631,13 +620,15 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         String typeString = Naming.toPathName(tyref);
 
         // bugfix: The reference might be to an array. Remove the array reference then.
-        while (typeString.endsWith("[]"))
+        while (typeString.endsWith("[]")) {
             typeString = typeString.substring(0, typeString.length() - 2);
+        }
 
         // look in the already created classes:
         CompilationUnit stub = stubClasses.get(typeString);
-        if (stub != null)
+        if (stub != null) {
             throw new IllegalStateException("try to resolve an unknown type twice");
+        }
 
         recoder.abstraction.Type ty;
 
@@ -648,11 +639,12 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             ty = null;
         }
         if (ty == null) {
-            if (!typeString.contains("."))
+            if (!typeString.contains(".")) {
                 throw new UnresolvedReferenceException(
                     "Type references to undefined classes may only appear if they are fully qualified: "
                         + tyref.toSource(),
                     tyref);
+            }
 
             recoder.java.CompilationUnit cu;
             try {

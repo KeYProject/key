@@ -1,16 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable>
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
+public abstract class MatchSchemaVariableInstruction<SV extends OperatorSV>
         extends Instruction<SV> {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);
@@ -36,7 +43,7 @@ public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable>
 
         final Term t = inst.getTermInstantiation(op, inst.getExecutionContext(), services);
         if (t != null) {
-            if (!t.equalsModRenaming(term)) {
+            if (!t.equalsModProperty(term, RENAMING_TERM_PROPERTY)) {
                 return null;
             } else {
                 return matchCond;
@@ -46,10 +53,8 @@ public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable>
         try {
             return matchCond.setInstantiations(inst.add(op, term, services));
         } catch (IllegalInstantiationException e) {
-            LOGGER.debug("FAILED. Exception thrown at sorted schema variable", e);
+            return null;
         }
-
-        return null;
     }
 
     /**

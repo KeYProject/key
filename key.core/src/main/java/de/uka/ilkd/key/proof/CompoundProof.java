@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -30,9 +33,9 @@ public class CompoundProof extends ProofAggregate {
 
     @Override
     public Proof[] getProofs() {
-        List<Proof> l = new LinkedList<Proof>();
+        List<Proof> l = new LinkedList<>();
         flatten(l);
-        return l.toArray(new Proof[l.size()]);
+        return l.toArray(new Proof[0]);
     }
 
 

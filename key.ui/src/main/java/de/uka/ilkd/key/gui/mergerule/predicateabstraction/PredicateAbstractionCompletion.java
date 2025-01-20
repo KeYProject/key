@@ -1,11 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.mergerule.predicateabstraction;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.gui.mergerule.MergeProcedureCompletion;
@@ -16,9 +16,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
 
 /**
  * Completion class for {@link MergeWithPredicateAbstraction}.
@@ -48,19 +50,17 @@ public class PredicateAbstractionCompletion
         final ImmutableList<SymbolicExecutionState> partnerStates =
             MergeRuleUtils.sequentsToSEPairs(partners);
 
-        final ArrayList<LocationVariable> differingLocVars = new ArrayList<LocationVariable>();
+        final ArrayList<LocationVariable> differingLocVars = new ArrayList<>();
 
         MergeRuleUtils.getUpdateLeftSideLocations(joinState.first).forEach(v -> {
             // The meaning of the following statement corresponds to
             // partnerStates.fold("right value for v differs", false)
-            final boolean isDifferent = StreamSupport.stream(partnerStates.spliterator(), false)
-                    .collect(Collectors
-                            .reducing(false,
-                                partner -> !MergeRuleUtils
-                                        .getUpdateRightSideForSafe(partner.getSymbolicState(), v)
-                                        .equals(MergeRuleUtils.getUpdateRightSideForSafe(
-                                            joinState.getSymbolicState(), v)),
-                                (b1, b2) -> (b1 || b2)));
+            final boolean isDifferent = StreamSupport
+                    .stream(partnerStates.spliterator(), false).map(partner -> !MergeRuleUtils
+                            .getUpdateRightSideForSafe(partner.getSymbolicState(), v)
+                            .equals(MergeRuleUtils.getUpdateRightSideForSafe(
+                                joinState.getSymbolicState(), v)))
+                    .reduce(false, (b1, b2) -> (b1 || b2));
 
             if (isDifferent) {
                 differingLocVars.add(v);

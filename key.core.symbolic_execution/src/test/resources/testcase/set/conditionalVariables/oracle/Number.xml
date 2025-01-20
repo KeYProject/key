@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.equals(n)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (this.content==n.content)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+      <branchStatement name="if (this.content == n.content)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="not(equals(n,null))" pathCondition="not(equals(n,null))" pathConditionChanged="true" branchCondition="not(equals(n,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <branchCondition name="equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" pathConditionChanged="true" branchCondition="equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return true;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" pathConditionChanged="false">

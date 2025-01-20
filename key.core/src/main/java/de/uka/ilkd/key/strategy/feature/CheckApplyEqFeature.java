@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -21,7 +24,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     private CheckApplyEqFeature() {}
 
-    protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal, MutableState mState) {
         Debug.assertTrue(pos != null,
             "Need to know the position of " + "the application of the taclet");
 
@@ -37,8 +40,9 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
     private boolean isNotSelfApplication(PosInOccurrence pos, IfFormulaInstantiation ifInst) {
         if (!(ifInst instanceof IfFormulaInstSeq)
                 || ifInst.getConstrainedFormula() != pos.sequentFormula()
-                || ((IfFormulaInstSeq) ifInst).inAntec() != pos.isInAntec())
+                || ((IfFormulaInstSeq) ifInst).inAntec() != pos.isInAntec()) {
             return true;
+        }
 
         // Position may not be one of the terms compared in
         // the equation
@@ -49,19 +53,18 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
         // leading updates are not interesting
         while (it.getSubTerm().op() instanceof UpdateApplication) {
-            if (!it.hasNext())
+            if (!it.hasNext()) {
                 return true;
+            }
             it.next();
         }
 
-        if (!(it.getSubTerm().op() instanceof Equality) || !it.hasNext())
+        if (!(it.getSubTerm().op() instanceof Equality) || !it.hasNext()) {
             return true;
+        }
 
-        if (it.getChild() == 0)
-            // we don't allow rewriting in the left term of the equation
-            return false;
-
-        return true;
+        // we don't allow rewriting in the left term of the equation
+        return it.getChild() != 0;
     }
 
 }

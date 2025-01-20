@@ -1,30 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
 import java.util.Map;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.rulefilter.AndRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.NoFindTaclet;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -36,6 +34,8 @@ import de.uka.ilkd.key.util.Debug;
  */
 
 public class TacletAppIndex {
+    public static final AtomicLong PERF_CREATE_ALL = new AtomicLong();
+    public static final AtomicLong PERF_UPDATE = new AtomicLong();
 
     private final TacletIndex tacletIndex;
 
@@ -44,7 +44,7 @@ public class TacletAppIndex {
 
     private TermTacletAppIndexCacheSet indexCaches;
 
-    private Goal goal;
+    private final Goal goal;
 
     /**
      * Object to which the appearance of new taclet apps is reported
@@ -61,20 +61,21 @@ public class TacletAppIndex {
     /**
      * The sequent with the formulas for which taclet indices are hold by this object. Invariant:
      * <code>seq != null</code> implies that the indices <code>antecIndex</code>,
-     * <code>succIndex</code> are up to date for the sequent <code>seq</code>
+     * <code>succIndex</code> are up-to-date for the sequent <code>seq</code>
      */
     private Sequent seq;
 
-    private Map<CacheKey, TermTacletAppIndex> cache;
+    private final Map<CacheKey, TermTacletAppIndex> cache;
 
-    public TacletAppIndex(TacletIndex tacletIndex, Services services) {
-        this(tacletIndex, null, null, null, null, TacletFilter.TRUE,
+    public TacletAppIndex(TacletIndex tacletIndex, Goal goal, Services services) {
+        this(tacletIndex, null, null, goal, null, TacletFilter.TRUE,
             new TermTacletAppIndexCacheSet(services.getCaches().getTermTacletAppIndexCache()),
             services.getCaches().getTermTacletAppIndexCache());
     }
 
     private TacletAppIndex(TacletIndex tacletIndex, SemisequentTacletAppIndex antecIndex,
-            SemisequentTacletAppIndex succIndex, Goal goal, Sequent seq, RuleFilter ruleFilter,
+            SemisequentTacletAppIndex succIndex, @NonNull Goal goal, Sequent seq,
+            RuleFilter ruleFilter,
             TermTacletAppIndexCacheSet indexCaches, Map<CacheKey, TermTacletAppIndex> cache) {
         this.tacletIndex = tacletIndex;
         this.antecIndex = antecIndex;
@@ -90,10 +91,6 @@ public class TacletAppIndex {
         newRuleListener = p_newRuleListener;
     }
 
-    private NewRuleListener getNewRulePropagator() {
-        return newRuleListener;
-    }
-
     public void setRuleFilter(RuleFilter p_ruleFilter) {
         if (p_ruleFilter != ruleFilter) {
             ruleFilter = p_ruleFilter;
@@ -101,25 +98,12 @@ public class TacletAppIndex {
         }
     }
 
-    private RuleFilter getRuleFilter() {
-        return ruleFilter;
-    }
-
     /**
      * returns a new TacletAppIndex with a given TacletIndex
      */
-    TacletAppIndex copyWithTacletIndex(TacletIndex p_tacletIndex) {
-        return new TacletAppIndex(p_tacletIndex, antecIndex, succIndex, getGoal(), getSequent(),
+    TacletAppIndex copyWith(TacletIndex p_tacletIndex, Goal goal) {
+        return new TacletAppIndex(p_tacletIndex, antecIndex, succIndex, goal, getSequent(),
             ruleFilter, indexCaches, cache);
-    }
-
-    /**
-     * Set the goal association of this index to the given object <code>p_goal</code>. If the
-     * sequent of the new goal differs from the former one (attribute <code>seq</code>), the index
-     * will be rebuilt as soon as data is requested from it.
-     */
-    public void setup(Goal p_goal) {
-        goal = p_goal;
     }
 
     /**
@@ -139,10 +123,12 @@ public class TacletAppIndex {
 
     private void createNewIndexCache() {
         indexCaches = new TermTacletAppIndexCacheSet(cache);
-        if (antecIndex != null)
+        if (antecIndex != null) {
             antecIndex.setIndexCache(indexCaches);
-        if (succIndex != null)
+        }
+        if (succIndex != null) {
             succIndex.setIndexCache(indexCaches);
+        }
     }
 
     /**
@@ -154,30 +140,36 @@ public class TacletAppIndex {
     }
 
     private void createAllFromGoal() {
-        this.seq = getNode().sequent();
+        var time = System.nanoTime();
+        try {
+            this.seq = getNode().sequent();
 
-        antecIndex = new SemisequentTacletAppIndex(getSequent(), true, getServices(), tacletIndex(),
-            getNewRulePropagator(), getRuleFilter(), indexCaches);
-        succIndex = new SemisequentTacletAppIndex(getSequent(), false, getServices(), tacletIndex(),
-            getNewRulePropagator(), getRuleFilter(), indexCaches);
+            antecIndex =
+                new SemisequentTacletAppIndex(getSequent(), true, getServices(), tacletIndex(),
+                    newRuleListener, ruleFilter, indexCaches);
+            succIndex =
+                new SemisequentTacletAppIndex(getSequent(), false, getServices(), tacletIndex(),
+                    newRuleListener, ruleFilter, indexCaches);
+        } finally {
+            PERF_CREATE_ALL.getAndAdd(System.nanoTime() - time);
+        }
     }
 
     private void ensureIndicesExist() {
-        Debug.assertFalse(getGoal() == null,
-            "TacletAppIndex does not know to which goal it " + "refers");
-
-        if (!isUpToDateForGoal())
-            // Indices are not up to date
+        if (isOutdated()) {
+            // Indices are not up-to-date
             createAllFromGoal();
+        }
     }
 
     /**
-     * @return true iff this index currently is up to date with respect to the sequent of the
-     *         associated goal; this does not detect other modifications like an altered user
+     * @return true iff this index is currently outdated with respect to the sequent of the
+     *         associated goal; this does not detect other modifications
+     *         like an altered user
      *         constraint
      */
-    private boolean isUpToDateForGoal() {
-        return getGoal() != null && getSequent() == getNode().sequent();
+    private boolean isOutdated() {
+        return getGoal() == null || getSequent() != getNode().sequent();
     }
 
     private SemisequentTacletAppIndex getIndex(PosInOccurrence pos) {
@@ -188,7 +180,7 @@ public class TacletAppIndex {
     private ImmutableList<TacletApp> getFindTacletWithPos(PosInOccurrence pos, TacletFilter filter,
             Services services) {
         Debug.assertFalse(pos == null);
-        ImmutableList<NoPosTacletApp> tacletInsts = getFindTaclet(pos, filter, services);
+        ImmutableList<NoPosTacletApp> tacletInsts = getFindTaclet(pos, filter);
         return createTacletApps(tacletInsts, pos, services);
     }
 
@@ -213,7 +205,7 @@ public class TacletAppIndex {
      */
     static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
             PosInOccurrence pos, Services services) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
         for (NoPosTacletApp tacletApp : tacletInsts) {
             if (tacletApp.taclet() instanceof FindTaclet) {
                 PosTacletApp newTacletApp = tacletApp.setPosInOccurrence(pos, services);
@@ -230,12 +222,7 @@ public class TacletAppIndex {
     static TacletApp createTacletApp(NoPosTacletApp tacletApp, PosInOccurrence pos,
             Services services) {
         if (tacletApp.taclet() instanceof FindTaclet) {
-            PosTacletApp newTacletApp = tacletApp.setPosInOccurrence(pos, services);
-            if (newTacletApp != null) {
-                return newTacletApp;
-            } else {
-                return null;
-            }
+            return tacletApp.setPosInOccurrence(pos, services);
         } else {
             return tacletApp;
         }
@@ -258,23 +245,22 @@ public class TacletAppIndex {
      * a PosInOccurrence. RewriteTaclets with wrong prefix are filtered out.
      *
      * @param pos the PosInOccurrence to focus
-     * @param services the Services object encapsulating information about the java datastructures
-     *        like (static)types etc.
      * @return list of all possible instantiations
      */
-    public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos, TacletFilter filter,
-            TermServices services) {
+    public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos,
+            TacletFilter filter) {
 
-        final Iterator<NoPosTacletApp> it = getFindTaclet(pos, filter, services).iterator();
+        final Iterator<NoPosTacletApp> it = getFindTaclet(pos, filter).iterator();
 
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
 
         while (it.hasNext()) {
             final NoPosTacletApp tacletApp = it.next();
             final Taclet t = tacletApp.taclet();
             if (t instanceof RewriteTaclet && ((RewriteTaclet) t).checkPrefix(pos,
-                MatchConditions.EMPTY_MATCHCONDITIONS) != null)
+                MatchConditions.EMPTY_MATCHCONDITIONS) != null) {
                 result = result.prepend(tacletApp);
+            }
         }
 
         return result;
@@ -284,12 +270,9 @@ public class TacletAppIndex {
      * collects all FindTaclets with instantiations and position
      *
      * @param pos the PosInOccurrence to focus
-     * @param services the Services object encapsulating information about the java datastructures
-     *        like (static)types etc.
      * @return list of all possible instantiations
      */
-    public ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence pos, TacletFilter filter,
-            TermServices services) {
+    public ImmutableList<NoPosTacletApp> getFindTaclet(PosInOccurrence pos, TacletFilter filter) {
         return getIndex(pos).getTacletAppAt(pos, filter);
     }
 
@@ -315,29 +298,32 @@ public class TacletAppIndex {
      *
      * @param sci SequentChangeInfo describing the change of the sequent
      */
-    public void sequentChanged(Goal goal, SequentChangeInfo sci) {
-        if (sci.getOriginalSequent() != getSequent())
-            // we are not up to date and have to rebuild everything (lazy)
+    public void sequentChanged(SequentChangeInfo sci) {
+        if (sci.getOriginalSequent() != getSequent()) {
+            // we are not up-to-date and have to rebuild everything (lazy)
             clearIndexes();
-        else
+        } else {
+            var time = System.nanoTime();
             updateIndices(sci);
+            PERF_UPDATE.getAndAdd(System.nanoTime() - time);
+        }
     }
 
     private void updateIndices(SequentChangeInfo sci) {
         seq = sci.sequent();
 
         antecIndex =
-            antecIndex.sequentChanged(sci, getServices(), tacletIndex(), getNewRulePropagator());
+            antecIndex.sequentChanged(sci, getServices(), tacletIndex, newRuleListener);
 
         succIndex =
-            succIndex.sequentChanged(sci, getServices(), tacletIndex(), getNewRulePropagator());
+            succIndex.sequentChanged(sci, getServices(), tacletIndex, newRuleListener);
     }
 
     private void updateIndices(final SetRuleFilter newTaclets) {
-        antecIndex = antecIndex.addTaclets(newTaclets, getSequent(), getServices(), tacletIndex(),
-            getNewRulePropagator());
-        succIndex = succIndex.addTaclets(newTaclets, getSequent(), getServices(), tacletIndex(),
-            getNewRulePropagator());
+        antecIndex =
+            antecIndex.addTaclets(newTaclets, getServices(), tacletIndex, newRuleListener);
+        succIndex =
+            succIndex.addTaclets(newTaclets, getServices(), tacletIndex, newRuleListener);
     }
 
 
@@ -355,15 +341,16 @@ public class TacletAppIndex {
             createNewIndexCache();
         }
 
-        if (!isUpToDateForGoal()) {
-            // we are not up to date and have to rebuild everything (lazy)
+        if (isOutdated()) {
+            // we are not up-to-date and have to rebuild everything (lazy)
             clearIndexes();
             return;
         }
 
         if (tacletApp.taclet() instanceof NoFindTaclet) {
-            if (ruleFilter.filter(tacletApp.taclet()))
-                getNewRulePropagator().ruleAdded(tacletApp, null);
+            if (ruleFilter.filter(tacletApp.taclet())) {
+                newRuleListener.ruleAdded(tacletApp, null);
+            }
             return;
         }
 
@@ -390,8 +377,8 @@ public class TacletAppIndex {
             }
         }
 
-        if (!isUpToDateForGoal()) {
-            // we are not up to date and have to rebuild everything (lazy)
+        if (isOutdated()) {
+            // we are not up-to-date and have to rebuild everything (lazy)
             clearIndexes();
             return;
         }
@@ -400,7 +387,7 @@ public class TacletAppIndex {
         for (NoPosTacletApp tacletApp : tacletApps) {
             if (tacletApp.taclet() instanceof NoFindTaclet) {
                 if (ruleFilter.filter(tacletApp.taclet())) {
-                    getNewRulePropagator().ruleAdded(tacletApp, null);
+                    newRuleListener.ruleAdded(tacletApp, null);
                 }
             } else {
                 newTaclets.addRuleToSet(tacletApp.taclet());
@@ -435,7 +422,7 @@ public class TacletAppIndex {
 
     public String toString() {
         return "TacletAppIndex with indexing, getting Taclets from" + " TacletIndex "
-            + tacletIndex();
+            + tacletIndex;
     }
 
     // helper because IList<NoPosTacletApp> is no IList<TacletApp>
@@ -464,7 +451,7 @@ public class TacletAppIndex {
     }
 
     private Node getNode() {
-        return getGoal().node();
+        return goal.node();
     }
 
     /**
@@ -479,10 +466,12 @@ public class TacletAppIndex {
      * taclet app.
      */
     public void reportRuleApps(NewRuleListener l, Services services) {
-        if (antecIndex != null)
+        if (antecIndex != null) {
             antecIndex.reportRuleApps(l);
-        if (succIndex != null)
+        }
+        if (succIndex != null) {
             succIndex.reportRuleApps(l);
+        }
 
         l.rulesAdded(getNoFindTaclet(TacletFilter.TRUE, services), null);
     }

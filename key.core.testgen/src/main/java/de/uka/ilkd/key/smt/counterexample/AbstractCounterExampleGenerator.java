@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.counterexample;
 
 import java.util.LinkedList;
@@ -13,11 +16,12 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,14 +68,12 @@ public abstract class AbstractCounterExampleGenerator {
             throw new IllegalStateException(
                 "Can't find SMT solver " + SolverTypes.Z3_CE_SOLVER.getName());
         }
-
         final Proof proof =
             createProof(ui, oldProof, oldSequent, "Semantics Blasting: " + oldProof.name());
         final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
         TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
         final ProverTaskListener ptl = ui.getProofControl().getDefaultProverTaskListener();
         ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
-
         try {
             synchronized (macro) { // TODO: Useless? No other thread has access to macro wait for
                                    // macro to terminate
@@ -91,12 +93,10 @@ public abstract class AbstractCounterExampleGenerator {
         SolverLauncher launcher = new SolverLauncher(settings);
         launcher.addListener(createSolverListener(settings, proof));
 
-        List<SolverType> solvers = new LinkedList<SolverType>();
+        List<SolverType> solvers = new LinkedList<>();
         solvers.add(SolverTypes.Z3_CE_SOLVER);
 
         launcher.launch(solvers, SMTProblem.createSMTProblems(proof), proof.getServices());
-
-
     }
 
     /**

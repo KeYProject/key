@@ -1,6 +1,6 @@
-/**
- * Created on: Mar 17, 2011
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.lang;
 
 import java.util.LinkedList;
@@ -29,8 +29,7 @@ public class SMTFunction {
     protected SMTSort imageSort;
 
     /**
-     * @param id
-     * @param domainSorts
+     * creates an inital SMT function
      */
     public SMTFunction() {
         super();
@@ -49,7 +48,7 @@ public class SMTFunction {
     public SMTFunction(String id, SMTSort argSort1, SMTSort argSort2, SMTSort imageSort) {
         super();
         this.id = Util.processName(id);
-        List<SMTSort> domainSorts = new LinkedList<SMTSort>();
+        List<SMTSort> domainSorts = new LinkedList<>();
         domainSorts.add(argSort1);
         domainSorts.add(argSort2);
         this.domainSorts = domainSorts;
@@ -114,25 +113,30 @@ public class SMTFunction {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
 
-        if (this == obj)
+        if (this == obj) {
             return true;
+        }
 
-        if (!(obj instanceof SMTFunction))
+        if (!(obj instanceof SMTFunction f)) {
             return false;
-        SMTFunction f = (SMTFunction) obj;
+        }
 
-        if (!this.id.equals(f.id))
+        if (!this.id.equals(f.id)) {
             return false;
+        }
 
-        if (this.domainSorts.size() != f.domainSorts.size())
+        if (this.domainSorts.size() != f.domainSorts.size()) {
             return false;
+        }
 
         for (int i = 0; i < this.domainSorts.size(); i++) {
-            if (!this.domainSorts.get(i).equals(f.domainSorts.get(i)))
+            if (!this.domainSorts.get(i).equals(f.domainSorts.get(i))) {
                 return false;
+            }
         }
         return true;
     }
@@ -172,14 +176,14 @@ public class SMTFunction {
     }
 
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
 
-        buff.append("(declare-fun " + id + " " + "(");
+        buff.append("(declare-fun ").append(id).append(" ").append("(");
         // if (domainSorts == null) return "domainSorts is null";
         for (SMTSort s : domainSorts) {
-            buff.append(s.getTopLevel().getId() + " ");
+            buff.append(s.getTopLevel().getId()).append(" ");
         }
-        buff.append(")" + " " + imageSort.getTopLevel().getId() + ")");
+        buff.append(")" + " ").append(imageSort.getTopLevel().getId()).append(")");
 
         return buff.toString();
 

@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.ArrayList;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -16,19 +18,15 @@ import de.uka.ilkd.key.strategy.definition.IDefaultStrategyPropertiesFactory;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
-import de.uka.ilkd.key.strategy.feature.BinaryFeature;
-import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
-import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
-import de.uka.ilkd.key.strategy.feature.ScaleFeature;
+import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.ContainsLabelFeature;
 import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.logic.Name;
 
 /**
  * {@link Strategy} to use for symbolic execution.
@@ -42,14 +40,9 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     /**
      * The default factory.
      */
-    public static IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
-        new IDefaultStrategyPropertiesFactory() {
-            @Override
-            public StrategyProperties createDefaultStrategyProperties() {
-                return SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false,
-                    false, false, false, false);
-            }
-        };
+    public static final IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
+        () -> SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false,
+            false, false, false, false);
 
     /**
      * Constructor.
@@ -125,7 +118,8 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
         // body branches)
         globalF = add(globalF, ifZero(not(new BinaryFeature() {
             @Override
-            protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+            protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
+                    MutableState mState) {
                 return pos != null
                         && SymbolicExecutionUtil.hasSymbolicExecutionLabel(pos.subTerm());
             }
@@ -327,7 +321,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
             // Model
             return new StrategySettingsDefinition(false, null, 1000, "Symbolic Execution Options",
                 SymbolicExecutionStrategy.DEFAULT_FACTORY,
-                new ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>>(),
+                new ArrayList<>(),
                 methodTreatment, loopTreatment, blockTreatment, branchHiding, aliasChecks);
         }
     }

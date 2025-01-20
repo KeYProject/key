@@ -1,6 +1,6 @@
-/**
- * tests the symbolic execution of the program meta constructs
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.*;
@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -100,7 +101,7 @@ public class TestProgramMetaConstructs {
     @Test
     public void testForInitUnfoldTransformer1() {
         forInitUnfoldTransformerTest("{ for (int i = 4, y = 42; i <= 6; i++) { } }",
-            new String[] { "int i = 4,y = 42;" });
+            new String[] { "int i = 4, y = 42;" });
     }
 
     @Test
@@ -114,7 +115,7 @@ public class TestProgramMetaConstructs {
     public void testForInitUnfoldTransformer3() {
         forInitUnfoldTransformerTest(
             "{ int i = 4, z = 42; for (i++, i--, z = 17; i <= 6; i++) { } }",
-            new String[] { "i++;", "i--;", "z=17;" });
+            new String[] { "i++;", "i--;", "z = 17;" });
     }
 
     private void forInitUnfoldTransformerTest(String programBlock, String[] expectedStmts) {

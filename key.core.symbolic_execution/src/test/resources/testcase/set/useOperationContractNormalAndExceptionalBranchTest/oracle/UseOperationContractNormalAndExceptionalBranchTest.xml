@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="&lt;call UseOperationContractNormalAndExceptionalBranchTest.main(value)&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call UseOperationContractNormalAndExceptionalBranchTest.main(
+  value
+)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = magic(value);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_magic = magic(value) catch(exc_0)
-pre: (value &lt; 0 &amp; value &gt;= -10)&lt;&lt;SC&gt;&gt;
+pre:   (value &lt; 0 &amp; value &gt;= -10)&lt;&lt;SC&gt;&gt;
 | value &lt; -10
 | (value &gt;= 0
 &amp; value &lt; 10)&lt;&lt;SC&gt;&gt;
 | value &gt;= 10
-post: (   (value &lt; 0 &amp; value &gt;= -10)&lt;&lt;SC&gt;&gt;
+post:   (   (value &lt; 0 &amp; value &gt;= -10)&lt;&lt;SC&gt;&gt;
    -&gt;   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
       &amp; java.lang.Exception::instance(exc_0) = TRUE)
 &amp; (   value &lt; -10
@@ -22,8 +24,10 @@ mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_magic" exceptionTerm="exc_0" contractParameters="value" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathConditionChanged="true" branchCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="int magicNumberCopy = magicNumber;" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathConditionChanged="false">
-                  <statement name="return magicNumber+magicNumberCopy;" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value)&gt;" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))">
+                  <statement name="return magicNumber + magicNumberCopy;" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(
+  value
+)&gt;" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))">
                         <termination name="&lt;end&gt;" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,geq(value,Z(0(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
@@ -32,7 +36,9 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
             </branchCondition>
             <branchCondition name="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),leq(value,Z(neglit(1(#)))))" pathCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),leq(value,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),leq(value,Z(neglit(1(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
                <statement name="return -1;" pathCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),leq(value,Z(neglit(1(#)))))" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value)&gt;" pathCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),leq(value,Z(neglit(1(#)))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),leq(value,Z(neglit(1(#)))))">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(
+  value
+)&gt;" pathCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),leq(value,Z(neglit(1(#)))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),leq(value,Z(neglit(1(#)))))">
                      <termination name="&lt;end&gt;" pathCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),leq(value,Z(neglit(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>

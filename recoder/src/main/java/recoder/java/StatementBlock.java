@@ -1,6 +1,13 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import recoder.abstraction.ClassType;
 import recoder.java.declaration.TypeDeclaration;
@@ -9,11 +16,6 @@ import recoder.java.declaration.VariableSpecification;
 import recoder.java.statement.JavaStatement;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Statement block.
@@ -130,7 +132,7 @@ public class StatementBlock extends JavaStatement
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
@@ -277,9 +279,9 @@ public class StatementBlock extends JavaStatement
 
     public List<TypeDeclaration> getTypesInScope() {
         if (name2type == null || name2type.isEmpty()) {
-            return new ArrayList<TypeDeclaration>(0);
+            return new ArrayList<>(0);
         }
-        List<TypeDeclaration> res = new ArrayList<TypeDeclaration>();
+        List<TypeDeclaration> res = new ArrayList<>();
         for (TypeDeclaration td : name2type.values()) {
             res.add(td);
         }
@@ -297,7 +299,7 @@ public class StatementBlock extends JavaStatement
     public void addTypeToScope(ClassType type, String name) {
         Debug.assertNonnull(type, name);
         if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            name2type = new HashMap<String, TypeDeclaration>();
+            name2type = new HashMap<>();
         }
         name2type.put(name, (TypeDeclaration) type);
     }
@@ -312,9 +314,9 @@ public class StatementBlock extends JavaStatement
 
     public List<VariableSpecification> getVariablesInScope() {
         if (name2var == null || name2var.isEmpty()) {
-            return new ArrayList<VariableSpecification>();
+            return new ArrayList<>();
         }
-        List<VariableSpecification> res = new ArrayList<VariableSpecification>();
+        List<VariableSpecification> res = new ArrayList<>();
         for (VariableSpecification vs : name2var.values()) {
             res.add(vs);
         }
@@ -332,7 +334,7 @@ public class StatementBlock extends JavaStatement
     public void addVariableToScope(VariableSpecification var) {
         Debug.assertNonnull(var);
         if (name2var == null || name2var == UNDEFINED_SCOPE) {
-            name2var = new HashMap<String, VariableSpecification>();
+            name2var = new HashMap<>();
         }
         name2var.put(var.getName(), var);
     }

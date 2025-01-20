@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
@@ -22,9 +25,9 @@ public class SymbolicExecutionTermLabelFactory
             throw new TermLabelException("Label " + SymbolicExecutionTermLabel.NAME
                 + " requires exactly one Integer-Parameter with its ID.");
         }
-        Integer val;
+        int val;
         try {
-            val = Integer.valueOf(parameters.get(0));
+            val = Integer.parseInt(parameters.get(0));
         } catch (NumberFormatException e) {
             throw new TermLabelException("Label " + SymbolicExecutionTermLabel.NAME
                 + " requires exactly one Integer-Parameter with its ID.", e);

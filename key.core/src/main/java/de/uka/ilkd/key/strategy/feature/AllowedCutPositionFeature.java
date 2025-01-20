@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -20,7 +23,7 @@ public class AllowedCutPositionFeature extends BinaryFeature {
 
     private AllowedCutPositionFeature() {}
 
-    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         Debug.assertFalse(pos == null, "Feature is only applicable to rules with find");
 
         return onlyBelowRightJunctors(pos);
@@ -39,8 +42,9 @@ public class AllowedCutPositionFeature extends BinaryFeature {
             } else if (op == (negated ? Junctor.OR : Junctor.AND)) {
                 /* nothing */
             } else if (negated && op == Junctor.IMP) {
-                if (child == 0)
+                if (child == 0) {
                     negated = !negated;
+                }
             } else {
                 return op instanceof Quantifier;
             }

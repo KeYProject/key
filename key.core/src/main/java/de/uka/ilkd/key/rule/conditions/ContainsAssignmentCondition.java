@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -7,9 +10,10 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.SyntaxElement;
 
 
 /**
@@ -53,7 +57,7 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
      * {@inheritDoc}
      */
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
+    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
         if (var != expression) {
             return true;

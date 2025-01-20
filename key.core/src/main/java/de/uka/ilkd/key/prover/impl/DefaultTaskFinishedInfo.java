@@ -1,6 +1,6 @@
-/**
- *
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -8,6 +8,9 @@ import de.uka.ilkd.key.prover.TaskFinishedInfo;
 
 public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
 
+    /**
+     * See {@link TaskFinishedInfo#getSource()} for possible values.
+     */
     private final Object source;
 
     // TODO
@@ -19,6 +22,17 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     private final int closedGoals;
 
 
+    /**
+     * Create a new info object.
+     * Make sure your source object is documented in {@link TaskFinishedInfo}!
+     *
+     * @param source source object
+     * @param result task result
+     * @param proof the proof the task worked on
+     * @param time time the task took (milliseconds)
+     * @param appliedRules how many nodes were created
+     * @param closedGoals how many goals were closed
+     */
     public DefaultTaskFinishedInfo(Object source, Object result, Proof proof, long time,
             int appliedRules, int closedGoals) {
         this.source = source;
@@ -62,6 +76,9 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     // display message for the status bar
     @Override
     public String toString() {
+        if (proof.isDisposed()) {
+            return "Proof disposed";
+        }
         if (appliedRules != 0) {
             StringBuilder message = new StringBuilder();
             String timeString = (timeInMillis / 1000) + "." + ((timeInMillis % 1000) / 100);

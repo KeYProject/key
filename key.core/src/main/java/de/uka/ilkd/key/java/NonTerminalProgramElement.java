@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
+
+import org.key_project.logic.SyntaxElement;
 
 /**
  * Non terminal program element. taken from COMPOST and changed to achieve an immutable structure
@@ -22,4 +27,8 @@ public interface NonTerminalProgramElement extends ProgramElement {
      */
     ProgramElement getChildAt(int index);
 
+    @Override
+    default SyntaxElement getChild(int n) {
+        return getChildAt(n);
+    }
 }

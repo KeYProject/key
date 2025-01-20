@@ -1,13 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.key_project.util.java.IOUtil;
-import recoder.io.ArchiveDataLocation;
-import recoder.io.DataFileLocation;
-import recoder.io.DataLocation;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,12 +10,24 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
+import de.uka.ilkd.key.java.recoderext.URLDataLocation;
+
+import org.key_project.util.java.IOUtil;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import recoder.io.ArchiveDataLocation;
+import recoder.io.DataFileLocation;
+import recoder.io.DataLocation;
 
 import static de.uka.ilkd.key.util.MiscTools.containsWholeWord;
 import static de.uka.ilkd.key.util.MiscTools.isJMLComment;
@@ -31,8 +38,9 @@ public class TestMiscTools {
     @Test
     public void testDisectFilenameUnix() {
         // run only on UNIX-like systems
-        if (File.separatorChar != '/')
+        if (File.separatorChar != '/') {
             return;
+        }
         String s = "/home/daniel//workspace/key";
         Object[] ls = MiscTools.disectFilename(s).toArray();
         assertEquals("", ls[0]);
@@ -53,8 +61,9 @@ public class TestMiscTools {
     @Test
     public void testDisectFilenameWindows() {
         // run only on Windows systems
-        if (File.separatorChar != '\\')
+        if (File.separatorChar != '\\') {
             return;
+        }
         String s = "C:\\Windows\\Users\\";
         Object[] ls = MiscTools.disectFilename(s).toArray();
         assertEquals("C:", ls[0]);
@@ -63,8 +72,9 @@ public class TestMiscTools {
     @Test
     public void testMakeFilenameRelativeUnix() {
         // run only on UNIX-like systems
-        if (File.separatorChar != '/')
+        if (File.separatorChar != '/') {
             return;
+        }
 
         String s = "/home/daniel/bla";
         String t = "/home/daniel/blubb";
@@ -85,8 +95,9 @@ public class TestMiscTools {
     @Test
     public void testMakeFilenameRelativeWindows() {
         // run only on Windows systems
-        if (File.separatorChar != '\\')
+        if (File.separatorChar != '\\') {
             return;
+        }
 
         // test windows delimiters
         String s = "C:\\Windows";
@@ -150,16 +161,16 @@ public class TestMiscTools {
         Path tmp = Files.createTempFile("test with whitespace", ".txt");
         URI tmpURI = tmp.toUri();
         DataLocation urlDataLoc = new URLDataLocation(tmpURI.toURL());
-        assertEquals(tmpURI, MiscTools.extractURI(urlDataLoc));
+        assertEquals(tmpURI, MiscTools.extractURI(urlDataLoc).orElseThrow());
 
         // additional test for URLDataLocation with whitespace in filename
         Path tmpSpace = Files.createTempFile("test with whitespace", ".txt");
         URI tmpSpaceURI = tmpSpace.toUri();
         DataLocation urlDataLoc2 = new URLDataLocation(tmpSpaceURI.toURL());
-        assertEquals(tmpSpaceURI, MiscTools.extractURI(urlDataLoc2));
+        assertEquals(tmpSpaceURI, MiscTools.extractURI(urlDataLoc2).orElseThrow());
 
         // test for ArchiveDataLocation
-        byte[] b = "test content".getBytes();
+        byte[] b = "test content".getBytes(StandardCharsets.UTF_8);
         Path zipP = Files.createTempFile("test with whitespace!", ".zip");
 
         try (FileOutputStream fos = new FileOutputStream(zipP.toFile());
@@ -177,10 +188,10 @@ public class TestMiscTools {
 
             URI tmpZipURI = zipP.toUri();
             assertEquals("jar:" + tmpZipURI + "!/" + "entry.txt",
-                MiscTools.extractURI(entry0).toString());
+                MiscTools.extractURI(entry0).orElseThrow().toString());
             assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20whitespace.txt",
-                MiscTools.extractURI(entry1).toString());
-            URI read = MiscTools.extractURI(entry2);
+                MiscTools.extractURI(entry1).orElseThrow().toString());
+            URI read = MiscTools.extractURI(entry2).orElseThrow();
 
             // we can not simply use read.toURL().openStream(), because that uses caches and thus
             // keeps the file open (at least on Windows)
@@ -189,18 +200,18 @@ public class TestMiscTools {
             try (InputStream is = juc.getInputStream()) {
                 Assertions.assertNotNull(is);
                 // try if the file can be read correctly
-                assertEquals(new String(b), IOUtil.readFrom(is));
+                assertEquals(new String(b, StandardCharsets.UTF_8), IOUtil.readFrom(is));
             }
             assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20!bang!.txt", read.toString());
         }
 
         // test for SpecDataLocation
         DataLocation specDataLoc = new SpecDataLocation("UNKNOWN", "unknown");
-        assertEquals("urn:UNKNOWN:unknown", MiscTools.extractURI(specDataLoc).toString());
+        assertEquals(Optional.empty(), MiscTools.extractURI(specDataLoc));
 
         // test for DataFileLocation
         DataLocation fileDataLoc = new DataFileLocation(tmp.toFile());
-        assertEquals(tmpURI, MiscTools.extractURI(fileDataLoc));
+        assertEquals(tmpURI, MiscTools.extractURI(fileDataLoc).orElseThrow());
 
         // clean up temporary files
         Files.deleteIfExists(tmp);
@@ -257,7 +268,7 @@ public class TestMiscTools {
         Assertions.assertNotNull(u3);
 
         // write a test zip file
-        byte[] b = "test content".getBytes();
+        byte[] b = "test content".getBytes(StandardCharsets.UTF_8);
         String entryName = "entry with whitespace.txt";
         Path zipP = Files.createTempFile("test with whitespace!", ".zip");
         try (FileOutputStream fos = new FileOutputStream(zipP.toFile());
@@ -273,7 +284,7 @@ public class TestMiscTools {
             try (InputStream is = juc.getInputStream()) {
                 Assertions.assertNotNull(is);
                 // try if the file can be read correctly
-                assertEquals(new String(b), IOUtil.readFrom(is));
+                assertEquals(new String(b, StandardCharsets.UTF_8), IOUtil.readFrom(is));
             }
 
             // test reparsing jar url

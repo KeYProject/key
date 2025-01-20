@@ -1,42 +1,31 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.NamedProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.ProgramPrefixUtil;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Labeled statement.
  */
-
 public class LabeledStatement extends JavaStatement
         implements StatementContainer, NamedProgramElement, ProgramPrefix {
 
     /**
      * Name.
      */
-
     protected final Label name;
 
     /**
      * Body.
      */
-
     protected final Statement body;
 
 
@@ -74,7 +63,6 @@ public class LabeledStatement extends JavaStatement
      *
      * @param name an identifier.
      */
-
     public LabeledStatement(Label name) {
         this.name = name;
         body = new EmptyStatement();
@@ -92,7 +80,6 @@ public class LabeledStatement extends JavaStatement
      * @param id a Label.
      * @param statement a statement.
      */
-
     public LabeledStatement(Label id, Statement statement, PositionInfo pos) {
         super(pos);
         this.name = id;
@@ -138,9 +125,9 @@ public class LabeledStatement extends JavaStatement
         if (body instanceof StatementBlock) {
             return StatementBlock.computePrefixElements(((StatementBlock) body).getBody(), this);
         } else if (body instanceof ProgramPrefix) {
-            return StatementBlock.computePrefixElements(new ImmutableArray<Statement>(body), this);
+            return StatementBlock.computePrefixElements(new ImmutableArray<>(body), this);
         }
-        return new ImmutableArray<ProgramPrefix>(this);
+        return new ImmutableArray<>(this);
     }
 
 
@@ -175,7 +162,6 @@ public class LabeledStatement extends JavaStatement
      *
      * @return the string.
      */
-
     public final String getName() {
         return (name == null) ? null : name.toString();
     }
@@ -185,7 +171,6 @@ public class LabeledStatement extends JavaStatement
      *
      * @return the identifier.
      */
-
     public Label getLabel() {
         return name;
     }
@@ -218,13 +203,14 @@ public class LabeledStatement extends JavaStatement
      *
      * @return an int giving the number of children of this node
      */
-
     public int getChildCount() {
         int result = 0;
-        if (name != null)
+        if (name != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -235,16 +221,17 @@ public class LabeledStatement extends JavaStatement
      * @return the program element at the given position
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
-
     public ProgramElement getChildAt(int index) {
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();
@@ -255,7 +242,6 @@ public class LabeledStatement extends JavaStatement
      *
      * @return the number of statements.
      */
-
     public int getStatementCount() {
         return (body != null) ? 1 : 0;
     }
@@ -267,7 +253,6 @@ public class LabeledStatement extends JavaStatement
      * @return the statement with the given index.
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
-
     public Statement getStatementAt(int index) {
         if (body != null && index == 0) {
             return body;
@@ -283,25 +268,6 @@ public class LabeledStatement extends JavaStatement
      */
     public void visit(Visitor v) {
         v.performActionOnLabeledStatement(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printLabeledStatement(this);
-    }
-
-    /**
-     * testing if programelements are equal modulo renaming abstract from names. Therefore
-     * declaration of label names have to be mapped to the same abstract name. This is done here.
-     */
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (se == null || this.getClass() != se.getClass()) {
-            return false;
-        }
-
-        final LabeledStatement lSt = (LabeledStatement) se;
-
-        nat.add(name, lSt.name);
-        return super.equalsModRenaming(lSt, nat);
     }
 
     public PosInProgram getFirstActiveChildPos() {

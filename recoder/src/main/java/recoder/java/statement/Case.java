@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.statement;
 
 import recoder.java.*;
@@ -99,8 +101,8 @@ public class Case extends Branch implements ExpressionContainer {
             expression.setExpressionContainer(this);
         }
         if (body != null) {
-            for (int i = 0; i < body.size(); i += 1) {
-                body.get(i).setStatementContainer(this);
+            for (Statement statement : body) {
+                statement.setStatementContainer(this);
             }
         }
     }
@@ -128,10 +130,12 @@ public class Case extends Branch implements ExpressionContainer {
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null)
+        if (expression != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result += body.size();
+        }
         return result;
     }
 
@@ -147,8 +151,9 @@ public class Case extends Branch implements ExpressionContainer {
     public ProgramElement getChildAt(int index) {
         int len;
         if (expression != null) {
-            if (index == 0)
+            if (index == 0) {
                 return expression;
+            }
             index--;
         }
         if (body != null) {
@@ -183,7 +188,7 @@ public class Case extends Branch implements ExpressionContainer {
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
@@ -310,8 +315,9 @@ public class Case extends Branch implements ExpressionContainer {
     }
 
     public SourceElement getLastElement() {
-        if (body == null || body.size() == 0)
+        if (body == null || body.size() == 0) {
             return this;
+        }
         return body.get(body.size() - 1).getLastElement();
     }
 }

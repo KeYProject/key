@@ -1,23 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableMapEntry;
-
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.SyntaxElement;
+import org.key_project.util.collection.ImmutableMapEntry;
 
 /**
  * This variable condition ensures that no other label of the same name exists in the context
@@ -28,7 +31,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     private final ProgramSV labelSV;
 
     public NewJumpLabelCondition(SchemaVariable sv) {
-        if (!(sv instanceof ProgramSV) || sv.sort() != ProgramSVSort.LABEL) {
+        if (!(sv instanceof ProgramSV psv) || psv.sort() != ProgramSVSort.LABEL) {
             throw new IllegalArgumentException(
                 "The new jump label " + "variable condition, must be parameterised with a "
                     + "program schemavariable of sort LABEL.");
@@ -38,11 +41,11 @@ public final class NewJumpLabelCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions matchCond, Services services) {
         if (var != labelSV && matchCond.getInstantiations().isInstantiated(labelSV)) {
             var = labelSV;
-            instCandidate = (SVSubstitute) matchCond.getInstantiations().getInstantiation(labelSV);
+            instCandidate = (SyntaxElement) matchCond.getInstantiations().getInstantiation(labelSV);
         }
 
         if (var == labelSV) {
@@ -59,7 +62,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     }
 
     private List<ProgramElement> collect(SVInstantiations inst) {
-        final List<ProgramElement> result = new LinkedList<ProgramElement>();
+        final List<ProgramElement> result = new LinkedList<>();
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
             inst.pairIterator();
         while (it.hasNext()) {

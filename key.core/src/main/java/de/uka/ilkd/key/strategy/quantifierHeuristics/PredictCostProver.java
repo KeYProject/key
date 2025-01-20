@@ -1,11 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -13,6 +13,12 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
+import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * TODO: rewrite, this seems pretty inefficient ...
@@ -27,7 +33,7 @@ public class PredictCostProver {
     private ImmutableSet<Term> assertLiterals;
 
     /** clauses from <code>instance</code> of CNF */
-    private Set<Clause> clauses = new LinkedHashSet<Clause>();
+    private Set<Clause> clauses = new LinkedHashSet<>();
 
     private final Services services;
 
@@ -64,7 +70,7 @@ public class PredictCostProver {
     }
 
     private ImmutableSet<ImmutableSet<Term>> createClause(ImmutableSet<Term> set) {
-        final ImmutableSet<ImmutableSet<Term>> nil = DefaultImmutableSet.<ImmutableSet<Term>>nil();
+        final ImmutableSet<ImmutableSet<Term>> nil = DefaultImmutableSet.nil();
         ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
         for (Term t : set) {
             ImmutableSet<ImmutableSet<Term>> tmp = nil;
@@ -99,7 +105,7 @@ public class PredictCostProver {
             op = pro.op();
         }
         if ((op == Equality.EQUALS || op == Equality.EQV)
-                && pro.sub(0).equalsModRenaming(pro.sub(1))) {
+                && pro.sub(0).equalsModProperty(pro.sub(1), RENAMING_TERM_PROPERTY)) {
             return negated ? falseT : trueT;
         }
         Term arithRes = HandleArith.provedByArith(pro, services);
@@ -127,7 +133,7 @@ public class PredictCostProver {
             ax = ax.sub(0);
             negated = !negated;
         }
-        if (pro.equalsModRenaming(ax)) {
+        if (pro.equalsModProperty(ax, RENAMING_TERM_PROPERTY)) {
             return negated ? falseT : trueT;
         }
         return problem;
@@ -196,7 +202,7 @@ public class PredictCostProver {
     private long firstRefine() {
         long cost = 1;
         boolean assertChanged = false;
-        Set<Clause> res = new LinkedHashSet<Clause>();
+        Set<Clause> res = new LinkedHashSet<>();
         for (final Clause c : clauses) {
             c.firstRefine();
             long cCost = c.cost();
@@ -243,7 +249,7 @@ public class PredictCostProver {
     private class Clause implements Iterable<Term> {
 
         /** all literals contains in this clause */
-        private ImmutableSet<Term> literals = DefaultImmutableSet.<Term>nil();
+        private ImmutableSet<Term> literals;
 
         public Clause(ImmutableSet<Term> lits) {
             literals = lits;
@@ -251,10 +257,9 @@ public class PredictCostProver {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof Clause)) {
+            if (!(o instanceof Clause other)) {
                 return false;
             }
-            final Clause other = (Clause) o;
             if (other.literals.size() != literals.size()) {
                 return false;
             }
@@ -302,7 +307,7 @@ public class PredictCostProver {
          * that can't be removed by refining
          */
         public ImmutableSet<Term> refine(Iterable<? extends Term> assertLits) {
-            ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
+            ImmutableSet<Term> res = DefaultImmutableSet.nil();
             for (final Term lit : this) {
                 final Operator op = proveLiteral(lit, assertLits).op();
                 if (op == Junctor.TRUE) {
@@ -341,7 +346,8 @@ public class PredictCostProver {
                 if (op == Junctor.TRUE) {
                     return true;
                 }
-                if (op == Junctor.FALSE && terms[0].equalsModIrrelevantTermLabels(terms[j])) {
+                if (op == Junctor.FALSE
+                        && terms[0].equalsModProperty(terms[j], IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     next = next.remove(terms[j]);
                     literals = literals.remove(terms[j]);
                 }

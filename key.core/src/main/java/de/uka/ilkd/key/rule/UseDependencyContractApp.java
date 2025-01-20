@@ -1,23 +1,25 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 public class UseDependencyContractApp extends AbstractContractRuleApp {
 
@@ -30,7 +32,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence pio,
             Contract instantiation, PosInOccurrence step) {
-        this(builtInRule, pio, ImmutableSLList.<PosInOccurrence>nil(), instantiation, step);
+        this(builtInRule, pio, ImmutableSLList.nil(), instantiation, step);
     }
 
     public UseDependencyContractApp(BuiltInRule rule, PosInOccurrence pio,
@@ -67,7 +69,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     }
 
 
-    public PosInOccurrence step(Sequent seq, TermServices services) {
+    public PosInOccurrence step() {
         return step;
     }
 
@@ -89,7 +91,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp tryToInstantiate(Goal goal) {
         if (heapContext == null) {
-            heapContext = HeapContext.getModHeaps(goal.proof().getServices(), false);
+            heapContext = HeapContext.getModifiableHeaps(goal.proof().getServices(), false);
         }
         if (complete()) {
             return this;
@@ -108,11 +110,12 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp tryToInstantiateContract(final Services services) {
         final Term focus = posInOccurrence().subTerm();
-        if (!(focus.op() instanceof IObserverFunction))
-            // TODO: find more appropriate exception
+        if (!(focus.op() instanceof IObserverFunction target))
+        // TODO: find more appropriate exception
+        {
             throw new RuntimeException(
                 "Dependency contract rule is not applicable to term " + focus);
-        final IObserverFunction target = (IObserverFunction) focus.op();
+        }
 
         final Term selfTerm;
         final KeYJavaType kjt;
@@ -122,7 +125,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
             kjt = target.getContainerType();
         } else {
             if (getHeapContext() == null) {
-                heapContext = HeapContext.getModHeaps(services, false);
+                heapContext = HeapContext.getModifiableHeaps(services, false);
             }
             selfTerm = focus.sub(target.getStateCount() * target.getHeapCount(services));
             kjt = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
@@ -133,7 +136,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
         if (contracts.size() > 0) {
             UseDependencyContractApp r = setContract(contracts.iterator().next());
             if (r.getHeapContext() == null) {
-                r.heapContext = HeapContext.getModHeaps(services, false);
+                r.heapContext = HeapContext.getModifiableHeaps(services, false);
             }
             return r;
         }

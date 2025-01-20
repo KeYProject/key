@@ -1,15 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.proofdiff;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Triple;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -20,8 +22,10 @@ public class ProofDifference {
     private List<String> leftAntec = new LinkedList<>(), rightAntec = new LinkedList<>(),
             rightSucc = new LinkedList<>(), leftSucc = new LinkedList<>();
 
-    private Set<String> exclusiveAntec = new HashSet<>(), commonSucc = new HashSet<>(),
-            exclusiveSucc = new HashSet<>(), commonAntec = new HashSet<>();
+    private final Set<String> exclusiveAntec = new HashSet<>();
+    private final Set<String> commonSucc = new HashSet<>();
+    private final Set<String> exclusiveSucc = new HashSet<>();
+    private final Set<String> commonAntec = new HashSet<>();
 
     public static ProofDifference create(Services services, Node left, Node right) {
         return create(left, right, (Term t) -> LogicPrinter.quickPrintTerm(t, services));
@@ -79,41 +83,52 @@ public class ProofDifference {
         return current;
     }
 
+    /**
+     * Entry in the search queue.
+     *
+     * @param idxLeft index of the left candidate
+     * @param idxRight index of the right candidate
+     * @param distance measure of difference between candidates
+     */
+    private record QueueEntry(int idxLeft, int idxRight, int distance) {}
+
     static List<Matching> findPairs(List<String> left, List<String> right) {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());
         int initCap =
             Math.max(8, Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
-        PriorityQueue<Triple<Integer, Integer, Integer>> queue =
-            new PriorityQueue<>(initCap, Comparator.comparingInt((t) -> t.third));
+        PriorityQueue<QueueEntry> queue =
+            new PriorityQueue<>(initCap, Comparator.comparingInt(QueueEntry::distance));
         for (int i = 0; i < left.size(); i++) {
             for (int j = 0; j < right.size(); j++) {
-                queue.add(new Triple<>(i, j, Levensthein.calculate(left.get(i), right.get(j))));
+                queue.add(new QueueEntry(i, j, Levensthein.calculate(left.get(i), right.get(j))));
             }
         }
 
         boolean[] matchedLeft = new boolean[left.size()];
         boolean[] matchedRight = new boolean[right.size()];
         while (!queue.isEmpty()) {
-            Triple<Integer, Integer, Integer> t = queue.poll();
+            QueueEntry t = queue.poll();
             /*
-             * if(t.third>=THRESHOLD) { break; }
+             * if(t.elseTerm>=THRESHOLD) { break; }
              */
-            if (!matchedLeft[t.first] && !matchedRight[t.second]) {
-                String l = left.get((int) t.first);
-                String r = right.get((int) t.second);
-                pairs.add(new Matching(l, r, t.third));
-                matchedLeft[t.first] = true;
-                matchedRight[t.second] = true;
+            if (!matchedLeft[t.idxLeft] && !matchedRight[t.idxRight]) {
+                String l = left.get(t.idxLeft);
+                String r = right.get(t.idxRight);
+                pairs.add(new Matching(l, r, t.distance));
+                matchedLeft[t.idxLeft] = true;
+                matchedRight[t.idxRight] = true;
             }
         }
 
         for (int i = 0; i < matchedLeft.length; i++) {
-            if (!matchedLeft[i])
+            if (!matchedLeft[i]) {
                 pairs.add(new Matching(left.get(i), null, left.get(i).length()));
+            }
         }
         for (int i = 0; i < matchedRight.length; i++) {
-            if (!matchedRight[i])
+            if (!matchedRight[i]) {
                 pairs.add(new Matching(null, right.get(i), right.get(i).length()));
+            }
         }
 
         return pairs;
@@ -196,31 +211,11 @@ public class ProofDifference {
         }
     }
 
-    static class Matching {
-        final String left, right;
-        final int distance;
-
-        Matching(String left, String right, int distance) {
-            this.left = left;
-            this.right = right;
-            this.distance = distance;
-        }
-
-        public String getLeft() {
-            return left;
-        }
-
-        public String getRight() {
-            return right;
-        }
-
-        public int getDistance() {
-            return distance;
-        }
+    record Matching(String left, String right, int distance) {
 
         @Override
-        public String toString() {
-            return String.format("(%s, %s)", left, right);
+            public String toString() {
+                return String.format("(%s, %s)", left, right);
+            }
         }
-    }
 }

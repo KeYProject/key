@@ -1,16 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.testgen;
 
-import de.uka.ilkd.key.core.KeYMediator;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import javax.swing.*;
+import javax.swing.text.DefaultCaret;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
-import javax.swing.*;
-import javax.swing.text.DefaultCaret;
-import java.awt.*;
-import java.awt.event.ActionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TGInfoDialog extends JDialog {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TGInfoDialog.class);
     private final JTextArea textArea;
     private final JButton stopButton;
     private final JButton exitButton;
@@ -27,8 +34,11 @@ public class TGInfoDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             // This method delegates the request only to the UserInterfaceControl
             // which implements the functionality. No functionality is allowed in this method body!
-            MainWindow.getInstance().getMediator().getUI().getProofControl().stopAndWaitAutoMode();
-            exitButton.setEnabled(true);
+            new Thread(() -> {
+                MainWindow.getInstance().getMediator().getUI().getProofControl()
+                        .stopAndWaitAutoMode();
+                ThreadUtilities.invokeOnEventQueue(() -> exitButton.setEnabled(true));
+            }).start();
         }
     };
 
@@ -50,12 +60,8 @@ public class TGInfoDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            KeYMediator mediator = MainWindow.getInstance().getMediator();
-            mediator.stopInterface(true);
-            mediator.setInteractive(false);
             worker = new TGWorker(TGInfoDialog.this);
-            mediator.addInterruptedListener(worker);
-            worker.execute();
+            worker.start();
         }
     };
 
@@ -67,18 +73,18 @@ public class TGInfoDialog extends JDialog {
 
         @Override
         public void writeln(String line) {
-            textArea.append(line + "\n");
+            ThreadUtilities.invokeOnEventQueue(() -> textArea.append(line + "\n"));
         }
 
         @Override
         public void writeException(Throwable t) {
-            t.printStackTrace();
-            textArea.append("Error: " + t.getMessage());
+            LOGGER.warn("Exception", t);
+            ThreadUtilities.invokeOnEventQueue(() -> textArea.append("Error: " + t.getMessage()));
         }
 
         @Override
         public void testGenerationCompleted() {
-            exitButton.setEnabled(true);
+            ThreadUtilities.invokeOnEventQueue(() -> exitButton.setEnabled(true));
         }
     };
 
@@ -96,7 +102,6 @@ public class TGInfoDialog extends JDialog {
         setTitle("Test Suite Generation");
         setSize(1000, 700);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(MainWindow.getInstance());
         setLayout(new BorderLayout());
 
         final JScrollPane scrollpane = new JScrollPane(textArea);

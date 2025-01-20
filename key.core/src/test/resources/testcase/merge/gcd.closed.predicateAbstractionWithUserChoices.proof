@@ -41,12 +41,11 @@
 
 \javaSource "";
 
-\proofObligation "#Proof Obligation Settings
-#Thu Mar 30 17:10:22 CEST 2017
-name=Gcd[Gcd\\:\\:gcd(int,int)].JML normal_behavior operation contract.0
-contract=Gcd[Gcd\\:\\:gcd(int,int)].JML normal_behavior operation contract.0
-class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
-";
+\proofObligation {
+	"name": "Gcd[Gcd::gcd(int,int)].JML normal_behavior operation contract.0",
+	"contract": "Gcd[Gcd::gcd(int,int)].JML normal_behavior operation contract.0",
+	"class": "de.uka.ilkd.key.proof.init.FunctionalOperationContractPO",
+ }
 
 \proof {
 (keyLog "0" (keyUser "dscheurer" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
@@ -55,11 +54,6 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
 
 (branch "dummy ID"
 (builtin "One Step Simplification" (formula "1") (newnames "a,b,result,exc,heapAtPre,o,f"))
-(rule "translateJavaMod" (formula "1") (term "0,0,0,1,0,0,1,1"))
-(rule "translateJavaMod" (formula "1") (term "0,1,0,1,0,0,1,1"))
-(rule "translateJavaMod" (formula "1") (term "0,1,0,0,0,1,1,0,0,1,1"))
-(rule "translateJavaMod" (formula "1") (term "0,1,0,0,1,1,0,0,1,1"))
-(rule "translateJavaMod" (formula "1") (term "0,1,0,1,1,0,0,1,1"))
 (rule "impRight" (formula "1"))
 (rule "andLeft" (formula "1"))
 (rule "inEqSimp_gtToGeq" (formula "3") (term "0,0,0,0,1,1,0,0,1"))
@@ -167,11 +161,6 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                (branch "Post (gcdHelp)"
                   (builtin "One Step Simplification" (formula "9"))
                   (builtin "One Step Simplification" (formula "10"))
-                  (rule "translateJavaMod" (formula "9") (term "0,0,0,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,0,0,1,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,0,1,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,1,1,0,1,1"))
                   (rule "andLeft" (formula "9"))
                   (rule "andLeft" (formula "10"))
                   (rule "andLeft" (formula "11"))
@@ -3381,11 +3370,6 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                (branch "Exceptional Post (gcdHelp)"
                   (builtin "One Step Simplification" (formula "10"))
                   (builtin "One Step Simplification" (formula "9"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,0,0,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,0,0,1,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,0,1,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,1,1,0,1,1"))
                   (rule "andLeft" (formula "9"))
                   (rule "selectCreatedOfAnonAsFormulaEQ" (formula "10") (term "1,0") (ifseqformula "9"))
                   (rule "andLeft" (formula "10"))
@@ -3444,11 +3428,6 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                (branch "Post (gcdHelp)"
                   (builtin "One Step Simplification" (formula "10"))
                   (builtin "One Step Simplification" (formula "9"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,0,0,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,0,0,1,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,0,1,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,1,1,0,1,1"))
                   (rule "andLeft" (formula "9"))
                   (rule "andLeft" (formula "10"))
                   (rule "andLeft" (formula "11"))
@@ -6800,11 +6779,6 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
                (branch "Exceptional Post (gcdHelp)"
                   (builtin "One Step Simplification" (formula "9"))
                   (builtin "One Step Simplification" (formula "10"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,0,0,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,0,0,1,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,0,1,1,0,1,1"))
-                  (rule "translateJavaMod" (formula "9") (term "0,1,0,1,1,0,1,1"))
                   (rule "andLeft" (formula "9"))
                   (rule "selectCreatedOfAnonAsFormulaEQ" (formula "10") (term "1,0") (ifseqformula "9"))
                   (rule "andLeft" (formula "10"))

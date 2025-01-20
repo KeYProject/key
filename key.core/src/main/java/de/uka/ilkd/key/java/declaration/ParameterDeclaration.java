@@ -1,14 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+
 /**
- * Formal parameters require a VariableSpecificationList of size() <= 1 (size() == 0 for abstract
+ * Formal parameters require a VariableSpecificationList of {@code size() <= 1} ({@code size() == 0}
+ * for abstract
  * methods) without initializer (for Java).
  */
 public class ParameterDeclaration extends VariableDeclaration {
@@ -50,7 +54,7 @@ public class ParameterDeclaration extends VariableDeclaration {
     public ParameterDeclaration(Modifier[] mods, TypeReference typeRef, VariableSpecification var,
             boolean parentIsInterfaceDeclaration, boolean parameterIsVarArg) {
         super(mods, typeRef, parentIsInterfaceDeclaration);
-        this.varSpec = new ImmutableArray<VariableSpecification>(var);
+        this.varSpec = new ImmutableArray<>(var);
         this.varArgParameter = parameterIsVarArg;
     }
 
@@ -85,7 +89,7 @@ public class ParameterDeclaration extends VariableDeclaration {
             boolean parameterIsVarArg) {
         super(children, parentIsInterfaceDeclaration);
         this.varSpec =
-            new ImmutableArray<VariableSpecification>(children.get(VariableSpecification.class));
+            new ImmutableArray<>(children.get(VariableSpecification.class));
         this.varArgParameter = parameterIsVarArg;
     }
 
@@ -107,12 +111,15 @@ public class ParameterDeclaration extends VariableDeclaration {
      */
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (varSpec != null)
+        }
+        if (varSpec != null) {
             result++;
+        }
         return result;
     }
 
@@ -134,13 +141,15 @@ public class ParameterDeclaration extends VariableDeclaration {
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (varSpec != null) {
-            if (index == 0)
+            if (index == 0) {
                 return varSpec.get(0);
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

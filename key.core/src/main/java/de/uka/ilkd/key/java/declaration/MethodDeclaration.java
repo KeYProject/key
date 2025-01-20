@@ -1,22 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.NamedProgramElement;
-import de.uka.ilkd.key.java.ParameterContainer;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.VariableScope;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Method declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -24,12 +22,48 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 public class MethodDeclaration extends JavaDeclaration implements MemberDeclaration,
         TypeReferenceContainer, NamedProgramElement, ParameterContainer, Method, VariableScope {
 
+    /**
+     * The return type of the method.
+     */
     protected final TypeReference returnType;
+    /**
+     * In case of void return type: comments associated with the method.
+     */
     protected final Comment[] voidComments;
+    /**
+     * The name of the method.
+     */
     protected final ProgramElementName name;
+    /**
+     * Parameters of the method.
+     */
     protected final ImmutableArray<ParameterDeclaration> parameters;
+    /**
+     * 'throws' part of the method. Indicates which exceptions the method may throw.
+     * May be null.
+     */
     protected final Throws exceptions;
+    /**
+     * Body of the method.
+     * May be null, in which case the body is referenced in a file using {@link #posInfo}.
+     */
     protected final StatementBlock body;
+    /**
+     * JML modifiers of the referenced method. Includes e.g. {@code pure}.
+     */
+    protected final JMLModifiers jmlModifiers;
+
+    /**
+     * JML modifiers of a method
+     *
+     * @param pure pure
+     * @param strictlyPure strictly pure
+     * @param helper helper
+     * @param specMathMode spec math mode
+     */
+    public record JMLModifiers(boolean pure, boolean strictlyPure, boolean helper,
+            SpecMathMode specMathMode) {
+    }
 
 
     /**
@@ -42,12 +76,14 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     /**
      * Method declaration.
      *
-     * @param children an ExtList of children. May include: a TypeReference (as a reference to the
-     *        return type), a de.uka.ilkd.key.logic.ProgramElementName (as Name of the method),
-     *        several ParameterDeclaration (as parameters of the declared method), a StatementBlock
-     *        (as body of the declared method), several Modifier (taken as modifiers of the
-     *        declaration), a Comment
+     * @param children an ExtList of children. Must include: a TypeReference (as a reference to the
+     *        return type),
+     *        a {@link ProgramElementName} (as Name of the method),
+     *        one or more {@link ParameterDeclaration} (as parameters of the declared method),
+     *        optionally a {@link StatementBlock} (as body of the declared method),
+     *        optionally a {@link Throws} to indicate exceptional behaviour
      * @param parentIsInterfaceDeclaration a boolean set true iff parent is an InterfaceDeclaration
+     * @param voidComments in case of void return type: comments associated with the method
      */
     public MethodDeclaration(ExtList children, boolean parentIsInterfaceDeclaration,
             Comment[] voidComments) {
@@ -56,11 +92,12 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         this.voidComments = voidComments;
         name = children.get(ProgramElementName.class);
         this.parameters =
-            new ImmutableArray<ParameterDeclaration>(children.collect(ParameterDeclaration.class));
+            new ImmutableArray<>(children.collect(ParameterDeclaration.class));
         exceptions = children.get(Throws.class);
         body = children.get(StatementBlock.class);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
         assert returnType == null || voidComments == null;
+        this.jmlModifiers = JMLInfoExtractor.parseMethod(this);
     }
 
 
@@ -78,7 +115,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     public MethodDeclaration(Modifier[] modifiers, TypeReference returnType,
             ProgramElementName name, ParameterDeclaration[] parameters, Throws exceptions,
             StatementBlock body, boolean parentIsInterfaceDeclaration) {
-        this(modifiers, returnType, name, new ImmutableArray<ParameterDeclaration>(parameters),
+        this(modifiers, returnType, name, new ImmutableArray<>(parameters),
             exceptions, body, parentIsInterfaceDeclaration);
     }
 
@@ -105,8 +142,12 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         this.exceptions = exceptions;
         this.body = body;
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
+        this.jmlModifiers = JMLInfoExtractor.parseMethod(this);
     }
 
+    public JMLModifiers getJmlModifiers() {
+        return jmlModifiers;
+    }
 
     @Override
     public ProgramElementName getProgramElementName() {
@@ -122,25 +163,31 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
 
     @Override
     public SourceElement getLastElement() {
-        return getChildAt(getChildCount() - 1).getLastElement();
+        return getChildAt(this.getChildCount() - 1).getLastElement();
     }
 
 
     @Override
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (returnType != null)
+        }
+        if (returnType != null) {
             result++;
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (parameters != null)
+        }
+        if (parameters != null) {
             result += parameters.size();
-        if (exceptions != null)
+        }
+        if (exceptions != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -156,13 +203,15 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
             index -= len;
         }
         if (returnType != null) {
-            if (index == 0)
+            if (index == 0) {
                 return returnType;
+            }
             index--;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (parameters != null) {
@@ -173,13 +222,15 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
             index -= len;
         }
         if (exceptions != null) {
-            if (index == 0)
+            if (index == 0) {
                 return exceptions;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -240,6 +291,12 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     }
 
 
+    /**
+     * Get the "void comments" of this method declaration.
+     * Only non-null if the method has void return type.
+     *
+     * @return the "void comments"
+     */
     public Comment[] getVoidComments() {
         return voidComments;
     }
@@ -298,7 +355,6 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         return parentIsInterfaceDeclaration || super.isPublic();
     }
 
-
     @Override
     public boolean isStatic() {
         return super.isStatic();
@@ -315,6 +371,10 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         return super.getStateCount();
     }
 
+    public boolean isVoid() {
+        return returnType == null || returnType.getKeYJavaType() == KeYJavaType.VOID_TYPE;
+    }
+
     /**
      * test whether the declaration is a method with a variable number of arguments (i.e. the
      * ellipsis ...)
@@ -322,8 +382,9 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
      * @return true iff so
      */
     public boolean isVarArgMethod() {
-        if (parameters == null || parameters.size() == 0)
+        if (parameters == null || parameters.size() == 0) {
             return false;
+        }
         return parameters.get(parameters.size() - 1).isVarArg();
     }
 
@@ -361,10 +422,5 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     @Override
     public void visit(Visitor v) {
         v.performActionOnMethodDeclaration(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printMethodDeclaration(this);
     }
 }

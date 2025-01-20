@@ -1,17 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Generic removing lemma generator adds the default implementation only that all
@@ -28,7 +31,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
     /**
      * The map from generic sorts to proxy sorts.
      */
-    private final Map<Sort, Sort> sortMap = new HashMap<Sort, Sort>();
+    private final Map<Sort, Sort> sortMap = new HashMap<>();
 
 
     /**
@@ -40,8 +43,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
     @Override
     protected Operator replaceOp(Operator op, TermServices services) {
 
-        if (op instanceof SortDependingFunction) {
-            SortDependingFunction sdf = (SortDependingFunction) op;
+        if (op instanceof SortDependingFunction sdf) {
             Sort sort = sdf.getSortDependingOn();
             Sort repSort = replaceSort(sort, services);
             if (sort != repSort) {
@@ -68,7 +70,7 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
             }
 
             ImmutableSet<Sort> extSorts = replaceSorts(sort.extendsSorts(), services);
-            ProxySort result = new ProxySort(sort.name(), extSorts);
+            ProxySort result = new ProxySort(sort.name(), extSorts, "", "");
             sortMap.put(sort, result);
             return result;
 

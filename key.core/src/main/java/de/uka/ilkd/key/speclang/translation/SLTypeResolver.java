@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -37,7 +40,7 @@ public final class SLTypeResolver extends SLExpressionResolver {
                     KeYJavaType containingType = receiver.getType();
                     while (true) {
                         String typeName = containingType.getSort().name().toString();
-                        if (typeName.substring(typeName.lastIndexOf(".") + 1).equals(name)) {
+                        if (typeName.substring(typeName.lastIndexOf('.') + 1).equals(name)) {
                             return new SLExpression(containingType);
                         }
                         ProgramVariable et = javaInfo.getAttribute(

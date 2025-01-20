@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -12,8 +15,8 @@ import de.uka.ilkd.key.logic.op.TermSV;
 @Deprecated
 public class NewDependingOn {
 
-    private SchemaVariable first;
-    private SchemaVariable second;
+    private final SchemaVariable first;
+    private final SchemaVariable second;
 
     /**
      * constructs a pair of variables given two SchemaVariables. The first SchemaVariable has to
@@ -49,10 +52,9 @@ public class NewDependingOn {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof NewDependingOn)) {
+        if (!(o instanceof NewDependingOn nfi)) {
             return false;
         }
-        NewDependingOn nfi = (NewDependingOn) o;
         return (nfi.first == first() && nfi.second == second());
     }
 

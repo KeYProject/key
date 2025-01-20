@@ -1,39 +1,27 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.rule;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -60,7 +48,7 @@ import de.uka.ilkd.key.util.Triple;
  * <li>Succedent: {@code <resultCondition> & <result> = <something>}</li>
  * </ul>
  * The side proof uses the default side proof settings (splitting = delayed) and is started via
- * {@link SymbolicExecutionUtil#startSideProof(de.uka.ilkd.key.proof.Proof, Sequent, String)}. In
+ * {@link SymbolicExecutionSideProofUtil#startSideProof}. In
  * case that at least one result branch has applicable rules an exception is thrown and the rule is
  * aborted.
  * </p>
@@ -130,7 +118,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
      * {@inheritDoc}
      */
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
             throws RuleAbortException {
         try {
             // Extract required Terms from goal
@@ -171,18 +159,18 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
                     .computeGeneralSequentToProve(goal.sequent(), pio.sequentFormula());
-            Function newPredicate = createResultFunction(sideProofServices, varTerm.sort());
+            JFunction newPredicate = createResultFunction(sideProofServices, varTerm.sort());
             final TermBuilder tb = sideProofServices.getTermBuilder();
             Term newTerm = tb.func(newPredicate, varTerm);
             Term newModalityTerm = sideProofServices.getTermFactory().createTerm(modalityTerm.op(),
-                new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(),
-                modalityTerm.javaBlock(), modalityTerm.getLabels());
+                new ImmutableArray<>(newTerm), modalityTerm.boundVars(),
+                modalityTerm.getLabels());
             Term newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
             sequentToProve = sequentToProve
                     .addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false)
                     .sequent();
             // Compute results and their conditions
-            List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
+            List<ResultsAndCondition> conditionsAndResultsMap =
                 computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
                     newPredicate);
             // Create new single goal in which the query is replaced by the possible results
@@ -190,11 +178,12 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             Goal resultGoal = goals.head();
             resultGoal.removeFormula(pio);
             // Create results
-            Set<Term> resultTerms = new LinkedHashSet<Term>();
-            for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
-                Term conditionTerm = tb.and(conditionsAndResult.second);
-                Term resultEqualityTerm = varFirst ? tb.equals(conditionsAndResult.first, otherTerm)
-                        : tb.equals(otherTerm, conditionsAndResult.first);
+            Set<Term> resultTerms = new LinkedHashSet<>();
+            for (ResultsAndCondition conditionsAndResult : conditionsAndResultsMap) {
+                Term conditionTerm = tb.and(conditionsAndResult.conditions());
+                Term resultEqualityTerm =
+                    varFirst ? tb.equals(conditionsAndResult.result(), otherTerm)
+                            : tb.equals(otherTerm, conditionsAndResult.result());
                 Term resultTerm = pio.isInAntec() ? tb.imp(conditionTerm, resultEqualityTerm)
                         : tb.and(conditionTerm, resultEqualityTerm);
                 resultTerms.add(resultTerm);

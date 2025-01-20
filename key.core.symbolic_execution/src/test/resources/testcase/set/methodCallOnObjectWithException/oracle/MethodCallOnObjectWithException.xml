@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call MethodCallOnObjectWithException.main()&gt;" pathCondition="true" pathConditionChanged="false">
-      <statement name="MethodCallOnObjectWithException x = new MethodCallOnObjectWithException ();" pathCondition="true" pathConditionChanged="false">
+      <statement name="MethodCallOnObjectWithException x = new MethodCallOnObjectWithException(
+    
+  );" pathCondition="true" pathConditionChanged="false">
          <methodCall name="&lt;call MethodCallOnObjectWithException()&gt;" pathCondition="true" pathConditionChanged="false">
             <methodReturn name="&lt;return of MethodCallOnObjectWithException&gt;" signature="&lt;return of MethodCallOnObjectWithException()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodCallOnObjectWithException&gt;" signatureIncludingReturnValue="&lt;return of MethodCallOnObjectWithException()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                <statement name="return x.doSomething();" pathCondition="true" pathConditionChanged="false">
@@ -9,7 +11,9 @@
                      <statement name="MethodCallOnObjectWithException x = null;" pathCondition="true" pathConditionChanged="false">
                         <statement name="return x_3.return42();" pathCondition="true" pathConditionChanged="false">
                            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call x.doSomething()&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
-                              <statement name="MethodCallOnObjectWithException y = new MethodCallOnObjectWithException ();" pathCondition="true" pathConditionChanged="false">
+                              <statement name="MethodCallOnObjectWithException y = new MethodCallOnObjectWithException(
+    
+  );" pathCondition="true" pathConditionChanged="false">
                                  <methodCall name="&lt;call MethodCallOnObjectWithException()&gt;" pathCondition="true" pathConditionChanged="false">
                                     <methodReturn name="&lt;return of MethodCallOnObjectWithException&gt;" signature="&lt;return of MethodCallOnObjectWithException()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodCallOnObjectWithException&gt;" signatureIncludingReturnValue="&lt;return of MethodCallOnObjectWithException()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                        <statement name="return y.return42();" pathCondition="true" pathConditionChanged="false">

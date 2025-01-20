@@ -1,14 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression.operator.adt;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 public class AllObjects extends Operator {
 
@@ -29,11 +31,6 @@ public class AllObjects extends Operator {
 
     public void visit(Visitor v) {
         v.performActionOnAllObjects(this);
-    }
-
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printAllObjects(this);
     }
 
     public int getArity() {

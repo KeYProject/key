@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 /**
@@ -33,11 +36,11 @@ public interface ProgressMonitor {
      * A progress monitor that does nothing. This is a singleton, use
      * {@link ProgressMonitor.Empty#getInstance} to get one.
      */
-    public static class Empty implements ProgressMonitor {
+    class Empty implements ProgressMonitor {
 
         private Empty() {}
 
-        private static Empty INSTANCE = new Empty();
+        private static final Empty INSTANCE = new Empty();
 
         /** Return a do-nothing progress monitor. */
         public static Empty getInstance() {

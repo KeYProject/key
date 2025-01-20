@@ -1,24 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.RewriteTaclet;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * A contract for checking the well-definedness of a specification for a class invariant.
@@ -30,10 +29,10 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     private final ClassInvariant inv;
 
     private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
-            LocationVariable heap, OriginalVariables origVars, Condition requires, Term assignable,
+            LocationVariable heap, OriginalVariables origVars, Condition requires, Term modifiable,
             Term accessible, Condition ensures, Term mby, Term rep, ClassInvariant inv,
             TermBuilder tb) {
-        super(name, id, type, target, heap, origVars, requires, assignable, accessible, ensures,
+        super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
         this.inv = inv;
     }
@@ -45,7 +44,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         assert inv != null;
         this.inv = inv;
         setRequires(inv.getOriginalInv());
-        setAssignable(TB.strictlyNothing(), services);
+        setModifiable(TB.strictlyNothing(), services);
         setEnsures(inv.getOriginalInv());
         setAccessible(accessible);
         setMby(mby);
@@ -54,13 +53,13 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     @Override
     public ClassWellDefinedness map(UnaryOperator<Term> op, Services services) {
         return new ClassWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
-            getOrigVars(), getRequires().map(op), op.apply(getAssignable()),
+            getOrigVars(), getRequires().map(op), op.apply(getModifiable()),
             op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
             op.apply(getRepresents()), inv.map(op, services), services.getTermBuilder());
     }
 
     @Override
-    Function generateMbyAtPreFunc(Services services) {
+    JFunction generateMbyAtPreFunc(Services services) {
         return null;
     }
 
@@ -82,9 +81,9 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final KeYJavaType kjt = services.getJavaInfo().getJavaLangObject();
         final String prefix = WellDefinednessCheck.INV_TACLET;
         final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
-        final SchemaVariable heapSV =
+        final TermSV heapSV =
             SchemaVariableFactory.createTermSV(new Name("h"), heap.sort());
-        final SchemaVariable sv = SchemaVariableFactory.createTermSV(new Name("a"), kjt.getSort());
+        final TermSV sv = SchemaVariableFactory.createTermSV(new Name("a"), kjt.getSort());
         final Term var = TB.var(sv);
         final Term wdSelf = TB.wd(var);
         final Term[] heaps = new Term[] { TB.var(heapSV) };
@@ -105,7 +104,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         return this.inv;
     }
 
-    public final void addInv(Term inv) {
+    public void addInv(Term inv) {
         addRequires(inv);
         addEnsures(inv);
     }
@@ -137,14 +136,14 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     @Override
     public ClassWellDefinedness setID(int newId) {
         return new ClassWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
-            getOrigVars(), getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getOrigVars(), getRequires(), getModifiable(), getAccessible(), getEnsures(), getMby(),
             getRepresents(), getInvariant(), TB);
     }
 
     @Override
     public ClassWellDefinedness setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new ClassWellDefinedness(getName(), id(), type(), newPM, getHeap(), getOrigVars(),
-            getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getRequires(), getModifiable(), getAccessible(), getEnsures(), getMby(),
             getRepresents(), getInvariant().setKJT(newKJT), TB);
     }
 

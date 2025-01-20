@@ -1,9 +1,13 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
 
-import recoder.abstraction.Package;
+import java.util.List;
+
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.java.Expression;
 import recoder.java.ProgramElement;
 import recoder.java.Reference;
@@ -12,8 +16,6 @@ import recoder.java.declaration.*;
 import recoder.java.reference.*;
 import recoder.java.statement.EmptyStatement;
 import recoder.util.ProgressListener;
-
-import java.util.List;
 
 /**
  * Implements queries for program model elements with concrete syntactical representations.
@@ -305,7 +307,7 @@ public interface SourceInfo extends ProgramModelInfo {
      * Returns the syntactical counterpart of the given method. Returns <CODE>
      * null</CODE>, if the given method is not a method declaration.
      *
-     * @param m a method.
+     * @param c a constructor.
      * @return the corresponding method declaration, or <CODE>null</CODE>, if the given method has
      *         no syntactical representation.
      */
@@ -315,7 +317,7 @@ public interface SourceInfo extends ProgramModelInfo {
      * Returns the syntactical counterpart of the given variable. Returns <CODE>
      * null</CODE>, if the given variable is not a variable specification.
      *
-     * @param m a variable.
+     * @param v a variable.
      * @return the corresponding variable specification, or <CODE>null</CODE>, if the given variable
      *         has no syntactical representation.
      */
@@ -359,4 +361,3 @@ public interface SourceInfo extends ProgramModelInfo {
     Type getAnnotationType(AnnotationUseSpecification au);
 
 }
-

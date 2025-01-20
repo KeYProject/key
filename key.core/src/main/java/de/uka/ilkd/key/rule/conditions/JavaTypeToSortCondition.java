@@ -1,21 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SortException;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.sort.Sort;
 
 
 /**
@@ -24,12 +29,12 @@ import de.uka.ilkd.key.util.Debug;
  */
 public final class JavaTypeToSortCondition implements VariableCondition {
 
-    private final SchemaVariable exprOrTypeSV;
+    private final OperatorSV exprOrTypeSV;
     private final GenericSort sort;
     private final boolean elemSort;
 
 
-    public JavaTypeToSortCondition(final SchemaVariable exprOrTypeSV, final GenericSort sort,
+    public JavaTypeToSortCondition(final OperatorSV exprOrTypeSV, final GenericSort sort,
             final boolean elemSort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
@@ -41,19 +46,16 @@ public final class JavaTypeToSortCondition implements VariableCondition {
     }
 
 
-    public static boolean checkSortedSV(final SchemaVariable exprOrTypeSV) {
+    public static boolean checkSortedSV(final OperatorSV exprOrTypeSV) {
         final Sort svSort = exprOrTypeSV.sort();
-        if (svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.SIMPLEEXPRESSION
+        return svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.SIMPLEEXPRESSION
                 || svSort == ProgramSVSort.NONSIMPLEEXPRESSION || svSort == ProgramSVSort.TYPE
-                || exprOrTypeSV.arity() == 0) {
-            return true;
-        }
-        return false;
+                || exprOrTypeSV.arity() == 0;
     }
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute svSubst,
+    public MatchConditions check(SchemaVariable var, SyntaxElement svSubst,
             MatchConditions matchCond, Services services) {
         if (var != exprOrTypeSV) {
             return matchCond;

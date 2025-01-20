@@ -1,0 +1,23 @@
+\rules {
+
+    \lemma
+    two_plus_two_is_four {
+        \find(2 + 2 = 4)
+        \sameUpdateLevel
+        \replacewith(true)
+    };
+    }
+\problem {
+add(Z(2(#)), Z(2(#))) = Z(4(#))
+}
+
+\proof {
+(keyLog "0" (keyUser "arne" ) (keyVersion "3b3afbd3c459d500948aebed1347d8d52aa969d6"))
+
+(autoModeTime "0")
+
+(branch "dummy ID"
+(rule "two_plus_two_is_four" (formula "1") (userinteraction))
+(rule "closeTrue" (formula "1") (userinteraction))
+)
+}

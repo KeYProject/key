@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import org.key_project.util.collection.ImmutableList;
@@ -103,14 +106,22 @@ public class SequentChangeInfo {
         this.originalSequent = originalSequent;
     }
 
+    public SequentChangeInfo copy() {
+        return new SequentChangeInfo(
+            antecedent == null ? null : antecedent.copy(),
+            succedent == null ? null : succedent.copy(),
+            resultingSequent,
+            originalSequent);
+    }
+
     /**
      * returns true iff the sequent has been changed by the operation
      *
      * @return true iff the sequent has been changed by the operation
      */
     public boolean hasChanged() {
-        return (antecedent == null || antecedent.hasChanged())
-                || (succedent == null || succedent.hasChanged());
+        return (antecedent != null && antecedent.hasChanged())
+                || (succedent != null && succedent.hasChanged());
     }
 
     /**
@@ -331,6 +342,4 @@ public class SequentChangeInfo {
 
         return result;
     }
-
-
 }

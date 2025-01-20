@@ -1,5 +1,9 @@
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
+
+import java.io.File;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -9,14 +13,15 @@ import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -92,8 +97,9 @@ public class TestTacletIndex {
 
     private boolean isRuleIn(ImmutableList<? extends TacletApp> l, TacletApp rule) {
         for (TacletApp aL : l) {
-            if (aL.taclet() == rule.taclet())
+            if (aL.taclet() == rule.taclet()) {
                 return true;
+            }
         }
         return false;
     }
@@ -254,7 +260,7 @@ public class TestTacletIndex {
             new InitConfig(new Services(AbstractProfile.getDefaultProfile()))), seq_p5);
         final BuiltInRuleAppIndex builtinIdx = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
         final Goal goal_p5 =
-            new Goal(node_p5, new RuleAppIndex(ruleIdx, builtinIdx, node_p5.proof().getServices()));
+            new Goal(node_p5, ruleIdx, builtinIdx, node_p5.proof().getServices());
         return goal_p5.ruleAppIndex();
     }
 

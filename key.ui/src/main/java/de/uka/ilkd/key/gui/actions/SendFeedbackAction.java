@@ -1,28 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.*;
+import java.net.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
@@ -39,8 +31,12 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
+
 import org.key_project.util.Streams;
 import org.key_project.util.java.IOUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Action that executes if "Send Feedback..." was pressed. There are currently two locations: In
@@ -53,6 +49,7 @@ import org.key_project.util.java.IOUtil;
  *
  */
 public class SendFeedbackAction extends AbstractAction {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SendFeedbackAction.class);
 
     private static final long serialVersionUID = 8146108238901822515L;
 
@@ -120,7 +117,8 @@ public class SendFeedbackAction extends AbstractAction {
             } catch (Exception e) {
                 zipEntryFileName += ".exception";
                 data = (e.getClass().getSimpleName() + " occured while trying to read data.\n"
-                    + e.getMessage() + "\n" + serializeStackTrace(e)).getBytes();
+                    + e.getMessage() + "\n" + serializeStackTrace(e))
+                        .getBytes(StandardCharsets.UTF_8);
             }
             stream.putNextEntry(new ZipEntry(zipEntryFileName));
             stream.write(data);
@@ -146,10 +144,7 @@ public class SendFeedbackAction extends AbstractAction {
             try {
                 String file =
                     MainWindow.getInstance().getRecentFiles().getMostRecent();
-                if (file == null || file.length() == 0) {
-                    return false;
-                }
-                return true;
+                return file != null && file.length() != 0;
             } catch (Exception e) {
                 return false;
             }
@@ -164,7 +159,7 @@ public class SendFeedbackAction extends AbstractAction {
 
         @Override
         byte[] retrieveFileData() {
-            return KeYConstants.VERSION.getBytes();
+            return KeYConstants.VERSION.getBytes(StandardCharsets.UTF_8);
         }
     }
 
@@ -180,11 +175,11 @@ public class SendFeedbackAction extends AbstractAction {
             System.getProperties().list(pw);
             String propsAsString = sw.getBuffer().toString();
             pw.close();
-            return propsAsString.getBytes();
+            return propsAsString.getBytes(StandardCharsets.UTF_8);
         }
     }
 
-    private class OpenGoalItem extends SendFeedbackFileItem {
+    private static class OpenGoalItem extends SendFeedbackFileItem {
         OpenGoalItem() {
             super("Send open proof goal", "openGoal.txt");
         }
@@ -193,7 +188,7 @@ public class SendFeedbackAction extends AbstractAction {
         byte[] retrieveFileData() {
             KeYMediator mediator = MainWindow.getInstance().getMediator();
             Goal goal = mediator.getSelectedGoal();
-            return goal.toString().getBytes();
+            return goal.toString().getBytes(StandardCharsets.UTF_8);
         }
 
         @Override
@@ -207,7 +202,7 @@ public class SendFeedbackAction extends AbstractAction {
         }
     }
 
-    private class OpenProofItem extends SendFeedbackFileItem {
+    private static class OpenProofItem extends SendFeedbackFileItem {
         OpenProofItem() {
             super("Send open proof", "openProof.proof");
         }
@@ -226,7 +221,7 @@ public class SendFeedbackAction extends AbstractAction {
         boolean isEnabled() {
             try {
                 Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
-                return proof == null ? false : true;
+                return proof != null;
             } catch (Exception e) {
                 return false;
             }
@@ -240,7 +235,8 @@ public class SendFeedbackAction extends AbstractAction {
 
         @Override
         byte[] retrieveFileData() {
-            return ProofSettings.DEFAULT_SETTINGS.settingsToString().getBytes();
+            return ProofSettings.DEFAULT_SETTINGS.settingsToString()
+                    .getBytes(StandardCharsets.UTF_8);
         }
     }
 
@@ -256,7 +252,7 @@ public class SendFeedbackAction extends AbstractAction {
 
         @Override
         byte[] retrieveFileData() {
-            return serializeStackTrace(throwable).getBytes();
+            return serializeStackTrace(throwable).getBytes(StandardCharsets.UTF_8);
         }
     }
 
@@ -268,29 +264,31 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         boolean isEnabled() {
             if (throwable != null) {
-                Location location = null;
                 try {
-                    location = ExceptionTools.getLocation(throwable);
+                    var location = ExceptionTools.getLocation(throwable);
+                    return location != null && location.getFileURI().isPresent();
                 } catch (MalformedURLException e) {
                     // no valid location could be extracted
-                    e.printStackTrace();
+                    LOGGER.warn("Failed to extract location", e);
                     return false;
                 }
-                return Location.isValidLocation(location);
             }
             return false;
         }
 
         @Override
         byte[] retrieveFileData() throws IOException {
-            Location location = ExceptionTools.getLocation(throwable);
             /*
              * Certainly there are more efficient methods than reading to string with IOUtil (using
              * default charset) and then writing back to byte[] (using default charset again).
              * However, this way it is a very concise and easy to read.
              */
-            String source = IOUtil.readFrom(location.getFileURL());
-            return source.getBytes(Charset.defaultCharset());
+            Location url = ExceptionTools.getLocation(throwable);
+            if (url != null) {
+                String content = IOUtil.readFrom(url.fileUri());
+                return content.getBytes(Charset.defaultCharset());
+            }
+            return new byte[0];
         }
     }
 
@@ -305,7 +303,7 @@ public class SendFeedbackAction extends AbstractAction {
             try {
                 Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
                 File javaSourceLocation = OutputStreamProofSaver.getJavaSourceLocation(proof);
-                return javaSourceLocation == null ? false : true;
+                return javaSourceLocation != null;
             } catch (Exception e) {
                 return false;
             }
@@ -360,6 +358,7 @@ public class SendFeedbackAction extends AbstractAction {
                         + "e-mail to " + FEEDBACK_RECIPIENT + ".", jfc.getSelectedFile()));
             }
         } catch (Exception e) {
+            LOGGER.error("", e);
             IssueDialog.showExceptionDialog(parent, e);
         }
     }
@@ -403,6 +402,7 @@ public class SendFeedbackAction extends AbstractAction {
             }
 
         } catch (Exception e) {
+            LOGGER.error("", e);
             IssueDialog.showExceptionDialog(parent, e);
         }
     }
@@ -422,14 +422,14 @@ public class SendFeedbackAction extends AbstractAction {
                 }
             }
             stream.putNextEntry(new ZipEntry("bugDescription.txt"));
-            stream.write(message.getBytes());
+            stream.write(message.getBytes(StandardCharsets.UTF_8));
             stream.closeEntry();
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(parent, e.getMessage());
         }
     }
 
-    private final SendFeedbackItem items[] = { new StacktraceItem(), new FaultyFileItem(),
+    private final SendFeedbackItem[] items = { new StacktraceItem(), new FaultyFileItem(),
         new LastLoadedProblemItem(), new VersionItem(), new SystemPropertiesItem(),
         new OpenGoalItem(), new OpenProofItem(), new SettingsItem(), new JavaSourceItem() };
 

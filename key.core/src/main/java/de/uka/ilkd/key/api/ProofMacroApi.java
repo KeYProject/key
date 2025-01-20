@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.api;
-
-import de.uka.ilkd.key.macros.ProofMacro;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
+
+import de.uka.ilkd.key.macros.ProofMacro;
 
 /**
  * This class provides access to the proof script commands.
@@ -14,7 +17,7 @@ import java.util.ServiceLoader;
  * @version 1 (09.05.17)
  */
 public class ProofMacroApi {
-    private Map<String, ProofMacro> commandMap = new HashMap<>();
+    private final Map<String, ProofMacro> commandMap = new HashMap<>();
 
     public ProofMacroApi() {
         initialize();
@@ -23,8 +26,9 @@ public class ProofMacroApi {
     private void initialize() {
         ServiceLoader<ProofMacro> loader = ServiceLoader.load(ProofMacro.class);
         loader.forEach(psc -> {
-            if (psc.getScriptCommandName() != null)
+            if (psc.getScriptCommandName() != null) {
                 commandMap.put(psc.getScriptCommandName(), psc);
+            }
         });
     }
 

@@ -1,4 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
+
+import java.awt.event.ActionEvent;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
@@ -7,17 +18,11 @@ import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.ui.MediatorProofControl;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.event.ActionEvent;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class provides an action for KeY UI which runs a set of specified proof files automatically.
@@ -41,8 +46,7 @@ public class RunAllProofsAction extends MainWindowAction {
     /**
      * Filename of the user-defined input files.
      */
-    @Nullable
-    private static final String RUN_ALL_PROOFS_UI = System.getenv(ENV_VARIABLE);
+    private static final @Nullable String RUN_ALL_PROOFS_UI = System.getenv(ENV_VARIABLE);
 
     /**
      * Default file name for lookup in the classpath.
@@ -65,8 +69,7 @@ public class RunAllProofsAction extends MainWindowAction {
      * content of {@link #ENV_VARIABLE} ({@link #RUN_ALL_PROOFS_UI}) is null, then
      * {@link #DEFAULT_FILE} is used.
      */
-    @Nonnull
-    private List<File> loadFiles() throws IOException {
+    private @NonNull List<File> loadFiles() throws IOException {
         LOGGER.info("Use 'export {}=<...>' to set the input file for {}.", ENV_VARIABLE,
             getClass().getSimpleName());
 
@@ -81,7 +84,8 @@ public class RunAllProofsAction extends MainWindowAction {
             stream = new FileInputStream(RUN_ALL_PROOFS_UI);
         }
 
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(stream))) {
+        try (BufferedReader in =
+            new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             return in.lines().filter(it -> !it.startsWith("#") && !it.trim().isEmpty())
                     .map(it -> (it.startsWith("/") ? new File(it) : new File(exampleDir, it))
                             .getAbsoluteFile())
@@ -99,7 +103,7 @@ public class RunAllProofsAction extends MainWindowAction {
             files = loadFiles();
         } catch (IOException e) {
             files = new ArrayList<>();
-            e.printStackTrace();
+            LOGGER.warn("Failed to load files");
         }
 
         setName("Run all proofs");

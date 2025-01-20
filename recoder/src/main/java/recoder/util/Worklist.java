@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 import java.util.Enumeration;
@@ -15,7 +17,7 @@ public class Worklist {
     /**
      * should it be possible to add items to the worklist twice?
      */
-    protected boolean allowDuplicates;
+    protected final boolean allowDuplicates;
 
     /**
      * records thw maximum length of the worklist
@@ -25,7 +27,7 @@ public class Worklist {
     /**
      * the queue that implements the worklist
      */
-    Queue impl = new Queue(HashCode.IDENTITY);
+    final Queue impl = new Queue(HashCode.IDENTITY);
 
     /**
      * creates a new empty worklist

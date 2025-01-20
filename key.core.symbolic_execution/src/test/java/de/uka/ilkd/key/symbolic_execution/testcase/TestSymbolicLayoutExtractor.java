@@ -1,4 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutExtractor;
@@ -9,18 +19,14 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.object_model.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import org.junit.jupiter.api.*;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * Tests {@link SymbolicLayoutExtractor}.
@@ -527,7 +533,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             String precondition, int numberOfReturnNodeInMostLeftBranch,
             int expectedNumberOfLayouts, boolean useOperationContracts,
             boolean onReturnStatementNode) throws Exception {
-        HashMap<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
@@ -635,7 +641,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
         extractor.analyse();
         // Test the initial memory layouts (first time with lazy computation)
         List<ISymbolicLayout> initialLayoutsFirstTime =
-            new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());
+            new ArrayList<>(extractor.getLayoutsCount());
         assertEquals(expectedNumberOfLayouts, extractor.getLayoutsCount());
         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
             ISymbolicLayout current = extractor.getInitialLayout(i);
@@ -657,7 +663,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
         }
         // Test the current memory layouts (first time with lazy computation)
         List<ISymbolicLayout> currentLayoutsFirstTime =
-            new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());
+            new ArrayList<>(extractor.getLayoutsCount());
         for (int i = 0; i < extractor.getLayoutsCount(); i++) {
             ISymbolicLayout current = extractor.getCurrentLayout(i);
             currentLayoutsFirstTime.add(current);

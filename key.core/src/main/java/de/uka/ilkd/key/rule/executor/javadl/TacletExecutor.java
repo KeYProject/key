@@ -1,12 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -20,10 +19,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
@@ -39,6 +35,10 @@ import de.uka.ilkd.key.rule.executor.RuleExecutor;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -162,7 +162,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
             RuleApp tacletApp, Services services) {
 
-        ImmutableList<SequentFormula> replacements = ImmutableSLList.<SequentFormula>nil();
+        ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(termLabelState, sf, services,
@@ -283,7 +283,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
     /**
      * adds the given rules (i.e. the rules to add according to the Taclet goal template to the node
-     * of the given goal
+     * of the given goal)
      *
      * @param rules the rules to be added
      * @param goal the goal describing the node where the rules should be added
@@ -296,9 +296,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
         for (Taclet tacletToAdd : rules) {
             final Node n = goal.node();
-            final StringBuilder uniqueTail = new StringBuilder(tacletToAdd.name().toString());
-            uniqueTail.append(AUTONAME).append(n.getUniqueTacletId());
-            tacletToAdd = tacletToAdd.setName(uniqueTail.toString());
+            tacletToAdd = tacletToAdd
+                    .setName(tacletToAdd.name().toString() + AUTONAME + n.getUniqueTacletId());
 
 
             // the new Taclet may contain variables with a known
@@ -339,10 +338,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
     protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
             SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,
             Services services, MatchConditions matchCond) {
-        ImmutableList<RenamingTable> renamings = ImmutableSLList.<RenamingTable>nil();
+        ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
         for (final SchemaVariable sv : pvs) {
-            final ProgramVariable inst =
-                (ProgramVariable) matchCond.getInstantiations().getInstantiation(sv);
+            final var inst =
+                (LocationVariable) matchCond.getInstantiations().getInstantiation(sv);
             // if the goal already contains the variable to be added
             // (not just a variable with the same name), then there is nothing to do
             Collection<IProgramVariable> progVars =
@@ -352,19 +351,19 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             }
 
             final VariableNamer vn = services.getVariableNamer();
-            final ProgramVariable renamedInst = vn.rename(inst, goal, posOfFind);
+            final LocationVariable renamedInst = vn.rename(inst, goal, posOfFind);
             goal.addProgramVariable(renamedInst);
             services.addNameProposal(renamedInst.name());
 
-            HashMap<ProgramVariable, ProgramVariable> renamingMap = vn.getRenamingMap();
+            final HashMap<LocationVariable, LocationVariable> renamingMap = vn.getRenamingMap();
             if (!renamingMap.isEmpty()) {
                 // execute renaming
-                final ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
+                final ProgVarReplacer pvr = new ProgVarReplacer(renamingMap, services);
 
                 // globals
                 // we do not need to do the old assignment
                 // goal.setGlobalProgVars(pvr.replace(Immutables.createSetFrom(progVars)));
-                // as the following assertions ensure it would have no effect anyways.
+                // as the following assertions ensure it would have no effect anyway.
                 assert renamingMap.size() == 1;
                 assert renamingMap.get(inst) == renamedInst;
                 assert !progVars.contains(inst);
@@ -405,12 +404,13 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         ImmutableList<SequentChangeInfo> res = null;
         Iterator<SequentChangeInfo> itNewGoalSequents;
 
-        // proof obligation for the if formulas
+        // proof obligation for the if-formulas
         Term ifObl = null;
 
         // always create at least one new goal
-        if (p_numberOfNewGoals == 0)
+        if (p_numberOfNewGoals == 0) {
             p_numberOfNewGoals = 1;
+        }
 
         if (p_list != null) {
             int i = taclet.ifSequent().antecedent().size();
@@ -421,16 +421,17 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                     // build the if obligation formula
                     ifPart = inst.getConstrainedFormula().formula();
 
-                    // negate formulas of the if succedent
+                    // negate formulas of the if-succedent
                     final TermServices services = p_goal.proof().getServices();
-                    if (i <= 0)
+                    if (i <= 0) {
                         ifPart = services.getTermBuilder().not(ifPart);
+                    }
 
                     if (res == null) {
-                        res = ImmutableSLList.<SequentChangeInfo>nil();
+                        res = ImmutableSLList.nil();
                         for (int j = 0; j < p_numberOfNewGoals + 1; j++) {
                             res = res.prepend(SequentChangeInfo.createSequentChangeInfo(
-                                (SemisequentChangeInfo) null, (SemisequentChangeInfo) null,
+                                (SemisequentChangeInfo) null, null,
                                 p_goal.sequent(), p_goal.sequent()));
                         }
                         ifObl = ifPart;
@@ -455,11 +456,11 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         }
 
         if (res == null) {
-            res = ImmutableSLList.<SequentChangeInfo>nil();
+            res = ImmutableSLList.nil();
             for (int j = 0; j < p_numberOfNewGoals; j++) {
                 res = res.prepend(
                     SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo) null,
-                        (SemisequentChangeInfo) null, p_goal.sequent(), p_goal.sequent()));
+                        null, p_goal.sequent(), p_goal.sequent()));
             }
         } else {
             // find the sequent the if obligation has to be added to

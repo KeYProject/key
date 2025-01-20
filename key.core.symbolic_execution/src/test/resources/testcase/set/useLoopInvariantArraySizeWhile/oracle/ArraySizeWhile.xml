@@ -6,12 +6,12 @@
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
             <loopInvariant name="invariant: ((i &gt;= 0 &amp; i &lt;= array.length)&lt;&lt;SC&gt;&gt; &amp; result = i)&lt;&lt;SC&gt;&gt;;
-variant: javaSubInt(array.length, i)
+variant: array.length - i
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
                <branchCondition name="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_0,i_0)),gt(length(array),i_0)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_0,i_0)),gt(length(array),i_0)))" pathConditionChanged="true" branchCondition="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_0,i_0)),gt(length(array),i_0)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
-                  <loopCondition name="i&lt;array.length" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_0,i_0)),gt(length(array),i_0)))" pathConditionChanged="false" blockOpened="false">
+                  <loopCondition name="i &lt; array.length;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_0,i_0)),gt(length(array),i_0)))" pathConditionChanged="false" blockOpened="false">
                      <callStackEntry path="/0"/>
                      <statement name="result++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(result_0,i_0)),gt(length(array),i_0)))" pathConditionChanged="false">
                         <callStackEntry path="/0"/>

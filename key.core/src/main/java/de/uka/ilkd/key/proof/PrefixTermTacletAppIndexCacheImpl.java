@@ -1,12 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
+
+import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
 import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * The abstract superclass of caches for taclet app indexes that are implemented using a common
@@ -40,8 +45,9 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
     @SuppressWarnings("unused")
     private void countAccess(boolean hit) {
         ++total;
-        if (hit)
+        if (hit) {
             ++hits;
+        }
         if (total % 1000 == 0 && total != 0) {
             LOGGER.info("{} {}, size {}: {}", name(), hashCode(), cache.size(),
                 ((double) hits) / (double) total);
@@ -87,10 +93,10 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         }
 
         public boolean equals(Object obj) {
-            if (!(obj instanceof CacheKey))
+            if (!(obj instanceof CacheKey objKey)) {
                 return false;
+            }
 
-            final CacheKey objKey = (CacheKey) obj;
             return parent == objKey.parent && analysedTerm.equals(objKey.analysedTerm);
         }
 

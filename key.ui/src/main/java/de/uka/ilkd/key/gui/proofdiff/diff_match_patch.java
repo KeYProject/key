@@ -1,24 +1,11 @@
-/*
- * Diff Match and Patch
- *
- * Copyright 2006 Google Inc. http://code.google.com/p/google-diff-match-patch/
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
- */
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.proofdiff;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,41 +32,41 @@ public class diff_match_patch {
     /**
      * Cost of an empty edit operation in terms of edit characters.
      */
-    public short Diff_EditCost = 4;
+    public final short Diff_EditCost = 4;
     /**
      * At what point is no match declared (0.0 = perfection, 1.0 = very loose).
      */
-    public float Match_Threshold = 0.5f;
+    public final float Match_Threshold = 0.5f;
     /**
      * How far to search for a match (0 = exact location, 1000+ = broad match). A match this many
      * characters away from the expected location will add 1.0 to the score (0.0 is a perfect
      * match).
      */
-    public int Match_Distance = 1000;
+    public final int Match_Distance = 1000;
     /**
      * When deleting a large block of text (over ~64 characters), how close do the contents have to
      * be to match the expected contents. (0.0 = perfection, 1.0 = very loose). Note that
      * Match_Threshold controls how closely the end points of a delete need to match.
      */
-    public float Patch_DeleteThreshold = 0.5f;
+    public final float Patch_DeleteThreshold = 0.5f;
     /**
      * Chunk size for context length.
      */
-    public short Patch_Margin = 4;
+    public final short Patch_Margin = 4;
 
     /**
      * The number of bits in an int.
      */
-    private short Match_MaxBits = 32;
+    private final short Match_MaxBits = 32;
 
     /**
      * Internal class for returning results from diff_linesToChars(). Other less paranoid languages
      * just use a three-element array.
      */
     protected static class LinesToCharsResult {
-        protected String chars1;
-        protected String chars2;
-        protected List<String> lineArray;
+        protected final String chars1;
+        protected final String chars2;
+        protected final List<String> lineArray;
 
         protected LinesToCharsResult(String chars1, String chars2, List<String> lineArray) {
             this.chars1 = chars1;
@@ -156,7 +143,7 @@ public class diff_match_patch {
         // Check for equality (speedup).
         LinkedList<Diff> diffs;
         if (text1.equals(text2)) {
-            diffs = new LinkedList<Diff>();
+            diffs = new LinkedList<>();
             if (text1.length() != 0) {
                 diffs.add(new Diff(Operation.EQUAL, text1));
             }
@@ -203,7 +190,7 @@ public class diff_match_patch {
      */
     private LinkedList<Diff> diff_compute(String text1, String text2, boolean checklines,
             long deadline) {
-        LinkedList<Diff> diffs = new LinkedList<Diff>();
+        LinkedList<Diff> diffs = new LinkedList<>();
 
         if (text1.length() == 0) {
             // Just add some text (speedup).
@@ -295,19 +282,19 @@ public class diff_match_patch {
         diffs.add(new Diff(Operation.EQUAL, ""));
         int count_delete = 0;
         int count_insert = 0;
-        String text_delete = "";
-        String text_insert = "";
+        StringBuilder text_delete = new StringBuilder();
+        StringBuilder text_insert = new StringBuilder();
         ListIterator<Diff> pointer = diffs.listIterator();
         Diff thisDiff = pointer.next();
         while (thisDiff != null) {
             switch (thisDiff.operation) {
             case INSERT:
                 count_insert++;
-                text_insert += thisDiff.text;
+                text_insert.append(thisDiff.text);
                 break;
             case DELETE:
                 count_delete++;
-                text_delete += thisDiff.text;
+                text_delete.append(thisDiff.text);
                 break;
             case EQUAL:
                 // Upon reaching an equality, check for prior redundancies.
@@ -318,14 +305,15 @@ public class diff_match_patch {
                         pointer.previous();
                         pointer.remove();
                     }
-                    for (Diff newDiff : diff_main(text_delete, text_insert, false, deadline)) {
+                    for (Diff newDiff : diff_main(text_delete.toString(), text_insert.toString(),
+                        false, deadline)) {
                         pointer.add(newDiff);
                     }
                 }
                 count_insert = 0;
                 count_delete = 0;
-                text_delete = "";
-                text_insert = "";
+                text_delete = new StringBuilder();
+                text_insert = new StringBuilder();
                 break;
             }
             thisDiff = pointer.hasNext() ? pointer.next() : null;
@@ -449,7 +437,7 @@ public class diff_match_patch {
         }
         // Diff took too long and hit the deadline or
         // number of diffs equals number of characters, no commonality at all.
-        LinkedList<Diff> diffs = new LinkedList<Diff>();
+        LinkedList<Diff> diffs = new LinkedList<>();
         diffs.add(new Diff(Operation.DELETE, text1));
         diffs.add(new Diff(Operation.INSERT, text2));
         return diffs;
@@ -490,8 +478,8 @@ public class diff_match_patch {
      *         strings. The zeroth element of the List of unique strings is intentionally blank.
      */
     protected LinesToCharsResult diff_linesToChars(String text1, String text2) {
-        List<String> lineArray = new ArrayList<String>();
-        Map<String, Integer> lineHash = new LinkedHashMap<String, Integer>();
+        List<String> lineArray = new ArrayList<>();
+        Map<String, Integer> lineHash = new LinkedHashMap<>();
         // e.g. linearray[4] == "Hello\n"
         // e.g. linehash.get("Hello\n") == 4
 
@@ -531,11 +519,11 @@ public class diff_match_patch {
             lineStart = lineEnd + 1;
 
             if (lineHash.containsKey(line)) {
-                chars.append(String.valueOf((char) (int) lineHash.get(line)));
+                chars.append((char) (int) lineHash.get(line));
             } else {
                 lineArray.add(line);
                 lineHash.put(line, lineArray.size() - 1);
-                chars.append(String.valueOf((char) (lineArray.size() - 1)));
+                chars.append((char) (lineArray.size() - 1));
             }
         }
         return chars.toString();
@@ -739,7 +727,7 @@ public class diff_match_patch {
             return;
         }
         boolean changes = false;
-        Stack<Diff> equalities = new Stack<Diff>(); // Stack of qualities.
+        Stack<Diff> equalities = new Stack<>(); // Stack of qualities.
         String lastequality = null; // Always equal to equalities.lastElement().text
         ListIterator<Diff> pointer = diffs.listIterator();
         // Number of characters that changed prior to the equality.
@@ -1010,8 +998,8 @@ public class diff_match_patch {
     }
 
     // Define some regex patterns for matching boundaries.
-    private Pattern BLANKLINEEND = Pattern.compile("\\n\\r?\\n\\Z", Pattern.DOTALL);
-    private Pattern BLANKLINESTART = Pattern.compile("\\A\\r?\\n\\r?\\n", Pattern.DOTALL);
+    private final Pattern BLANKLINEEND = Pattern.compile("\\n\\r?\\n\\Z", Pattern.DOTALL);
+    private final Pattern BLANKLINESTART = Pattern.compile("\\A\\r?\\n\\r?\\n", Pattern.DOTALL);
 
     /**
      * Reduce the number of edits by eliminating operationally trivial equalities.
@@ -1023,7 +1011,7 @@ public class diff_match_patch {
             return;
         }
         boolean changes = false;
-        Stack<Diff> equalities = new Stack<Diff>(); // Stack of equalities.
+        Stack<Diff> equalities = new Stack<>(); // Stack of equalities.
         String lastequality = null; // Always equal to equalities.lastElement().text
         ListIterator<Diff> pointer = diffs.listIterator();
         // Is there an insertion operation before the last equality.
@@ -1405,14 +1393,10 @@ public class diff_match_patch {
         for (Diff aDiff : diffs) {
             switch (aDiff.operation) {
             case INSERT:
-                try {
-                    text.append("+")
-                            .append(URLEncoder.encode(aDiff.text, "UTF-8").replace('+', ' '))
-                            .append("\t");
-                } catch (UnsupportedEncodingException e) {
-                    // Not likely on modern system.
-                    throw new Error("This system does not support UTF-8.", e);
-                }
+                text.append("+")
+                        .append(
+                            URLEncoder.encode(aDiff.text, StandardCharsets.UTF_8).replace('+', ' '))
+                        .append("\t");
                 break;
             case DELETE:
                 text.append("-").append(aDiff.text.length()).append("\t");
@@ -1442,7 +1426,7 @@ public class diff_match_patch {
      */
     public LinkedList<Diff> diff_fromDelta(String text1, String delta)
             throws IllegalArgumentException {
-        LinkedList<Diff> diffs = new LinkedList<Diff>();
+        LinkedList<Diff> diffs = new LinkedList<>();
         int pointer = 0; // Cursor in text1
         String[] tokens = delta.split("\t");
         for (String token : tokens) {
@@ -1458,10 +1442,7 @@ public class diff_match_patch {
                 // decode would change all "+" to " "
                 param = param.replace("+", "%2B");
                 try {
-                    param = URLDecoder.decode(param, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    // Not likely on modern system.
-                    throw new Error("This system does not support UTF-8.", e);
+                    param = URLDecoder.decode(param, StandardCharsets.UTF_8);
                 } catch (IllegalArgumentException e) {
                     // Malformed URI sequence.
                     throw new IllegalArgumentException("Illegal escape in diff_fromDelta: " + param,
@@ -1535,7 +1516,7 @@ public class diff_match_patch {
             // Nothing to match.
             return -1;
         } else if (loc + pattern.length() <= text.length()
-                && text.substring(loc, loc + pattern.length()).equals(pattern)) {
+                && text.startsWith(pattern, loc)) {
             // Perfect match at the perfect spot! (Includes case of null pattern)
             return loc;
         } else {
@@ -1673,7 +1654,7 @@ public class diff_match_patch {
      * @return Hash of character locations.
      */
     protected Map<Character, Integer> match_alphabet(String pattern) {
-        Map<Character, Integer> s = new LinkedHashMap<Character, Integer>();
+        Map<Character, Integer> s = new LinkedHashMap<>();
         char[] char_pattern = pattern.toCharArray();
         for (char c : char_pattern) {
             s.put(c, 0);
@@ -1799,7 +1780,7 @@ public class diff_match_patch {
             throw new IllegalArgumentException("Null inputs. (patch_make)");
         }
 
-        LinkedList<Patch> patches = new LinkedList<Patch>();
+        LinkedList<Patch> patches = new LinkedList<>();
         if (diffs.isEmpty()) {
             return patches; // Get rid of the null case.
         }
@@ -1881,7 +1862,7 @@ public class diff_match_patch {
      * @return Array of Patch objects.
      */
     public LinkedList<Patch> patch_deepCopy(LinkedList<Patch> patches) {
-        LinkedList<Patch> patchesCopy = new LinkedList<Patch>();
+        LinkedList<Patch> patchesCopy = new LinkedList<>();
         for (Patch aPatch : patches) {
             Patch patchCopy = new Patch();
             for (Diff aDiff : aPatch.diffs) {
@@ -2013,9 +1994,9 @@ public class diff_match_patch {
      */
     public String patch_addPadding(LinkedList<Patch> patches) {
         short paddingLength = this.Patch_Margin;
-        String nullPadding = "";
+        StringBuilder nullPadding = new StringBuilder();
         for (short x = 1; x <= paddingLength; x++) {
-            nullPadding += String.valueOf((char) x);
+            nullPadding.append((char) x);
         }
 
         // Bump all the patches forward.
@@ -2029,7 +2010,7 @@ public class diff_match_patch {
         LinkedList<Diff> diffs = patch.diffs;
         if (diffs.isEmpty() || diffs.getFirst().operation != Operation.EQUAL) {
             // Add nullPadding equality.
-            diffs.addFirst(new Diff(Operation.EQUAL, nullPadding));
+            diffs.addFirst(new Diff(Operation.EQUAL, nullPadding.toString()));
             patch.start1 -= paddingLength; // Should be 0.
             patch.start2 -= paddingLength; // Should be 0.
             patch.length1 += paddingLength;
@@ -2050,7 +2031,7 @@ public class diff_match_patch {
         diffs = patch.diffs;
         if (diffs.isEmpty() || diffs.getLast().operation != Operation.EQUAL) {
             // Add nullPadding equality.
-            diffs.addLast(new Diff(Operation.EQUAL, nullPadding));
+            diffs.addLast(new Diff(Operation.EQUAL, nullPadding.toString()));
             patch.length1 += paddingLength;
             patch.length2 += paddingLength;
         } else if (paddingLength > diffs.getLast().text.length()) {
@@ -2062,7 +2043,7 @@ public class diff_match_patch {
             patch.length2 += extraLength;
         }
 
-        return nullPadding;
+        return nullPadding.toString();
     }
 
     /**
@@ -2189,12 +2170,12 @@ public class diff_match_patch {
      * @throws IllegalArgumentException If invalid input.
      */
     public List<Patch> patch_fromText(String textline) throws IllegalArgumentException {
-        List<Patch> patches = new LinkedList<Patch>();
+        List<Patch> patches = new LinkedList<>();
         if (textline.length() == 0) {
             return patches;
         }
         List<String> textList = Arrays.asList(textline.split("\n"));
-        LinkedList<String> text = new LinkedList<String>(textList);
+        LinkedList<String> text = new LinkedList<>(textList);
         Patch patch;
         Pattern patchHeader = Pattern.compile("^@@ -(\\d+),?(\\d*) \\+(\\d+),?(\\d*) @@$");
         Matcher m;
@@ -2241,10 +2222,7 @@ public class diff_match_patch {
                 line = text.getFirst().substring(1);
                 line = line.replace("+", "%2B"); // decode would change all "+" to " "
                 try {
-                    line = URLDecoder.decode(line, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    // Not likely on modern system.
-                    throw new Error("This system does not support UTF-8.", e);
+                    line = URLDecoder.decode(line, StandardCharsets.UTF_8);
                 } catch (IllegalArgumentException e) {
                     // Malformed URI sequence.
                     throw new IllegalArgumentException("Illegal escape in patch_fromText: " + line,
@@ -2344,13 +2322,10 @@ public class diff_match_patch {
                 return false;
             }
             if (text == null) {
-                if (other.text != null) {
-                    return false;
-                }
-            } else if (!text.equals(other.text)) {
-                return false;
+                return other.text == null;
+            } else {
+                return text.equals(other.text);
             }
-            return true;
         }
     }
 
@@ -2359,7 +2334,7 @@ public class diff_match_patch {
      * Class representing one patch operation.
      */
     public static class Patch {
-        public LinkedList<Diff> diffs;
+        public final LinkedList<Diff> diffs;
         public int start1;
         public int start2;
         public int length1;
@@ -2369,7 +2344,7 @@ public class diff_match_patch {
          * Constructor. Initializes with an empty list of diffs.
          */
         public Patch() {
-            this.diffs = new LinkedList<Diff>();
+            this.diffs = new LinkedList<>();
         }
 
         /**
@@ -2409,13 +2384,8 @@ public class diff_match_patch {
                     text.append(' ');
                     break;
                 }
-                try {
-                    text.append(URLEncoder.encode(aDiff.text, "UTF-8").replace('+', ' '))
-                            .append("\n");
-                } catch (UnsupportedEncodingException e) {
-                    // Not likely on modern system.
-                    throw new Error("This system does not support UTF-8.", e);
-                }
+                text.append(URLEncoder.encode(aDiff.text, StandardCharsets.UTF_8).replace('+', ' '))
+                        .append("\n");
             }
             return unescapeForEncodeUriCompatability(text.toString());
         }

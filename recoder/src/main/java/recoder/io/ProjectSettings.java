@@ -1,6 +1,14 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.io;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.*;
 
 import recoder.AbstractService;
 import recoder.ServiceConfiguration;
@@ -8,12 +16,6 @@ import recoder.parser.JavaCCParser;
 import recoder.service.DefaultErrorHandler;
 import recoder.service.ErrorHandler;
 import recoder.util.FileUtils;
-
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.io.File;
-import java.io.FileFilter;
-import java.util.*;
 
 /**
  * The project settings object manages global properties such as search and output paths, and
@@ -26,11 +28,7 @@ import java.util.*;
  */
 public class ProjectSettings extends AbstractService implements PropertyNames {
 
-    private static final FileFilter jarFilter = new FileFilter() {
-        public boolean accept(File pathname) {
-            return pathname.getPath().endsWith(".jar");
-        }
-    };
+    private static final FileFilter jarFilter = pathname -> pathname.getPath().endsWith(".jar");
     /**
      * The default properties.
      */
@@ -125,7 +123,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
     }
 
     public final boolean java5Allowed() {
-        return Boolean.valueOf(properties.getProperty(JAVA_5)).booleanValue();
+        return Boolean.valueOf(properties.getProperty(JAVA_5));
     }
 
     /**
@@ -205,8 +203,8 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
         if (pathlist == null) {
             return null;
         }
-        Set<String> alreadyExisting = new HashSet<String>();
-        StringBuffer newpathlist = new StringBuffer();
+        Set<String> alreadyExisting = new HashSet<>();
+        StringBuilder newpathlist = new StringBuilder();
         pathlist = pathlist.replace('/', File.separatorChar);
         pathlist = pathlist.replace('\\', File.separatorChar);
         StringTokenizer paths = new StringTokenizer(pathlist, File.pathSeparator);
@@ -266,17 +264,17 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
         }
         String oldpath = getProperty(INPUT_PATH);
         String extPath = extDir.getPath();
-        if (oldpath.indexOf(extPath) != -1) {
+        if (oldpath.contains(extPath)) {
             return;
         }
 
         // add all the jars from extDir in the path
-        StringBuffer additions = null;
+        StringBuilder additions = null;
         File[] jars = extDir.listFiles(ProjectSettings.jarFilter);
         if (jars.length > 0) {
-            additions = new StringBuffer();
-            for (int i = 0; i < jars.length; i++) {
-                additions.append(File.pathSeparator + jars[i].getPath());
+            additions = new StringBuilder();
+            for (File jar : jars) {
+                additions.append(File.pathSeparator + jar.getPath());
             }
         }
         setProperty(INPUT_PATH, oldpath + File.pathSeparator + additions);

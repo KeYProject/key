@@ -1,10 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -15,6 +14,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This dialog allows the user to select the proof to load from a proof bundle.
@@ -24,6 +28,7 @@ import java.util.zip.ZipFile;
 public final class ProofSelectionDialog extends JDialog {
 
     private static final long serialVersionUID = -586107341789859969L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofSelectionDialog.class);
 
     /**
      * Regex for identifiers (class, method), which catches for example "java.lang.Object",
@@ -82,12 +87,10 @@ public final class ProofSelectionDialog extends JDialog {
         Dimension buttonDim = new Dimension(100, 27);
         okButton.setPreferredSize(buttonDim);
         okButton.setMinimumSize(buttonDim);
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                proofToLoad = list.getSelectedValue();
-                setVisible(false);
-                dispose();
-            }
+        okButton.addActionListener(e -> {
+            proofToLoad = list.getSelectedValue();
+            setVisible(false);
+            dispose();
         });
         // disable "Ok" button if no proof was found
         if (list.getModel().getSize() == 0) {
@@ -100,11 +103,9 @@ public final class ProofSelectionDialog extends JDialog {
         JButton cancelButton = new JButton("Cancel");
         cancelButton.setPreferredSize(buttonDim);
         cancelButton.setMinimumSize(buttonDim);
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-                dispose();
-            }
+        cancelButton.addActionListener(e -> {
+            setVisible(false);
+            dispose();
         });
         buttonPanel.add(cancelButton);
 
@@ -120,13 +121,16 @@ public final class ProofSelectionDialog extends JDialog {
      * @throws IOException if the proof bundle can not be read
      */
     private JList<Path> createAndFillList(Path bundlePath) throws IOException {
-        // read zip
-        ZipFile bundle = new ZipFile(bundlePath.toFile());
-
         // create a list of all *.proof files (only top level in bundle)
-        List<Path> proofs = bundle.stream().filter(e -> !e.isDirectory())
-                .filter(e -> e.getName().endsWith(".proof")).map(e -> Paths.get(e.getName()))
-                .collect(Collectors.toList());
+        List<Path> proofs;
+        // read zip
+        try (ZipFile bundle = new ZipFile(bundlePath.toFile())) {
+            proofs = bundle.stream().filter(e -> !e.isDirectory())
+                    .filter(e -> e.getName().endsWith(".proof")).map(e -> Paths.get(e.getName()))
+                    .collect(Collectors.toList());
+        }
+
+
 
         // show the list in a JList
         DefaultListModel<Path> model = new DefaultListModel<>();
@@ -146,21 +150,17 @@ public final class ProofSelectionDialog extends JDialog {
                 }
             }
         });
-        list.setCellRenderer(new ListCellRenderer<Path>() {
-            @Override
-            public Component getListCellRendererComponent(JList<? extends Path> jList, Path value,
-                    int index, boolean isSelected, boolean cellHasFocus) {
-                JLabel label = new JLabel(abbreviateProofPath(value));
-                label.setOpaque(true); // allows for color changes via setSelectionBackground()
-                if (isSelected) {
-                    label.setBackground(list.getSelectionBackground());
-                    label.setForeground(list.getSelectionForeground());
-                } else {
-                    label.setBackground(list.getBackground());
-                    label.setForeground(list.getForeground());
-                }
-                return label;
+        list.setCellRenderer((jList, value, index, isSelected, cellHasFocus) -> {
+            JLabel label = new JLabel(abbreviateProofPath(value));
+            label.setOpaque(true); // allows for color changes via setSelectionBackground()
+            if (isSelected) {
+                label.setBackground(list.getSelectionBackground());
+                label.setForeground(list.getSelectionForeground());
+            } else {
+                label.setBackground(list.getBackground());
+                label.setForeground(list.getForeground());
             }
+            return label;
         });
         return list;
     }
@@ -210,6 +210,7 @@ public final class ProofSelectionDialog extends JDialog {
             dialog.setVisible(true);
             proofPath = dialog.proofToLoad;
         } catch (IOException exc) {
+            LOGGER.error("", exc);
             IssueDialog.showExceptionDialog(MainWindow.getInstance(), exc);
         }
         return proofPath;

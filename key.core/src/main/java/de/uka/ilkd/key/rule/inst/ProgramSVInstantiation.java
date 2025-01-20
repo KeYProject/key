@@ -1,16 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 
 /**
- * this class wrapps a ImmMap<SchemaVariable,JavaProgramElement> and is used to store instantiations
+ * this class wrapps an {@link ImmutableList} and is used to store instantiations
  * of schemavariables. The class is immutable, this means changing its content will result in
  * creating a new object.
  */
@@ -21,7 +24,7 @@ public class ProgramSVInstantiation {
         new ProgramSVInstantiation();
 
     /** the map with the instantiations */
-    private ImmutableList<ProgramSVEntry> list = ImmutableSLList.<ProgramSVEntry>nil();
+    private ImmutableList<ProgramSVEntry> list = ImmutableSLList.nil();
 
     /** integer to cache the hashcode */
     private int hashcode = 0;
@@ -108,7 +111,7 @@ public class ProgramSVInstantiation {
     /**
      * returns iterator of the listped pair (SchemaVariables, JavaProgramElement)
      *
-     * @return the Iterator<IEntry<SchemaVariable,JavaProgramElement>>
+     * @return the Iterator
      */
     public Iterator<ProgramSVEntry> iterator() {
         return list.iterator();
@@ -164,7 +167,7 @@ public class ProgramSVInstantiation {
 
     /** toString */
     public String toString() {
-        StringBuffer result = new StringBuffer("ProgramSVInstantiation:\n");
+        StringBuilder result = new StringBuilder("ProgramSVInstantiation:\n");
         return (result.append(list.toString())).toString();
     }
 }

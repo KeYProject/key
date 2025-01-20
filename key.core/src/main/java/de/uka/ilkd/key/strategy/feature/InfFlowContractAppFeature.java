@@ -1,10 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
 
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
@@ -30,6 +30,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableMapEntry;
 
 
 public class InfFlowContractAppFeature implements Feature {
@@ -79,7 +82,7 @@ public class InfFlowContractAppFeature implements Feature {
             if (!(cmp instanceof PosTacletApp)) {
                 return false;
             }
-            final PosInOccurrence oldPio = ((PosTacletApp) cmp).posInOccurrence();
+            final PosInOccurrence oldPio = cmp.posInOccurrence();
             if (!comparePio(newApp, cmp, newPio, oldPio)) {
                 return false;
             }
@@ -199,7 +202,8 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;
@@ -246,7 +250,7 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     private ArrayList<SequentFormula> getRelatesTerms(Goal goal) {
-        ArrayList<SequentFormula> list = new ArrayList<SequentFormula>();
+        ArrayList<SequentFormula> list = new ArrayList<>();
         Semisequent antecedent = goal.node().sequent().antecedent();
         for (SequentFormula f : antecedent) {
             if (f.formula().op().toString().startsWith("RELATED_BY_")) {

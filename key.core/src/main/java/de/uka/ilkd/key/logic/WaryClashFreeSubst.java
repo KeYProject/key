@@ -1,13 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 
 public class WaryClashFreeSubst extends ClashFreeSubst {
 
@@ -91,7 +94,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
             } else {
                 newVar = getVariable();
             }
-            newVarTerm = tb.var(newVar);
+            newVarTerm = tb.varOfQuantVar(newVar);
         }
     }
 
@@ -172,7 +175,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
         final boolean addSubst = subTermChanges(t.varsBoundHere(targetPos), target);
         newSubterms[targetPos] = addSubst ? substWithNewVar(target) : target;
 
-        return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock());
+        return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), null);
     }
 
     /**

@@ -1,4 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.smt.settings;
+
+import java.math.RoundingMode;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
@@ -7,26 +13,13 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
-import javax.swing.*;
-
-import java.math.RoundingMode;
-
-import static de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider.BUNDLE;
-
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
 class SolverOptions extends SettingsPanel implements SettingsProvider {
-    private static final String INFO_SOLVER_NAME = "infoSolverName";
-    private static final String INFO_SOLVER_PARAMETERS = "infoSolverParameters";
-    private static final String INFO_SOLVER_COMMAND = "infoSolverCommand";
-    private static final String INFO_SOLVER_SUPPORT = "infoSolverSupport";
-    private static final String INFO_SOLVER_INFO = "SOLVER_INFO";
-    private static final String[] SOLVER_SUPPORT_TEXT = { BUNDLE.getString("SOLVER_SUPPORTED"),
-        BUNDLE.getString("SOLVER_MAY_SUPPORTED"), BUNDLE.getString("SOLVER_UNSUPPORTED") };
-    private static final String INFO_SOLVER_TIMEOUT = "SOLVER_TIMEOUT";
-
+    private static final String[] SOLVER_SUPPORT_TEXT = { SMTSettingsProvider.SOLVER_SUPPORTED,
+        SMTSettingsProvider.SOLVER_MAY_SUPPORTED, SMTSettingsProvider.SOLVER_UNSUPPORTED };
     private static final int SOLVER_SUPPORTED = 0;
 
     private static final int SOLVER_NOT_SUPPOTED = 1;
@@ -55,14 +48,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         createCheckSupportButton();
     }
 
-    private static final String versionInfo(String info, String versionString) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(info);
-        builder.append(" ");
-        builder.append("(");
-        builder.append(versionString);
-        builder.append(")");
-        return builder.toString();
+    private static String versionInfo(String info, String versionString) {
+        return info + " " + "(" + versionString + ")";
     }
 
     protected JButton createDefaultButton() {
@@ -74,9 +61,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     private String createSupportedVersionText() {
-        StringBuilder result = new StringBuilder("The following minimal version is supported: ");
-        result.append(solverType.getMinimumSupportedVersion());
-        return result.toString();
+        return "The following minimal version is supported: "
+            + solverType.getMinimumSupportedVersion();
     }
 
     private String getSolverSupportText() {
@@ -88,12 +74,21 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         }
     }
 
-    private JTextField createSolverInformation() {
+    private JTextArea createSolverInformation() {
         String info = solverType.getInfo();
-        if (info != null && !info.equals("")) {
-            JTextField solverInfo =
-                addTextField("Info", info, BUNDLE.getString(INFO_SOLVER_INFO), null);
+        if (info != null && !info.isEmpty()) {
+            JTextArea solverInfo =
+                addTextAreaWithoutScroll("Info", info, SMTSettingsProvider.INFO_SOLVER_INFO, null);
+            solverInfo.setLineWrap(true);
+            solverInfo.setWrapStyleWord(true);
             solverInfo.setEditable(false);
+
+            // text field to copy style from
+            JTextField textField = new JTextField();
+            textField.setEditable(false);
+            solverInfo.setBackground(textField.getBackground());
+            solverInfo.setBorder(textField.getBorder());
+
             return solverInfo;
         }
         return null;
@@ -102,7 +97,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     protected JTextField createSolverSupported() {
 
         JTextField txt = addTextField("Support", getSolverSupportText(),
-            BUNDLE.getString(INFO_SOLVER_SUPPORT) + createSupportedVersionText(), emptyValidator());
+            SMTSettingsProvider.INFO_SOLVER_SUPPORT + createSupportedVersionText(),
+            emptyValidator());
         txt.setEditable(false);
         return txt;
     }
@@ -117,7 +113,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         // Use floor rounding to be consistent with the value that will be set for the timeout.
         editor.getFormat().setRoundingMode(RoundingMode.FLOOR);
         jsp.setEditor(editor);
-        addTitledComponent("Timeout", jsp, BUNDLE.getString(INFO_SOLVER_TIMEOUT));
+        addTitledComponent("Timeout", jsp, SMTSettingsProvider.INFO_SOLVER_TIMEOUT);
         return jsp;
     }
 
@@ -134,13 +130,13 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     protected JTextField createSolverParameters() {
         return addTextField("Parameters", solverType.getSolverParameters(),
-            BUNDLE.getString(INFO_SOLVER_PARAMETERS), e -> {
+            SMTSettingsProvider.INFO_SOLVER_PARAMETERS, e -> {
             });
     }
 
     public JTextField createSolverCommand() {
         return addTextField("Command", solverType.getSolverCommand(),
-            BUNDLE.getString(INFO_SOLVER_COMMAND), e -> {
+            SMTSettingsProvider.INFO_SOLVER_COMMAND, e -> {
             });
     }
 
@@ -169,7 +165,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     protected JTextField createSolverName() {
         JTextField txt = addTextField("Name", solverType.getName(),
-            BUNDLE.getString(INFO_SOLVER_NAME), emptyValidator());
+            SMTSettingsProvider.INFO_SOLVER_NAME, emptyValidator());
         txt.setEditable(false);
         return txt;
     }
@@ -180,7 +176,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         setSmtSettings(SettingsManager.getSmtPiSettings().clone());
         return this;
     }

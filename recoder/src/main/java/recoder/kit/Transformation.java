@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -126,7 +128,7 @@ public abstract class Transformation {
     public static void doAttach(Import child, CompilationUnit parent, int index) {
         ASTList<Import> list = parent.getImports();
         if (list == null) {
-            parent.setImports(list = new ASTArrayList<Import>());
+            parent.setImports(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParent(parent);
@@ -153,7 +155,7 @@ public abstract class Transformation {
     public static void doAttach(Statement child, StatementBlock parent, int index) {
         ASTList<Statement> list = parent.getBody();
         if (list == null) {
-            parent.setBody(list = new ASTArrayList<Statement>());
+            parent.setBody(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setStatementContainer(parent);
@@ -191,7 +193,7 @@ public abstract class Transformation {
     public static void doAttach(Statement child, Case parent, int index) {
         ASTList<Statement> list = parent.getBody();
         if (list == null) {
-            parent.setBody(list = new ASTArrayList<Statement>());
+            parent.setBody(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setStatementContainer(parent);
@@ -207,7 +209,7 @@ public abstract class Transformation {
     public static void doAttach(Statement child, Default parent, int index) {
         ASTList<Statement> list = parent.getBody();
         if (list == null) {
-            parent.setBody(list = new ASTArrayList<Statement>());
+            parent.setBody(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setStatementContainer(parent);
@@ -313,7 +315,7 @@ public abstract class Transformation {
     public static void doAttach(TypeDeclaration child, CompilationUnit parent, int index) {
         ASTList<TypeDeclaration> list = parent.getDeclarations();
         if (list == null) {
-            parent.setDeclarations(list = new ASTArrayList<TypeDeclaration>());
+            parent.setDeclarations(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParent(parent);
@@ -329,7 +331,7 @@ public abstract class Transformation {
     public static void doAttach(ClassDeclaration child, StatementBlock parent, int index) {
         ASTList<Statement> list = parent.getBody();
         if (list == null) {
-            parent.setBody(list = new ASTArrayList<Statement>());
+            parent.setBody(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParent(parent);
@@ -356,7 +358,7 @@ public abstract class Transformation {
     public static void doAttach(MemberDeclaration child, TypeDeclaration parent, int index) {
         ASTList<MemberDeclaration> list = parent.getMembers();
         if (list == null) {
-            parent.setMembers(list = new ASTArrayList<MemberDeclaration>());
+            parent.setMembers(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setMemberParent(parent);
@@ -373,7 +375,7 @@ public abstract class Transformation {
 
         ASTList<ParameterDeclaration> list = parent.getParameters();
         if (list == null) {
-            parent.setParameters(list = new ASTArrayList<ParameterDeclaration>());
+            parent.setParameters(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParameterContainer(parent);
@@ -400,7 +402,7 @@ public abstract class Transformation {
     public static void doAttach(DeclarationSpecifier child, Declaration parent, int index) {
         ASTList<DeclarationSpecifier> list = parent.getDeclarationSpecifiers();
         if (list == null) {
-            parent.setDeclarationSpecifiers(list = new ASTArrayList<DeclarationSpecifier>());
+            parent.setDeclarationSpecifiers(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParent(parent);
@@ -464,7 +466,7 @@ public abstract class Transformation {
 
         ASTList<FieldSpecification> list = parent.getFieldSpecifications();
         if (list == null) {
-            parent.setFieldSpecifications(list = new ASTArrayList<FieldSpecification>());
+            parent.setFieldSpecifications(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParent(parent);
@@ -482,7 +484,7 @@ public abstract class Transformation {
 
         ASTList<VariableSpecification> list = parent.getVariableSpecifications();
         if (list == null) {
-            parent.setVariableSpecifications(list = new ASTArrayList<VariableSpecification>());
+            parent.setVariableSpecifications(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParent(parent);
@@ -519,7 +521,7 @@ public abstract class Transformation {
     public static void doAttachAsInitializer(LoopInitializer child, For parent) {
         ASTList<LoopInitializer> list = parent.getInitializers();
         if (list == null) {
-            parent.setInitializers(list = new ASTArrayList<LoopInitializer>());
+            parent.setInitializers(list = new ASTArrayList<>());
         }
         list.add(0, child);
         child.setStatementContainer(parent);
@@ -570,7 +572,7 @@ public abstract class Transformation {
     public static void doAttachAsUpdate(ExpressionStatement child, For parent, int index) {
         ASTList<Expression> list = parent.getUpdates();
         if (list == null) {
-            parent.setUpdates(list = new ASTArrayList<Expression>());
+            parent.setUpdates(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setExpressionContainer(parent);
@@ -608,7 +610,7 @@ public abstract class Transformation {
     public static void doAttach(Catch child, Try parent, int index) {
         ASTList<Branch> list = parent.getBranchList();
         if (list == null) {
-            parent.setBranchList(list = new ASTArrayList<Branch>());
+            parent.setBranchList(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParent(parent);
@@ -624,7 +626,7 @@ public abstract class Transformation {
     public static void doAttach(Finally child, Try parent, int index) {
         ASTList<Branch> list = parent.getBranchList();
         if (list == null) {
-            parent.setBranchList(list = new ASTArrayList<Branch>());
+            parent.setBranchList(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParent(parent);
@@ -640,7 +642,7 @@ public abstract class Transformation {
     public static void doAttach(Case child, Switch parent, int index) {
         ASTList<Branch> list = parent.getBranchList();
         if (list == null) {
-            parent.setBranchList(list = new ASTArrayList<Branch>());
+            parent.setBranchList(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParent(parent);
@@ -656,7 +658,7 @@ public abstract class Transformation {
     public static void doAttach(Default child, Switch parent, int index) {
         ASTList<Branch> list = parent.getBranchList();
         if (list == null) {
-            parent.setBranchList(list = new ASTArrayList<Branch>());
+            parent.setBranchList(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParent(parent);
@@ -694,7 +696,7 @@ public abstract class Transformation {
     public static void doAttachAsArgument(Expression child, ArrayReference parent, int index) {
         ASTList<Expression> list = parent.getDimensionExpressions();
         if (list == null) {
-            parent.setDimensionExpressions(list = new ASTArrayList<Expression>());
+            parent.setDimensionExpressions(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setExpressionContainer(parent);
@@ -743,7 +745,7 @@ public abstract class Transformation {
     public static void doAttachAsArgument(Expression child, MethodReference parent, int index) {
         ASTList<Expression> list = parent.getArguments();
         if (list == null) {
-            parent.setArguments(list = new ASTArrayList<Expression>());
+            parent.setArguments(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setExpressionContainer(parent);
@@ -827,7 +829,7 @@ public abstract class Transformation {
     public static void doAttach(ArrayInitializer child, ArrayInitializer parent, int index) {
         ASTList<Expression> list = parent.getArguments();
         if (list == null) {
-            parent.setArguments(list = new ASTArrayList<Expression>());
+            parent.setArguments(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setExpressionContainer(parent);
@@ -911,7 +913,7 @@ public abstract class Transformation {
     public static void doAttachAsArgument(Expression child, Operator parent, int index) {
         ASTList<Expression> list = parent.getArguments();
         if (list == null) {
-            parent.setArguments(list = new ASTArrayList<Expression>());
+            parent.setArguments(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setExpressionContainer(parent);
@@ -928,7 +930,7 @@ public abstract class Transformation {
             int index) {
         ASTList<Expression> list = parent.getArguments();
         if (list == null) {
-            parent.setArguments(list = new ASTArrayList<Expression>());
+            parent.setArguments(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setExpressionContainer(parent);
@@ -954,7 +956,7 @@ public abstract class Transformation {
     public static void doAttachAsArgument(Expression child, TypeCast parent) {
         ASTList<Expression> list = parent.getArguments();
         if (list == null) {
-            parent.setArguments(list = new ASTArrayList<Expression>());
+            parent.setArguments(list = new ASTArrayList<>());
         }
         list.add(0, child);
         child.setExpressionContainer(parent);
@@ -969,7 +971,7 @@ public abstract class Transformation {
     public static void doAttachAsArgument(Expression child, Instanceof parent) {
         ASTList<Expression> list = parent.getArguments();
         if (list == null) {
-            parent.setArguments(list = new ASTArrayList<Expression>());
+            parent.setArguments(list = new ASTArrayList<>());
         }
         list.add(0, child);
         child.setExpressionContainer(parent);
@@ -985,7 +987,7 @@ public abstract class Transformation {
     public static void doAttachAsArgument(Expression child, New parent, int index) {
         ASTList<Expression> list = parent.getArguments();
         if (list == null) {
-            parent.setArguments(list = new ASTArrayList<Expression>());
+            parent.setArguments(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setExpressionContainer(parent);
@@ -1001,7 +1003,7 @@ public abstract class Transformation {
     public static void doAttachAsArgument(Expression child, NewArray parent, int index) {
         ASTList<Expression> list = parent.getArguments();
         if (list == null) {
-            parent.setArguments(list = new ASTArrayList<Expression>());
+            parent.setArguments(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setExpressionContainer(parent);
@@ -1056,7 +1058,7 @@ public abstract class Transformation {
     public static void doAttach(TypeReference child, InheritanceSpecification parent, int index) {
         ASTList<TypeReference> list = parent.getSupertypes();
         if (list == null) {
-            parent.setSupertypes(list = new ASTArrayList<TypeReference>());
+            parent.setSupertypes(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParent(parent);
@@ -1097,7 +1099,7 @@ public abstract class Transformation {
     public static void doAttach(TypeReference child, Throws parent, int index) {
         ASTList<TypeReference> list = parent.getExceptions();
         if (list == null) {
-            parent.setExceptions(list = new ASTArrayList<TypeReference>());
+            parent.setExceptions(list = new ASTArrayList<>());
         }
         list.add(index, child);
         child.setParent(parent);
@@ -2236,4 +2238,3 @@ public abstract class Transformation {
     }
 
 }
-

@@ -7,7 +7,7 @@
             <callStackEntry path="/0"/>
             <blockContract name="result_0 = magic()) catch(exc_0)
 pre measuredByEmpty &amp; x_3 = 4711
-post returned = TRUE
+post   returned = TRUE
 &amp; exc_0 = null
 &amp; (returned = TRUE -&gt; result_0 = -2)
 mod {}&lt;&lt;impl&gt;&gt;termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false">

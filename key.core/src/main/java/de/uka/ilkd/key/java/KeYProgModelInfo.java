@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
+
+import java.util.*;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
@@ -11,16 +16,16 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
 import recoder.java.CompilationUnit;
-
-import java.util.*;
 
 public class KeYProgModelInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYProgModelInfo.class);
@@ -226,7 +231,9 @@ public class KeYProgModelInfo {
         if (recoderType instanceof recoder.java.declaration.TypeDeclaration) {
             return ((recoder.java.declaration.TypeDeclaration) recoderType).isFinal();
         } else // array or primitive type
+        {
             return false;
+        }
     }
 
 
@@ -294,16 +301,19 @@ public class KeYProgModelInfo {
             return bt1.getFullName().equals(bt2.getFullName());
         }
         if (bt1 instanceof recoder.abstraction.ClassType
-                && bt2 instanceof recoder.abstraction.ClassType)
-            return isSubtype((recoder.abstraction.ClassType) bt1,
-                (recoder.abstraction.ClassType) bt2);
+                && bt2 instanceof recoder.abstraction.ClassType) {
+            return isSubtype((ClassType) bt1,
+                (ClassType) bt2);
+        }
         if (bt1 instanceof recoder.abstraction.ArrayType
-                && bt2 instanceof recoder.abstraction.ArrayType)
+                && bt2 instanceof recoder.abstraction.ArrayType) {
             return isAssignmentCompatible((recoder.abstraction.ArrayType) bt1,
                 (recoder.abstraction.ArrayType) bt2);
+        }
         if (bt1 instanceof recoder.abstraction.ClassType
-                && bt2 instanceof recoder.abstraction.ArrayType)
+                && bt2 instanceof recoder.abstraction.ArrayType) {
             return false;
+        }
         if (bt1 instanceof recoder.abstraction.ArrayType
                 && bt2 instanceof recoder.abstraction.ClassType) {
             if (((recoder.abstraction.ClassType) bt2).isInterface()) {
@@ -319,8 +329,7 @@ public class KeYProgModelInfo {
     private List<recoder.abstraction.Method> getRecoderMethods(KeYJavaType kjt) {
         if (kjt.getJavaType() instanceof TypeDeclaration) {
             Object o = rec2key().toRecoder(kjt);
-            if (o instanceof recoder.abstraction.ClassType) {
-                recoder.abstraction.ClassType rct = (recoder.abstraction.ClassType) o;
+            if (o instanceof ClassType rct) {
                 return rct.getProgramModelInfo().getMethods(rct);
             }
         }
@@ -474,9 +483,9 @@ public class KeYProgModelInfo {
         ImmutableArray<MemberDeclaration> members = cd.getMembers();
         for (int i = 0; i < members.size(); i++) {
             final MemberDeclaration member = members.get(i);
-            if (member instanceof IProgramMethod
-                    && ((IProgramMethod) member).getMethodDeclaration().getName().equals(name)) {
-                return (IProgramMethod) member;
+            if (member instanceof IProgramMethod pm
+                    && pm.getMethodDeclaration().getName().equals(name)) {
+                return pm;
             }
         }
         LOGGER.debug("keyprogmodelinfo: implicit method {} not found in {}", name, ct);
@@ -506,7 +515,6 @@ public class KeYProgModelInfo {
         if (methodlist.size() == 1) {
             return (IProgramMethod) rec2key().toKeY(methodlist.get(0));
         } else if (methodlist.isEmpty()) {
-            LOGGER.debug("javainfo: Program Method not found: {}", m);
             return null;
         } else {
             Debug.fail();
@@ -729,8 +737,9 @@ public class KeYProgModelInfo {
             List<recoder.abstraction.ClassType> superTypes = rct.getAllSupertypes();
             int k = 0;
             while (k < superTypes.size()
-                    && !declaresApplicableMethods(superTypes.get(k), name, rsignature))
+                    && !declaresApplicableMethods(superTypes.get(k), name, rsignature)) {
                 k++;
+            }
             if (k < superTypes.size()) {
                 rct = superTypes.get(k);
                 KeYJavaType r = (KeYJavaType) mapping.toKeY(rct);
@@ -784,10 +793,11 @@ public class KeYProgModelInfo {
         while (i < s) {
             recoder.abstraction.Method m = list.get(i);
             if (name.equals(m.getName()) && si.isCompatibleSignature(signature, m.getSignature())
-                    && si.isVisibleFor(m, ct) && !m.isAbstract())
+                    && si.isVisibleFor(m, ct) && !m.isAbstract()) {
                 return true;
-            else
+            } else {
                 i++;
+            }
         }
         return false;
     }
@@ -804,20 +814,17 @@ public class KeYProgModelInfo {
         while (i < s) {
             recoder.abstraction.Method m = list.get(i);
             if (name.equals(m.getName()) && si.isCompatibleSignature(signature, m.getSignature())
-                    && si.isVisibleFor(m, ct))
+                    && si.isVisibleFor(m, ct)) {
                 return true;
-            else
+            } else {
                 i++;
+            }
         }
         return false;
     }
 
     public void putImplicitMethod(IProgramMethod m, KeYJavaType t) {
-        Map<String, IProgramMethod> map = implicits.get(t);
-        if (map == null) {
-            map = new LinkedHashMap<>();
-            implicits.put(t, map);
-        }
+        Map<String, IProgramMethod> map = implicits.computeIfAbsent(t, k -> new LinkedHashMap<>());
         map.put(m.name().toString(), m);
     }
 

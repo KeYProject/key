@@ -1,15 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.StringUtil;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -29,6 +23,10 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Abstract base class for all default implementations of the sub-interfaces of
@@ -54,9 +52,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     protected final IProgramMethod method;
 
     /**
-     * @see #getModality()
+     * @see AuxiliaryContract#getModalityKind()
      */
-    protected final Modality modality;
+    protected final Modality.JavaModalityKind modalityKind;
 
     /**
      * @see #getInstantiationSelfTerm()
@@ -89,9 +87,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     protected final Map<LocationVariable, Term> freePostconditions;
 
     /**
-     * @see #getModifiesClause(LocationVariable, Services)
+     * @see #getModifiableClause(LocationVariable, Services)
      */
-    protected final Map<LocationVariable, Term> modifiesClauses;
+    protected final Map<LocationVariable, Term> modifiableClauses;
+
+    /**
+     * @see #getFreeModifiableClause(LocationVariable, Services)
+     */
+    protected final Map<LocationVariable, Term> freeModifiableClauses;
 
     /**
      * @see #getInfFlowSpecs()
@@ -109,9 +112,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     protected final boolean transactionApplicable;
 
     /**
-     * @see #hasModifiesClause(LocationVariable)
+     * @see #hasModifiableClause(LocationVariable)
      */
-    protected final Map<LocationVariable, Boolean> hasMod;
+    protected final Map<LocationVariable, Boolean> hasModifiable;
+
+    /**
+     * @see #hasFreeModifiableClause(LocationVariable)
+     */
+    protected final Map<LocationVariable, Boolean> hasFreeModifiable;
 
     /**
      * @see #getBaseName()
@@ -129,54 +137,62 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param block the block this contract belongs to.
      * @param labels all labels belonging to the block.
      * @param method the method containing the block.
-     * @param modality this contract's modality.
+     * @param modalityKind this contract's modality kind.
      * @param preconditions this contract's preconditions on every heap.
      * @param measuredBy this contract's measured-by term.
      * @param postconditions this contract's postconditions on every heap.
-     * @param modifiesClauses this contract's modifies clauses on every heap.
+     * @param modifiableClauses this contract's modifiable clauses on every heap.
+     * @param freeModifiableClauses this contract's free modifiable clauses on every heap.
      * @param infFlowSpecs this contract's information flow specifications.
      * @param variables this contract's variables.
-     * @param transactionApplicable whether or not this contract is applicable for transactions.
-     * @param hasMod a map specifying on which heaps this contract has a modified clause.
+     * @param transactionApplicable whether this contract is applicable for transactions.
+     * @param hasModifiable a map specifying on which heaps this contract has a modifiable clause.
      * @param functionalContracts the functional contracts corresponding to this contract.
      */
     public AbstractAuxiliaryContractImpl(final String baseName, final StatementBlock block,
-            final List<Label> labels, final IProgramMethod method, final Modality modality,
+            final List<Label> labels, final IProgramMethod method,
+            final Modality.JavaModalityKind modalityKind,
             final Map<LocationVariable, Term> preconditions,
             final Map<LocationVariable, Term> freePreconditions, final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
             final Map<LocationVariable, Term> freePostconditions,
-            final Map<LocationVariable, Term> modifiesClauses,
-            final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
-            final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
+            final Map<LocationVariable, Term> modifiableClauses,
+            final Map<LocationVariable, Term> freeModifiableClauses,
+            final ImmutableList<InfFlowSpec> infFlowSpecs,
+            final Variables variables,
+            final boolean transactionApplicable,
+            final Map<LocationVariable, Boolean> hasModifiable,
+            final Map<LocationVariable, Boolean> hasFreeModifiable,
             ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
         assert block != null;
         assert labels != null;
         assert method != null;
-        assert modality != null;
+        assert modalityKind != null;
         assert preconditions != null;
         assert postconditions != null;
-        assert modifiesClauses != null;
+        assert modifiableClauses != null;
         assert variables.breakFlags != null;
         assert variables.continueFlags != null;
         assert variables.exception != null;
-        assert variables.remembranceHeaps != null && variables.remembranceHeaps.size() > 0;
+        assert variables.remembranceHeaps != null && !variables.remembranceHeaps.isEmpty();
         assert variables.remembranceLocalVariables != null;
         this.baseName = baseName;
         this.block = block;
         this.labels = labels;
         this.method = method;
-        this.modality = modality;
+        this.modalityKind = modalityKind;
         this.preconditions = preconditions;
         this.freePreconditions = freePreconditions;
         this.measuredBy = measuredBy;
         this.postconditions = postconditions;
         this.freePostconditions = freePostconditions;
-        this.modifiesClauses = modifiesClauses;
+        this.modifiableClauses = modifiableClauses;
+        this.freeModifiableClauses = freeModifiableClauses;
         this.infFlowSpecs = infFlowSpecs;
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
-        this.hasMod = hasMod;
+        this.hasModifiable = hasModifiable;
+        this.hasFreeModifiable = hasFreeModifiable;
         this.functionalContracts = functionalContracts;
     }
 
@@ -206,8 +222,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Modality getModality() {
-        return modality;
+    public Modality.JavaModalityKind getModalityKind() {
+        return modalityKind;
     }
 
     @Override
@@ -227,13 +243,18 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public boolean isReadOnly(final Services services) {
-        return modifiesClauses.get(services.getTypeConverter().getHeapLDT().getHeap())
+        return modifiableClauses.get(services.getTypeConverter().getHeapLDT().getHeap())
                 .op() == services.getTypeConverter().getLocSetLDT().getEmpty();
     }
 
     @Override
-    public boolean hasModifiesClause(LocationVariable heap) {
-        return hasMod.get(heap);
+    public boolean hasModifiableClause(LocationVariable heap) {
+        return hasModifiable.get(heap);
+    }
+
+    @Override
+    public boolean hasFreeModifiableClause(LocationVariable heap) {
+        return hasFreeModifiable.get(heap);
     }
 
     @Override
@@ -298,7 +319,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Term getMby(ProgramVariable selfVar, Services services) {
+    public Term getMby(LocationVariable selfVar, Services services) {
         return getTerm(measuredBy,
             new Variables(selfVar, null, null, null, null, null, null, null, null, null, services),
             services);
@@ -312,7 +333,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Term getPrecondition(final LocationVariable heap, final ProgramVariable self,
+    public Term getPrecondition(final LocationVariable heap, final LocationVariable self,
             final Map<LocationVariable, LocationVariable> atPres, final Services services) {
         return getTerm(preconditions.get(heap),
             new Variables(self, null, null, null, null, null, null, null, null, atPres, services),
@@ -360,7 +381,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Term getFreePrecondition(final LocationVariable heap, final ProgramVariable self,
+    public Term getFreePrecondition(final LocationVariable heap, final LocationVariable self,
             final Map<LocationVariable, LocationVariable> atPres, final Services services) {
         return getTerm(freePreconditions.get(heap),
             new Variables(self, null, null, null, null, null, null, null, null, atPres, services),
@@ -409,29 +430,59 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Term getModifiesClause(final LocationVariable heap, final ProgramVariable self,
+    public Term getModifiableClause(final LocationVariable heap, final LocationVariable self,
             final Services services) {
-        return getTerm(modifiesClauses.get(heap),
+        return getTerm(modifiableClauses.get(heap),
             new Variables(self, null, null, null, null, null, null, null, null, null, services),
             services);
     }
 
     @Override
-    public Term getModifiesClause(final LocationVariable heapVariable, final Term heap,
+    public Term getModifiableClause(final LocationVariable heapVariable, final Term heap,
             final Term self, final Services services) {
-        return getTerm(modifiesClauses.get(heapVariable), heap,
+        return getTerm(modifiableClauses.get(heapVariable), heap,
             new Terms(self, null, null, null, null, null, null, null, null, null), services);
     }
 
     @Override
-    public Term getModifiesClause(final LocationVariable heap, final Variables variables,
+    public Term getModifiableClause(final LocationVariable heap, final Variables variables,
             final Services services) {
-        return getTerm(modifiesClauses.get(heap), variables, services);
+        return getTerm(modifiableClauses.get(heap), variables, services);
     }
 
     @Override
-    public Term getModifiesClause(final LocationVariable heap, final Services services) {
-        return getModifiesClause(heap, variables.self, services);
+    public Term getModifiableClause(final LocationVariable heap, final Services services) {
+        return getModifiableClause(heap, variables.self, services);
+    }
+
+    @Override
+    public Term getFreeModifiableClause(final LocationVariable heap, final LocationVariable self,
+            final Services services) {
+        return getTerm(
+            freeModifiableClauses.get(heap),
+            new Variables(self, null, null, null, null, null, null, null, null, null, services),
+            services);
+    }
+
+    @Override
+    public Term getFreeModifiableClause(final LocationVariable heapVariable, final Term heap,
+            final Term self, final Services services) {
+        return getTerm(
+            freeModifiableClauses.get(heapVariable),
+            heap,
+            new Terms(self, null, null, null, null, null, null, null, null, null),
+            services);
+    }
+
+    @Override
+    public Term getFreeModifiableClause(
+            final LocationVariable heap, final Variables variables, final Services services) {
+        return getTerm(freeModifiableClauses.get(heap), variables, services);
+    }
+
+    @Override
+    public Term getFreeModifiableClause(final LocationVariable heap, final Services services) {
+        return getFreeModifiableClause(heap, variables.self, services);
     }
 
     @Override
@@ -475,8 +526,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Term getMod(Services services) {
-        return modifiesClauses.get(services.getTypeConverter().getHeapLDT().getHeap());
+    public Term getModifiable(Services services) {
+        return modifiableClauses.get(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
     @Override
@@ -521,8 +572,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public Term getAssignable(LocationVariable heap) {
-        return modifiesClauses.get(heap);
+    public Term getModifiable(LocationVariable heap) {
+        return modifiableClauses.get(heap);
     }
 
     @Override
@@ -549,11 +600,11 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         stringBuilder.append(" catch(");
         stringBuilder.append(variables.exception);
         stringBuilder.append(")");
-        String mods = getHtmlMods(baseHeap, heapLDT, services);
+        String modifiables = getHtmlModifiables(baseHeap, heapLDT, services);
         String pres = getHtmlPres(baseHeap, heapLDT, services);
         String posts = getHtmlPosts(baseHeap, heapLDT, services);
         return "<html>" + "<i>" + LogicPrinter.escapeHTML(stringBuilder.toString(), false) + "</i>"
-            + pres + posts + mods + "<br><b>termination</b> " + getModality()
+            + pres + posts + modifiables + "<br><b>termination</b> " + getModalityKind()
             /*
              * + (transactionApplicableContract() ? "<br><b>transactionApplicable applicable</b>" :
              * "")
@@ -590,10 +641,10 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         stringBuilder.append(" catch(");
         stringBuilder.append(terms.exception);
         stringBuilder.append(")");
-        String mods = getPlainMods(terms.self, baseHeap, heapLDT, services);
+        String modifiables = getPlainModifiables(terms.self, baseHeap, heapLDT, services);
         String pres = getPlainPres(terms, baseHeap, heapLDT, services);
         String posts = getPlainPosts(terms, baseHeap, heapLDT, services);
-        return stringBuilder.toString() + pres + posts + mods + "termination " + getModality();
+        return stringBuilder + pres + posts + modifiables + "termination " + getModalityKind();
     }
 
     @Override
@@ -612,8 +663,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         if ((block == null && other.block != null)
                 || (block != null && !block.equals(other.block))) {
             return false;
-        } else if ((hasMod == null && other.hasMod != null)
-                || (hasMod != null && !hasMod.equals(other.hasMod))) {
+        } else if ((hasModifiable == null && other.hasModifiable != null)
+                || (hasModifiable != null && !hasModifiable.equals(other.hasModifiable))) {
             return false;
         } else if ((infFlowSpecs == null && other.infFlowSpecs != null)
                 || (infFlowSpecs != null && !infFlowSpecs.equals(other.infFlowSpecs))) {
@@ -628,11 +679,12 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         } else if ((method == null && other.method != null)
                 || (method != null && !method.equals(other.method))) {
             return false;
-        } else if ((modality == null && other.modality != null)
-                || (modality != null && !modality.equals(other.modality))) {
+        } else if ((modalityKind == null && other.modalityKind != null)
+                || (modalityKind != null && !modalityKind.equals(other.modalityKind))) {
             return false;
-        } else if ((modifiesClauses == null && other.modifiesClauses != null)
-                || (modifiesClauses != null && !modifiesClauses.equals(other.modifiesClauses))) {
+        } else if ((modifiableClauses == null && other.modifiableClauses != null)
+                || (modifiableClauses != null
+                        && !modifiableClauses.equals(other.modifiableClauses))) {
             return false;
         } else if ((postconditions == null && other.postconditions != null)
                 || (postconditions != null && !postconditions.equals(other.postconditions))) {
@@ -642,11 +694,10 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             return false;
         } else if (transactionApplicable != other.transactionApplicable) {
             return false;
-        } else if ((variables == null && other.variables != null)
-                || (variables != null && !variables.equals(other.variables))) {
-            return false;
+        } else {
+            return (variables != null || other.variables == null)
+                    && (variables == null || variables.equals(other.variables));
         }
-        return true;
     }
 
     @Override
@@ -654,13 +705,13 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         final int prime = 31;
         int result = 1;
         result = prime * result + ((block == null) ? 0 : block.hashCode());
-        result = prime * result + ((hasMod == null) ? 0 : hasMod.hashCode());
+        result = prime * result + ((hasModifiable == null) ? 0 : hasModifiable.hashCode());
         result = prime * result + ((infFlowSpecs == null) ? 0 : infFlowSpecs.hashCode());
         result = prime * result + ((instantiationSelf == null) ? 0 : instantiationSelf.hashCode());
         result = prime * result + ((labels == null) ? 0 : labels.hashCode());
         result = prime * result + ((method == null) ? 0 : method.hashCode());
-        result = prime * result + ((modality == null) ? 0 : modality.hashCode());
-        result = prime * result + ((modifiesClauses == null) ? 0 : modifiesClauses.hashCode());
+        result = prime * result + ((modalityKind == null) ? 0 : modalityKind.hashCode());
+        result = prime * result + ((modifiableClauses == null) ? 0 : modifiableClauses.hashCode());
         result = prime * result + ((postconditions == null) ? 0 : postconditions.hashCode());
         result = prime * result + ((preconditions == null) ? 0 : preconditions.hashCode());
         result = prime * result + (transactionApplicable ? 1231 : 1237);
@@ -687,7 +738,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @return a map from every variable in {@link #getVariables()} to its counterpart in
      *         {@code newVariables}.
      */
-    protected Map<ProgramVariable, ProgramVariable> createReplacementMap(
+    protected Map<LocationVariable, LocationVariable> createReplacementMap(
             final Variables newVariables, final Services services) {
         final VariableReplacementMap result = new VariableReplacementMap(services.getTermFactory());
         result.replaceSelf(variables.self, newVariables.self, services);
@@ -741,25 +792,25 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param baseHeap base heap.
      * @param heapLDT heap LDT.
      * @param services services.
-     * @return a HTML representation of this contract's modifies clauses.
+     * @return an HTML representation of this contract's modifiable clauses.
      */
-    private String getHtmlMods(final LocationVariable baseHeap, final HeapLDT heapLDT,
+    private String getHtmlModifiables(final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String mods = "";
+        StringBuilder modifiables = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            if (modifiesClauses.get(heap) != null) {
-                mods =
-                    mods + "<br><b>mod" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                        + LogicPrinter.escapeHTML(
-                            LogicPrinter.quickPrintTerm(modifiesClauses.get(heap), services),
-                            false);
+            if (modifiableClauses.get(heap) != null) {
+                modifiables.append("<br><b>modifiable")
+                        .append(heap == baseHeap ? "" : "[" + heap + "]")
+                        .append("</b> ").append(LogicPrinter.escapeHTML(
+                            LogicPrinter.quickPrintTerm(modifiableClauses.get(heap), services),
+                            false));
                 /*
-                 * if (heap == baseHeap && !hasRealModifiesClause) { mods = mods +
+                 * if (heap == baseHeap && !hasRealModifiableClause) { modifiables = modifiables +
                  * "<b>, creates no new objects</b>"; }
                  */
             }
         }
-        return mods;
+        return modifiables.toString();
     }
 
     /**
@@ -767,19 +818,19 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param baseHeap base heap.
      * @param heapLDT heap LDT.
      * @param services services.
-     * @return a HTML representation of this contract's preconditions.
+     * @return an HTML representation of this contract's preconditions.
      */
     private String getHtmlPres(final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String pres = "";
+        StringBuilder pres = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (preconditions.get(heap) != null) {
-                pres = pres + "<br><b>pre" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                    + LogicPrinter.escapeHTML(
-                        LogicPrinter.quickPrintTerm(preconditions.get(heap), services), false);
+                pres.append("<br><b>pre").append(heap == baseHeap ? "" : "[" + heap + "]")
+                        .append("</b> ").append(LogicPrinter.escapeHTML(
+                            LogicPrinter.quickPrintTerm(preconditions.get(heap), services), false));
             }
         }
-        return pres;
+        return pres.toString();
     }
 
     /**
@@ -787,19 +838,20 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param baseHeap base heap.
      * @param heapLDT heap LDT.
      * @param services services.
-     * @return a HTML representation of this contract's postconditions.
+     * @return an HTML representation of this contract's postconditions.
      */
     private String getHtmlPosts(final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String posts = "";
+        StringBuilder posts = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (postconditions.get(heap) != null) {
-                posts = posts + "<br><b>post" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                    + LogicPrinter.escapeHTML(
-                        LogicPrinter.quickPrintTerm(postconditions.get(heap), services), false);
+                posts.append("<br><b>post").append(heap == baseHeap ? "" : "[" + heap + "]")
+                        .append("</b> ").append(LogicPrinter.escapeHTML(
+                            LogicPrinter.quickPrintTerm(postconditions.get(heap), services),
+                            false));
             }
         }
-        return posts;
+        return posts.toString();
     }
 
     /**
@@ -808,24 +860,26 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @param baseHeap base heap.
      * @param heapLDT heap LDT.
      * @param services services.
-     * @return a plain text representation of this contract's modifies clauses.
+     * @return a plain text representation of this contract's modifiable clauses.
      */
-    private String getPlainMods(Term self, final LocationVariable baseHeap, final HeapLDT heapLDT,
+    private String getPlainModifiables(Term self, final LocationVariable baseHeap,
+            final HeapLDT heapLDT,
             final Services services) {
-        String mods = "";
+        StringBuilder modifiables = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            Term modifiesClause =
-                getModifiesClause(heap, services.getTermBuilder().var(heap), self, services);
-            if (modifiesClause != null) {
-                mods = mods + "\nmod" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                    + StringUtil.trim(LogicPrinter.quickPrintTerm(modifiesClause, services));
+            Term modifiableClause =
+                getModifiableClause(heap, services.getTermBuilder().var(heap), self, services);
+            if (modifiableClause != null) {
+                modifiables.append("\nmodifiable").append(heap == baseHeap ? "" : "[" + heap + "]")
+                        .append(" ")
+                        .append(LogicPrinter.quickPrintTerm(modifiableClause, services));
                 /*
-                 * if (heap == baseHeap && !hasRealModifiesClause) { mods = mods +
+                 * if (heap == baseHeap && !hasRealModifiableClause) { modifiables = modifiables +
                  * "<b>, creates no new objects</b>"; }
                  */
             }
         }
-        return mods;
+        return modifiables.toString();
     }
 
     /**
@@ -838,16 +892,16 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getPlainPres(Terms terms, final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String pres = "";
+        StringBuilder pres = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             Term precondition = getPrecondition(heap, services.getTermBuilder().var(baseHeap),
                 terms.self, terms.remembranceHeaps, services);
             if (precondition != null) {
-                pres = pres + "\npre" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                    + StringUtil.trim(LogicPrinter.quickPrintTerm(precondition, services));
+                pres.append("\npre").append(heap == baseHeap ? "" : "[" + heap + "]").append(" ")
+                        .append(LogicPrinter.quickPrintTerm(precondition, services));
             }
         }
-        return pres;
+        return pres.toString();
     }
 
     /**
@@ -860,16 +914,16 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getPlainPosts(Terms terms, final LocationVariable baseHeap,
             final HeapLDT heapLDT, final Services services) {
-        String posts = "";
+        StringBuilder posts = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             Term postcondition =
                 getPostcondition(heap, services.getTermBuilder().var(baseHeap), terms, services);
             if (postcondition != null) {
-                posts = posts + "\npost" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                    + StringUtil.trim(LogicPrinter.quickPrintTerm(postcondition, services));
+                posts.append("\npost").append(heap == baseHeap ? "" : "[" + heap + "]").append(" ")
+                        .append(LogicPrinter.quickPrintTerm(postcondition, services));
             }
         }
-        return posts;
+        return posts.toString();
     }
 
     /**
@@ -971,9 +1025,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         private final Term diverges;
 
         /**
-         * A map from every heap to an assignable term.
+         * A map from every heap to an modifiable term.
          */
-        private final Map<LocationVariable, Term> assignables;
+        private final Map<LocationVariable, Term> modifiables;
+
+        /**
+         * A map from every heap to a free modifiable term.
+         */
+        private final Map<LocationVariable, Term> modifiablesFree;
 
         /**
          * A list of heaps used in this contract.
@@ -981,9 +1040,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         private final ImmutableList<LocationVariable> heaps;
 
         /**
-         * A map specifying on which heaps this contract has a modifies clause.
+         * A map specifying on which heaps this contract has a modifiable clause.
          */
-        private final Map<LocationVariable, Boolean> hasMod;
+        private final Map<LocationVariable, Boolean> hasModifiable;
+
+        /**
+         * A map specifying on which heaps this contract has a free modifiable clause.
+         */
+        private final Map<LocationVariable, Boolean> hasFreeModifiable;
 
         /**
          *
@@ -1004,11 +1068,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param returns the contract's postcondition for abrupt termination with {@code return}
          *        statements.
          * @param signals the contract's postcondition for abrupt termination due to abrupt
-         *        termintation.
+         *        termination.
          * @param signalsOnly a term specifying which uncaught exceptions may occur.
          * @param diverges a diverges clause.
-         * @param assignables map from every heap to an assignable term.
-         * @param hasMod map specifying on which heaps this contract has a modifies clause.
+         * @param modifiables map from every heap to an modifiable term.
+         * @param modifiablesFree map from every heap to a free modifiable term.
+         * @param hasMod map specifying on which heaps this contract has a modifiable clause.
+         * @param hasFreeModifiable map specifying on which heaps this contract has a free
+         *        modifiable clause.
          * @param services services.
          */
         public Creator(final String baseName, final StatementBlock block, final List<Label> labels,
@@ -1017,11 +1084,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 final Map<LocationVariable, Term> requiresFree, final Term measuredBy,
                 final Map<LocationVariable, Term> ensures,
                 final Map<LocationVariable, Term> ensuresFree,
-                final ImmutableList<InfFlowSpec> infFlowSpecs, final Map<Label, Term> breaks,
-                final Map<Label, Term> continues, final Term returns, final Term signals,
-                final Term signalsOnly, final Term diverges,
-                final Map<LocationVariable, Term> assignables,
-                final Map<LocationVariable, Boolean> hasMod, final Services services) {
+                final ImmutableList<InfFlowSpec> infFlowSpecs,
+                final Map<Label, Term> breaks, final Map<Label, Term> continues, final Term returns,
+                final Term signals, final Term signalsOnly, final Term diverges,
+                final Map<LocationVariable, Term> modifiables,
+                final Map<LocationVariable, Term> modifiablesFree,
+                final Map<LocationVariable, Boolean> hasModifiable,
+                final Map<LocationVariable, Boolean> hasFreeModifiable,
+                final Services services) {
             super(services.getTermFactory(), services);
             this.baseName = baseName;
             this.block = block;
@@ -1041,9 +1111,11 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             this.signals = signals;
             this.signalsOnly = signalsOnly;
             this.diverges = diverges;
-            this.assignables = assignables;
+            this.modifiables = modifiables;
+            this.modifiablesFree = modifiablesFree;
             this.heaps = services.getTypeConverter().getHeapLDT().getAllHeaps();
-            this.hasMod = hasMod;
+            this.hasModifiable = hasModifiable;
+            this.hasFreeModifiable = hasFreeModifiable;
         }
 
         /**
@@ -1052,7 +1124,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         public ImmutableSet<T> create() {
             return create(buildPreconditions(), buildFreePreconditions(), buildPostconditions(),
-                buildFreePostconditions(), buildModifiesClauses(), infFlowSpecs);
+                buildFreePostconditions(), buildModifiableClauses(), buildFreeModifiableClauses(),
+                infFlowSpecs);
         }
 
         /**
@@ -1060,7 +1133,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return the contract's preconditions.
          */
         protected Map<LocationVariable, Term> buildPreconditions() {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 // Add JML precondition to precondition
                 if (requires.get(heap) != null) {
@@ -1072,7 +1145,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 Term mbyTerm;
 
                 if (measuredBy != null && !measuredBy.equals(measuredByEmpty())) {
-                    Map<Term, Term> replacementMap = new LinkedHashMap<Term, Term>();
+                    Map<Term, Term> replacementMap = new LinkedHashMap<>();
 
                     for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : variables.outerRemembranceVariables
                             .entrySet()) {
@@ -1111,7 +1184,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return the contract's free preconditions.
          */
         protected Map<LocationVariable, Term> buildFreePreconditions() {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 // Add JML precondition to precondition
                 if (requiresFree.get(heap) != null) {
@@ -1127,7 +1200,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         protected Map<LocationVariable, Term> buildPostconditions() {
             final Map<LocationVariable, Term> postconditions =
-                new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 if (ensures.get(heap) != null) {
                     postconditions.put(heap, buildPostcondition(heap));
@@ -1142,7 +1215,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         protected Map<LocationVariable, Term> buildFreePostconditions() {
             final Map<LocationVariable, Term> freePostconditions =
-                new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 if (ensuresFree.get(heap) != null) {
                     freePostconditions.put(heap, buildFreePostcondition(heap));
@@ -1218,7 +1291,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param postconditions postconditions for abrupt termination.
          * @return a postcondition created conjunctively from the specified postconditions.
          */
-        private Term conditionPostconditions(final Map<Label, ProgramVariable> flags,
+        private Term conditionPostconditions(final Map<Label, LocationVariable> flags,
                 final Map<Label, Term> postconditions) {
             Term result = tt();
             for (Label label : flags.keySet()) {
@@ -1231,7 +1304,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         /**
          *
          * @param flag an abrupt termination flag.
-         * @param postcondition a postcondition for abrupt termination with the specifed flag.
+         * @param postcondition a postcondition for abrupt termination with the specified flag.
          * @return a part of the postcondition.
          */
         private Term conditionPostcondition(final ProgramVariable flag, final Term postcondition) {
@@ -1313,7 +1386,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param flags a map containing all abrupt termination flags.
          * @return a term corresponding to {@link Behavior#NORMAL_BEHAVIOR}
          */
-        private Term buildNormalTerminationCondition(final Map<Label, ProgramVariable> flags) {
+        private Term buildNormalTerminationCondition(final Map<Label, LocationVariable> flags) {
             Term result = tt();
             for (Label label : flags.keySet()) {
                 result = and(result, buildFlagIsCondition(flags.get(label), FALSE()));
@@ -1326,7 +1399,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param flags a map containing all abrupt termination flags.
          * @return a term equivalent to the negation of {@link #buildNormalTerminationCondition()}
          */
-        private Term buildAbruptTerminationCondition(final Map<Label, ProgramVariable> flags) {
+        private Term buildAbruptTerminationCondition(final Map<Label, LocationVariable> flags) {
             Term result = ff();
             for (Label label : flags.keySet()) {
                 result = or(result, buildFlagIsCondition(flags.get(label), TRUE()));
@@ -1340,7 +1413,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param truth a boolean term.
          * @return a term which is true iff the flag is equal to the term.
          */
-        private Term buildFlagIsCondition(final ProgramVariable flag, final Term truth) {
+        private Term buildFlagIsCondition(final LocationVariable flag, final Term truth) {
             Term result = tt();
             if (flag != null) {
                 result = equals(var(flag), truth);
@@ -1358,68 +1431,90 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
         /**
          *
-         * @return the contract's modifies clauses.
+         * @return the contract's modifiable clauses.
          */
-        private Map<LocationVariable, Term> buildModifiesClauses() {
-            return assignables;
+        private Map<LocationVariable, Term> buildModifiableClauses() {
+            return modifiables;
+        }
+
+        /**
+         *
+         * @return the contract's free modifiable clauses.
+         */
+        private Map<LocationVariable, Term> buildFreeModifiableClauses() {
+            return modifiablesFree;
         }
 
         /**
          *
          * @param preconditions the contracts' preconditions.
          * @param postconditions the contracts' postconditions.
-         * @param modifiesClauses the contracts' modifies clauses.
+         * @param modifiableClauses the contracts' modifiable clauses.
          * @param infFlowSpecs the contracts' information flow specifications.
-         * @return a set of one or two contracts (depending on whether the {@code diverges} clause
+         * @return a set of one or two contracts depending on whether the {@code diverges} clause
          *         is trivial (i.e., {@code true} or {@code false}) or not.
          */
         private ImmutableSet<T> create(final Map<LocationVariable, Term> preconditions,
                 final Map<LocationVariable, Term> freePreconditions,
                 final Map<LocationVariable, Term> postconditions,
                 final Map<LocationVariable, Term> freePostconditions,
-                final Map<LocationVariable, Term> modifiesClauses,
+                final Map<LocationVariable, Term> modifiableClauses,
+                final Map<LocationVariable, Term> freeModifiableClauses,
                 final ImmutableList<InfFlowSpec> infFlowSpecs) {
             ImmutableSet<T> result = DefaultImmutableSet.nil();
-            final boolean transactionApplicable = modifiesClauses
+            final boolean transactionApplicable = modifiableClauses
                     .get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
             result = result.add(build(baseName, block, labels, method,
-                diverges.equals(ff()) ? Modality.DIA : Modality.BOX, preconditions,
-                freePreconditions, measuredBy, postconditions, freePostconditions, modifiesClauses,
-                infFlowSpecs, variables, transactionApplicable, hasMod));
+                diverges.equals(ff()) ? Modality.JavaModalityKind.DIA
+                        : Modality.JavaModalityKind.BOX,
+                preconditions,
+                freePreconditions, measuredBy, postconditions, freePostconditions,
+                modifiableClauses, freeModifiableClauses,
+                infFlowSpecs, variables, transactionApplicable, hasModifiable, hasFreeModifiable));
             if (divergesConditionCannotBeExpressedByAModality()) {
-                result = result.add(build(baseName, block, labels, method, Modality.DIA,
+                result = result.add(build(baseName, block, labels, method,
+                    Modality.JavaModalityKind.DIA,
                     addNegatedDivergesConditionToPreconditions(preconditions), freePreconditions,
-                    measuredBy, postconditions, freePostconditions, modifiesClauses, infFlowSpecs,
-                    variables, transactionApplicable, hasMod));
+                    measuredBy, postconditions, freePostconditions,
+                    modifiableClauses, freeModifiableClauses,
+                    infFlowSpecs, variables, transactionApplicable, hasModifiable,
+                    hasFreeModifiable));
             }
             return result;
         }
 
         /**
-         *
          * @param baseName the base name.
          * @param block the block this contract belongs to.
          * @param labels all labels belonging to the block.
          * @param method the method containing the block.
-         * @param modality this contract's modality.
+         * @param modalityKind this contract's modality kind.
          * @param preconditions this contract's preconditions on every heap.
          * @param measuredBy this contract's measured-by term.
          * @param postconditions this contract's postconditions on every heap.
-         * @param modifiesClauses this contract's modifies clauses on every heap.
+         * @param modifiableClauses this contract's modifiable clauses on every heap.
+         * @param freeModifiableClauses this contract's free modifiable clauses on every heap.
          * @param infFlowSpecs this contract's information flow specifications.
          * @param variables this contract's variables.
-         * @param transactionApplicable whether or not this contract is applicable for transactions.
-         * @param hasMod a map specifying on which heaps this contract has a modified clause.
+         * @param transactionApplicable whether this contract is applicable for transactions.
+         * @param hasModifiable a map specifying on which heaps this contract has a modifiable
+         *        clause.
+         * @param hasFreeModifiable a map specifying on which heaps this contract has a free
+         *        modifiable clause.
          * @return an instance of {@code T} with the specified attributes.
          */
         protected abstract T build(String baseName, StatementBlock block, List<Label> labels,
-                IProgramMethod method, Modality modality, Map<LocationVariable, Term> preconditions,
+                IProgramMethod method, Modality.JavaModalityKind modalityKind,
+                Map<LocationVariable, Term> preconditions,
                 Map<LocationVariable, Term> freePreconditions, Term measuredBy,
                 Map<LocationVariable, Term> postconditions,
                 Map<LocationVariable, Term> freePostconditions,
-                Map<LocationVariable, Term> modifiesClauses,
+                Map<LocationVariable, Term> modifiableClauses,
+                Map<LocationVariable, Term> freeModifiableClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod);
+                boolean transactionApplicable,
+                Map<LocationVariable, Boolean> hasModifiable,
+                Map<LocationVariable, Boolean> hasFreeModifiable);
 
         /**
          *
@@ -1436,7 +1531,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private Map<LocationVariable, Term> addNegatedDivergesConditionToPreconditions(
                 final Map<LocationVariable, Term> preconditions) {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 if (preconditions.get(heap) != null) {
                     result.put(heap, and(preconditions.get(heap), not(convertToFormula(diverges))));
@@ -1448,7 +1543,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     /**
-     * This class is used to to combine multiple contracts for the same block and apply them
+     * This class is used to combine multiple contracts for the same block and apply them
      * simultaneously. It should be overridden in every subclass.
      *
      * @param <T> the type of the subclass.
@@ -1491,9 +1586,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         protected final Map<LocationVariable, Term> freePostconditions;
 
         /**
-         * @see AuxiliaryContract#getModifiesClause(LocationVariable, Services)
+         * @see AuxiliaryContract#getModifiableClause(LocationVariable, Services)
          */
-        protected final Map<LocationVariable, Term> modifiesClauses;
+        protected final Map<LocationVariable, Term> modifiableClauses;
+
+        /**
+         * @see AuxiliaryContract#getModifiableClause(LocationVariable, Services)
+         */
+        protected final Map<LocationVariable, Term> freeModifiableClauses;
 
         /**
          *
@@ -1503,26 +1603,22 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         public Combinator(final T[] contracts, final Services services) {
             super(services.getTermFactory(), services);
             this.contracts = sort(contracts);
-            preconditions = new LinkedHashMap<LocationVariable, Term>();
-            freePreconditions = new LinkedHashMap<LocationVariable, Term>();
-            postconditions = new LinkedHashMap<LocationVariable, Term>();
-            freePostconditions = new LinkedHashMap<LocationVariable, Term>();
-            modifiesClauses = new LinkedHashMap<LocationVariable, Term>();
+            preconditions = new LinkedHashMap<>();
+            freePreconditions = new LinkedHashMap<>();
+            postconditions = new LinkedHashMap<>();
+            freePostconditions = new LinkedHashMap<>();
+            modifiableClauses = new LinkedHashMap<>();
+            freeModifiableClauses = new LinkedHashMap<>();
         }
 
         /**
          *
          * @param contracts the contract's to sort.
-         * @return an array containg the specified contracts sorted alphabetically by name.
+         * @return an array containing the specified contracts sorted alphabetically by name.
          */
         private T[] sort(final T[] contracts) {
             // sort contracts alphabetically (for determinism)
-            Arrays.sort(contracts, new Comparator<T>() {
-                @Override
-                public int compare(T firstContract, T secondContract) {
-                    return firstContract.getName().compareTo(secondContract.getName());
-                }
-            });
+            Arrays.sort(contracts, Comparator.comparing(SpecificationElement::getName));
             return contracts;
         }
 
@@ -1542,7 +1638,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 addFreePreconditionFrom(contract, heap);
                 addPostconditionFrom(precondition, contract, heap);
                 addFreePostconditionFrom(precondition, contract, heap);
-                addModifiesClauseFrom(contract, heap);
+                addModifiableClauseFrom(contract, heap);
+                addFreeModifiableClauseFrom(contract, heap);
             }
         }
 
@@ -1613,15 +1710,31 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
         /**
          *
-         * @param contract the contract whose modified clause to add.
+         * @param contract the contract whose modifiable clause to add.
          * @param heap the heap to use.
          */
-        private void addModifiesClauseFrom(final T contract, final LocationVariable heap) {
-            final Term additionalModifiesClause =
-                contract.getModifiesClause(heap, placeholderVariables.self, services);
-            if (additionalModifiesClause != null) {
-                modifiesClauses.put(heap,
-                    unionPossiblyNull(modifiesClauses.get(heap), additionalModifiesClause));
+        private void addModifiableClauseFrom(final T contract, final LocationVariable heap) {
+            final Term additionalModifiableClause =
+                contract.getModifiableClause(heap, placeholderVariables.self, services);
+            if (additionalModifiableClause != null) {
+                modifiableClauses.put(heap,
+                    unionPossiblyNull(modifiableClauses.get(heap), additionalModifiableClause));
+            }
+        }
+
+        /**
+         *
+         * @param contract
+         *        the contract whose modifiable clause to add.
+         * @param heap
+         *        the heap to use.
+         */
+        private void addFreeModifiableClauseFrom(final T contract, final LocationVariable heap) {
+            final Term additionalModifiableClause =
+                contract.getModifiableClause(heap, placeholderVariables.self, services);
+            if (additionalModifiableClause != null) {
+                freeModifiableClauses.put(heap,
+                    unionPossiblyNull(freeModifiableClauses.get(heap), additionalModifiableClause));
             }
         }
 
@@ -1679,7 +1792,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             if (formula == null) {
                 return tt();
             } else {
-                final Map<Term, Term> replacementMap = new LinkedHashMap<Term, Term>();
+                final Map<Term, Term> replacementMap = new LinkedHashMap<>();
 
                 for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables
                         .entrySet()) {

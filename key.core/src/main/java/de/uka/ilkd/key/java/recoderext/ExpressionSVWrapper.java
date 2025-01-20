@@ -1,15 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.logic.op.OperatorSV;
+
 import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
 import recoder.java.LoopInitializer;
-import recoder.java.NonTerminalProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.StatementContainer;
 import recoder.java.expression.Literal;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ReferenceSuffix;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public class ExpressionSVWrapper extends Literal
         implements Expression, LoopInitializer, KeYRecoderExtension, SVWrapper, ReferencePrefix {
@@ -18,7 +20,7 @@ public class ExpressionSVWrapper extends Literal
      *
      */
     private static final long serialVersionUID = 7659491655661716390L;
-    protected SchemaVariable sv;
+    protected final OperatorSV sv;
     protected ReferenceSuffix suff;
 
 
@@ -26,14 +28,11 @@ public class ExpressionSVWrapper extends Literal
 
     protected ExpressionSVWrapper(ExpressionSVWrapper proto) {
         super(proto);
+        sv = proto.getSV();
         expressionParent = null;
     }
 
-    public ExpressionSVWrapper() {
-        expressionParent = null;
-    }
-
-    public ExpressionSVWrapper(SchemaVariable sv) {
+    public ExpressionSVWrapper(OperatorSV sv) {
         this.sv = sv;
         expressionParent = null;
     }
@@ -44,53 +43,19 @@ public class ExpressionSVWrapper extends Literal
     public void makeParentRoleValid() {
     }
 
-    /**
-     * Get AST parent.
-     *
-     * @return the non terminal program element.
-     */
-    public NonTerminalProgramElement getASTParent() {
-        return expressionParent;
-    }
 
-
-    /**
-     * sets the schema variable of sort statement
-     *
-     * @param sv the SchemaVariable
-     */
-    public void setSV(SchemaVariable sv) {
-        this.sv = sv;
-    }
-
-
-    public SchemaVariable getSV() {
+    @Override
+    public OperatorSV getSV() {
         return sv;
     }
 
 
-    /**
-     * Get expression container.
-     *
-     * @return the expression container.
-     */
-    public ExpressionContainer getExpressionContainer() {
-        return expressionParent;
-    }
-
-    /**
-     * Set expression container.
-     *
-     * @param c an expression container.
-     */
-    public void setExpressionContainer(ExpressionContainer c) {
-        expressionParent = c;
-    }
-
     // don't think we need it
+    @Override
     public void accept(SourceVisitor v) {
     }
 
+    @Override
     public ExpressionSVWrapper deepClone() {
         return new ExpressionSVWrapper(sv);
     }
@@ -100,6 +65,7 @@ public class ExpressionSVWrapper extends Literal
      *
      * @return the statement container.
      */
+    @Override
     public StatementContainer getStatementContainer() {
         return statementParent;
     }
@@ -109,11 +75,13 @@ public class ExpressionSVWrapper extends Literal
      *
      * @param c a statement container.
      */
+    @Override
     public void setStatementContainer(StatementContainer c) {
         statementParent = c;
     }
 
 
+    @Override
     public ReferenceSuffix getReferenceSuffix() {
         return suff;
     }
@@ -123,6 +91,7 @@ public class ExpressionSVWrapper extends Literal
      *
      * @param path a reference suffix.
      */
+    @Override
     public void setReferenceSuffix(ReferenceSuffix path) {
         suff = path;
     }

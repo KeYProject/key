@@ -4,7 +4,7 @@
 (1/71) -- recoder.java.declaration.ClassDeclaration
   * /*@ accessible \inv: footprint;       @ invariant
   * /*@ model \locset footprint;       @ accessible fo
-(65/1) -- recoder.java.declaration.FieldDeclaration
+(67/67) -- recoder.java.declaration.FieldDeclaration
   * /*@ accessible \inv: footprint;       @ invariant
   * /*@ model \locset footprint;       @ accessible fo
   * /*@model @*/

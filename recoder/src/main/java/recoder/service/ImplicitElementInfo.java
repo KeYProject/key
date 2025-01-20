@@ -1,13 +1,15 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
+
+import java.util.List;
 
 import recoder.abstraction.ClassType;
 import recoder.abstraction.DefaultConstructor;
 import recoder.abstraction.ImplicitEnumMethod;
 import recoder.java.declaration.EnumDeclaration;
-
-import java.util.List;
 
 /**
  * Handles requests for implicitly defined program model elements. In particular these are

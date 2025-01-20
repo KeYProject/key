@@ -1,14 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -23,7 +21,18 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
-import javax.annotation.Nullable;
+import org.key_project.logic.Name;
+import org.key_project.logic.Named;
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import static org.key_project.util.Strings.formatAsList;
 
 
 /**
@@ -68,7 +77,7 @@ import javax.annotation.Nullable;
  * {@link de.uka.ilkd.key.rule.TacletApp TacletApp}
  * </p>
  */
-public abstract class Taclet implements Rule, Named {
+public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
 
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
@@ -80,7 +89,7 @@ public abstract class Taclet implements Rule, Named {
         }
     }
 
-    /** name of the taclet */
+    /** unique name of the taclet */
     private final Name name;
 
     /** name displayed by the pretty printer */
@@ -151,6 +160,8 @@ public abstract class Taclet implements Rule, Named {
 
     /** Integer to cache the hashcode */
     private int hashcode = 0;
+    /** Integer to cache the hashcode */
+    private int hashcode2 = 0;
 
     private final Trigger trigger;
 
@@ -173,8 +184,6 @@ public abstract class Taclet implements Rule, Named {
      * The taclet executor
      */
     protected TacletExecutor<? extends Taclet> executor;
-
-
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
@@ -264,7 +273,7 @@ public abstract class Taclet implements Rule, Named {
     public ImmutableSet<QuantifiableVariable> getBoundVariables() {
         if (boundVariables == null) {
             ImmutableSet<QuantifiableVariable> result =
-                DefaultImmutableSet.<QuantifiableVariable>nil();
+                DefaultImmutableSet.nil();
 
             for (final TacletGoalTemplate tgt : goalTemplates()) {
                 result = result.union(tgt.getBoundVariables());
@@ -441,8 +450,9 @@ public abstract class Taclet implements Rule, Named {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == this)
+        if (o == this) {
             return true;
+        }
 
         if (o == null || o.getClass() != this.getClass()) {
             return false;
@@ -458,6 +468,40 @@ public abstract class Taclet implements Rule, Named {
             return false;
         } else if (ifSequent != null && !ifSequent.equals(t2.ifSequent)) {
             return false;
+        }
+
+        if (!choices.equals(t2.choices)) {
+            return false;
+        }
+
+        return goalTemplates.equals(t2.goalTemplates);
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object o) {
+        if (o == this)
+            return true;
+
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
+
+        final Taclet t2 = (Taclet) o;
+
+        if ((ifSequent == null && t2.ifSequent != null)
+                || (ifSequent != null && t2.ifSequent == null)) {
+            return false;
+        } else {
+            ImmutableList<SequentFormula> if1 = ifSequent.asList();
+            ImmutableList<SequentFormula> if2 = t2.ifSequent.asList();
+            while (!if1.isEmpty() && !if2.isEmpty()
+                    && if1.head().equalsModProofIrrelevancy(if2.head())) {
+                if1 = if1.tail();
+                if2 = if2.tail();
+            }
+            if (!if1.isEmpty() || !if2.isEmpty()) {
+                return false;
+            }
         }
 
         if (!choices.equals(t2.choices)) {
@@ -482,6 +526,17 @@ public abstract class Taclet implements Rule, Named {
         return hashcode;
     }
 
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        if (hashcode2 == 0) {
+            hashcode2 = ifSequent.getFormulabyNr(1).hashCodeModProofIrrelevancy();
+            if (hashcode2 == 0) {
+                hashcode2 = -1;
+            }
+        }
+        return hashcode2;
+    }
+
     /**
      * returns the set of schemavariables of the taclet's if-part
      *
@@ -493,7 +548,7 @@ public abstract class Taclet implements Rule, Named {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
             svc.visit(ifSequent());
 
-            ifVariables = DefaultImmutableSet.<SchemaVariable>nil();
+            ifVariables = DefaultImmutableSet.nil();
             for (final SchemaVariable sv : svc.vars()) {
                 ifVariables = ifVariables.add(sv);
             }
@@ -537,7 +592,6 @@ public abstract class Taclet implements Rule, Named {
     }
 
     StringBuffer toStringVarCond(StringBuffer sb) {
-
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
             sb = sb.append("\\varcond(");
 
@@ -554,18 +608,14 @@ public abstract class Taclet implements Rule, Named {
             for (NotFreeIn pair : varsNotFreeIn) {
                 sb = sb.append("\\notFreeIn(").append(pair.first()).append(", ")
                         .append(pair.second()).append(")");
-                if (countVarsNotFreeIn > 0 || !variableConditions.isEmpty())
+                if (countVarsNotFreeIn > 0 || !variableConditions.isEmpty()) {
                     sb = sb.append(", ");
+                }
                 --countVarsNotFreeIn;
             }
 
-            int countVariableConditions = variableConditions.size();
-            for (final VariableCondition vc : variableConditions) {
-                sb.append(vc);
-                if (countVariableConditions > 0)
-                    sb.append(", ");
-                --countVariableConditions;
-            }
+            sb.append(formatAsList(variableConditions, "", ", ", ""));
+
             sb = sb.append(")\n");
         }
         return sb;
@@ -575,27 +625,14 @@ public abstract class Taclet implements Rule, Named {
         if (goalTemplates.isEmpty()) {
             sb.append("\\closegoal");
         } else {
-            Iterator<TacletGoalTemplate> it = goalTemplates().iterator();
-            while (it.hasNext()) {
-                sb = sb.append(it.next());
-                if (it.hasNext())
-                    sb = sb.append(";");
-                sb = sb.append("\n");
-            }
+            sb.append(formatAsList(goalTemplates, "", ";\n", "\n"));
         }
         return sb;
     }
 
     StringBuffer toStringRuleSets(StringBuffer sb) {
-        Iterator<RuleSet> itRS = ruleSets();
-        if (itRS.hasNext()) {
-            sb = sb.append("\\heuristics(");
-            while (itRS.hasNext()) {
-                sb = sb.append(itRS.next());
-                if (itRS.hasNext())
-                    sb = sb.append(", ");
-            }
-            sb = sb.append(")");
+        if (!ruleSets.isEmpty()) {
+            sb.append("\\heuristics").append(formatAsList(ruleSets, "(", ", ", ")"));
         }
         return sb;
     }
@@ -603,6 +640,20 @@ public abstract class Taclet implements Rule, Named {
     StringBuffer toStringAttribs(StringBuffer sb) {
         // if (noninteractive()) sb = sb.append(" \\noninteractive");
         sb.append("\nChoices: ").append(choices);
+        return sb;
+    }
+
+    StringBuffer toStringTriggers(StringBuffer sb) {
+        if (trigger != null) {
+            sb.append("\n\\trigger{");
+            sb.append(trigger.triggerVar());
+            sb.append("} ");
+            sb.append(trigger.getTerm());
+            if (trigger.hasAvoidConditions()) {
+                sb.append(" \\avoid ");
+                sb.append(formatAsList(trigger.avoidConditions(), "", ", ", ""));
+            }
+        }
         return sb;
     }
 
@@ -614,6 +665,7 @@ public abstract class Taclet implements Rule, Named {
     @Override
     public String toString() {
         if (tacletAsString == null) {
+            // FIXME this essentially reimplements PrettyPrinter::printTaclet
             StringBuffer sb = new StringBuffer();
             sb = sb.append(name()).append(" {\n");
             sb = toStringIf(sb);
@@ -621,6 +673,7 @@ public abstract class Taclet implements Rule, Named {
             sb = toStringGoalTemplates(sb);
             sb = toStringRuleSets(sb);
             sb = toStringAttribs(sb);
+            sb = toStringTriggers(sb);
             tacletAsString = sb.append("}").toString();
         }
         return tacletAsString;
@@ -631,10 +684,11 @@ public abstract class Taclet implements Rule, Named {
      *         (interactive/non-interactive, activated rule sets)
      */
     public boolean admissible(boolean interactive, ImmutableList<RuleSet> p_ruleSets) {
-        if (interactive)
+        if (interactive) {
             return admissibleInteractive(p_ruleSets);
-        else
+        } else {
             return admissibleAutomatic(p_ruleSets);
+        }
     }
 
     protected boolean admissibleInteractive(ImmutableList<RuleSet> notAdmissibleRuleSets) {
@@ -643,8 +697,9 @@ public abstract class Taclet implements Rule, Named {
 
     protected boolean admissibleAutomatic(ImmutableList<RuleSet> admissibleRuleSets) {
         for (final RuleSet tacletRuleSet : getRuleSets()) {
-            if (admissibleRuleSets.contains(tacletRuleSet))
+            if (admissibleRuleSets.contains(tacletRuleSet)) {
                 return true;
+            }
         }
         return false;
     }
@@ -738,9 +793,9 @@ public abstract class Taclet implements Rule, Named {
         }
 
         /**
-         * Constructor.
+         * Constructor creating a hint indicating
+         * {@link TacletOperation#REPLACE_TERM} as the currently performed operation.
          *
-         * @param tacletOperation The currently performed operation.
          * @param term The optional replace {@link Term} of the taclet.
          */
         public TacletLabelHint(Term term) {
@@ -836,7 +891,7 @@ public abstract class Taclet implements Rule, Named {
          *
          * @author Martin Hentschel
          */
-        public static enum TacletOperation {
+        public enum TacletOperation {
             /**
              * Add clause of a {@link Taclet} applied to the antecedent. Available information are
              * {@link TacletLabelHint#getSequent()} and {@link TacletLabelHint#getSequentFormula()}.
@@ -884,7 +939,7 @@ public abstract class Taclet implements Rule, Named {
              * modify the {@link PosInOccurrence}. Available information are
              * {@link TacletLabelHint#getTerm()}.
              */
-            REPLACE_TERM;
+            REPLACE_TERM
         }
     }
 
@@ -899,7 +954,7 @@ public abstract class Taclet implements Rule, Named {
      *         goal that should be closed (with the constraint this taclet is applied under).
      */
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
+    public @NonNull ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
         return getExecutor().apply(goal, services, tacletApp);
     }
 
@@ -919,10 +974,11 @@ public abstract class Taclet implements Rule, Named {
     private @Nullable String origin;
 
     @Override
-    @Nullable
-    public String getOrigin() { return origin; }
+    public @Nullable String getOrigin() {
+        return origin;
+    }
 
-    public void setOrigin(@Nullable String origin) { this.origin = origin; }
+    public void setOrigin(@Nullable String origin) {
+        this.origin = origin;
+    }
 }
-
-

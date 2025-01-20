@@ -1,10 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -12,6 +11,10 @@ import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociationValueContainer;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * Default implementation of {@link ISymbolicAssociationValueContainer}.
@@ -50,7 +53,7 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     /**
      * Adds a new {@link ISymbolicAssociation}.
      *
-     * @param value The new {@link ISymbolicAssociation} to add.
+     * @param association The new {@link ISymbolicAssociation} to add.
      */
     public void addAssociation(ISymbolicAssociation association) {
         associations = associations.append(association);
@@ -62,15 +65,11 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     @Override
     public ISymbolicAssociation getAssociation(final IProgramVariable programVariable,
             final boolean isArrayIndex, final Term arrayIndex, final Term condition) {
-        return CollectionUtil.search(associations, new IFilter<ISymbolicAssociation>() {
-            @Override
-            public boolean select(ISymbolicAssociation element) {
-                return element.getProgramVariable() == programVariable
-                        && element.isArrayIndex() == isArrayIndex
-                        && ObjectUtil.equals(element.getArrayIndex(), arrayIndex)
-                        && ObjectUtil.equals(element.getCondition(), condition);
-            }
-        });
+        return CollectionUtil.search(associations,
+            element -> element.getProgramVariable() == programVariable
+                    && element.isArrayIndex() == isArrayIndex
+                    && Objects.equals(element.getArrayIndex(), arrayIndex)
+                    && Objects.equals(element.getCondition(), condition));
     }
 
     /**
@@ -96,14 +95,10 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     @Override
     public ISymbolicValue getValue(final IProgramVariable programVariable,
             final boolean isArrayIndex, final Term arrayIndex, final Term condition) {
-        return CollectionUtil.search(values, new IFilter<ISymbolicValue>() {
-            @Override
-            public boolean select(ISymbolicValue element) {
-                return element.getProgramVariable() == programVariable
-                        && element.isArrayIndex() == isArrayIndex
-                        && ObjectUtil.equals(element.getArrayIndex(), arrayIndex)
-                        && ObjectUtil.equals(element.getCondition(), condition);
-            }
-        });
+        return CollectionUtil.search(values,
+            element -> element.getProgramVariable() == programVariable
+                    && element.isArrayIndex() == isArrayIndex
+                    && Objects.equals(element.getArrayIndex(), arrayIndex)
+                    && Objects.equals(element.getCondition(), condition));
     }
 }

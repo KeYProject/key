@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -6,19 +9,20 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+
 public class OracleInvariantTranslator {
 
-    private Services services;
+    private final Services services;
 
     public OracleInvariantTranslator(Services services) {
         this.services = services;
@@ -48,8 +52,7 @@ public class OracleInvariantTranslator {
 
         for (ClassAxiom c : spec.getClassAxioms(kjt)) {
 
-            if (c instanceof RepresentsAxiom && c.getKJT().equals(kjt)) {
-                RepresentsAxiom ra = (RepresentsAxiom) c;
+            if (c instanceof RepresentsAxiom ra && c.getKJT().equals(kjt)) {
 
                 Term t = ra.getAxiom(h, o, services);
 

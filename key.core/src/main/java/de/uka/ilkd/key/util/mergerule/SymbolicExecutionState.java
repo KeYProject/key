@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.mergerule;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Pair;
+
+import org.key_project.util.collection.Pair;
 
 /**
  * A symbolic execution state is a pair of a symbolic state in form of a parallel update, and a path
@@ -56,7 +60,7 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
     }
 
     /**
-     * @param The node corresponding to this SE state.
+     * @param correspondingNode The node corresponding to this SE state.
      */
     public void setCorrespondingNode(Node correspondingNode) {
         this.correspondingNode = correspondingNode;

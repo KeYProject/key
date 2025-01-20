@@ -1,4 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
@@ -7,19 +16,15 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
-import org.junit.jupiter.api.Assertions;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -33,13 +38,11 @@ public class TestRecoder2KeY {
 
     // some non sense java blocks with lots of statements and expressions
     private static final String[] jblocks = new String[] {
-        "{int j=7; int i;\n i=1; byte d=0; short f=1; long l=123; \n "
-            + "for (i=0, j=1; (i<42) && (i>0); i++, j--)\n" + " { i=13; j=1; } "
-            + "while ((-i<7) || (i++==7--) | (--i==++7) ||(!true && false) ||" + " ('a'=='d') "
-            + "|| (\"asd\"==\"as\"+\"d\") & (d==f) ^ (d/f+2>=f*d-f%d)|| (l<=~i)"
-            + " || !(this==null) || ((this!=null) ? (8<<j<8>>i) : (7&5>8>>>7L)"
-            + " || (7|5!=8^4)) && i+=j && i=j && i/=j && i%=j && i-=j && i*=j"
-            + " && i<<=j && i>>=j && i>>>=j && i&=j && i^=j && i|=j) j=7;" + "}",
+        """
+                {int j=7; int i;
+                 i=1; byte d=0; short f=1; long l=123;\s
+                 for (i=0, j=1; (i<42) && (i>0); i++, j--)
+                 { i=13; j=1; } while ((-i<7) || (i++==7--) | (--i==++7) ||(!true && false) || ('a'=='d') || ("asd"=="as"+"d") & (d==f) ^ (d/f+2>=f*d-f%d)|| (l<=~i) || !(this==null) || ((this!=null) ? (8<<j<8>>i) : (7&5>8>>>7L) || (7|5!=8^4)) && i+=j && i=j && i/=j && i%=j && i-=j && i*=j && i<<=j && i>>=j && i>>>=j && i&=j && i^=j && i|=j) j=7;}""",
 
         "{" + "int j=7; int i;\n i=1;" + "do { j++; } while (i==1);"
             + "if (j==42) j=7; else {i=7; j=43;}" + ";;" + "label0: j=42;"
@@ -86,8 +89,9 @@ public class TestRecoder2KeY {
     private static String removeBlanks(String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
-            if (!(s.charAt(i) == (' ')) && !(s.charAt(i) == ('\n')))
+            if (!(s.charAt(i) == (' ')) && !(s.charAt(i) == ('\n'))) {
                 sb.append(s.charAt(i));
+            }
         }
         return sb.toString();
     }
@@ -123,8 +127,7 @@ public class TestRecoder2KeY {
             String keyProg = removeBlanks(c2k.readBlockWithEmptyContext(jblocks[i]).toString());
             String recoderProg =
                 removeBlanks(c2k.recoderBlock(jblocks[i], c2k.createEmptyContext()).toSource());
-            assertEquals(recoderProg, keyProg,
-                "Block :" + i + " rec:" + recoderProg + "key:" + keyProg);
+            assertEquals(recoderProg, keyProg, "Block " + i);
         }
     }
 
@@ -159,19 +162,11 @@ public class TestRecoder2KeY {
     public void xtestFileInput() {
         char[] ch = new char[100000];
         int n = 0;
-        Reader fr = null;
-        try {
-            fr = new BufferedReader(new FileReader("de/uka/ilkd/key/java/Recoder2KeY.java"));
+        try (Reader fr = new BufferedReader(
+            new FileReader("de/uka/ilkd/key/java/Recoder2KeY.java", StandardCharsets.UTF_8))) {
             n = fr.read(ch);
         } catch (IOException e) {
             System.err.println("Recoder2KeY.java not found");
-        } finally {
-            if (fr != null) {
-                try {
-                    fr.close();
-                } catch (IOException e) {
-                }
-            }
         }
         String inputString = new String(ch, 0, n);
         testClass(inputString);

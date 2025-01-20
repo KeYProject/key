@@ -1,18 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
-
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import de.uka.ilkd.key.util.Triple;
-import org.antlr.v4.runtime.ParserRuleContext;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.*;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
@@ -31,8 +35,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(ENSURES_FREE, toString);
     }
 
-    private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause,
-            @Nonnull Name heap) {
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
+    public ImmutableList<LabeledParserRuleContext> getAssignableFree(Name toString) {
+        return getList(ASSIGNABLE_FREE, toString);
+    }
+
+    private ImmutableList<LabeledParserRuleContext> getList(@NonNull ClauseHd clause,
+            @NonNull Name heap) {
         List<LabeledParserRuleContext> seq =
             clauses.stream().filter(it -> it.clauseType.equals(clause))
                     .filter(it -> Objects.equals(it.heap, heap)).map(it -> it.ctx)
@@ -56,6 +68,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(REQUIRES, heap);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public ImmutableList<LabeledParserRuleContext> getAssignable(Name heap) {
         return getList(ASSIGNABLE, heap);
     }
@@ -74,9 +90,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     /**
      * Heap-dependent clauses
+     * Note that the name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
      */
     public enum ClauseHd {
-        ACCESSIBLE, ASSIGNABLE, REQUIRES, REQUIRES_FREE, ENSURES, ENSURES_FREE, AXIOMS,
+        ACCESSIBLE, ASSIGNABLE, ASSIGNABLE_FREE, REQUIRES, REQUIRES_FREE, ENSURES, ENSURES_FREE,
+        AXIOMS,
     }
 
     private final Behavior behavior;
@@ -98,8 +117,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
     }
 
-    public TextualJMLSpecCase(ImmutableList<String> mods, @Nonnull Behavior behavior) {
-        super(mods);
+    public TextualJMLSpecCase(ImmutableList<JMLModifier> modifiers, @NonNull Behavior behavior) {
+        super(modifiers);
         if (behavior == null) {
             throw new IllegalArgumentException();
         }
@@ -107,6 +126,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
+        if (clauses.isEmpty()) {
+            setPosition(ctx);
+        }
         clauses.add(new Entry(clause, ctx));
         return this;
     }
@@ -117,8 +139,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName,
             LabeledParserRuleContext ctx) {
-        if (heapName == null)
+        if (heapName == null) {
             heapName = HeapLDT.BASE_HEAP_NAME;
+        }
         clauses.add(new Entry(clause, ctx, heapName));
         return this;
     }
@@ -142,15 +165,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      *
      * @param other
      */
-    public @Nonnull TextualJMLSpecCase merge(@Nonnull TextualJMLSpecCase other) {
+    public @NonNull TextualJMLSpecCase merge(@NonNull TextualJMLSpecCase other) {
         TextualJMLSpecCase res = clone();
         res.clauses.addAll(other.clauses);
         return res;
     }
 
     @Override
-    public @Nonnull TextualJMLSpecCase clone() {
-        TextualJMLSpecCase res = new TextualJMLSpecCase(getMods(), getBehavior());
+    public @NonNull TextualJMLSpecCase clone() {
+        TextualJMLSpecCase res = new TextualJMLSpecCase(getModifiers(), getBehavior());
         res.name = name;
         res.clauses = new ArrayList<>(clauses);
         return res;
@@ -171,8 +194,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     @Override
     public String toString() {
-        return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses + ", mods="
-            + mods + ", name='" + name + '\'' + '}';
+        return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses
+            + ", modifiers=" + modifiers + ", name='" + name + '\'' + '}';
     }
 
 
@@ -181,9 +204,21 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         addClause(REQUIRES, label);
     }
 
-    public Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext>[] getAbbreviations() {
+    /**
+     * An abbreviation is a short-name for a term. Currently unused during the JML translation.
+     * A relict from older days ({@link #getAbbreviations()}.
+     *
+     * @param typeName name of the type
+     * @param abbrevName the short-representation of the term
+     * @param abbreviatedTerm the term to be abbreviated.
+     */
+    public record Abbreviation(LabeledParserRuleContext typeName,
+            LabeledParserRuleContext abbrevName,
+            LabeledParserRuleContext abbreviatedTerm) {}
+
+    public Abbreviation[] getAbbreviations() {
         /* weigl: prepare for future use of generated abbreviations from JML specifications */
-        return new Triple[0];
+        return new Abbreviation[0];
     }
 
     public ImmutableList<LabeledParserRuleContext> getInfFlowSpecs() {
@@ -225,6 +260,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return ImmutableList.fromList(seq);
     }
 
+    /**
+     * The name 'assignable' is kept here for legacy reasons.
+     * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
+     */
     public ImmutableList<LabeledParserRuleContext> getAssignable() {
         return getList(ASSIGNABLE);
     }
@@ -240,11 +279,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof TextualJMLSpecCase))
+        }
+        if (!(o instanceof TextualJMLSpecCase that)) {
             return false;
-        TextualJMLSpecCase that = (TextualJMLSpecCase) o;
+        }
         return getBehavior() == that.getBehavior() && clauses.equals(that.clauses);
     }
 

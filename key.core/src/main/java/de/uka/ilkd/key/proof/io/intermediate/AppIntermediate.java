@@ -1,8 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io.intermediate;
 
+import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.logic.Name;
 
 /**
  * Represents an intermediate rule / taclet application.
@@ -28,7 +30,7 @@ public abstract class AppIntermediate {
      * @return The line number of this application in the loaded proof file.
      */
     public String getLineNr() {
-        return "" + lineNr;
+        return String.valueOf(lineNr);
     }
 
     /**

@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
+
+import java.io.File;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.*;
@@ -7,13 +12,14 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableList;
-
-import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,7 +54,7 @@ public class ProofExplorationServiceTest {
     @Test
     public void testAdditionAntec() {
         Term add = parseTerm("p");
-        expService.soundAddition(currentProof.getGoal(currentProof.root()), add, true);
+        expService.soundAddition(currentProof.getOpenGoal(currentProof.root()), add, true);
         ImmutableList<Goal> goals = currentProof.openGoals();
 
         assertEquals(2, goals.size(), "Two new goals created");
@@ -93,7 +99,7 @@ public class ProofExplorationServiceTest {
     @Test
     public void testAdditionSucc() {
         Term added = parseTerm("q");
-        expService.soundAddition(currentProof.getGoal(currentProof.root()), added, false);
+        expService.soundAddition(currentProof.getOpenGoal(currentProof.root()), added, false);
         ImmutableList<Goal> goals = currentProof.openGoals();
 
         assertEquals(2, goals.size(), "Two new goals created");

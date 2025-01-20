@@ -1,20 +1,12 @@
-/*
- * Created on 18.12.2004
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
-
-import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.helper.FindResources;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -35,13 +27,20 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.helper.FindResources;
+import org.key_project.util.java.CollectionUtil;
+
+import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class HelperClassForTests {
 
@@ -55,7 +54,7 @@ public class HelperClassForTests {
         @Override
         public RuleCollection getStandardRules() {
             return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
-                ImmutableSLList.<BuiltInRule>nil());
+                ImmutableSLList.nil());
         }
     };
 
@@ -155,8 +154,9 @@ public class HelperClassForTests {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static HashMap<String, String> setDefaultTacletOptions(File baseDir,
-            String javaPathInBaseDir) throws ProblemLoaderException, ProofInputException {
+    public static Map<String, String> setDefaultTacletOptions(File baseDir,
+            String javaPathInBaseDir)
+            throws ProblemLoaderException, ProofInputException {
         if (!ProofSettings.isChoiceSettingInitialised()) {
             // Make sure that required files exists
             File javaFile = new File(baseDir, javaPathInBaseDir);
@@ -191,9 +191,9 @@ public class HelperClassForTests {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static HashMap<String, String> setDefaultTacletOptionsForTarget(File javaFile,
-            String containerTypeName, final String targetName)
-            throws ProblemLoaderException, ProofInputException {
+    public static Map<String, String> setDefaultTacletOptionsForTarget(File javaFile,
+            String containerTypeName,
+            final String targetName) throws ProblemLoaderException, ProofInputException {
         if (!ProofSettings.isChoiceSettingInitialised()) {
             KeYEnvironment<?> environment = null;
             Proof proof = null;
@@ -208,12 +208,8 @@ public class HelperClassForTests {
                 ImmutableSet<IObserverFunction> targets =
                     environment.getSpecificationRepository().getContractTargets(containerKJT);
                 IObserverFunction target =
-                    CollectionUtil.search(targets, new IFilter<IObserverFunction>() {
-                        @Override
-                        public boolean select(IObserverFunction element) {
-                            return targetName.equals(element.toString());
-                        }
-                    });
+                    CollectionUtil.search(targets,
+                        element -> targetName.equals(element.toString()));
                 // Assert.assertNotNull(target);
                 // Find first contract.
                 ImmutableSet<Contract> contracts =
@@ -241,16 +237,16 @@ public class HelperClassForTests {
      *
      * @return The original settings which are overwritten.
      */
-    public static HashMap<String, String> setDefaultTacletOptions() {
+    public static Map<String, String> setDefaultTacletOptions() {
         // Assert.assertTrue(ProofSettings.isChoiceSettingInitialised());
         // Set default taclet options
         ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-        HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
-        HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
+        var oldSettings = choiceSettings.getDefaultChoices();
+        HashMap<String, String> newSettings = new HashMap<>(oldSettings);
         newSettings.putAll(MiscTools.getDefaultTacletOptions());
         choiceSettings.setDefaultChoices(newSettings);
         // Make sure that default taclet options are set
-        HashMap<String, String> updatedChoiceSettings =
+        var updatedChoiceSettings =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
         for (Entry<String, String> entry : newSettings.entrySet()) {
             // Assert.assertEquals(entry.getValue(), updatedChoiceSettings.get(entry.getKey()));
@@ -263,12 +259,12 @@ public class HelperClassForTests {
      *
      * @param options The taclet options to restore.
      */
-    public static void restoreTacletOptions(HashMap<String, String> options) {
+    public static void restoreTacletOptions(Map<String, String> options) {
         if (options != null) {
             // Assert.assertTrue(ProofSettings.isChoiceSettingInitialised());
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(options);
             // Make sure that taclet options are restored
-            HashMap<String, String> updatedChoiceSettings =
+            var updatedChoiceSettings =
                 ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
             for (Entry<String, String> entry : options.entrySet()) {
                 // Assert.assertEquals(entry.getValue(), updatedChoiceSettings.get(entry.getKey()));
@@ -290,20 +286,12 @@ public class HelperClassForTests {
         KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
         // Assert.assertNotNull(containerKJT);
         ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
-        IProgramMethod pm = CollectionUtil.search(pms, new IFilter<IProgramMethod>() {
-            @Override
-            public boolean select(IProgramMethod element) {
-                return methodFullName.equals(element.getFullName());
-            }
-        });
+        IProgramMethod pm =
+            CollectionUtil.search(pms, element -> methodFullName.equals(element.getFullName()));
         if (pm == null) {
             pms = javaInfo.getConstructors(containerKJT);
-            pm = CollectionUtil.search(pms, new IFilter<IProgramMethod>() {
-                @Override
-                public boolean select(IProgramMethod element) {
-                    return methodFullName.equals(element.getFullName());
-                }
-            });
+            pm = CollectionUtil.search(pms,
+                element -> methodFullName.equals(element.getFullName()));
         }
         // Assert.assertNotNull(pm);
         return pm;

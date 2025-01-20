@@ -1,12 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * <p>
@@ -27,13 +31,13 @@ public interface IExecutionTermination extends IExecutionNode<SourceElement> {
     /**
      * The default name of a termination node with {@link TerminationKind#NORMAL}.
      */
-    public static final String NORMAL_TERMINATION_NODE_NAME =
+    String NORMAL_TERMINATION_NODE_NAME =
         INTERNAL_NODE_NAME_START + "end" + INTERNAL_NODE_NAME_END;
 
     /**
      * The default name of a termination node with {@link TerminationKind#LOOP_BODY}.
      */
-    public static final String LOOP_BODY_TERMINATION_NODE_NAME =
+    String LOOP_BODY_TERMINATION_NODE_NAME =
         INTERNAL_NODE_NAME_START + "loop body end" + INTERNAL_NODE_NAME_END;
 
     /**
@@ -42,21 +46,21 @@ public interface IExecutionTermination extends IExecutionNode<SourceElement> {
      *
      * @return The {@link IProgramVariable} which is used to caught global exceptions.
      */
-    public IProgramVariable getExceptionVariable();
+    IProgramVariable getExceptionVariable();
 
     /**
      * Returns the {@link Sort} of the caught exception.
      *
      * @return The {@link Sort} of the caught exception.
      */
-    public Sort getExceptionSort();
+    Sort getExceptionSort();
 
     /**
      * Returns the {@link TerminationKind}.
      *
      * @return The {@link TerminationKind}.
      */
-    public TerminationKind getTerminationKind();
+    TerminationKind getTerminationKind();
 
     /**
      * Checks if this branch would be closed without the uninterpreted predicate and thus be treated
@@ -64,14 +68,14 @@ public interface IExecutionTermination extends IExecutionNode<SourceElement> {
      *
      * @return {@code true} verified/closed, {@code false} not verified/still open
      */
-    public boolean isBranchVerified();
+    boolean isBranchVerified();
 
     /**
      * Defines the possible termination kinds.
      *
      * @author Martin Hentschel
      */
-    public static enum TerminationKind {
+    enum TerminationKind {
         /**
          * Normal termination without any exceptions.
          */

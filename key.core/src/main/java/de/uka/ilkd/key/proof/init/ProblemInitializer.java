@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Field;
@@ -12,9 +19,10 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
@@ -26,21 +34,22 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
-
-import java.io.*;
-import java.util.*;
 
 
 public final class ProblemInitializer {
@@ -57,16 +66,16 @@ public final class ProblemInitializer {
     private FileRepo fileRepo;
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
+
     public ProblemInitializer(ProgressMonitor mon, Services services,
             ProblemInitializerListener listener) {
         this.services = services;
         this.progMon = mon;
         this.listener = listener;
     }
-
-    // -------------------------------------------------------------------------
-    // constructors
-    // -------------------------------------------------------------------------
 
     public ProblemInitializer(Profile profile) {
         if (profile == null) {
@@ -233,11 +242,7 @@ public final class ProblemInitializer {
         final String javaPath = envInput.readJavaPath();
         final List<File> classPath = envInput.readClassPath();
         final File bootClassPath;
-        try {
-            bootClassPath = envInput.readBootClassPath();
-        } catch (IOException ioe) {
-            throw new ProofInputException(ioe);
-        }
+        bootClassPath = envInput.readBootClassPath();
 
         final Includes includes = envInput.readIncludes();
 
@@ -293,7 +298,7 @@ public final class ProblemInitializer {
     }
 
     /**
-     * Removes all schema variables, all generic sorts and all sort depending symbols for a generic
+     * Removes all schema variables, all generic sorts and all sort-depending symbols for a generic
      * sort out of the namespaces. Helper for readEnvInput().
      * <p>
      * See bug report #1185, #1189 (in Mantis)
@@ -301,13 +306,13 @@ public final class ProblemInitializer {
     private void cleanupNamespaces(InitConfig initConfig) {
         Namespace<QuantifiableVariable> newVarNS = new Namespace<>();
         Namespace<Sort> newSortNS = new Namespace<>();
-        Namespace<Function> newFuncNS = new Namespace<>();
+        Namespace<JFunction> newFuncNS = new Namespace<>();
         for (Sort n : initConfig.sortNS().allElements()) {
             if (!(n instanceof GenericSort)) {
                 newSortNS.addSafely(n);
             }
         }
-        for (Function n : initConfig.funcNS().allElements()) {
+        for (JFunction n : initConfig.funcNS().allElements()) {
             if (!(n instanceof SortDependingFunction
                     && ((SortDependingFunction) n).getSortDependingOn() instanceof GenericSort)) {
                 newFuncNS.addSafely(n);
@@ -340,8 +345,8 @@ public final class ProblemInitializer {
             populateNamespaces(term.sub(i), namespaces, rootGoal);
         }
 
-        if (term.op() instanceof Function) {
-            namespaces.functions().add((Function) term.op());
+        if (term.op() instanceof JFunction) {
+            namespaces.functions().add((JFunction) term.op());
         } else if (term.op() instanceof ProgramVariable) {
             final ProgramVariable pv = (ProgramVariable) term.op();
             if (namespaces.programVariables().lookup(pv.name()) == null) {
@@ -355,7 +360,7 @@ public final class ProblemInitializer {
         } else if (term.javaBlock() != null && !term.javaBlock().isEmpty()) {
             final ProgramElement pe = term.javaBlock().program();
             final Services serv = rootGoal.proof().getServices();
-            final ImmutableSet<ProgramVariable> freeProgVars =
+            final ImmutableSet<LocationVariable> freeProgVars =
                 MiscTools.getLocalIns(pe, serv).union(MiscTools.getLocalOuts(pe, serv));
             for (ProgramVariable pv : freeProgVars) {
                 if (namespaces.programVariables().lookup(pv.name()) == null) {
@@ -378,8 +383,7 @@ public final class ProblemInitializer {
     }
 
     // what is the purpose of this method?
-    private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig)
-            throws ProofInputException {
+    private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig) {
         // TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(),
             false);
@@ -402,7 +406,7 @@ public final class ProblemInitializer {
             // register built in rules
             Profile profile = proofs[i].getInitConfig().getProfile();
             final ImmutableList<BuiltInRule> rules =
-                profile.getStandardRules().getStandardBuiltInRules();
+                profile.getStandardRules().standardBuiltInRules();
             int j = 0;
             final int step = rules.size() != 0 ? (7 / rules.size()) : 0;
             for (Rule r : rules) {
@@ -426,7 +430,7 @@ public final class ProblemInitializer {
         // The synchronized statement is required for thread save parsing since all JavaCC parser
         // are generated static.
         // For our own parser (ProofJavaParser.jj and SchemaJavaParser.jj) it is possible to
-        // generate them non static
+        // generate them non-static
         // which is done on branch "hentschelJavaCCInstanceNotStatic". But recoder still uses static
         // methods and
         // the synchronized statement can not be avoided for this reason.
@@ -452,9 +456,11 @@ public final class ProblemInitializer {
                 cleanupNamespaces(currentBaseConfig);
                 baseConfig = currentBaseConfig;
             }
+
             InitConfig ic = prepare(envInput, currentBaseConfig);
-            if (Debug.ENABLE_DEBUG)
+            if (Debug.ENABLE_DEBUG) {
                 print(ic);
+            }
             return ic;
         }
     }
@@ -464,14 +470,15 @@ public final class ProblemInitializer {
         try {
             taclets1 = File.createTempFile("proof", ".txt");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to create temp file", e);
             return;
         }
         LOGGER.debug("Taclets under: {}", taclets1);
-        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(taclets1)))) {
+        try (PrintWriter out =
+            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.print(firstProof.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed write proof", e);
         }
     }
 
@@ -480,20 +487,19 @@ public final class ProblemInitializer {
         try {
             taclets1 = File.createTempFile("taclets", ".txt");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to create temp file", e);
             return;
         }
         LOGGER.debug("Taclets under: {}", taclets1);
-        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(taclets1)))) {
+        try (PrintWriter out =
+            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.format("Date: %s%n", new Date());
 
             out.format("Choices: %n");
             ic.getActivatedChoices().forEach(i -> out.format("\t%s%n", i));
 
             out.format("Activated Taclets: %n");
-            final List<Taclet> taclets = new ArrayList<>();
-            for (Taclet t : ic.activatedTaclets())
-                taclets.add(t);
+            final List<Taclet> taclets = new ArrayList<>(ic.activatedTaclets());
             taclets.sort(Comparator.comparing(a -> a.name().toString()));
             for (Taclet taclet : taclets) {
                 out.format("== %s (%s) =========================================%n", taclet.name(),
@@ -502,7 +508,7 @@ public final class ProblemInitializer {
                 out.format("-----------------------------------------------------%n");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to save", e);
         }
     }
 
@@ -510,18 +516,28 @@ public final class ProblemInitializer {
     // public interface
     // -------------------------------------------------------------------------
 
+    private void configureTermLabelSupport(InitConfig initConfig) {
+        initConfig.getServices().setOriginFactory(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                    .getUseOriginLabels()
+                            ? new OriginTermLabelFactory()
+                            : null);
+    }
+
     private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)
             throws ProofInputException {
         // create initConfig
         InitConfig initConfig = referenceConfig.copy();
 
+        configureTermLabelSupport(initConfig);
 
         // read Java
         readJava(envInput, initConfig);
 
         // register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-        final Namespace<Function> functions = initConfig.getServices().getNamespaces().functions();
+        final Namespace<JFunction> functions =
+            initConfig.getServices().getNamespaces().functions();
         final HeapLDT heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
         if (javaInfo != null) {
@@ -537,15 +553,17 @@ public final class ProblemInitializer {
                     }
                 }
                 for (ProgramMethod pm : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-                    if (pm == null)
+                    if (pm == null) {
                         continue; // weigl 2021-11-10
+                    }
                     if (!(pm.isVoid() || pm.isConstructor())) {
                         functions.add(pm);
                     }
                 }
             }
-        } else
+        } else {
             throw new ProofInputException("Problem initialization without JavaInfo!");
+        }
 
         // read envInput
         readEnvInput(envInput, initConfig);
@@ -565,6 +583,8 @@ public final class ProblemInitializer {
             // determine environment
             initConfig = determineEnvironment(po, Objects.requireNonNull(initConfig));
 
+
+
             // read problem
             reportStatus("Loading problem \"" + po.name() + "\"");
             po.readProblem();
@@ -572,8 +592,9 @@ public final class ProblemInitializer {
             // final work
             setUpProofHelper(po, pa);
 
-            if (Debug.ENABLE_DEBUG)
+            if (Debug.ENABLE_DEBUG) {
                 print(pa.getFirstProof());
+            }
 
             // done
             proofCreated(pa);
@@ -624,6 +645,14 @@ public final class ProblemInitializer {
         this.fileRepo = fileRepo;
     }
 
+    public ProblemInitializerListener getListener() {
+        return listener;
+    }
+
+    public ProgressMonitor getProgMon() {
+        return progMon;
+    }
+
     public interface ProblemInitializerListener {
         void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate);
 
@@ -638,13 +667,7 @@ public final class ProblemInitializer {
         void resetStatus(Object sender);
 
         void reportException(Object sender, ProofOblInput input, Exception e);
-    }
 
-    public ProblemInitializerListener getListener() {
-        return listener;
-    }
-
-    public ProgressMonitor getProgMon() {
-        return progMon;
+        default void showIssueDialog(Collection<PositionedString> issues) {}
     }
 }

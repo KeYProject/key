@@ -1,30 +1,29 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
+import java.util.Set;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.pp.PosTableLayouter;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+
+import org.key_project.logic.sort.Sort;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Set;
 
 public class ProofInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofInfo.class);
@@ -78,8 +77,7 @@ public class ProofInfo {
 
     public Term getPreConTerm() {
         Contract c = getContract();
-        if (c instanceof FunctionalOperationContract) {
-            FunctionalOperationContract t = (FunctionalOperationContract) c;
+        if (c instanceof FunctionalOperationContract t) {
             OriginalVariables orig = t.getOrigVars();
             Term post = t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
                 orig.params, orig.atPres, services);
@@ -89,35 +87,27 @@ public class ProofInfo {
         return services.getTermBuilder().ff();
     }
 
-    public Term getAssignable() {
+    public Term getModifiable() {
         Contract c = getContract();
-        return c.getAssignable(services.getTypeConverter().getHeapLDT().getHeap());
+        return c.getModifiable(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
     public String getCode() {
-
         Term f = getPO();
         JavaBlock block = getJavaBlock(f);
 
-        // getUpdate(f);
-        StringWriter sw = new StringWriter();
-        sw.write("   " + getUpdate(f) + "\n");
-        PrettyPrinter pw = new CustomPrettyPrinter(sw, false);
-
-        try {
-            block.program().prettyPrint(pw);
-            return sw.getBuffer().toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-
+        PosTableLayouter l = PosTableLayouter.pure();
+        l.beginC(0);
+        l.print(" ").print(getUpdate(f)).nl();
+        PrettyPrinter p = new PrettyPrinter(l);
+        block.program().visit(p);
+        l.end();
+        return p.result();
     }
 
     public void getProgramVariables(Term t, Set<Term> vars) {
         if (t.op() instanceof ProgramVariable && isRelevantConstant(t)) {
-            vars.add(TermLabel.removeIrrelevantLabels(t, services));
+            vars.add(TermLabelManager.removeIrrelevantLabels(t, services));
         }
 
         for (Term sub : t.subs()) {
@@ -143,11 +133,7 @@ public class ProofInfo {
             return false;
         }
 
-        if (s.extendsTrans(objSort) || s.equals(intSort) || s.equals(boolSort)) {
-            return true;
-        }
-
-        return false;
+        return s.extendsTrans(objSort) || s.equals(intSort) || s.equals(boolSort);
 
     }
 
@@ -179,8 +165,7 @@ public class ProofInfo {
 
 
     private String processUpdate(Term update) {
-        if (update.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate up = (ElementaryUpdate) update.op();
+        if (update.op() instanceof ElementaryUpdate up) {
             if (up.lhs().sort()
                     .extendsTrans(services.getTypeConverter().getHeapLDT().targetSort())) {
                 return "";

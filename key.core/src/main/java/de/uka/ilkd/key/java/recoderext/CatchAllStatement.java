@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.Expression;
@@ -111,10 +114,12 @@ public class CatchAllStatement extends JavaStatement
      */
     public int getChildCount() {
         int result = 0;
-        if (body != null)
+        if (body != null) {
             result++;
-        if (param != null)
+        }
+        if (param != null) {
             result++;
+        }
         return result;
     }
 
@@ -128,13 +133,15 @@ public class CatchAllStatement extends JavaStatement
      */
     public ProgramElement getChildAt(int index) {
         if (param != null) {
-            if (index == 0)
+            if (index == 0) {
                 return param;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

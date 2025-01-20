@@ -1,6 +1,6 @@
-/**
- * Created on: May 18, 2011
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.lang;
 
 import java.util.List;
@@ -15,7 +15,7 @@ public class SMTTermUnaryOp extends SMTTerm {
 
     public enum Op {
         NOT, BVNOT, BVNEG
-    };
+    }
 
     private Op operator;
     private SMTTerm sub;
@@ -113,8 +113,9 @@ public class SMTTermUnaryOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
-        if (this.equals(a))
+        if (this.equals(a)) {
             return b;
+        }
 
         // return new TermUnaryOp(operator, (Term) sub.substitute(a, b));
         return sub.substitute(a, b).unaryOp(operator);
@@ -141,15 +142,17 @@ public class SMTTermUnaryOp extends SMTTerm {
 
     @Override
     public boolean equals(Object term) {
-        if (term == null)
+        if (term == null) {
             return false;
+        }
 
-        if (this == term)
+        if (this == term) {
             return true;
+        }
 
-        if (!(term instanceof SMTTermUnaryOp))
+        if (!(term instanceof SMTTermUnaryOp ut)) {
             return false;
-        SMTTermUnaryOp ut = (SMTTermUnaryOp) term;
+        }
 
         return this.operator.equals(ut.operator) && this.sub.equals(ut.sub);
     }
@@ -195,17 +198,12 @@ public class SMTTermUnaryOp extends SMTTerm {
             tab = tab.append(" ");
         }
 
-        switch (operator) {
-        case NOT:
-            return tab + "(not" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";
-        case BVNOT:
-            return tab + "(bvnot" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";
-        case BVNEG:
-            return tab + "(bvneg" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";
-        default:
-            throw new RuntimeException("Unexpected: supported unaryOp={NOT}");
-        }
-
+        return switch (operator) {
+        case NOT -> tab + "(not" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";
+        case BVNOT -> tab + "(bvnot" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";
+        case BVNEG -> tab + "(bvneg" + "\n" + sub.toString(nestPos + 1) + "\n" + tab + ")";
+        default -> throw new RuntimeException("Unexpected: supported unaryOp={NOT}");
+        };
     }
 
 }

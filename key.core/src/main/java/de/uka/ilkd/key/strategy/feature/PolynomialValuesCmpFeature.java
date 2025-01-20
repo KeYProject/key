@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.math.BigInteger;
@@ -78,33 +81,38 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
                 // we currently only support constant polynomials
                 assert leftPoly.getParts().isEmpty();
                 assert rightPoly.getParts().isEmpty();
-                if (leftPoly.getConstantTerm().signum() == 0)
+                if (leftPoly.getConstantTerm().signum() == 0) {
                     return true;
-                if (rightPoly.getConstantTerm().signum() == 0)
+                }
+                if (rightPoly.getConstantTerm().signum() == 0) {
                     return false;
+                }
                 return leftPoly.getConstantTerm().mod(rightPoly.getConstantTerm().abs())
                         .signum() == 0;
             }
         };
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        return compare(getPolynomial(left, leftCoeff, app, pos, goal),
-            getPolynomial(right, rightCoeff, app, pos, goal));
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        return compare(getPolynomial(left, leftCoeff, app, pos, goal, mState),
+            getPolynomial(right, rightCoeff, app, pos, goal, mState));
     }
 
     protected abstract boolean compare(Polynomial leftPoly, Polynomial rightPoly);
 
     private Polynomial getPolynomial(ProjectionToTerm polyProj, ProjectionToTerm coeffProj,
-            TacletApp app, PosInOccurrence pos, Goal goal) {
+            TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Polynomial poly = Polynomial.create(polyProj.toTerm(app, pos, goal), services);
+        final Polynomial poly =
+            Polynomial.create(polyProj.toTerm(app, pos, goal, mState), services);
 
-        if (coeffProj == null)
+        if (coeffProj == null) {
             return poly;
-        final Term coeffT = coeffProj.toTerm(app, pos, goal);
-        if (coeffT == null)
+        }
+        final Term coeffT = coeffProj.toTerm(app, pos, goal, mState);
+        if (coeffT == null) {
             return poly;
+        }
 
         final BigInteger coeff =
             new BigInteger(AbstractTermTransformer.convertToDecimalString(coeffT, services));

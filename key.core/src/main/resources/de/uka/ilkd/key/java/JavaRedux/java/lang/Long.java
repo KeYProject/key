@@ -4,8 +4,8 @@
 package java.lang;
 
 public final class Long implements java.lang.Comparable {
-   public final static int MIN_VALUE = 0x8000000000000000L;
-   public final static int MAX_VALUE = 0x7fffffffffffffffL;
+   public final static long MIN_VALUE = 0x8000000000000000L;
+   public final static long MAX_VALUE = 0x7fffffffffffffffL;
    public final static java.lang.Class TYPE;
    public final static int SIZE = 64;
 }

@@ -1,24 +1,25 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
+
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**
@@ -49,12 +50,16 @@ public final class ClassInvariantImpl implements ClassInvariant {
     /**
      * The original self variable of the receiver object.
      */
-    private final ParsableVariable originalSelfVar;
+    private final LocationVariable originalSelfVar;
     /**
      * Whether the class invariant is a static (i.e., &lt;$inv&gt;) or an instance invariant (i.e.,
      * &lt;inv&gt;).
      */
     private final boolean isStatic;
+    /**
+     * Whether the class invariant is free.
+     */
+    private final boolean isFree;
 
 
     // -------------------------------------------------------------------------
@@ -72,9 +77,26 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param selfVar the variable used for the receiver object
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, Term inv, ParsableVariable selfVar) {
-        assert name != null && !name.equals("");
-        assert displayName != null && !displayName.equals("");
+            VisibilityModifier visibility, Term inv, LocationVariable selfVar) {
+        this(name, displayName, kjt, visibility, inv, selfVar, false);
+    }
+
+    /**
+     * Creates a class invariant.
+     *
+     * @param name the unique internal name of the invariant
+     * @param displayName the displayed name of the invariant
+     * @param kjt the KeYJavaType to which the invariant belongs
+     * @param visibility the visibility of the invariant (null for default visibility)
+     * @param inv the invariant formula itself
+     * @param selfVar the variable used for the receiver object
+     * @param free whether this contract is free.
+     */
+    public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
+            VisibilityModifier visibility, Term inv, LocationVariable selfVar,
+            boolean free) {
+        assert name != null && !name.isEmpty();
+        assert displayName != null && !displayName.isEmpty();
         assert kjt != null;
         assert inv != null;
         this.name = name;
@@ -86,7 +108,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
         final OpCollector oc = new OpCollector();
         originalInv.execPostOrder(oc);
         this.isStatic = selfVar == null;
-        // assert isStatic == !oc.contains(originalSelfVar);
+        this.isFree = free;
     }
 
 
@@ -94,8 +116,9 @@ public final class ClassInvariantImpl implements ClassInvariant {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Map<Operator, Operator> getReplaceMap(ParsableVariable selfVar, TermServices services) {
-        Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
+    private Map<Operator, Operator> getReplaceMap(AbstractSortedOperator selfVar,
+            TermServices services) {
+        Map<Operator, Operator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());
@@ -114,7 +137,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     @Override
     public ClassInvariant map(UnaryOperator<Term> op, Services services) {
         return new ClassInvariantImpl(name, displayName, kjt, visibility, op.apply(originalInv),
-            originalSelfVar);
+            originalSelfVar, isFree);
     }
 
     @Override
@@ -136,7 +159,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
 
     @Override
-    public Term getInv(ParsableVariable selfVar, TermServices services) {
+    public Term getInv(AbstractSortedOperator selfVar, TermServices services) {
         final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         Term res = or.replace(originalInv);
@@ -154,6 +177,11 @@ public final class ClassInvariantImpl implements ClassInvariant {
     @Override
     public boolean isStatic() {
         return isStatic;
+    }
+
+    @Override
+    public boolean isFree() {
+        return isFree;
     }
 
 
@@ -178,16 +206,11 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
     @Override
     public OriginalVariables getOrigVars() {
-        final ProgramVariable self;
-        if (this.originalSelfVar instanceof ProgramVariable) {
-            self = (ProgramVariable) this.originalSelfVar;
-        } else if (this.originalSelfVar != null) {
-            self = new LocationVariable(new ProgramElementName(originalSelfVar.toString()), kjt);
-        } else {
-            self = null;
-        }
+        final LocationVariable self;
+        // TODO: Is this a correct change?
+        self = this.originalSelfVar;
         return new OriginalVariables(self, null, null,
-            new LinkedHashMap<LocationVariable, ProgramVariable>(),
-            ImmutableSLList.<ProgramVariable>nil());
+            new LinkedHashMap<>(),
+            ImmutableSLList.nil());
     }
 }

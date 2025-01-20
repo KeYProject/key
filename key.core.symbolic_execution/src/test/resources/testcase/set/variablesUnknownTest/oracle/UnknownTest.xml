@@ -9,7 +9,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="this.previous=null;" pathCondition="true" pathConditionChanged="false">
+      <statement name="this.previous = null;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="next" isArrayIndex="false">
@@ -26,7 +26,7 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <statement name="this.next=new UnknownTest ();" pathCondition="true" pathConditionChanged="false">
+         <statement name="this.next = new UnknownTest();" pathCondition="true" pathConditionChanged="false">
             <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="next" isArrayIndex="false">
@@ -113,7 +113,7 @@
                         </variable>
                      </value>
                   </variable>
-                  <statement name="this.next.next=new UnknownTest ();" pathCondition="true" pathConditionChanged="false">
+                  <statement name="this.next.next = new UnknownTest();" pathCondition="true" pathConditionChanged="false">
                      <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="next" isArrayIndex="false">

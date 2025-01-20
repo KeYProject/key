@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call DifferentBranchesTest.main(_a)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (_a==null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+      <branchStatement name="if (_a == null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="equals(a,null)" pathCondition="equals(a,null)" pathConditionChanged="true" branchCondition="equals(a,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 42;" pathCondition="equals(a,null)" pathConditionChanged="false">
                <methodReturn name="&lt;return of main&gt;" signature="&lt;return of DifferentBranchesTest.main(_a)&gt;" pathCondition="equals(a,null)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(a,null)">
@@ -12,11 +12,11 @@
             </statement>
          </branchCondition>
          <branchCondition name="not(equals(a,null))" pathCondition="not(equals(a,null))" pathConditionChanged="true" branchCondition="not(equals(a,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <statement name="_a[10]=2;" pathCondition="not(equals(a,null))" pathConditionChanged="false">
+            <statement name="_a[10] = 2;" pathCondition="not(equals(a,null))" pathConditionChanged="false">
                <branchCondition name="or(lt(length(a),Z(0(#))),gt(length(a),Z(0(1(#)))))" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" pathConditionChanged="true" branchCondition="or(lt(length(a),Z(0(#))),gt(length(a),Z(0(1(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="_a[20]=4;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" pathConditionChanged="false">
+                  <statement name="_a[20] = 4;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" pathConditionChanged="false">
                      <branchCondition name="gt(length(a),Z(0(2(#))))" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="true" branchCondition="gt(length(a),Z(0(2(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <statement name="return _a[10]+_a[20];" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="false">
+                        <statement name="return _a[10] + _a[20];" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="false">
                            <methodReturn name="&lt;return of main&gt;" signature="&lt;return of DifferentBranchesTest.main(_a)&gt;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))">
                               <termination name="&lt;end&gt;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="false">
                               </termination>

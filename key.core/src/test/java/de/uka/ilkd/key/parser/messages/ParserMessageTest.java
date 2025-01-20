@@ -1,14 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser.messages;
-
-import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.util.ExceptionTools;
-import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.provider.Arguments;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -17,6 +10,17 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.util.ExceptionTools;
+import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.provider.Arguments;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -92,9 +96,10 @@ public class ParserMessageTest {
 
         assertNotNull(location, "Cannot recover error location from Exception: " + exception);
 
-        assertNotNull(location.getFileURL(), "Couldn't recreate file URL from received exception.");
+        assertNotNull(location.getFileURI().orElse(null),
+            "Couldn't recreate file URL from received exception.");
 
-        assertEquals(javaFile.getAbsoluteFile(), Paths.get(location.getFileURL().toURI()),
+        assertEquals(javaFile.getAbsoluteFile(), Paths.get(location.getFileURI().get()),
             "Filename retrieved from parser message "
                 + "doesn't match filename of originally parsed file.");
     }
@@ -121,8 +126,8 @@ public class ParserMessageTest {
                 + "to specify the line number in which a parser error is " + "expected to occur.");
         int expectedLineNumber = Integer.parseInt(secondLine.substring(7));
 
-        assertEquals(expectedLineNumber, location.getLine(),
-            "Line number " + location.getLine() + " of retrieved parser message "
+        assertEquals(expectedLineNumber, location.getPosition().line(),
+            "Line number " + location.getPosition().line() + " of retrieved parser message "
                 + "doesn't match expected line number " + expectedLineNumber + ".");
     }
 
@@ -135,7 +140,7 @@ public class ParserMessageTest {
                 + "expected to occur.");
         int expectedColumnNumber = Integer.parseInt(thirdLine.substring(6));
 
-        assertEquals(expectedColumnNumber, location.getColumn(),
+        assertEquals(expectedColumnNumber, location.getPosition().column(),
             "Column number of retrieved parser message " + "doesn't match expected column number.");
     }
 

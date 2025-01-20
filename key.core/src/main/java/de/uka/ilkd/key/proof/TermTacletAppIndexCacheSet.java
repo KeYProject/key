@@ -1,25 +1,19 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 import java.util.Map;
 
-import org.key_project.util.LRUCache;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+
+import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Cache that is used for accelerating <code>TermTacletAppIndex</code>. Basically, this is a mapping
@@ -83,14 +77,14 @@ public class TermTacletAppIndexCacheSet {
      * this is a mapping from <code>IList<QuantifiedVariable></code> to <code>TopLevelCache</code>
      */
     private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> topLevelCaches =
-        new LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache>(
+        new LRUCache<>(
             MAX_CACHE_ENTRIES);
 
     /**
      * cache for locations that are below updates, but not below programs or in the scope of binders
      */
     private final ITermTacletAppIndexCache belowUpdateCacheEmptyPrefix =
-        new BelowUpdateCache(ImmutableSLList.<QuantifiableVariable>nil());
+        new BelowUpdateCache(ImmutableSLList.nil());
 
     /**
      * cache for locations that are below programs, but not in the scope of binders
@@ -102,20 +96,20 @@ public class TermTacletAppIndexCacheSet {
      * mapping from <code>IList<QuantifiedVariable></code> to <code>BelowProgCache</code>
      */
     private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> belowProgCaches =
-        new LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache>(
+        new LRUCache<>(
             MAX_CACHE_ENTRIES);
 
-    private Map<CacheKey, TermTacletAppIndex> cache;
+    private final Map<CacheKey, TermTacletAppIndex> cache;
 
     public TermTacletAppIndexCacheSet(Map<CacheKey, TermTacletAppIndex> cache) {
         assert cache != null;
         this.cache = cache;
-        antecCache = new TopLevelCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
-        succCache = new TopLevelCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
+        antecCache = new TopLevelCache(ImmutableSLList.nil(), cache);
+        succCache = new TopLevelCache(ImmutableSLList.nil(), cache);
         topLevelCacheEmptyPrefix =
-            new TopLevelCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
+            new TopLevelCache(ImmutableSLList.nil(), cache);
         belowProgCacheEmptyPrefix =
-            new BelowProgCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
+            new BelowProgCache(ImmutableSLList.nil(), cache);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -155,8 +149,9 @@ public class TermTacletAppIndexCacheSet {
      *         binders binding <code>prefix</code> (which might be empty)
      */
     private ITermTacletAppIndexCache getTopLevelCache(ImmutableList<QuantifiableVariable> prefix) {
-        if (prefix.isEmpty())
+        if (prefix.isEmpty()) {
             return topLevelCacheEmptyPrefix;
+        }
         ITermTacletAppIndexCache res = topLevelCaches.get(prefix);
         if (res == null) {
             res = new TopLevelCache(prefix, cache);
@@ -170,8 +165,9 @@ public class TermTacletAppIndexCacheSet {
      *         <code>prefix</code> (which might be empty)
      */
     private ITermTacletAppIndexCache getBelowProgCache(ImmutableList<QuantifiableVariable> prefix) {
-        if (prefix.isEmpty())
+        if (prefix.isEmpty()) {
             return belowProgCacheEmptyPrefix;
+        }
         ITermTacletAppIndexCache res = belowProgCaches.get(prefix);
         if (res == null) {
             res = new BelowProgCache(prefix, cache);
@@ -186,8 +182,9 @@ public class TermTacletAppIndexCacheSet {
      */
     private ITermTacletAppIndexCache getBelowUpdateCache(
             ImmutableList<QuantifiableVariable> prefix) {
-        if (prefix.isEmpty())
+        if (prefix.isEmpty()) {
             return belowUpdateCacheEmptyPrefix;
+        }
         return new BelowUpdateCache(prefix);
     }
 
@@ -197,8 +194,9 @@ public class TermTacletAppIndexCacheSet {
      */
     private boolean isUpdateTargetPos(Term t, int subtermIndex) {
         final Operator op = t.op();
-        if (!(op instanceof UpdateApplication))
+        if (!(op instanceof UpdateApplication)) {
             return false;
+        }
 
         return subtermIndex == UpdateApplication.targetPos();
     }
@@ -207,7 +205,8 @@ public class TermTacletAppIndexCacheSet {
      * @return <code>true</code> if <code>op</code> is an operator below which we are caching
      */
     private boolean isAcceptedOperator(Operator op) {
-        return op instanceof IfThenElse || (op instanceof Function && !(op instanceof Transformer))
+        return op instanceof IfThenElse
+                || (op instanceof JFunction && !(op instanceof Transformer))
                 || op instanceof Junctor || op instanceof Equality || op instanceof Quantifier
                 || op instanceof UpdateApplication || op instanceof Modality;
     }
@@ -221,15 +220,18 @@ public class TermTacletAppIndexCacheSet {
         }
 
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
-            if (isUpdateTargetPos(t, subtermIndex))
+            if (isUpdateTargetPos(t, subtermIndex)) {
                 return getBelowUpdateCache(getExtendedPrefix(t, subtermIndex));
+            }
 
             final Operator op = t.op();
-            if (op instanceof Modality)
+            if (op instanceof Modality) {
                 return getBelowProgCache(getExtendedPrefix(t, subtermIndex));
+            }
 
-            if (isAcceptedOperator(op))
+            if (isAcceptedOperator(op)) {
                 return getTopLevelCache(getExtendedPrefix(t, subtermIndex));
+            }
 
             return noCache;
         }
@@ -248,11 +250,13 @@ public class TermTacletAppIndexCacheSet {
 
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             final Operator op = t.op();
-            if (op instanceof Modality)
+            if (op instanceof Modality) {
                 return getBelowProgCache(getExtendedPrefix(t, subtermIndex));
+            }
 
-            if (isAcceptedOperator(op))
+            if (isAcceptedOperator(op)) {
                 return getBelowUpdateCache(getExtendedPrefix(t, subtermIndex));
+            }
 
             return noCache;
         }
@@ -273,8 +277,9 @@ public class TermTacletAppIndexCacheSet {
         }
 
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
-            if (isAcceptedOperator(t.op()))
+            if (isAcceptedOperator(t.op())) {
                 return getBelowProgCache(getExtendedPrefix(t, subtermIndex));
+            }
 
             return noCache;
         }

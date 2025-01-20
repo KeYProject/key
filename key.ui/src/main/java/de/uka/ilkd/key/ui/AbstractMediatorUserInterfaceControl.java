@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
@@ -29,14 +32,13 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl} for user interfaces in which a
@@ -48,7 +50,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(AbstractMediatorUserInterfaceControl.class);
-    protected boolean saveOnly = false;
+    private boolean saveOnly = false;
 
     private final MediatorProofControl proofControl = createProofControl();
 
@@ -127,8 +129,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             ProofMacroFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
             ProverTaskListener ptl = this;
             try {
-                getMediator().stopInterface(true);
-                getMediator().setInteractive(false);
+                getMediator().initiateAutoMode(proof, true, false);
                 ptl.taskStarted(
                     new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
                 synchronized (macro) {
@@ -141,8 +142,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
                 LOGGER.debug("Exception occurred during macro application:", e);
             } finally {
                 ptl.taskFinished(info);
-                getMediator().setInteractive(true);
-                getMediator().startInterface(true);
+                getMediator().finishAutoMode(proof, true, true, null);
             }
             return true;
         } else {
@@ -172,33 +172,26 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time
-            ThreadUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    getMediator().stopInterface(true);
-                    getMediator().setInteractive(false);
-                }
+            ThreadUtilities.invokeAndWait(() -> {
+                getMediator().initiateAutoMode(info.getProof(), true, false);
             });
         }
     }
 
     protected void macroSideProofDisposing(final ProofMacroFinishedInfo initiatingInfo,
             final Proof initiatingProof, final Proof sideProof) {
-        ThreadUtilities.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                saveSideProof(sideProof);
-                // make everyone listen to the proof remove
-                getMediator().startInterface(true);
-                if (initiatingProof.closed()) {
-                    getMediator().getSelectionModel().setSelectedNode(initiatingProof.root());
-                } else {
-                    getMediator().getSelectionModel()
-                            .setSelectedGoal(initiatingProof.openGoals().head());
-                }
-                // go into automode again
-                getMediator().stopInterface(true);
+        ThreadUtilities.invokeAndWait(() -> {
+            saveSideProof(sideProof);
+            // make everyone listen to the proof remove
+            getMediator().startInterface(true);
+            if (initiatingProof.closed()) {
+                getMediator().getSelectionModel().setSelectedNode(initiatingProof.root());
+            } else {
+                getMediator().getSelectionModel()
+                        .setSelectedGoal(initiatingProof.openGoals().head());
             }
+            // go into automode again
+            getMediator().stopInterface(true);
         });
     }
 
@@ -210,11 +203,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      */
     private void saveSideProof(Proof proof) {
         String proofName = proof.name().toString();
-        if (proofName.endsWith(".key")) {
-            proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
-        } else if (proofName.endsWith(".proof")) {
-            proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
-        }
+        proofName = MiscTools.removeFileExtension(proofName);
         final String filename = MiscTools.toValidFileName(proofName) + ".proof";
         final File proofFolder;
         if (proof.getProofFile() != null) {
@@ -225,10 +214,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         final File toSave = new File(proofFolder, filename);
         final KeYResourceManager krm = KeYResourceManager.getManager();
         final ProofSaver ps = new ProofSaver(proof, toSave.getAbsolutePath(), krm.getSHA1());
-        try {
-            ps.save();
-        } catch (IOException e) {
-            reportException(this, null, e);
+        final String errorMsg = ps.save();
+        if (errorMsg != null) {
+            reportException(this, null, new IOException(errorMsg));
         }
     }
 
@@ -271,10 +259,10 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * asks if removal of a task is completed. This is useful to display a dialog to the user and
      * asking her or if on command line to allow it always.
      *
-     * @param message
+     * @param message to be displayed asking for confirmation
      * @return true if removal has been granted
      */
-    public boolean confirmTaskRemoval(String string) {
+    public boolean confirmTaskRemoval(String message) {
         return true;
     }
 

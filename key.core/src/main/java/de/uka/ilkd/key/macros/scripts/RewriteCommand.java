@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -11,11 +18,11 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
  * This class provides the command <code>rewrite</code>.
@@ -40,12 +47,12 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
     /**
      * List of PosInOcc that haven't been successfully replaced
      */
-    private List<PosInOccurrence> failposInOccs = new ArrayList<>();
+    private final List<PosInOccurrence> failposInOccs = new ArrayList<>();
 
     /**
      * List of PosInOcc that successfully replaced
      */
-    private List<PosInOccurrence> succposInOccs = new ArrayList<>();
+    private final List<PosInOccurrence> succposInOccs = new ArrayList<>();
 
     /**
      * Constructs this rewrite command.
@@ -106,7 +113,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         // filter taclets that are applicable on the given formula in the antecedent
         for (SequentFormula sf : g.node().sequent().antecedent()) {
 
-            if (p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
+            if (p.formula != null
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
@@ -115,7 +123,8 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
 
         // filter taclets that are applicable on the given formula in the succedent
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
+            if (p.formula != null
+                    && !sf.formula().equalsModProperty(p.formula, RENAMING_TERM_PROPERTY)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
@@ -134,8 +143,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
 
         // Find taclet that transforms find term to replace term, when applied on find term
         for (TacletApp tacletApp : list) {
-            if (tacletApp instanceof PosTacletApp) {
-                PosTacletApp pta = (PosTacletApp) tacletApp;
+            if (tacletApp instanceof PosTacletApp pta) {
                 if (pta.taclet() instanceof RewriteTaclet) {
                     if (pta.taclet().displayName().equals("cut_direct")) {
                         continue;
@@ -185,7 +193,6 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
             failposInOccs.remove(pta.posInOccurrence());
             succposInOccs.add(pta.posInOccurrence());
             goalold.apply(pta);
-            return;
         } else {
             throw new IllegalArgumentException(
                 "Unsuccessful application of rewrite taclet " + pta.taclet().displayName());
@@ -250,4 +257,3 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         public Term formula;
     }
 }
-

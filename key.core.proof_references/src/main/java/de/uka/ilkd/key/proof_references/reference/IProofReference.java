@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.reference;
 
 import java.util.Collection;
@@ -20,7 +23,7 @@ import de.uka.ilkd.key.speclang.Contract;
  *
  * @author Martin Hentschel
  * @see ProofReferenceUtil
- * @see IProofReferencesAnalyst.
+ * @see IProofReferencesAnalyst
  */
 public interface IProofReference<T> {
     /**
@@ -32,7 +35,7 @@ public interface IProofReference<T> {
      * ({@link #getTarget()}).
      * </p>
      */
-    public static final String CALL_METHOD = "Call Method";
+    String CALL_METHOD = "Call Method";
 
     /**
      * <p>
@@ -43,7 +46,7 @@ public interface IProofReference<T> {
      * ({@link #getTarget()}).
      * </p>
      */
-    public static final String INLINE_METHOD = "Inline Method";
+    String INLINE_METHOD = "Inline Method";
 
     /**
      * <p>
@@ -54,7 +57,7 @@ public interface IProofReference<T> {
      * References of this kind should provide a {@link Contract} as target ({@link #getTarget()}).
      * </p>
      */
-    public static final String USE_CONTRACT = "Use Contract";
+    String USE_CONTRACT = "Use Contract";
 
     /**
      * <p>
@@ -65,7 +68,7 @@ public interface IProofReference<T> {
      * ({@link #getTarget()}).
      * </p>
      */
-    public static final String ACCESS = "Access";
+    String ACCESS = "Access";
 
     /**
      * <p>
@@ -76,7 +79,7 @@ public interface IProofReference<T> {
      * ({@link #getTarget()}).
      * </p>
      */
-    public static final String USE_INVARIANT = "Use Invariant";
+    String USE_INVARIANT = "Use Invariant";
 
     /**
      * <p>
@@ -87,40 +90,40 @@ public interface IProofReference<T> {
      * ({@link #getTarget()}).
      * </p>
      */
-    public static final String USE_AXIOM = "Use Axiom";
+    String USE_AXIOM = "Use Axiom";
 
     /**
      * Returns the reference kind which is a human readable {@link String}.
      *
      * @return The reference kind as human readable {@link String}.
      */
-    public String getKind();
+    String getKind();
 
     /**
      * Returns the {@link Node}s in which the reference was found.
      *
      * @return The {@link Node}s in which the reference was found.
      */
-    public LinkedHashSet<Node> getNodes();
+    LinkedHashSet<Node> getNodes();
 
     /**
      * Adds the given {@link Node}s to the own {@link Node}s.
      *
      * @param nodes The {@link Node}s to add.
      */
-    public void addNodes(Collection<Node> nodes);
+    void addNodes(Collection<Node> nodes);
 
     /**
      * Returns the target source member.
      *
      * @return The target source member.
      */
-    public T getTarget();
+    T getTarget();
 
     /**
      * Returns the source {@link Proof}.
      *
      * @return The source {@link Proof}.
      */
-    public Proof getSource();
+    Proof getSource();
 }

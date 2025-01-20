@@ -3,16 +3,16 @@
    <methodCall name="&lt;call BranchStatementBlockTest.recursiveMain()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="return recursiveDecrease(3);" pathCondition="true" pathConditionChanged="false">
          <methodCall name="&lt;call BranchStatementBlockTest.recursiveDecrease(x_2)&gt;" pathCondition="true" pathConditionChanged="false">
-            <branchStatement name="if (x_2&gt;0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
-               <statement name="return recursiveDecrease(x_2-1);" pathCondition="true" pathConditionChanged="false">
+            <branchStatement name="if (x_2 &gt; 0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+               <statement name="return recursiveDecrease(x_2 - 1);" pathCondition="true" pathConditionChanged="false">
                   <methodCall name="&lt;call BranchStatementBlockTest.recursiveDecrease(x_6)&gt;" pathCondition="true" pathConditionChanged="false">
-                     <branchStatement name="if (x_6&gt;0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
-                        <statement name="return recursiveDecrease(x_6-1);" pathCondition="true" pathConditionChanged="false">
+                     <branchStatement name="if (x_6 &gt; 0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                        <statement name="return recursiveDecrease(x_6 - 1);" pathCondition="true" pathConditionChanged="false">
                            <methodCall name="&lt;call BranchStatementBlockTest.recursiveDecrease(x_10)&gt;" pathCondition="true" pathConditionChanged="false">
-                              <branchStatement name="if (x_10&gt;0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
-                                 <statement name="return recursiveDecrease(x_10-1);" pathCondition="true" pathConditionChanged="false">
+                              <branchStatement name="if (x_10 &gt; 0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                                 <statement name="return recursiveDecrease(x_10 - 1);" pathCondition="true" pathConditionChanged="false">
                                     <methodCall name="&lt;call BranchStatementBlockTest.recursiveDecrease(x_14)&gt;" pathCondition="true" pathConditionChanged="false">
-                                       <branchStatement name="if (x_14&gt;0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                                       <branchStatement name="if (x_14 &gt; 0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                           <statement name="return x_14;" pathCondition="true" pathConditionChanged="false">
                                              <methodReturn name="&lt;return of recursiveDecrease&gt;" signature="&lt;return of BranchStatementBlockTest.recursiveDecrease(x_14)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                 <methodReturn name="&lt;return of recursiveDecrease&gt;" signature="&lt;return of BranchStatementBlockTest.recursiveDecrease(x_10)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">

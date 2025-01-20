@@ -1,6 +1,8 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,23 +13,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import de.uka.ilkd.key.logic.RenamingTable;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.merge.MergeRule;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.logic.RenamingTable;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.merge.MergeRule;
+import org.key_project.util.collection.Pair;
 import org.key_project.util.lookup.Lookup;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class Node implements Iterable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
@@ -41,6 +45,7 @@ public class Node implements Iterable<Node> {
     private static final String OPEN_GOAL = "OPEN GOAL";
 
     private static final String CLOSED_GOAL = "Closed goal";
+    private static final String CACHED_GOAL = "Closed goal (via cache)";
 
     private static final String NODES = "nodes";
 
@@ -48,7 +53,11 @@ public class Node implements Iterable<Node> {
     private final Proof proof;
 
     /** The parent node. **/
-    private Node parent = null;
+    private @Nullable Node parent = null;
+    /**
+     * The branch location of this proof node.
+     */
+    private BranchLocation branchLocation = null;
 
     private Sequent seq = Sequent.EMPTY_SEQUENT;
 
@@ -62,29 +71,46 @@ public class Node implements Iterable<Node> {
      * a linked list of the locally generated program variables. It extends the list of the parent
      * node.
      */
-    private ImmutableList<IProgramVariable> localProgVars = ImmutableSLList.<IProgramVariable>nil();
+    private ImmutableList<IProgramVariable> localProgVars = ImmutableSLList.nil();
 
     /**
      * a linked list of the locally generated function symbols. It extends the list of the parent
      * node.
      */
-    private ImmutableList<Function> localFunctions = ImmutableSLList.<Function>nil();
+    private ImmutableList<JFunction> localFunctions = ImmutableSLList.nil();
 
     private boolean closed = false;
 
     /** contains non-logical content, used for user feedback */
     private NodeInfo nodeInfo;
 
+    /**
+     * Serial number of this proof node.
+     * For each proof, serial numbers are assigned to nodes as they are created:
+     * the first step is assigned number 0, the next step number 1, and so on.
+     */
     private final int serialNr;
 
+    /**
+     * Step index of this proof node.
+     * Unlike serial numbers, the step index increases by one for each node in the proof tree
+     * when visited in a depth-first order.
+     * Only valid after {@link Proof#setStepIndices()} is called!
+     */
+    private int stepIndex = 0;
+
+    /**
+     * Sibling number of this proof node.
+     * If the {@link #parent()} proof node has more than one child node,
+     * each child node receives an index (starting at 0, incrementing by 1 for each sibling).
+     */
     private int siblingNr = -1;
 
     private ImmutableList<RenamingTable> renamings;
 
     private String cachedName = null;
 
-    @Nullable
-    private Lookup userData = null;
+    private @Nullable Lookup userData = null;
 
 
     /**
@@ -92,17 +118,17 @@ public class Node implements Iterable<Node> {
      * taclet with an addrule section on this node, then these taclets are stored in this list
      */
     private ImmutableSet<NoPosTacletApp> localIntroducedRules =
-        DefaultImmutableSet.<NoPosTacletApp>nil();
+        DefaultImmutableSet.nil();
 
     /**
-     * Holds the undo methods for the information added by rules to the {@link Goal#strategyInfos}.
+     * Holds the undo methods for the information added by rules to the {@code Goal.strategyInfos}.
      */
     private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
+
 
     /**
      * creates an empty node that is root and leaf.
      */
-
     public Node(Proof proof) {
         this.proof = proof;
         serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
@@ -110,7 +136,7 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * creates a node with the given contents
+     * creates a node with the given contents and associated proof
      */
     public Node(Proof proof, Sequent seq) {
         this(proof);
@@ -205,10 +231,10 @@ public class Node implements Iterable<Node> {
 
     /**
      * Returns the set of created program variables known in this node.
-     *
+     * <p>
      * In the resulting list, the newest additions come first.
      *
-     * @returns a non-null immutable list of program variables.
+     * @return a non-null immutable list of program variables.
      */
     public ImmutableList<IProgramVariable> getLocalProgVars() {
         return localProgVars;
@@ -227,12 +253,12 @@ public class Node implements Iterable<Node> {
      *
      * @return a non-null immutable list of function symbols.
      */
-    public Iterable<Function> getLocalFunctions() {
+    public Iterable<JFunction> getLocalFunctions() {
         return localFunctions;
     }
 
-    public void addLocalFunctions(Collection<? extends Function> elements) {
-        for (Function op : elements) {
+    public void addLocalFunctions(Collection<? extends JFunction> elements) {
+        for (JFunction op : elements) {
             localFunctions = localFunctions.prepend(op);
         }
     }
@@ -249,7 +275,7 @@ public class Node implements Iterable<Node> {
     /**
      * @return the parent node of this node.
      */
-    public Node parent() {
+    public @Nullable Node parent() {
         return parent;
     }
 
@@ -257,7 +283,7 @@ public class Node implements Iterable<Node> {
      * @return true iff this node is a leaf, i.e., has no children.
      */
     public boolean leaf() {
-        return children.size() == 0;
+        return children.isEmpty();
     }
 
     /**
@@ -431,7 +457,14 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * @return an iterator for all nodes in the subtree.
+     * @return the direct children of this node.
+     */
+    public Collection<Node> children() {
+        return Collections.unmodifiableList(children);
+    }
+
+    /**
+     * @return an iterator for all nodes in the subtree (including this node).
      */
     public Iterator<Node> subtreeIterator() {
         return new SubtreeIterator(this);
@@ -444,7 +477,7 @@ public class Node implements Iterable<Node> {
 
     /**
      *
-     * @param i an index.
+     * @param i an index (starting at 0).
      * @return the i-th child of this node.
      */
     public Node child(int i) {
@@ -535,7 +568,8 @@ public class Node implements Iterable<Node> {
             tree.append(connectNode);
         }
 
-        tree.append("(" + newEnumeration + newPostNr + ") " + sequent().toString() + "\n");
+        tree.append("(").append(newEnumeration).append(newPostNr).append(") ")
+                .append(sequent().toString()).append("\n");
 
         // create new prefix
         if (ownNr < maxNr) {
@@ -570,8 +604,10 @@ public class Node implements Iterable<Node> {
 
             RuleApp rap = getAppliedRuleApp();
             if (rap == null) {
-                final Goal goal = proof().getGoal(this);
-                if (this.isClosed()) {
+                final Goal goal = proof().getOpenGoal(this);
+                if (this.isClosed() && lookup(ClosedBy.class) != null) {
+                    cachedName = CACHED_GOAL;
+                } else if (this.isClosed()) {
                     return CLOSED_GOAL; // don't cache this
                 } else if (goal == null) {
                     // should never happen (please check)
@@ -580,7 +616,7 @@ public class Node implements Iterable<Node> {
                     cachedName = LINKED_GOAL;
                 } else if (goal.isAutomatic()) {
                     cachedName = OPEN_GOAL;
-                } else if (goal != null) {
+                } else {
                     cachedName = INTERACTIVE_GOAL;
                 }
                 return cachedName;
@@ -595,7 +631,7 @@ public class Node implements Iterable<Node> {
                 return nodeInfo.getFirstStatementString();
             }
 
-            cachedName = rap.rule().displayName();
+            cachedName = rap.displayName();
             if (cachedName == null) {
                 cachedName = RULE_WITHOUT_NAME;
             }
@@ -775,9 +811,29 @@ public class Node implements Iterable<Node> {
      *
      * @return
      */
-    public @Nonnull Lookup getUserData() {
-        if (userData == null)
+    public @NonNull Lookup getUserData() {
+        if (userData == null) {
             userData = new Lookup();
+        }
         return userData;
+    }
+
+    public BranchLocation getBranchLocation() {
+        if (branchLocation == null) {
+            BranchLocation prev = parent != null ? parent.getBranchLocation() : BranchLocation.ROOT;
+            if (parent != null && parent.children.size() > 1) {
+                prev = prev.append(new Pair<>(parent, siblingNr));
+            }
+            this.branchLocation = prev;
+        }
+        return branchLocation;
+    }
+
+    public int getStepIndex() {
+        return stepIndex;
+    }
+
+    void setStepIndex(int stepIndex) {
+        this.stepIndex = stepIndex;
     }
 }

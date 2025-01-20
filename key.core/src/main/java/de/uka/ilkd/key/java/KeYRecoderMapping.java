@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
 
@@ -7,6 +10,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +25,10 @@ public class KeYRecoderMapping {
     /**
      * maps a recoder programelement (or something similar, e.g. Type) to the KeY-equivalent
      */
-    private HashMap<Object, Object> map;
+    private final HashMap<Object, Object> map;
 
     /** maps a KeY programelement to the Recoder-equivalent */
-    private HashMap<Object, Object> revMap;
+    private final HashMap<Object, Object> revMap;
 
     /** a pseudo super class for all arrays used to declare length */
     private KeYJavaType superArrayType = null;
@@ -86,16 +90,12 @@ public class KeYRecoderMapping {
 
     /**
      * returns the Recoder-equivalent to a given ModelElement (KeY). If there's no
-     * Recoder-equivalent to the ModelElement pe a debug message "Model Element <pe> not known" is
-     * printed.
+     * Recoder-equivalent to the ModelElement <code>pe</code> null is returned.
      *
      * @param pe a ModelElement
      */
     public recoder.ModelElement toRecoder(ModelElement pe) {
-        Object res = revMap.get(pe);
-        Debug.assertTrue(res != null, "Model Element not known", pe);
-
-        return (recoder.ModelElement) res;
+        return (recoder.ModelElement) revMap.get(pe);
     }
 
     public void put(Object rec, Object key) {
@@ -103,7 +103,6 @@ public class KeYRecoderMapping {
         Debug.assertTrue(formerValue == null, "keyrecodermapping: duplicate registration of type:",
             key);
         revMap.put(key, rec);
-        LOGGER.debug("Size of rec2key: {} entries", map.size());
     }
 
     public boolean mapped(Object rec) {
@@ -112,8 +111,6 @@ public class KeYRecoderMapping {
 
 
     public Set<Object> elemsKeY() {
-        LOGGER.debug("Size of rec2key: {} entries", map.size());
-
         return revMap.keySet();
     }
 

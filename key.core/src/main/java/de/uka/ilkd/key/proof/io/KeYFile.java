@@ -1,10 +1,26 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import de.uka.ilkd.key.java.Position;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
 import de.uka.ilkd.key.nparser.builder.ProblemFinder;
 import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -12,25 +28,20 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Immutables;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 /**
@@ -51,10 +62,8 @@ public class KeYFile implements EnvInput {
     private final Profile profile;
     protected InitConfig initConfig;
     private KeyAst.File fileCtx = null;
-    @Nullable
-    private ProblemFinder problemFinder = null;
-    @Nullable
-    private ProblemInformation problemInformation = null;
+    private @Nullable ProblemFinder problemFinder = null;
+    private @Nullable ProblemInformation problemInformation = null;
     private Includes includes;
 
     /**
@@ -149,7 +158,7 @@ public class KeYFile implements EnvInput {
                 input = file.getNewStream();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to open new stream", e);
         }
         return input;
     }
@@ -157,6 +166,7 @@ public class KeYFile implements EnvInput {
     protected KeyAst.File getParseContext() {
         if (fileCtx == null) {
             try {
+                LOGGER.trace("Reading KeY file {}", file);
                 fileCtx = ParsingFacade.parseFile(file.getCharStream());
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -216,11 +226,12 @@ public class KeYFile implements EnvInput {
 
     @Override
     public File readBootClassPath() {
-        @Nonnull
+        @NonNull
         ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
-        if (bootClassPath == null)
+        if (bootClassPath == null) {
             return null;
+        }
         File bootClassPathFile = new File(bootClassPath);
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
@@ -231,7 +242,7 @@ public class KeYFile implements EnvInput {
         return bootClassPathFile;
     }
 
-    protected @Nonnull ProblemInformation getProblemInformation() {
+    protected @NonNull ProblemInformation getProblemInformation() {
         if (problemInformation == null) {
             KeyAst.File ctx = getParseContext();
             problemInformation = ctx.getProblemInformation();
@@ -240,10 +251,9 @@ public class KeYFile implements EnvInput {
     }
 
 
-    @Nonnull
     @Override
-    public List<File> readClassPath() {
-        @Nonnull
+    public @NonNull List<File> readClassPath() {
+        @NonNull
         ProblemInformation pi = getProblemInformation();
         String parentDirectory = file.file().getParent();
         List<File> fileList = new ArrayList<>();
@@ -263,7 +273,7 @@ public class KeYFile implements EnvInput {
 
     @Override
     public String readJavaPath() throws ProofInputException {
-        @Nonnull
+        @NonNull
         ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
@@ -302,14 +312,14 @@ public class KeYFile implements EnvInput {
             throw new IllegalStateException("KeYFile: InitConfig not set.");
         }
         // read .key file
-        LOGGER.debug("Reading KeY file {}", file);
         ChoiceInformation ci = getParseContext().getChoices();
         initConfig.addCategory2DefaultChoices(ci.getDefaultOptions());
 
-        readSorts();
-        readFuncAndPred();
+        var warnings = new ArrayList<PositionedString>();
+        warnings.addAll(readSorts());
+        warnings.addAll(readFuncAndPred());
 
-        return DefaultImmutableSet.<PositionedString>nil();
+        return DefaultImmutableSet.fromCollection(warnings);
     }
 
     /**
@@ -318,21 +328,17 @@ public class KeYFile implements EnvInput {
      * @return list of parser warnings
      */
     public ImmutableSet<PositionedString> readContracts() {
-        LOGGER.debug("Read specifications obtained when parsing the Java files " +
-            "(usually JML and Strings.key) from {}", file);
-
         SpecificationRepository specRepos = initConfig.getServices().getSpecificationRepository();
         ContractsAndInvariantsFinder cinvs =
             new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
         getParseContext().accept(cinvs);
-        specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
-        specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
+        specRepos.addContracts(Immutables.createSetFrom(cinvs.getContracts()));
+        specRepos.addClassInvariants(Immutables.createSetFrom(cinvs.getInvariants()));
 
-        return DefaultImmutableSet.<PositionedString>nil();
+        return DefaultImmutableSet.nil();
     }
 
-    @Nonnull
-    protected ProblemFinder getProblemFinder() {
+    protected @NonNull ProblemFinder getProblemFinder() {
         if (problemFinder == null) {
             problemFinder = new ProblemFinder(initConfig.getServices(), initConfig.namespaces());
             getParseContext().accept(problemFinder);
@@ -345,26 +351,32 @@ public class KeYFile implements EnvInput {
      * reads the sorts declaration of the .key file only, modifying the sort namespace of the
      * initial configuration
      */
-    public void readSorts() {
+    public Collection<PositionedString> readSorts() {
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalDeclarations(ctx);
         ChoiceInformation choice = getParseContext().getChoices();
         // we ignore the namespace of choice finder.
         initConfig.addCategory2DefaultChoices(choice.getDefaultOptions());
+
+        return io.getWarnings().stream().map(BuildingIssue::asPositionedString).toList();
     }
 
 
     /**
      * reads the functions and predicates declared in the .key file only, modifying the function
      * namespaces of the respective taclet options.
+     *
+     * @return warnings during the interpretation of the AST constructs
      */
-    public void readFuncAndPred() {
-        if (file == null)
-            return;
+    public List<PositionedString> readFuncAndPred() {
+        if (file == null) {
+            return null;
+        }
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalFuncAndPred(ctx);
+        return io.getWarnings().stream().map(BuildingIssue::asPositionedString).toList();
     }
 
 
@@ -401,9 +413,15 @@ public class KeYFile implements EnvInput {
      *         in <code>issues</code>
      */
     protected List<PositionedString> getPositionedStrings(List<BuildingIssue> issues) {
-        return issues.stream().map(w -> new PositionedString(w.getMessage(),
-            file != null ? file.getExternalForm() : "<unknown file>",
-            new Position(w.getLineNumber(), w.getPosInLine())))
+        return issues.stream().map(w -> {
+            try {
+                return new PositionedString(w.message(),
+                    new Location(file != null ? new URL(file.getExternalForm()).toURI() : null,
+                        w.position()));
+            } catch (MalformedURLException | URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        })
                 .collect(Collectors.<PositionedString>toList());
     }
 
@@ -411,7 +429,7 @@ public class KeYFile implements EnvInput {
         return null;
     }
 
-    public String getProofObligation() {
+    public Configuration getProofObligation() {
         return null;
     }
 

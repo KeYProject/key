@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
 import java.util.HashMap;
@@ -5,16 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
 
@@ -27,50 +23,52 @@ import de.uka.ilkd.key.util.UnicodeHelper;
  * The Notation associated with an operator might change. New Notations can be added.
  *
  * <p>
- * The next lines describe a general rule how to determine priorities and associativities:
+ * The next lines describe a general rule how to determine priorities and associativity:
  *
  * One thing we need to know from the pretty printer: Given a term <tt>t</tt> containg <tt>s</tt> as
  * proper subterm. Then <tt>s</tt> is printed in parentheses when the priority of the top level
  * symbol of <tt>s</tt> is strict less than the associativity of the position where <tt>s</tt>
  * occurs. For example:
  * <p>
- * Let the priority of <tt>AND</tt> be <tt>30</tt> and the associativities for each of its subterms
- * be 40; <tt>OR</tt>s priority is <tt>20</tt> and the associativites are both <tt>30</tt> then
+ * Let the priority of <tt>AND</tt> be <tt>30</tt> and the associativity for each of its subterms
+ * be 40; <tt>OR</tt>s priority is <tt>20</tt> and the associativity are both <tt>30</tt> then
  * <ul>
- * <li>formula <tt>(p & q) | r</tt> is pretty printed as <tt>p & q | r</tt> as the priority of & is
+ * <li>formula {@code (p & q) | r} is pretty printed as {@code p & q | r} as the priority of
+ * {@code &} is
  * 30 which is (greater or) equal than the associativity of <tt>OR</tt>s left subterm which is
  * 30.</li>
- * <li>In contrast the formula <tt>p & (q | r)</tt> is pretty printed as <tt>p & (q | r)</tt> as the
+ * <li>In contrast the formula {@code p & (q | r)} is pretty printed as {@code p & (q | r)} as the
  * priority of <tt>OR</tt> is 20 which is less than the associativity of <tt>AND</tt>s left subterm,
  * which is 40.</li>
  * </ul>
  *
  * A general rule to determine the correct priority and associativity is to use:
- *
+ * <p>
  * Grammar rules whose derivation delivers a syntactical correct logic term should follow a standard
  * numbering scheme, which is used as indicator for priorities and associativites, e.g. by simply
- * reading the grammar rule <blockquote><tt>term60 ::= term70 (IMP term70)?</tt></blockquote> we get
+ * reading the grammar rule <blockquote>{@code term60 ::= term70 (IMP term70)?}</blockquote> we get
  * the priority of <tt>IMP</tt>, which is <tt>60</tt>. The associativities of <tt>IMP</tt>s subterms
  * are not much more difficult to determine, namely the left subterm has associativity <tt>70</tt>
  * and in this case its the same for the right subterm (<tt>70</tt>).
+ * </p>
  * <p>
  * There are exceptional cases for
  * <ul>
  * <li><em>infix function</em> symbols that are left associative e.g. <code>-, +</code> <blockquote>
- * <tt> term90 ::= term100 (PLUS term100)* </tt> </blockquote> then the associative for the right
+ * {@code term90 ::= term100 (PLUS term100)* } </blockquote> then the associative for the right
  * subterm is increased by <tt>1</tt>, i.e. here we have a priority of <tt>90</tt> for <tt>PLUS</tt>
  * as infix operator, a left associativity of <tt>100</tt> <em>and</em> a right associativity of
  * <tt>101</tt></li>
- * <li>update and substituition terms: for them their associativity is determined dynamically by the
+ * <li>update and substitution terms: for them their associativity is determined dynamically by the
  * pretty printer depending if it is applied on a formula or term. In principal there should be two
  * different rules in the parser as then we could reuse the general rule from above, but there are
  * technical reasons which causes this exception.</li>
  * <li>some very few rules do not follow the usual parser design e.g. like
- * <blockquote><tt>R_PRIO ::= SubRule_ASS1 | SubRule_ASS2 </tt></blockquote> where
- * <blockquote><tt>SubRule_ASS2 ::= OP SubRule_ASS1</tt></blockquote> Most of these few rules could
+ * <blockquote>{@code R_PRIO ::= SubRule_ASS1 | SubRule_ASS2 }</blockquote> where
+ * <blockquote>{@code SubRule_ASS2 ::= OP SubRule_ASS1}</blockquote> Most of these few rules could
  * in general be rewritten to fit the usual scheme e.g. as
- * <blockquote><tt> R_PRIO ::= (OP)? SubRule_ASS1</tt></blockquote> using the priorities and
- * associativities of the so rewritten rules (instead of rewriting them actually) is a way to cope
+ * <blockquote>{@code R_PRIO ::= (OP)? SubRule_ASS1}</blockquote> using the priorities and
+ * associativity of the so rewritten rules (instead of rewriting them actually) is a way to cope
  * with them.</li>
  * </ul>
  */
@@ -148,7 +146,7 @@ public final class NotationInfo {
      */
     private HashMap<Object, Notation> createDefaultNotation() {
 
-        HashMap<Object, Notation> tbl = new LinkedHashMap<Object, Notation>(50);
+        HashMap<Object, Notation> tbl = new LinkedHashMap<>(50);
 
         tbl.put(Junctor.TRUE, new Notation.Constant("true", PRIORITY_ATOM));
         tbl.put(Junctor.FALSE, new Notation.Constant("false", PRIORITY_ATOM));
@@ -163,36 +161,40 @@ public final class NotationInfo {
             new Notation.Quantifier("\\forall", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
         tbl.put(Quantifier.EX,
             new Notation.Quantifier("\\exists", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
-        tbl.put(Modality.DIA,
+        tbl.put(Modality.JavaModalityKind.DIA,
             new Notation.ModalityNotation("\\<", "\\>", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.BOX,
+        tbl.put(Modality.JavaModalityKind.BOX,
             new Notation.ModalityNotation("\\[", "\\]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.TOUT, new Notation.ModalityNotation("\\[[", "\\]]", PRIORITY_MODALITY,
-            PRIORITY_POST_MODALITY));
-        tbl.put(Modality.DIA_TRANSACTION, new Notation.ModalityNotation("\\diamond_transaction",
-            "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.BOX_TRANSACTION, new Notation.ModalityNotation("\\box_transaction",
-            "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
-        tbl.put(Modality.TOUT_TRANSACTION, new Notation.ModalityNotation("\\throughout_transaction",
-            "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(ModalOperatorSV.class,
+            new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(Modality.JavaModalityKind.TOUT,
+            new Notation.ModalityNotation("\\[[", "\\]]", PRIORITY_MODALITY,
+                PRIORITY_POST_MODALITY));
+        tbl.put(Modality.JavaModalityKind.DIA_TRANSACTION,
+            new Notation.ModalityNotation("\\diamond_transaction",
+                "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(Modality.JavaModalityKind.BOX_TRANSACTION,
+            new Notation.ModalityNotation("\\box_transaction",
+                "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(Modality.JavaModalityKind.TOUT_TRANSACTION,
+            new Notation.ModalityNotation("\\throughout_transaction",
+                "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));
         tbl.put(IfExThenElse.IF_EX_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\ifEx"));
         tbl.put(WarySubstOp.SUBST, new Notation.Subst());
         tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
         tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.ParallelUpdateNotation());
 
-        tbl.put(Function.class, new Notation.FunctionNotation());
+        tbl.put(JFunction.class, new Notation.FunctionNotation());
         tbl.put(LogicVariable.class, new Notation.VariableNotation());
         tbl.put(LocationVariable.class, new Notation.VariableNotation());
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
         tbl.put(Equality.class,
             new Notation.Infix("=", PRIORITY_EQUAL, PRIORITY_COMPARISON, PRIORITY_COMPARISON));
         tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
-        tbl.put(ModalOperatorSV.class,
-            new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_MODALITY));
         tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
 
-        tbl.put(Sort.CAST_NAME,
+        tbl.put(JavaDLTheory.CAST_NAME,
             new Notation.CastFunction("(", ")", PRIORITY_CAST, PRIORITY_BOTTOM));
         tbl.put(TermLabel.class, new Notation.LabelNotation("<<", ">>", PRIORITY_LABEL));
         return tbl;
@@ -434,6 +436,18 @@ public final class NotationInfo {
         result = notationTable.get(op.getClass());
         if (result != null) {
             return result;
+        }
+
+        if (op instanceof Modality mod) {
+            result = notationTable.get(mod.kind());
+            if (result != null) {
+                return result;
+            } else {
+                result = notationTable.get(ModalOperatorSV.class);
+                if (result != null) {
+                    return result;
+                }
+            }
         }
 
         if (op instanceof SchemaVariable) {

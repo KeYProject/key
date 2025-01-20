@@ -1,13 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
@@ -16,8 +14,12 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredica
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
+
+import org.key_project.logic.sort.Sort;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Rule that merges two sequents based on a lattice of user-defined predicates. This procedure is no
@@ -26,6 +28,8 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
  * @author Dominic Scheurer
  */
 public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(MergeWithPredicateAbstraction.class);
 
     private static final String DISPLAY_NAME = "MergeByPredicateAbstraction";
 
@@ -34,7 +38,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * given sort).
      */
     private HashMap<Sort, ArrayList<AbstractionPredicate>> predicates =
-        new HashMap<Sort, ArrayList<AbstractionPredicate>>();
+        new HashMap<>();
 
     /**
      * The concrete lattice type which determines how abstract elements are generated from
@@ -66,7 +70,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
             Map<ProgramVariable, AbstractDomainElement> userChoices) {
         for (AbstractionPredicate pred : predicates) {
             if (!this.predicates.containsKey(pred.getArgSort())) {
-                this.predicates.put(pred.getArgSort(), new ArrayList<AbstractionPredicate>());
+                this.predicates.put(pred.getArgSort(), new ArrayList<>());
             }
 
             this.predicates.get(pred.getArgSort()).add(pred);
@@ -97,7 +101,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * been specified for that sort.
      *
      * @param s {@link Sort} of for elements in the lattice.
-     * @param predicates {@link AbstractionPredicate}s for all sorts.
+     * @param applicablePredicates {@link AbstractionPredicate}s for all sorts.
      * @param latticeType Type of {@link AbstractPredicateAbstractionLattice}.
      * @param services The {@link Services} object.
      * @return The corresponding {@link AbstractDomainLattice}.
@@ -122,7 +126,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
             return latticeConstructor.newInstance(applicablePredicates);
         } catch (NoSuchMethodException | SecurityException | InstantiationException
                 | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to instantiate", e);
             return new SimplePredicateAbstractionLattice(applicablePredicates);
         }
     }
@@ -150,7 +154,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
         Sort s = predicate.getArgSort();
 
         if (!predicates.containsKey(s)) {
-            predicates.put(s, new ArrayList<AbstractionPredicate>());
+            predicates.put(s, new ArrayList<>());
         }
 
         predicates.get(s).add(predicate);
@@ -162,9 +166,8 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * @param predicates The predicates to set.
      */
     public void addPredicates(Iterable<AbstractionPredicate> predicates) {
-        Iterator<AbstractionPredicate> it = predicates.iterator();
-        while (it.hasNext()) {
-            addPredicate(it.next());
+        for (AbstractionPredicate predicate : predicates) {
+            addPredicate(predicate);
         }
     }
 

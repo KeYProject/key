@@ -1,13 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Inheritance specification.
@@ -40,7 +43,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
 
     public InheritanceSpecification(TypeReference supertype) {
-        this.supertypes = new ImmutableArray<TypeReference>(supertype);
+        this.supertypes = new ImmutableArray<>(supertype);
     }
 
     /**
@@ -50,7 +53,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
 
     public InheritanceSpecification(TypeReference[] supertypes) {
-        this.supertypes = new ImmutableArray<TypeReference>(supertypes);
+        this.supertypes = new ImmutableArray<>(supertypes);
     }
 
     /**
@@ -61,7 +64,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
     protected InheritanceSpecification(ExtList children) {
         super(children);
-        this.supertypes = new ImmutableArray<TypeReference>(children.collect(TypeReference.class));
+        this.supertypes = new ImmutableArray<>(children.collect(TypeReference.class));
     }
 
 
@@ -81,8 +84,9 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     public int getChildCount() {
         int result = 0;
-        if (supertypes != null)
+        if (supertypes != null) {
             result += supertypes.size();
+        }
         return result;
     }
 

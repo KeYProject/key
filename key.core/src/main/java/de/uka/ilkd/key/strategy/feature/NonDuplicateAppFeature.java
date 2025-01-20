@@ -1,13 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+
+
 
 /**
  * Binary feature that returns zero iff a certain Taclet app has not already been performed
@@ -16,24 +16,9 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppFeature();
 
-    protected boolean containsRuleApp(ImmutableList<RuleApp> list, TacletApp rapp,
-            PosInOccurrence pio) {
-
-        for (RuleApp aList : list) {
-            if (sameApplication(aList, rapp, pio))
-                return true;
-        }
-
-        return false;
-    }
-
-    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         if (!app.ifInstsComplete()) {
             return true;
-        }
-
-        if (pos == null) {
-            return !containsRuleApp(goal.appliedRuleApps(), app, pos);
         }
 
         return noDuplicateFindTaclet(app, pos, goal);
@@ -42,9 +27,5 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp, PosInOccurrence newPio,
             PosInOccurrence oldPio) {
         return oldPio.equals(newPio);
-    }
-
-    protected boolean semiSequentContains(Semisequent semisequent, SequentFormula cfma) {
-        return semisequent.contains(cfma);
     }
 }

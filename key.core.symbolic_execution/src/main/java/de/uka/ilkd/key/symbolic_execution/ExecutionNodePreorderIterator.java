@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -24,7 +27,7 @@ public class ExecutionNodePreorderIterator {
      * The element at that the iteration has started used as end condition to make sure that only
      * over the subtree of the element is iterated.
      */
-    private IExecutionNode<?> start;
+    private final IExecutionNode<?> start;
 
     /**
      * The next element or {@code null} if no more elements exists.
@@ -90,8 +93,8 @@ public class ExecutionNodePreorderIterator {
             IExecutionNode<?>[] children = parent.getChildren();
             IExecutionNode<?> nextChildOnParent = null; // The next child on the parent or the last
                                                         // child after iteration has finished
-            for (int i = 0; i < children.length; i++) {
-                nextChildOnParent = children[i];
+            for (IExecutionNode<?> child : children) {
+                nextChildOnParent = child;
                 if (nextChildOnParent == start) {
                     return null;
                 }

@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.removegenerics;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -54,8 +58,9 @@ public class Main {
 
         System.out.println("Version - 071019 - 1546");
 
-        if (args.length == 0)
+        if (args.length == 0) {
             usage();
+        }
 
         GenericRemover remover = new GenericRemover(new ConsoleGenericRemoverMonitor());
         for (int i = 0; i < args.length; i++) {
@@ -118,14 +123,15 @@ public class Main {
     }
 
     private static List<String> addLinesFromFile(String file) throws IOException {
-        List<String> files = new LinkedList<String>();
-        BufferedReader br = new BufferedReader(new FileReader(file));
+        List<String> files = new LinkedList<>();
+        BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8));
 
         String line = br.readLine();
         while (line != null) {
             line = line.trim();
-            if (!line.startsWith("#"))
+            if (!line.startsWith("#")) {
                 files.add(line);
+            }
         }
         br.close();
         return files;

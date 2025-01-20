@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.expression.operator;
 
 import recoder.java.*;
@@ -280,12 +282,15 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     public int getChildCount() {
         int result = 0;
-        if (typeReference != null)
+        if (typeReference != null) {
             result++;
-        if (children != null)
+        }
+        if (children != null) {
             result += children.size();
-        if (arrayInitializer != null)
+        }
+        if (arrayInitializer != null) {
             result++;
+        }
         return result;
     }
 
@@ -300,8 +305,9 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     public ProgramElement getChildAt(int index) {
         int len;
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (children != null) {
@@ -312,8 +318,9 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
             index -= len;
         }
         if (arrayInitializer != null) {
-            if (index == 0)
+            if (index == 0) {
                 return arrayInitializer;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -326,10 +333,12 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     public int getExpressionCount() {
         int result = 0;
-        if (children != null)
+        if (children != null) {
             result += children.size();
-        if (arrayInitializer != null)
+        }
+        if (arrayInitializer != null) {
             result++;
+        }
         return result;
     }
 
@@ -349,8 +358,9 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
             index -= len;
         }
         if (arrayInitializer != null) {
-            if (index == 0)
+            if (index == 0) {
                 return arrayInitializer;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -362,7 +372,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */

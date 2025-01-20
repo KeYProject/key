@@ -1,7 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -10,6 +12,8 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.logic.Name;
 
 /**
  * Creates the wellformedness condition for the given anonymizing heap terms if they apply for the
@@ -33,7 +37,7 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
         final Operator op = term.sub(0).op();
         assert op instanceof Modality;
 
-        return createWellformedCond(MiscTools.isTransaction((Modality) op),
+        return createWellformedCond(MiscTools.isTransaction(((Modality) op).kind()),
             MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
             anonPermissionsHeapTerm, services);
     }

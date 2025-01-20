@@ -1,7 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.settings;
 
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.colors.ColorSettingsProvider;
 import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -11,30 +25,26 @@ import de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.*;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
 public class SettingsManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsManager.class);
+
     public static final ExtensionManager EXTENSION_MANAGER = new ExtensionManager();
     public static final SettingsProvider SMT_SETTINGS = new SMTSettingsProvider();
     public static final TacletOptionsSettings TACLET_OPTIONS_SETTINGS = new TacletOptionsSettings();
     public static final ShortcutSettings SHORTCUT_SETTINGS = new ShortcutSettings();
     public static final StandardUISettings STANDARD_UI_SETTINGS = new StandardUISettings();
     public static final ColorSettingsProvider COLOR_SETTINGS = new ColorSettingsProvider();
+    public static final FeatureSettingsPanel FEATURE_SETTINGS_PANEL = new FeatureSettingsPanel();
 
     private static SettingsManager INSTANCE;
-    private List<SettingsProvider> settingsProviders = new LinkedList<>();
+    private final List<SettingsProvider> settingsProviders = new LinkedList<>();
 
     static SettingsManager createWithExtensions() {
         SettingsManager sm = new SettingsManager();
@@ -52,6 +62,7 @@ public class SettingsManager {
             INSTANCE.add(EXTENSION_MANAGER);
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
             // INSTANCE.add(COLOR_SETTINGS);
+            INSTANCE.add(FEATURE_SETTINGS_PANEL);
         }
         return INSTANCE;
     }
@@ -92,10 +103,10 @@ public class SettingsManager {
     public static Properties loadProperties(File settingsFile) {
         Properties props = new Properties();
         if (settingsFile.exists()) {
-            try (FileReader reader = new FileReader(settingsFile)) {
+            try (FileReader reader = new FileReader(settingsFile, StandardCharsets.UTF_8)) {
                 props.load(reader);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed to load settings", e);
             }
         }
         return props;
@@ -114,8 +125,7 @@ public class SettingsManager {
         dialog.setSettingsProvider(settingsProviders);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.setIconImage(IconFactory.keyLogo());
-        dialog.setSize(800, 600);
-        dialog.setLocationByPlatform(true);
+        dialog.setLocationRelativeTo(mainWindow);
         return dialog;
     }
 
@@ -145,21 +155,20 @@ public class SettingsManager {
         return settingsProviders.remove(o);
     }
 
-    public Action getActionShowSettings(MainWindow window) {
-        class ShowSettingsAction extends KeyAction {
-            private static final long serialVersionUID = 153753479823919818L;
-
-            public ShowSettingsAction() {
-                setName("Show Settings");
-                setIcon(IconFactory.editFile(16));
-                lookupAcceleratorKey();
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showSettingsDialog(window);
-            }
+    public static class ShowSettingsAction extends MainWindowAction {
+        public ShowSettingsAction(MainWindow mainWindow) {
+            super(mainWindow);
+            setName("Settings");
+            setIcon(IconFactory.editFile(16));
         }
-        return new ShowSettingsAction();
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            getInstance().showSettingsDialog(mainWindow);
+        }
+    }
+
+    public static Action getActionShowSettings(MainWindow window) {
+        return new ShowSettingsAction(window);
     }
 }

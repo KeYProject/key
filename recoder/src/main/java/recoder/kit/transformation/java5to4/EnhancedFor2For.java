@@ -1,6 +1,7 @@
-/**
- * This file is part of the RECODER library and protected by the LGPL.
- */
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation.java5to4;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -24,7 +25,7 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
 /**
- * converts an enhanced for loop to an "old style" for loop. This follows JLS 3rd edition, �14.14.2.
+ * converts an enhanced for loop to an "old style" for loop. This follows JLS 3rd edition, §14.14.2.
  * <p>
  * Currently, if given enhanced for iterates over an array, this will replace the enhanced for with
  * a statement block and not inline it into a possibly given statement block, yielding possibly not
@@ -106,8 +107,9 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             iteratorType = sc.getSourceInfo().getType(mr);
         } else if (guardType instanceof ArrayType) {
             iteratorType = null;
-        } else
+        } else {
             throw new IllegalStateException("Broken Model");
+        }
         return setProblemReport(EQUIVALENCE);
     }
 
@@ -131,12 +133,12 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             guard = pf.createLessThan(pf.createVariableReference(pf.createIdentifier(iteratorName)),
                 pf.createArrayLengthReference(
                     pf.createVariableReference(pf.createIdentifier(arrayReferenceName))));
-            update = new ASTArrayList<Expression>(pf.createPostIncrement(
+            update = new ASTArrayList<>(pf.createPostIncrement(
                 pf.createVariableReference(pf.createIdentifier(iteratorName))));
             firstStmnt.getVariableSpecifications().get(0)
                     .setInitializer(pf.createArrayReference(
                         pf.createVariableReference(pf.createIdentifier(arrayReferenceName)),
-                        new ASTArrayList<Expression>(
+                        new ASTArrayList<>(
                             pf.createVariableReference(pf.createIdentifier(iteratorName)))));
         } else {
             // Iterable
@@ -156,14 +158,13 @@ public final class EnhancedFor2For extends TwoPassTransformation {
                         pf.createIdentifier("next")));
         }
 
-        ASTList<Statement> statements = new ASTArrayList<Statement>(2);
+        ASTList<Statement> statements = new ASTArrayList<>(2);
 
         statements.add(firstStmnt);
         if (enhancedFor.getStatementCount() > 0) {
             // if statement block, go into it
             Statement s = enhancedFor.getStatementAt(0);
-            if (s instanceof StatementBlock) {
-                StatementBlock sb = (StatementBlock) s;
+            if (s instanceof StatementBlock sb) {
                 for (int i = 0; i < sb.getStatementCount(); i++) {
                     statements.add(sb.getStatementAt(i).deepClone());
                 }
@@ -172,7 +173,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             }
         }
 
-        For newFor = new For(new ASTArrayList<LoopInitializer>(init), guard, update,
+        For newFor = new For(new ASTArrayList<>(init), guard, update,
             new StatementBlock(statements));
         newFor.makeAllParentRolesValid();
 
@@ -180,7 +181,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
         Statement replacee;
 
         if (iteratorType == null) {
-            ASTArrayList<Statement> sml = new ASTArrayList<Statement>(2);
+            ASTArrayList<Statement> sml = new ASTArrayList<>(2);
             // create array name reference
             LocalVariableDeclaration lvd =
                 pf.createLocalVariableDeclaration(null, TypeKit.createTypeReference(pf, guardType),

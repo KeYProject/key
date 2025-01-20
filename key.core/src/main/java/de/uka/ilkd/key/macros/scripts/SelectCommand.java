@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Deque;
@@ -5,8 +8,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -16,6 +17,10 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
+import org.key_project.util.collection.ImmutableList;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {
@@ -69,7 +74,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             return null;
         }
 
-        final Iterable<Node> children = (() -> node.childrenIterator());
+        final Iterable<Node> children = (node::childrenIterator);
         for (Node child : children) {
             goal = getFirstSubtreeGoal(child, proof);
             if (goal != null) {
@@ -87,7 +92,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private Goal findGoalWith(Function<Node, Boolean> filter, Function<Node, Goal> goalRetriever,
             Proof proof) throws ScriptException {
-        Deque<Node> choices = new LinkedList<Node>();
+        Deque<Node> choices = new LinkedList<>();
         Node node = proof.root();
 
         while (node != null) {
@@ -102,15 +107,9 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             }
 
             switch (childCount) {
-            case 0:
-                node = choices.pollLast();
-                break;
-
-            case 1:
-                node = node.child(0);
-                break;
-
-            default:
+            case 0 -> node = choices.pollLast();
+            case 1 -> node = node.child(0);
+            default -> {
                 Node next = null;
                 for (int i = 0; i < childCount; i++) {
                     Node child = node.child(i);
@@ -124,7 +123,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
                 }
                 assert next != null;
                 node = next;
-                break;
+            }
             }
         }
 
@@ -137,7 +136,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private boolean contains(Semisequent semiseq, Term formula) {
         for (SequentFormula sf : semiseq.asList()) {
-            if (sf.formula().equalsModRenaming(formula)) {
+            if (sf.formula().equalsModProperty(formula, RENAMING_TERM_PROPERTY)) {
                 return true;
             }
         }
@@ -149,7 +148,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return "select";
     }
 
-    public class Parameters {
+    public static class Parameters {
         /** A formula defining the goal to select */
         @Option(value = "formula", required = false)
         public Term formula;

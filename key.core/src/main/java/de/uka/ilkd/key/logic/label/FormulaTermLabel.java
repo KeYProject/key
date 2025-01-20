@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.Collection;
@@ -5,8 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
+
+import org.key_project.logic.Name;
 
 /**
  * Label attached to a predicates for instance in postconditions, loop invariants or precondition
@@ -94,7 +98,7 @@ public class FormulaTermLabel implements TermLabel {
         this.majorId = majorId;
         this.minorId = minorId;
         if (beforeIds != null && !beforeIds.isEmpty()) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             boolean afterFirst = false;
             for (String id : beforeIds) {
                 if (id != null) {
@@ -123,29 +127,26 @@ public class FormulaTermLabel implements TermLabel {
      * {@inheritDoc}
      */
     public String toString() {
-        return NAME.toString() + "(" + getId() + (beforeIds != null ? ", " + beforeIds : "") + ")";
+        return NAME + "(" + getId() + (beforeIds != null ? ", " + beforeIds : "") + ")";
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Object getChild(int i) {
-        switch (i) {
-        case 0:
-            return getId();
-        case 1:
-            return beforeIds;
-        default:
-            return null;
-        }
+    public Object getTLChild(int i) {
+        return switch (i) {
+        case 0 -> getId();
+        case 1 -> beforeIds;
+        default -> null;
+        };
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int getChildCount() {
+    public int getTLChildCount() {
         if (beforeIds != null) {
             return 2;
         } else {
@@ -179,7 +180,7 @@ public class FormulaTermLabel implements TermLabel {
      * @throws TermLabelException Occurred Exception in case that the given ID is not valid.
      */
     public static int getMajorId(String id) throws TermLabelException {
-        int index = id.indexOf(".");
+        int index = id.indexOf('.');
         if (index < 0) {
             throw new TermLabelException(
                 "The ID '" + id + "' is not separated into major and minor ID by '.'.");
@@ -208,7 +209,7 @@ public class FormulaTermLabel implements TermLabel {
      * @throws TermLabelException Occurred Exception in case that the given ID is not valid.
      */
     public static int getMinorId(String id) throws TermLabelException {
-        int index = id.indexOf(".");
+        int index = id.indexOf('.');
         if (index < 0) {
             throw new TermLabelException(
                 "The ID '" + id + "' is not separated into major and minor ID by '.'.");
@@ -250,7 +251,7 @@ public class FormulaTermLabel implements TermLabel {
         if (beforeIds == null || beforeIds.isEmpty()) {
             throw new TermLabelException("No before IDs defined.");
         }
-        List<String> result = new LinkedList<String>();
+        List<String> result = new LinkedList<>();
         String[] candidates = getBeforeIds(beforeIds);
         for (String id : candidates) {
             if (!id.isEmpty()) {

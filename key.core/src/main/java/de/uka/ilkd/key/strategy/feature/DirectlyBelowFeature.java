@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -10,7 +13,7 @@ import de.uka.ilkd.key.rule.RuleApp;
  * top-level and the symbol immediately above the focus is <code>badSymbol</code>. Optionally, one
  * can also specify that zero should only be returned if the symbol immediately above the focus is
  * <code>badSymbol</code> and the focus has a certain subterm index.
- *
+ * <p>
  * TODO: eliminate this class and use term features instead
  */
 public abstract class DirectlyBelowFeature extends BinaryFeature {
@@ -23,13 +26,16 @@ public abstract class DirectlyBelowFeature extends BinaryFeature {
         this.index = index;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (pos == null)
+    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        if (pos == null) {
             return false;
-        if (pos.isTopLevel())
+        }
+        if (pos.isTopLevel()) {
             return false;
-        if (!isBadSymbol(pos.up().subTerm().op()))
+        }
+        if (!isBadSymbol(pos.up().subTerm().op())) {
             return false;
+        }
         return index == -1 || index == pos.getIndex();
     }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.util.HashMap;
@@ -28,7 +31,7 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
      * Map to save the nodes that already have been reached, so nodes are not counted twice for the
      * hitcount
      */
-    private final Map<Integer, Boolean> hittedNodes = new HashMap<Integer, Boolean>();
+    private final Map<Integer, Boolean> hittedNodes = new HashMap<>();
 
     /**
      * Creates a new {@link AbstractHitCountBreakpoint}.
@@ -43,10 +46,10 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
     }
 
     /**
-     * Checks if the Hitcount is exceeded for the given {@link JavaLineBreakpoint}. If the Hitcount
+     * Checks if the hitcount is exceeded for the given {@link LineBreakpoint}. If the Hitcount
      * is not exceeded the hitted counter is incremented, otherwise its set to 0.
      *
-     * @return true if the Hitcount is exceeded or the {@link JavaLineBreakpoint} has no Hitcount.
+     * @return true if the Hitcount is exceeded or the {@link LineBreakpoint} has no Hitcount.
      */
     protected boolean hitcountExceeded(Node node) {
         if (!(hitCount == -1)) {

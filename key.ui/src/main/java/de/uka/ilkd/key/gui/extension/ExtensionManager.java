@@ -1,30 +1,37 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.extension;
+
+import java.awt.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.impl.Extension;
 import de.uka.ilkd.key.gui.extension.impl.ExtensionSettings;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.help.HelpFacade;
+import de.uka.ilkd.key.gui.help.HelpInfo;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import net.miginfocom.layout.CC;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
+ * Settings panel where extensions are disabled / enabled.
+ *
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
 public class ExtensionManager extends SettingsPanel implements SettingsProvider {
-    private static final long serialVersionUID = 6682677093231975786L;
     private static final ExtensionSettings EXTENSION_SETTINGS = new ExtensionSettings();
-    private HashMap<JCheckBox, Extension> map;
+    private HashMap<JCheckBox, Extension<?>> map;
     private String keywords = "";
 
     public ExtensionManager() {
@@ -84,10 +91,18 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
                         pCenter.add(createInfoArea(it.getDescription()));
                         keywords += it.getDescription();
                     }
+
+                    // add a help button if the relevant annotation is there
+                    var help = it.getType().getAnnotation(HelpInfo.class);
+                    var helpPath = help != null ? help.path() : null;
+                    if (helpPath != null) {
+                        var infoButton = createHelpButton(() -> HelpFacade.openHelp(helpPath));
+                        pCenter.add(infoButton);
+                    }
                 });
     }
 
-    private String getSupportLabel(Extension it) {
+    private String getSupportLabel(Extension<?> it) {
         return "Provides: " + (it.supportsContextMenu() ? "ContextMenu " : "")
             + (it.supportsLeftPanel() ? "LeftPanel " : "")
             + (it.supportsMainMenu() ? "MainMenu " : "")
@@ -102,7 +117,7 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
     }
 
     @Override
-    public JComponent getPanel(MainWindow window) {
+    public JPanel getPanel(MainWindow window) {
         refresh();
         return this;
     }

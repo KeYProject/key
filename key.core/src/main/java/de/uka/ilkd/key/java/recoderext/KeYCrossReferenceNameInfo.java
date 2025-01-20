@@ -1,6 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import de.uka.ilkd.key.java.ConvertException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.ServiceConfiguration;
@@ -9,9 +16,6 @@ import recoder.abstraction.Type;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.kit.UnitKit;
 import recoder.service.DefaultNameInfo;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 
 
@@ -95,8 +99,9 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
     @Override
     public Type getType(String name) {
         Type t = super.getType(name);
-        if (t instanceof ClassType)
+        if (t instanceof ClassType) {
             classtypes.put(name, (ClassType) t);
+        }
         return t;
     }
 
@@ -110,8 +115,9 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
     @Override
     public ClassType getJavaLangObject() throws ConvertException {
         ClassType result = super.getJavaLangObject();
-        if (result == null)
+        if (result == null) {
             throw new ConvertException("Class type 'java.lang.Object' cannot be found");
+        }
         return result;
     }
 

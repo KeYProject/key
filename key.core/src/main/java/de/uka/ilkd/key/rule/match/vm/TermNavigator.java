@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.ArrayDeque;
@@ -17,7 +20,7 @@ public class TermNavigator {
      *
      * The used TermNavigator have to be explicitly released by the user via {@link #release()}
      */
-    private static ArrayDeque<TermNavigator> TERM_NAVIGATOR_POOL = new ArrayDeque<>();
+    private static final ArrayDeque<TermNavigator> TERM_NAVIGATOR_POOL = new ArrayDeque<>();
     static {
         for (int i = 0; i < POOL_SIZE; i++) {
             TERM_NAVIGATOR_POOL.push(new TermNavigator());
@@ -50,7 +53,7 @@ public class TermNavigator {
 
     /**
      * top element on stack contains always the pair whose first component is the element to be
-     * returned by {@link #next()} while the second points to the child to be visited next (or
+     * returned by {@link #gotoNext()} while the second points to the child to be visited next (or
      * equals the arity of the first component if no such child exists) For all elements on the
      * stack that are not the top element the second component is less than the arity of the term in
      * the first component
@@ -105,12 +108,12 @@ public class TermNavigator {
     }
 
     public void gotoNextSibling() {
-        stack.pop().release();;
+        stack.pop().release();
         gotoNextHelper();
     }
 
     public void release() {
-        stack.forEach((e) -> e.release());
+        stack.forEach(MutablePair::release);
         stack.clear();
         if (TERM_NAVIGATOR_POOL.size() < POOL_SIZE) {
             synchronized (TERM_NAVIGATOR_POOL) {
@@ -133,7 +136,7 @@ public class TermNavigator {
          *
          * The used TermNavigator have to be explicitly released by the user via {@link #release()}
          */
-        private static ArrayDeque<MutablePair> PAIR_POOL = new ArrayDeque<>();
+        private static final ArrayDeque<MutablePair> PAIR_POOL = new ArrayDeque<>();
         static {
             for (int i = 0; i < PAIR_POOL_SIZE; i++) {
                 PAIR_POOL.push(new MutablePair(null, null));

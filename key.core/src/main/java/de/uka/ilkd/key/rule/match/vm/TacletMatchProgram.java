@@ -1,8 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.ArrayList;
-
-import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -23,6 +24,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.instructions.Instruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Instances of this class represent programs for matching a term against a given pattern. The
@@ -45,7 +48,7 @@ public class TacletMatchProgram {
     public static TacletMatchProgram createProgram(Term pattern) {
         ArrayList<MatchInstruction> program = new ArrayList<>();
         createProgram(pattern, program);
-        return new TacletMatchProgram(program.toArray(new MatchInstruction[program.size()]));
+        return new TacletMatchProgram(program.toArray(new MatchInstruction[0]));
     }
 
     /** the skip program (matches anything) */
@@ -63,25 +66,23 @@ public class TacletMatchProgram {
     /**
      * returns the instruction for the specified variable
      *
-     * @param sv the {@link SchemaVariable} for which to get the instruction
+     * @param op the {@link SchemaVariable} for which to get the instruction
      * @return the instruction for the specified variable
      */
     public static MatchSchemaVariableInstruction<? extends SchemaVariable> getMatchInstructionForSV(
             SchemaVariable op) {
-        MatchSchemaVariableInstruction<? extends SchemaVariable> instruction = null;
+        MatchSchemaVariableInstruction<? extends SchemaVariable> instruction;
 
-        if (op instanceof ModalOperatorSV) {
-            instruction = Instruction.matchModalOperatorSV((ModalOperatorSV) op);
-        } else if (op instanceof FormulaSV) {
-            instruction = Instruction.matchFormulaSV((FormulaSV) op);
-        } else if (op instanceof TermSV) {
-            instruction = Instruction.matchTermSV((TermSV) op);
-        } else if (op instanceof VariableSV) {
-            instruction = Instruction.matchVariableSV((VariableSV) op);
-        } else if (op instanceof ProgramSV) {
-            instruction = Instruction.matchProgramSV((ProgramSV) op);
-        } else if (op instanceof UpdateSV) {
-            instruction = Instruction.matchUpdateSV((UpdateSV) op);
+        if (op instanceof FormulaSV formulaSV) {
+            instruction = Instruction.matchFormulaSV(formulaSV);
+        } else if (op instanceof TermSV termSV) {
+            instruction = Instruction.matchTermSV(termSV);
+        } else if (op instanceof VariableSV variableSV) {
+            instruction = Instruction.matchVariableSV(variableSV);
+        } else if (op instanceof ProgramSV programSV) {
+            instruction = Instruction.matchProgramSV(programSV);
+        } else if (op instanceof UpdateSV updateSV) {
+            instruction = Instruction.matchUpdateSV(updateSV);
         } else {
             throw new IllegalArgumentException(
                 "Do not know how to match " + op + " of type " + op.getClass());
@@ -102,16 +103,10 @@ public class TacletMatchProgram {
     private static void createProgram(Term pattern, ArrayList<MatchInstruction> program) {
         final Operator op = pattern.op();
 
-        final JavaProgramElement patternPrg = pattern.javaBlock().program();
-
         final ImmutableArray<QuantifiableVariable> boundVars = pattern.boundVars();
 
         if (!boundVars.isEmpty()) {
             program.add(Instruction.matchAndBindVariables(boundVars));
-        }
-
-        if (pattern.op() instanceof Modality || pattern.op() instanceof ModalOperatorSV) {
-            program.add(Instruction.matchProgram(patternPrg));
         }
 
         if (pattern.hasLabels()) {
@@ -124,6 +119,15 @@ public class TacletMatchProgram {
             program.add(Instruction.matchSortDependingFunction((SortDependingFunction) op));
         } else if (op instanceof ElementaryUpdate) {
             program.add(Instruction.matchElementaryUpdate((ElementaryUpdate) op));
+        } else if (op instanceof Modality mod) {
+            final var kind = mod.kind();
+            if (kind instanceof ModalOperatorSV sv) {
+                program.add(Instruction.matchModalOperatorSV(sv));
+            } else {
+                program.add(Instruction.matchModalOperator(mod));
+            }
+            final JavaProgramElement patternPrg = pattern.javaBlock().program();
+            program.add(Instruction.matchProgram(patternPrg));
         } else {
             program.add(Instruction.matchOp(op));
         }

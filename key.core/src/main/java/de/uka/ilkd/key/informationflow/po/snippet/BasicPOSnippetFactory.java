@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
@@ -11,7 +14,7 @@ public interface BasicPOSnippetFactory {
     /**
      * The snippets which can be produced by this factory.
      */
-    public static enum Snippet {
+    enum Snippet {
         // free precondition (the "general assumption")
         FREE_PRE(BasicFreePreSnippet.class),
 
@@ -24,8 +27,8 @@ public interface BasicPOSnippetFactory {
         // postcondition of the contract
         CONTRACT_POST(BasicPostconditionSnippet.class),
 
-        // modifies of the contract
-        CONTRACT_MOD(BasicModifiesSnippet.class),
+        // modifiable of the contract
+        CONTRACT_MODIFIABLE(BasicModifiableSnippet.class),
 
         // dependencies of the contract
         CONTRACT_DEP(BasicDependsSnippet.class),
@@ -86,9 +89,9 @@ public interface BasicPOSnippetFactory {
         Snippet(Class<?> c) {
             this.c = c;
         }
-    };
+    }
 
 
-    public Term create(Snippet snippet) throws UnsupportedOperationException;
+    Term create(Snippet snippet) throws UnsupportedOperationException;
 
 }

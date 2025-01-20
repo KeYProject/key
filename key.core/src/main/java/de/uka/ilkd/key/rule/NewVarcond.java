@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -63,6 +66,7 @@ public class NewVarcond {
 
     @Override
     public String toString() {
-        return "\\new(" + sv + ", " + (type != null ? "" + type : "\\typeof(" + peerSV + ")") + ")";
+        return "\\new(" + sv + ", "
+            + (type != null ? String.valueOf(type) : "\\typeof(" + peerSV + ")") + ")";
     }
 }

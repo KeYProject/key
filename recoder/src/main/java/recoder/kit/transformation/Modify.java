@@ -1,6 +1,10 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.kit.transformation;
+
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.Declaration;
@@ -13,8 +17,6 @@ import recoder.java.declaration.modifier.Static;
 import recoder.kit.ModifierKit;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
-
-import java.util.List;
 
 /**
  * Syntactic transformation that modifies a declaration by adding/removing single modifiers. This
@@ -65,8 +67,7 @@ public class Modify extends TwoPassTransformation {
         if (mods == null) {
             return false;
         }
-        for (int i = 0; i < mods.size(); i += 1) {
-            DeclarationSpecifier res = mods.get(i);
+        for (DeclarationSpecifier res : mods) {
             if (mod.isInstance(res)) {
                 return true;
             }

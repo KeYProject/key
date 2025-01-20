@@ -1,4 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.mergerule.predicateabstraction;
+
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
@@ -10,32 +29,18 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.Pair;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.*;
 
 /**
  * A Swing reimplementation of the (much nicer) JavaFX abstraction predicates choice dialog -- since
@@ -60,7 +65,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
     private ArrayList<Pair<Sort, Name>> registeredPlaceholders = new ArrayList<>();
     private ArrayList<AbstractionPredicate> registeredPredicates = new ArrayList<>();
-    private ArrayList<AbstractDomainElemChoice> abstrPredicateChoices = new ArrayList<>();
+    private final ArrayList<AbstractDomainElemChoice> abstrPredicateChoices = new ArrayList<>();
 
     private Class<? extends AbstractPredicateAbstractionLattice> latticeType =
         SimplePredicateAbstractionLattice.class;
@@ -103,9 +108,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     public AbstractionPredicatesChoiceDialog(Goal goal, List<LocationVariable> differingLocVars) {
         this();
         this.goal = goal;
-        differingLocVars.forEach(v -> {
-            abstrPredicateChoices.add(new AbstractDomainElemChoice(v, Optional.empty()));
-        });
+        differingLocVars.forEach(
+            v -> abstrPredicateChoices.add(new AbstractDomainElemChoice(v, Optional.empty())));
     }
 
     /**
@@ -581,10 +585,10 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      *
      * @author Dominic Steinhoefel
      */
-    class Result {
-        private ArrayList<AbstractionPredicate> registeredPredicates;
-        private Class<? extends AbstractPredicateAbstractionLattice> latticeType;
-        private LinkedHashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices =
+    static class Result {
+        private final ArrayList<AbstractionPredicate> registeredPredicates;
+        private final Class<? extends AbstractPredicateAbstractionLattice> latticeType;
+        private final LinkedHashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices =
             new LinkedHashMap<>();
 
         public Result(ArrayList<AbstractionPredicate> registeredPredicates,
@@ -667,10 +671,10 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
             items.addItem(Optional.empty());
 
             if (lattice != null) {
-                final Iterator<AbstractDomainElement> it = lattice.iterator();
-                while (it.hasNext()) {
+                for (AbstractDomainElement abstractDomainElement : lattice) {
                     items.addItem(
-                        Optional.of((AbstractPredicateAbstractionDomainElement) it.next()));
+                        Optional.of(
+                            (AbstractPredicateAbstractionDomainElement) abstractDomainElement));
                 }
             }
 

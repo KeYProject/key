@@ -1,10 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Statement;
@@ -20,6 +19,10 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 
 /**
  *
@@ -30,7 +33,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
     @Override
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> posts = ImmutableSLList.nil();
         if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
@@ -58,15 +61,16 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
         }
 
         // create java block
-        Modality modality = (Modality) d.get(BasicSnippetData.Key.MODALITY);
+        Modality.JavaModalityKind kind =
+            (Modality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
         final JavaBlock jb = buildJavaBlock(d, vs);
 
         // create program term
-        final Modality symbExecMod;
-        if (modality == Modality.BOX) {
-            symbExecMod = Modality.DIA;
+        final Modality.JavaModalityKind symbExecMod;
+        if (kind == Modality.JavaModalityKind.BOX) {
+            symbExecMod = Modality.JavaModalityKind.DIA;
         } else {
-            symbExecMod = Modality.BOX;
+            symbExecMod = Modality.JavaModalityKind.BOX;
         }
         final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
 
@@ -95,7 +99,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
 
         // create block call
         final Label[] labelsArray = (Label[]) d.get(BasicSnippetData.Key.LABELS);
-        final ImmutableArray<Label> labels = new ImmutableArray<Label>(labelsArray);
+        final ImmutableArray<Label> labels = new ImmutableArray<>(labelsArray);
         final AuxiliaryContract.Variables variables =
             (AuxiliaryContract.Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
         final StatementBlock block = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);

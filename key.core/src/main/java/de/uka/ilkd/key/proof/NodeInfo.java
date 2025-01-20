@@ -1,30 +1,24 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import java.net.URI;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.util.MiscTools;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.ObjectUtil;
-
-import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
@@ -35,6 +29,11 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
+
+import org.key_project.logic.Name;
+import org.key_project.proof.LocationVariableTracker;
+import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public class NodeInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(NodeInfo.class);
 
-    private static Set<Name> symbolicExecNames = new HashSet<>(9);
+    private static final Set<Name> symbolicExecNames = new HashSet<>(9);
 
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement = null;
@@ -70,6 +69,11 @@ public class NodeInfo {
     /** has the rule app of the node been applied by a proof script? */
     private boolean scriptingApplication = false;
 
+    /**
+     * Has the rule app been determined as superfluous by some proof analysis algorithm?
+     */
+    private boolean uselessApplication = false;
+
     /** User-provided plain-text annotations to the node. */
     private String notes;
 
@@ -92,6 +96,20 @@ public class NodeInfo {
         symbolicExecNames.add(new Name("loop_expand"));
         symbolicExecNames.add(new Name("loop_scope_expand"));
         symbolicExecNames.add(new Name("loop_scope_inv_taclet"));
+    }
+
+    /**
+     * Copy the NodeInfo of another proof node into this object.
+     * Copies {@link #interactiveApplication}, {@link #scriptingApplication},
+     * {@link #uselessApplication} and {@link #notes}.
+     *
+     * @param node a proof node
+     */
+    public void copyFrom(Node node) {
+        interactiveApplication = node.getNodeInfo().interactiveApplication;
+        scriptingApplication = node.getNodeInfo().scriptingApplication;
+        uselessApplication = node.getNodeInfo().uselessApplication;
+        notes = node.getNodeInfo().notes;
     }
 
 
@@ -143,8 +161,7 @@ public class NodeInfo {
     public static SourceElement computeFirstStatement(RuleApp ruleApp) {
         SourceElement firstStatement = null;
         // TODO: unify with MiscTools getActiveStatement
-        if (ruleApp instanceof PosTacletApp) {
-            PosTacletApp pta = (PosTacletApp) ruleApp;
+        if (ruleApp instanceof PosTacletApp pta) {
             if (!isSymbolicExecution(pta.taclet())) {
                 return null;
             }
@@ -253,26 +270,6 @@ public class NodeInfo {
     }
 
     /**
-     * returns the name of the source file where the active statement occurs or the string
-     * <tt>NONE</tt> if the statement does not originate from a source file (e.g. created by a
-     * taclet application or part of a generated implicit method)
-     *
-     * @return name of source file as described above
-     */
-    public String getExecStatementParentClass() {
-        determineFirstAndActiveStatement();
-        if (activeStatement instanceof JavaSourceElement) {
-            PositionInfo posInf = activeStatement.getPositionInfo();
-            // extract the file path as a string if possible
-            String pathStr = MiscTools.getSourcePath(posInf);
-            if (pathStr != null) {
-                return pathStr;
-            }
-        }
-        return "<NONE>";
-    }
-
-    /**
      * returns the position of the executed statement in its source code or Position.UNDEFINED
      *
      * @return statement position as described above
@@ -291,9 +288,9 @@ public class NodeInfo {
         determineFirstAndActiveStatement();
         if (firstStatement != null) {
             if (firstStatementString == null) {
-                firstStatementString = "" + firstStatement;
+                firstStatementString = String.valueOf(firstStatement);
             }
-            firstStatementString = "" + activeStatement;
+            firstStatementString = String.valueOf(activeStatement);
             return firstStatementString;
         }
         return null;
@@ -314,9 +311,7 @@ public class NodeInfo {
             return;
         }
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
-        if (ruleApp instanceof TacletApp) {
-            TacletApp tacletApp = (TacletApp) ruleApp; // XXX
-
+        if (ruleApp instanceof TacletApp tacletApp) {
             Pattern p = Pattern.compile("#\\w+");
             Matcher m = p.matcher(s);
             StringBuffer sb = new StringBuffer();
@@ -336,12 +331,24 @@ public class NodeInfo {
                     res = arg; // use sv name instead
                 } else {
                     if (val instanceof Term) {
-                        val = TermLabel.removeIrrelevantLabels((Term) val,
+                        val = TermLabelManager.removeIrrelevantLabels((Term) val,
                             node.proof().getServices());
                     } else if (val instanceof TermInstantiation) {
-                        val = TermLabel.removeIrrelevantLabels(
+                        val = TermLabelManager.removeIrrelevantLabels(
                             ((TermInstantiation) val).getInstantiation(),
                             node.proof().getServices());
+                    } else if (val instanceof LocationVariable locVar) {
+                        var originTracker = node.proof().lookup(LocationVariableTracker.class);
+                        if (originTracker != null) {
+                            var origin = originTracker.getCreatedBy(locVar);
+                            if (origin instanceof PosTacletApp posTacletApp) {
+                                var name = posTacletApp.taclet().displayName();
+                                if (name.equals("ifElseUnfold") || name.equals("ifUnfold")) {
+                                    val =
+                                        posTacletApp.instantiations().lookupValue(new Name("#nse"));
+                                }
+                            }
+                        }
                     }
                     res = ProofSaver.printAnything(val, node.proof().getServices());
                 }
@@ -402,7 +409,7 @@ public class NodeInfo {
     public void setNotes(String newNotes) {
         String oldNotes = notes;
         notes = newNotes;
-        if (!ObjectUtil.equals(oldNotes, newNotes)) {
+        if (!Objects.equals(oldNotes, newNotes)) {
             node.proof().fireNotesChanged(node);
         }
     }
@@ -422,5 +429,21 @@ public class NodeInfo {
 
     public void setSequentChangeInfo(SequentChangeInfo sequentChangeInfo) {
         this.sequentChangeInfo = sequentChangeInfo;
+    }
+
+    /**
+     * @return whether the proof step does not contribute to the proof
+     */
+    public boolean isUselessApplication() {
+        return uselessApplication;
+    }
+
+    /**
+     * Mark this node as useless or useful.
+     *
+     * @param uselessApplication whether this node should be marked as useless
+     */
+    public void setUselessApplication(boolean uselessApplication) {
+        this.uselessApplication = uselessApplication;
     }
 }

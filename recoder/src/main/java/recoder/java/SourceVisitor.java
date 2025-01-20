@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java;
 
 import recoder.java.declaration.*;
@@ -167,8 +169,9 @@ public abstract class SourceVisitor {
      */
     public void visitAnnotationPropertyReference(AnnotationPropertyReference x) {
         Identifier id = x.getIdentifier();
-        if (id != null)
+        if (id != null) {
             id.accept(this);
+        }
     }
 
 
@@ -320,7 +323,7 @@ public abstract class SourceVisitor {
     /**
      * visits the specified annotation. The default implementation does nothing.
      *
-     * @param a
+     * @param x
      */
     public void visitElementValuePair(AnnotationElementValuePair x) {
     }

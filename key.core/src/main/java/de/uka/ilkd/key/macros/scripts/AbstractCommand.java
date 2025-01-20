@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -6,11 +13,6 @@ import de.uka.ilkd.key.macros.scripts.meta.ArgumentsLifter;
 import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 import de.uka.ilkd.key.proof.Proof;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * <p>
@@ -21,7 +23,6 @@ import java.util.logging.Logger;
  * @author Alexander Weigl
  */
 public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
-    protected static Logger log = Logger.getLogger(ProofScriptCommand.class.getName());
     protected Proof proof;
     protected Services service;
     protected EngineState state;
@@ -41,9 +42,10 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
         this.parameterClazz = clazz;
     }
 
-    public List<ProofScriptArgument> getArguments() {
-        if (parameterClazz == null)
+    public List<ProofScriptArgument<T>> getArguments() {
+        if (parameterClazz == null) {
             return new ArrayList<>();
+        }
         return ArgumentsLifter.inferScriptArguments(parameterClazz, this);
     }
 
@@ -51,7 +53,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     @Override
     public T evaluateArguments(EngineState state, Map<String, Object> arguments) throws Exception {
         if (parameterClazz != null) {
-            T obj = parameterClazz.newInstance();
+            T obj = parameterClazz.getDeclaredConstructor().newInstance();
             return state.getValueInjector().inject(this, obj, arguments);
         }
         return null;

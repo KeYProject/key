@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
@@ -12,7 +15,7 @@ public class SeqSub extends ADTPrefixConstruct {
     private static final long serialVersionUID = 9034359926577584988L;
 
     public SeqSub(Expression e1, Expression e2, Expression e3) {
-        children = new ASTArrayList<Expression>(getArity());
+        children = new ASTArrayList<>(getArity());
         children.add(e1);
         children.add(e2);
         children.add(e3);

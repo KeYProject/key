@@ -40,7 +40,7 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <statement name="this.a=x;" pathCondition="true" pathConditionChanged="false">
+         <statement name="this.a = x;" pathCondition="true" pathConditionChanged="false">
             <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="a" isArrayIndex="false">
@@ -75,7 +75,7 @@
                <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <statement name="this.b=3;" pathCondition="true" pathConditionChanged="false">
+            <statement name="this.b = 3;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="a" isArrayIndex="false">
@@ -110,7 +110,7 @@
                   <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <statement name="param=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
+               <statement name="param = new IntWrapper();" pathCondition="true" pathConditionChanged="false">
                   <variable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="a" isArrayIndex="false">
@@ -205,7 +205,7 @@
                            <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <statement name="param.value=1;" pathCondition="true" pathConditionChanged="false">
+                        <statement name="param.value = 1;" pathCondition="true" pathConditionChanged="false">
                            <variable name="self" isArrayIndex="false">
                               <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="a" isArrayIndex="false">
@@ -238,7 +238,7 @@
                               <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <statement name="this.wrapper=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
+                           <statement name="this.wrapper = new IntWrapper();" pathCondition="true" pathConditionChanged="false">
                               <variable name="self" isArrayIndex="false">
                                  <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     <variable name="a" isArrayIndex="false">
@@ -337,7 +337,7 @@
                                           </variable>
                                        </value>
                                     </variable>
-                                    <statement name="this.wrapper.value=4;" pathCondition="true" pathConditionChanged="false">
+                                    <statement name="this.wrapper.value = 4;" pathCondition="true" pathConditionChanged="false">
                                        <variable name="self" isArrayIndex="false">
                                           <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                              <variable name="a" isArrayIndex="false">
@@ -374,7 +374,8 @@
                                           <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
-                                       <statement name="return this.a+this.b+x+this.wrapper.value+param.value;" pathCondition="true" pathConditionChanged="false">
+                                       <statement name="return
+this.a + this.b + x + this.wrapper.value + param.value;" pathCondition="true" pathConditionChanged="false">
                                           <variable name="self" isArrayIndex="false">
                                              <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                 <variable name="a" isArrayIndex="false">

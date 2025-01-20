@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
 /**
@@ -76,13 +79,6 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
     public void proofGoalsChanged(ProofTreeEvent e) {
         proofStructureChanged(e);
     }
-
-    /**
-     * If, e.g., an SMT Solver was applied to node/goal referenced in e, then this event occurs in
-     * order to monitor, e.g. by a dialog, the result of the SMT solver. The data from the SMT
-     * solver can be accessed via. {@code Node.getCounterExData()}
-     */
-    public void smtDataUpdate(ProofTreeEvent e) {}
 
     /**
      * {@inheritDoc}

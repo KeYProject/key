@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.util;
 
 import java.util.Enumeration;
@@ -168,7 +170,8 @@ public abstract class AbstractIndex implements HashCode {
     }
 
     public void clear() {
-        for (int index = table.length; --index >= 0; table[index] = null);
+        for (int index = table.length; --index >= 0; table[index] = null) {
+        }
         count = 0;
     }
 
@@ -177,10 +180,9 @@ public abstract class AbstractIndex implements HashCode {
     }
 
     public boolean equals(Object ob) {
-        if (!(ob instanceof AbstractIndex)) {
+        if (!(ob instanceof AbstractIndex x)) {
             return false;
         }
-        AbstractIndex x = (AbstractIndex) ob;
         if (x.size() != size()) {
             return false;
         }
@@ -210,7 +212,7 @@ public abstract class AbstractIndex implements HashCode {
 
     public String toString() {
         int max = size() - 1;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Enumeration e = elements();
         buf.append("{");
         for (int i = 0; i <= max; i++) {
@@ -229,7 +231,7 @@ public abstract class AbstractIndex implements HashCode {
     static class Enumerator implements Enumeration {
         int index;
 
-        Object[] table;
+        final Object[] table;
 
         Enumerator(Object[] table) {
             this.table = table;

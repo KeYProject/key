@@ -1,9 +1,12 @@
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.logic.Sorted;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
+
+import org.key_project.logic.sort.Sort;
 
 /**
  * Special assert statements intended for use with KeY. Raises
@@ -14,7 +17,6 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
  *
  */
 public final class Assert {
-
     private static boolean assertionsEnabled() {
         // This class is only used by FunctionalOperationContractImpl
         return FunctionalOperationContractImpl.class.desiredAssertionStatus();
@@ -27,8 +29,9 @@ public final class Assert {
      * @param t2
      */
     public static void assertEqualSort(Sorted t1, Sorted t2) {
-        if (!assertionsEnabled())
+        if (!assertionsEnabled()) {
             return;
+        }
         Sort s1 = t1.sort();
         Sort s2 = t2.sort();
         if (!s1.equals(s2)) {
@@ -45,8 +48,9 @@ public final class Assert {
      * @param t2
      */
     public static void assertSubSort(Sorted t1, Sorted t2) {
-        if (!assertionsEnabled())
+        if (!assertionsEnabled()) {
             return;
+        }
         Sort s1 = t1.sort();
         Sort s2 = t2.sort();
         if (!s1.extendsTrans(s2)) {

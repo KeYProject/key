@@ -1,10 +1,12 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java;
 
-import recoder.ProgramFactory;
-
 import java.io.Serializable;
+
+import recoder.ProgramFactory;
 
 /**
  * Top level implementation of a Java {@link SourceElement}. This class already knows its
@@ -19,7 +21,7 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
      * The JavaProgramFactory.
      */
 
-    protected static JavaProgramFactory factory = JavaProgramFactory.getInstance();
+    protected static final JavaProgramFactory factory = JavaProgramFactory.getInstance();
 
     /**
      * Position bit encoding. Internal format is start line: 16 | start column: 8 | end line: 16 |
@@ -191,5 +193,9 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
 
     public String toSource() {
         return factory.toSource(this);
+    }
+
+    public String toString() {
+        return getClass().getName() + "@" + getStartPosition();
     }
 }

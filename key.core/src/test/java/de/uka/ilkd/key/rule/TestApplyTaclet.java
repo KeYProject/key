@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule;
+
+import java.util.Iterator;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -10,16 +15,19 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import java.util.Iterator;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -173,8 +181,8 @@ public class TestApplyTaclet {
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
-        RuleApp rApp = rApplist.head();
-        rApp = ((TacletApp) rApp).tryToInstantiate(TacletForTests.services());
+        TacletApp rApp = rApplist.head();
+        rApp = rApp.tryToInstantiate(TacletForTests.services());
         assertTrue(rApp.complete(), "Rule App should be complete");
         ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
         assertEquals(1, goals.size(), "Too many or zero goals for all-right.");
@@ -565,9 +573,10 @@ public class TestApplyTaclet {
         assertEquals(4, rApplist.size(), "Expected four rule applications.");
 
         ImmutableList<TacletApp> appList = ImmutableSLList.nil();
-        for (TacletApp aRApplist : rApplist)
+        for (TacletApp aRApplist : rApplist) {
             appList =
                 appList.prepend(aRApplist.findIfFormulaInstantiations(goal.sequent(), services));
+        }
 
         assertEquals(1, appList.size(), "Expected one match.");
         assertTrue(appList.head().complete(), "Rule App should be complete");
@@ -596,9 +605,10 @@ public class TestApplyTaclet {
 
         ImmutableList<TacletApp> appList = ImmutableSLList.nil();
         Iterator<TacletApp> appIt = rApplist.iterator();
-        while (appIt.hasNext())
+        while (appIt.hasNext()) {
             appList =
                 appList.prepend(appIt.next().findIfFormulaInstantiations(goal.sequent(), services));
+        }
 
         assertEquals(0, appList.size(), "Did not expect a match.");
 
@@ -610,8 +620,9 @@ public class TestApplyTaclet {
         while (appIt.hasNext()) {
             TacletApp a =
                 appIt.next().setIfFormulaInstantiations(ifInsts, TacletForTests.services());
-            if (a != null)
+            if (a != null) {
                 appList = appList.prepend(a);
+            }
         }
 
         assertEquals(1, appList.size(), "Expected one match.");
@@ -730,18 +741,18 @@ public class TestApplyTaclet {
         Term resultFormula = goals.head().sequent().getFormulabyNr(1).formula();
         Term correctFormula = correctSeq.getFormulabyNr(1).formula();
 
-        assertTrue(resultFormula.equalsModRenaming(correctFormula),
+        assertTrue(resultFormula.equalsModProperty(correctFormula, RENAMING_TERM_PROPERTY),
             "Wrong result. Expected:"
                 + ProofSaver.printAnything(correctFormula, TacletForTests.services()) + " But was:"
                 + ProofSaver.printAnything(resultFormula, TacletForTests.services()));
+        assertEquals(resultFormula.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            correctFormula.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes of formulas should be equal modulo renaming");
     }
 
     private Goal createGoal(Node n, TacletIndex tacletIndex) {
         final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
-        final RuleAppIndex ruleAppIndex =
-            new RuleAppIndex(tacletIndex, birIndex, n.proof().getServices());
-        final Goal goal = new Goal(n, ruleAppIndex);
-        return goal;
+        return new Goal(n, tacletIndex, birIndex, n.proof().getServices());
     }
 
     /**
@@ -841,8 +852,13 @@ public class TestApplyTaclet {
             goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
         // FIXME weigl: This test case is spurious:
         // actual.toString() == expected.toString() but internally there is a difference.
-        assertTrue(expected.equalsModRenaming(is, new NameAbstractionTable()),
+        assertTrue(
+            expected.equalsModProperty(is, RENAMING_SOURCE_ELEMENT_PROPERTY,
+                new NameAbstractionTable()),
             "Expected:" + expected + "\n but was:" + is);
+        assertEquals(expected.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY),
+            is.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY),
+            "Hash codes of ProgramElements should be equals modulo renaming.");
     }
 
     /**
@@ -875,8 +891,13 @@ public class TestApplyTaclet {
 
         ProgramElement is =
             goals.head().sequent().getFormulabyNr(1).formula().javaBlock().program();
-        assertTrue(expected.equalsModRenaming(is, new NameAbstractionTable()),
+        assertTrue(
+            expected.equalsModProperty(is, RENAMING_SOURCE_ELEMENT_PROPERTY,
+                new NameAbstractionTable()),
             "Expected:" + expected + "\n but was:" + is);
+        assertEquals(expected.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY),
+            is.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY),
+            "Hash codes of ProgramElements should be equal modulo renaming.");
     }
 
     @Test

@@ -1,25 +1,31 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-
-import java.io.File;
-import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,7 +43,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
     public void test1ImproveReadability() throws ProblemLoaderException {
         File location = new File(testCaseDirectory,
             "/readability/InnerAndAnonymousTypeTest/InnerAndAnonymousTypeTest.java")
-                    .getAbsoluteFile();
+                .getAbsoluteFile();
         assertTrue(location.exists(), "Could not find required resource: " + location);
 
         KeYEnvironment<?> environment = KeYEnvironment.load(location, null, null, null);
@@ -120,7 +126,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
             // weigl: disable, no clue why the choice settings should be initialised
             // assertTrue(SymbolicExecutionUtil.isChoiceSettingInitialised());
             // Store default choice settings
-            HashMap<String, String> defaultSettings =
+            Map<String, String> defaultSettings =
                 ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
             // weigl: disable, no clue why the choice settings should be initialised
             // assertFalse(defaultSettings.isEmpty());
@@ -141,10 +147,14 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
             Assertions.assertEquals(newValue, SymbolicExecutionUtil
                     .getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
             // Make sure that all other settings are unchanged.
-            HashMap<String, String> changedSettings =
+            Map<String, String> changedSettings =
                 ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
-            defaultSettings.put(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
-            Assertions.assertEquals(defaultSettings, changedSettings);
+
+            Map<String, String> expectedSettings = new HashMap<>();
+            expectedSettings.putAll(defaultSettings);
+            expectedSettings.put(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, newValue);
+
+            Assertions.assertEquals(expectedSettings, changedSettings);
         } finally {
             if (originalValue != null) {
                 SymbolicExecutionUtil.setChoiceSetting(

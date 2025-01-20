@@ -1,20 +1,23 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
+
+import java.beans.PropertyChangeListener;
 import java.util.EventObject;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 
-/*
- * Is this a legacy option? Finding instantiations seems to be done by the prover, even if this
- * option is disabled. (Kai Wallisch, December 2013)
+/**
+ * Option to specify all instantiations manually (does not apply to the automatic solver).
  */
 public class MinimizeInteraction extends KeYMenuCheckBox {
     public static final String NAME = "Minimize Interaction";
     public static final String TOOL_TIP =
-        "If ticked and automated strategy (play button) is used, the prover tries to minimize user interaction, "
-            + "e.g., if the prover can find instantiations by itself, it will not ask the user to provide them.";
+        "If not ticked, applying a taclet manually will require you to instantiate " +
+            "all schema variables.";
 
     /**
      *
@@ -29,27 +32,24 @@ public class MinimizeInteraction extends KeYMenuCheckBox {
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
      */
-    private final SettingsListener generalSettingsListener = new SettingsListener() {
-        @Override
-        public void settingsChanged(EventObject e) {
-            handleGeneralSettingsChanged(e);
-        }
-    };
+    private final PropertyChangeListener generalSettingsListener =
+        this::handleGeneralSettingsChanged;
 
     public MinimizeInteraction(MainWindow mainWindow) {
         super(mainWindow, NAME);
         this.mainWindow = mainWindow;
         setName("MinimizeInteractionInstance");
         setTooltip(TOOL_TIP);
+        // Attention: The listener is never// removed, because there is only one
+        // MainWindow!
         ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
-                .addSettingsListener(generalSettingsListener); // Attention: The listener is never
-                                                               // removed, because there is only one
-                                                               // MainWindow!
+                .addPropertyChangeListener(generalSettingsListener);
         updateSelectedState();
     }
 
     protected void updateSelectedState() {
-        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter());
+        setSelected(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getTacletFilter());
     }
 
     @Override
@@ -67,7 +67,7 @@ public class MinimizeInteraction extends KeYMenuCheckBox {
     protected void handleGeneralSettingsChanged(EventObject e) {
         updateSelectedState();
         final boolean tacletFilter =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getTacletFilter();
         updateMainWindow(tacletFilter);
     }
 }

@@ -1,11 +1,17 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.inst;
 
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.logic.sort.Sort;
 
 
 /**
@@ -13,7 +19,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public abstract class GenericSortCondition {
 
-    private GenericSort gs;
+    private final GenericSort gs;
 
     /**
      * Create the condition that needs to be fulfilled for the given instantiation of a metavariable
@@ -27,13 +33,12 @@ public abstract class GenericSortCondition {
     public static GenericSortCondition createCondition(SchemaVariable sv,
             InstantiationEntry<?> p_entry) {
 
-        if (!(p_entry instanceof TermInstantiation)) {
+        if (!(p_entry instanceof TermInstantiation ti)) {
             return null;
         }
 
-        final TermInstantiation ti = (TermInstantiation) p_entry;
-
-        return createCondition(sv.sort(), ti.getInstantiation().sort(), !subSortsAllowed(sv));
+        return createCondition(((OperatorSV) sv).sort(), ti.getInstantiation().sort(),
+            !subSortsAllowed(sv));
     }
 
     /**
@@ -45,8 +50,9 @@ public abstract class GenericSortCondition {
     public static GenericSortCondition createCondition(SortDependingFunction p0,
             SortDependingFunction p1) {
 
-        if (!p0.isSimilar(p1))
+        if (!p0.isSimilar(p1)) {
             return null;
+        }
 
         return createCondition(p0.getSortDependingOn(), p1.getSortDependingOn(), true);
     }
@@ -76,17 +82,18 @@ public abstract class GenericSortCondition {
             // collection sorts; therefore identity has to be ensured
             p_identity = true;
 
-            if (!s0.getClass().equals(s1.getClass()))
+            if (!s0.getClass().equals(s1.getClass())) {
                 return null;
+            }
 
             s0 = ((ArraySort) s0).elementSort();
             s1 = ((ArraySort) s1).elementSort();
         }
 
-        if (!(s0 instanceof GenericSort) || s1 == Sort.FORMULA || s1 == Sort.UPDATE)
+        if (!(s0 instanceof GenericSort gs) || s1 == JavaDLTheory.FORMULA
+                || s1 == JavaDLTheory.UPDATE) {
             return null;
-
-        final GenericSort gs = (GenericSort) s0;
+        }
 
         if (p_identity) {
             return createIdentityCondition(gs, s1);
@@ -105,10 +112,11 @@ public abstract class GenericSortCondition {
      */
     public static GenericSortCondition forceInstantiation(Sort p_s, boolean p_maximum) {
 
-        if (p_s instanceof GenericSort)
+        if (p_s instanceof GenericSort) {
             return createForceInstantiationCondition((GenericSort) p_s, p_maximum);
-        else if (p_s instanceof ArraySort)
+        } else if (p_s instanceof ArraySort) {
             return forceInstantiation(((ArraySort) p_s).elementSort(), p_maximum);
+        }
 
         return null;
     }
@@ -161,7 +169,7 @@ public abstract class GenericSortCondition {
 
 
     static class GSCSupersort extends GenericSortCondition {
-        Sort s;
+        final Sort s;
 
         protected GSCSupersort(GenericSort p_gs, Sort p_s) {
             super(p_gs);
@@ -189,7 +197,7 @@ public abstract class GenericSortCondition {
 
 
     static class GSCIdentity extends GenericSortCondition {
-        Sort s;
+        final Sort s;
 
         protected GSCIdentity(GenericSort p_gs, Sort p_s) {
             super(p_gs);
@@ -215,7 +223,7 @@ public abstract class GenericSortCondition {
 
 
     static class GSCForceInstantiation extends GenericSortCondition {
-        boolean maximum;
+        final boolean maximum;
 
         protected GSCForceInstantiation(GenericSort p_gs, boolean p_maximum) {
             super(p_gs);

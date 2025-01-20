@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.Identifier;
@@ -9,7 +12,7 @@ public class NewArrayWrapper extends NewArray {
      *
      */
     private static final long serialVersionUID = -3838799869300845065L;
-    private Identifier scope;
+    private final Identifier scope;
 
     public NewArrayWrapper(NewArray proto, Identifier scope) {
         super(proto);

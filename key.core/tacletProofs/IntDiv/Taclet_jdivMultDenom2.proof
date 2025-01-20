@@ -2,14 +2,15 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Mon Feb 25 17:12:37 CET 2019
+#Wed Apr 12 13:21:41 CEST 2023
+[Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
-[Choice]DefaultChoices=assertions-assertions\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , initialisation-initialisation\\:disableStaticInitialisation , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , permissions-permissions\\:off , moreSeqRules-moreSeqRules\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off
+[Choice]DefaultChoices=JavaCard-JavaCard\\:on, Strings-Strings\\:on, assertions-assertions\\:on, bigint-bigint\\:on, floatRules-floatRules\\:strictfpOnly, initialisation-initialisation\\:disableStaticInitialisation, intRules-intRules\\:arithmeticSemanticsIgnoringOF, integerSimplificationRules-integerSimplificationRules\\:full, javaLoopTreatment-javaLoopTreatment\\:efficient, mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off, methodExpansion-methodExpansion\\:modularOnly, modelFields-modelFields\\:showSatisfiability, moreSeqRules-moreSeqRules\\:off, permissions-permissions\\:off, programRules-programRules\\:Java, reach-reach\\:on, runtimeExceptions-runtimeExceptions\\:ban, sequences-sequences\\:on, wdChecks-wdChecks\\:off, wdOperator-wdOperator\\:L
 [StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
 [StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]UseBuiltUniqueness=false
@@ -41,30 +42,29 @@
 "
 }
 
-\proofObligation "#Proof Obligation Settings
-#Mon Feb 25 17:12:37 CET 2019
-name=jdivMultDenom2
-class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
-";
+\proofObligation {
+	"name": "jdivMultDenom2",
+	"class": "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
+ }
 
 \proof {
-(keyLog "0" (keyUser "pschmitt" ) (keyVersion "9ae063eef8ce4750d1555dc6eb80eb69310feb74"))
+(keyLog "0" (keyUser "Julian" ) (keyVersion "80a871ca3bac8bb405ecc216fcb6fa9ef6f8a395"))
 
-(autoModeTime "4")
+(autoModeTime "0")
 
 (branch "dummy ID"
 (rule "notRight" (formula "1") (newnames "f_cfac,f_divDenom"))
 (rule "andLeft" (formula "1"))
 (rule "notLeft" (formula "2"))
-(builtin "One Step Simplification" (formula "1"))
+ (builtin "One Step Simplification" (formula "1"))
 (rule "notLeft" (formula "1") (userinteraction))
 (rule "mul_comm" (formula "2") (term "0,0") (userinteraction))
 (rule "jdivMultDenom1" (formula "2") (term "0") (userinteraction))
-(branch "Case 1"
-   (builtin "One Step Simplification" (formula "2"))
+(branch
+    (builtin "One Step Simplification" (formula "2"))
    (rule "closeTrue" (formula "2") (userinteraction))
 )
-(branch "Case 2"
+(branch
    (rule "notRight" (formula "2"))
    (rule "close" (formula "2") (ifseqformula "1"))
 )

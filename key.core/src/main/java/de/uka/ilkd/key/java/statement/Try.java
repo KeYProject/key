@@ -1,18 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.ProgramPrefixUtil;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Try.
@@ -60,7 +57,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     public Try(StatementBlock body, Branch[] branches) {
         this.body = body;
-        this.branches = new ImmutableArray<Branch>(branches);
+        this.branches = new ImmutableArray<>(branches);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -92,7 +89,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     public Try(ExtList children) {
         super(children);
         this.body = children.get(StatementBlock.class);
-        this.branches = new ImmutableArray<Branch>(children.collect(Branch.class));
+        this.branches = new ImmutableArray<>(children.collect(Branch.class));
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -140,7 +137,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
 
     public SourceElement getLastElement() {
-        return getChildAt(getChildCount() - 1).getLastElement();
+        return getChildAt(this.getChildCount() - 1).getLastElement();
     }
 
     /**
@@ -151,10 +148,12 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     public int getChildCount() {
         int result = 0;
-        if (body != null)
+        if (body != null) {
             result++;
-        if (branches != null)
+        }
+        if (branches != null) {
             result += branches.size();
+        }
         return result;
     }
 
@@ -168,8 +167,9 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     public ProgramElement getChildAt(int index) {
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
             index--;
         }
         if (branches != null) {
@@ -257,10 +257,6 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
      */
     public void visit(Visitor v) {
         v.performActionOnTry(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printTry(this);
     }
 
     public PosInProgram getFirstActiveChildPos() {

@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.statement;
 
 import recoder.java.*;
@@ -94,10 +96,12 @@ public class Assert extends JavaStatement implements ExpressionContainer {
      */
     public int getChildCount() {
         int result = 0;
-        if (condition != null)
+        if (condition != null) {
             result++;
-        if (message != null)
+        }
+        if (message != null) {
             result++;
+        }
         return result;
     }
 
@@ -111,13 +115,15 @@ public class Assert extends JavaStatement implements ExpressionContainer {
 
     public ProgramElement getChildAt(int index) {
         if (condition != null) {
-            if (index == 0)
+            if (index == 0) {
                 return condition;
+            }
             index--;
         }
         if (message != null) {
-            if (index == 0)
+            if (index == 0) {
                 return message;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -154,7 +160,7 @@ public class Assert extends JavaStatement implements ExpressionContainer {
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
@@ -188,10 +194,12 @@ public class Assert extends JavaStatement implements ExpressionContainer {
      */
     public int getExpressionCount() {
         int c = 0;
-        if (condition != null)
+        if (condition != null) {
             c++;
-        if (message != null)
+        }
+        if (message != null) {
             c++;
+        }
         return c;
     }
 

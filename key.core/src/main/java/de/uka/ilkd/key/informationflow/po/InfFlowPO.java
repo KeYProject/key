@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po;
 
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+
+import org.key_project.logic.Named;
 
 public interface InfFlowPO extends ProofOblInput {
 
@@ -13,18 +17,18 @@ public interface InfFlowPO extends ProofOblInput {
      *
      * @return the information flow proof obligation variables.
      */
-    public IFProofObligationVars getLeafIFVars();
+    IFProofObligationVars getLeafIFVars();
 
-    public InfFlowProofSymbols getIFSymbols();
+    InfFlowProofSymbols getIFSymbols();
 
-    public void addIFSymbol(Term t);
+    void addIFSymbol(Term t);
 
-    public void addIFSymbol(Named n);
+    void addIFSymbol(Named n);
 
-    public void addLabeledIFSymbol(Term t);
+    void addLabeledIFSymbol(Term t);
 
-    public void addLabeledIFSymbol(Named n);
+    void addLabeledIFSymbol(Named n);
 
-    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols);
+    void unionLabeledIFSymbols(InfFlowProofSymbols symbols);
 
 }

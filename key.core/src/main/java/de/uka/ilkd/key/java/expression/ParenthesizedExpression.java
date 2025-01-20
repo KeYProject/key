@@ -1,18 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.expression;
 
-import java.io.IOException;
-
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Redundant Parentheses. Modelled as a special "identity" unary "infix" operator.
@@ -34,29 +31,6 @@ public class ParenthesizedExpression extends Operator
 
     public ParenthesizedExpression(Expression child) {
         super(child);
-    }
-
-    /**
-     * Returns the number of children of this node.
-     *
-     * @return an int giving the number of children of this node
-     */
-    public int getChildCount() {
-        return (children != null) ? children.size() : 0;
-    }
-
-    /**
-     * Returns the child at the specified index in this node's "virtual" child array
-     *
-     * @param index an index into this node's "virtual" child array
-     * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
-     */
-    public ProgramElement getChildAt(int index) {
-        if (children != null) {
-            return children.get(index);
-        }
-        throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
@@ -103,10 +77,6 @@ public class ParenthesizedExpression extends Operator
      */
     public void visit(Visitor v) {
         v.performActionOnParenthesizedExpression(this);
-    }
-
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        w.printParenthesizedExpression(this);
     }
 
     /**

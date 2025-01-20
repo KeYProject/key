@@ -1,16 +1,21 @@
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.testsuite.basic.analysis;
 
-import junit.framework.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import recoder.abstraction.ClassType;
 import recoder.java.CompilationUnit;
+import recoder.java.declaration.TypeDeclaration;
 import recoder.kit.ProblemReport;
 import recoder.kit.Transformation;
 import recoder.service.ChangeHistory;
 import recoder.testsuite.basic.BasicTestsSuite;
-
-import java.util.List;
 
 /**
  * Erases all compilation units, checks if the model is "empty", undoes the change and checks if the
@@ -19,7 +24,7 @@ import java.util.List;
  * @author AL
  * @since 0.72
  */
-@Ignore
+@Disabled
 public class ModelRebuildTest extends AnalysisReportTest {
 
     @Test
@@ -28,8 +33,8 @@ public class ModelRebuildTest extends AnalysisReportTest {
             public ProblemReport execute() {
                 getChangeHistory().begin(this);
                 List<CompilationUnit> units = getSourceFileRepository().getCompilationUnits();
-                for (int i = 0; i < units.size(); i += 1) {
-                    detach(units.get(i));
+                for (CompilationUnit unit : units) {
+                    detach(unit);
                 }
                 return NO_PROBLEM;
             }
@@ -41,13 +46,13 @@ public class ModelRebuildTest extends AnalysisReportTest {
 
         // model should be cleared now except for byte code and implicitly
         // defined stuff
-        Assert.assertEquals(
+        Assertions.assertEquals(
             BasicTestsSuite.getConfig().getSourceFileRepository().getKnownCompilationUnits().size(),
             0);
         List<ClassType> ctl = BasicTestsSuite.getConfig().getNameInfo().getClassTypes();
         for (int i = ctl.size() - 1; i >= 0; i -= 1) {
-            Assert.assertTrue("Syntax tree left in an emptied model",
-                !(ctl.get(i) instanceof recoder.java.declaration.TypeDeclaration));
+            Assertions.assertFalse(ctl.get(i) instanceof TypeDeclaration,
+                "Syntax tree left in an emptied model");
         }
 
         ch.rollback(clearAll);

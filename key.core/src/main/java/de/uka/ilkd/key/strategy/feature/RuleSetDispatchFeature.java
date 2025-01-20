@@ -1,9 +1,10 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -13,6 +14,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -25,9 +28,11 @@ public class RuleSetDispatchFeature implements Feature {
 
     private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<>();
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (!(app instanceof TacletApp))
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
+        if (!(app instanceof TacletApp)) {
             return NumberRuleAppCost.getZeroCost();
+        }
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
         ImmutableList<RuleSet> ruleSetsOfAppliedTaclet = ((TacletApp) app).taclet().getRuleSets();
@@ -41,7 +46,7 @@ public class RuleSetDispatchFeature implements Feature {
 
             final Feature partialF = rulesetToFeature.get(rs);
             if (partialF != null) {
-                res = res.add(partialF.computeCost(app, pos, goal));
+                res = res.add(partialF.computeCost(app, pos, goal, mState));
                 if (res instanceof TopRuleAppCost) {
                     break;
                 }
@@ -57,10 +62,11 @@ public class RuleSetDispatchFeature implements Feature {
      */
     public void add(RuleSet ruleSet, Feature f) {
         Feature combinedF = rulesetToFeature.get(ruleSet);
-        if (combinedF == null)
+        if (combinedF == null) {
             combinedF = f;
-        else
+        } else {
             combinedF = SumFeature.createSum(combinedF, f);
+        }
 
         rulesetToFeature.put(ruleSet, combinedF);
     }

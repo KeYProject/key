@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.po;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
@@ -21,12 +24,8 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
 
     public Proof createProof(String proofName, Term poTerm, InitConfig proofConfig) {
         final Proof proof = super.createProof(proofName, poTerm, proofConfig);
-        StrategyInfoUndoMethod undo = new StrategyInfoUndoMethod() {
-            @Override
-            public void undo(de.uka.ilkd.key.util.properties.Properties strategyInfos) {
-                strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
-            }
-        };
+        StrategyInfoUndoMethod undo =
+            strategyInfos -> strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
         proof.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true,
             undo);
 

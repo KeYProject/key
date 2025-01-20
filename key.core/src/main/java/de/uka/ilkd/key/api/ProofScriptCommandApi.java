@@ -1,11 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.api;
-
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
+
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
 /**
  * This class provides access to the proof script commands.
@@ -14,12 +17,13 @@ import java.util.ServiceLoader;
  * @version 1 (21.04.17)
  */
 public class ProofScriptCommandApi {
-    private Map<String, ProofScriptCommand> commandMap = new HashMap<>();
+    private final Map<String, ProofScriptCommand<?>> commandMap = new HashMap<>();
 
     public ProofScriptCommandApi() {
         initialize();
     }
 
+    @SuppressWarnings("rawtypes")
     private void initialize() {
         ServiceLoader<ProofScriptCommand> loader = ServiceLoader.load(ProofScriptCommand.class);
         loader.forEach(psc -> commandMap.put(psc.getName(), psc));
@@ -32,7 +36,7 @@ public class ProofScriptCommandApi {
      *
      * @return a collection of proof script commands
      */
-    public Collection<ProofScriptCommand> getScriptCommands() {
+    public Collection<ProofScriptCommand<?>> getScriptCommands() {
         return commandMap.values();
     }
 

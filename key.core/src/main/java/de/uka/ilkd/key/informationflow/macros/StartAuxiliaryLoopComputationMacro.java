@@ -1,6 +1,7 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.informationflow.macros;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
@@ -21,6 +22,10 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+
+import org.key_project.util.collection.ImmutableList;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         implements StartSideProofMacro {
@@ -46,7 +51,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        if (goals == null || goals.head() == null || goals.head().node() == null
+        if (goals == null || goals.isEmpty() || goals.head().node() == null
                 || goals.head().node().parent() == null) {
             return false;
         }
@@ -56,10 +61,9 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         final Services services = proof.getServices();
 
         RuleApp app = goals.head().node().parent().getAppliedRuleApp();
-        if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
+        if (!(app instanceof LoopInvariantBuiltInRuleApp loopInvRuleApp)) {
             return false;
         }
-        final LoopInvariantBuiltInRuleApp loopInvRuleApp = (LoopInvariantBuiltInRuleApp) app;
         final LoopSpecification loopInv = loopInvRuleApp.getSpec();
         final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {
@@ -73,7 +77,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         final Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 
-        return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
+        return posInOcc.subTerm().equalsModProperty(selfComposedExec, RENAMING_TERM_PROPERTY);
     }
 
     @Override

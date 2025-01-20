@@ -1,19 +1,38 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui;
 
-import bibliothek.gui.dock.StackDockStation;
-import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+import java.util.stream.Stream;
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MouseInputAdapter;
+
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.core.Main;
-
 import de.uka.ilkd.key.gui.actions.*;
-
+import de.uka.ilkd.key.gui.actions.useractions.ProofLoadUserAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -26,41 +45,41 @@ import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.plugins.action_history.ActionHistoryExtension;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.settings.FontSizeFacade;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.gui.utilities.LruCached;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
+import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
+
+import org.key_project.logic.Name;
+
+import bibliothek.gui.dock.StackDockStation;
+import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.*;
-import java.util.function.Function;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-import java.util.stream.Stream;
+import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
 @HelpInfo()
 public final class MainWindow extends JFrame {
@@ -69,31 +88,34 @@ public final class MainWindow extends JFrame {
      * size of the tool bar icons
      */
     public static final int TOOLBAR_ICON_SIZE = 16;
+    /**
+     * size of the tab icons
+     */
+    public static final float TAB_ICON_SIZE = 16f;
+    /**
+     * Tooltip for auto mode button.
+     */
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
     private static final long serialVersionUID = 5853419918923902636L;
     private static final String PARA =
         "<p style=\"font-family: lucida;font-size: 12pt;font-weight: bold\">";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainWindow.class);
+    private static final FeatureSettings.Feature FEATURE_BULK_UI_TEST = createFeature(
+        "BULK_UI_TEST",
+        "Activates the 'Run All Proofs' action that allows you to run multiple proofs inside the UI.",
+        false);
 
     private static MainWindow instance = null;
     /**
      * Search bar for Sequent Views.
      */
-    public final SequentViewSearchBar sequentViewSearchBar;
+    private final SequentViewSearchBar sequentViewSearchBar;
     /**
      * SequentView for the current goal
      */
-    public final CurrentGoalView currentGoalView;
-    /**
-     * The menu for the SMT solver options
-     */
-    public final JMenu smtOptions = new JMenu("SMT Solvers...");
+    private final CurrentGoalView currentGoalView;
 
-    /**
-     * the tab bar at the left
-     */
-    // private final MainWindowTabbedPane mainWindowTabbedPane;
     private final GoalList openGoalsView;
     private final ProofTreeView proofTreeView;
     private final InfoView infoView;
@@ -142,8 +164,10 @@ public final class MainWindow extends JFrame {
         new ToggleSequentViewTooltipAction(this);
     private final ToggleSourceViewTooltipAction toggleSourceViewTooltipAction =
         new ToggleSourceViewTooltipAction(this);
+    private final ToggleProofTreeTooltipAction toogleProofTreeTooltipAction =
+        new ToggleProofTreeTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
-    public boolean frozen = false;
+    private boolean frozen = false;
     /**
      *
      */
@@ -215,6 +239,8 @@ public final class MainWindow extends JFrame {
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
+    private SelectionBackAction selectionBackAction;
+    private SelectionForwardAction selectionForwardAction;
 
     private SingleCDockable dockProofListView;
     private SingleCDockable dockSourceView;
@@ -237,7 +263,7 @@ public final class MainWindow extends JFrame {
             return noSolverSelected;
         }
         for (SolverType type : types) {
-            builder.append(type.getName() + ", ");
+            builder.append(type.getName()).append(", ");
         }
         builder.delete(builder.length() - 2, builder.length());
         SolverTypeCollection chosenSolvers =
@@ -250,12 +276,16 @@ public final class MainWindow extends JFrame {
      */
     private boolean disableCurrentGoalView = false;
 
+    private final LruCached<HTMLSyntaxHighlighter.Args, String> highlightCache =
+        new LruCached<>(HTMLSyntaxHighlighter.Args::run);
+
     /*
      * This class should only be instantiated once!
      */
     private MainWindow() {
-        getRootPane().getInputMap().put(HelpFacade.ACTION_OPEN_HELP.getAcceleratorKey(),
-            HelpFacade.ACTION_OPEN_HELP);
+        InputMap inputMap =
+            getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        inputMap.put(HelpFacade.ACTION_OPEN_HELP.getAcceleratorKey(), HelpFacade.ACTION_OPEN_HELP);
         getRootPane().getActionMap().put(HelpFacade.ACTION_OPEN_HELP, HelpFacade.ACTION_OPEN_HELP);
 
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
@@ -272,13 +302,18 @@ public final class MainWindow extends JFrame {
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);
+        KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.preInit(this, mediator));
+
+        Config.DEFAULT.setDefaultFonts();
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        FontSizeFacade.resizeFonts(vs.getUIFontSizeFactor());
+
         termLabelMenu = new TermLabelMenu(this);
         currentGoalView = new CurrentGoalView(this);
         emptySequent = new EmptySequent(this);
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
         proofListView = new JScrollPane();
         autoModeAction = new AutoModeAction(this);
-        // mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
         sourceViewFrame = new SourceViewFrame(this);
         proofList = new TaskTree(mediator);
@@ -300,6 +335,12 @@ public final class MainWindow extends JFrame {
             KeYGuiExtension.KeyboardShortcuts.MAIN_WINDOW);
 
         KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.init(this, mediator));
+
+        DockingHelper.focus(this, ProofTreeView.class);
+    }
+
+    public LruCached<HTMLSyntaxHighlighter.Args, String> getHighlightCache() {
+        return highlightCache;
     }
 
     /**
@@ -353,6 +394,15 @@ public final class MainWindow extends JFrame {
             LOGGER.error("Use the --help option for more command line options.");
             System.exit(-1);
         }
+        // always construct MainWindow on event dispatch thread
+        if (!EventQueue.isDispatchThread()) {
+            try {
+                SwingUtilities.invokeAndWait(MainWindow::getInstance);
+            } catch (InterruptedException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+            return instance;
+        }
         if (instance == null) {
             instance = new MainWindow();
             if (ensureIsVisible) {
@@ -402,12 +452,16 @@ public final class MainWindow extends JFrame {
     }
 
     /**
-     * Tries to set the system look and feel if this option is activated.
+     * Tries to set the configured look and feel if the option is activated.
      */
     private void setLaF() {
         try {
-            if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().useSystemLaF()) {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            String className =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getLookAndFeel();
+            // only set look and feel if configured
+            // (previous KeY versions stored [no value set] as "null")
+            if (className != null && !className.equals("null")) {
+                UIManager.setLookAndFeel(className);
 
                 // Workarounds for GTK+
                 // TODO: check whether they apply to other LaFs
@@ -417,7 +471,7 @@ public final class MainWindow extends JFrame {
                 SwingUtilities.updateComponentTreeUI(this);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("failed to set look and feel ", e);
         }
     }
 
@@ -469,7 +523,7 @@ public final class MainWindow extends JFrame {
         // FIXME do this NOT in layout of GUI
         // minimize interaction
         final boolean stupidMode =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getTacletFilter();
         userInterface.getProofControl().setMinimizeInteraction(stupidMode);
 
         // set up actions
@@ -493,8 +547,13 @@ public final class MainWindow extends JFrame {
         unicodeToggleAction = new UnicodeToggleAction(this);
         goalSelectAboveAction = new GoalSelectAboveAction(this);
         goalSelectBelowAction = new GoalSelectBelowAction(this);
-
-        Config.DEFAULT.setDefaultFonts();
+        SelectionHistory history = new SelectionHistory(mediator);
+        selectionBackAction = new SelectionBackAction(this, history);
+        selectionForwardAction = new SelectionForwardAction(this, history);
+        history.addChangeListener(selectionBackAction);
+        history.addChangeListener(selectionForwardAction);
+        selectionBackAction.update();
+        selectionForwardAction.update();
 
         // create menubar
         JMenuBar bar = createMenuBar();
@@ -508,6 +567,7 @@ public final class MainWindow extends JFrame {
         toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
         toolBarPanel.add(controlToolBar);
         toolBarPanel.add(fileOpToolBar);
+        toolBarPanel.add(createNavigationToolBar());
 
         KeYGuiExtensionFacade.createToolbars(this).forEach(toolBarPanel::add);
 
@@ -550,7 +610,7 @@ public final class MainWindow extends JFrame {
         Stream<TabPanel> defaultPanels =
             Stream.of(proofTreeView, infoView, strategySelectionView, openGoalsView);
         Stream.concat(defaultPanels, extensionPanels).map(DockingHelper::createSingleDock)
-                .forEach(it -> dockControl.addDockable(it));
+                .forEach(dockControl::addDockable);
         dockControl.addDockable(dockProofListView);
         dockControl.addDockable(dockSequent);
         dockControl.addDockable(dockSourceView);
@@ -560,6 +620,8 @@ public final class MainWindow extends JFrame {
 
         dockSourceView.setVisible(true);
 
+        KeYGuiExtensionFacade.getAllPanels(this)
+                .forEach(it -> DockingHelper.addLeftPanel(it.getClass().getName()));
         DockingHelper.restoreFactoryDefault(this);
 
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA
@@ -577,18 +639,9 @@ public final class MainWindow extends JFrame {
         loadPreferences(this);
     }
 
-    /*
-     * private JToggleButton createHeatmapToggle() { return new JToggleButton(new
-     * HeatmapToggleAction(this)); }
-     */
-
-    /*
-     * private JButton createHeatmapMenuOpener() { return new JButton(new
-     * HeatmapSettingsAction(this)); }
-     */
-
     private JToolBar createFileOpsToolBar() {
         JToolBar fileOperations = new JToolBar("File Operations");
+        fileOperations.setFloatable(false);
         fileOperations.add(openFileAction);
         fileOperations.add(openMostRecentFileAction);
         fileOperations.add(editMostRecentFileAction);
@@ -602,7 +655,7 @@ public final class MainWindow extends JFrame {
 
     private JToolBar createProofControlToolBar() {
         JToolBar toolBar = new JToolBar("Proof Control");
-        toolBar.setFloatable(true);
+        toolBar.setFloatable(false);
         toolBar.setRollover(true);
 
         toolBar.add(createWiderAutoModeButton());
@@ -615,9 +668,23 @@ public final class MainWindow extends JFrame {
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
+        var act = new ActionHistoryExtension(this, mediator);
+        toolBar.add(act.getUndoButton().getAction());
+        toolBar.add(act.getUndoUptoButton());
         toolBar.addSeparator();
-        // toolBar.add(createHeatmapToggle());
-        // toolBar.add(createHeatmapMenuOpener());
+
+        return toolBar;
+    }
+
+    private JToolBar createNavigationToolBar() {
+        JToolBar toolBar = new JToolBar("Selection Navigation");
+        toolBar.setFloatable(false);
+        toolBar.setRollover(true);
+
+        SelectionHistory history = new SelectionHistory(mediator);
+        toolBar.add(selectionBackAction);
+        toolBar.add(selectionForwardAction);
+        toolBar.addSeparator();
 
         return toolBar;
     }
@@ -649,8 +716,7 @@ public final class MainWindow extends JFrame {
          */
         smtComponent.addListener(e -> {
             DropdownSelectionButton but = (DropdownSelectionButton) e.getSource();
-            if (but.getAction() instanceof SMTInvokeAction) {
-                SMTInvokeAction action = (SMTInvokeAction) but.getAction();
+            if (but.getAction() instanceof SMTInvokeAction action) {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
                         .setActiveSolverUnion(action.getSolverUnion());
             }
@@ -701,7 +767,7 @@ public final class MainWindow extends JFrame {
     /**
      * @return the status line object
      */
-    protected MainStatusLine getStatusLine() {
+    MainStatusLine getStatusLine() {
         return statusLine;
     }
 
@@ -717,12 +783,15 @@ public final class MainWindow extends JFrame {
      * Make the status line display a standard message, make progress bar and abort button invisible
      */
     public void setStandardStatusLine() {
-        ThreadUtilities.invokeOnEventQueue(new Runnable() {
-            @Override
-            public void run() {
-                setStandardStatusLineImmediately();
-            }
-        });
+        ThreadUtilities.invokeOnEventQueue(this::setStandardStatusLineImmediately);
+    }
+
+    /**
+     * Hide the progress bar if it is currently visible.
+     */
+    public void hideStatusProgress() {
+        statusLine.setProgressPanelVisible(false);
+        getStatusLine().setProgress(0);
     }
 
     private void setStatusLineImmediately(String str, int max) {
@@ -746,14 +815,9 @@ public final class MainWindow extends JFrame {
         ThreadUtilities.invokeOnEventQueue(() -> setStatusLineImmediately(str, max));
     }
 
-    @Deprecated
-    public void selectFirstTab() {
-        // weigl disable: this.mainWindowTabbedPane.setSelectedIndex(0);
-    }
-
     /**
-     * Freeze the main window by blocking all input events, except those for the status line (i.e.
-     * the abort button within the status line)
+     * Freeze the main window by blocking all input events, except those for the toolbar (i.e.
+     * the abort button within the toolbar)
      */
     public void freezeExceptAutoModeButton() {
         if (!frozen) {
@@ -772,15 +836,27 @@ public final class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * Update the sequent view.
+     */
     public void makePrettyView() {
         if (getMediator().ensureProofLoaded()) {
             getMediator().getNotationInfo().refresh(mediator.getServices());
-            getMediator().getSelectedProof().fireProofGoalsChanged();
         }
+        SwingUtilities.invokeLater(this::updateSequentView);
     }
 
     private void addToProofList(de.uka.ilkd.key.proof.ProofAggregate plist) {
         proofList.addProof(plist);
+        // TODO/Check: the code below emulates phantom actions. Check if this can be solved
+        // differently
+        // in particular as this side-effect is unexpected for a caller of the method
+        // Moved it from the super class to here, as it is only the windowed version and not the
+        // console ui that
+        // needs it.
+        for (Proof proof : plist.getProofs()) {
+            new ProofLoadUserAction(getMediator(), proof).actionPerformed(null);
+        }
         // GUI
         proofList.setSize(proofList.getPreferredSize());
         proofListView.setViewportView(proofList);
@@ -793,7 +869,7 @@ public final class MainWindow extends JFrame {
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(createFileMenu());
         menuBar.add(createViewMenu());
-        menuBar.add(createProofMenu());
+        menuBar.add(createProofMenu(null));
         menuBar.add(createOptionsMenu());
         KeYGuiExtensionFacade.addExtensionsToMainMenu(this, menuBar);
         menuBar.add(Box.createHorizontalGlue());
@@ -824,10 +900,20 @@ public final class MainWindow extends JFrame {
         submenu.add(loadUserDefinedTacletsForProvingAction);
         submenu.add(loadKeYTaclets);
         submenu.add(lemmaGenerationBatchModeAction);
-        if (Main.isExperimentalMode()) {
+
+        {
             RunAllProofsAction runAllProofsAction = new RunAllProofsAction(this);
-            submenu.add(runAllProofsAction);
+            var rapItem = new JMenuItem(runAllProofsAction);
+            final Consumer<Boolean> showRAPAction = active -> {
+                if (active) {
+                    submenu.add(rapItem);
+                } else {
+                    submenu.remove(rapItem);
+                }
+            };
+            FeatureSettings.onAndActivate(FEATURE_BULK_UI_TEST, showRAPAction);
         }
+
         fileMenu.addSeparator();
         fileMenu.add(recentFileMenu.getMenu());
         fileMenu.addSeparator();
@@ -839,23 +925,6 @@ public final class MainWindow extends JFrame {
         JMenu view = new JMenu("View");
         view.setMnemonic(KeyEvent.VK_V);
 
-        JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
-        laf.setToolTipText("If checked KeY tries to appear in the look and feel of your "
-            + "window manager, if not in the default Java LaF (aka Metal).");
-        final de.uka.ilkd.key.settings.ViewSettings vs =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-        laf.setSelected(vs.useSystemLaF());
-        laf.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                vs.setUseSystemLaF(((JCheckBoxMenuItem) e.getSource()).isSelected());
-                // TODO: inform that this requires a restart
-                LOGGER.warn("Info: Look and feel changed for next start of KeY.");
-            }
-        });
-        // view.add(laf); // uncomment this line to include the option in the menu
-
-
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
         view.add(new JCheckBoxMenuItem(new SyntaxHighlightingToggleAction(this)));
@@ -863,6 +932,7 @@ public final class MainWindow extends JFrame {
         view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
         view.add(new JCheckBoxMenuItem(toggleSequentViewTooltipAction));
         view.add(new JCheckBoxMenuItem(toggleSourceViewTooltipAction));
+        view.add(new JCheckBoxMenuItem(toogleProofTreeTooltipAction));
 
         view.addSeparator();
         {
@@ -879,9 +949,10 @@ public final class MainWindow extends JFrame {
 
         view.add(createSelectionMenu());
 
-        // JMenuItem hmItem = new JMenuItem("Heatmap Options");
-        // hmItem.addActionListener(new HeatmapSettingsAction(this));
-        // view.add(hmItem);
+        view.addSeparator();
+        view.add(selectionBackAction);
+        view.add(selectionForwardAction);
+        view.addSeparator();
 
         return view;
     }
@@ -893,54 +964,66 @@ public final class MainWindow extends JFrame {
         return goalSelection;
     }
 
-    private JMenu createProofMenu() {
+    /**
+     * Create the proof menu.
+     *
+     * @param selected a specific proof that the menu should work on, may be null
+     * @return the menu
+     */
+    public JMenu createProofMenu(Proof selected) {
         JMenu proof = new JMenu("Proof");
         proof.setMnemonic(KeyEvent.VK_P);
 
-        proof.add(autoModeAction);
-        GoalBackAction goalBack = new GoalBackAction(this, true);
-        proof.addMenuListener(new MenuListener() {
-            @Override
-            public void menuSelected(MenuEvent e) {
-                /*
-                 * we use this MenuListener to update the name only if the menu is shown since it
-                 * would be slower to update the name (which means scanning all open and closed
-                 * goals) at every selection change (via the KeYSelectionListener in GoalBackAction)
-                 */
-                goalBack.updateName();
-            }
+        if (selected == null) {
+            proof.add(autoModeAction);
+            GoalBackAction goalBack = new GoalBackAction(this, true);
+            proof.addMenuListener(new MenuListener() {
+                @Override
+                public void menuSelected(MenuEvent e) {
+                    /*
+                     * we use this MenuListener to update the name only if the menu is shown since
+                     * it
+                     * would be slower to update the name (which means scanning all open and closed
+                     * goals) at every selection change (via the KeYSelectionListener in
+                     * GoalBackAction)
+                     */
+                    goalBack.updateName();
+                }
 
-            @Override
-            public void menuDeselected(MenuEvent e) {
-            }
+                @Override
+                public void menuDeselected(MenuEvent e) {
+                }
 
-            @Override
-            public void menuCanceled(MenuEvent e) {
-            }
-        });
-        proof.add(goalBack);
-        proof.add(new PruneProofAction(this));
-        proof.add(new AbandonTaskAction(this));
-        proof.addSeparator();
-        proof.add(new SearchInProofTreeAction(this));
-        proof.add(new SearchInSequentAction(this));
-        proof.add(new SearchNextAction(this));
-        proof.add(new SearchPreviousAction(this));
-        {
+                @Override
+                public void menuCanceled(MenuEvent e) {
+                }
+            });
+            proof.add(goalBack);
+            proof.add(new PruneProofAction(this));
+        }
+        proof.add(new AbandonTaskAction(this, selected));
+        if (selected == null) {
+            proof.addSeparator();
+            proof.add(new SearchInProofTreeAction(this));
+            proof.add(new SearchInSequentAction(this, sequentViewSearchBar));
+            proof.add(new SearchNextAction(this, sequentViewSearchBar));
+            proof.add(new SearchPreviousAction(this, sequentViewSearchBar));
             JMenu searchModeMenu = new JMenu("Search Mode");
 
             for (SequentViewSearchBar.SearchMode mode : SequentViewSearchBar.SearchMode.values()) {
-                searchModeMenu.add(new SearchModeChangeAction(this, mode));
+                searchModeMenu.add(new SearchModeChangeAction(this, sequentViewSearchBar, mode));
             }
 
             proof.add(searchModeMenu);
         }
         proof.addSeparator();
-        proof.add(new ShowUsedContractsAction(this));
-        proof.add(new ShowActiveTactletOptionsAction(this));
+        proof.add(new ShowUsedContractsAction(this, selected));
+        // We merge the old window to view the active taclet options with the window for all active
+        // settings
+        // proof.add(new ShowActiveTactletOptionsAction(this, showActiveSettingsAction));
         proof.add(showActiveSettingsAction);
-        proof.add(new ShowProofStatistics(this));
-        proof.add(new ShowKnownTypesAction(this));
+        proof.add(new ShowProofStatistics(this, selected));
+        proof.add(new ShowKnownTypesAction(this, selected));
         return proof;
     }
 
@@ -948,8 +1031,9 @@ public final class MainWindow extends JFrame {
         JMenu options = new JMenu("Options");
         options.setMnemonic(KeyEvent.VK_O);
 
-        options.add(SettingsManager.getInstance().getActionShowSettings(this));
-        options.add(new TacletOptionsAction(this));
+        options.add(SettingsManager.getActionShowSettings(this));
+        // remove since taclet options should only be set through the general settings dialog
+        // options.add(new TacletOptionsAction(this));
         options.add(new SMTOptionsAction(this));
         // options.add(setupSpeclangMenu()); // legacy since only JML supported
         options.addSeparator();
@@ -960,7 +1044,6 @@ public final class MainWindow extends JFrame {
         options.add(new JCheckBoxMenuItem(new EnsureSourceConsistencyToggleAction(this)));
 
         return options;
-
     }
 
     private JMenu createHelpMenu() {
@@ -981,9 +1064,9 @@ public final class MainWindow extends JFrame {
      */
     public void updateSMTSelectMenu() {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE
-                .getSMTSettings().getUsableSolverUnions(Main.isExperimentalMode());
+                .getSMTSettings().getUsableSolverUnions();
 
-        if (solverUnions == null || solverUnions.isEmpty()) {
+        if (solverUnions.isEmpty()) {
             updateDPSelectionMenu();
         } else {
             updateDPSelectionMenu(solverUnions);
@@ -1042,16 +1125,13 @@ public final class MainWindow extends JFrame {
             selectAll.putClientProperty("CheckBoxMenuItem.doNotCloseOnMouseClick", Boolean.TRUE);
             // The new selection listener checking whether all the current items or none of them
             // are selected and changing the selection status of selectAll accordingly.
-            selectAllListener = new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    if (smtComponent.getSelectedItems().length == actions.length
-                            && !selectAll.isSelected()) {
-                        selectAll.setSelected(true);
-                    } else if (smtComponent.getSelectedItems().length == 0
-                            && selectAll.isSelected()) {
-                        selectAll.setSelected(false);
-                    }
+            selectAllListener = e -> {
+                if (smtComponent.getSelectedItems().length == actions.length
+                        && !selectAll.isSelected()) {
+                    selectAll.setSelected(true);
+                } else if (smtComponent.getSelectedItems().length == 0
+                        && selectAll.isSelected()) {
+                    selectAll.setSelected(false);
                 }
             };
             smtComponent.addListener(selectAllListener);
@@ -1071,28 +1151,22 @@ public final class MainWindow extends JFrame {
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
         JRadioButtonMenuItem jmlButton =
-            new JRadioButtonMenuItem("Source File Comments Are JML", gs.useJML());
+            new JRadioButtonMenuItem("Source File Comments Are JML", gs.isUseJML());
         result.add(jmlButton);
         group.add(jmlButton);
         jmlButton.setIcon(IconFactory.jmlLogo(15));
-        jmlButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-                gs.setUseJML(true);
-            }
+        jmlButton.addActionListener(e -> {
+            GeneralSettings gs12 = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+            gs12.setUseJML(true);
         });
 
         JRadioButtonMenuItem noneButton =
-            new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.useJML());
+            new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.isUseJML());
         result.add(noneButton);
         group.add(noneButton);
-        noneButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-                gs.setUseJML(false);
-            }
+        noneButton.addActionListener(e -> {
+            GeneralSettings gs1 = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+            gs1.setUseJML(false);
         });
 
         return result;
@@ -1110,33 +1184,22 @@ public final class MainWindow extends JFrame {
     }
 
     public void addProblem(final de.uka.ilkd.key.proof.ProofAggregate plist) {
-        Runnable guiUpdater = new Runnable() {
-            @Override
-            public void run() {
-                disableCurrentGoalView = true;
-                addToProofList(plist);
-                setUpNewProof(plist.getFirstProof());
-                disableCurrentGoalView = false;
-                updateSequentView();
-            }
+        Runnable guiUpdater = () -> {
+            disableCurrentGoalView = true;
+            addToProofList(plist);
+            getMediator().getSelectionModel().setSelectedProof(plist.getFirstProof());
+            disableCurrentGoalView = false;
         };
         ThreadUtilities.invokeOnEventQueue(guiUpdater);
-    }
-
-    private Proof setUpNewProof(Proof proof) {
-        getMediator().setProof(proof);
-        return proof;
     }
 
     /*
      * Updates the sequent displayed in the main frame.
      */
     private synchronized void updateSequentView() {
-
         if (disableCurrentGoalView) {
             return;
         }
-
         final SequentView newSequentView;
 
         // if this is set we can skip calls to printSequent, since it is invoked in setSequentView
@@ -1154,20 +1217,20 @@ public final class MainWindow extends JFrame {
                 }
                 newSequentView = currentGoalView;
             } else {
-                newSequentView = new InnerNodeView(getMediator().getSelectedNode(), this);
+                Sequent seq = getMediator().getSelectionModel().getSelectedSequent();
+                RuleApp ruleApp = getMediator().getSelectionModel().getSelectedRuleApp();
+                newSequentView = new InnerNodeView(getMediator().getSelectedProof(),
+                    getMediator().getSelectedNode(), ruleApp, seq, this);
                 if (!isPrintRunImmediately) {
                     newSequentView.printSequent();
                 }
             }
         }
 
-        Runnable sequentUpdater = new Runnable() {
-            @Override
-            public void run() {
-                mainFrame.setContent(newSequentView);
-                // always does printSequent if on the event thread
-                sequentViewSearchBar.setSequentView(newSequentView);
-            }
+        Runnable sequentUpdater = () -> {
+            mainFrame.setSequentView(newSequentView);
+            // always does printSequent if on the event thread
+            sequentViewSearchBar.setSequentView(newSequentView);
         };
 
         if (isPrintRunImmediately) {
@@ -1179,7 +1242,7 @@ public final class MainWindow extends JFrame {
                 // such that the entire app needs to be closed. Just print
                 // the exception and pretend everything was good. (Like would
                 // happen when incoked on the event queue.
-                ex.printStackTrace();
+                LOGGER.warn("Sequent updater exception", ex);
             }
         } else {
             SwingUtilities.invokeLater(sequentUpdater);
@@ -1187,7 +1250,26 @@ public final class MainWindow extends JFrame {
 
     }
 
+    /**
+     * Scroll the sequent view to the specified y coordinate.
+     *
+     * @param y coordinate in pixels
+     */
+    public void scrollTo(int y) {
+        mainFrame.scrollTo(y);
+    }
+
+    /**
+     * Get the main frame for access to the sequent view
+     *
+     * @return the container for this main window.
+     */
+    public MainFrame getMainFrame() {
+        return mainFrame;
+    }
+
     void displayResults(String message) {
+        LOGGER.debug("displaying results: {}", message);
         setStatusLine(message);
     }
 
@@ -1259,7 +1341,7 @@ public final class MainWindow extends JFrame {
      * @param component the non-null component whose preferences are to be set
      * @see PreferenceSaver
      */
-    public final void loadPreferences(Component component) {
+    public void loadPreferences(Component component) {
         prefSaver.load(component);
     }
 
@@ -1270,12 +1352,12 @@ public final class MainWindow extends JFrame {
      *
      * @see PreferenceSaver
      */
-    public final void syncPreferences() {
+    public void syncPreferences() {
         try {
             prefSaver.flush();
         } catch (BackingStoreException e) {
             // it is not tragic if the preferences cannot be stored.
-            e.printStackTrace();
+            LOGGER.warn("Failed to save preferences", e);
         }
     }
 
@@ -1315,7 +1397,7 @@ public final class MainWindow extends JFrame {
      *
      * @see RecentFileMenu#addRecentFile(String)
      */
-    public void addRecentFile(@Nonnull String absolutePath) {
+    public void addRecentFile(@NonNull String absolutePath) {
         recentFileMenu.addRecentFile(absolutePath);
     }
 
@@ -1366,14 +1448,21 @@ public final class MainWindow extends JFrame {
     }
 
     /**
-     * Defines if talcet infos are shown or not.
-     * <p>
-     * Used by the Eclipse integration.
+     * Defines if taclet infos are shown or not.
      *
      * @param show {@code true} show taclet infos, {@code false} hide taclet infos.
      */
     public void setShowTacletInfo(boolean show) {
-        proofTreeView.tacletInfoToggle.setSelected(show);
+        mainFrame.setShowTacletInfo(show);
+    }
+
+    public boolean isShowTacletInfo() {
+        return mainFrame.isShowTacletInfo();
+    }
+
+    public void setShowProofTreeTooltip(Object source) {
+        toogleProofTreeTooltipAction
+                .actionPerformed(new ActionEvent(proofTreeView, ActionEvent.ACTION_PERFORMED, ""));
     }
 
     public AutoModeAction getAutoModeAction() {
@@ -1394,6 +1483,10 @@ public final class MainWindow extends JFrame {
 
     public SourceViewFrame getSourceViewFrame() {
         return sourceViewFrame;
+    }
+
+    public CurrentGoalView getCurrentGoalView() {
+        return currentGoalView;
     }
 
     /**
@@ -1444,8 +1537,8 @@ public final class MainWindow extends JFrame {
      */
     private static class GlassPaneListener extends MouseInputAdapter {
         Component currentComponent = null;
-        Component glassPane;
-        Container contentPane;
+        final Component glassPane;
+        final Container contentPane;
 
         public GlassPaneListener(Component glassPane, Container contentPane) {
             this.glassPane = glassPane;
@@ -1557,20 +1650,20 @@ public final class MainWindow extends JFrame {
 
         private void setToolBarDisabled() {
             assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-            doNotReenable = new LinkedHashSet<Component>();
+            doNotReenable = new LinkedHashSet<>();
             Component[] cs = controlToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!cs[i].isEnabled()) {
-                    doNotReenable.add(cs[i]);
+            for (Component component : cs) {
+                if (!component.isEnabled()) {
+                    doNotReenable.add(component);
                 }
-                cs[i].setEnabled(false);
+                component.setEnabled(false);
             }
             cs = fileOpToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!cs[i].isEnabled()) {
-                    doNotReenable.add(cs[i]);
+            for (Component c : cs) {
+                if (!c.isEnabled()) {
+                    doNotReenable.add(c);
                 }
-                cs[i].setEnabled(false);
+                c.setEnabled(false);
             }
         }
 
@@ -1583,15 +1676,15 @@ public final class MainWindow extends JFrame {
             }
 
             Component[] cs = controlToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!doNotReenable.contains(cs[i])) {
-                    cs[i].setEnabled(true);
+            for (Component component : cs) {
+                if (!doNotReenable.contains(component)) {
+                    component.setEnabled(true);
                 }
             }
             cs = fileOpToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!doNotReenable.contains(cs[i])) {
-                    cs[i].setEnabled(true);
+            for (Component c : cs) {
+                if (!doNotReenable.contains(c)) {
+                    c.setEnabled(true);
                 }
             }
 
@@ -1600,7 +1693,6 @@ public final class MainWindow extends JFrame {
 
         @Override
         public void modalDialogOpened(EventObject e) {
-
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // disable all elements except the sequent window (drag'n'drop !) ...
                 enableMenuBar(MainWindow.this.getJMenuBar(), false);
@@ -1638,7 +1730,8 @@ public final class MainWindow extends JFrame {
 
     }
 
-    class MainProofListener implements AutoModeListener, KeYSelectionListener, SettingsListener {
+    class MainProofListener
+            implements AutoModeListener, KeYSelectionListener, PropertyChangeListener {
 
         Proof proof = null;
 
@@ -1647,10 +1740,10 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
-            if (getMediator().isInAutoMode()) {
+            if (disableCurrentGoalView) {
                 return;
             }
-            updateSequentView();
+            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
         }
 
         /**
@@ -1658,18 +1751,20 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void selectedProofChanged(KeYSelectionEvent e) {
+            if (disableCurrentGoalView) {
+                return;
+            }
             LOGGER.debug("Main: initialize with new proof");
 
             if (proof != null && !proof.isDisposed()) {
-                proof.getSettings().getStrategySettings().removeSettingsListener(this);
+                proof.getSettings().getStrategySettings().removePropertyChangeListener(this);
             }
             proof = e.getSource().getSelectedProof();
             if (proof != null) {
-                proof.getSettings().getStrategySettings().addSettingsListener(this);
+                proof.getSettings().getStrategySettings().removePropertyChangeListener(this);
             }
 
             disableCurrentGoalView = false;
-            updateSequentView();
             makePrettyView();
         }
 
@@ -1678,7 +1773,7 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void autoModeStarted(ProofEvent e) {
-            LOGGER.info("Automode started");
+            LOGGER.debug("Automode started");
             disableCurrentGoalView = true;
             getMediator().removeKeYSelectionListener(proofListener);
             freezeExceptAutoModeButton();
@@ -1689,21 +1784,15 @@ public final class MainWindow extends JFrame {
          */
         @Override
         public synchronized void autoModeStopped(ProofEvent e) {
-            if (Debug.ENABLE_DEBUG) {
-                LOGGER.info("Automode stopped");
-            }
+            LOGGER.debug("Automode stopped");
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
-            updateSequentView();
             getMediator().addKeYSelectionListenerChecked(proofListener);
         }
 
-        /**
-         * invoked when the strategy of a proof has been changed
-         */
         @Override
-        public synchronized void settingsChanged(EventObject e) {
-            if (proof.getSettings().getStrategySettings() == e.getSource()) {
+        public synchronized void propertyChange(PropertyChangeEvent evt) {
+            if (proof.getSettings().getStrategySettings() == evt.getSource()) {
                 // updateAutoModeConfigButton();
             }
         }
@@ -1733,4 +1822,12 @@ public final class MainWindow extends JFrame {
 
     }
 
+    /**
+     * Update other UI components based on the new sequent view.
+     *
+     * @param sequentView the sequent view to show
+     */
+    public void setSequentView(SequentView sequentView) {
+        sequentViewSearchBar.setSequentView(sequentView);
+    }
 }

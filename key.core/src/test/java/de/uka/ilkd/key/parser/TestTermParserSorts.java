@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
+import java.io.IOException;
+
 import de.uka.ilkd.key.logic.Term;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -55,10 +59,10 @@ public class TestTermParserSorts extends AbstractTestTermParser {
      * The KeY type int has several possible corresponding KeYJavaTypes. Those types are: char,
      * byte, short, int, long
      *
-     * This test checks if the parser finds a suitable function, if a query with integer arguments
+     * This test checks if the parser finds a suitable function if a query with integer arguments
      * is provided.
      *
-     * Sometimes several functions are available that the parser may select. For example a query of
+     * Sometimes several functions are available that the parser may select. For example, a query of
      * the form "a.query(0)" with Java functions available that have the following signatures:
      *
      * public int query(int i); public int query(byte b);

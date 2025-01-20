@@ -1,13 +1,15 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.ModelException;
 import recoder.abstraction.ClassType;
 import recoder.java.Import;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Exception indicating that a particular import is ambiguous.
@@ -68,7 +70,7 @@ public class AmbiguousImportException extends ModelException {
      * Returns the possible imported class types.
      */
     public List<ClassType> getChoices() {
-        List<ClassType> list = new ArrayList<ClassType>(2);
+        List<ClassType> list = new ArrayList<>(2);
         list.add(version1);
         list.add(version2);
         return list;

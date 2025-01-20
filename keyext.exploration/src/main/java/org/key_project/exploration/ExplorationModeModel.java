@@ -1,4 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
@@ -6,12 +15,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-import javax.annotation.Nonnull;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The central place to store global information for Proof Exploration.
@@ -35,7 +39,7 @@ public class ExplorationModeModel {
     /**
      * Mode which rules to use in actions mode Default: whole application is shown
      */
-    private @Nonnull ExplorationState explorationTacletAppState = ExplorationState.WHOLE_APP;
+    private @NonNull ExplorationState explorationTacletAppState = ExplorationState.WHOLE_APP;
 
 
     /**
@@ -47,7 +51,7 @@ public class ExplorationModeModel {
     /**
      * Get the state which kind of taclet to use
      */
-    public @Nonnull ExplorationState getExplorationTacletAppState() {
+    public @NonNull ExplorationState getExplorationTacletAppState() {
         return explorationTacletAppState;
     }
 

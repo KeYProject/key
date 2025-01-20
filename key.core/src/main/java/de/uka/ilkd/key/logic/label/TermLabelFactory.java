@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
@@ -17,7 +20,7 @@ import de.uka.ilkd.key.logic.TermServices;
  * the same name.
  *
  * <p>
- * Please see information in {@link TermLabels} on how to introduce new label types.
+ * Please see information in {@link TermLabel}s on how to introduce new label types.
  * </p>
  *
  * @param <T> the type of term labels which are returned by this factory.
@@ -41,5 +44,5 @@ public interface TermLabelFactory<T extends TermLabel> {
      *
      * @throws TermLabelException if the parameters were illegally formatted
      */
-    public T parseInstance(List<String> arguments, TermServices services) throws TermLabelException;
+    T parseInstance(List<String> arguments, TermServices services) throws TermLabelException;
 }

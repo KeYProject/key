@@ -1,4 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang.jml;
+
+import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -7,19 +14,25 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,31 +59,31 @@ public class TestJMLTranslator {
             atPres.put(services.getTypeConverter().getHeapLDT().getHeap(),
                 TB.var(TB.heapAtPreVar("heapAtPre", false)));
         }
-        jmlIO = new JmlIO().services(services).classType(testClassType)
+        jmlIO = new JmlIO(services).classType(testClassType)
+                .specMathMode(JMLInfoExtractor.getSpecMathModeOrDefault(testClassType))
                 .selfVar(buildSelfVarAsProgVar());
     }
 
-    protected ProgramVariable buildSelfVarAsProgVar() {
+    protected LocationVariable buildSelfVarAsProgVar() {
         ProgramElementName classPEN = new ProgramElementName("self");
         return new LocationVariable(classPEN, testClassType);
     }
 
 
-    protected ProgramVariable buildExcVar() {
+    protected LocationVariable buildExcVar() {
         KeYJavaType excType = javaInfo.getTypeByClassName("java.lang.Throwable");
         ProgramElementName excPEN = new ProgramElementName("exc");
         return new LocationVariable(excPEN, excType);
     }
 
 
-    protected ProgramVariable buildResultVar(IProgramMethod pm) {
+    protected LocationVariable buildResultVar(IProgramMethod pm) {
         ProgramElementName resPEN = new ProgramElementName("result");
         return new LocationVariable(resPEN, pm.getReturnType());
     }
 
 
     private boolean termContains(Term t, Term sub) {
-
         for (int i = 0; i < t.arity(); i++) {
             if (t.sub(i).equals(sub) || termContains(t.sub(i), sub)) {
                 return true;
@@ -106,7 +119,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testSelfVar() {
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        LocationVariable selfVar = buildSelfVarAsProgVar();
         Term result = jmlIO.selfVar(selfVar).parseExpression("this");
         assertNotNull(result);
         assertEquals(result, TB.var(selfVar));
@@ -115,7 +128,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testLogicalExpression() {
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        LocationVariable selfVar = buildSelfVarAsProgVar();
         Term result = jmlIO.parseExpression("(b <= s &&  i > 5) ==> this != instance");
         assertNotNull(result);
         assertEquals(Junctor.IMP, result.op());
@@ -136,7 +149,7 @@ public class TestJMLTranslator {
     @Test
     public void testParenExpression() {
         ProgramElementName classPEN = new ProgramElementName("o");
-        ProgramVariable var = new LocationVariable(classPEN, testClassType);
+        LocationVariable var = new LocationVariable(classPEN, testClassType);
         jmlIO.parameters(ImmutableSLList.singleton(var)).parseExpression("(o.i)");
     }
 
@@ -172,8 +185,11 @@ public class TestJMLTranslator {
             services.getNamespaces().sorts().lookup(new Name("int")));
         Term expected = TB.all(i, TB.imp(TB.inInt(TB.var(i)),
             TB.and(TB.leq(TB.zTerm("0"), TB.var(i)), TB.leq(TB.var(i), TB.zTerm("2147483647")))));
-        assertTrue(result.equalsModRenaming(expected),
+        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
+        assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
     }
 
 
@@ -188,23 +204,30 @@ public class TestJMLTranslator {
             services.getNamespaces().sorts().lookup(new Name("int")));
         Term expected = TB.ex(i, TB.and(TB.inInt(TB.var(i)),
             TB.and(TB.leq(TB.zTerm("0"), TB.var(i)), TB.leq(TB.var(i), TB.zTerm("2147483647")))));
-        assertTrue(result.equalsModRenaming(expected),
+        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
+        assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
     }
 
 
     @Test
     public void testBsumInt() {
+        jmlIO.specMathMode(SpecMathMode.JAVA);
         Term result = jmlIO.parseExpression("(\\bsum int i; 0; 2147483647; i)");
         NamespaceSet nss = services.getNamespaces();
         Function q = nss.functions().lookup(new Name("bsum"));
         LogicVariable i = new LogicVariable(new Name("i"), nss.sorts().lookup(new Name("int")));
-        Term expected = TB.func(services.getTypeConverter().getIntegerLDT().getJavaCastInt(),
+        Term expected = TB.func(services.getTypeConverter().getIntegerLDT().getModuloInt(),
             TB.bsum(i, TB.zTerm("0"), TB.zTerm("2147483647"), TB.var(i)));
         assertNotNull(result);
         Assertions.assertSame(q, result.sub(0).op());
-        assertTrue(result.equalsModRenaming(expected),
+        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
+        assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
     }
 
 
@@ -217,8 +240,11 @@ public class TestJMLTranslator {
         Term expected = TB.bsum(i, TB.zTerm("0"), TB.zTerm("2147483647"), TB.var(i));
         assertNotNull(result);
         Assertions.assertSame(q, result.op());
-        assertTrue(result.equalsModRenaming(expected),
+        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
+        assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
     }
 
     @Test
@@ -234,8 +260,11 @@ public class TestJMLTranslator {
             TB.not(TB.equals(TB.var(o), TB.NULL())));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[] { o },
             TB.ife(guard, TB.empty(), TB.empty()));
-        assertTrue(result.equalsModRenaming(expected),
+        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
+        assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
     }
 
     @Test
@@ -252,8 +281,11 @@ public class TestJMLTranslator {
             TB.or(TB.convertToFormula(TB.created(TB.var(o))), TB.equals(TB.var(o), TB.NULL()));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[] { o },
             TB.ife(guard, TB.empty(), TB.empty()));
-        assertTrue(result.equalsModRenaming(expected),
+        assertTrue(result.equalsModProperty(expected, RENAMING_TERM_PROPERTY),
             "Result was: " + result + "; \nExpected was: " + expected);
+        assertEquals(result.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            expected.hashCodeModProperty(RENAMING_TERM_PROPERTY),
+            "Hash codes should be equal modulo renaming.");
     }
 
 
@@ -268,7 +300,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testOld() {
-        ProgramVariable excVar = buildExcVar();
+        LocationVariable excVar = buildExcVar();
 
         Term result = jmlIO.exceptionVariable(excVar).atPres(atPres)
                 .parseExpression("this.i == \\old(this.i)");
@@ -282,14 +314,14 @@ public class TestJMLTranslator {
 
     @Test
     public void testResultVar() {
-        ProgramVariable excVar = buildExcVar();
+        LocationVariable excVar = buildExcVar();
 
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
 
         IProgramMethod pm =
             javaInfo.getProgramMethod(testClassType, "getOne", signature, testClassType);
 
-        ProgramVariable resultVar = buildResultVar(pm);
+        LocationVariable resultVar = buildResultVar(pm);
 
         Term result = jmlIO.atPres(atPres).resultVariable(resultVar).exceptionVariable(excVar)
                 .parseExpression("\\result == 1");
@@ -399,9 +431,11 @@ public class TestJMLTranslator {
         assertNotNull(resultTypeofClass);
         assertNotNull(resultTypeofPrimitive);
 
-        Function ioFuncObject = javaInfo.objectSort().getInstanceofSymbol(services);
-        Function ioFuncInt =
-            services.getNamespaces().sorts().lookup("int").getInstanceofSymbol(services);
+        JFunction ioFuncObject =
+            services.getJavaDLTheory().getInstanceofSymbol(javaInfo.objectSort(), services);
+        JFunction ioFuncInt =
+            services.getJavaDLTheory()
+                    .getInstanceofSymbol(services.getNamespaces().sorts().lookup("int"), services);
 
         assertTrue(termContains(resultTypeofClass, ioFuncObject));
         assertTrue(termContains(resultTypeofPrimitive, ioFuncInt));
@@ -410,7 +444,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testCorrectImplicitThisResolution() {
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        LocationVariable selfVar = buildSelfVarAsProgVar();
         LocationVariable array =
             (LocationVariable) javaInfo.getAttribute("testPackage.TestClass::array");
 
@@ -419,7 +453,7 @@ public class TestJMLTranslator {
 
         assertNotNull(result);
         final LogicVariable qv = new LogicVariable(new Name("a"), selfVar.sort());
-        final Function fieldSymbol =
+        final JFunction fieldSymbol =
             services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(array, services);
         Term expected = TB.all(qv,
             TB.imp(
@@ -431,9 +465,41 @@ public class TestJMLTranslator {
                     TB.not(TB.equals(TB.var(qv), TB.NULL()))), // implicit non null
                 TB.equals(TB.var(qv), TB.var(selfVar))));
 
-        final boolean condition = result.equalsModRenaming(expected);
+        final boolean condition = result.equalsModProperty(expected, RENAMING_TERM_PROPERTY);
         assertTrue(condition, format("Expected:%s\n Was:%s",
             ProofSaver.printTerm(expected, services), ProofSaver.printTerm(result, services)));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "\\seq(1) + \\seq(2,3) : \\seq_concat(\\seq(1), \\seq(2,3))",
+        "\\locset(this.b) + \\locset(this.s) : \\set_union(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) | \\locset(this.s) : \\set_union(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) & \\locset(this.s) : \\intersect(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) * \\locset(this.s) : \\intersect(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) <= \\locset(this.s) : \\subset(\\locset(this.b), \\locset(this.s))",
+        "\\locset(this.b) < \\locset(this.s) : \\subset(\\locset(this.b), \\locset(this.s)) && \\locset(this.b) != \\locset(this.s)",
+        "\\locset(this.b) >= \\locset(this.s) : \\subset(\\locset(this.s), \\locset(this.b))",
+        "\\locset(this.b) > \\locset(this.s) : \\subset(\\locset(this.s), \\locset(this.b)) && \\locset(this.b) != \\locset(this.s)",
+    }, delimiter = ':')
+    public void testOperatorOverloading(String expression, String expected) {
+        Term tTrans = null, tExp = null;
+        try {
+            tTrans = jmlIO.parseExpression(expression);
+        } catch (Exception e) {
+            fail("Cannot parse " + expression, e);
+        }
+
+        try {
+            tExp = jmlIO.parseExpression(expected);
+        } catch (Exception e) {
+            fail("Cannot parse " + expected, e);
+        }
+
+        if (!tTrans.equalsModProperty(tExp, TERM_LABELS_PROPERTY)) {
+            // this gives nicer error
+            assertEquals(tExp, tTrans);
+        }
     }
 
 }

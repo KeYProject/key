@@ -1,4 +1,21 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.nodeviews;
+
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -12,23 +29,9 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DropTargetAdapter;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * <p>
@@ -62,7 +65,7 @@ import java.util.List;
 public class DragNDropInstantiator extends DropTargetAdapter {
 
     /** the sequentview where dnd has been initiated */
-    private CurrentGoalView seqView;
+    private final CurrentGoalView seqView;
 
 
     DragNDropInstantiator(CurrentGoalView seqView) {
@@ -82,8 +85,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                     event.acceptDrop(event.getSourceActions());
                     List<?> files =
                         (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-                    for (Iterator<?> i = files.iterator(); i.hasNext();) {
-                        File f = (File) i.next();
+                    for (Object file : files) {
+                        File f = (File) file;
                         MainWindow.getInstance().loadProblem(f);
                     }
                     event.dropComplete(true);
@@ -93,10 +96,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             } else {
                 event.rejectDrop();
             }
-        } catch (IOException exception) {
-            // just reject drop do not bother the user
-            event.rejectDrop();
-        } catch (UnsupportedFlavorException ufException) {
+        } catch (IOException | UnsupportedFlavorException exception) {
             // just reject drop do not bother the user
             event.rejectDrop();
         }
@@ -178,7 +178,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         final Sequent sequent = seqView.getMediator().getSelectedGoal().sequent();
 
 
-        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
+        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.nil();
         if (targetPos.isSequent()) {
             // collects all applicable taclets at the source position
             // which have an addrule section
@@ -214,7 +214,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     private ImmutableList<PosTacletApp> getDirectionDependentApps(final PosInSequent sourcePos,
             final PosInSequent targetPos, final Services services, final Sequent sequent) {
 
-        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
+        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.nil();
         // all applicable taclets where the drag source has been interpreted
         // as
         // the find part and the drop position as the one of the
@@ -280,10 +280,10 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             TacletFilter filter, Services services) {
 
         if (findPos == null || findPos.isSequent()) {
-            return ImmutableSLList.<PosTacletApp>nil();
+            return ImmutableSLList.nil();
         }
 
-        ImmutableList<TacletApp> allTacletsAtFindPosition = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> allTacletsAtFindPosition = ImmutableSLList.nil();
         KeYMediator r = seqView.getMediator();
 
         // if in replaceWithMode only apps that contain at least one replacewith
@@ -303,7 +303,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * the taclet applications is given the correct position information where their "find" has been
      * matched
      *
-     * @param tacletApps the {@link IList<TacletApp>} with taclet applications to be enriched by
+     * @param tacletApps the {@link ImmutableList<TacletApp>} with taclet applications to be
+     *        enriched by
      *        position information
      * @param findPos the {@link PosInOccurrence} against which the find part has been matched
      * @return the taclet apps as given in <tt>tacletApps</tt> but with position information
@@ -311,7 +312,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     private ImmutableList<PosTacletApp> addPositionInformation(ImmutableList<TacletApp> tacletApps,
             PosInOccurrence findPos, Services services) {
 
-        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
+        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.nil();
         for (TacletApp tacletApp : tacletApps) {
             TacletApp app = tacletApp;
             if (app instanceof NoPosTacletApp) {
@@ -328,18 +329,19 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * <tt>apps</tt>. The resulting applications are returned. The given apps must have either all
      * an if part or none of them.
      *
-     * @param apps the {@link IList<PosTacletApp>} with all apps whose if sequent has to be matched
+     * @param apps the {@link ImmutableList<PosTacletApp>} with all apps whose if sequent has to be
+     *        matched
      *        against the formula specified by the pair <tt>seq</tt> and <tt>ifPIO</tt>
      * @param seq the Sequent to which the position information in <tt>ifPIO</tt> is relative to
      * @param ifPIO the PosInOccurrence describing the position of the term to be matched against
      *        the if sequent of the taclets
      * @param services the Services
-     * @return the {@link IList<PosTacletApp>} that have been matched successfully
+     * @return the {@link ImmutableList<PosTacletApp>} that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeIfInstantiations(ImmutableList<PosTacletApp> apps,
             Sequent seq, PosInOccurrence ifPIO, Services services) {
 
-        ImmutableList<PosTacletApp> result = ImmutableSLList.<PosTacletApp>nil();
+        ImmutableList<PosTacletApp> result = ImmutableSLList.nil();
 
         final ImmutableList<IfFormulaInstantiation> ifFmlInst;
 
@@ -365,7 +367,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                 } else if (ifFmlInst == null) {
                     // as either all taclets have an if sequent or none
                     // we can exit here
-                    return ImmutableSLList.<PosTacletApp>nil();
+                    return ImmutableSLList.nil();
                 } else {
                     // the right side is not checked in tacletapp
                     // not sure where to incorporate the check...
@@ -388,20 +390,21 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * tries to complete the (partial) taclet instantantiation of the applications given in
      * <tt>apps</tt>. The resulting applications are returned.
      *
-     * @param apps the {@link IList<PosTacletApp>} with all apps whose if sequent has to be matched
+     * @param apps the {@link ImmutableList<PosTacletApp>} with all apps whose if sequent has to be
+     *        matched
      *        against the formula specified by the pair <tt>seq</tt> and <tt>ifPIO</tt> is relative
      *        to
      * @param missingSVPIO the PosInOccurrence describing the position of the term an uninstantiated
      *        SV will be matched against
      * @param services the Services
-     * @return the {@link IList<PosTacletApp>} that have been matched successfully
+     * @return the {@link ImmutableList<PosTacletApp>} that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeInstantiations(ImmutableList<PosTacletApp> apps,
             PosInOccurrence missingSVPIO, Services services) {
 
-        ImmutableList<PosTacletApp> result = ImmutableSLList.<PosTacletApp>nil();
+        ImmutableList<PosTacletApp> result = ImmutableSLList.nil();
         if (missingSVPIO == null) {
-            return ImmutableSLList.<PosTacletApp>nil();
+            return ImmutableSLList.nil();
         }
 
         for (PosTacletApp app1 : apps) {
@@ -555,7 +558,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             /**
              * tests if the goal templates contain at least one addrule section
              *
-             * @param goalDescriptions the {@link IList<TacletGoalTemplate>} to be looked through
+             * @param goalDescriptions the {@link ImmutableList<TacletGoalTemplate>} to be looked
+             *        through
              * @return true if an addrule section has been found
              */
             private boolean goalTemplatesContainAddrules(

@@ -1,13 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge;
 
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
@@ -15,6 +13,11 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Defines a concrete merge procedure, in particular the result of merging two terms for a given
@@ -33,12 +36,11 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
  * @see MergeByIfThenElse
  * @see MergeIfThenElseAntecedent
  * @see MergeTotalWeakening
- * @see MergeWithSignLattice
  */
 public abstract class MergeProcedure {
 
     /** Concrete merge procedures. */
-    static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList.<MergeProcedure>nil();
+    static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList.nil();
 
     static {
         CONCRETE_RULES =
@@ -111,35 +113,9 @@ public abstract class MergeProcedure {
      *
      * @author Dominic Scheurer
      */
-    public static class ValuesMergeResult {
-        private ImmutableSet<Term> newConstraints;
-        private Term mergeVal;
-        private LinkedHashSet<Name> newNames;
-        private LinkedHashSet<Term> sideConditions;
-
-        public ValuesMergeResult(ImmutableSet<Term> newConstraints, Term mergeVal,
-                LinkedHashSet<Name> newNames, LinkedHashSet<Term> sideConditions) {
-            this.newConstraints = newConstraints;
-            this.mergeVal = mergeVal;
-            this.newNames = newNames;
-            this.sideConditions = sideConditions;
-        }
-
-        public ImmutableSet<Term> getNewConstraints() {
-            return newConstraints;
-        }
-
-        public Term getMergeVal() {
-            return mergeVal;
-        }
-
-        public LinkedHashSet<Name> getNewNames() {
-            return newNames;
-        }
-
-        public LinkedHashSet<Term> getSideConditions() {
-            return sideConditions;
-        }
+    public record ValuesMergeResult(ImmutableSet<Term> newConstraints, Term mergeVal,
+            LinkedHashSet<Name> newNames,
+            LinkedHashSet<Term> sideConditions) {
     }
 
 }

@@ -132,7 +132,7 @@
       (rule "lengthCons" (formula "1") (term "1,1") (userinteraction))
       (rule "andLeft" (formula "1") (userinteraction))
       (rule "andLeft" (formula "1") (userinteraction))
-      (rule "inChar" (formula "4") (userinteraction))
+      (rule "expandInChar" (formula "4") (userinteraction))
       (rule "true_left" (formula "4") (userinteraction))
       (rule "replaceCons" (formula "5") (term "2,1") (userinteraction))
       (rule "substringI" (formula "5") (term "2,0") (userinteraction))

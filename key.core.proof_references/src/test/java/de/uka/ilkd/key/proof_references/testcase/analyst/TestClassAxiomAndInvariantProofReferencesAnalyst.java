@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof_references.testcase.analyst;
 
 import de.uka.ilkd.key.proof_references.analyst.ClassAxiomAndInvariantProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.proof_references.testcase.AbstractProofReferenceTestCase;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -65,7 +69,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
                 "equiv(java.lang.Object::<inv>(heap,self),true)"),
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
-                "equals(test.ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
+                "equals(test.ModelFieldTest::$f(heap,self),mul(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
     }
 
     /**
@@ -79,7 +83,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
                 "equiv(java.lang.Object::<inv>(heap,self),true)"),
             new ExpectedProofReferences(IProofReference.USE_AXIOM,
-                "equals(test.ModelFieldTest::$f(heap,self),javaMulInt(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
+                "equals(test.ModelFieldTest::$f(heap,self),mul(Z(2(#)),int::select(heap,self,test.ModelFieldTest::$x)))"));
     }
 
     /**

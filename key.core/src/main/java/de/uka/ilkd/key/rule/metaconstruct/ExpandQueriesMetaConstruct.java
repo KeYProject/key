@@ -1,14 +1,20 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.logic.Name;
 
 
 /**
@@ -22,7 +28,7 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
     public static final String name = "#ExpandQueries";
 
     public ExpandQueriesMetaConstruct() {
-        super(new Name(name), 2, Sort.FORMULA);
+        super(new Name(name), 2, JavaDLTheory.FORMULA);
     }
 
     /**
@@ -50,9 +56,10 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
         final StrategyProperties props =
             services.getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
         final boolean queryTreatmenIsOn =
-            props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY) == StrategyProperties.QUERY_ON;
-        if (queryTreatmenIsOn || props.getProperty(
-            StrategyProperties.QUERY_OPTIONS_KEY) == StrategyProperties.QUERY_RESTRICTED) {
+            Objects.equals(props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY),
+                StrategyProperties.QUERY_ON);
+        if (queryTreatmenIsOn || Objects.equals(props.getProperty(
+            StrategyProperties.QUERY_OPTIONS_KEY), StrategyProperties.QUERY_RESTRICTED)) {
             result = QueryExpand.INSTANCE.evaluateQueries(services, arg1, positiveContext,
                 queryTreatmenIsOn);
         } else {

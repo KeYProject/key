@@ -1,9 +1,8 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.io;
-
-import recoder.util.FileCollector;
-import recoder.util.StringUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -11,6 +10,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import recoder.util.FileCollector;
+import recoder.util.StringUtils;
 
 /**
  * This class describes a list of search paths. Search paths may contain a mixture of directories,
@@ -25,23 +27,23 @@ public class PathList {
     /**
      * Caches names of types relative to the search path that are known to be unknown. Set <String>.
      */
-    private final Set<String> notFound = new HashSet<String>();
+    private final Set<String> notFound = new HashSet<>();
     /**
      * Maps filenames to data locations. Map <String, DataLocation>.
      */
-    private final Map<String, DataLocation> locations = new HashMap<String, DataLocation>();
+    private final Map<String, DataLocation> locations = new HashMap<>();
     /**
      * Stores path entries. List <File|ZipFile>.
      */
-    private final List<Object> paths = new ArrayList<Object>();
+    private final List<Object> paths = new ArrayList<>();
     /**
      * Caches directory content queries. Map <File, NaturalHashSet>.
      */
-    private final Map<File, Set<String>> dirContents = new HashMap<File, Set<String>>();
+    private final Map<File, Set<String>> dirContents = new HashMap<>();
     /**
      * Caches known directories. Map <File, File>.
      */
-    private final Map<File, File> knownDirs = new HashMap<File, File>();
+    private final Map<File, File> knownDirs = new HashMap<>();
 
     /**
      * creates a new empty path list
@@ -66,8 +68,8 @@ public class PathList {
      * @param paths the array of path strings to be added
      */
     public PathList(String[] paths) {
-        for (int i = 0; i < paths.length; i++) {
-            add(paths[i]);
+        for (String path : paths) {
+            add(path);
         }
     }
 
@@ -108,7 +110,7 @@ public class PathList {
             result = split_paths.length;
             for (int i = 0; i < result; i++) {
                 String path = split_paths[i].trim();
-                if (!path.equals("")) {
+                if (!path.isEmpty()) {
                     addPath(path);
                 }
             }
@@ -123,12 +125,10 @@ public class PathList {
     protected Set getContents(File directory) {
         Set<String> result = dirContents.get(directory);
         if (result == null) {
-            dirContents.put(directory, result = new HashSet<String>());
+            dirContents.put(directory, result = new HashSet<>());
             String[] list = null;
             list = directory.list();
-            for (int i = 0; i < list.length; i++) {
-                result.add(list[i]);
-            }
+            Collections.addAll(result, list);
         }
         return result;
     }
@@ -147,8 +147,7 @@ public class PathList {
     }
 
     private DataLocation getLocation(Object p, String relativeName) {
-        if (p instanceof ZipFile) {
-            ZipFile zf = (ZipFile) p;
+        if (p instanceof ZipFile zf) {
             if (zf.getEntry(relativeName) != null) {
                 return new ArchiveDataLocation(zf, relativeName);
             } else {
@@ -158,8 +157,7 @@ public class PathList {
                     return new ArchiveDataLocation(zf, hs);
                 }
             }
-        } else if (p instanceof File) {
-            File dir = (File) p;
+        } else if (p instanceof File dir) {
             int sep = relativeName.lastIndexOf(File.separatorChar);
             if (sep >= 0) {
                 dir = getDir(dir, relativeName.substring(0, sep));
@@ -208,10 +206,8 @@ public class PathList {
      * @return a name for this file, possibly relative to this search path.
      */
     public String getRelativeName(String absoluteFilename) {
-        for (int i = 0; i < paths.size(); i++) {
-            Object o = paths.get(i);
-            if (o instanceof File) {
-                File p = (File) o;
+        for (Object o : paths) {
+            if (o instanceof File p) {
                 if (p.isDirectory()) {
                     String pathfilename = p.getAbsolutePath();
                     if (absoluteFilename.startsWith(pathfilename)) {
@@ -241,8 +237,8 @@ public class PathList {
     public DataLocation[] findAll(String relativeName) {
         DataLocation[] tmpRes = new DataLocation[paths.size()];
         int count = 0;
-        for (int i = 0; i < paths.size(); i++) {
-            DataLocation dl = getLocation(paths.get(i), relativeName);
+        for (Object path : paths) {
+            DataLocation dl = getLocation(path, relativeName);
             if (dl != null) {
                 tmpRes[count++] = dl;
             }
@@ -256,11 +252,9 @@ public class PathList {
     // the filter must be able to accept null parent directories
     // (e.g. for ZipEntries)
     public DataLocation[] findAll(FilenameFilter filter) {
-        List<DataLocation> res = new ArrayList<DataLocation>();
-        for (int i = 0, s = paths.size(); i < s; i++) {
-            Object f = paths.get(i);
-            if (f instanceof ZipFile) {
-                ZipFile zf = (ZipFile) f;
+        List<DataLocation> res = new ArrayList<>();
+        for (Object f : paths) {
+            if (f instanceof ZipFile zf) {
                 Enumeration enum2 = zf.entries();
                 while (enum2.hasMoreElements()) {
                     ZipEntry e = (ZipEntry) enum2.nextElement();
@@ -309,17 +303,17 @@ public class PathList {
         if (paths.isEmpty()) {
             result = "";
         } else {
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < paths.size(); i++) {
+            StringBuilder sb = new StringBuilder();
+            for (Object path : paths) {
                 sb.append(File.pathSeparatorChar);
-                Object f = paths.get(i);
+                Object f = path;
                 if (f instanceof ZipFile) {
                     sb.append(((ZipFile) f).getName());
                 } else {
                     sb.append(((File) f).getPath());
                 }
             }
-            result = sb.toString().substring(1);
+            result = sb.substring(1);
         }
         return result;
     }

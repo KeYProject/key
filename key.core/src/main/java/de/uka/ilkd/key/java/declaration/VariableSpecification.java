@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.*;
@@ -7,8 +10,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
+
 import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,10 +102,12 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int result = 0;
-        if (var != null)
+        if (var != null) {
             result++;
-        if (initializer != null)
+        }
+        if (initializer != null) {
             result++;
+        }
         return result;
     }
 
@@ -114,8 +120,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (var != null) {
-            if (index == 0)
+            if (index == 0) {
                 return var;
+            }
             index--;
         }
         if (initializer != null && index == 0) {
@@ -251,21 +258,16 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     @Override
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printVariableSpecification(this);
-    }
-
-    /**
-     * equals modulo renaming is described in the corresponding comment in class SourceElement. The
-     * variables declared in the local variable declaration have to be added to the
-     * NameAbstractionTable.
-     */
-    @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (!(se instanceof VariableSpecification)) {
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
-        final VariableSpecification vs = (VariableSpecification) se;
+
+        VariableSpecification vs = (VariableSpecification) o;
+
         if (dimensions != vs.getDimensions()) {
             return false;
         }
@@ -278,12 +280,12 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
                 return false;
             }
         }
-        nat.add(var, vs.getProgramVariable());
+
         if (vs.getChildCount() != getChildCount()) {
             return false;
         }
         for (int i = 0, cc = getChildCount(); i < cc; i++) {
-            if (!getChildAt(i).equalsModRenaming(vs.getChildAt(i), nat)) {
+            if (!getChildAt(i).equals(vs.getChildAt(i))) {
                 return false;
             }
         }
@@ -295,9 +297,6 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         final ProgramElement pe = source.getSource();
         matchCond = super.match(source, matchCond);
         if (matchCond != null && getDimensions() != ((VariableSpecification) pe).getDimensions()) {
-            LOGGER.debug(
-                "Program match. Variables have different dimension " + "(template {}, source {})",
-                this, pe);
             return null;
         }
         return matchCond;

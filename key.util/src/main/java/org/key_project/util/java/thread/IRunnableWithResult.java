@@ -1,4 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util.java.thread;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -17,12 +22,14 @@ public interface IRunnableWithResult<T> extends IRunnableWithException {
      *
      * @return The result.
      */
-    public T getResult();
+    @Nullable
+    T getResult();
 
     /**
      * Returns an occurred exception.
      *
      * @return An occurred exception.
      */
-    public Exception getException();
+    @Nullable
+    Exception getException();
 }

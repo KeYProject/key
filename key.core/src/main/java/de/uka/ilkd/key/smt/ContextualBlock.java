@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
 
 
@@ -62,9 +65,9 @@ class ContextualBlock {
      */
     public static final int PREDICATE_TYPE = 1;
 
-    private int Start;
-    private int End;
-    private int Type;
+    private final int Start;
+    private final int End;
+    private final int Type;
 
     /**
      *

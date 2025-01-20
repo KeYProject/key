@@ -1,14 +1,16 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Field declaration.
@@ -53,7 +55,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     public FieldDeclaration(TypeReference typeRef, Identifier name) {
         setTypeReference(typeRef);
-        ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1);
+        ASTList<FieldSpecification> list = new ASTArrayList<>(1);
         list.add(getFactory().createFieldSpecification(name));
         setFieldSpecifications(list);
         makeParentRoleValid();
@@ -72,7 +74,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             Identifier name, Expression init) {
         setDeclarationSpecifiers(mods);
         setTypeReference(typeRef);
-        ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1);
+        ASTList<FieldSpecification> list = new ASTArrayList<>(1);
         list.add(getFactory().createFieldSpecification(name, init));
         setFieldSpecifications(list);
         makeParentRoleValid();
@@ -170,7 +172,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     }
 
     public List<FieldSpecification> getVariables() {
-        return new ArrayList<FieldSpecification>(fieldSpecs);
+        return new ArrayList<>(fieldSpecs);
     }
 
     /**
@@ -181,12 +183,15 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null)
+        if (declarationSpecifiers != null) {
             result += declarationSpecifiers.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (fieldSpecs != null)
+        }
+        if (fieldSpecs != null) {
             result += fieldSpecs.size();
+        }
         return result;
     }
 
@@ -208,8 +213,9 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (fieldSpecs != null) {
@@ -247,7 +253,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */

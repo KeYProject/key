@@ -1,14 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.mgt;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -18,9 +15,15 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +36,7 @@ public final class ProofCorrectnessMgt {
     private final DefaultMgtProofListener proofListener = new DefaultMgtProofListener();
     private final DefaultMgtProofTreeListener proofTreeListener = new DefaultMgtProofTreeListener();
 
-    private Set<RuleApp> cachedRuleApps = new LinkedHashSet<RuleApp>();
+    private final Set<RuleApp> cachedRuleApps = new LinkedHashSet<>();
     private ProofStatus proofStatus = ProofStatus.OPEN;
 
 
@@ -101,7 +104,7 @@ public final class ProofCorrectnessMgt {
         // look for cycles
         while (!newPaths.isEmpty()) {
             final Iterator<ImmutableList<Contract>> it = newPaths.iterator();
-            newPaths = DefaultImmutableSet.<ImmutableList<Contract>>nil();
+            newPaths = DefaultImmutableSet.nil();
 
             while (it.hasNext()) {
                 final ImmutableList<Contract> path = it.next();
@@ -147,7 +150,7 @@ public final class ProofCorrectnessMgt {
         ImmutableSet<Proof> newProofs = proofs;
         while (newProofs.size() > 0) {
             final Iterator<Proof> it = newProofs.iterator();
-            newProofs = DefaultImmutableSet.<Proof>nil();
+            newProofs = DefaultImmutableSet.nil();
 
             while (it.hasNext()) {
                 final Proof p = it.next();
@@ -179,9 +182,15 @@ public final class ProofCorrectnessMgt {
         ImmutableSet<Proof> presumablyClosed = DefaultImmutableSet.nil();
         for (Proof p : all) {
             if (!p.isDisposed()) {
-                if (p.openGoals().size() > 0) {
+                // some branch is closed via cache:
+                if (p.openGoals().size() == 0 && p.closedGoals().stream()
+                        .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
+                    p.mgt().proofStatus = ProofStatus.CLOSED_BY_CACHE;
+                } else if (p.openGoals().size() > 0) {
+                    // some branch is open
                     p.mgt().proofStatus = ProofStatus.OPEN;
                 } else {
+                    // all branches are properly closed
                     p.mgt().proofStatus = ProofStatus.CLOSED;
                     presumablyClosed = presumablyClosed.add(p);
                 }
@@ -234,11 +243,11 @@ public final class ProofCorrectnessMgt {
 
 
     public ImmutableSet<Contract> getUsedContracts() {
-        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        ImmutableSet<Contract> result = DefaultImmutableSet.nil();
         for (RuleApp ruleApp : cachedRuleApps) {
             RuleJustification ruleJusti = getJustification(ruleApp);
             if (ruleJusti instanceof RuleJustificationBySpec) {
-                Contract contract = ((RuleJustificationBySpec) ruleJusti).getSpec();
+                Contract contract = ((RuleJustificationBySpec) ruleJusti).spec();
                 ImmutableSet<Contract> atomicContracts = specRepos.splitContract(contract);
                 assert atomicContracts != null;
                 atomicContracts = specRepos.getInheritedContracts(atomicContracts);
@@ -256,14 +265,6 @@ public final class ProofCorrectnessMgt {
     public ProofStatus getStatus() {
         return proofStatus;
     }
-
-    @Override
-    protected void finalize() throws Throwable {
-        removeProofListener();
-        super.finalize();
-    }
-
-
 
     // -------------------------------------------------------------------------
     // inner classes

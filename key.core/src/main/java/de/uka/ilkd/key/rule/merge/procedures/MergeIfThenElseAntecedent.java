@@ -1,20 +1,22 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import org.key_project.logic.Name;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Rule that merges two sequents based on the if-then-else construction: If two locations are
@@ -58,9 +60,9 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
 
         final TermBuilder tb = services.getTermBuilder();
 
-        Function newSkolemConst = MergeRuleUtils
+        JFunction newSkolemConst = MergeRuleUtils
                 .getNewSkolemConstantForPrefix(v.op().name().toString(), v.sort(), services);
-        LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+        LinkedHashSet<Name> newNames = new LinkedHashSet<>();
         newNames.add(newSkolemConst.name());
 
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
@@ -68,7 +70,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
             valueInState1, valueInState2, state1, state2, distinguishingFormula, services));
 
         return new ValuesMergeResult(newConstraints, tb.func(newSkolemConst), newNames,
-            new LinkedHashSet<Term>());
+            new LinkedHashSet<>());
 
     }
 
@@ -100,14 +102,14 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
         ImmutableSet<Term> result = DefaultImmutableSet.nil();
 
         if (distinguishingFormula == null) {
-            final Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
+            final MergeByIfThenElse.DistanceFormRightSide distFormAndRightSidesForITEUpd =
                 MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm,
                     elseTerm, services);
 
-            final Term cond = distFormAndRightSidesForITEUpd.first;
-            final Term ifForm = distFormAndRightSidesForITEUpd.second;
-            final Term elseForm = distFormAndRightSidesForITEUpd.third;
-            final boolean isSwapped = distFormAndRightSidesForITEUpd.fourth;
+            final Term cond = distFormAndRightSidesForITEUpd.distinguishingFormula();
+            final Term ifForm = distFormAndRightSidesForITEUpd.ifTerm();
+            final Term elseForm = distFormAndRightSidesForITEUpd.elseTerm();
+            final boolean isSwapped = distFormAndRightSidesForITEUpd.sideCommuted();
 
             final Term varEqualsIfForm = tb.equals(constrained, ifForm);
             final Term varEqualsElseForm = tb.equals(constrained, elseForm);

@@ -1,9 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
+
+import java.net.MalformedURLException;
 
 import de.uka.ilkd.key.parser.Location;
 
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A simple checked exception which holds an location.
@@ -39,9 +43,8 @@ public class LocatableException extends RuntimeException implements HasLocation 
         this.location = location;
     }
 
-    @Nullable
     @Override
-    public Location getLocation() throws MalformedURLException {
+    public @Nullable Location getLocation() throws MalformedURLException {
         return location;
     }
 }

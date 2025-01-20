@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.Identifier;
@@ -52,8 +55,9 @@ public class CcatchBreakLabelParameterDeclaration extends CcatchNonstandardParam
     @Override
     public ProgramElement getChildAt(int index) {
         if (label != null) {
-            if (index == 0)
+            if (index == 0) {
                 return label;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -74,7 +78,7 @@ public class CcatchBreakLabelParameterDeclaration extends CcatchNonstandardParam
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @exception ClassCastException if the new child cannot take over the role of the old one.
      */

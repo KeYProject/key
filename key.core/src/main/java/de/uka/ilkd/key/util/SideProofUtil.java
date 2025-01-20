@@ -1,8 +1,9 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
 import java.util.HashMap;
-
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Sequent;
@@ -19,6 +20,8 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
+
+import org.key_project.util.collection.ImmutableSet;
 
 public final class SideProofUtil {
     /**
@@ -39,9 +42,8 @@ public final class SideProofUtil {
      *         {@link Proof} but with its own {@link OneStepSimplifier} instance.
      */
     @SuppressWarnings("unchecked")
-    public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final Proof source,
-            final Choice... enableChoices) {
-        assert source != null;
+    public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(
+            final Proof source, final Choice... enableChoices) {
         assert !source.isDisposed();
         // Get required source instances
         final InitConfig sourceInitConfig = source.getInitConfig();
@@ -84,7 +86,7 @@ public final class SideProofUtil {
 
     /**
      * removes all choices with the same category as {@code choiceToActivate} from {@code choices}
-     * and adds {@link choiceToActivate} to the set
+     * and adds {@code choiceToActivate} to the set
      *
      * @param choices the currently active choices
      * @param choiceToActivate the {@link Choice} to activate
@@ -121,7 +123,6 @@ public final class SideProofUtil {
     public static ProofStarter createSideProof(ProofEnvironment sideProofEnvironment,
             Sequent sequentToProve, String proofName) throws ProofInputException {
         // Make sure that valid parameters are given
-        assert sequentToProve != null;
         // Create ProofStarter
         ProofStarter starter = new ProofStarter(false);
         // Configure ProofStarter

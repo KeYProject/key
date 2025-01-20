@@ -1,12 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
-import org.key_project.util.java.ObjectUtil;
+import java.util.Objects;
 
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -37,12 +36,12 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * The start of the method containing the associated Breakpoint
      */
-    protected int methodStart;
+    protected final int methodStart;
 
     /**
      * The end of the method containing the associated Breakpoint
      */
-    protected int methodEnd;
+    protected final int methodEnd;
 
     /**
      * The path of the class this {@link LineBreakpoint} is associated with.
@@ -63,7 +62,6 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
      * @param conditionEnabled flag if the condition is enabled
      * @param methodStart the line the containing method of this breakpoint starts at
      * @param methodEnd the line the containing method of this breakpoint ends at
-     * @param containerType the type of the element containing the breakpoint
      * @param isEntry flag to tell whether to stop on method entry
      * @param isExit flag to tell whether to stop on method exit
      * @throws SLTranslationException if the condition could not be parsed to a valid Term
@@ -100,21 +98,16 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     private boolean isMethodCallNode(Node node, RuleApp ruleApp) {
         SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
         IProgramMethod currentPm = null;
-        if (statement instanceof MethodBodyStatement) {
-            MethodBodyStatement mbs = (MethodBodyStatement) statement;
+        if (statement instanceof MethodBodyStatement mbs) {
             currentPm = mbs.getProgramMethod(getProof().getServices());
         }
         if (currentPm != null && currentPm.equals(getPm())
                 && SymbolicExecutionUtil.isMethodCallNode(node, ruleApp, statement)) {
             return true;
-        } else if (ruleApp instanceof ContractRuleApp) {
-            ContractRuleApp methodRuleApp = (ContractRuleApp) ruleApp;
+        } else if (ruleApp instanceof ContractRuleApp methodRuleApp) {
             Contract contract = methodRuleApp.getInstantiation();
-            if (contract instanceof FunctionalOperationContract) {
-                FunctionalOperationContract methodContract = (FunctionalOperationContract) contract;
-                if (methodContract.getTarget().equals(getPm())) {
-                    return true;
-                }
+            if (contract instanceof FunctionalOperationContract methodContract) {
+                return methodContract.getTarget().equals(getPm());
             }
         }
         return false;
@@ -130,14 +123,10 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
                 || SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp))
                 && isCorrectMethodReturn(node, ruleApp)) {
             return true;
-        } else if (ruleApp instanceof ContractRuleApp) {
-            ContractRuleApp methodRuleApp = (ContractRuleApp) ruleApp;
+        } else if (ruleApp instanceof ContractRuleApp methodRuleApp) {
             Contract contract = methodRuleApp.getInstantiation();
-            if (contract instanceof FunctionalOperationContract) {
-                FunctionalOperationContract methodContract = (FunctionalOperationContract) contract;
-                if (methodContract.getTarget().equals(getPm())) {
-                    return true;
-                }
+            if (contract instanceof FunctionalOperationContract methodContract) {
+                return methodContract.getTarget().equals(getPm());
             }
         }
         return false;
@@ -148,7 +137,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
         term = TermBuilder.goBelowUpdates(term);
         MethodFrame mf =
             JavaTools.getInnermostMethodFrame(term.javaBlock(), node.proof().getServices());
-        return ObjectUtil.equals(getPm(), mf.getProgramMethod());
+        return Objects.equals(getPm(), mf.getProgramMethod());
     }
 
     @Override
@@ -180,8 +169,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
                 NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
             if (activeStatement != null
                     && activeStatement.getStartPosition() != Position.UNDEFINED) {
-                if (activeStatement.getStartPosition().getLine() >= methodStart
-                        && activeStatement.getEndPosition().getLine() <= methodEnd) {
+                if (activeStatement.getStartPosition().line() >= methodStart
+                        && activeStatement.getEndPosition().line() <= methodEnd) {
                     return true;
                 }
                 break;
@@ -199,8 +188,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
                 NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
             if (activeStatement != null
                     && activeStatement.getStartPosition() != Position.UNDEFINED) {
-                if (activeStatement.getStartPosition().getLine() >= methodStart
-                        && activeStatement.getEndPosition().getLine() <= methodEnd
+                if (activeStatement.getStartPosition().line() >= methodStart
+                        && activeStatement.getEndPosition().line() <= methodEnd
                         && activeStatement instanceof LocalVariableDeclaration) {
                     return true;
                 }

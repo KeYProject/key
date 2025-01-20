@@ -1,5 +1,7 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
+/* This file was part of the RECODER library and protected by the LGPL.
+ * This file is part of KeY since 2021 - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package recoder.java.declaration;
 
 import recoder.java.JavaNonTerminalProgramElement;
@@ -47,7 +49,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
 
     public InheritanceSpecification(TypeReference supertype) {
-        supertypes = new ASTArrayList<TypeReference>(1);
+        supertypes = new ASTArrayList<>(1);
         supertypes.add(supertype);
         // makeParentRoleValid() called by subclasses' constructors
     }
@@ -115,8 +117,9 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     public int getChildCount() {
         int result = 0;
-        if (supertypes != null)
+        if (supertypes != null) {
             result += supertypes.size();
+        }
         return result;
     }
 
@@ -153,7 +156,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      * the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */

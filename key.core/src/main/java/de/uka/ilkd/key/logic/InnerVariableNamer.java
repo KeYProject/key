@@ -1,10 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+
+import org.key_project.logic.Name;
 
 
 /**
@@ -27,10 +31,10 @@ public class InnerVariableNamer extends VariableNamer {
         int maxInGlobals = getMaxCounterInGlobals(basename, globals);
         int maxInProgram = getMaxCounterInProgram(basename, program, posOfDeclaration);
 
-        return (maxInGlobals > maxInProgram ? maxInGlobals : maxInProgram);
+        return (Math.max(maxInGlobals, maxInProgram));
     }
 
-    public ProgramVariable rename(ProgramVariable var, Goal goal, PosInOccurrence posOfFind) {
+    public LocationVariable rename(LocationVariable var, Goal goal, PosInOccurrence posOfFind) {
         ProgramElementName name = var.getProgramElementName();
         BasenameAndIndex bai = getBasenameAndIndex(name);
         Iterable<ProgramElementName> globals = wrapGlobals(goal.node().getLocalProgVars());
@@ -61,7 +65,7 @@ public class InnerVariableNamer extends VariableNamer {
             }
         }
 
-        ProgramVariable newvar = var;
+        LocationVariable newvar = var;
         if (!newname.equals(name)) {
             newvar = new LocationVariable(newname, var.getKeYJavaType());
             map.put(var, newvar);

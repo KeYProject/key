@@ -1,13 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
-import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 /**
  * IN ORDER TO START THE SOLVERS USE THIS CLASS.<br>
@@ -283,7 +286,6 @@ public class SolverLauncher implements SolverListener {
         // Launch all solvers until the queue is empty or the launcher is
         // interrupted.
         launchLoop(solvers);
-
         // at this point either there are no solvers left to start or
         // the whole launching process was interrupted.
         waitForRunningSolvers();
@@ -291,7 +293,6 @@ public class SolverLauncher implements SolverListener {
         cleanUp(solvers);
 
         notifyListenersOfStop();
-
     }
 
     private void notifyListenersOfStart(Collection<SMTProblem> problems,
@@ -317,7 +318,6 @@ public class SolverLauncher implements SolverListener {
                         // if there is nothing to do, wait for the next solver
                         // finishing its task.
                         wait.await();
-
                     } catch (InterruptedException e) {
                         launcherInterrupted(e);
                     }
@@ -383,8 +383,8 @@ public class SolverLauncher implements SolverListener {
         lock.lock();
         try {
             session.removeCurrentlyRunning(solver);
-            wait.signal();
         } finally {
+            wait.signal();
             lock.unlock();
         }
     }

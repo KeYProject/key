@@ -1,18 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -21,22 +17,29 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.op.OperatorSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.PredictCostProver;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 public class TriggeredInstantiations implements TermGenerator {
 
@@ -45,10 +48,10 @@ public class TriggeredInstantiations implements TermGenerator {
     }
 
     private Sequent last = Sequent.EMPTY_SEQUENT;
-    private Set<Term> lastCandidates = new HashSet<Term>();
-    private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.<Term>nil();
+    private Set<Term> lastCandidates = new HashSet<>();
+    private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.nil();
 
-    private boolean checkConditions;
+    private final boolean checkConditions;
 
     /**
      *
@@ -58,26 +61,26 @@ public class TriggeredInstantiations implements TermGenerator {
         this.checkConditions = checkConditions;
     }
 
-    @Override
     /**
      * Generates all instances
      */
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (app instanceof TacletApp) {
+    @Override
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
+        if (app instanceof TacletApp tapp) {
 
             final Services services = goal.proof().getServices();
-            final TacletApp tapp = (TacletApp) app;
             final Taclet taclet = tapp.taclet();
 
             final Set<Term> terms;
             final Set<Term> axiomSet;
-            ImmutableSet<Term> axioms = DefaultImmutableSet.<Term>nil();
+            ImmutableSet<Term> axioms = DefaultImmutableSet.nil();
 
 
             final Sequent seq = goal.sequent();
             if (seq != last) {
-                terms = new HashSet<Term>();
-                axiomSet = new HashSet<Term>();
+                terms = new HashSet<>();
+                axiomSet = new HashSet<>();
                 computeAxiomAndCandidateSets(seq, terms, axiomSet, services);
                 for (Term axiom : axiomSet) {
                     axioms = axioms.add(axiom);
@@ -102,7 +105,7 @@ public class TriggeredInstantiations implements TermGenerator {
                 if (tapp.uninstantiatedVars().size() <= 1) {
                     SVInstantiations svInst = tapp.instantiations();
 
-                    final SchemaVariable sv = taclet.getTrigger().getTriggerVar();
+                    final OperatorSV sv = taclet.getTrigger().triggerVar();
                     final Sort svSort;
                     if (sv.sort() instanceof GenericSort) {
                         svSort = svInst.getGenericSortInstantiations().getRealSort(sv, services);
@@ -113,7 +116,7 @@ public class TriggeredInstantiations implements TermGenerator {
                     final Metavariable mv = new Metavariable(new Name("$MV$" + sv.name()), svSort);
 
                     final Term trigger = instantiateTerm(taclet.getTrigger().getTerm(), services,
-                        svInst.replace(sv, services.getTermBuilder().var(mv), services));
+                        svInst.replace(sv, services.getTermFactory().createTerm(mv), services));
 
                     final Set<Term> instances =
                         computeInstances(services, comprehension, mv, trigger, terms, axioms, tapp);
@@ -155,7 +158,8 @@ public class TriggeredInstantiations implements TermGenerator {
 
         for (SequentFormula sf : antecedent) {
             collectTerms(sf.formula(), terms, integerLDT);
-            if (sf.formula().op() instanceof Function || sf.formula().op() == Equality.EQUALS) {
+            if (sf.formula().op() instanceof JFunction
+                    || sf.formula().op() == Equality.EQUALS) {
                 axioms.add(
                     inAntecedent ? sf.formula() : services.getTermBuilder().not(sf.formula()));
             }
@@ -166,7 +170,7 @@ public class TriggeredInstantiations implements TermGenerator {
             Services services) {
 
         long cost = PredictCostProver.computerInstanceCost(
-            new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), cond,
+            new Substitution(DefaultImmutableMap.nilMap()), cond,
             axioms, services);
         return cost == -1;
     }
@@ -175,8 +179,8 @@ public class TriggeredInstantiations implements TermGenerator {
             final Metavariable mv, final Term trigger, Set<Term> terms, ImmutableSet<Term> axioms,
             TacletApp app) {
 
-        final HashSet<Term> instances = new HashSet<Term>();
-        final HashSet<Term> alreadyChecked = new HashSet<Term>();
+        final HashSet<Term> instances = new HashSet<>();
+        final HashSet<Term> alreadyChecked = new HashSet<>();
 
         for (final Term t : terms) {
             boolean addToInstances = true;
@@ -207,11 +211,11 @@ public class TriggeredInstantiations implements TermGenerator {
     private ImmutableList<Term> instantiateConditions(Services services, TacletApp app,
             final Term middle) {
         ImmutableList<Term> conditions;
-        conditions = ImmutableSLList.<Term>nil();
-        for (Term singleAvoidCond : app.taclet().getTrigger().getAvoidConditions()) {
+        conditions = ImmutableSLList.nil();
+        for (Term singleAvoidCond : app.taclet().getTrigger().avoidConditions()) {
             conditions =
                 conditions.append(instantiateTerm(singleAvoidCond, services, app.instantiations()
-                        .replace(app.taclet().getTrigger().getTriggerVar(), middle, services)));
+                        .replace(app.taclet().getTrigger().triggerVar(), middle, services)));
         }
         return conditions;
     }

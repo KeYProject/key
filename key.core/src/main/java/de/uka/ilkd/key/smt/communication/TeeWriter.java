@@ -1,8 +1,12 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.communication;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Writer;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -12,13 +16,11 @@ import java.io.Writer;
  * @version 1 (10/3/21)
  */
 public class TeeWriter extends Writer {
-    @Nonnull
-    private final Writer source;
 
-    @Nonnull
-    private final Writer sink;
+    private final @NonNull Writer source;
+    private final @NonNull Writer sink;
 
-    public TeeWriter(@Nonnull Writer source, @Nonnull Writer sink) {
+    public TeeWriter(@NonNull Writer source, @NonNull Writer sink) {
         this.source = source;
         this.sink = sink;
     }

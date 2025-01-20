@@ -1,14 +1,18 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  *
@@ -46,12 +50,7 @@ class ScriptLineParser {
     /**
      * the file URL from which the script is taken.
      */
-    private URL fileURL;
-
-    /**
-     * number of characters read so far
-     */
-    private int readChars;
+    private URI fileURI;
 
     /**
      * While within a string literal, this stores the character with which the string has started.
@@ -76,23 +75,16 @@ class ScriptLineParser {
         IN_COMMENT
     }
 
-    public ScriptLineParser(Reader reader) {
+    public ScriptLineParser(Reader reader, @Nullable Location initialLocation) {
         this.reader = reader;
-        this.fileURL = null;
+        if (initialLocation != null) {
+            this.fileURI = initialLocation.getFileURI().orElse(null);
+            this.line = initialLocation.getPosition().line();
+            this.col = initialLocation.getPosition().column();
+        }
     }
 
-    /**
-     * Creates a ScriptLineParser that reads from the given resource.
-     *
-     * @param fileURL the resource to read from
-     * @throws IOException if opening an InputStream from the resource fails
-     */
-    public ScriptLineParser(URL fileURL) throws IOException {
-        this.reader = new BufferedReader(new InputStreamReader(fileURL.openStream()));
-        this.fileURL = fileURL;
-    }
-
-    public Map<String, String> parseCommand() throws IOException, ScriptException {
+    public ParsedCommand parseCommand() throws IOException, ScriptException {
         Map<String, String> result = new HashMap<>();
 
         StringBuilder cmdBuilder = new StringBuilder();
@@ -101,6 +93,7 @@ class ScriptLineParser {
         State state = State.INIT;
         State stateBeforeComment = null;
         int impCounter = 1;
+        Location start = null;
 
         while (true) {
             int c = reader.read();
@@ -113,70 +106,67 @@ class ScriptLineParser {
             }
             pos++;
 
+            if (start == null && !Character.isWhitespace(c)) {
+                start = getLocation();
+            }
+
             switch (c) {
-            case -1:
-                if (sb.length() > 0 || key != null || !result.isEmpty()) {
+            case -1 -> {
+                if (!sb.isEmpty() || key != null || !result.isEmpty()) {
                     throw new ScriptException("Trailing characters at end of script (missing ';'?)",
-                        fileURL, line, col);
+                        getLocation());
                 }
                 return null;
-            case '=':
+            }
+            case '=' -> {
                 switch (state) {
-                case IN_ID:
+                case IN_ID -> {
                     state = State.AFTER_EQ;
                     key = sb.toString();
                     sb.setLength(0);
-                    break;
-                case IN_QUOTE:
-                    sb.append((char) c);
-                    break;
-                case IN_COMMENT:
-                    break;
-                default:
-                    exc(c);
                 }
-                break;
-            case ' ':
-            case '\t':
-            case '\n':
+                case IN_QUOTE -> sb.append((char) c);
+                case IN_COMMENT -> {
+                }
+                default -> exc(c);
+                }
+            }
+            case ' ', '\t', '\n' -> {
                 switch (state) {
-                case IN_ID:
+                case IN_ID -> {
                     state = State.INIT;
                     result.put("#" + (impCounter++), sb.toString());
                     sb.setLength(0);
-                    break;
-                case IN_QUOTE:
-                    sb.append((char) c);
-                    break;
-                case IN_UNQUOTE:
+                }
+                case IN_QUOTE -> sb.append((char) c);
+                case IN_UNQUOTE -> {
                     state = State.INIT;
                     result.put(key, sb.toString());
                     sb.setLength(0);
-                    break;
-                case IN_COMMENT:
+                }
+                case IN_COMMENT -> {
                     if (c == '\n') {
                         state = stateBeforeComment;
                     }
-                    break;
-                default:
-                    break;
                 }
-                break;
-            case '\r':
-                break;
-            case '"':
-            case '\'':
+                default -> {
+                }
+                }
+            }
+            case '\r' -> {
+            }
+            case '"', '\'' -> {
                 switch (state) {
-                case INIT:
+                case INIT -> {
                     state = State.IN_QUOTE;
                     stringInitChar = c;
                     key = "#" + (impCounter++);
-                    break;
-                case AFTER_EQ:
+                }
+                case AFTER_EQ -> {
                     state = State.IN_QUOTE;
                     stringInitChar = c;
-                    break;
-                case IN_QUOTE:
+                }
+                case IN_QUOTE -> {
                     if (stringInitChar == c) {
                         state = State.INIT;
                         result.put(key, sb.toString());
@@ -184,117 +174,86 @@ class ScriptLineParser {
                     } else {
                         sb.append((char) c);
                     }
-                    break;
-                case IN_COMMENT:
-                    break;
-                default:
-                    exc(c);
                 }
-                break;
-            case '#':
+                case IN_COMMENT -> {
+                }
+                default -> exc(c);
+                }
+            }
+            case '#' -> {
                 switch (state) {
-                case IN_QUOTE:
-                    sb.append((char) c);
-                    break;
-                case IN_COMMENT:
-                    break;
-                default:
+                case IN_QUOTE -> sb.append((char) c);
+                case IN_COMMENT -> {
+                }
+                default -> {
                     stateBeforeComment = state;
                     state = State.IN_COMMENT;
                 }
-                break;
-            case ';':
+                }
+            }
+            case ';' -> {
                 switch (state) {
-                case IN_QUOTE:
-                    sb.append((char) c);
-                    break;
-                case IN_COMMENT:
-                    break;
-                case IN_ID:
-                    result.put("#" + (impCounter++), sb.toString());
-                    break;
-                case INIT:
-                    break;
-                case IN_UNQUOTE:
-                    result.put(key, sb.toString());
-                    break;
-                default:
-                    exc(c);
+                case IN_QUOTE -> sb.append((char) c);
+                case IN_COMMENT, INIT -> {
+                }
+                case IN_ID -> result.put("#" + (impCounter++), sb.toString());
+                case IN_UNQUOTE -> result.put(key, sb.toString());
+                default -> exc(c);
                 }
                 if (state != State.IN_COMMENT && state != State.IN_QUOTE) {
                     result.put(LITERAL_KEY, cmdBuilder.toString().trim());
-                    return result;
+                    var end = getLocation();
+                    return new ParsedCommand(result, start, end);
                 }
-                break;
-            default:
+            }
+            default -> {
                 switch (state) {
-                case INIT:
-                case IN_ID:
+                case INIT, IN_ID -> {
                     state = State.IN_ID; // fallthru intended!
                     if (!isIDChar(c)) {
                         exc(c);
                     }
                     sb.append((char) c);
-                    break;
-                case IN_UNQUOTE:
-                case AFTER_EQ:
+                }
+                case IN_UNQUOTE, AFTER_EQ -> {
                     state = State.IN_UNQUOTE;
                     if (!isIDChar(c)) {
                         exc(c);
                     }
                     sb.append((char) c);
-                    break;
-                case IN_QUOTE:
-                    sb.append((char) c);
-                    break;
-                case IN_COMMENT:
-                    break;
-                default:
+                }
+                case IN_QUOTE -> sb.append((char) c);
+                case IN_COMMENT -> {
+                }
+                default -> {
                     assert false;
                 }
+                }
+            }
             }
             if (state != State.IN_COMMENT) {
                 cmdBuilder.append((char) c);
             }
-            readChars++;
         }
     }
 
-    private boolean isIDChar(int c) {
+    private static boolean isIDChar(int c) {
         return Character.isLetterOrDigit(c) || ADMISSIBLE_CHARS.indexOf((char) c) > -1;
     }
 
     private void exc(int c) throws ScriptException {
         throw new ScriptException(
-            String.format("Unexpected char '%s' at %d:%d", (char) c, line, col), fileURL, line,
-            col);
+            String.format("Unexpected char '%s' at %d:%d", (char) c, line, col), getLocation());
     }
 
-    /**
-     * Get the number of characters read so far.
-     *
-     * @return a non-negative integer
-     */
-    public int getReadChars() {
-        return readChars;
+    private Location getLocation() {
+        return new Location(fileURI, Position.newOneBased(line, col));
     }
 
-    public int getLine() {
-        return line;
-    }
-
-    public int getColumn() {
-        return col;
-    }
-
-    public int getPosition() {
+    public int getOffset() {
         return pos;
     }
 
-    public void setLocation(Location location) {
-        this.line = location.getLine();
-        this.col = location.getColumn();
-        this.fileURL = location.getFileURL();
+    public record ParsedCommand(Map<String, String> args, Location start, Location end) {
     }
-
 }

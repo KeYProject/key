@@ -1,13 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import java.util.EventObject;
-import java.util.LinkedList;
 import java.util.Properties;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,45 +16,54 @@ import org.slf4j.LoggerFactory;
  *
  * @author lanzinger
  */
-public class TermLabelSettings implements Settings, Cloneable {
+public class TermLabelSettings extends AbstractSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(TermLabelSettings.class);
 
-    /**
-     * Property key for {@link #getUseOriginLabels()}
-     */
-    private static final String USE_ORIGIN_LABELS = "[Labels]UseOriginLabels";
+    public static final String USE_ORIGIN_LABELS = "UseOriginLabels";
 
-    /**
-     * @see {@link #getUseOriginLabels()}
-     */
+    public static final String CATEGORY = "Labels";
+
     private boolean useOriginLabels = true;
-
-    /**
-     * @see #addSettingsListener(SettingsListener)
-     * @see #removeSettingsListener(SettingsListener)
-     */
-    private final LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
 
     @Override
     public void readSettings(Properties props) {
-        String str = props.getProperty(USE_ORIGIN_LABELS);
+        String str = props.getProperty("[" + CATEGORY + "]" + USE_ORIGIN_LABELS);
 
         if (str != null && (str.equals("true") || str.equals("false"))) {
             setUseOriginLabels(Boolean.parseBoolean(str));
         } else {
-            LOGGER.debug("TermLabelSettings: Failure while reading the setting \"UseOriginLabels\"."
-                + "Using the default value: true." + "The string read was: {}", str);
             setUseOriginLabels(true);
         }
     }
 
     @Override
     public void writeSettings(Properties props) {
-        props.setProperty(USE_ORIGIN_LABELS, Boolean.toString(useOriginLabels));
+        props.setProperty("[" + CATEGORY + "]" + USE_ORIGIN_LABELS,
+            Boolean.toString(useOriginLabels));
+    }
+
+    @Override
+    public void readSettings(Configuration props) {
+        var category = props.getSection(CATEGORY);
+        if (category == null)
+            return;
+        try {
+            setUseOriginLabels(category.getBool(USE_ORIGIN_LABELS));
+        } catch (Exception e) {
+            LOGGER.debug("TermLabelSettings: Failure while reading the setting \"UseOriginLabels\"."
+                + "Using the default value: true." + "The string read was: {}",
+                category.get(USE_ORIGIN_LABELS), e);
+            setUseOriginLabels(true);
+        }
+    }
+
+    @Override
+    public void writeSettings(Configuration props) {
+        var category = props.getOrCreateSection(CATEGORY);
+        category.set(USE_ORIGIN_LABELS, useOriginLabels);
     }
 
     /**
-     *
      * @return {@code true} iff {@link OriginTermLabel}s should be used.
      */
     public boolean getUseOriginLabels() {
@@ -67,32 +76,8 @@ public class TermLabelSettings implements Settings, Cloneable {
      * @param useOriginLabels whether {@link OriginTermLabel}s should be used.
      */
     public void setUseOriginLabels(boolean useOriginLabels) {
-        if (this.useOriginLabels != useOriginLabels) {
-            this.useOriginLabels = useOriginLabels;
-            fireSettingsChanged();
-        }
-    }
-
-    @Override
-    public void addSettingsListener(SettingsListener l) {
-        listenerList.add(l);
-    }
-
-    /**
-     * Removes a listener from this settings object.
-     *
-     * @param l the listener to remove.
-     */
-    public void removeSettingsListener(SettingsListener l) {
-        listenerList.remove(l);
-    }
-
-    /**
-     * Notify all listeners of the current state of this settings object.
-     */
-    protected void fireSettingsChanged() {
-        for (SettingsListener aListenerList : listenerList) {
-            aListenerList.settingsChanged(new EventObject(this));
-        }
+        var old = this.useOriginLabels;
+        this.useOriginLabels = useOriginLabels;
+        firePropertyChange(USE_ORIGIN_LABELS, old, useOriginLabels);
     }
 }

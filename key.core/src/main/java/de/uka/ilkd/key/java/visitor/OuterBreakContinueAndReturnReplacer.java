@@ -1,21 +1,14 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Stack;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -26,33 +19,35 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.key_project.util.ExtList;
+
 public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     protected static final Boolean CHANGED = Boolean.TRUE;
 
     private final Break breakOut;
-    private final Map<Label, ProgramVariable> breakFlags;
-    private final Map<Label, ProgramVariable> continueFlags;
-    private final ProgramVariable returnFlag;
-    private final ProgramVariable returnValue;
-    private final ProgramVariable exception;
+    private final Map<Label, LocationVariable> breakFlags;
+    private final Map<Label, LocationVariable> continueFlags;
+    private final LocationVariable returnFlag;
+    private final LocationVariable returnValue;
+    private final LocationVariable exception;
 
-    private final Stack<ExtList> stack = new Stack<ExtList>();
-    private final Stack<Label> labels = new Stack<Label>();
-    private final Stack<MethodFrame> frames = new Stack<MethodFrame>();
+    private final ArrayDeque<ExtList> stack = new ArrayDeque<>();
+    private final ArrayDeque<Label> labels = new ArrayDeque<>();
+    private final ArrayDeque<MethodFrame> frames = new ArrayDeque<>();
     private int loopAndSwitchCascadeDepth;
 
     private StatementBlock result;
 
     public OuterBreakContinueAndReturnReplacer(final StatementBlock block,
             final Iterable<Label> alwaysInnerLabels, final Label breakOutLabel,
-            final Map<Label, ProgramVariable> breakFlags,
-            final Map<Label, ProgramVariable> continueFlags, final ProgramVariable returnFlag,
-            final ProgramVariable returnValue, final ProgramVariable exception,
+            final Map<Label, LocationVariable> breakFlags,
+            final Map<Label, LocationVariable> continueFlags, final LocationVariable returnFlag,
+            final LocationVariable returnValue, final LocationVariable exception,
             final Services services) {
         super(block, services);
         for (Label label : alwaysInnerLabels) {
-            this.labels.add(label);
+            this.labels.push(label);
         }
         this.breakOut = new Break(breakOutLabel);
         this.breakFlags = breakFlags;
@@ -130,9 +125,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     }
 
     private void performActionOnJump(final LabelJumpStatement x,
-            final Map<Label, ProgramVariable> flags) {
+            final Map<Label, LocationVariable> flags) {
         if (isJumpToOuterLabel(x)) {
-            final ProgramVariable flag = flags.get(x.getLabel());
+            final LocationVariable flag = flags.get(x.getLabel());
             assert flag != null : "a label flag must not be null";
             final Statement assign =
                 KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE, x.getPositionInfo());
@@ -146,12 +141,12 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     private boolean isJumpToOuterLabel(final LabelJumpStatement x) {
         return loopAndSwitchCascadeDepth == 0 && x.getProgramElementName() == null
-                || x.getLabel() != null && labels.search(x.getLabel()) == -1;
+                || x.getLabel() != null && !labels.contains(x.getLabel());
     }
 
     @Override
     public void performActionOnReturn(final Return x) {
-        if (frames.empty()) {
+        if (frames.isEmpty()) {
             final ExtList changeList = stack.peek();
             if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
