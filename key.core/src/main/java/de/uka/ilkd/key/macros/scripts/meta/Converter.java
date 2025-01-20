@@ -1,12 +1,15 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts.meta;
 
 /**
- * A {@link Converter} translates a textual representation to an instance of {@code T}.
+ * A {@link Converter} translates an instance of {@code R} to an instance of {@code T}.
  *
  * @param <T>
  * @author Alexander Weigl
  */
-public interface Converter<R,T> {
+public interface Converter<R, T> {
     /**
      * Translates the textual representation given in {@code s} to an instance of {@code T}.
      *

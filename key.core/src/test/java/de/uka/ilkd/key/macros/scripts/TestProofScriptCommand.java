@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
@@ -73,8 +72,8 @@ public class TestProofScriptCommand {
 
         Proof proof = env.getLoadedProof();
 
-        var script = ParsingFacade.parseScript(new PositionedString(props.get("script"),
-                tmpKey.toFile().getAbsolutePath()));
+        var script = ParsingFacade.parseScript(
+            new PositionedString(props.get("script"), tmpKey.toUri()));
         ProofScriptEngine pse =
             new ProofScriptEngine(script);
 

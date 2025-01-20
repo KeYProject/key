@@ -26,7 +26,7 @@ public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParamete
 
     @Override
     public FormulaParameter evaluateArguments(EngineState state,
-                                              Map<String, Object> arguments)
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new FormulaParameter(), arguments);
     }

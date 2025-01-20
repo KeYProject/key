@@ -11,7 +11,6 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -68,9 +67,9 @@ public class ProveRulesTest {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(proofFile);
         Proof proof = env.getLoadedProof();
 
-      KeyAst.ProofScript script = env.getProofScript();
+        KeyAst.ProofScript script = env.getProofScript();
         if (script != null) {
-    	  ProofScriptEngine pse = new ProofScriptEngine(script);
+            ProofScriptEngine pse = new ProofScriptEngine(script);
             pse.execute(env.getUi(), proof);
         }
 
@@ -144,8 +143,10 @@ public class ProveRulesTest {
          */
         return tacletNames.stream().filter(it -> it.equals("schiffl_thm_1"))
                 .map(
-            tacletName -> DynamicTest.dynamicTest(tacletName, () -> loadTacletProof(tacletName,
-                tacletObjectByTacletName.get(tacletName), proofFileByTacletName.get(tacletName))));
+                    tacletName -> DynamicTest.dynamicTest(tacletName,
+                        () -> loadTacletProof(tacletName,
+                            tacletObjectByTacletName.get(tacletName),
+                            proofFileByTacletName.get(tacletName))));
     }
 
 }

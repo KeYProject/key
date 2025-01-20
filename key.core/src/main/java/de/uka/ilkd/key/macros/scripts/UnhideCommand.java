@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -45,7 +49,7 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
 
     @Override
     public Parameters evaluateArguments(EngineState state,
-                                        Map<String, Object> arguments)
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }

@@ -6,13 +6,11 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 import java.util.Optional;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.macros.scripts.meta.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverCore;
@@ -105,12 +103,12 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
      * matchesRegEx (may not be null).
      *
      * @param maybeMatchesRegEx The RegEx which should match on the sequent formula to focus.
-     * @param breakpointArg     An optional breakpoint argument.
-     * @param goal              The {@link Goal} to apply the strategy on, needed for the rule
-                               application* manager.
-     * @param proverCore        The {@link ProverCore}, needed for resetting the strategy
-                               afterward.
-     * @param services          The {@link Services} object.
+     * @param breakpointArg An optional breakpoint argument.
+     * @param goal The {@link Goal} to apply the strategy on, needed for the rule
+     *        application* manager.
+     * @param proverCore The {@link ProverCore}, needed for resetting the strategy
+     *        afterward.
+     * @param services The {@link Services} object.
      * @throws ScriptException
      */
     private void setupFocussedBreakpointStrategy(final Optional<String> maybeMatchesRegEx,
@@ -118,7 +116,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             final Services services) throws ScriptException {
         final Optional<PosInOccurrence> focus = maybeMatchesRegEx.isPresent()
                 ? Optional.of(MacroCommand.extractMatchingPio(goal.node().sequent(),
-                        maybeMatchesRegEx.get(), services))
+                    maybeMatchesRegEx.get(), services))
                 : Optional.empty();
 
         final AutomatedRuleApplicationManager realManager = //

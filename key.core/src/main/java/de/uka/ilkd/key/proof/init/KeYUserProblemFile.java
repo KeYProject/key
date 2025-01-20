@@ -27,7 +27,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 
@@ -185,11 +184,11 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * Returns the {@link ProofScriptEntry} in this resource
      *
      * @return {@link ProofScriptEntry} if present otherwise null
-     * @see KeyAst.File#findProofScript(URI)
+     * @see #findProofScript()
      */
-    public @Nullable ProofScriptEntry readProofScript() {
+    public KeyAst.@Nullable ProofScript readProofScript() {
         URI url = getInitialFile().toURI();
-        return getParseContext().findProofScript(url);
+        return getParseContext().findProofScript();
     }
 
     /**
@@ -249,7 +248,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *         is defined by the file.
      */
     private Profile readProfileFromFile() {
-        @NonNull
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {

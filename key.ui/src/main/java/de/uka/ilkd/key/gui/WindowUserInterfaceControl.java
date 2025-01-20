@@ -12,9 +12,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.*;
 
-import de.uka.ilkd.key.nparser.KeyAst;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
@@ -26,7 +23,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.nparser.ProofScriptEntry;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -224,15 +221,16 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
-                ProblemLoader problemLoader = (ProblemLoader) info.getSource();
                 if (problemLoader.hasProofScript()) {
-                    KeyAst.ProofScript scriptAndLoc;
                     try {
-                        scriptAndLoc = problemLoader.readProofScript();
+                        KeyAst.ProofScript scriptAndLoc = problemLoader.readProofScript();
                         ProofScriptWorker psw =
-                                new ProofScriptWorker(mainWindow.getMediator(), scriptAndLoc);
-                    psw.init();
-                    psw.execute();
+                            new ProofScriptWorker(mainWindow.getMediator(), scriptAndLoc);
+                        psw.init();
+                        psw.execute();
+                    } catch (ProofInputException e) {
+                        throw new RuntimeException(e);
+                    }
                 } else if (macroChosen()) {
                     applyMacro();
                 }

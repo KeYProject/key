@@ -69,7 +69,7 @@ public class ProofScriptFromFileAction extends AbstractAction {
             if (res == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fc.getSelectedFile();
                 lastDirectory = selectedFile.getParentFile();
-                var script = ParsingFacade.parseScript(selectedFile);
+                var script = ParsingFacade.parseScript(selectedFile.toPath());
                 ProofScriptWorker psw = new ProofScriptWorker(mediator, script);
                 psw.init();
                 psw.execute();

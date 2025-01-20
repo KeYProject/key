@@ -37,7 +37,7 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
 
     @Override
     public Parameters evaluateArguments(EngineState state,
-                                        Map<String, Object> arguments)
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }

@@ -15,6 +15,7 @@ import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -39,7 +40,6 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 
 import org.antlr.runtime.MismatchedTokenException;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -679,8 +679,7 @@ public abstract class AbstractProblemLoader {
         }
     }
 
-    private ReplayResult replayProof(Proof proof)
-            throws ProofInputException, ProblemLoaderException {
+    private ReplayResult replayProof(Proof proof) {
         String status = "";
         List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();

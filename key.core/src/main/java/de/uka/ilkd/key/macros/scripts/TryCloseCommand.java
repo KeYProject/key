@@ -7,7 +7,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
@@ -27,8 +26,9 @@ public class TryCloseCommand extends AbstractCommand<TryCloseCommand.TryCloseArg
         super(TryCloseArguments.class);
     }
 
-    @Override public TryCloseArguments evaluateArguments(EngineState state,
-                                                         Map<String, Object> arguments)
+    @Override
+    public TryCloseArguments evaluateArguments(EngineState state,
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new TryCloseArguments(), arguments);
     }

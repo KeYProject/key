@@ -28,7 +28,7 @@ class DataRecordingTestFile extends TestFile {
 
     @Override
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-                            KeyAst.ProofScript script) throws Exception {
+            KeyAst.ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             DataRecordingStrategy strategy = new DataRecordingStrategy(loadedProof, this);

@@ -32,7 +32,7 @@ public class SaveInstCommand extends AbstractCommand<Map<String, Object>> {
 
     @Override
     public Map<String, Object> evaluateArguments(EngineState state,
-                                                 Map<String, Object> arguments) {
+            Map<String, Object> arguments) {
         return arguments;
     }
 

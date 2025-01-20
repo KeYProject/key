@@ -4,10 +4,10 @@
 package de.uka.ilkd.key.nparser;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
 import de.uka.ilkd.key.nparser.builder.FindProblemInformation;
@@ -93,17 +93,24 @@ public abstract class KeyAst<T extends ParserRuleContext> {
          * or including
          * other files.
          *
-         * @param url location pointing to the source of the AST
          * @return a {@link ProofScriptEntry} if {@code \proofscript} is present
          */
-        public @Nullable ProofScript findProofScript(URI url) {
-            if (ctx.problem() != null && ctx.problem().proofScript() != null) {
-                KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
-                Location location = new Location(url,
-                    Position.newOneBased(pctx.ps.getLine(), pctx.ps.getCharPositionInLine()));
+        public @Nullable ProofScript findProofScript() {
+            if (ctx.problem() != null && ctx.problem().proofScriptEntry() != null) {
+                KeYParser.ProofScriptEntryContext pctx = ctx.problem().proofScriptEntry();
 
-                String text = pctx.ps.getText();
-                return new ProofScriptEntry(StringUtil.trim(text, '"'), location);
+                KeYParser.ProofScriptContext ps;
+                if (pctx.STRING_LITERAL() != null) {
+                    var ctx = pctx.STRING_LITERAL().getSymbol();
+                    String text = pctx.STRING_LITERAL().getText();
+
+                    // +1 for the removal of the quote.
+                    text = StringUtil.move(StringUtil.trim(text, '"'), ctx.getLine(),
+                        ctx.getCharPositionInLine() + 1);
+                    return ParsingFacade.parseScript(text);
+                } else {
+                    return new KeyAst.ProofScript(pctx.proofScript());
+                }
             }
             return null;
         }
@@ -214,22 +221,26 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
     }
 
+    /**
+     * This struct encapsulate the information of a proof script found in key files.
+     *
+     * @author Alexander Weigl
+     * @version 1 (23.04.24)
+     */
     public static class ProofScript extends KeyAst<KeYParser.ProofScriptContext> {
-        ProofScript(@Nonnull KeYParser.ProofScriptContext ctx) {
+        ProofScript(KeYParser.@NonNull ProofScriptContext ctx) {
             super(ctx);
         }
 
-        public URL getUrl() {
+        public URI getUrl() {
+            final var sourceName = ctx.start.getTokenSource().getSourceName();
             try {
-                final var sourceName = ctx.start.getTokenSource().getSourceName();
-                if(sourceName.startsWith("file:") || sourceName.startsWith("http:") || sourceName.startsWith("jar:"))
-                    return new URL(sourceName);
-                else
-                    return new java.io.File(sourceName).toURI().toURL();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return null;
+                if (sourceName.startsWith("file:") || sourceName.startsWith("http:")
+                        || sourceName.startsWith("jar:"))
+                    return new URI(sourceName);
+            } catch (URISyntaxException ignored) {
             }
+            return new java.io.File(sourceName).toURI();
         }
     }
 

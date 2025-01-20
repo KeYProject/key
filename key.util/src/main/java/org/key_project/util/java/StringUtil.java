@@ -490,4 +490,15 @@ public final class StringUtil {
         return (int) text.chars().skip(beginIndex).limit(endIndex - beginIndex)
                 .filter(ch -> ch == x).count();
     }
+
+    /**
+     *
+     * @param text
+     * @param line
+     * @param charPositionInLine
+     * @return
+     */
+    public static String move(@NonNull String text, int line, int charPositionInLine) {
+        return repeat("\n", line) + repeat(" ", charPositionInLine) + text;
+    }
 }

@@ -20,7 +20,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.nparser.ProofScriptEntry;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -161,14 +161,14 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             ProblemLoader problemLoader = (ProblemLoader) info.getSource();
             if (problemLoader.hasProofScript()) {
                 try {
-                   KeyAst.ProofScript script = problemLoader.readProofScript();
-                   ProofScriptEngine pse = new ProofScriptEngine(script);
-                this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
-                        pse.execute(this, proof);
-                        // The start and end messages are fake to persuade the system ...
-                        // All this here should refactored anyway ...
-                        this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
-                    }
+                    KeyAst.ProofScript script = problemLoader.readProofScript();
+                    ProofScriptEngine pse = new ProofScriptEngine(script);
+                    this.taskStarted(
+                        new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
+                    pse.execute(this, proof);
+                    // The start and end messages are fake to persuade the system ...
+                    // All this here should refactored anyway ...
+                    this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
                 } catch (Exception e) {
                     LOGGER.debug("", e);
                     System.exit(-1);

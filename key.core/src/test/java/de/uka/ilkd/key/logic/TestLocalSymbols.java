@@ -7,11 +7,9 @@ import java.io.File;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -124,12 +122,12 @@ public class TestLocalSymbols {
     // there was a bug.
     @Test
     public void testDoubleInstantiation() throws Exception {
-        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX,  "doubleSkolem.key");
+        File proofFile = new File(TEST_RESOURCES_DIR_PREFIX, "doubleSkolem.key");
         Assertions.assertTrue(proofFile.exists(), "Proof file does not exist" + proofFile);
 
         KeYEnvironment<?> env = KeYEnvironment.load(
-                JavaProfile.getDefaultInstance(), proofFile, null, null,
-                null, true);
+            JavaProfile.getDefaultInstance(), proofFile, null, null,
+            null, true);
 
         Proof proof = env.getLoadedProof();
         var script = env.getProofScript();

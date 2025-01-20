@@ -20,8 +20,9 @@ public abstract class NoArgumentCommand implements ProofScriptCommand<Void> {
         return new ArrayList<>();
     }
 
-    @Override public Void evaluateArguments(EngineState state,
-                                            Map<String, Object> arguments) {
+    @Override
+    public Void evaluateArguments(EngineState state,
+            Map<String, Object> arguments) {
         return null;
     }
 

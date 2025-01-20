@@ -30,25 +30,25 @@ import org.jspecify.annotations.Nullable;
  * @author Martin Hentschel
  */
 public class KeYEnvironment<U extends UserInterfaceControl> {
-   /**
-    * The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
-    */
-   private final U ui;
+    /**
+     * The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
+     */
+    private final U ui;
 
-   /**
-    * The loaded project.
-    */
-   private final InitConfig initConfig;
+    /**
+     * The loaded project.
+     */
+    private final InitConfig initConfig;
 
-   /**
-    * An optional {@link Proof} which was loaded by the specified proof file.
-    */
-   private final Proof loadedProof;
+    /**
+     * An optional {@link Proof} which was loaded by the specified proof file.
+     */
+    private final Proof loadedProof;
 
-   /**
-    * An optional field denoting a script contained in the proof file.
-    */
-   private final @Nullable KeyAst.ProofScript proofScript;
+    /**
+     * An optional field denoting a script contained in the proof file.
+     */
+    private final KeyAst.@Nullable ProofScript proofScript;
 
     /**
      * Indicates that this {@link KeYEnvironment} is disposed.
@@ -75,10 +75,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      *
      * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      * @param initConfig The loaded project.
-    * @param proofScript
+     * @param proofScript add an optional proof script
      */
-   public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof,
-            @Nullable ProofScriptEntry proofScript, ReplayResult replayResult) {
+    public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof,
+            KeyAst.@Nullable ProofScript proofScript, ReplayResult replayResult) {
         this.ui = ui;
         this.initConfig = initConfig;
         this.loadedProof = loadedProof;
@@ -89,14 +89,14 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * Returns the {@link UserInterfaceControl} in which the {@link Proof} is loaded.
      *
-    * @return The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
-    */
-   public U getUi() {
-      return ui;
-   }
+     * @return The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
+     */
+    public U getUi() {
+        return ui;
+    }
 
-   /**
-    * Returns the {@link ProofControl} of {@link #getUi()}.
+    /**
+     * Returns the {@link ProofControl} of {@link #getUi()}.
      *
      * @return The {@link ProofControl} of {@link #getUi()}.
      */
@@ -140,12 +140,12 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
         return getServices().getSpecificationRepository();
     }
 
-   public Profile getProfile() {
-      return getInitConfig().getProfile();
-   }
+    public Profile getProfile() {
+        return getInitConfig().getProfile();
+    }
 
-   /**
-    * Returns the loaded {@link Proof} if a proof file was loaded.
+    /**
+     * Returns the loaded {@link Proof} if a proof file was loaded.
      *
      * @return The loaded {@link Proof} if available and {@code null} otherwise.
      */
@@ -165,15 +165,15 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * Creates a new {@link Proof} with help of the {@link UserInterfaceControl}.
      *
-    * @param input The {@link ProofOblInput} to instantiate {@link Proof} from.
-    * @return The instantiated {@link Proof}.
-    * @throws ProofInputException Occurred Exception.
-    */
-   public Proof createProof(ProofOblInput input) throws ProofInputException {
-      return ui.createProof(getInitConfig(), input);
-   }
+     * @param input The {@link ProofOblInput} to instantiate {@link Proof} from.
+     * @return The instantiated {@link Proof}.
+     * @throws ProofInputException Occurred Exception.
+     */
+    public Proof createProof(ProofOblInput input) throws ProofInputException {
+        return ui.createProof(getInitConfig(), input);
+    }
 
-   /**
+    /**
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
      * {@code MainWindow} is not involved in the whole process.
      *
@@ -187,10 +187,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     public static KeYEnvironment<DefaultUserInterfaceControl> load(File location,
             List<File> classPaths, File bootClassPath, List<File> includes)
             throws ProblemLoaderException {
-      return load(null, location, classPaths, bootClassPath, includes, false);
-   }
+        return load(null, location, classPaths, bootClassPath, includes, false);
+    }
 
-   /**
+    /**
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
      * {@code MainWindow} is not involved in the whole process.
      *
@@ -207,9 +207,9 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             RuleCompletionHandler ruleCompletionHandler) throws ProblemLoaderException {
         return load(null, location, classPaths, bootClassPath, includes, null,
             ruleCompletionHandler, false);
-   }
+    }
 
-   /**
+    /**
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
      * {@code MainWindow} is not involved in the whole process.
      *
@@ -220,9 +220,9 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param includes Optional includes to consider.
      * @param forceNewProfileOfNewProofs {@code} true
      *        {@code AbstractProblemLoader.profileOfNewProofs} will
-    *                                         be used as
+     *        be used as
      *        {@link Profile} of new proofs, {@code false} {@link Profile}
-    *                                          specified by problem file
+     *        specified by problem file
      *        will be used for new proofs.
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
@@ -230,12 +230,12 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, File location,
             List<File> classPaths, File bootClassPath, List<File> includes,
             boolean forceNewProfileOfNewProofs)
-           throws ProblemLoaderException {
+            throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, null, null,
             forceNewProfileOfNewProofs);
-   }
+    }
 
-   /**
+    /**
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
      * {@code MainWindow} is not involved in the whole process.
      *
@@ -287,42 +287,42 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
             Consumer<Proof> callbackProofLoaded,
             boolean forceNewProfileOfNewProofs)
-           throws ProblemLoaderException {
+            throws ProblemLoaderException {
         DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
-      AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath,
+        AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath,
             includes, poPropertiesToForce, forceNewProfileOfNewProofs, callbackProofLoaded);
         InitConfig initConfig = loader.getInitConfig();
 
         return new KeYEnvironment<>(ui, initConfig, loader.getProof(),
             loader.getProofScript(), loader.getResult());
-   }
+    }
 
     public static KeYEnvironment<DefaultUserInterfaceControl> load(File keyFile)
             throws ProblemLoaderException {
         return load(keyFile, null, null, null);
     }
 
-   /**
-    * Disposes this {@link KeYEnvironment}.
-    */
-   public void dispose() {
-      if (loadedProof != null && !loadedProof.isDisposed()) {
-         loadedProof.dispose();
-      }
-      disposed = true;
-   }
+    /**
+     * Disposes this {@link KeYEnvironment}.
+     */
+    public void dispose() {
+        if (loadedProof != null && !loadedProof.isDisposed()) {
+            loadedProof.dispose();
+        }
+        disposed = true;
+    }
 
-   /**
+    /**
      * Checks if this {@link KeYEnvironment} is disposed meaning that {@link #dispose()} was already
      * executed at least once.
      *
-     * @return {@code true} disposed, {@code false} not disposed and still functionable.
+     * @return {@code true} disposed, {@code false} not disposed and still functional.
      */
     public boolean isDisposed() {
         return disposed;
     }
 
-    public @Nullable ProofScriptEntry getProofScript() {
+    public KeyAst.@Nullable ProofScript getProofScript() {
         return proofScript;
     }
 }

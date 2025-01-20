@@ -15,7 +15,6 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -162,9 +161,9 @@ public class TestFile implements Serializable {
             boolean success;
             try {
                 // Initialize KeY environment and load proof.
-         var pair = load(keyFile);
+                var pair = load(keyFile);
                 env = pair.first;
-         var script = pair.second;
+                var script = pair.second;
                 loadedProof = env.getLoadedProof();
                 ReplayResult replayResult;
 
@@ -263,7 +262,7 @@ public class TestFile implements Serializable {
      * want to use a different strategy.
      */
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-                            KeyAst.ProofScript script) throws Exception {
+            KeyAst.ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
@@ -278,8 +277,8 @@ public class TestFile implements Serializable {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-   private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(File keyFile)
-           throws ProblemLoaderException {
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(File keyFile)
+            throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
     }

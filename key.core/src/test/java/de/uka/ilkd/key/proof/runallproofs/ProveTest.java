@@ -108,7 +108,7 @@ public class ProveTest {
             LOGGER.info("({}) Proving done", caseId);
 
             env = pair.first;
-            var script= pair.second;
+            var script = pair.second;
             loadedProof = env.getLoadedProof();
 
             AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
@@ -182,7 +182,7 @@ public class ProveTest {
      * want to use a different strategy.
      */
     private void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-                          KeyAst.ProofScript script) throws Exception {
+            KeyAst.ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
@@ -197,8 +197,7 @@ public class ProveTest {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript>
-    load(
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(
             File keyFile) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());

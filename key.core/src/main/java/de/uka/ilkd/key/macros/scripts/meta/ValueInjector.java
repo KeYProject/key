@@ -3,11 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts.meta;
 
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-import de.uka.ilkd.key.nparser.KeYParser;
-import de.uka.ilkd.key.util.Pair;
-import org.antlr.v4.runtime.RuleContext;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +32,19 @@ public class ValueInjector {
      * T --> StringConverter<T>
      * </pre>
      */
-    private final Map<Pair<Class<?>, Class<?>>, Converter<?, ?>> converters = new HashMap<>();
+    private final Map<ConverterKey<?, ?>, Converter<?, ?>> converters = new HashMap<>();
+
+    /**
+     *
+     * @param source
+     * @param target
+     * @param <S>
+     * @param <T>
+     */
+    private record ConverterKey<S,T>(
+    Class<S> source, Class<T>target)
+    {
+    }
 
     /**
      * Injects the given {@code arguments} in the {@code obj}. For more details see
@@ -46,7 +53,7 @@ public class ValueInjector {
      * @param command a proof script command
      * @param obj a parameter class with annotation
      * @param arguments a non-null map of string pairs
-     * @param <T>       an arbitrary type
+     * @param <T> an arbitrary type
      * @return the same object as {@code obj}
      * @throws ArgumentRequiredException a required argument was not given in {@code arguments}
      * @throws InjectionReflectionException an access on some reflection methods occurred
@@ -99,7 +106,7 @@ public class ValueInjector {
     /**
      * Injects the converted version of the given {@code arguments} in the given {@code obj}.
      *
-     * @param <T>       type safety
+     * @param <T> type safety
      * @param command a proof script command
      * @param obj a non-null instance of a parameter class (with annotation)
      * @param arguments a non-null string map
@@ -195,30 +202,34 @@ public class ValueInjector {
         var converter = (Converter<Object, Object>) getConverter(meta.getType(), val.getClass());
         if (converter == null) {
             throw new NoSpecifiedConverterException(
-                "No converter registered for class: " + meta.getField().getType() + " from " + val.getClass(), meta);
+                "No converter registered for class: " + meta.getField().getType() + " from "
+                    + val.getClass(),
+                meta);
         }
         try {
             return converter.convert(val);
         } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert value %s (%s) to type %s",
-                val, val.getClass(), meta.getField().getType().getName()), e, meta);
+            throw new ConversionException(
+                String.format("Could not convert value %s (%s) to type %s",
+                    val, val.getClass(), meta.getField().getType().getName()),
+                e, meta);
         }
     }
 
     /**
      * Registers the given converter for the specified class.
      *
-     * @param ret  a class
+     * @param ret a class
      * @param conv a converter for the given class
-     * @param <T>  an arbitrary type
+     * @param <T> an arbitrary type
      */
     public <R, T> void addConverter(Class<R> ret, Class<T> arg, Converter<R, T> conv) {
-        converters.put(new Pair<>(ret, arg), conv);
+        converters.put(new ConverterKey<>(ret, arg), conv);
     }
 
     public <R, T> void addConverter(Converter<R, T> conv) {
         var m = conv.getClass().getMethods()[0];
-        converters.put(new Pair<>(m.getReturnType(), m.getParameterTypes()[0]), conv);
+        converters.put(new ConverterKey<>(m.getReturnType(), m.getParameterTypes()[0]), conv);
     }
 
     /**
@@ -231,12 +242,13 @@ public class ValueInjector {
      */
     @SuppressWarnings("unchecked")
     public <R, T> Converter<R, T> getConverter(Class<R> ret, Class<T> arg) {
-        return (Converter<R, T>) converters.get(new Pair<>(ret, arg));
+        return (Converter<R, T>) converters.get(new ConverterKey<>(ret, arg));
     }
 
     @Override
     public String toString() {
-        return getClass().getName() + "(" + converters.keySet().stream()
-                .map(it -> it.toString()).collect(Collectors.joining(",\n")) + ")";
+        return "%s(%s)".formatted(
+            getClass().getName(),
+            converters.keySet().stream().map(Record::toString).collect(Collectors.joining(",\n")));
     }
 }

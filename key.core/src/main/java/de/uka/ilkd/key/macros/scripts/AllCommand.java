@@ -3,17 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
+import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
+import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 
-public class AllCommand extends AbstractCommand<Map<String, Object>> {
+public class AllCommand implements ProofScriptCommand<Map<String, Object>> {
+    private String documentation;
 
-    public AllCommand() {
-        super(null);
+    @Override
+    public List<ProofScriptArgument<Map<String, Object>>> getArguments() {
+        return List.of();
     }
 
     @Override
@@ -22,74 +26,39 @@ public class AllCommand extends AbstractCommand<Map<String, Object>> {
     }
 
     @Override
-    public String getName() {
-        return "onAll";
-    }
+    public void execute(AbstractUserInterfaceControl uiControl, Map<String, Object> args,
+            EngineState stateMap) throws ScriptException, InterruptedException {
+        var block = (KeYParser.ProofScriptContext) args.get(ProofScriptEngine.KEY_SUB_SCRIPT);
 
-    @Override
-    protected void execute(Map<String, Object> args) throws ScriptException, InterruptedException {
-        String wrappedCmdname = args.get("#2").toString();
-        if (wrappedCmdname == null) {
+        if (block == null) {
             throw new ScriptException("Missing command to apply onAll to");
         }
 
-        ProofScriptCommand<?> command = ProofScriptEngine.getCommand(wrappedCmdname);
-        if (command == null) {
-            throw new ScriptException("Unknown command: " + wrappedCmdname);
-        }
-
-        var newArgs = rearrangeArgs(args);
-
-        try {
-            executeWrappedCommand(command, newArgs);
-        } catch (Exception e) {
-            throw new ScriptException(e);
-        }
-
-    }
-
-    private HashMap<String, Object> rearrangeArgs(Map<String, Object> args) {
-        HashMap<String, Object> newArgs = new HashMap<>();
-        for (Entry<String, Object> en : args.entrySet()) {
-            if (en.getKey().matches("#[0-9]+")) {
-                int no = Integer.parseInt(en.getKey().substring(1));
-                if (no != 1) {
-                    newArgs.put("#" + (no - 1), en.getValue());
-                }
-            } else {
-                newArgs.put(en.getKey(), en.getValue());
-            }
-        }
-        return newArgs;
-    }
-
-    private <A> void executeWrappedCommand(ProofScriptCommand<A> command,
-                                           Map<String, Object> newArgs) throws Exception {
-        A params = command.evaluateArguments(state, newArgs);
-
+        var proof = stateMap.getProof();
         // Node selectedNode = state.getSelectedNode();
         for (Goal g : proof.openGoals()) {
             // if (isBelow(g, selectedNode)) {
-            state.setGoal(g);
-            command.execute(uiControl, params, state);
+            stateMap.setGoal(g);
+            stateMap.getEngine().execute(uiControl, block.proofScriptCommand());
             // }
         }
         // state.setGoal(selectedNode);
     }
 
-    private boolean isBelow(Goal g, Node above) {
-        if (above == null) {
-            return true;
-        }
 
-        Node node = g.node();
-        while (node != null) {
-            if (node == above) {
-                return true;
-            }
-            node = node.parent();
-        }
+    @Override
+    public String getName() {
+        return "onAll";
+    }
 
-        return false;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDocumentation() {
+        if (documentation == null) {
+            documentation = DescriptionFacade.getDocumentation(this);
+        }
+        return documentation;
     }
 }
