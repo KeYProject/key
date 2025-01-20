@@ -1658,7 +1658,7 @@ public class TermBuilder {
     }
 
     /**
-     * Get a term for a accessing a final field.
+     * Get a term for accessing a final field.
      * This can be used for ordinary fields and model fields.
      * The results are quite different!
      *
@@ -1673,6 +1673,22 @@ public class TermBuilder {
         final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort ? finalDot(sort, o, func(f))
                 : func(f, getBaseHeap(), o);
+    }
+
+    /**
+     * Get a term for accessing a static final field.
+     * This can be used for ordinary fields.
+     *
+     * @param sort the sort of the result.
+     * @param f the field to access
+     * @return the term representing the static access "C.f"
+     * @see #finalDot(Sort, Term, Term) for accessing final Java or ghost fields
+     * @see #dot(Sort, Term, JFunction) for accessing final model fields
+     */
+    public Term staticFinalDot(Sort sort, JFunction f) {
+        final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+        return f.sort() == fieldSort ? finalDot(sort, NULL(), func(f))
+                : func(f, getBaseHeap(), NULL());
     }
 
     /**

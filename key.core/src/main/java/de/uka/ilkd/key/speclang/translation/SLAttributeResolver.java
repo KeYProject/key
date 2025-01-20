@@ -134,8 +134,15 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                         heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
                     Term attributeTerm;
                     if (attribute.isStatic()) {
-                        attributeTerm =
-                            services.getTermBuilder().staticDot(attribute.sort(), fieldSymbol);
+                        if (attribute.isFinal() &&
+                                FinalHeapResolution.recallIsFinalEnabled()) {
+                            attributeTerm =
+                                services.getTermBuilder().staticFinalDot(attribute.sort(),
+                                    fieldSymbol);
+                        } else {
+                            attributeTerm =
+                                services.getTermBuilder().staticDot(attribute.sort(), fieldSymbol);
+                        }
                     } else if (attribute.isFinal() &&
                             FinalHeapResolution.recallIsFinalEnabled()) {
                         attributeTerm = services.getTermBuilder().finalDot(attribute.sort(),
