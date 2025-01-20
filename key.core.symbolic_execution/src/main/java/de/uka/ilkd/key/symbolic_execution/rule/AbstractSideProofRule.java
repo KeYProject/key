@@ -6,21 +6,18 @@ package de.uka.ilkd.key.symbolic_execution.rule;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -86,8 +83,8 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
-    protected List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Goal goal,
-            ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
+    protected List<ResultsAndCondition> computeResultsAndConditions(Services services,
+            Goal goal, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
             JFunction newPredicate) throws ProofInputException {
         return SymbolicExecutionSideProofUtil.computeResultsAndConditions(goal.getOverlayServices(),
             goal.proof(),
@@ -135,4 +132,5 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     public boolean isApplicableOnSubTerms() {
         return false;
     }
+
 }

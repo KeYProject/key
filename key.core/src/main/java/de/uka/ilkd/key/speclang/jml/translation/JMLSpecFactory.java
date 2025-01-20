@@ -45,7 +45,6 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
 import org.key_project.logic.Name;
@@ -604,12 +603,11 @@ public class JMLSpecFactory {
      */
     private ImmutableList<Term> registerAbbreviationVariables(TextualJMLSpecCase textualSpecCase,
             Context context, ProgramVariableCollection progVars, ContractClauses clauses) {
-        for (Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext> abbrv : textualSpecCase
-                .getAbbreviations()) {
+        for (TextualJMLSpecCase.Abbreviation abbrv : textualSpecCase.getAbbreviations()) {
             final KeYJavaType abbrKJT =
-                services.getJavaInfo().getKeYJavaType(abbrv.first.first.getText());
+                services.getJavaInfo().getKeYJavaType(abbrv.typeName().first.getText());
             final ProgramElementName abbrVarName =
-                new ProgramElementName(abbrv.second.first.getText());
+                new ProgramElementName(abbrv.abbrevName().first.getText());
             final LocationVariable abbrVar = new LocationVariable(abbrVarName, abbrKJT, true, true);
             assert abbrVar.isGhost() : "specification parameter not ghost";
             services.getNamespaces().programVariables().addSafely(abbrVar);
@@ -618,7 +616,7 @@ public class JMLSpecFactory {
             // parameter
             Term rhs = new JmlIO(services).context(context).parameters(progVars.paramVars)
                     .atPres(progVars.atPres).atBefore(progVars.atBefores)
-                    .translateTerm(abbrv.third);
+                    .translateTerm(abbrv.abbreviatedTerm());
             clauses.abbreviations =
                 clauses.abbreviations.append(tb.elementary(tb.var(abbrVar), rhs));
         }
@@ -897,7 +895,7 @@ public class JMLSpecFactory {
     }
 
     public String generateName(IProgramMethod pm, Behavior originalBehavior, String customName) {
-        return ((!(customName == null) && customName.length() > 0) ? customName
+        return ((!(customName == null) && !customName.isEmpty()) ? customName
                 : getContractName(pm, originalBehavior));
     }
 
@@ -1234,9 +1232,10 @@ public class JMLSpecFactory {
         var context = Context.inClass(kjt, false, tb);
 
         // translateToTerm expression
-        Triple<IObserverFunction, Term, Term> dep =
+        TranslatedDependencyContract dep =
             new JmlIO(services).context(context).translateDependencyContract(originalDep);
-        return cf.dep(kjt, targetHeap, dep, dep.first.isStatic() ? null : context.selfVar());
+        return cf.dep(kjt, targetHeap, dep,
+            dep.observerFunction().isStatic() ? null : context.selfVar());
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, TextualJMLDepends textualDep) {
@@ -1429,7 +1428,7 @@ public class JMLSpecFactory {
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
             clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasAssignable,
             clauses.hasFreeAssignable, clauses.decreases, services)
-                    .create();
+                .create();
     }
 
     /**
@@ -1464,7 +1463,7 @@ public class JMLSpecFactory {
             clauses.continues, clauses.returns, clauses.signals, clauses.signalsOnly,
             clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasAssignable,
             clauses.hasFreeAssignable, clauses.decreases, services)
-                    .create();
+                .create();
     }
 
     private ProgramVariableCollection createProgramVariablesForStatement(Statement statement,

@@ -271,7 +271,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
             LogicServices services) {
         return new SVInstantiations(map.put(sv, entry), interesting().put(sv, entry),
             getUpdateContext(), getGenericSortInstantiations(), getGenericSortConditions())
-                    .checkSorts(sv, entry, false, services);
+                .checkSorts(sv, entry, false, services);
     }
 
 
@@ -656,7 +656,7 @@ public class SVInstantiations implements org.key_project.prover.rules.inst.SVIns
             throws SortException {
         return new SVInstantiations(map, interesting(), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions().prepend(p_c))
-                    .checkCondition(p_c, false, services);
+                .checkCondition(p_c, false, services);
     }
 
     public ExecutionContext getExecutionContext() {

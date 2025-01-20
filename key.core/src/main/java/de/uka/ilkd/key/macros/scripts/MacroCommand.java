@@ -133,8 +133,8 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
 
         for (int i = 1; i < sequent.size() + 1; i++) {
             final boolean matchesRegex = formatTermString(
-                LogicPrinter.quickPrintTerm((Term) sequent.getFormulabyNr(i).formula(), services))
-                        .matches(".*" + matchRegEx + ".*");
+                LogicPrinter.quickPrintTerm(sequent.getFormulabyNr(i).formula(), services))
+                    .matches(".*" + matchRegEx + ".*");
             if (matchesRegex) {
                 if (matched) {
                     throw new ScriptException("More than one occurrence of a matching term.");

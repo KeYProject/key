@@ -328,9 +328,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         this.expandOSSNodes = expandOSSNodes;
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
+    protected void dispose() throws Throwable {
         Config.DEFAULT.removeConfigChangeListener(configChangeListener);
         NodeInfoVisualizer.removeListener(nodeInfoVisListener);
     }
