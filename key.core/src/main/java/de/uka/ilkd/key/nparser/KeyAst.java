@@ -18,6 +18,7 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 
+import org.antlr.v4.runtime.CharStreams;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.CharStream;
@@ -107,7 +108,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                     // +1 for the removal of the quote.
                     text = StringUtil.move(StringUtil.trim(text, '"'), ctx.getLine(),
                         ctx.getCharPositionInLine() + 1);
-                    return ParsingFacade.parseScript(text);
+                    return ParsingFacade.parseScript(CharStreams.fromString(text, ctx.getTokenSource().getSourceName()));
                 } else {
                     return new KeyAst.ProofScript(pctx.proofScript());
                 }
