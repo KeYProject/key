@@ -1,3 +1,6 @@
 [submodule "keyext.rusty/rust-wrapper/rust"]
 	path = keyext.rusty/rust-wrapper/rust
 	url = git@github.com:rust-lang/rust.git
+[submodule "rust-wrapper"]
+	path = rust-wrapper
+	url = https://github.com/Drodt/KeY-rustc-wrapper.git
