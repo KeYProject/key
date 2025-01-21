@@ -72,16 +72,17 @@ public class TestProofScriptCommand {
 
         Proof proof = env.getLoadedProof();
 
-        var script = ParsingFacade.parseScript(
-            new PositionedString(props.get("script"), tmpKey.toUri()));
-        ProofScriptEngine pse =
-            new ProofScriptEngine(script);
+        var script = ParsingFacade.parseScript(props.get("script"));
+        ProofScriptEngine pse = new ProofScriptEngine(script);
 
         try {
             pse.execute(env.getUi(), proof);
         } catch (Exception ex) {
-            assertTrue(props.containsKey("exception"), "unexpected exception");
-            Assertions.assertTrue(ex.getMessage().startsWith(props.get("exception").trim()));
+            ex.printStackTrace();
+            assertTrue(props.containsKey("exception"),
+                    "An exception was not expected, but got " + ex.getMessage());
+            Assertions.assertTrue(ex.getMessage().startsWith(props.get("exception").trim()),
+                    "Unexpected exception: " + ex.getMessage()+"\n expected: " + props.get("exception").trim());
             return;
         }
 
