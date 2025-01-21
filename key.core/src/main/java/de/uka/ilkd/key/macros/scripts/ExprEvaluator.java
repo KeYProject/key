@@ -6,6 +6,7 @@ package de.uka.ilkd.key.macros.scripts;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeYParser;
+import de.uka.ilkd.key.nparser.KeYParser.*;
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 
@@ -14,10 +15,18 @@ import org.slf4j.LoggerFactory;
 
 import static org.key_project.util.java.StringUtil.trim;
 
-/**
- * @author Alexander Weigl
- * @version 1 (18.01.25)
- */
+/// Evaluates expression inside of proof script to their appropriate type.
+///
+/// - [ExpressionContext]: [Term]
+/// - [SeqContext]: [Sequent]
+/// - [Boolean_literalContext]: [Boolean]
+/// - [IntegerContext]: [Integer]
+/// - [DoubleLiteralContext]: [Double]
+/// - [String_literalContext]: [String]
+///
+/// @author Alexander Weigl
+/// @version 1 (18.01.25)
+/// @see de.uka.ilkd.key.nparser.KeYParser.ProofScriptExpressionContext
 class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExprEvaluator.class);
     private final EngineState state;
@@ -27,7 +36,7 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitBoolean_literal(KeYParser.Boolean_literalContext ctx) {
+    public Object visitBoolean_literal(Boolean_literalContext ctx) {
         return Boolean.parseBoolean(ctx.getText());
     }
 
@@ -37,7 +46,7 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitInteger(KeYParser.IntegerContext ctx) {
+    public Object visitInteger(IntegerContext ctx) {
         return Integer.parseInt(ctx.getText());
     }
 
@@ -47,17 +56,17 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitDoubleLiteral(KeYParser.DoubleLiteralContext ctx) {
+    public Object visitDoubleLiteral(DoubleLiteralContext ctx) {
         return Double.parseDouble(ctx.getText());
     }
 
     @Override
-    public Object visitString_literal(KeYParser.String_literalContext ctx) {
+    public Object visitString_literal(String_literalContext ctx) {
         return trim(ctx.getText(), '"');
     }
 
     @Override
-    public Object visitSeq(KeYParser.SeqContext ctx) {
+    public Object visitSeq(SeqContext ctx) {
         var expressionBuilder =
             new ExpressionBuilder(state.getProof().getServices(), state.getCurrentNamespaces());
         expressionBuilder.setAbbrevMap(state.getAbbreviations());
