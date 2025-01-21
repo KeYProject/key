@@ -9,7 +9,7 @@ import java.util.Map;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
-import org.key_project.rusty.ast.Label;
+import org.key_project.rusty.ast.ConcreteLabel;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.abstraction.PrimitiveType;
 import org.key_project.rusty.ast.abstraction.Type;
@@ -332,7 +332,7 @@ public abstract class ProgramSVSort extends SortImpl {
 
         @Override
         public boolean canStandFor(RustyProgramElement check, Services services) {
-            return check instanceof Label;
+            return check instanceof ConcreteLabel;
         }
     }
 }

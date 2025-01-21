@@ -20,3 +20,5 @@ STORE_EXPR_IN : '\\storeExprIn';
 HAS_INVARIANT : '\\hasInvariant';
 GET_INVARIANT : '\\getInvariant';
 GET_VARIANT   : '\\getVariant';
+IS_LABELED    : '\\isLabeled';
+DIFFERENT     : '\\different';

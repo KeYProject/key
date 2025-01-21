@@ -38,8 +38,8 @@ expr
    | expr DOTDOTEQ expr # RangeExpression
    | expr EQ expr # AssignmentExpression
    | expr compoundAssignOperator expr # CompoundAssignmentExpression
-   | KW_CONTINUE LIFETIME_OR_LABEL? expr? # ContinueExpression
-   | KW_BREAK LIFETIME_OR_LABEL? expr? # BreakExpression
+   | KW_CONTINUE label? expr? # ContinueExpression
+   | KW_BREAK label? expr? # BreakExpression
    | KW_RETURN expr? # ReturnExpression
    | LPAREN expr RPAREN # GroupedExpression
    | LSQUAREBRACKET arrayElements? RSQUAREBRACKET # ArrayExpression
@@ -111,8 +111,8 @@ typeOf
    ;
 
 loopExpr
-   : loopLabel? infiniteLoopExpr
-   | loopScope
+   : loopLabel? (infiniteLoopExpr
+    | loopScope)
    ;
 
 infiniteLoopExpr
@@ -121,3 +121,11 @@ infiniteLoopExpr
 
 loopScope
     : 'loop_scope!' '(' idx=schemaVariable ',' blockExpr ')';
+
+loopLabel
+   : label COLON
+   ;
+
+label
+    : LIFETIME_OR_LABEL | schemaVariable
+    ;

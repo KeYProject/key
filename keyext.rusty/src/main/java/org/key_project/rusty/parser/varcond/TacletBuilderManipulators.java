@@ -38,6 +38,9 @@ public class TacletBuilderManipulators {
     private static final ArgumentType S = ArgumentType.STRING;
     private static final ArgumentType T = ArgumentType.TERM;
 
+    public static final AbstractConditionBuilder DIFFERENT =
+            new ConstructorBasedBuilder("different", DifferentInstantiationCondition.class, SV, SV);
+
     public static final AbstractConditionBuilder APPLY_UPDATE_ON_RIGID =
         new ConstructorBasedBuilder(
             "applyUpdateOnRigid", ApplyUpdateOnRigidCondition.class, USV, SV, SV);
@@ -85,6 +88,14 @@ public class TacletBuilderManipulators {
                     (SchemaVariable) arguments[1]);
             }
         };
+    public static final AbstractConditionBuilder IS_LABELED =
+            new AbstractConditionBuilder("isLabeled", PV) {
+                @Override
+                public IsLabeledCondition build(Object[] arguments, List<String> parameters,
+                                                boolean negated) {
+                    return new IsLabeledCondition((ProgramSV) arguments[0],negated);
+                }
+            };
 
     public static AbstractTacletBuilderCommand NEW_TYPE_OF =
         new AbstractTacletBuilderCommand("newTypeOf", SV, SV) {
@@ -118,10 +129,10 @@ public class TacletBuilderManipulators {
     private static final List<TacletBuilderCommand> tacletBuilderCommands = new ArrayList<>(2);
 
     static {
-        register(APPLY_UPDATE_ON_RIGID, NEW_DEPENDING_ON, EQUAL_UNIQUE,
+        register(DIFFERENT,APPLY_UPDATE_ON_RIGID, NEW_DEPENDING_ON, EQUAL_UNIQUE,
             DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE, NEW_TYPE_OF, NEW_RUSTY_TYPE,
             NEW_LOCAL_VARS, STORE_EXPR_IN, STORE_TERM_IN, HAS_INVARIANT, GET_INVARIANT,
-            GET_VARIANT);
+            GET_VARIANT, IS_LABELED);
     }
 
     /**

@@ -449,14 +449,14 @@ public class SchemaConverter {
 
     private ContinueExpression convertContinueExpression(
             org.key_project.rusty.parsing.RustySchemaParser.ContinueExpressionContext ctx) {
-        var label = ctx.LIFETIME_OR_LABEL() != null ? convertLabel(ctx.LIFETIME_OR_LABEL()) : null;
+        var label = ctx.label() != null ? convertLabel(ctx.label()) : null;
         var expr = ctx.expr() != null ? convertExpr(ctx.expr()) : null;
         return new ContinueExpression(label, expr);
     }
 
     private BreakExpression convertBreakExpression(
             org.key_project.rusty.parsing.RustySchemaParser.BreakExpressionContext ctx) {
-        var label = ctx.LIFETIME_OR_LABEL() != null ? convertLabel(ctx.LIFETIME_OR_LABEL()) : null;
+        var label = ctx.label() != null ? convertLabel(ctx.label()) : null;
         var expr = ctx.expr() != null ? convertExpr(ctx.expr()) : null;
         return new BreakExpression(label, expr);
     }
@@ -602,7 +602,7 @@ public class SchemaConverter {
     private LoopExpression convertLoopExpr(
             org.key_project.rusty.parsing.RustySchemaParser.LoopExprContext ctx) {
         var label =
-            ctx.loopLabel() == null ? null : convertLabel(ctx.loopLabel().LIFETIME_OR_LABEL());
+            ctx.loopLabel() == null ? null : convertLabel(ctx.loopLabel().label());
         if (ctx.infiniteLoopExpr() != null)
             return convertInfiniteLoopExpr(ctx.infiniteLoopExpr(), label);
         if (ctx.loopScope() != null)
@@ -976,8 +976,14 @@ public class SchemaConverter {
         return new PathIdentSegment(convertIdentifier(ctx.identifier()));
     }
 
-    private Label convertLabel(TerminalNode l) {
-        return getLabel(l.getText().substring(1));
+    private Label convertLabel(RustySchemaParser.LabelContext ctx) {
+        if (ctx.LIFETIME_OR_LABEL() != null)
+            return getLabel(ctx.LIFETIME_OR_LABEL().getText().substring(1));
+        else return new SchemaLabel(getProgramSV(ctx));
+    }
+
+    private ProgramSV getProgramSV(RustySchemaParser.LabelContext ctx) {
+        return (ProgramSV) lookupSchemaVariable(ctx.schemaVariable().getText().substring(2));
     }
 
     private ClosureParam convertClosureParam(

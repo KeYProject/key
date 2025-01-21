@@ -22,6 +22,8 @@ varexpId
  | HAS_INVARIANT
  | GET_INVARIANT
  | GET_VARIANT
+ | IS_LABELED
+ | DIFFERENT
  ;
 
 elementary_update_term: a=mutating_update_term (ASSIGN b=mutating_update_term)?;

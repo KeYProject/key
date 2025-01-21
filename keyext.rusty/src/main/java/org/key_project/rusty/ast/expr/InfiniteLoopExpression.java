@@ -13,7 +13,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 // spotless:off
-public record InfiniteLoopExpression(@Nullable Label label, Expr body) implements LoopExpression {
+public record InfiniteLoopExpression(@Nullable Label label, Expr body) implements LoopExpression, LabeledExpression {
     @Override
     public void visit(Visitor v) {
         v.performActionOnInfiniteLoop(this);
