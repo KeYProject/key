@@ -176,7 +176,8 @@ public class ProofScriptEngine {
                     String.format("Error while executing script: %s%n%nCommand: %s%nPosition: %s%n",
                         e.getMessage(),
                         prettyPrintCommand(commandContext),
-                        BuilderHelpers.getPosition(commandContext)),e);
+                        BuilderHelpers.getPosition(commandContext)),
+                    e);
             }
         }
     }

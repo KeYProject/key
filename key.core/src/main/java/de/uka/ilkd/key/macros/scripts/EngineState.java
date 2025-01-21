@@ -3,6 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -20,23 +28,17 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
+
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.StringUtil;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * @author Alexander Weigl
@@ -114,12 +116,13 @@ public class EngineState {
 
     private <T> void addContextTranslator(ValueInjector v, Class<T> aClass) {
         Converter<T, ProofScriptExpressionContext> converter =
-                (ProofScriptExpressionContext a) -> convertToString(v, aClass, a);
+            (ProofScriptExpressionContext a) -> convertToString(v, aClass, a);
         v.addConverter(aClass, ProofScriptExpressionContext.class, converter);
     }
 
     @SuppressWarnings("unchecked")
-    private <R, T> R convertToString(ValueInjector inj, Class<R> aClass, ProofScriptExpressionContext ctx)
+    private <R, T> R convertToString(ValueInjector inj, Class<R> aClass,
+            ProofScriptExpressionContext ctx)
             throws Exception {
         try {
             if (aClass == String.class && ctx.string_literal() != null) {
@@ -164,10 +167,10 @@ public class EngineState {
      *
      * @param checkAutomatic Set to true if the returned {@link Goal} should be automatic.
      * @return the first open goal, which has to be automatic iff checkAutomatic
-     * is true.
+     *         is true.
      * @throws ProofAlreadyClosedException If the proof is already closed when calling this method.
-     * @throws ScriptException             If there is no such {@link Goal}, or something else goes
-     *                                     wrong.
+     * @throws ScriptException If there is no such {@link Goal}, or something else goes
+     *         wrong.
      */
     @SuppressWarnings("unused")
     public @NonNull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
@@ -229,8 +232,7 @@ public class EngineState {
         Goal result = null;
         Node node = rootNode;
 
-        loop:
-        while (node != null) {
+        loop: while (node != null) {
             if (node.isClosed()) {
                 return null;
             }
@@ -238,30 +240,30 @@ public class EngineState {
             int childCount = node.childrenCount();
 
             switch (childCount) {
-                case 0 -> {
-                    result = getGoal(proof.openGoals(), node);
-                    if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
-                        // We found our goal
-                        break loop;
-                    }
-                    node = choices.pollLast();
+            case 0 -> {
+                result = getGoal(proof.openGoals(), node);
+                if (!checkAutomatic || Objects.requireNonNull(result).isAutomatic()) {
+                    // We found our goal
+                    break loop;
                 }
-                case 1 -> node = node.child(0);
-                default -> {
-                    Node next = null;
-                    for (int i = 0; i < childCount; i++) {
-                        Node child = node.child(i);
-                        if (!child.isClosed()) {
-                            if (next == null) {
-                                next = child;
-                            } else {
-                                choices.add(child);
-                            }
+                node = choices.pollLast();
+            }
+            case 1 -> node = node.child(0);
+            default -> {
+                Node next = null;
+                for (int i = 0; i < childCount; i++) {
+                    Node child = node.child(i);
+                    if (!child.isClosed()) {
+                        if (next == null) {
+                            next = child;
+                        } else {
+                            choices.add(child);
                         }
                     }
-                    assert next != null;
-                    node = next;
                 }
+                assert next != null;
+                node = next;
+            }
             }
         }
 
@@ -276,7 +278,7 @@ public class EngineState {
             return term;
         else
             throw new IllegalStateException(
-                    "Unexpected sort for term: " + term + ". Expected: " + sort);
+                "Unexpected sort for term: " + term + ". Expected: " + sort);
     }
 
     private @NonNull KeyIO getKeyIO() throws ScriptException {

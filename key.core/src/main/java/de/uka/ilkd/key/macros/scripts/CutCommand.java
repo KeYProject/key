@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -10,9 +12,8 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import org.key_project.logic.Name;
 
-import java.util.Map;
+import org.key_project.logic.Name;
 
 /**
  * The command object CutCommand has as scriptcommand name "cut" As parameters: a formula with the
@@ -34,14 +35,14 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     public String getDocumentation() {
         return """
                 CutCommand has as script command name "cut"
-                
+
                 As parameters:
                 * a formula with the id "#2""";
     }
 
     @Override
     public Parameters evaluateArguments(EngineState state,
-                                        Map<String, Object> arguments)
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }

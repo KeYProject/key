@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -79,7 +78,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param proofScript add an optional proof script
      */
     public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof,
-                          @Nullable ProofScript proofScript, ReplayResult replayResult) {
+            @Nullable ProofScript proofScript, ReplayResult replayResult) {
         this.ui = ui;
         this.initConfig = initConfig;
         this.loadedProof = loadedProof;
