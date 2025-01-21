@@ -84,17 +84,6 @@ public class EngineState {
         v.addConverter(Sequent.class, String.class, this::toSequent);
         v.addConverter(Sort.class, String.class, this::toSort);
 
-        v.addConverter(Integer.TYPE, Integer.class, (Integer i) -> (int) i);
-        v.addConverter(Double.TYPE, Double.class, d -> d);
-        v.addConverter(Boolean.TYPE, Boolean.class, b -> b);
-
-        v.addConverter(Integer.TYPE, String.class, Integer::parseInt);
-        v.addConverter(Double.TYPE, String.class, Double::parseDouble);
-        v.addConverter(Boolean.TYPE, String.class, Boolean::parseBoolean);
-        v.addConverter(Integer.class, String.class, Integer::parseInt);
-        v.addConverter(Double.class, String.class, Double::parseDouble);
-        v.addConverter(Boolean.class, String.class, Boolean::parseBoolean);
-
         addContextTranslator(v, String.class);
         addContextTranslator(v, Term.class);
         addContextTranslator(v, Integer.class);

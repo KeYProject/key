@@ -100,6 +100,10 @@ public class ValueInjector {
         vi.addConverter(Long.TYPE, String.class, Long::parseLong);
         vi.addConverter(Double.TYPE, String.class, Double::parseDouble);
         vi.addConverter(Float.TYPE, String.class, Float::parseFloat);
+        vi.addConverter(Integer.TYPE, Integer.class, (Integer i) -> (int) i);
+        vi.addConverter(Double.TYPE, Double.class, d -> d);
+        vi.addConverter(Boolean.TYPE, Boolean.class, b -> b);
+
         return vi;
     }
 
