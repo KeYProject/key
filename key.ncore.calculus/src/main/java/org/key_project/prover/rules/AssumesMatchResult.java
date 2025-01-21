@@ -5,6 +5,4 @@ package org.key_project.prover.rules;
 
 import org.key_project.util.collection.ImmutableList;
 
-public record AssumesMatchResult(ImmutableList<AssumesFormulaInstantiation> candidates,
-                                 ImmutableList<MatchConditions> matchConditions) {
-}
+public record AssumesMatchResult(ImmutableList<AssumesFormulaInstantiation>candidates,ImmutableList<MatchConditions>matchConditions){}

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.parser.varcond;
 
 import org.key_project.logic.SyntaxElement;
@@ -15,7 +18,8 @@ public class DifferentInstantiationCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate, MatchConditions matchCond, Services services) {
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions matchCond, Services services) {
         final var svInst = matchCond.getInstantiations();
         if (var == var1) {
             final Object inst2 = svInst.getInstantiation(var2);
@@ -23,7 +27,8 @@ public class DifferentInstantiationCondition implements VariableCondition {
         } else if (var == var2) {
             final Object inst1 = svInst.getInstantiation(var1);
             return inst1 == null || !inst1.equals(instCandidate) ? matchCond : null;
-        }else {
-        return matchCond;}
+        } else {
+            return matchCond;
+        }
     }
 }

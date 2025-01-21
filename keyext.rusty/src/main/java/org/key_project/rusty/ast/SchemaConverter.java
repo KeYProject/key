@@ -32,7 +32,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -979,7 +978,8 @@ public class SchemaConverter {
     private Label convertLabel(RustySchemaParser.LabelContext ctx) {
         if (ctx.LIFETIME_OR_LABEL() != null)
             return getLabel(ctx.LIFETIME_OR_LABEL().getText().substring(1));
-        else return new SchemaLabel(getProgramSV(ctx));
+        else
+            return new SchemaLabel(getProgramSV(ctx));
     }
 
     private ProgramSV getProgramSV(RustySchemaParser.LabelContext ctx) {

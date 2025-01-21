@@ -60,9 +60,4 @@ public Position getPosition(){return position;}
 
 @Override public int hashCode(){return Objects.hash(fileUri,position);}
 
-    @Override
-    public int compareTo(@NonNull Location o) {
-        return Comparator.<Location, URI>comparing(l -> l.fileUri, Comparator.nullsLast(Comparator.naturalOrder()))
-                .thenComparing(Location::getPosition, Comparator.nullsLast(Comparator.naturalOrder())).compare(this, o);
-    }
-}
+@Override public int compareTo(@NonNull Location o){return Comparator.<Location,URI>comparing(l->l.fileUri,Comparator.nullsLast(Comparator.naturalOrder())).thenComparing(Location::getPosition,Comparator.nullsLast(Comparator.naturalOrder())).compare(this,o);}}

@@ -17,14 +17,15 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.MatchConditions;
+import org.key_project.prover.rules.VariableCondition;
 import org.key_project.util.collection.*;
 
 /**
@@ -68,8 +69,9 @@ public class NewLocalVarsCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchConditions matchCond, Services services) {
-        SVInstantiations svInst = matchCond.getInstantiations();
+            MatchConditions matchCond, LogicServices services) {
+        final Services javaServices = (Services) services;
+        SVInstantiations svInst = (SVInstantiations) matchCond.getInstantiations();
         if (svInst.getInstantiation(varDeclsSV) != null) {
             return matchCond;
         }
@@ -78,14 +80,14 @@ public class NewLocalVarsCondition implements VariableCondition {
             return matchCond;
         }
 
-        var vars = MiscTools.getLocalOuts(body, services);
+        var vars = MiscTools.getLocalOuts(body, javaServices);
         List<VariableDeclaration> decls = new ArrayList<>(vars.size());
         ImmutableList<Term> updatesBefore = ImmutableSLList.nil();
         ImmutableList<Term> updatesFrame = ImmutableSLList.nil();
-        var tb = services.getTermBuilder();
+        var tb = javaServices.getTermBuilder();
         for (var v : vars) {
             final var newName =
-                services.getVariableNamer().getTemporaryNameProposal(v.name() + "_before");
+                javaServices.getVariableNamer().getTemporaryNameProposal(v.name() + "_before");
             KeYJavaType type = v.getKeYJavaType();
             var locVar = new LocationVariable(newName, type);
             var spec = new VariableSpecification(locVar);

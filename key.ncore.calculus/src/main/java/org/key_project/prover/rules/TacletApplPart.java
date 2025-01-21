@@ -6,8 +6,4 @@ package org.key_project.prover.rules;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
-public record TacletApplPart(Sequent assumesSequent, ImmutableList<? extends NewVarcond> varsNew,
-                             ImmutableList<? extends NotFreeIn> varsNotFreeIn,
-                             ImmutableList<? extends NewDependingOn> varsNewDependingOn,
-                             ImmutableList<? extends VariableCondition> variableConditions) {
-}
+public record TacletApplPart(Sequent assumesSequent,ImmutableList<?extends NewVarcond>varsNew,ImmutableList<?extends NotFreeIn>varsNotFreeIn,ImmutableList<?extends NewDependingOn>varsNewDependingOn,ImmutableList<?extends VariableCondition>variableConditions){}
