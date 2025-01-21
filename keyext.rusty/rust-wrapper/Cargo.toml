@@ -1,4 +1,0 @@
-[workspace]
-members = ["crates/cargo-key", "crates/example", "crates/key-wrapper"]
-
-resolver = "2"
