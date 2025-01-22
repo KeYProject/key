@@ -19,8 +19,8 @@ dependencies {
     javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
     antlr group: 'org.antlr', name: 'antlr', version: '3.5.3'   // use ANTLR version 3
 
-    antlr4 "org.antlr:antlr4:4.13.1"
-    api "org.antlr:antlr4-runtime:4.13.1"
+    antlr4 "org.antlr:antlr4:4.13.2"
+    api "org.antlr:antlr4-runtime:4.13.2"
     //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 }
 
