@@ -27,14 +27,16 @@ plugins {
     id "org.checkerframework" version "0.6.48"
 
     id("org.sonarqube") version "6.0.1.5171"
+
+    id("checkstyle")
 }
 
 sonar {
-  properties {
-    property "sonar.projectKey", "KeYProject_key"
-    property "sonar.organization", "keyproject"
-    property "sonar.host.url", "https://sonarcloud.io"
-  }
+    properties {
+        property "sonar.projectKey", "KeYProject_key"
+        property "sonar.organization", "keyproject"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }
 
 
@@ -55,6 +57,11 @@ def build = System.env.BUILD_NUMBER == null ? "-dev" : "-${System.env.BUILD_NUMB
 
 group = "org.key-project"
 version = "2.12.4$build"
+
+
+repositories {
+    mavenCentral()
+}
 
 subprojects {
     apply plugin: "java"
@@ -109,14 +116,14 @@ subprojects {
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
         // Setting the release to Java 21
         options.release = 21
     }
 
-    tasks.withType(Javadoc) {
+    tasks.withType(Javadoc).configureEach {
         failOnError = false
         options.addBooleanOption 'Xdoclint:none', true
         //options.verbose()
@@ -124,7 +131,7 @@ subprojects {
         options.addBooleanOption('html5', true)
     }
 
-    tasks.withType(Test) {//Configure all tests
+    tasks.withType(Test).configureEach {//Configure all tests
         systemProperty "test-resources", "src/test/resources"
         systemProperty "testcases", "src/test/resources/testcase"
         systemProperty "TACLET_PROOFS", "tacletProofs"
@@ -138,7 +145,7 @@ subprojects {
         maxParallelForks = 1 // weigl: test on master
     }
 
-    tasks.withType(Test) {
+    tasks.withType(Test).configureEach {
         useJUnitPlatform {
             includeEngines 'junit-vintage'
             includeEngines 'junit-jupiter'
@@ -166,7 +173,7 @@ subprojects {
         }
     }
 
-    task testFast(type: Test) {
+    tasks.register('testFast', Test) {
         group "verification"
         useJUnitPlatform {
             excludeTags "slow", "performance", "interactive"
@@ -192,14 +199,14 @@ subprojects {
     // The following two tasks can be used to execute main methods from the project
     // The main class is set via "gradle -DmainClass=... execute --args ..."
     // see https://stackoverflow.com/questions/21358466/gradle-to-execute-java-class-without-modifying-build-gradle
-    task execute(type: JavaExec) {
+    tasks.register('execute', JavaExec) {
         description 'Execute main method from the project. Set main class via "gradle -DmainClass=... execute --args ..."'
         group "application"
         mainClass.set(System.getProperty('mainClass'))
         classpath = sourceSets.main.runtimeClasspath
     }
 
-    task executeInTests(type: JavaExec) {
+    tasks.register('executeInTests', JavaExec) {
         description 'Execute main method from the project (tests loaded). Set main class via "gradle -DmainClass=... execute --args ..."'
         group "application"
         mainClass.set(System.getProperty('mainClass'))
@@ -216,7 +223,7 @@ subprojects {
         ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
     }
 
-    task pmdMainChanged(type: Pmd) {
+    tasks.register('pmdMainChanged', Pmd) {
         // Specify all files that should be checked
         def changedFiles = getChangedFiles()
         source pmdMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
@@ -233,37 +240,6 @@ subprojects {
         }
     }
 
-
-    checkstyle {
-        toolVersion = "10.6.0"
-        ignoreFailures = true
-        configFile file("$rootDir/gradle/key_checks.xml")
-        showViolations = false // disable console output
-    }
-
-
-    task checkstyleMainChanged(type: Checkstyle) {
-        // Specify all files that should be checked
-        def changedFiles = getChangedFiles()
-        source checkstyleMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
-        classpath = checkstyleMain.classpath
-
-        //println(source.getFiles())
-
-        // Define the output folder of the generated reports
-        reports {
-            html {
-                enabled true
-                outputLocation = file("build/reports/checkstyle/main_diff.html")
-            }
-            xml {
-                enabled true
-                outputLocation = file("build/reports/checkstyle/main_diff.xml")
-            }
-        }
-    }
-
-
     // tasks.withType(FindBugs) {
     //     reports {
     //         xml.enabled = false
@@ -277,13 +253,13 @@ subprojects {
         }
     }
 
-    task sourcesJar(type: Jar) {
+    tasks.register('sourcesJar', Jar) {
         description = 'Create a jar file with the sources from this project'
         from sourceSets.main.allJava
         archiveClassifier = 'sources'
     }
 
-    task javadocJar(type: Jar) {
+    tasks.register('javadocJar', Jar) {
         description = 'Create a jar file with the javadocs from this project'
         from javadoc
         archiveClassifier = 'javadoc'
@@ -488,15 +464,52 @@ subprojects {
     }
 }
 
-task start {
+tasks.register('start'){
     description "Use :key.ui:run instead"
     doFirst {
         println "Use :key.ui:run instead"
     }
 }
 
+checkstyle {
+    toolVersion = "10.21.1"
+    ignoreFailures = true
+    configFile file("$rootDir/gradle/key_checks.xml")
+    showViolations = true
+}
+
+tasks.register('checkstyleMainChanged', Checkstyle){
+    classpath = checkstyleClasspath
+
+    def changedFiles = getChangedFiles()
+    changedFiles.removeAll { f -> !f.endsWith(".java") }
+    source changedFiles
+    println(source.getFiles())
+
+    minHeapSize = "200m"
+    maxHeapSize = "1g"
+
+    // Define the output folder of the generated reports
+    reports {
+        sarif.required = true
+        sarif.outputLocation = file("build/reports/checkstyle/main_diff.sarif.json")
+        html.required = true
+        html.outputLocation = file("build/reports/checkstyle/main_diff.html")
+        xml.required = true
+        xml.outputLocation = file("build/reports/checkstyle/main_diff.xml")
+    }
+
+    doLast {
+        checkstyleMarkdownReport(
+                file("build/reports/checkstyle/main_diff.xml"),
+                file("build/reports/checkstyle/main_diff.md"))
+    }
+}
+
+
+
 // Generation of a JavaDoc across sub projects.
-task alldoc(type: Javadoc) {
+tasks.register('alldoc', Javadoc){
     group "documentation"
     description "Generate a JavaDoc across sub projects"
     def projects = subprojects
@@ -528,7 +541,7 @@ task alldoc(type: Javadoc) {
 }
 
 // Creates a jar file with the javadoc over all sub projects.
-task alldocJar(type: Zip) {
+tasks.register('alldocJar', Zip){
     dependsOn alldoc
     description 'Create a jar file with the javadoc over all sub projects'
     from alldoc
@@ -547,22 +560,46 @@ if (jacocoEnabled.toBoolean()) {
 @Memoized
 def getChangedFiles() {
     // Get the target and source branch
-    def anchor = "git merge-base HEAD origin/main".execute().getText()
+    //def anchor = "git merge-base HEAD origin/main".execute().getText()
+    //println("Base revision: $anchor")
+
+    def baseRef = /*System.getenv("GITHUB_BASE_REF") ?:*/ "origin/main"
 
     // Get list of all changed files including status
-    def allFiles = "git diff --name-status --diff-filter=dr $anchor".execute().getText().split("\n")
-    //println("Found ${allFiles.length} changed files")
+    def allFiles = "git diff --name-only --diff-filter=dr $baseRef".execute().getText().split("\n")
+    println("Found ${allFiles.length} changed files")
 
     // Remove the status prefix
-    def files = new TreeSet<String>()
-    for (file in allFiles) {
-        if (file.length() > 1) {
-            def a = file.substring(1).trim()
-            if (!a.isBlank()) {
-                files.add(("$rootDir/" + a).toString())
+    def files = new TreeSet<String>(allFiles.toList())
+    // Return the list of touched files
+    files
+}
+
+def checkstyleMarkdownReport(File xmlFile, File targetFile) {
+    if(!xmlFile.exists()) return
+    def root = new groovy.xml.XmlSlurper().parseText(xmlFile.text)
+    def out = new PrintWriter(targetFile)
+
+
+    def sha= System.getenv("GITHUB_SHA") ?: "main"
+    def host = System.getenv("GITHUB_SERVER_URL") ?: "https://github.com"
+    def repo = System.getenv("GITHUB_REPOSITORY") ?: "keyproject/key"
+    def baseUrl = "$host/$repo/blob/$sha"
+    try{
+        out.write("# Checkstyle Report\n\n")
+
+        for(xmlFileNode in root.file) {
+            def f = file(xmlFileNode.@name.toString())
+            def path = projectDir.relativePath(f)
+            out.write("## $path\n\n")
+            def url="$baseUrl/$path"
+            for(error in xmlFileNode.error) {
+                def source=error.@source
+                out.write("\n* ${error.@severity} [${error.@message} @${error.@line}:${error.@column}]($url#L${error.@line})")
             }
         }
     }
-    // Return the list of touched files
-    files
+    finally{
+        out.close()
+}
 }

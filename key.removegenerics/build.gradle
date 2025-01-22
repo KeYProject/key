@@ -1,12 +1,12 @@
 plugins {
-    id 'application'
-    id 'com.github.johnrengelman.shadow' version "8.1.1"
+    id("application")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-description "Helper to remove generics from Java source code"
+description = "Helper to remove generics from Java source code"
 
 dependencies {
-    implementation project(":key.core")
+    implementation(project(":key.core"))
 }
 
 application {

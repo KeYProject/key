@@ -1,27 +1,26 @@
 plugins {
-    id 'ca.coglinc.javacc' version '2.4.0'
-    id 'antlr'
+    id("ca.coglinc.javacc") version "2.4.0"
+    id("antlr")
 }
 
-description "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
+description = "Core functionality (terms, rules, prover, ...) for deductive verification of Java programs"
 
 configurations { antlr4 }
 
 dependencies {
-    api project(':key.util')
-    api project(':key.ncore')
-    //api group: group, name: 'recoderkey', version: '1.0'
-    api project(':recoder')
-    implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    implementation group: 'org.antlr', name: 'antlr-runtime', version: '3.5.3'
-    implementation group: 'antlr', name: 'antlr', version: '2.7.7'
+    api(project(":key.util"))
+    api(project(":key.ncore"))
+    //api group: group, name: "recoderkey", version: "1.0"
+    api(project(":recoder"))
+    implementation group: "net.java.dev.javacc", name: "javacc", version: "4.0"
+    implementation group: "org.antlr", name: "antlr-runtime", version: "3.5.3"
+    implementation group: "antlr", name: "antlr", version: "2.7.7"
 
-    javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    antlr group: 'org.antlr', name: 'antlr', version: '3.5.3'   // use ANTLR version 3
+    javacc group: "net.java.dev.javacc", name: "javacc", version: "4.0"
+    antlr group: "org.antlr", name: "antlr", version: "3.5.3"   // use ANTLR version 3
 
-    antlr4 "org.antlr:antlr4:4.13.2"
-    api "org.antlr:antlr4-runtime:4.13.2"
-    //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+    antlr4("org.antlr:antlr4:4.13.2")
+    api("org.antlr:antlr4-runtime:4.13.2")
 }
 
 // The target directory for JavaCC (parser generation)
@@ -78,16 +77,16 @@ task generateSMTListings {
     outputs.files file("$outputDir/$pack/DefinedSymbolsHandler.preamble.xml")
     doLast {
         new File("$outputDir/$pack/DefinedSymbolsHandler.preamble.xml").withWriter { list ->
-            list.writeLine '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
-            list.writeLine '<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">'
-            list.writeLine '<properties>'
+            list.writeLine "<?xml version="1.0" encoding="UTF-8" standalone="no"?>"
+            list.writeLine "<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">"
+            list.writeLine "<properties>"
             new File("$resourcesDir/$pack").eachFile {
-                if (it.name.endsWith('.DefinedSymbolsHandler.preamble.xml')) {
+                if (it.name.endsWith(".DefinedSymbolsHandler.preamble.xml")) {
                     // println it.name
                     it.eachLine { list.writeLine it }
                 }
             }
-            list.writeLine '</properties>'
+            list.writeLine "</properties>"
         }
     }
 }
@@ -110,7 +109,7 @@ task generateSolverPropsList {
             }
         })
         list.sort()
-        String files = ''
+        String files = ""
         for (String propsFile : list) {
             files += propsFile + System.lineSeparator()
         }
@@ -130,14 +129,14 @@ tasks.withType(Test) {
 
 
 task testProveRules(type: Test) {
-    description 'Proves KeY taclet rules tagged as lemma'
+    description "Proves KeY taclet rules tagged as lemma"
     group "verification"
     filter { includeTestsMatching "ProveRulesTest" }
     //useJUnitPlatform() {includeTags "testProveRules"    }
 }
 
 task testRunAllFunProofs(type: Test) {
-    description 'Prove/reload all keyfiles tagged for regression testing'
+    description "Prove/reload all keyfiles tagged for regression testing"
     group "verification"
     filter {
         includeTestsMatching "RunAllProofsFunctional"
@@ -145,7 +144,7 @@ task testRunAllFunProofs(type: Test) {
 }
 
 task testRunAllInfProofs(type: Test) {
-    description 'Prove/reload all keyfiles tagged for regression testing'
+    description "Prove/reload all keyfiles tagged for regression testing"
     group "verification"
     filter {
         includeTestsMatching "RunAllProofsInfFlow"
@@ -154,7 +153,7 @@ task testRunAllInfProofs(type: Test) {
 
 
 task testProveSMTLemmas(type: Test) {
-    description 'Prove (or load proofs for) lemmas used in the SMT translation'
+    description "Prove (or load proofs for) lemmas used in the SMT translation"
     group "verification"
     filter {
         includeTestsMatching "ProveSMTLemmasTest"
@@ -164,15 +163,15 @@ task testProveSMTLemmas(type: Test) {
 // Run the tests for the new smt translation in strict mode
 // where "unknown" is less accepted
 task testStrictSMT(type: Test) {
-    description 'Run the tests for the new smt translation in strict mode'
-    group 'verification'
+    description "Run the tests for the new smt translation in strict mode"
+    group "verification"
     systemProperty("key.newsmt2.stricttests", "true")
     filter {
         includeTestsMatching "MasterHandlerTest"
     }
 }
 
-//Generation of the three version files within the resources by executing `git'.
+//Generation of the three version files within the resources by executing `git".
 task generateVersionFiles() {
     def outputFolder = file("build/resources/main/de/uka/ilkd/key/util")
     def sha1 = new File(outputFolder, "sha1")
@@ -182,8 +181,8 @@ task generateVersionFiles() {
     inputs.files "$project.rootDir/.git/HEAD"
     outputs.files sha1, branch, versionf
 
-    def gitRevision = gitRevParse('HEAD')
-    def gitBranch = gitRevParse('--abbrev-ref HEAD')
+    def gitRevision = gitRevParse("HEAD")
+    def gitBranch = gitRevParse("--abbrev-ref HEAD")
 
     doLast {
         sha1.text = gitRevision

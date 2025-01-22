@@ -1,13 +1,8 @@
-plugins {
-}
-
-description "Generic data strutures for terms and formulas without dependencies to a specific target programming language"
-
-configurations { }
+description = "Generic data strutures for terms and formulas without dependencies to a specific target programming language"
 
 dependencies {
-    api project(':key.util')
-    implementation 'org.jspecify:jspecify:1.0.0'
+    api(project(':key.util'))
+    implementation("org.jspecify:jspecify:1.0.0")
 }
 
 tasks.withType(Test) {

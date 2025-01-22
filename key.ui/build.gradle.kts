@@ -2,41 +2,41 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 plugins {
-    id 'application'
+    id("application")
 
     // Used to create a single executable jar file with all dependencies
     // see task "shadowJar" below
     // https://imperceptiblethoughts.com/shadow/
-    id 'com.github.johnrengelman.shadow' version "8.1.1"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-description "User interface for the deductive verification of Java programs"
+description = "User interface for the deductive verification of Java programs"
 
 dependencies {
-    implementation project(":key.core")
-    implementation project(":key.core.rifl")
+    implementation(project(":key.core")
+    implementation(project(":key.core.rifl")
 
-    implementation project(":key.core.proof_references")
-    implementation project(":key.core.symbolic_execution")
-    implementation project(":key.removegenerics")
+    implementation(project(":key.core.proof_references"))
+    implementation(project(":key.core.symbolic_execution"))
+    implementation(project(":key.removegenerics"))
 
-    api 'com.miglayout:miglayout-swing:11.4.2'
+    api("com.miglayout:miglayout-swing:11.4.2")
 
     //logging implementation used by the slf4j
-    implementation 'ch.qos.logback:logback-classic:1.5.15'
+    implementation("ch.qos.logback:logback-classic:1.5.15")
 
-    api 'org.key-project:docking-frames-common:1.1.3p1'
-    api 'org.key-project:docking-frames-core:1.1.3p1'
+    api("org.key-project:docking-frames-common:1.1.3p1")
+    api("org.key-project:docking-frames-core:1.1.3p1")
 
-    runtimeOnly project(":keyext.ui.testgen")
-    runtimeOnly project(":keyext.caching")
-    runtimeOnly project(":keyext.exploration")
-    runtimeOnly project(":keyext.slicing")
-    runtimeOnly project(":keyext.proofmanagement")
+    runtimeOnly(project(":keyext.ui.testgen"))
+    runtimeOnly(project(":keyext.caching"))
+    runtimeOnly(project(":keyext.exploration"))
+    runtimeOnly(project(":keyext.slicing"))
+    runtimeOnly(project(":keyext.proofmanagement"))
 }
 
 task createExamplesZip(type: Zip) {
-    description 'Create "examples.zip" containing all KeY examples'
+    description "Create "examples.zip" containing all KeY examples"
     destinationDirectory = file("$buildDir/resources/main/")
     archiveFileName = "examples.zip"
     from "examples"
@@ -82,7 +82,7 @@ task runWithProfiler(type: JavaExec) {
                "-XX:StartFlightRecording=duration=30s,filename=key_profile.jfr",
                "-XX:FlightRecorderOptions=stackdepth=256"]
     doLast {
-        println "A file key_profile.jfr has been created in folder 'key.ui' by JRE (FlightRecoder)."
+        println "A file key_profile.jfr has been created in folder "key.ui" by JRE (FlightRecoder)."
         println "You can open key_profile.jfr in IntelliJ to inspect the performance measurement."
     }
 }
@@ -110,7 +110,7 @@ List<String> scanReadmeFiles() {
 
         def readme = Paths.get(projectDir.toString(), "examples",
                 line.replace("/", File.separator))
-        def dir = line.substring(0, line.lastIndexOf('/') + 1)
+        def dir = line.substring(0, line.lastIndexOf("/") + 1)
         result.add(line)
         // The project file is not always project.key, but better include the
         // default file.
