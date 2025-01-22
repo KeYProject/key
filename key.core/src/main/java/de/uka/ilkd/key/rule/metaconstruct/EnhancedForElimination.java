@@ -138,9 +138,8 @@ public class EnhancedForElimination extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-
-        ProgramElement result = doTransform(pe, services, svInst).getResult();
-
+        final ProgramElement result =
+            doTransform(pe, services, svInst).getResult();
         return new ProgramElement[] { result };
     }
 
@@ -148,7 +147,7 @@ public class EnhancedForElimination extends ProgramTransformer {
             SVInstantiations svInst) {
         assert pe instanceof EnhancedFor : "Only works on enhanced fors";
 
-        EnhancedFor enhancedFor = (EnhancedFor) pe;
+        final EnhancedFor enhancedFor = (EnhancedFor) pe;
 
         Expression expression = enhancedFor.getGuardExpression();
 

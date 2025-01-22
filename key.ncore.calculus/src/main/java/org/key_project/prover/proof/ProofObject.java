@@ -46,5 +46,11 @@ public interface ProofObject<G extends ProofGoal<G>> {
      */
     void closeGoal(G goalToClose);
 
+    /**
+     * returns the services which provide access to the meta infrastructure like
+     * namespaces for functions, sort etc.
+     *
+     * @return services managing the logic infrastructure
+     */
     LogicServices getServices();
 }

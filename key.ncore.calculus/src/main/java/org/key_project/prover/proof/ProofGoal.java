@@ -5,6 +5,11 @@ package org.key_project.prover.proof;
 
 import org.key_project.prover.sequent.Sequent;
 
+/**
+ * Interface for proof goals of a sequent proof.
+ *
+ * @param <G> the type of the concrete realization of the proof goal
+ */
 public interface ProofGoal<G extends ProofGoal<G>> {
     ProofObject<G> proof();
 

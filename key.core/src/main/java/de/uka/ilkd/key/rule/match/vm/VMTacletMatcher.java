@@ -309,7 +309,7 @@ public class VMTacletMatcher implements TacletMatcher {
                 }
             }
         }
-        return (MatchConditions) matchCond;
+        return matchCond;
     }
 
     /**
