@@ -59,13 +59,13 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     private JTextArea tacletInfo = new JTextArea();
 
     private Node node;
-    private final org.key_project.prover.rules.RuleApp ruleApp;
+    private final RuleApp ruleApp;
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
         this(node.proof(), node, node.getAppliedRuleApp(), node.sequent(), mainWindow);
     }
 
-    public InnerNodeView(Proof proof, Node node, org.key_project.prover.rules.RuleApp ruleApp,
+    public InnerNodeView(Proof proof, Node node, RuleApp ruleApp,
             Sequent sequent,
             MainWindow mainWindow) {
         super(mainWindow);
@@ -99,10 +99,10 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
                 highlightPos(app.posInOccurrence(), RULEAPP_HIGHLIGHTER);
             }
 
-            if (app instanceof TacletApp) {
-                highlightIfFormulas((TacletApp) app);
-            } else if (app instanceof IBuiltInRuleApp) {
-                highlightIfInsts((IBuiltInRuleApp) app);
+            if (app instanceof TacletApp tacletApp) {
+                highlightIfFormulas(tacletApp);
+            } else if (app instanceof IBuiltInRuleApp builtInRuleApp) {
+                highlightIfInsts(builtInRuleApp);
             }
 
         } catch (BadLocationException badLocation) {
@@ -112,8 +112,8 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     }
 
     /**
-     * @param tapp The taclet app for which the if formulae should be highlighted.
-     * @throws BadLocationException
+     * @param tapp The taclet app whose assumes-formulas should be highlighted.
+     * @throws BadLocationException if the highlight is placed at a non-existing position
      */
     private void highlightIfFormulas(TacletApp tapp) throws BadLocationException {
         final ImmutableList<AssumesFormulaInstantiation> ifs = tapp.assumesFormulaInstantiations();

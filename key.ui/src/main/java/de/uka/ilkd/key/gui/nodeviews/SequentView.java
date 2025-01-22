@@ -74,12 +74,10 @@ public abstract class SequentView extends JEditorPane {
     private static final HighlightPainter MOUSE_SELECTION_PAINTER =
         new DefaultHighlightPainter(MOUSE_SELECTION_COLOR.get());
 
-
     // maximum opacity of heatmap color
     private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
     public static final String PROP_LAST_MOUSE_POSITION = "lastMousePosition";
     public static final Point OUTSIDE_MOUSE_POSITION = new Point(-1, -1);
-
 
     private final MainWindow mainWindow;
 
