@@ -1223,7 +1223,7 @@ public class Proof implements ProofObject<Goal>, Named {
      */
     protected void fireProofDisposing(ProofDisposedEvent e) {
         ProofDisposedListener[] listener = getProofDisposedListeners();
-        for (ProofDisposedListener l : listener) {
+        for (final ProofDisposedListener l : listener) {
             l.proofDisposing(e);
         }
     }
