@@ -116,14 +116,14 @@ subprojects {
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
         // Setting the release to Java 21
         options.release = 21
     }
 
-    tasks.withType(Javadoc) {
+    tasks.withType(Javadoc).configureEach {
         failOnError = false
         options.addBooleanOption 'Xdoclint:none', true
         //options.verbose()
@@ -131,12 +131,12 @@ subprojects {
         options.addBooleanOption('html5', true)
     }
 
-    tasks.withType(Test) {//Configure all tests
+    tasks.withType(Test).configureEach {//Configure all tests
         systemProperty "test-resources", "src/test/resources"
         systemProperty "testcases", "src/test/resources/testcase"
         systemProperty "TACLET_PROOFS", "tacletProofs"
         systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
-        systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
+        systemProperty "RUNALLPROOFS_DIR", "${layout.buildDirectory}/report/runallproves"
 
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
@@ -145,7 +145,7 @@ subprojects {
         maxParallelForks = 1 // weigl: test on master
     }
 
-    tasks.withType(Test) {
+    tasks.withType(Test).configureEach {
         useJUnitPlatform {
             includeEngines 'junit-vintage'
             includeEngines 'junit-jupiter'
@@ -229,14 +229,10 @@ subprojects {
         source pmdMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
         classpath = checkstyleMain.classpath
         reports {
-            html {
-                enabled true
-                outputLocation = file("build/reports/pmd/main_diff.html")
-            }
-            xml {
-                enabled true
-                outputLocation = file("build/reports/pmd/main_diff.xml")
-            }
+            html.required = true
+            html.outputLocation = file("${layout.buildDirectory}/reports/pmd/main_diff.html")
+            xml.required = true
+            xml.outputLocation = file("${layout.buildDirectory}/reports/pmd/main_diff.xml")
         }
     }
 
@@ -246,7 +242,7 @@ subprojects {
     //         html.enabled = true
     //     }
     // }
-    tasks.withType(Pmd) {
+    tasks.withType(Pmd).configureEach {
         reports {
             xml.getRequired().set(true)
             html.getRequired().set(true)
@@ -516,7 +512,7 @@ tasks.register('alldoc', Javadoc){
     //key.ui javadoc is broken
     source projects.collect { it.sourceSets.main.allJava }
     classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
-    destinationDir = file("${buildDir}/docs/javadoc")
+    destinationDir = file("${layout.buildDirectory}/docs/javadoc")
 
     if (JavaVersion.current().isJava9Compatible()) {
         //notworking on jenkins
@@ -534,8 +530,6 @@ tasks.register('alldoc', Javadoc){
         bottom = "Copyright &copy; 2003-2023 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
         links += "https://docs.oracle.com/en/java/javase/17/docs/api/"
-        links += "http://www.antlr2.org/javadoc/"
-        links += "http://www.antlr3.org/api/Java/"
         links += "https://www.antlr.org/api/Java/"
     }
 }
@@ -546,7 +540,7 @@ tasks.register('alldocJar', Zip){
     description 'Create a jar file with the javadoc over all sub projects'
     from alldoc
     archiveFileName = "key-api-doc-${project.version}.zip"
-    destinationDirectory = file("$buildDir/distribution")
+    destinationDirectory = file("${layout.buildDirectory}/distribution")
 }
 
 //conditionally enable jacoco coverage when `-DjacocoEnabled=true` is given on CLI.
@@ -594,7 +588,6 @@ def checkstyleMarkdownReport(File xmlFile, File targetFile) {
             out.write("## $path\n\n")
             def url="$baseUrl/$path"
             for(error in xmlFileNode.error) {
-                def source=error.@source
                 out.write("\n* ${error.@severity} [${error.@message} @${error.@line}:${error.@column}]($url#L${error.@line})")
             }
         }

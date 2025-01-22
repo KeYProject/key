@@ -51,13 +51,18 @@ jobs:
           cache: 'gradle'
       - name: Build with Gradle
         run: ./gradlew --parallel --continue checkstyleMainChanged
-      - run: "cat build/reports/checkstyle/main_diff.md >> $GITHUB_STEP_SUMMARY"
-      - name: Archive code coverage results
+      - name: "Touch files to avoid errors"
+        run: "touch build/reports/checkstyle/main_diff.{md,sarif.json}"
+      - name: "Job summary"
+        run: "cat build/reports/checkstyle/main_diff.md >> $GITHUB_STEP_SUMMARY"
+      - name: Upload checkstyle report
         uses: actions/upload-artifact@v4
+        if: (success() || failure())
         with:
           name: checkstyle-report
           path: build/reports/checkstyle/main_diff.html
-      - uses: github/codeql-action/upload-sarif@v3
-        if: success() || failure()
+      - name: "Publish in Github code scanning"
+        uses: github/codeql-action/upload-sarif@v3
+        if: (success() || failure())
         with:
           sarif_file: build/reports/checkstyle/main_diff.sarif.json
