@@ -102,9 +102,9 @@ public class HirRustyReader {
                 throw new RuntimeException(e);
             }
             var hir = Files.readString(tmpDir.resolve("hir.json"), Charset.defaultCharset());
-            var crate = Crate.parseJSON(hir);
+            var wrapperOutput = Crate.parseJSON(hir);
             var converter = new HirConverter(services);
-            var converted = converter.convertCrate(crate);
+            var converted = converter.convertCrate(wrapperOutput.crate());
             BlockExpression body = converted.getVerificationTarget().body();
             var es = (ExpressionStatement) body.getStatements().get(0);
             {
