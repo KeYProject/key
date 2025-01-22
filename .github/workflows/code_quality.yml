@@ -35,3 +35,29 @@ jobs:
           cache: 'gradle'
       - name: Build with Gradle
         run: ./gradlew --parallel --continue spotlessCheck
+
+  checkstyle_changed_files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      # - run: "git diff --name-only origin/main"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Build with Gradle
+        run: ./gradlew --parallel --continue checkstyleMainChanged
+      - run: "cat build/reports/checkstyle/main_diff.md >> $GITHUB_STEP_SUMMARY"
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkstyle-report
+          path: build/reports/checkstyle/main_diff.html
+      - uses: github/codeql-action/upload-sarif@v3
+        if: success() || failure()
+        with:
+          sarif_file: build/reports/checkstyle/main_diff.sarif.json
