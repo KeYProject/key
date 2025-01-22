@@ -7,7 +7,24 @@ import org.key_project.logic.IntIterator;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 
+import org.jspecify.annotations.NonNull;
+
+/**
+ * Represents a position within a formula contained in a sequent. It enables navigation and analysis
+ * of term structures.
+ */
 public class PosInOccurrence {
+
+    /**
+     * Creates a new {@link PosInOccurrence} for a specific position in a formula within the given
+     * sequent.
+     *
+     * @param seq The sequent containing the formula.
+     * @param formulaNumber The index of the formula within the sequent (the first formula has
+     *        number 1).
+     * @param pos The position within the formula to be represented.
+     * @return A new {@link PosInOccurrence} pointing to the specified position in the formula.
+     */
     public static PosInOccurrence findInSequent(Sequent seq, int formulaNumber, PosInTerm pos) {
         return new PosInOccurrence(seq.getFormulaByNr(formulaNumber), pos,
             seq.numberInAntec(formulaNumber));
@@ -34,7 +51,16 @@ public class PosInOccurrence {
      */
     private volatile Term subTermCache = null;
 
-    public PosInOccurrence(SequentFormula sequentFormula, PosInTerm posInTerm, boolean inAntec) {
+    /**
+     * Constructs a {@link PosInOccurrence} representing a position in a sequent formula.
+     *
+     * @param sequentFormula The formula the position belongs to.
+     * @param posInTerm The position within the formula.
+     * @param inAntec True if the position is within the antecedent of the sequent.
+     * @throws NullPointerException If `sequentFormula` or `posInTerm` is null.
+     */
+    public PosInOccurrence(@NonNull SequentFormula sequentFormula, @NonNull PosInTerm posInTerm,
+            boolean inAntec) {
         assert posInTerm != null;
         assert sequentFormula != null;
         this.inAntec = inAntec;
@@ -44,24 +70,32 @@ public class PosInOccurrence {
     }
 
     /**
-     * returns the SequentFormula that determines the occurrence of this PosInOccurrence
+     * Retrieves the formula associated with this position.
+     *
+     * @return The {@link SequentFormula} this position refers to.
      */
     public SequentFormula sequentFormula() {
         return sequentFormula;
     }
 
     /**
-     * @return Depth of the represented position within a formula; top-level positions
-     *         (<code>isTopLevel()</code> have depth zero
+     * Computes the depth of this position within the formula. Top-level positions (see
+     * {@link #isTopLevel()})
+     * have a depth of 0.
+     *
+     * @return The depth of the position.
      */
     public int depth() {
         return posInTerm().depth();
     }
 
     /**
-     * creates a new PosInOccurrence that has exactly the same state as this object except the
-     * PosInTerm is new and walked up the specified subterm, as specified in method up of
-     * {@link PosInTerm}.
+     * /**
+     * Moves up one level in the term structure and returns a new {@link PosInOccurrence}
+     * representing the new position.
+     *
+     * @return A new {@link PosInOccurrence} one level higher in the term structure.
+     * @throws IllegalStateException If the position is already at the top level.
      */
     public PosInOccurrence up() {
         assert !isTopLevel() : "not possible to go up from top level position";
@@ -69,46 +103,62 @@ public class PosInOccurrence {
     }
 
     /**
-     * creates a new PosInOccurrence that has exactly the same state as this object except the
-     * PosInTerm is new and walked down the specified subterm, as specified in method down of
-     * {@link PosInTerm}.
+     * Moves down to the specified child in the term structure and returns a new
+     * {@link PosInOccurrence}
+     * representing the new position.
+     *
+     * @param i The index of the child to move to.
+     * @return A new {@link PosInOccurrence} pointing to the specified child.
      */
     public PosInOccurrence down(int i) {
         return new PosInOccurrence(sequentFormula, posInTerm.down(i), inAntec);
     }
 
     /**
-     * @return the number/index of the deepest subterm that this <code>PosInOccurrence</code> points
-     *         to. If the position is top-level, the result will be <code>-1</code>
+     * Retrieves the index of the deepest subterm this position points to.
+     * Returns -1 if the position is top-level.
+     *
+     * @return The index of the subterm or -1 if at the top level.
      */
     public int getIndex() {
         return posInTerm.getIndex();
     }
 
     /**
-     * returns true iff the occurrence is in the antecedent of a sequent.
+     * Determines whether this position is in the antecedent of the sequent.
+     *
+     * @return True if the position is in the antecedent, otherwise false.
      */
     public boolean isInAntec() {
         return inAntec;
     }
 
+    /**
+     * Checks if this position is at the top level of the formula.
+     *
+     * @return True if the position is at the top level, otherwise false.
+     */
     public boolean isTopLevel() {
         return posInTerm == PosInTerm.getTopLevel();
     }
+
 
     /**
      * The usage of this method is strongly discouraged, use {@link PosInOccurrence#iterator}
      * instead. describes the exact occurrence of the referred term inside
      * {@link SequentFormula#formula()}
      *
-     * @return the position in the formula of the SequentFormula of this PosInOccurrence.
+     * @return the position in the formula of the SequentFormula of this {@link PosInOccurrence}.
      */
     public PosInTerm posInTerm() {
         return posInTerm;
     }
 
     /**
-     * Ascend to the top node of the formula this object points to
+     * Moves to the top level of the formula and returns a new {@link PosInOccurrence} for that
+     * position.
+     *
+     * @return A `PosInOccurrence` representing the top level.
      */
     public PosInOccurrence topLevel() {
         if (isTopLevel()) {
@@ -118,7 +168,9 @@ public class PosInOccurrence {
     }
 
     /**
-     * returns the subterm this object points to
+     * Retrieves the subterm pointed to by this position.
+     *
+     * @return The {@link Term} at this position.
      */
     public Term subTerm() {
         if (subTermCache == null) {
@@ -128,8 +180,11 @@ public class PosInOccurrence {
     }
 
     /**
-     * compares this PosInOccurrence with another PosInOccurrence and returns true if both describe
-     * the same occurrence
+     * Compares this {@link PosInOccurrence} with another object for equality based on their
+     * contents.
+     *
+     * @param obj The object to compare with.
+     * @return True if the two objects describe the same occurrence, otherwise false.
      */
     public boolean eqEquals(Object obj) {
         if (!(obj instanceof PosInOccurrence cmp)) {
@@ -144,11 +199,11 @@ public class PosInOccurrence {
     }
 
     /**
-     * Contrary to <code>eqEquals</code>, this method returns true only for pio objects that point
-     * to the same (identical) formula
+     * Checks if this {@link PosInOccurrence} refers to the exact same formula as another
+     * and to an equal position within this formula.
      *
-     * @param obj the Object to which this one is compared
-     * @return true if both objects are equal
+     * @param obj The object to compare with.
+     * @return True if both refer to the same formula, otherwise false.
      */
     @Override
     public boolean equals(Object obj) {
@@ -178,13 +233,13 @@ public class PosInOccurrence {
     }
 
     /**
-     * Replace the formula this object points to with the new formula given
+     * Replaces the formula associated with this occurrence and returns a new object pointing
+     * to the same position within the new formula.
      *
-     * @param p_newFormula the new formula
-     * @return a <code>PosInOccurrence</code> object that points to the same position within the
-     *         formula <code>p_newFormula</code> as this object does within the formula
-     *         <code>constrainedFormula()</code>. It is not tested whether this position exists
-     *         within <code>p_newFormula</code>
+     * @param p_newFormula The new formula.
+     * @return A {@link PosInOccurrence} pointing to the same position in the new formula. It is not
+     *         tested
+     *         whether this position exists within {@code p_newFormula}
      */
     public PosInOccurrence replaceSequentFormula(SequentFormula p_newFormula) {
         assert p_newFormula != null;
@@ -194,6 +249,11 @@ public class PosInOccurrence {
         return new PosInOccurrence(p_newFormula, posInTerm, inAntec);
     }
 
+    /**
+     * Returns an iterator for traversing the path of this position within the term structure.
+     *
+     * @return A {@link PIOPathIterator} for traversing this position.
+     */
     public PIOPathIterator iterator() {
         return new PIOPathIteratorImpl();
     }
