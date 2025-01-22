@@ -512,7 +512,7 @@ tasks.register('alldoc', Javadoc){
     //key.ui javadoc is broken
     source projects.collect { it.sourceSets.main.allJava }
     classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
-    destinationDir = file("${layout.buildDirectory}/docs/javadoc")
+    destinationDir = layout.buildDirectory.dir("/docs/javadoc").asFile
 
     if (JavaVersion.current().isJava9Compatible()) {
         //notworking on jenkins
@@ -540,7 +540,7 @@ tasks.register('alldocJar', Zip){
     description 'Create a jar file with the javadoc over all sub projects'
     from alldoc
     archiveFileName = "key-api-doc-${project.version}.zip"
-    destinationDirectory = file("${layout.buildDirectory}/distribution")
+    destinationDirectory = layout.buildDirectory.dir("distribution")
 }
 
 //conditionally enable jacoco coverage when `-DjacocoEnabled=true` is given on CLI.
