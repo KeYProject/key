@@ -708,9 +708,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link For} as defined by <code>parameters</code>
      */
     public static EnhancedFor enhancedForLoop(final ExtList parameters) {
-        final EnhancedFor loop = new EnhancedFor(parameters);
-
-        return loop;
+        return new EnhancedFor(parameters);
     }
 
     /**

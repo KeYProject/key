@@ -307,7 +307,11 @@ public class TermBuilder {
      * @return a location variable for the given name and type
      */
     public LocationVariable atPreVar(String baseName, Sort sort, boolean makeNameUnique) {
-        return atPreVar(baseName, new KeYJavaType(sort), makeNameUnique);
+        var kjt = services.getJavaInfo().getKeYJavaType(sort);
+        if (kjt == null) {
+            kjt = new KeYJavaType(sort);
+        }
+        return atPreVar(baseName, kjt, makeNameUnique);
     }
 
     /**
