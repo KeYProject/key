@@ -3,20 +3,21 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
-
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.Nullable;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public record BuildingIssue(String message, @Nullable Throwable cause, boolean isWarning,
                             Position position,
                             @Nullable String sourceName) {
+
+    private static final URI URI_UNKNOWN = URI.create("file:unknown");
 
     public static BuildingIssue createError(String message, @Nullable ParserRuleContext token, @Nullable Throwable cause) {
         return createError(message, token != null ? token.start : null, cause);
@@ -42,11 +43,12 @@ public record BuildingIssue(String message, @Nullable Throwable cause, boolean i
         return fromToken(message, true, token, cause);
     }
 
-    public PositionedString asPositionedString()  {
+    public PositionedString asPositionedString() {
         try {
-            return new PositionedString(message, new Location(new URI(sourceName), position));
+            final var fileUri = sourceName != null ? new URI(sourceName) : URI_UNKNOWN;
+            return new PositionedString(message, new Location(fileUri, position));
         } catch (URISyntaxException e) {
-            return null;
+            throw new RuntimeException(e);
         }
     }
 }

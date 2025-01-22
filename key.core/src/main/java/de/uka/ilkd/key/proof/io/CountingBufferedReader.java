@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.IOUtil;
 
 public class CountingBufferedReader extends BufferedReader {
@@ -69,7 +70,7 @@ public class CountingBufferedReader extends BufferedReader {
     }
 
     @Override
-    public String readLine() throws IOException {
+    public @Nullable String readLine() throws IOException {
         final String line = super.readLine();
         if (line != null) {
             incCharCounter(line.length());

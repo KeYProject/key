@@ -3,21 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.ZipFile;
-
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
@@ -28,8 +17,14 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.RenamingTable;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -38,19 +33,30 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
-
+import org.antlr.v4.runtime.IntStream;
+import org.antlr.v4.runtime.TokenSource;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
-
-import org.antlr.v4.runtime.IntStream;
-import org.antlr.v4.runtime.TokenSource;
-import org.jspecify.annotations.Nullable;
 import recoder.io.ArchiveDataLocation;
 import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipFile;
 
 /**
  * Collection of some common, stateless functionality. Stolen from the weissInvariants side branch.
@@ -61,7 +67,7 @@ public final class MiscTools {
      * Pattern to parse URL scheme (capture group 1) and scheme specific part (group 2).
      */
     private static final Pattern URL_PATTERN =
-        Pattern.compile("(^[a-zA-Z][a-zA-Z0-9+\\-.]*):(.*)");
+            Pattern.compile("(^[a-zA-Z][a-zA-Z0-9+\\-.]*):(.*)");
 
     private MiscTools() {
     }
@@ -79,10 +85,10 @@ public final class MiscTools {
      *
      * @param loopTerm The term for which to return the {@link LoopSpecification}.
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
-     *         optional if there is no specified invariant for the loop.
+     * optional if there is no specified invariant for the loop.
      */
     public static LoopSpecification getSpecForTermWithLoopStmt(final Term loopTerm,
-            final Services services) {
+                                                               final Services services) {
         assert loopTerm.op() instanceof Modality;
         assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
 
@@ -99,7 +105,7 @@ public final class MiscTools {
     /**
      * @param services The {@link Services} object.
      * @return true iff the given {@link Services} object is associated to a {@link Profile} with
-     *         permissions.
+     * permissions.
      */
     public static boolean isPermissions(Services services) {
         return services.getProfile() instanceof JavaProfile
@@ -112,7 +118,7 @@ public final class MiscTools {
      *
      * @param modalityKind The modality to check.
      * @return true iff the given {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} is a
-     *         transaction modality.
+     * transaction modality.
      */
     public static boolean isTransaction(final Modality.JavaModalityKind modalityKind) {
         return modalityKind.transaction();
@@ -123,8 +129,8 @@ public final class MiscTools {
      * The normal heap, the saved heap (transaction), and the permission heap.
      *
      * @param modalityKind The current modality (checked for transaction).
-     * @param services The {@link Services} object (for {@link HeapLDT} and for checking whether
-     *        we're in the permissions profile).
+     * @param services     The {@link Services} object (for {@link HeapLDT} and for checking whether
+     *                     we're in the permissions profile).
      * @return The list of the applicable heaps for the given scenario.
      */
     public static List<LocationVariable> applicableHeapContexts(
@@ -159,10 +165,10 @@ public final class MiscTools {
      * Returns the receiver term of the passed method frame, or null if the frame belongs to a
      * static method.
      *
-     * @param mf a method frame.
+     * @param mf       a method frame.
      * @param services services.
      * @return the receiver term of the passed method frame, or null if the frame belongs to a
-     *         static method.
+     * static method.
      */
     public static @Nullable Term getSelfTerm(MethodFrame mf, Services services) {
         ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
@@ -177,10 +183,10 @@ public final class MiscTools {
     /**
      * All variables read in the specified program element, excluding newly declared variables.
      *
-     * @param pe a program element.
+     * @param pe       a program element.
      * @param services services.
      * @return all variables read in the specified program element, excluding newly declared
-     *         variables.
+     * variables.
      */
     public static ImmutableSet<LocationVariable> getLocalIns(ProgramElement pe, Services services) {
         final ReadPVCollector rpvc = new ReadPVCollector(pe, services);
@@ -191,13 +197,13 @@ public final class MiscTools {
     /**
      * All variables changed in the specified program element, excluding newly declared variables.
      *
-     * @param pe a program element.
+     * @param pe       a program element.
      * @param services services.
      * @return all variables changed in the specified program element, excluding newly declared
-     *         variables.
+     * variables.
      */
     public static ImmutableSet<LocationVariable> getLocalOuts(ProgramElement pe,
-            Services services) {
+                                                              Services services) {
         final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
         wpvc.start();
         return wpvc.getWrittenPVs();
@@ -206,13 +212,13 @@ public final class MiscTools {
     /**
      * All variables changed in the specified program element, including newly declared variables.
      *
-     * @param pe a program element.
+     * @param pe       a program element.
      * @param services services.
      * @return all variables changed in the specified program element, including newly declared
-     *         variables.
+     * variables.
      */
     public static ImmutableSet<LocationVariable> getLocalOutsAndDeclared(ProgramElement pe,
-            Services services) {
+                                                                         Services services) {
         final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
         wpvc.start();
         return wpvc.getWrittenPVs().union(wpvc.getDeclaredPVs());
@@ -221,12 +227,12 @@ public final class MiscTools {
     /**
      * All variables newly declared in the specified program element.
      *
-     * @param pe a program element.
+     * @param pe       a program element.
      * @param services services.
      * @return all variables newly declared in the specified program element.
      */
     public static ImmutableSet<LocationVariable> getLocallyDeclaredVars(ProgramElement pe,
-            Services services) {
+                                                                        Services services) {
         final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
         wpvc.start();
         return wpvc.getDeclaredPVs();
@@ -257,8 +263,8 @@ public final class MiscTools {
     /**
      * Concatenates two arrays.
      *
-     * @param s1 an array.
-     * @param s2 another array.
+     * @param s1  an array.
+     * @param s2  another array.
      * @param <S> type o array {@code s1} and of result array.
      * @param <T> type of array {@code s2}.
      * @return the concatenation of both arrays.
@@ -276,8 +282,8 @@ public final class MiscTools {
      * <code>m1</code> are dropped. This implementation tries to use the same implementation of
      * {@link java.util.Map} (provided in Java SE) as <code>m0</code>.
      *
-     * @param m0 a map.
-     * @param m1 another map.
+     * @param m0  a map.
+     * @param m1  another map.
      * @param <S> type of {@code m0}.
      * @param <T> type of {@code m1}.
      * @param <U> new type of result map indexes.
@@ -314,7 +320,7 @@ public final class MiscTools {
      * Windows systems).
      *
      * @param origFilename a filename.
-     * @param toFilename the name of a parent directory of {@code origFilename}.
+     * @param toFilename   the name of a parent directory of {@code origFilename}.
      * @return {@code origFilename} relative to {@code toFilename}
      */
     public static String makeFilenameRelative(String origFilename, String toFilename) {
@@ -369,7 +375,7 @@ public final class MiscTools {
      * {@link Object#toString()} is used to turn the objects into strings.
      *
      * @param collection an arbitrary non-null collection
-     * @param delimiter a non-null string which is put between the elements.
+     * @param delimiter  a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Iterable<?> collection, String delimiter) {
@@ -383,7 +389,7 @@ public final class MiscTools {
      * {@link Object#toString()} is used to turn the objects into strings.
      *
      * @param collection an arbitrary non-null array of objects
-     * @param delimiter a non-null string which is put between the elements.
+     * @param delimiter  a non-null string which is put between the elements.
      * @return the concatenation of all string representations separated by the delimiter
      */
     public static String join(Object[] collection, String delimiter) {
@@ -409,7 +415,7 @@ public final class MiscTools {
      * Checks whether a string contains another one as a whole word (i.e., separated by white spaces
      * or a semicolon at the end).
      *
-     * @param s string to search in
+     * @param s    string to search in
      * @param word string to be searched for
      * @return the answer to the question specified above
      */
@@ -437,7 +443,7 @@ public final class MiscTools {
      *
      * @param node The given {@link Node}.
      * @return The display name of the applied rule in the given {@link Node} or {@code null} if no
-     *         one exists.
+     * one exists.
      */
     public static @Nullable String getRuleDisplayName(@Nullable Node node) {
         String name = null;
@@ -481,7 +487,7 @@ public final class MiscTools {
      *
      * @param node The given {@link Node}.
      * @return The display name of the applied rule in the given {@link Node} or {@code null} if no
-     *         one exists.
+     * one exists.
      */
     public static @Nullable String getRuleName(@Nullable Node node) {
         String name = null;
@@ -550,7 +556,7 @@ public final class MiscTools {
      * @return The renamed variable
      */
     public static ProgramVariable findActualVariable(ProgramVariable originalVar,
-            @Nullable Node node) {
+                                                     @Nullable Node node) {
         if (node != null) {
             do {
                 if (node.getRenamingTable() != null) {
@@ -582,7 +588,7 @@ public final class MiscTools {
          * The declared program variables.
          */
         private ImmutableSet<LocationVariable> declaredPVs =
-            DefaultImmutableSet.nil();
+                DefaultImmutableSet.nil();
 
         public ReadPVCollector(ProgramElement root, Services services) {
             super(root, services);
@@ -614,13 +620,13 @@ public final class MiscTools {
          * The written program variables.
          */
         private ImmutableSet<LocationVariable> writtenPVs =
-            DefaultImmutableSet.nil();
+                DefaultImmutableSet.nil();
 
         /**
          * The declared program variables.
          */
         private ImmutableSet<LocationVariable> declaredPVs =
-            DefaultImmutableSet.nil();
+                DefaultImmutableSet.nil();
 
         public WrittenAndDeclaredPVCollector(ProgramElement root, Services services) {
             super(root, services);
@@ -681,7 +687,7 @@ public final class MiscTools {
     }
 
     public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
-            ImmutableList<Term> localOuts) {
+                                                          ImmutableList<Term> localOuts) {
         ImmutableList<Term> result = ImmutableSLList.nil();
         for (Term localIn : localIns) {
             if (!localOuts.contains(localIn)) {
@@ -765,7 +771,7 @@ public final class MiscTools {
      * plans for this).<br>
      * <b>Workaround:</b> Don't use directory names ending with "!".
      *
-     * @param zipFile the given zip
+     * @param zipFile   the given zip
      * @param entryName the entry path relative to the root of the zip
      * @return a zip/jar URI to the entry inside the zip
      * @throws IOException if an I/O error occurs
@@ -849,9 +855,9 @@ public final class MiscTools {
      * @param input the String to convert
      * @return a URL if successful
      * @throws MalformedURLException if the string can not be converted to URL because of an unknown
-     *         protocol or illegal format
+     *                               protocol or illegal format
      */
-    public static URL parseURL(@Nullable String input) throws MalformedURLException {
+    public static URI parseURL(@Nullable String input) throws URISyntaxException {
         if (input == null) {
             throw new NullPointerException("No URL can be created from null!");
         }
@@ -860,53 +866,50 @@ public final class MiscTools {
         String schemeSpecPart = "";
         Matcher m = URL_PATTERN.matcher(input);
         if (m.matches() && m.groupCount() == 2) {
-            scheme = m.group(1);
+            scheme = Objects.requireNonNull(m.group(1));
             schemeSpecPart = m.group(2);
         }
         switch (scheme) {
-        case "URL" -> {
-            // schemeSpecPart actually contains a URL again
-            return new URL(schemeSpecPart);
-        }
-        case "ARCHIVE" -> {
-            // format: "ARCHIVE:<filename>?<itemname>"
-            // extract item name and zip file
-            int qmindex = schemeSpecPart.lastIndexOf('?');
-            String zipName = schemeSpecPart.substring(0, qmindex);
-            String itemName = schemeSpecPart.substring(qmindex + 1);
-            try {
-                ZipFile zip = new ZipFile(zipName);
-                // use special method to ensure that path separators are correct
-                return getZipEntryURI(zip, itemName).toURL();
-            } catch (IOException e) {
-                MalformedURLException me =
-                    new MalformedURLException(input + " does not contain a valid URL");
-                me.initCause(e);
-                throw me;
+            case "URL" -> {
+                // schemeSpecPart actually contains a URL again
+                return new URI(schemeSpecPart);
             }
-        }
-        case "FILE" -> {
-            // format: "FILE:<path>"
-            Path path = Paths.get(schemeSpecPart).toAbsolutePath().normalize();
-            return path.toUri().toURL();
-        }
-        case "" -> {
-            // only file/path without protocol
-            Path p = Paths.get(input).toAbsolutePath().normalize();
-            return p.toUri().toURL();
-        }
-        default -> {
-            // may still be Windows path starting with <drive_letter>:
-            if (scheme.length() == 1) {
-                // TODO: Theoretically, a protocol with only a single letter is allowed.
-                // This (very rare) case currently is not handled correctly.
-                Path windowsPath = Paths.get(input).toAbsolutePath().normalize();
-                return windowsPath.toUri().toURL();
+            case "ARCHIVE" -> {
+                // format: "ARCHIVE:<filename>?<itemname>"
+                // extract item name and zip file
+                int qmindex = schemeSpecPart.lastIndexOf('?');
+                String zipName = schemeSpecPart.substring(0, qmindex);
+                String itemName = schemeSpecPart.substring(qmindex + 1);
+                try {
+                    ZipFile zip = new ZipFile(zipName);
+                    // use special method to ensure that path separators are correct
+                    return getZipEntryURI(zip, itemName);
+                } catch (IOException e) {
+                    throw new URISyntaxException(input, "Does not contain a valid URI: " + e.getMessage());
+                }
             }
-            // otherwise call URL constructor
-            // if this also fails, there is an unknown protocol -> MalformedURLException
-            return new URL(input);
-        }
+            case "FILE" -> {
+                // format: "FILE:<path>"
+                Path path = Paths.get(schemeSpecPart).toAbsolutePath().normalize();
+                return path.toUri();
+            }
+            case "" -> {
+                // only file/path without protocol
+                Path p = Paths.get(input).toAbsolutePath().normalize();
+                return p.toUri();
+            }
+            default -> {
+                // may still be Windows path starting with <drive_letter>:
+                if (scheme.length() == 1) {
+                    // TODO: Theoretically, a protocol with only a single letter is allowed.
+                    // This (very rare) case currently is not handled correctly.
+                    Path windowsPath = Paths.get(input).toAbsolutePath().normalize();
+                    return windowsPath.toUri();
+                }
+                // otherwise call URL constructor
+                // if this also fails, there is an unknown protocol -> MalformedURLException
+                return new URI(input);
+            }
         }
     }
 }

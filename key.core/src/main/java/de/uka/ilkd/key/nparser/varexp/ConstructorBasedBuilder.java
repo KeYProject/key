@@ -7,8 +7,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.rule.VariableCondition;
+import org.jspecify.annotations.NonNull;
 
 public class ConstructorBasedBuilder extends AbstractConditionBuilder {
     private final Class<? extends VariableCondition> clazz;
@@ -38,14 +40,15 @@ public class ConstructorBasedBuilder extends AbstractConditionBuilder {
     }
 
     @Override
-    public VariableCondition build(Object[] arguments, List<String> parameters, boolean negated) {
+    public VariableCondition build(@NonNull Object[] arguments, List<String> parameters, boolean negated) {
         if (negated && !negationSupported) {
             throw new RuntimeException(clazz.getName() + " does not support negation.");
         }
 
-        Object[] args = arguments;
+        Object[] args = Objects.requireNonNull(arguments);
         if (negationSupported) {
-            args = Arrays.copyOf(arguments, arguments.length + 1);
+            var a = Arrays.copyOf(arguments, arguments.length + 1);
+            args = a;
             args[args.length - 1] = negated;
         }
 

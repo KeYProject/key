@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.proof.Node;
-
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -89,7 +88,7 @@ public class NodePreorderIterator {
      * <b>Attention:</b> Needs to be called before {@link #next()} is called.
      *
      * @return The child index of {@link #next()} on its parent or {@code -1} if no parent is
-     *         available.
+     * available.
      */
     public int getChildIndexOnParent() {
         return childIndexOnParent;
@@ -110,16 +109,18 @@ public class NodePreorderIterator {
      * Computes the next element and updates {@link #next()}.
      */
     protected void updateNext() {
-        Node newNext = null;
+        if (next == null) {
+            return;
+        }
+
         if (next.childrenCount() >= 1) {
             this.childIndexOnParent = 0;
             this.returnedParents = 0;
-            newNext = next.child(0);
+            this.next = next.child(0);
         } else {
             this.returnedParents = 1;
-            newNext = getNextOnParent(next);
+            this.next = getNextOnParent(next);
         }
-        this.next = newNext;
     }
 
     /**
@@ -133,7 +134,7 @@ public class NodePreorderIterator {
         while (parent != null) {
             boolean nodeFound = false; // Indicates that node was found on the parent.
             Node nextChildOnParent = null; // The next child on the parent or the last child after
-                                           // iteration has finished
+            // iteration has finished
             for (int i = 0; i < parent.childrenCount(); i++) {
                 nextChildOnParent = parent.child(i);
                 if (nextChildOnParent == start) {

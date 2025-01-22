@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
@@ -33,7 +34,7 @@ public class JFunction extends Function implements Operator, Sorted {
     // -------------------------------------------------------------------------
 
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
+           @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
             boolean isSkolemConstant) {
         super(name, argSorts, sort, whereToBind, isRigid, unique, isSkolemConstant);
 
@@ -44,7 +45,7 @@ public class JFunction extends Function implements Operator, Sorted {
     }
 
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique) {
+           @Nullable ImmutableArray<Boolean> whereToBind, boolean unique) {
         this(name, sort, argSorts, whereToBind, unique, true, false);
     }
 
@@ -53,7 +54,7 @@ public class JFunction extends Function implements Operator, Sorted {
         this(name, sort, argSorts, whereToBind, unique, true, isSkolemConstant);
     }
 
-    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean @Nullable[] whereToBind,
             boolean unique) {
         this(name, sort, new ImmutableArray<>(argSorts),
             whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);

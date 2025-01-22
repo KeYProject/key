@@ -7,10 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -18,6 +15,7 @@ import java.util.zip.ZipFile;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.io.DataLocation;
@@ -28,13 +26,11 @@ import recoder.io.DataLocation;
  *
  * @author MU
  */
-
-
 public class ZipFileCollection implements FileCollection {
     private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileCollection.class);
 
-    final File file;
-    ZipFile zipFile;
+    private final File file;
+    private @Nullable ZipFile zipFile;
 
     public ZipFileCollection(File file) {
         this.file = file;
@@ -46,9 +42,7 @@ public class ZipFileCollection implements FileCollection {
             try {
                 zipFile = new ZipFile(file);
             } catch (ZipException ex) {
-                IOException iox =
-                    new IOException("can't open " + file + ": " + ex.getMessage(), ex);
-                throw iox;
+                throw new IOException("can't open " + file + ": " + ex.getMessage(), ex);
             }
         }
         return new Walker(extensions);
@@ -58,14 +52,14 @@ public class ZipFileCollection implements FileCollection {
         return createWalker(new String[] { extension });
     }
 
-    class Walker implements FileCollection.Walker {
+    public class Walker implements FileCollection.Walker {
 
         private final Enumeration<? extends ZipEntry> enumeration;
-        private ZipEntry currentEntry;
+        private @Nullable ZipEntry currentEntry;
         private final List<String> extensions;
 
         public Walker(String[] extensions) {
-            this.enumeration = zipFile.entries();
+            this.enumeration = Objects.requireNonNull(zipFile).entries();
             this.extensions = new ArrayList<>();
             for (String extension : extensions) {
                 this.extensions.add(extension.toLowerCase());
@@ -81,7 +75,7 @@ public class ZipFileCollection implements FileCollection {
         }
 
         public InputStream openCurrent() throws IOException {
-            if (currentEntry == null) {
+            if (currentEntry == null || zipFile == null) {
                 throw new NoSuchElementException();
             } else {
                 return zipFile.getInputStream(currentEntry);
@@ -94,7 +88,7 @@ public class ZipFileCollection implements FileCollection {
                 throw new NoSuchElementException();
             } else if (fileRepo != null) {
                 // request an InputStream from the FileRepo
-                URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
+                URI uri = MiscTools.getZipEntryURI(Objects.requireNonNull(zipFile), currentEntry.getName());
                 return fileRepo.getInputStream(uri.toURL());
             } else {
                 return openCurrent(); // fallback without FileRepo
@@ -104,10 +98,10 @@ public class ZipFileCollection implements FileCollection {
         public boolean step() {
             currentEntry = null;
             while (enumeration.hasMoreElements() && currentEntry == null) {
-                currentEntry = enumeration.nextElement();
+                var entry = enumeration.nextElement();
+                currentEntry = entry;
                 for (String extension : extensions) {
-                    if (extension != null
-                            && !currentEntry.getName().toLowerCase().endsWith(extension)) {
+                    if (extension != null && !entry.getName().toLowerCase().endsWith(extension)) {
                         currentEntry = null;
                     } else {
                         break;
@@ -125,7 +119,7 @@ public class ZipFileCollection implements FileCollection {
             // dont use ArchiveDataLocation this keeps the zip open and keeps reference to it!
             try {
                 // since we actually return a zip/jar, we use URLDataLocation
-                URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
+                URI uri = MiscTools.getZipEntryURI(Objects.requireNonNull(zipFile), currentEntry.getName());
                 return new URLDataLocation(uri.toURL());
             } catch (IOException e) {
                 LOGGER.warn("Failed to get zip entry uri", e);

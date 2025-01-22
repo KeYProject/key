@@ -144,7 +144,7 @@ public interface ProofMacro {
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
-    boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc);
+    boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc);
 
     /**
      * Can this macro be applied on the given node?
@@ -187,7 +187,9 @@ public interface ProofMacro {
      * @throws InterruptedException if the application of the macro has been interrupted.
      */
     ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+                                   ImmutableList<Goal> goals,
+                                   @Nullable PosInOccurrence posInOcc,
+                                   @Nullable ProverTaskListener listener)
             throws Exception;
 
     /**
@@ -211,7 +213,7 @@ public interface ProofMacro {
      * @throws InterruptedException if the application of the macro has been interrupted.
      */
     ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
-            PosInOccurrence posInOcc, ProverTaskListener listener)
+                                   @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
             throws Exception;
 
     /**

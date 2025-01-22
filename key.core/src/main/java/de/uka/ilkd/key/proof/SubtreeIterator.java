@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -23,7 +25,7 @@ class SubtreeIterator implements Iterator<Node> {
         this.root = root;
     }
 
-    private Node nextSibling(Node m) {
+    private @Nullable Node nextSibling(Node m) {
         Node p = m.parent();
         while (p != null && m != root) {
             final int c = p.childrenCount();

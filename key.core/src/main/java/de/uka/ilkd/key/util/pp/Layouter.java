@@ -3,9 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.pp;
 
-import java.util.*;
-
 import org.jspecify.annotations.NonNull;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Queue;
+import java.util.StringTokenizer;
 
 /**
  * This class pretty-prints information using line breaks and indentation. For instance, it can be
@@ -17,7 +20,7 @@ import org.jspecify.annotations.NonNull;
  *     j++;
  * }
  * </pre>
- *
+ * <p>
  * instead of
  *
  * <pre>
@@ -26,10 +29,10 @@ import org.jspecify.annotations.NonNull;
  *     j++;
  * }
  * </pre>
- *
+ * <p>
  * if a maximum line width of 15 characters is chosen.
  *
- * <P>
+ * <p>
  * The formatted output is directed to a <em>backend</em> which might write it to an I/O stream,
  * append it to the text of a GUI component or store it in a string. The {@link Backend} interface
  * encapsulates the concept of backend. Apart from handling the output, the backend is also asked
@@ -37,7 +40,7 @@ import org.jspecify.annotations.NonNull;
  * possible to include e.g. HTML markup in the output which does not take up any space. There is
  * a convenience implementation {@link StringBackend}, which writes to a {@link java.lang.String}.
  *
- * <P>
+ * <p>
  * The layouter internally keeps track of a current <em>indentation level</em>. Think of nicely
  * indented Java source code. Then the indentation level at any point is the number of blank columns
  * to be inserted at the beginning of the next line if you inserted a line break. To increase the
@@ -45,7 +48,7 @@ import org.jspecify.annotations.NonNull;
  * <em>blocks</em>. The indentation level changes when a block is begun, and it is reset to its
  * previous value when a block is ended. Of course, blocks maybe nested.
  *
- * <P>
+ * <p>
  * In order to break text among several lines, the layouter needs to be told where line breaks are
  * allowed. A <em>break</em> is a position in the text where there is either a line break (with
  * appropriate indentation) or a number of spaces, if enough material fits in one line. In order to
@@ -54,7 +57,7 @@ import org.jspecify.annotations.NonNull;
  * line are broken either at all or at none of the breaks. In an inconsistent block, as much
  * material as possible is put on one line before it is broken.
  *
- * <P>
+ * <p>
  * Consider the program above. It should be printed either as
  *
  * <pre>
@@ -63,7 +66,7 @@ import org.jspecify.annotations.NonNull;
  *     j++;
  * }
  * </pre>
- *
+ * <p>
  * or, if there is not enough space on the line, as
  *
  * <pre>
@@ -72,17 +75,17 @@ import org.jspecify.annotations.NonNull;
  *     j++;
  * }
  * </pre>
- *
+ * <p>
  * Given a Layouter object <code>l</code>, we could say:
  *
  * <pre>
  * l.begin(true, 2).print("while (i>0) {").brk(1, 0).print("i--;").brk(1, 0).print("j++;")
  *         .brk(1, -2).print("{").end();
  * </pre>
- *
- * The call to {@link #begin(boolean,int)} starts a consistent block, increasing the indentation
+ * <p>
+ * The call to {@link #begin(boolean, int)} starts a consistent block, increasing the indentation
  * level by 2. The {@link #print(String)} methods gives some actual text to be output. The call to
- * {@link #brk(int,int)} inserts a break. The first argument means that one space should be printed
+ * {@link #brk(int, int)} inserts a break. The first argument means that one space should be printed
  * at this position if the line is <em>not</em> broken. The second argument is an offset to be added
  * to the indentation level for the next line, if the line <em>is</em> broken. The effect of this
  * parameter can be seen in the call <code>brk(1,-2)</code>. The offset of <code>-2</code> outdents
@@ -91,12 +94,12 @@ import org.jspecify.annotations.NonNull;
  * <p>
  * If the lines in a block are broken, one sometimes wants to insert spaces up to the current
  * indentation level at a certain position without allowing a line break there. This can be done
- * using the {@link #ind(int,int)} method. For instance, one wants to output either
+ * using the {@link #ind(int, int)} method. For instance, one wants to output either
  *
  * <pre>
  *   ...[Good and Bad and Ugly]...
  * </pre>
- *
+ * <p>
  * or
  *
  * <pre>
@@ -104,7 +107,7 @@ import org.jspecify.annotations.NonNull;
  *       and Bad
  *       and Ugly]...
  * </pre>
- *
+ * <p>
  * Note the four spaces required before <code>Good</code>. We do this by opening a block which sets
  * the indentation level to the column where the <code>G</code> ends up and outdenting the lines
  * with the <code>and</code>:
@@ -113,8 +116,8 @@ import org.jspecify.annotations.NonNull;
  * l.print("...[").begin(true, 4).ind(0, 0).print("Good").brk(1, -4).print("and ").print("Bad")
  *         .brk(1, -4).print("and ").print("Ugly").end().print("]...");
  * </pre>
- *
- * Again, the first argument to {@link #ind(int,int)} is a number of spaces to print if the block we
+ * <p>
+ * Again, the first argument to {@link #ind(int, int)} is a number of spaces to print if the block we
  * are in is printed on one line. The second argument is an offset to be added to the current
  * indentation level to determine the column to which we should skip.
  *
@@ -127,19 +130,19 @@ import org.jspecify.annotations.NonNull;
  * Some applications need to keep track of where certain parts of the input text end up in the
  * output. For this purpose, the Layouter class provides the {@link #mark(Object)} method.
  *
- * <P>
+ * <p>
  * The public methods of this class may be divided into two categories: A small number of
  * <em>primitive</em> methods, as described above, and a host of <em>convenience</em> methods which
  * simplify calling the primitive ones for often-used arguments. For instance a call to
  * {@link #beginC()} is shorthand for <code>begin(true,ind)</code>, where <code>ind</code> is the
  * default indentation selected when the Layouter was constructed.
  *
- * <P>
+ * <p>
  * Most of the methods can throw an {@link UnbalancedBlocksException}, which indicates that the
  * sequence of method calls was illegal, i.e. more blocks were ended than begun, the Layouter is
  * closed before all blocks are ended, a break occurs outside any block, etc.
  *
- * <P>
+ * <p>
  * Also, most methods can throw an {@link java.io.IOException}. This only happens if a called method
  * in the backend throws an IOException, in which case that exception is passed through to the
  * caller of the Layouter method.
@@ -160,10 +163,14 @@ import org.jspecify.annotations.NonNull;
 
 public class Layouter<M> {
 
-    /** The Printer used for output. */
+    /**
+     * The Printer used for output.
+     */
     private final Printer<M> out;
 
-    /** The list of scanned tokens not yet output. */
+    /**
+     * The list of scanned tokens not yet output.
+     */
     private final Queue<StreamToken<M>> queue = new ArrayDeque<>();
 
     /**
@@ -203,7 +210,9 @@ public class Layouter<M> {
      */
     private final int largeSize;
 
-    /** A default indentation value used for blocks. */
+    /**
+     * A default indentation value used for blocks.
+     */
     private final int defaultIndent;
 
 
@@ -213,9 +222,8 @@ public class Layouter<M> {
      * Constructs a newly allocated Layouter which will send output to the given {@link Backend} and
      * has the given default indentation.
      *
-     * @param back the Backend
+     * @param back        the Backend
      * @param indentation the default indentation
-     *
      */
 
     public Layouter(StringBackend<M> back, int lineWidth, int indentation) {
@@ -224,17 +232,23 @@ public class Layouter<M> {
         this.defaultIndent = indentation;
     }
 
-    /** Line width */
+    /**
+     * Line width
+     */
     public int lineWidth() {
         return out.lineWidth();
     }
 
-    /** Sets the line width */
+    /**
+     * Sets the line width
+     */
     public void setLineWidth(int lineWidth) {
         out.setLineWidth(lineWidth);
     }
 
-    /** Default indent */
+    /**
+     * Default indent
+     */
     public int defaultIndent() {
         return defaultIndent;
     }
@@ -279,8 +293,8 @@ public class Layouter<M> {
      * broken. The indentation level is increased by <code>indent</code>.
      *
      * @param consistent <code>true</code> for consistent block
-     * @param relative <code>true</code> for indentation relative to parent block
-     * @param indent increment to indentation level
+     * @param relative   <code>true</code> for indentation relative to parent block
+     * @param indent     increment to indentation level
      * @return this
      */
     public Layouter<M> begin(boolean consistent, boolean relative, int indent) {
@@ -323,7 +337,7 @@ public class Layouter<M> {
      * at this point. If it <em>is</em> broken, indentation is added to the current indentation
      * level, plus the value of <code>offset</code>.
      *
-     * @param width space to insert if not broken
+     * @param width  space to insert if not broken
      * @param offset offset relative to current indentation level
      * @return this
      */
@@ -350,7 +364,7 @@ public class Layouter<M> {
      * on the current line. If that is the case, nothing is printed. No line break is possible at
      * this point.
      *
-     * @param width space to insert if not broken
+     * @param width  space to insert if not broken
      * @param offset offset relative to current indentation level
      * @return this
      */
@@ -375,7 +389,6 @@ public class Layouter<M> {
      *
      * @param o an object to be passed through to the backend.
      * @return this
-     *
      */
     public Layouter<M> mark(M o) {
         if (delimStack.isEmpty()) {
@@ -389,7 +402,6 @@ public class Layouter<M> {
     /**
      * Close the Layouter. No more methods should be called after this. All blocks begun must have
      * been ended by this point. Any pending material is written to the backend.
-     *
      */
     public void close() {
         if (!delimStack.isEmpty()) {
@@ -407,7 +419,7 @@ public class Layouter<M> {
      * broken. The indentation level is increased by <code>indent</code>.
      *
      * @param consistent <code>true</code> for consistent block
-     * @param indent increment to indentation level
+     * @param indent     increment to indentation level
      * @return this
      */
     public Layouter<M> begin(boolean consistent, int indent) {
@@ -420,7 +432,7 @@ public class Layouter<M> {
      * broken. The indentation level is increased by <code>indent</code>.
      *
      * @param consistent <code>true</code> for consistent block
-     * @param indent increment to indentation level
+     * @param indent     increment to indentation level
      * @return this
      */
     public Layouter<M> beginRelative(boolean consistent, int indent) {
@@ -582,12 +594,16 @@ public class Layouter<M> {
     /* Delimiter Stack handling */
 
 
-    /** Push an OpenBlockToken or BreakToken onto the delimStack */
+    /**
+     * Push an OpenBlockToken or BreakToken onto the delimStack
+     */
     private void push(StreamToken<M> t) {
         delimStack.offerLast(t);
     }
 
-    /** Pop the topmost Token from the delimStack */
+    /**
+     * Pop the topmost Token from the delimStack
+     */
     private StreamToken<M> pop() {
         StreamToken<M> token = delimStack.pollLast();
         if (token == null) {
@@ -607,7 +623,9 @@ public class Layouter<M> {
         return token;
     }
 
-    /** Return the top of the delimStack, without popping it. */
+    /**
+     * Return the top of the delimStack, without popping it.
+     */
     private StreamToken<M> top() {
         StreamToken<M> token = delimStack.peekLast();
         if (token == null) {
@@ -619,7 +637,9 @@ public class Layouter<M> {
 
     /* stream handling */
 
-    /** Put a StreamToken into the stream (at the end). */
+    /**
+     * Put a StreamToken into the stream (at the end).
+     */
     private void enqueue(StreamToken<M> t) {
         queue.offer(t);
     }
@@ -630,7 +650,11 @@ public class Layouter<M> {
      */
     private void advanceLeft() {
         StreamToken<M> t;
-        while (!queue.isEmpty() && ((t = queue.peek()).followingSizeKnown())) {
+        while (!queue.isEmpty()) {
+            t = queue.peek();
+            if (t == null || !t.followingSizeKnown()) {
+                break;
+            }
             t.print(out);
             queue.poll();
             totalOutput += t.size();
@@ -643,10 +667,14 @@ public class Layouter<M> {
      * A stream token.
      */
     private static abstract class StreamToken<M> {
-        /** Send this token to the Printer {@link #out}. */
+        /**
+         * Send this token to the Printer {@link #out}.
+         */
         abstract void print(Printer<M> out);
 
-        /** Return the size of this token if the block is not broken. */
+        /**
+         * Return the size of this token if the block is not broken.
+         */
         abstract int size();
 
         /**
@@ -675,7 +703,9 @@ public class Layouter<M> {
         }
     }
 
-    /** A token corresponding to a <code>print</code> call. */
+    /**
+     * A token corresponding to a <code>print</code> call.
+     */
     private static class StringToken<M> extends StreamToken<M> {
         final String s;
 
@@ -692,7 +722,9 @@ public class Layouter<M> {
         }
     }
 
-    /** A token corresponding to an <code>ind</code> call. */
+    /**
+     * A token corresponding to an <code>ind</code> call.
+     */
     private static class IndentationToken<M> extends StreamToken<M> {
         protected final int width;
         protected final int offset;
@@ -711,10 +743,14 @@ public class Layouter<M> {
         }
     }
 
-    /** Superclass of tokens which calculate their followingSize. */
+    /**
+     * Superclass of tokens which calculate their followingSize.
+     */
     private static abstract class SizeCalculatingToken<M> extends StreamToken<M> {
         protected final int begin;
-        /** negative means that end has not been set yet. */
+        /**
+         * negative means that end has not been set yet.
+         */
         protected int end = -1;
 
         SizeCalculatingToken(int begin) {
@@ -741,7 +777,9 @@ public class Layouter<M> {
         }
     }
 
-    /** A token corresponding to a <code>brk</code> call. */
+    /**
+     * A token corresponding to a <code>brk</code> call.
+     */
     private static class BreakToken<M> extends SizeCalculatingToken<M> {
         protected final int width;
         protected final int offset;
@@ -761,7 +799,9 @@ public class Layouter<M> {
         }
     }
 
-    /** A token corresponding to a <code>begin</code> call. */
+    /**
+     * A token corresponding to a <code>begin</code> call.
+     */
     private static class OpenBlockToken<M> extends SizeCalculatingToken<M> {
         protected final boolean consistent;
         protected final boolean relative;
@@ -783,9 +823,12 @@ public class Layouter<M> {
         }
     }
 
-    /** A token corresponding to an <code>end</code> call. */
+    /**
+     * A token corresponding to an <code>end</code> call.
+     */
     private static class CloseBlockToken<M> extends StreamToken<M> {
-        CloseBlockToken() {}
+        CloseBlockToken() {
+        }
 
         void print(Printer<M> out) {
             out.closeBlock();
@@ -797,7 +840,9 @@ public class Layouter<M> {
 
     }
 
-    /** A token corresponding to a <code>mark</code> call. */
+    /**
+     * A token corresponding to a <code>mark</code> call.
+     */
     private static class MarkToken<M> extends StreamToken<M> {
         protected final M o;
 

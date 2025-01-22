@@ -16,6 +16,7 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -76,7 +77,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      */
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+                                          ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
             throws Exception {
         final List<Node> initNodes = new ArrayList<>(goals.size());
         for (Goal goal : goals) {

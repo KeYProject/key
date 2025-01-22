@@ -28,6 +28,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 
 /**
  * This class inherits from LDT and implements all method that are necessary to handle integers,
@@ -303,7 +305,7 @@ public final class IntegerLDT extends LDT {
     // -------------------------------------------------------------------------
 
     public JFunction getNumberTerminator(@UnknownInitialization IntegerLDT this) {
-        return sharp;
+        return Objects.requireNonNull(sharp);
     }
 
 
@@ -323,7 +325,7 @@ public final class IntegerLDT extends LDT {
 
 
     public JFunction getNumberSymbol(@UnknownInitialization IntegerLDT this) {
-        return numbers;
+        return Objects.requireNonNull(numbers);
     }
 
 

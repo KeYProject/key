@@ -43,7 +43,7 @@ public class SkipMacro extends AbstractProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+                                          ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
             throws InterruptedException {
         // do nothing
         return new ProofMacroFinishedInfo(this, goals);

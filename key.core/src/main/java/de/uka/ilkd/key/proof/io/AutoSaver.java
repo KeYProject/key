@@ -13,6 +13,7 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.IOUtil;
 
 import org.slf4j.Logger;
@@ -36,14 +37,14 @@ public class AutoSaver implements ProverTaskListener {
     private static final File TMP_DIR = IOUtil.getTempDirectory();
     private static final String PREFIX = TMP_DIR + File.separator + ".autosave.";
 
-    private Proof proof;
+    private @Nullable Proof proof;
     private final int interval;
     private final boolean saveClosed;
 
     private static int defaultSaveInterval = 0;
     private static boolean defaultSaveClosedProof = false;
 
-    private static AutoSaver DEFAULT_INSTANCE = null;
+    private static @Nullable AutoSaver DEFAULT_INSTANCE = null;
 
     public static final PropertyChangeListener settingsListener =
         e -> {

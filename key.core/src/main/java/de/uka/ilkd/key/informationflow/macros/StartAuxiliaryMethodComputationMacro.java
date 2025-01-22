@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -74,7 +75,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+                                          ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
             throws Exception {
         final Services services = proof.getServices();
         final InfFlowContractPO po =

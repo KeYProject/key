@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.PositionedString;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -34,7 +35,7 @@ public class LDTInput implements EnvInput {
     private final LDTInputListener listener;
     private final Profile profile;
 
-    private InitConfig initConfig = null;
+    private @Nullable InitConfig initConfig = null;
 
     /**
      * creates a representation of the LDT files to be used as input to the KeY prover.
@@ -101,7 +102,7 @@ public class LDTInput implements EnvInput {
 
     // no class path elements here
     @Override
-    public File readBootClassPath() {
+    public @Nullable File readBootClassPath() {
         return null;
     }
 
@@ -145,7 +146,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof LDTInput li)) {
             return false;
         }
@@ -190,7 +191,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public File getInitialFile() {
+    public @Nullable File getInitialFile() {
         return null;
     }
 }

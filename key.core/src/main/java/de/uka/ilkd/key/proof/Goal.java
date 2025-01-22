@@ -29,6 +29,7 @@ import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -75,7 +76,7 @@ public final class Goal {
     /**
      * the strategy object that determines automated application of rules
      */
-    private Strategy goalStrategy = null;
+    private @Nullable Strategy goalStrategy = null;
     /**
      * This is the object which keeps book about all applicable rules.
      */
@@ -91,7 +92,7 @@ public final class Goal {
     /**
      * Marks this goal as linked (-> {@link MergeRule})
      */
-    private Goal linkedGoal = null;
+    private @Nullable Goal linkedGoal = null;
     /**
      * The namespaces local to this goal. This may evolve over time.
      */
@@ -156,8 +157,8 @@ public final class Goal {
         return goalStrategy;
     }
 
-    public void setGoalStrategy(Strategy p_goalStrategy) {
-        goalStrategy = p_goalStrategy;
+    public void setGoalStrategy(@Nullable Strategy goalStrategy) {
+        this.goalStrategy = goalStrategy;
         ruleAppManager.clearCache();
     }
 

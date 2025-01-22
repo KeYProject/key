@@ -33,6 +33,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
@@ -143,9 +144,8 @@ public class MergeRuleUtils {
      * @param toTranslate The formula to be translated.
      * @return The formula represented by the input or null if not applicable.
      */
-    public static Term translateToFormula(final Services services, final String toTranslate) {
+    public static @Nullable Term translateToFormula(final Services services, final String toTranslate) {
         try {
-            @NonNull
             Term result = new KeyIO(services).parseExpression(toTranslate);
             return result.sort() == JavaDLTheory.FORMULA ? result : null;
         } catch (Throwable e) {
@@ -308,7 +308,7 @@ public class MergeRuleUtils {
      * @return The right side in the update for the given left side, or null if the right side could
      *         not be determined.
      */
-    public static Term getUpdateRightSideFor(Term update, LocationVariable leftSide) {
+    public static @Nullable Term getUpdateRightSideFor(Term update, LocationVariable leftSide) {
         if (update.op() instanceof ElementaryUpdate
                 && ((ElementaryUpdate) update.op()).lhs().equals(leftSide)) {
 
@@ -488,7 +488,7 @@ public class MergeRuleUtils {
      *        constant.
      * @return A term equal to the input, but with constants substituted by fresh variables.
      */
-    public static Term substConstantsByFreshVars(Term term, HashSet<Function> restrictTo,
+    public static Term substConstantsByFreshVars(Term term, @Nullable HashSet<Function> restrictTo,
             HashMap<Function, LogicVariable> replMap, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
@@ -630,13 +630,11 @@ public class MergeRuleUtils {
      * @return The node where the variable was introduced.
      */
     public static Node getIntroducingNodeforLocVar(LocationVariable var, Node node) {
-
-        while (!node.root() && node.getLocalProgVars().contains(var)) {
-            node = node.parent();
+        var n = node;
+        while (n != null && !n.root() && node.getLocalProgVars().contains(var)) {
+            n = n.parent();
         }
-
         return node;
-
     }
 
     /**

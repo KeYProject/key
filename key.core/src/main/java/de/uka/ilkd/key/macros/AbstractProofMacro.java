@@ -39,11 +39,11 @@ public abstract class AbstractProofMacro implements ProofMacro {
     /**
      * {@inheritDoc}
      *
-     * By default, proof macros do not support scripts, thus <code>null</code> is returned.
+     * By default, proof macros do not support scripts, thus empty string is returned.
      */
     @Override
     public String getScriptCommandName() {
-        return null;
+        return "";
     }
 
     @Override
@@ -69,7 +69,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
-            @Nullable PosInOccurrence posInOcc, ProverTaskListener listener)
+                                          @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
             throws Exception {
         return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }

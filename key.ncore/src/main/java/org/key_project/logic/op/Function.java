@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.logic.op;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
@@ -14,8 +15,8 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public abstract class Function extends org.key_project.logic.op.AbstractSortedOperator {
     public Function(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            ImmutableArray<Boolean> whereToBind, boolean isRigid, boolean unique,
-            boolean isSkolemConstant) {
+                    @Nullable ImmutableArray<Boolean> whereToBind, boolean isRigid, boolean unique,
+                    boolean isSkolemConstant) {
         super(name, argSorts, sort, whereToBind, toModifier(isRigid, unique, isSkolemConstant));
     }
 

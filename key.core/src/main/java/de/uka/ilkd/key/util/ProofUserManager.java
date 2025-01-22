@@ -9,6 +9,7 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This singleton class is used to manage user of a {@link Proof} to make sure that a {@link Proof}
@@ -150,7 +151,7 @@ public final class ProofUserManager {
      * @param proof The {@link Proof} to get its {@link KeYEnvironment}.
      * @return The {@link KeYEnvironment} of the given {@link Proof}.
      */
-    public KeYEnvironment<?> getEnvironment(Proof proof) {
+    public @Nullable KeYEnvironment<?> getEnvironment(@Nullable Proof proof) {
         if (proof != null) {
             synchronized (this) {
                 return proofEnvironments.get(proof);

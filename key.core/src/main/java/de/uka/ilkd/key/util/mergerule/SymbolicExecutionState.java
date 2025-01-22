@@ -8,7 +8,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.Pair;
+
+import java.util.Objects;
 
 /**
  * A symbolic execution state is a pair of a symbolic state in form of a parallel update, and a path
@@ -18,7 +21,7 @@ import org.key_project.util.collection.Pair;
  */
 public class SymbolicExecutionState extends Pair<Term, Term> {
 
-    private Node correspondingNode = null;
+    private @Nullable Node correspondingNode = null;
 
     /**
      * @param symbolicState The symbolic state (parallel update).
@@ -55,7 +58,7 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
     /**
      * @return The node corresponding to this SE state.
      */
-    public Node getCorrespondingNode() {
+    public @Nullable Node getCorrespondingNode() {
         return correspondingNode;
     }
 
@@ -68,7 +71,7 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
 
     @Override
     public String toString() {
-        final Services services = getCorrespondingNode().proof().getServices();
+        final Services services = Objects.requireNonNull(getCorrespondingNode()).proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
             + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("

@@ -19,6 +19,7 @@ import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -69,7 +70,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      */
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+                                          ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
             throws InterruptedException {
         if (goals == null || goals.isEmpty()) {
             // should not happen, because in this case canApplyTo returns

@@ -10,6 +10,8 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * A symbolic execution state with program counter is a triple of a symbolic state in form of a
  * parallel update, a path condition in form of a JavaDL formula, and a program counter in form of a
@@ -48,7 +50,7 @@ public record SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCon
     /**
      * @return The node corresponding to this SE state.
      */
-    public Node getCorrespondingNode() {
+    public @Nullable Node getCorrespondingNode() {
         return correspondingNode;
     }
 
@@ -61,7 +63,7 @@ public record SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCon
 
     @Override
     public String toString() {
-        final Services services = getCorrespondingNode().proof().getServices();
+        final Services services = Objects.requireNonNull(getCorrespondingNode()).proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
             + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
