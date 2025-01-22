@@ -107,7 +107,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return null;
         }
 
-        public Includes getIncludes(URL base) {
+        public Includes getIncludes(URI base) {
             IncludeFinder finder = new IncludeFinder(base);
             accept(finder);
             return finder.getIncludes();

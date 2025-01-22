@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -37,7 +38,7 @@ public class RuleSourceFactory {
         return new UrlRuleSource(u);
     }
 
-    public static RuleSource initRuleFile(final URL url) {
+    public static RuleSource initRuleFile(final URI url) {
         return new UrlRuleSource(url);
     }
 

@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
 
+import org.jspecify.annotations.Nullable;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.reflection.ClassLoaderUtil;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.reflection.ClassLoaderUtil;
 
 /**
  * Provides static utility methods to get the following service:
@@ -33,7 +34,7 @@ public final class ProofInitServiceUtil {
      * All available {@link DefaultProfileResolver}.
      */
     private static final Map<String, DefaultProfileResolver> resolver =
-        createDefaultProfileResolver();
+            createDefaultProfileResolver();
 
     /**
      * Forbid instances.
@@ -89,11 +90,11 @@ public final class ProofInitServiceUtil {
      *
      * @param profileName The name of the requested {@link Profile}.
      * @return The {@link Profile} with the given name for usage in the {@link Thread} of the user
-     *         interface or {@code null} if not available.
+     * interface or {@code null} if not available.
      */
-    public static Profile getDefaultProfile(String profileName) {
+    public static @Nullable Profile getDefaultProfile(String profileName) {
         DefaultProfileResolver resolver =
-            ProofInitServiceUtil.getDefaultProfileResolver(profileName);
+                ProofInitServiceUtil.getDefaultProfileResolver(profileName);
         if (resolver != null) {
             return resolver.getDefaultProfile();
         } else {
@@ -107,7 +108,7 @@ public final class ProofInitServiceUtil {
      * @param profileName The name of the profile.
      * @return The corresponding {@link DefaultProfileResolver} or {@code null} if not available.
      */
-    public static DefaultProfileResolver getDefaultProfileResolver(String profileName) {
+    public static @Nullable DefaultProfileResolver getDefaultProfileResolver(String profileName) {
         return resolver.get(profileName);
     }
 
@@ -119,7 +120,7 @@ public final class ProofInitServiceUtil {
     private static Map<String, DefaultProfileResolver> createDefaultProfileResolver() {
         Map<String, DefaultProfileResolver> result = new HashMap<>();
         Iterator<DefaultProfileResolver> iter =
-            ClassLoaderUtil.loadServices(DefaultProfileResolver.class).iterator();
+                ClassLoaderUtil.loadServices(DefaultProfileResolver.class).iterator();
         while (iter.hasNext()) {
             try {
                 DefaultProfileResolver resolver = iter.next();

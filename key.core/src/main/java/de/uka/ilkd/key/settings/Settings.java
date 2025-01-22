@@ -42,7 +42,7 @@ public interface Settings {
      * @param props a non-null references to a configuration object. The state of this object
      *        shall not be changed by the implementations.
      */
-    void readSettings(@NonNull Configuration props);
+    void readSettings(Configuration props);
 
     /**
      * The internal state is stored in the given configuration object. The stored information must
@@ -55,7 +55,7 @@ public interface Settings {
      *        accordingly to the local
      *        internal state.
      */
-    void writeSettings(@NonNull Configuration props);
+    void writeSettings(Configuration props);
 
 
     /**
@@ -64,7 +64,7 @@ public interface Settings {
      * @param listener a non-null reference
      * @see java.beans.PropertyChangeSupport#addPropertyChangeListener(PropertyChangeListener)
      */
-    void addPropertyChangeListener(@NonNull PropertyChangeListener listener);
+    void addPropertyChangeListener(PropertyChangeListener listener);
 
     /**
      * Removes the given listener.
@@ -81,7 +81,7 @@ public interface Settings {
      * @param listener the listener to be added
      * @see PropertyChangeSupport#addPropertyChangeListener(String, PropertyChangeListener)
      */
-    void addPropertyChangeListener(@NonNull String propertyName,
+    void addPropertyChangeListener(String propertyName,
             @NonNull PropertyChangeListener listener);
 
     /**
@@ -91,6 +91,6 @@ public interface Settings {
      * @param listener the listener to be removed
      * @see PropertyChangeSupport#removePropertyChangeListener(String, PropertyChangeListener)
      */
-    void removePropertyChangeListener(@NonNull String propertyName,
+    void removePropertyChangeListener(String propertyName,
             @NonNull PropertyChangeListener listener);
 }

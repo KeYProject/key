@@ -24,7 +24,7 @@ public interface TacletBuilderCommand {
      * Checks if this command is responsible for the given command name. For example, for
      * {@code \varcond(\newType(t))} the name would be "newType".
      */
-    boolean isSuitableFor(@NonNull String name);
+    boolean isSuitableFor(String name);
 
     /**
      * Defines the amount and type of expected arguments. For example, if you want describe a

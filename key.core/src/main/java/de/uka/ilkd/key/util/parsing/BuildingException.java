@@ -35,12 +35,12 @@ public class BuildingException extends RuntimeException implements HasLocation {
         this(ctx == null ? null : ctx.start, message, e);
     }
 
-    public BuildingException(@Nullable Token t, String message, @Nullable Throwable e) {
+    public BuildingException(@Nullable Token t, @Nullable String message, @Nullable Throwable e) {
         super(message + " at " + getPosition(t), e);
         offendingSymbol = t;
     }
 
-    private static String getPosition(Token t) {
+    private static String getPosition(@Nullable Token t) {
         if (t != null) {
             var p = Position.fromToken(t);
             return t.getTokenSource().getSourceName() + ":" + p.line() + ":" + p.column();

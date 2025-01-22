@@ -16,6 +16,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -32,7 +33,7 @@ import org.jspecify.annotations.NonNull;
  * @author Hubert Schmid
  */
 
-public record Location(URI fileUri, Position position) implements Comparable<Location> {
+public record Location(@Nullable URI fileUri, Position position) implements Comparable<Location> {
     public static final Location UNDEFINED = new Location(null, Position.UNDEFINED);
 
     /**
@@ -47,9 +48,9 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
     @Deprecated
     public static Location fromFileName(String filename, Position position) {
         try {
-            return new Location(filename == null ? null : MiscTools.parseURL(filename).toURI(),
+            return new Location(filename == null ? null : MiscTools.parseURL(filename),
                     position);
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

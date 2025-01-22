@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.proof.Node;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -26,12 +27,12 @@ public class SearchNodePreorderIterator {
     /**
      * The next element or {@code null} if no more elements exists.
      */
-    private Node next;
+    private @Nullable Node next;
 
     /**
      * Constructor.
      *
-     * @param start The {@link Node} to iterate over its sub tree.
+     * @param start The {@link Node} to iterate over its subtree.
      */
     public SearchNodePreorderIterator(Node start) {
         this.next = start;
@@ -51,7 +52,7 @@ public class SearchNodePreorderIterator {
      *
      * @return The next {@link Node}.
      */
-    public Node next() {
+    public @Nullable Node next() {
         Node oldNext = next;
         updateNext();
         return oldNext;
@@ -61,22 +62,28 @@ public class SearchNodePreorderIterator {
      * Computes the next element and updates {@link #next()}.
      */
     protected void updateNext() {
+        if (next == null) {
+            return;
+        }
+
+        var next = this.next; //safe non-null type info
+
         if (!next.leaf()) {
-            next = next.child(0);
+            this.next = next.child(0);
         } else {
             Node parent = next.parent();
             while (parent != null) {
                 int childIndex = parent.getChildNr(next);
                 int parentChildCount = parent.childrenCount();
                 if (childIndex + 1 < parentChildCount) {
-                    next = parent.child(childIndex + 1);
+                    this.next = parent.child(childIndex + 1);
                     return; // done
                 } else {
-                    next = parent; // continue at parent
+                    this.next = parent; // continue at parent
                     parent = parent.parent();
                 }
             }
-            next = null;
+            this.next = null;
         }
     }
 }

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -68,7 +69,9 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      */
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+                                          ImmutableList<Goal> goals,
+                                          @Nullable PosInOccurrence posInOcc,
+                                          @Nullable ProverTaskListener listener)
             throws Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (final ProofMacro macro : getProofMacros()) {
@@ -80,7 +83,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
                     info = macro.applyTo(uic, proof, goals, posInOcc, pml);
                 }
                 pml.taskFinished(info);
-                // change source to this macro ... [TODO]
+                // change source to this macro ...
                 info = new ProofMacroFinishedInfo(this, info);
                 return info;
             }

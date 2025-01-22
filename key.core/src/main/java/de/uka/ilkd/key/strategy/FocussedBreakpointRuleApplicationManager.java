@@ -70,8 +70,8 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public void setGoal(Goal p_goal) {
-        delegate.setGoal(p_goal);
+    public void setGoal(Goal goal) {
+        delegate.setGoal(goal);
     }
 
     @Override

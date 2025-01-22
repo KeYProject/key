@@ -3,27 +3,30 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class UrlRuleSource extends RuleSource {
 
-    private final URL url;
+    private final URI url;
     private final long numberOfBytes;
 
-    UrlRuleSource(final URL url) {
+    UrlRuleSource(final URI url) throws IOException {
         this.url = url;
-        if ("file".equals(url.getProtocol())) {
-            numberOfBytes = new File(url.getFile()).length();
+        if ("file".equals(url.getScheme())) {
+            numberOfBytes = Files.size(Paths.get(url));
         } else {
             numberOfBytes = countBytesByReadingStream();
         }
@@ -31,10 +34,10 @@ public class UrlRuleSource extends RuleSource {
 
     private long countBytesByReadingStream() {
         try {
-            final InputStream input = url.openStream();
+            final InputStream input = url.toURL().openStream();
             long localNumberOfBytes = 0;
             for (int readValue = input.read(); readValue != -1; localNumberOfBytes++, readValue =
-                input.read()) {
+                    input.read()) {
             }
             input.close();
             return localNumberOfBytes;
@@ -60,7 +63,7 @@ public class UrlRuleSource extends RuleSource {
 
     @Override
     public String getExternalForm() {
-        return url.toExternalForm();
+        return url.toURL().toExternalForm();
     }
 
     @Override
@@ -81,7 +84,7 @@ public class UrlRuleSource extends RuleSource {
     public CharStream getCharStream() throws IOException {
         try (ReadableByteChannel channel = Channels.newChannel(getNewStream())) {
             return CharStreams.fromChannel(channel, StandardCharsets.UTF_8, 4096,
-                CodingErrorAction.REPLACE, url.toString(), -1);
+                    CodingErrorAction.REPLACE, url.toString(), -1);
         }
     }
 }

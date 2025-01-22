@@ -82,8 +82,7 @@ public class AutoMacro extends StrategyProofMacro {
 
     @Override
     public String getCategory() {
-        // This is only meant for proof scripting
-        return null;
+        return "";
     }
 
     @Override

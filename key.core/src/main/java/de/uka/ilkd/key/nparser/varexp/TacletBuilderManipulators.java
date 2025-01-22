@@ -36,7 +36,7 @@ import static de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode.*;
  */
 public class TacletBuilderManipulators {
     // region Factories
-    // Short cut for argument types
+    // Shortcut for argument types
     private static final ArgumentType TR = TYPE_RESOLVER;
     private static final ArgumentType KJT = ArgumentType.JAVA_TYPE;
     private static final ArgumentType PV = ArgumentType.VARIABLE;

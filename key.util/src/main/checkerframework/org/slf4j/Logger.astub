@@ -1,0 +1,100 @@
+package org.slf4j;
+
+
+import org.slf4j.event.Level;
+import org.slf4j.helpers.CheckReturnValue;
+import org.slf4j.spi.DefaultLoggingEventBuilder;
+import org.slf4j.spi.LoggingEventBuilder;
+import org.slf4j.spi.NOPLoggingEventBuilder;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
+
+public interface Logger {
+    void trace(String var1);
+    void trace(String var1, Object var2);
+    void trace(String var1, Object var2, Object var3);
+    void trace(String var1, Object... var2);
+    void trace(String var1, Throwable var2);
+
+    void trace(Marker var1, String var2);
+    void trace(Marker var1, String var2, Object var3);
+    void trace(Marker var1, String var2, Object var3, Object var4);
+    void trace(Marker var1, String var2, Object... var3);
+    void trace(Marker var1, String var2, Throwable var3);
+    boolean isDebugEnabled();
+
+    void debug(String var1);
+
+    void debug(String var1, Object var2);
+
+    void debug(String var1, Object var2, Object var3);
+
+    void debug(String var1, Object... var2);
+
+    void debug(String var1, Throwable var2);
+
+    boolean isDebugEnabled(Marker var1);
+
+    void debug(Marker var1, String var2);
+
+    void debug(Marker var1, String var2, Object var3);
+
+    void debug(Marker var1, String var2, Object var3, Object var4);
+
+    void debug(Marker var1, String var2, Object... var3);
+
+    void debug(Marker var1, String var2, Throwable var3);
+
+    @CheckReturnValue
+    default LoggingEventBuilder atDebug() {
+        return this.isDebugEnabled() ? this.makeLoggingEventBuilder(Level.DEBUG) : NOPLoggingEventBuilder.singleton();
+    }
+
+    boolean isInfoEnabled();
+
+    void info(String var1);
+
+    void info(String var1, Object var2);
+
+    void info(String var1, Object var2, Object var3);
+
+    void info(String var1, Object... var2);
+
+    void info(String var1, Throwable var2);
+
+    boolean isInfoEnabled(Marker var1);
+
+    void info(Marker var1, String var2);
+
+    void info(Marker var1, String var2, Object var3);
+
+    void info(Marker var1, String var2, Object var3, Object var4);
+
+    void info(Marker var1, String var2, Object... var3);
+
+    void info(Marker var1, String var2, Throwable var3);
+
+    void warn(String var1);
+    void warn(String var1, Object var2);
+    void warn(String var1, @Nullable Object @Nullable ... var2);
+    void warn(String var1, Object var2, Object var3);
+    void warn(String var1, Throwable var2);
+    void warn(Marker var1, String var2);
+    void warn(Marker var1, String var2, Object var3);
+    void warn(Marker var1, String var2, Object var3, Object var4);
+    void warn(Marker var1, String var2, @Nullable Object... var3);
+    void warn(Marker var1, String var2, Throwable var3);
+
+    void error(String var1);
+    void error(String var1, Object var2);
+    void error(String var1, Object var2, Object var3);
+    void error(String var1, Object... var2);
+    void error(String var1, Throwable var2);
+
+    void error(Marker var1, String var2);
+    void error(Marker var1, String var2, Object var3);
+    void error(Marker var1, String var2, Object var3, Object var4);
+    void error(Marker var1, String var2, Object... var3);
+    void error(Marker var1, String var2, Throwable var3);
+}

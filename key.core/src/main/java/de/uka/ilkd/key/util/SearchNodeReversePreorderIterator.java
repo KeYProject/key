@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.proof.Node;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -26,12 +27,12 @@ public class SearchNodeReversePreorderIterator {
     /**
      * The previous element or {@code null} if no more elements exists.
      */
-    private Node previous;
+    private @Nullable Node previous;
 
     /**
      * Constructor.
      *
-     * @param start The {@link Node} to iterate over its sub tree.
+     * @param start The {@link Node} to iterate over its subtree.
      */
     public SearchNodeReversePreorderIterator(Node start) {
         this.previous = start;
@@ -51,7 +52,7 @@ public class SearchNodeReversePreorderIterator {
      *
      * @return The next {@link Node}.
      */
-    public Node previous() {
+    public @Nullable Node previous() {
         Node oldPrevious = previous;
         updatePrevious();
         return oldPrevious;
@@ -61,16 +62,18 @@ public class SearchNodeReversePreorderIterator {
      * Computes the previous element and updates {@link #previous()}.
      */
     protected void updatePrevious() {
-        Node parent = previous.parent();
-        if (parent != null) {
-            int index = parent.getChildNr(previous);
-            if (index >= 1) {
-                previous = lastLeaf(parent.child(index - 1));
+        if(previous != null) {
+            Node parent = previous.parent();
+            if (parent != null) {
+                int index = parent.getChildNr(previous);
+                if (index >= 1) {
+                    previous = lastLeaf(parent.child(index - 1));
+                } else {
+                    previous = parent;
+                }
             } else {
-                previous = parent;
+                previous = null;
             }
-        } else {
-            previous = null;
         }
     }
 
