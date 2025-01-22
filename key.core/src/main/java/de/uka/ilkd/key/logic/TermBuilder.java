@@ -2173,6 +2173,17 @@ public class TermBuilder {
                 new ImmutableArray<>(qv));
     }
 
+    public Term mset(ImmutableList<LogicVariable> qvs, Term range, Term t) {
+        final JFunction mset = services.getNamespaces().functions().lookup("mset");
+        final Iterator<LogicVariable> it = qvs.iterator();
+        Term res = func(mset, new Term[] { convertToBoolean(range), t },
+                new ImmutableArray<>(it.next()));
+        while (it.hasNext()) {
+            res = func(mset, new Term[] { TRUE(), res }, new ImmutableArray<>(it.next()));
+        }
+        return res;
+    }
+
     public Term values() {
         return func(services.getTypeConverter().getSeqLDT().getValues());
     }
