@@ -6,7 +6,6 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.Consumer;
@@ -14,10 +13,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeYLexer;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -36,12 +34,12 @@ import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 
 import org.antlr.runtime.MismatchedTokenException;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -262,7 +260,6 @@ public abstract class AbstractProblemLoader {
      *
      * @param callbackProofLoaded optional callback, called when the proof is loaded but not yet
      *        replayed
-     *
      * @throws ProofInputException Occurred Exception.
      * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
@@ -661,27 +658,15 @@ public abstract class AbstractProblemLoader {
         return false;
     }
 
-    public Pair<String, Location> readProofScript() throws ProofInputException {
-        assert envInput instanceof KeYUserProblemFile;
-        KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
-
-        Triple<String, Integer, Integer> script = kupf.readProofScript();
-        URI url = kupf.getInitialFile().toURI();
-        Location location = new Location(url, Position.newOneBased(script.second, script.third));
-
-        return new Pair<>(script.first, location);
-    }
-
-    public Pair<String, Location> getProofScript() throws ProblemLoaderException {
-        if (hasProofScript()) {
-            try {
-                return readProofScript();
-            } catch (ProofInputException e) {
-                throw new ProblemLoaderException(this, e);
-            }
-        } else {
+    /**
+     * Returns a {@link ProofScriptEntry} if {@code \proofscript} is given with the problem.
+     */
+    public @Nullable ProofScriptEntry getProofScript() {
+        if (!hasProofScript()) {
             return null;
         }
+        KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
+        return kupf.readProofScript();
     }
 
     private ReplayResult replayProof(Proof proof) {

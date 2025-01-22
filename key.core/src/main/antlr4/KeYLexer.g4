@@ -145,6 +145,7 @@ EQUAL_UNIQUE : '\\equalUnique';
 NEW : '\\new';
 NEW_TYPE_OF: '\\newTypeOf';
 NEW_DEPENDING_ON: '\\newDependingOn';
+NEW_LOCAL_VARS: '\\newLocalVars';
 HAS_ELEMENTARY_SORT:'\\hasElementarySort';
 NEWLABEL : '\\newLabel';
 CONTAINS_ASSIGNMENT : '\\containsAssignment';

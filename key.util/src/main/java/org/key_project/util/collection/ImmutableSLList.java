@@ -91,13 +91,13 @@ public abstract class ImmutableSLList<T extends @Nullable Object> implements Imm
      * Convert the list to a Java array (O(n))
      */
     @Override
-    @SuppressWarnings("nullness")
     public <S extends @Nullable Object> S[] toArray(Class<S> type) {
         S[] result = (S[]) Array.newInstance(type, size());
         ImmutableList<T> rest = this;
         for (int i = 0, sz = size(); i < sz; i++) {
             // @ assert !rest.isEmpty();
             T head = rest.head();
+            // Somehow the nullness checker needs this cast to be explicit.
             result[i] = (S) type.cast(head);
             rest = rest.tail();
         }
