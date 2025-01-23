@@ -10,12 +10,13 @@ import java.util.Map;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import org.key_project.prover.engine.SingleRuleApplicationInfo;
+import org.key_project.prover.engine.StopCondition;
 
 /**
  * <p>
@@ -34,7 +35,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  *
  * @author Martin Hentschel
  */
-public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCondition {
+public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCondition<Proof, Goal> {
     /**
      * The default maximal number of steps to simulate a complete program execution.
      */

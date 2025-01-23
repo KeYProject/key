@@ -5,7 +5,9 @@ package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.StopCondition;
+
+import org.key_project.prover.engine.SingleRuleApplicationInfo;
+import org.key_project.prover.engine.StopCondition;
 
 /**
  * <p>
@@ -18,7 +20,7 @@ import de.uka.ilkd.key.prover.StopCondition;
  *
  * @author Martin Hentschel
  */
-public final class AppliedRuleStopCondition implements StopCondition {
+public final class AppliedRuleStopCondition implements StopCondition<Proof, Goal> {
     /**
      * {@inheritDoc}
      */

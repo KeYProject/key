@@ -55,7 +55,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         final Profile profile = services.getProfile();
 
         // create the rule application engine
-        final ProverCore applyStrategy =
+        final ProverCore<Proof, Goal> applyStrategy =
             new ApplyStrategy(profile.<Proof, Goal>getSelectedGoalChooserBuilder().create());
 
         // find the targets
