@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.util.Debug;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -47,8 +48,8 @@ public class FormulaTagManager {
     /**
      * @return the tag of the formula at the given position
      */
-    public FormulaTag getTagForPos(PosInOccurrence p_pio) {
-        return pioToTag.get(p_pio);
+    public FormulaTag getTagForPos(PosInOccurrence pio) {
+        return pioToTag.get(pio);
     }
 
     /**
@@ -56,7 +57,7 @@ public class FormulaTagManager {
      * returned <code>PosInOccurrence</code> can be obsolete and refer to a previous node.
      * If no formula is assigned to the given tag, <code>null</code> is returned
      */
-    public PosInOccurrence getPosForTag(FormulaTag p_tag) {
+    public @Nullable PosInOccurrence getPosForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
         if (info == null) {
             return null;
@@ -194,17 +195,17 @@ public class FormulaTagManager {
     /// /////////////////////////////////////////////////////////////////////////
     // Simple cache for <code>getFormulaInfo</code>
 
-    private FormulaTag lastTagQueried = null;
-    private FormulaInfo lastQueryResult = null;
+    private @Nullable FormulaTag lastTagQueried = null;
+    private @Nullable FormulaInfo lastQueryResult = null;
 
-    private void putInQueryCache(FormulaTag p_tag, FormulaInfo p_info) {
+    private void putInQueryCache(FormulaTag p_tag, @Nullable FormulaInfo info) {
         lastTagQueried = p_tag;
-        lastQueryResult = p_info;
+        lastQueryResult = info;
     }
 
     /// /////////////////////////////////////////////////////////////////////////
 
-    private FormulaInfo getFormulaInfo(FormulaTag p_tag) {
+    private @Nullable FormulaInfo getFormulaInfo(FormulaTag p_tag) {
         if (lastTagQueried != p_tag) {
             putInQueryCache(p_tag, tagToFormulaInfo.get(p_tag));
         }

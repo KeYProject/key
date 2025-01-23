@@ -3,4 +3,6 @@
  * Besides these other valid statements are the various expressions with
  * side effects ({@link recoder.java.expression.ExpressionStatement}s).
  */
-package de.uka.ilkd.key.java.statement;
+@NullMarked package de.uka.ilkd.key.java.statement;
+
+import org.jspecify.annotations.NullMarked;

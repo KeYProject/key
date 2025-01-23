@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
@@ -51,6 +52,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
@@ -73,7 +75,7 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
  * <p>
  *
  * Replay is started using
- * {@link #replay(ProblemInitializer.ProblemInitializerListener, ProgressMonitor)}. In the course of
+ * {@link #replay(ProblemInitializerListener, ProgressMonitor)}. In the course of
  * replaying, new nodes are added to the supplied proof object. The last goal touched during replay
  * can be obtained by {@link #getLastSelectedGoal()}.
  *
@@ -101,7 +103,7 @@ public class IntermediateProofReplayer {
     /** The problem loader, for reporting errors */
     private final AbstractProblemLoader loader;
     /** The proof object into which to load the replayed proof */
-    private Proof proof = null;
+    private final Proof proof;
 
     /** Encountered errors */
     private final List<Throwable> errors = new LinkedList<>();
@@ -126,7 +128,7 @@ public class IntermediateProofReplayer {
     private final HashMap<Integer, HashSet<PartnerNode>> joinPartnerNodes = new HashMap<>();
 
     /** The current open goal */
-    private Goal currGoal = null;
+    private @Nullable Goal currGoal = null;
 
     /**
      * Constructs a new {@link IntermediateProofReplayer}.
@@ -147,7 +149,7 @@ public class IntermediateProofReplayer {
     /**
      * Constructs a new {@link IntermediateProofReplayer} without initializing the queue of
      * intermediate parsing results. Note that
-     * {@link #replay(ProblemInitializer.ProblemInitializerListener, ProgressMonitor)} will not
+     * {@link #replay(ProblemInitializerListener, ProgressMonitor)} will not
      * work as expected when using this constructor, but other methods will.
      *
      * @param loader The problem loader, for reporting errors.
@@ -174,8 +176,8 @@ public class IntermediateProofReplayer {
      * @param progressMonitor progress monitor used to report replay progress (may be null)
      * @return result of the replay procedure (see {@link Result})
      */
-    public Result replay(ProblemInitializer.ProblemInitializerListener listener,
-            ProgressMonitor progressMonitor) {
+    public Result replay(ProblemInitializerListener listener,
+                         ProgressMonitor progressMonitor) {
         return replay(listener, progressMonitor, true);
     }
 
@@ -190,8 +192,8 @@ public class IntermediateProofReplayer {
      *        deleted (set to false if it shal be kept for further use)
      * @return result of the replay procedure (see {@link Result})
      */
-    public Result replay(ProblemInitializer.ProblemInitializerListener listener,
-            ProgressMonitor progressMonitor, boolean deleteIntermediateTree) {
+    public Result replay(@Nullable ProblemInitializerListener listener,
+                         @Nullable ProgressMonitor progressMonitor, boolean deleteIntermediateTree) {
         // initialize progress monitoring
         int stepIndex = 0;
         int reportInterval = 1;
@@ -225,7 +227,7 @@ public class IntermediateProofReplayer {
                         currNode.getNodeInfo().setBranchLabel(
                             ((BranchNodeIntermediate) currNodeInterm).getBranchTitle());
                         queue.addFirst(new Pair<>(currNode,
-                            currNodeInterm.getChildren().get(0)));
+                            currNodeInterm.getChildren().getFirst()));
                     }
                 } else if (currNodeInterm instanceof AppNodeIntermediate currInterm) {
 
@@ -236,8 +238,7 @@ public class IntermediateProofReplayer {
                             .setProposals(currInterm.getIntermediateRuleApp().getNewNames());
 
                     if (currInterm.getIntermediateRuleApp() instanceof TacletAppIntermediate) {
-                        TacletAppIntermediate appInterm =
-                            (TacletAppIntermediate) currInterm.getIntermediateRuleApp();
+                        TacletAppIntermediate appInterm = (TacletAppIntermediate) currInterm.getIntermediateRuleApp();
 
                         try {
                             currGoal.apply(constructTacletApp(appInterm, currGoal));

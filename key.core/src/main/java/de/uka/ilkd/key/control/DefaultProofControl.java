@@ -17,6 +17,7 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.util.ProofStarter;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -33,7 +34,7 @@ public class DefaultProofControl extends AbstractProofControl {
     /**
      * The currently running {@link Thread}.
      */
-    private Thread autoModeThread;
+    private @Nullable Thread autoModeThread;
 
     /**
      * Constructor.
@@ -74,7 +75,7 @@ public class DefaultProofControl extends AbstractProofControl {
 
     @Override
     public synchronized void stopAutoMode() {
-        if (isInAutoMode()) {
+        if (isInAutoMode() && autoModeThread != null) {
             autoModeThread.interrupt();
         }
     }
@@ -111,10 +112,8 @@ public class DefaultProofControl extends AbstractProofControl {
         public void run() {
             try {
                 fireAutoModeStarted(new ProofEvent(proof));
-                ProofStarter starter = ptl != null
-                        ? new ProofStarter(
-                            new CompositePTListener(getDefaultProverTaskListener(), ptl), false)
-                        : new ProofStarter(getDefaultProverTaskListener(), false);
+                ProofStarter starter = new ProofStarter(
+                    new CompositePTListener(getDefaultProverTaskListener(), ptl), false);
                 starter.init(proof);
                 if (goals != null) {
                     starter.start(goals);

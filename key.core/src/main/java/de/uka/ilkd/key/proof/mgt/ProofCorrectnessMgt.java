@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -73,7 +74,7 @@ public final class ProofCorrectnessMgt {
     // public interface
     // -------------------------------------------------------------------------
 
-    public RuleJustification getJustification(RuleApp r) {
+    public @Nullable RuleJustification getJustification(RuleApp r) {
         return proof.getInitConfig().getJustifInfo().getJustification(r, proof.getServices());
     }
 

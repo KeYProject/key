@@ -27,6 +27,7 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -205,10 +206,14 @@ public abstract class AbstractUserInterfaceControl
      * {@inheritDoc}
      */
     @Override
-    public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
-            File bootClassPath, List<File> includes, Properties poPropertiesToForce,
-            boolean forceNewProfileOfNewProofs,
-            Consumer<Proof> callback) throws ProblemLoaderException {
+    public AbstractProblemLoader load(@Nullable Profile profile,
+                                      @Nullable File file,
+                                      @Nullable List<File> classPath,
+                                      @Nullable File bootClassPath,
+                                      @Nullable List<File> includes,
+                                      @Nullable Properties poPropertiesToForce,
+                                      boolean forceNewProfileOfNewProofs,
+                                      @Nullable Consumer<Proof> callback) throws ProblemLoaderException {
         AbstractProblemLoader loader = null;
         try {
             loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, includes,
@@ -255,7 +260,7 @@ public abstract class AbstractUserInterfaceControl
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
+                                @Nullable ProofAggregate proofList, @Nullable ReplayResult result) throws ProblemLoaderException {
         if (proofList != null) {
             // avoid double registration at spec repos as that is done already earlier in
             // createProof

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.util.KeYResourceManager;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Abstract repo implementation to perform tasks independent from the concrete way the files are
@@ -68,16 +69,16 @@ public abstract class AbstractFileRepo implements FileRepo {
         FileSystems.getDefault().getPathMatcher("glob:**.class");
 
     /** The original java source path (absolute and normalized). */
-    private Path javaPath;
+    private @Nullable Path javaPath;
 
     /** The original class path (absolute and normalized). */
-    private List<Path> classpath;
+    private @Nullable List<Path> classpath;
 
     /**
      * The boot class path, that is, the path to the folder where stubs of library classes (e.g.
      * Object, List, ...) used in KeY are stored. The path stored here is absolute and normalized.
      */
-    private Path bootclasspath;
+    private @Nullable Path bootclasspath;
 
     /**
      * The base directory of the loaded proof (needed to calculate relative paths). If a .key/.proof
@@ -85,7 +86,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * loaded, baseDir should be set to the path of the directory. The path stored here is absolute
      * and normalized.
      */
-    private Path baseDir;
+    private @Nullable Path baseDir;
 
     /**
      * Stores the source paths of all files that have been copied to the repo as absolute paths. In
@@ -95,12 +96,12 @@ public abstract class AbstractFileRepo implements FileRepo {
      *
      * When the method {@link #saveProof(Path)} is called, all files registered here will be saved.
      */
-    private Set<Path> files = new HashSet<>();
+    private @Nullable Set<Path> files = new HashSet<>();
 
     /**
      * This set stores all proofs that use this repo. When it gets empty, the repo is disposed.
      */
-    private Set<Proof> registeredProofs = new HashSet<>();
+    private @Nullable Set<Proof> registeredProofs = new HashSet<>();
 
     /**
      * This flag indicates that the repo and all data in it have been deleted.
@@ -456,8 +457,6 @@ public abstract class AbstractFileRepo implements FileRepo {
         classpath = null;
         bootclasspath = null;
         baseDir = null;
-
-        files.clear();
         files = null;
         registeredProofs = null; // this set is already empty, else the repo must not be disposed
 

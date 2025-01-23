@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.lang;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,7 +58,7 @@ public class SMTTermVariable extends SMTTerm {
     }
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object term) {
+    public boolean equals(@Nullable Object term) {
         if (term == null) {
             return false;
         }

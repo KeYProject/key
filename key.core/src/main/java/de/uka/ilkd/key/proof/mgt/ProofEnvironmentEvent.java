@@ -7,16 +7,15 @@ import java.util.EventObject;
 
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import org.jspecify.annotations.Nullable;
 
 public class ProofEnvironmentEvent extends EventObject {
-
-    private static final long serialVersionUID = 2846838426822302188L;
-
-    private final ProofOblInput po;
+    private final @Nullable ProofOblInput po;
     private final ProofAggregate proofList;
 
-    public ProofEnvironmentEvent(ProofEnvironment source, ProofOblInput po,
-            ProofAggregate proofList) {
+    public ProofEnvironmentEvent(ProofEnvironment source,
+                                 @Nullable ProofOblInput po,
+                                 ProofAggregate proofList) {
         super(source);
         this.po = po;
         this.proofList = proofList;
@@ -34,7 +33,7 @@ public class ProofEnvironmentEvent extends EventObject {
     }
 
 
-    public ProofOblInput getPo() {
+    public @Nullable ProofOblInput getPo() {
         return po;
     }
 

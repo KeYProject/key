@@ -6,6 +6,8 @@ package de.uka.ilkd.key.control.instantiation_model;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.java.Position;
@@ -29,6 +31,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
@@ -40,13 +43,8 @@ import org.key_project.util.collection.Pair;
 import org.antlr.v4.runtime.CharStreams;
 
 public class TacletFindModel extends AbstractTableModel {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 5285420522875326156L;
     /** the instantiations entries */
-    private final ArrayList<Pair<SchemaVariable, String>> entries;
+    private final List<Pair<SchemaVariable, String>> entries;
     /** the related rule application */
     private final TacletApp originalApp;
     /** the integer defines the row until which no editing is possible */
@@ -455,7 +453,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @return the value
      */
     @Override
-    public Object getValueAt(int row, int col) {
+    public @Nullable Object getValueAt(int row, int col) {
         return col == 0 ? entries.get(row).first : entries.get(row).second;
     }
 
@@ -467,7 +465,7 @@ public class TacletFindModel extends AbstractTableModel {
     private int getSVRow(SchemaVariable sv) {
         int rowIndex = 0;
         for (Pair<SchemaVariable, String> pair : entries) {
-            if (pair.first.equals(sv)) {
+            if (Objects.equals(pair.first, sv)) {
                 return rowIndex;
             }
             ++rowIndex;

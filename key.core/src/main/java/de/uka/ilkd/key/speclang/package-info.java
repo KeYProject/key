@@ -5,4 +5,6 @@
  * OperationContract, and DependencyContract. These are used as input by the
  * proof obligations declared in package proof.init.
  */
-package de.uka.ilkd.key.speclang;
+@NullMarked package de.uka.ilkd.key.speclang;
+
+import org.jspecify.annotations.NullMarked;

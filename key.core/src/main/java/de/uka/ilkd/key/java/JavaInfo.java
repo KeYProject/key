@@ -18,6 +18,8 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.LRUCache;
@@ -429,7 +431,7 @@ public final class JavaInfo {
     /**
      * returns a KeYJavaType having the given sort
      */
-    public KeYJavaType getKeYJavaType(Sort sort) {
+    public @Nullable KeYJavaType getKeYJavaType(Sort sort) {
         List<KeYJavaType> l = lookupSort2KJTCache(sort);
         if (l != null && l.size() > 0) {
             // Return first KeYJavaType found for sort.
@@ -463,7 +465,7 @@ public final class JavaInfo {
         }
     }
 
-    public List<KeYJavaType> lookupSort2KJTCache(Sort sort) {
+    public @Nullable List<KeYJavaType> lookupSort2KJTCache(Sort sort) {
         updateSort2KJTCache();
         return sort2KJTCache.get(sort);
     }

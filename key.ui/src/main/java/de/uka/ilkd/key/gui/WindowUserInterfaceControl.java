@@ -47,6 +47,7 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.SwingUtil;
@@ -499,7 +500,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
+                                @Nullable ProofAggregate proofList, @Nullable ReplayResult result) throws ProblemLoaderException {
         super.loadingFinished(loader, poContainer, proofList, result);
         if (proofList != null) {
             if (result != null) {

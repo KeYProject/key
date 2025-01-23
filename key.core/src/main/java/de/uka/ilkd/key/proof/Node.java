@@ -74,7 +74,7 @@ public class Node implements Iterable<Node> {
     /**
      * contains non-logical content, used for user feedback
      */
-    private NodeInfo nodeInfo;
+    private @Nullable NodeInfo nodeInfo;
 
     /**
      * Serial number of this proof node.
@@ -166,6 +166,10 @@ public class Node implements Iterable<Node> {
      * @return the NodeInfo containing non-logical information
      */
     public NodeInfo getNodeInfo() {
+        if (nodeInfo == null) {
+            var ni = this.nodeInfo = new NodeInfo(this);
+            return ni;
+        }
         return nodeInfo;
     }
 
@@ -176,8 +180,8 @@ public class Node implements Iterable<Node> {
         return proof;
     }
 
-    public void setAppliedRuleApp(RuleApp ruleApp) {
-        this.nodeInfo.updateNoteInfo();
+    public void setAppliedRuleApp(@Nullable RuleApp ruleApp) {
+        this.getNodeInfo().updateNoteInfo();
         this.appliedRuleApp = ruleApp;
         clearNameCache();
     }
@@ -200,7 +204,7 @@ public class Node implements Iterable<Node> {
         }
     }
 
-    public NameRecorder getNameRecorder() {
+    public @Nullable NameRecorder getNameRecorder() {
         return nameRecorder;
     }
 
@@ -212,11 +216,11 @@ public class Node implements Iterable<Node> {
         renamings = list;
     }
 
-    public ImmutableList<RenamingTable> getRenamingTable() {
+    public @Nullable ImmutableList<RenamingTable> getRenamingTable() {
         return renamings;
     }
 
-    public RuleApp getAppliedRuleApp() {
+    public @Nullable RuleApp getAppliedRuleApp() {
         return appliedRuleApp;
     }
 
@@ -647,7 +651,7 @@ public class Node implements Iterable<Node> {
      */
     public boolean sanityCheckDoubleLinks() {
         if (!root()) {
-            if(parent ==null) return true;
+            if (parent == null) return true;
 
             if (!parent.children.contains(this)) {
                 return false;
@@ -805,7 +809,8 @@ public class Node implements Iterable<Node> {
      * @param service the key under which the data was registered
      * @param <T>     arbitray object
      */
-    public <T> void deregister(T obj, Class<T> service) {
+    public <T> void deregister(@Nullable T obj, Class<T> service) {
+        if(obj==null) return;
         if (userData != null) {
             userData.deregister(obj, service);
         }
