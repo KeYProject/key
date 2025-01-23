@@ -27,7 +27,6 @@ import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -1030,8 +1029,16 @@ public final class JmlTermFactory {
         return new Pair<>((IObserverFunction) lhs.getTerm().op(), t);
     }
 
-    public Triple<IObserverFunction, Term, Term> depends(SLExpression lhs, Term rhs,
-            SLExpression mby) {
+    /**
+     * Translates the dependency clause ({@code accessible rhs := mby \measured_by mby}) into a
+     * dependency contract.
+     *
+     * @param lhs left-hand side of the clause
+     * @param rhs right-hand side of the clause
+     * @param mby measured by term, can be omitted
+     * @return {@link TranslatedDependencyContract}
+     */
+    public TranslatedDependencyContract depends(SLExpression lhs, Term rhs, SLExpression mby) {
         LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
 
         if (!lhs.isTerm()) {
@@ -1050,7 +1057,7 @@ public final class JmlTermFactory {
                 + ", given" + lhs.getTerm().sub(0).op());
         }
 
-        return new Triple<>((IObserverFunction) lhs.getTerm().op(), rhs,
+        return new TranslatedDependencyContract((IObserverFunction) lhs.getTerm().op(), rhs,
             mby == null ? null : mby.getTerm());
     }
 

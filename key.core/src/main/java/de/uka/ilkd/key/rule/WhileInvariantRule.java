@@ -52,7 +52,6 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.LoopWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
@@ -163,10 +162,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Taclet informationFlowInvariantApp = ifInvariantBuilder.buildTaclet(infFlowGoal);
 
         // return information flow data
-        InfFlowData infFlowData = new InfFlowData(instantiationVars, guardAtPre, guardAtPost,
+        return new InfFlowData(instantiationVars, guardAtPre, guardAtPost,
             guardJb, guardTerm, localOutTerms, localOutsAtPre, localOutsAtPost, updates,
             loopInvApplPredTerm, informationFlowInvariantApp);
-        return infFlowData;
     }
 
 
@@ -221,9 +219,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         services.getSpecificationRepository().addLoopInvariant(spec);
 
         // cache and return result
-        final Instantiation result =
-            new Instantiation(u, progPost, loop, spec, selfTerm, innermostExecutionContext);
-        return result;
+        return new Instantiation(u, progPost, loop, spec, selfTerm, innermostExecutionContext);
     }
 
     private static Term createLocalAnonUpdate(ImmutableSet<LocationVariable> localOuts,
@@ -294,8 +290,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
-        final Term varAtPost = tb.var(varAtPostVar);
-        return varAtPost;
+        return tb.var(varAtPostVar);
     }
 
     private static Term buildBeforeVar(Term varTerm, Services services) {
@@ -310,8 +305,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final LocationVariable varAtPreVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPreVar, services);
-        final Term varAtPre = tb.var(varAtPreVar);
-        return varAtPre;
+        return tb.var(varAtPreVar);
     }
 
     private static Term buildAfterVar(Term varTerm, Services services) {
@@ -326,8 +320,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
-        final Term varAtPost = tb.var(varAtPostVar);
-        return varAtPost;
+        return tb.var(varAtPostVar);
     }
 
     private static ImmutableList<Term> buildLocalOutsAtPre(ImmutableList<Term> varTerms,
@@ -540,8 +533,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             this, bodyGoal, FULL_INVARIANT_TERM_HINT, null);
         Term bodyTerm = wir.transform(termLabelState, this, ruleApp, bodyGoal, applicationSequent,
             ruleApp.posInOccurrence(), inst.progPost, fullInvariant, svInst, services);
-        final Term guardTrueBody = tb.imp(tb.box(guardJb, guardTrueTerm), bodyTerm);
-        return guardTrueBody;
+        return tb.imp(tb.box(guardJb, guardTrueTerm), bodyTerm);
     }
 
 
@@ -569,11 +561,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term restPsi =
             tb.prog(modality.kind(), useJavaBlock, inst.progPost.sub(0),
                 instantiateLabels);
-        Term guardFalseRestPsi = tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));
-        return guardFalseRestPsi;
+        return tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));
     }
 
-    private Triple<JavaBlock, Term, Term> prepareGuard(final Instantiation inst,
+    private Guard prepareGuard(final Instantiation inst,
             final KeYJavaType booleanKJT, LoopInvariantBuiltInRuleApp loopRuleApp,
             final TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
@@ -592,8 +583,17 @@ public final class WhileInvariantRule implements BuiltInRule {
             JavaBlock.createJavaBlock(new StatementBlock(guardVarMethodFrame));
         final Term guardTrueTerm = tb.equals(tb.var(guardVar), tb.TRUE());
         final Term guardFalseTerm = tb.equals(tb.var(guardVar), tb.FALSE());
-        return new Triple<>(guardJb, guardTrueTerm, guardFalseTerm);
+        return new Guard(guardJb, guardTrueTerm, guardFalseTerm);
     }
+
+    /**
+     * Represents a {@code javaBlock} which is executed if the {@code trueTerm} is true.
+     *
+     * @param javaBlock a block of java code
+     * @param trueTerm a boolean term
+     * @param falseTerm the negation (at least semantically) of {@code trueTerm}
+     */
+    private record Guard(JavaBlock javaBlock, Term trueTerm, Term falseTerm) {}
 
     private void prepareInvInitiallyValidBranch(TermLabelState termLabelState, Services services,
             RuleApp ruleApp, Instantiation inst, final Term invTerm, Term reachableState,
@@ -752,11 +752,11 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term variantPO = variantPair.second;
 
         // prepare guard
-        final Triple<JavaBlock, Term, Term> guardStuff =
+        final Guard guardStuff =
             prepareGuard(inst, booleanKJT, loopRuleApp, services);
-        final JavaBlock guardJb = guardStuff.first;
-        final Term guardTrueTerm = guardStuff.second;
-        final Term guardFalseTerm = guardStuff.third;
+        final JavaBlock guardJb = guardStuff.javaBlock;
+        final Term guardTrueTerm = guardStuff.trueTerm;
+        final Term guardFalseTerm = guardStuff.falseTerm;
 
         Term beforeLoopUpdate = null;
 
@@ -995,48 +995,39 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
     }
 
-    private static final class InfFlowData {
-        public final ProofObligationVars symbExecVars;
-        public final Term guardAtPre;
-        public final Term guardAtPost;
-        public final JavaBlock guardJb;
-        public final Term guardTerm;
-        public final ImmutableList<Term> localOuts;
-        public final ImmutableList<Term> localOutsAtPre;
-        public final ImmutableList<Term> localOutsAtPost;
-        public final Pair<Term, Term> updates;
-        public final Term applPredTerm;
-        public final Taclet infFlowApp;
+    private record InfFlowData(ProofObligationVars symbExecVars, Term guardAtPre, Term guardAtPost, JavaBlock guardJb,
+                               Term guardTerm, ImmutableList<Term> localOuts, ImmutableList<Term> localOutsAtPre,
+                               ImmutableList<Term> localOutsAtPost, Pair<Term, Term> updates, Term applPredTerm,
+                               Taclet infFlowApp) {
+            private InfFlowData(ProofObligationVars symbExecVars, Term guardAtPre, Term guardAtPost,
+                                JavaBlock guardJb, Term guardTerm, ImmutableList<Term> localOuts,
+                                ImmutableList<Term> localOutsAtPre, ImmutableList<Term> localOutsAtPost,
+                                Pair<Term, Term> updates, Term applPredTerm, Taclet infFlowApp) {
+                this.symbExecVars = symbExecVars;
+                this.guardAtPre = guardAtPre;
+                this.guardAtPost = guardAtPost;
+                this.guardJb = guardJb;
+                this.guardTerm = guardTerm;
+                this.localOuts = localOuts;
+                this.localOutsAtPre = localOutsAtPre;
+                this.localOutsAtPost = localOutsAtPost;
+                this.updates = updates;
+                this.infFlowApp = infFlowApp;
+                this.applPredTerm = applPredTerm;
 
-        private InfFlowData(ProofObligationVars symbExecVars, Term guardAtPre, Term guardAtPost,
-                JavaBlock guardJb, Term guardTerm, ImmutableList<Term> localOuts,
-                ImmutableList<Term> localOutsAtPre, ImmutableList<Term> localOutsAtPost,
-                Pair<Term, Term> updates, Term applPredTerm, Taclet infFlowApp) {
-            this.symbExecVars = symbExecVars;
-            this.guardAtPre = guardAtPre;
-            this.guardAtPost = guardAtPost;
-            this.guardJb = guardJb;
-            this.guardTerm = guardTerm;
-            this.localOuts = localOuts;
-            this.localOutsAtPre = localOutsAtPre;
-            this.localOutsAtPost = localOutsAtPost;
-            this.updates = updates;
-            this.infFlowApp = infFlowApp;
-            this.applPredTerm = applPredTerm;
-
-            assert symbExecVars != null;
-            assert guardAtPre != null;
-            assert guardAtPost != null;
-            assert guardJb != null;
-            assert guardTerm != null;
-            assert localOuts != null;
-            assert localOutsAtPre != null;
-            assert localOutsAtPost != null;
-            assert updates != null;
-            assert applPredTerm != null;
-            assert infFlowApp != null;
+                assert symbExecVars != null;
+                assert guardAtPre != null;
+                assert guardAtPost != null;
+                assert guardJb != null;
+                assert guardTerm != null;
+                assert localOuts != null;
+                assert localOutsAtPre != null;
+                assert localOutsAtPost != null;
+                assert updates != null;
+                assert applPredTerm != null;
+                assert infFlowApp != null;
+            }
         }
-    }
 
     /**
      * {@inheritDoc}
