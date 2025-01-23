@@ -8,20 +8,32 @@ import java.lang.reflect.Type;
 import com.google.gson.*;
 
 public abstract class HirAdapter<T> implements JsonDeserializer<T> {
+    private final String tagString;
+
+    public HirAdapter() {
+        tagString = "serde_tag";
+    }
+
     @Override
     public T deserialize(JsonElement jsonElement, Type type,
             JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         var obj = jsonElement.getAsJsonObject();
-        var tag = obj.remove("serde_tag").getAsString();
-        var clazz = getType(tag);
-        if (clazz == null) {
-            throw new JsonParseException("(" + getClass() + ") Unknown serde_tag: " + tag);
-        }
         try {
-            return jsonDeserializationContext.deserialize(obj, clazz);
-        } catch (JsonSyntaxException e) {
-            System.err.println(
-                "Error while deserializing " + getClass() + "::" + tag + ": " + e.getMessage());
+            var tag = obj.remove(this.tagString).getAsString();
+            var clazz = getType(tag);
+            if (clazz == null) {
+                throw new JsonParseException(
+                    "(" + getClass() + ") Unknown " + this.tagString + ": " + tag);
+            }
+            try {
+                return jsonDeserializationContext.deserialize(obj, clazz);
+            } catch (JsonSyntaxException e) {
+                System.err.println(
+                    "Error while deserializing " + getClass() + "::" + tag + ": " + e.getMessage());
+                throw e;
+            }
+        } catch (RuntimeException e) {
+            System.err.println("Error while deserializing " + getClass() + ": " + e.getMessage());
             throw e;
         }
     }

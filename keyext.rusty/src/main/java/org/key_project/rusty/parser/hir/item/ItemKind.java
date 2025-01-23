@@ -13,6 +13,7 @@ public interface ItemKind {
             case "Use" -> Use.class;
             case "ExternCrate" -> ExternCrate.class;
             case "Fn" -> Fn.class;
+            case "Const" -> Const.class;
             default -> null;
             };
         }

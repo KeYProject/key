@@ -52,6 +52,9 @@ public class ProofCollections {
         var contracts = c.group("contracts");
         contracts.loadable("use-contract.proof");
 
+        var path = c.group("path");
+        path.loadable("rust-path.proof");
+
         return c;
     }
 }

@@ -4,7 +4,6 @@
 package org.key_project.rusty.proof.io.consistency;
 
 import java.io.*;
-import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -17,13 +16,24 @@ public class SimpleFileRepo extends AbstractFileRepo {
 
         Path norm = path.normalize(); // TODO: is this necessary?
 
-        if (RUST_MATCHER.matches(norm)) { // .java
-            // copy to src/classpath/bootclasspath (depending on path)
-            // return getJavaFilePath(norm);
+        if (RUST_MATCHER.matches(norm)) { // .rs
+            // copy to src (depending on path)
+            return getRustFilePath(norm);
         } else if (KEY_MATCHER.matches(norm)) { // .key/.proof
             // copy to top level
             // adapt file references
             return getKeyFilePath(norm);
+        }
+        return null;
+    }
+
+    private Path getRustFilePath(Path path) {
+        // assumes that path is an actual *.rs file, path has to be absolute and normalized
+        // return value: the path of the file relative to its proof bundle root
+
+        if (isInRustPath(path)) {
+            Path rel = getRustPath().relativize(path);
+            return Paths.get("src").resolve(rel);
         }
         return null;
     }
@@ -71,11 +81,6 @@ public class SimpleFileRepo extends AbstractFileRepo {
                 throw new IOException("The given URL is invalid!", e);
             }
 
-        } else if (protocol.equals("jar")) {
-            JarURLConnection juc = (JarURLConnection) url.openConnection();
-            Path jarPath = Paths.get(juc.getJarFile().getName());
-            addFile(jarPath);
-            return url.openStream();
         } else {
             throw new IOException("This type of URL is not supported!");
         }

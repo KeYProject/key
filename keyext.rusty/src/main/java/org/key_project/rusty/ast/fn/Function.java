@@ -60,9 +60,11 @@ public final class Function implements Item, Named {
 
     @Override
     public String toString() {
-        return "fn " + name() + "("
-            + params.stream().map(Object::toString).collect(Collectors.joining(", ")) + ") -> "
-            + returnType + " " + body;
+        if (params != null && body != null)
+            return "fn " + name() + "("
+                + params.stream().map(Object::toString).collect(Collectors.joining(", ")) + ") -> "
+                + returnType + " " + body;
+        return "fn " + name() + "[under construction]";
     }
 
     @Override
@@ -121,5 +123,4 @@ public final class Function implements Item, Named {
     public int hashCode() {
         return Objects.hash(name, selfKind, params, returnType, body);
     }
-
 }

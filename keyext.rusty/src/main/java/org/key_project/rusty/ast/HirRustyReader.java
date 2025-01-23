@@ -84,26 +84,8 @@ public class HirRustyReader {
             Files.writeString(lib, fn, StandardCharsets.UTF_8, StandardOpenOption.WRITE,
                 StandardOpenOption.TRUNCATE_EXISTING);
 
-            var command = new String[] { "cargo", "key", "-o", "hir.json" };
-            try {
-                Process cmd = Runtime.getRuntime().exec(command, null, tmpDir.toFile());
-                var stdErr = cmd.getErrorStream();
-                var errReader = new BufferedReader(new InputStreamReader(stdErr));
-                var sb = new StringBuilder();
-                String line;
-                while ((line = errReader.readLine()) != null) {
-                    sb.append(line).append("\n");
-                }
-                stdErr.close();
-                int code = cmd.waitFor();
-                // TODO: report error
-                assert code == 0 : sb.toString();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            var hir = Files.readString(tmpDir.resolve("hir.json"), Charset.defaultCharset());
-            var wrapperOutput = Crate.parseJSON(hir);
-            var converter = new HirConverter(services);
+            var wrapperOutput = getWrapperOutput(tmpDir);
+            var converter = new HirConverter(services, null);
             var converted = converter.convertCrate(wrapperOutput.crate());
             BlockExpression body = converted.getVerificationTarget().body();
             var es = (ExpressionStatement) body.getStatements().get(0);
@@ -144,6 +126,37 @@ public class HirRustyReader {
         } catch (ProofInputException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static Crate.WrapperOutput getWrapperOutput(Path path) throws IOException {
+        return getWrapperOutput(path, false);
+    }
+
+    public static Crate.WrapperOutput getWrapperOutput(Path path, boolean clean)
+            throws IOException {
+        try {
+            Process cleanCmd =
+                Runtime.getRuntime().exec(new String[] { "cargo", "clean" }, null, path.toFile());
+            cleanCmd.waitFor();
+            var command = new String[] { "cargo", "key", "-o", "hir.json" };
+            Process cmd = Runtime.getRuntime().exec(command, null, path.toFile());
+            var stdErr = cmd.getErrorStream();
+            var errReader = new BufferedReader(new InputStreamReader(stdErr));
+            var sb = new StringBuilder();
+            String line;
+            while ((line = errReader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            stdErr.close();
+            int code = cmd.waitFor();
+            // TODO: report error
+            assert code == 0 : sb.toString();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        var hir = Files.readString(path.resolve("hir.json"), Charset.defaultCharset());
+        var wrapperOutput = Crate.parseJSON(hir);
+        return wrapperOutput;
     }
 
     public RustyBlock readBlockWithEmptyContext(String s) {

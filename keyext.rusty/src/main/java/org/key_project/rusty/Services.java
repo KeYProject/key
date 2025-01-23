@@ -20,6 +20,7 @@ import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.Counter;
 import org.key_project.rusty.proof.NameRecorder;
 import org.key_project.rusty.proof.Proof;
+import org.key_project.rusty.proof.RustModel;
 import org.key_project.rusty.proof.init.Profile;
 import org.key_project.rusty.proof.mgt.SpecificationRepository;
 
@@ -54,6 +55,7 @@ public class Services implements LogicServices {
      * map of names to counters
      */
     private final HashMap<String, Counter> counters;
+    private RustModel rustModel;
 
     public Services() {
         this.tf = new TermFactory();
@@ -83,6 +85,7 @@ public class Services implements LogicServices {
         this.mRefManager = services.mRefManager;
         this.caches = services.caches;
         this.specRepos = services.specRepos;
+        this.rustModel = services.rustModel;
         rustInfo = services.rustInfo;
         nameRecorder = services.nameRecorder;
     }
@@ -258,7 +261,16 @@ public class Services implements LogicServices {
         s.specRepos = specRepos;
         s.setLDTs(getLDTs());
         s.setNamespaces(namespaces.copy());
+        s.setRustModel(getRustModel());
         nameRecorder = nameRecorder.copy();
         return s;
+    }
+
+    public RustModel getRustModel() {
+        return rustModel;
+    }
+
+    public void setRustModel(RustModel rustModel) {
+        this.rustModel = rustModel;
     }
 }

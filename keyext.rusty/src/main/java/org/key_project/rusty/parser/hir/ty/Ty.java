@@ -23,6 +23,8 @@ public interface Ty {
 
     record Tuple(Ty[] tys) implements Ty {}
 
+    record Adt() implements Ty {}
+
     class Adapter extends HirAdapter<Ty> {
         @Override
         public Class<? extends Ty> getType(String tag) {
@@ -34,6 +36,7 @@ public interface Ty {
                 case "Ref" -> Ref.class;
                 case "FnDef" -> FnDef.class;
                 case "Tuple" -> Tuple.class;
+                case "Adt" -> Adt.class;
                 default -> null;
             };
         }

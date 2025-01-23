@@ -9,10 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
+import java.nio.file.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,6 +46,9 @@ public abstract class AbstractFileRepo implements FileRepo {
      * When the method {@link #saveProof(Path)} is called, all files registered here will be saved.
      */
     private Set<Path> files = new HashSet<>();
+
+    /** The original Rust source path (absolute and normalized). */
+    private Path rustPath;
 
     /**
      * Variation of the method IOUtil.copy(): Copies the content of InputStream to OutputStream
@@ -138,7 +138,12 @@ public abstract class AbstractFileRepo implements FileRepo {
 
     @Override
     public void setRustyPath(String path) throws IllegalStateException {
-
+        if (rustPath != null) {
+            throw new IllegalStateException("Rust path is already set!");
+        }
+        if (path != null) {
+            rustPath = Paths.get(path).toAbsolutePath().normalize();
+        }
     }
 
     @Override
@@ -176,4 +181,19 @@ public abstract class AbstractFileRepo implements FileRepo {
      *         opened
      */
     protected abstract InputStream getInputStreamInternal(Path p) throws FileNotFoundException;
+
+    protected Path getRustPath() {
+        return rustPath;
+    }
+
+    /**
+     * Checks if the given path is inside the Java path
+     *
+     * @param path the path to check
+     * @return true if the path is inside the Java path and false if not
+     */
+    protected boolean isInRustPath(Path path) {
+        return rustPath != null && path.startsWith(rustPath);
+    }
+
 }

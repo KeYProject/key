@@ -4,7 +4,9 @@
 package org.key_project.rusty.proof.init;
 
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -14,6 +16,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.HirConverter;
+import org.key_project.rusty.ast.HirRustyReader;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.NamespaceSet;
 import org.key_project.rusty.logic.op.ElementaryUpdate;
@@ -22,6 +26,7 @@ import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.proof.Goal;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.ProofAggregate;
+import org.key_project.rusty.proof.RustModel;
 import org.key_project.rusty.proof.io.*;
 import org.key_project.rusty.proof.io.consistency.FileRepo;
 import org.key_project.rusty.proof.mgt.AxiomJustification;
@@ -128,73 +133,40 @@ public final class ProblemInitializer {
         return initConfig;
     }
 
-    // TODO
     private void readRust(EnvInput envInput, InitConfig initConfig) throws ProofInputException {
-        /*
-         * // this method must only be called once per init config
-         * assert !initConfig.getServices().getJavaInfo().rec2key().parsedSpecial();
-         * assert initConfig.getServices().getJavaModel() == null;
-         *
-         * // read Java source and classpath settings
-         * envInput.setInitConfig(initConfig);
-         * final String javaPath = envInput.readJavaPath();
-         * final List<File> classPath = envInput.readClassPath();
-         * final File bootClassPath;
-         * bootClassPath = envInput.readBootClassPath();
-         *
-         * final Includes includes = envInput.readIncludes();
-         *
-         * if (fileRepo != null) {
-         * // set the paths in the FileRepo (all three methods can deal with null parameters)
-         * fileRepo.setJavaPath(javaPath);
-         * fileRepo.setClassPath(classPath);
-         * fileRepo.setBootClassPath(bootClassPath);
-         * }
-         *
-         * // weigl: 2021-01, Early including the includes of the KeYUserProblemFile,
-         * // this allows to use included symbols inside JML.
-         * for (var fileName : includes.getRuleSets()) {
-         * KeYFile keyFile = new KeYFile(fileName.file().getName(), fileName, progMon,
-         * envInput.getProfile(), fileRepo);
-         * readEnvInput(keyFile, initConfig);
-         * }
-         *
-         * // create Recoder2KeY, set classpath
-         * final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
-         * initConfig.namespaces());
-         * r2k.setClassPath(bootClassPath, classPath);
-         *
-         * // read Java (at least the library classes)
-         * if (javaPath != null) {
-         * reportStatus("Reading Java source");
-         * final ProjectSettings settings = initConfig.getServices().getJavaInfo()
-         * .getKeYProgModelInfo().getServConf().getProjectSettings();
-         * final PathList searchPathList = settings.getSearchPathList();
-         * if (searchPathList.find(javaPath) == null) {
-         * searchPathList.add(javaPath);
-         * }
-         * Collection<String> var = getClasses(javaPath);
-         * if (envInput.isIgnoreOtherJavaFiles()) {
-         * String file = envInput.getJavaFile();
-         * if (var.contains(file)) {
-         * var = Collections.singletonList(file);
-         * }
-         * }
-         * // support for single file loading
-         * final String[] cus = var.toArray(new String[0]);
-         * try {
-         * r2k.readCompilationUnitsAsFiles(cus, fileRepo);
-         * } catch (ParseExceptionInFile e) {
-         * throw new ProofInputException(e);
-         * }
-         * } else {
-         * reportStatus("Reading Java libraries");
-         * r2k.parseSpecialClasses(fileRepo);
-         * }
-         * File initialFile = envInput.getInitialFile();
-         * initConfig.getServices().setJavaModel(
-         * JavaModel.createJavaModel(javaPath, classPath, bootClassPath, includes, initialFile));
-         */
+        // this method must only be called once per init config
+        // assert !initConfig.getServices().getRustInfo().rec2key().parsedSpecial();
+        assert initConfig.getServices().getRustModel() == null;
+
+        // read Rust source
+        envInput.setInitConfig(initConfig);
+        final String rustPath = envInput.readRustPath();
+
+        final Includes includes = envInput.readIncludes();
+
+        if (fileRepo != null) {
+            // set the paths in the FileRepo
+            fileRepo.setRustyPath(rustPath);
+        }
+
+        for (var fileName : includes.getRuleSets()) {
+            KeYFile keyFile = new KeYFile(fileName.file().getName(), fileName,
+                envInput.getProfile(), fileRepo);
+            readEnvInput(keyFile, initConfig);
+        }
+        if (rustPath != null) {
+            try {
+                var output =
+                    HirRustyReader.getWrapperOutput(Path.of(rustPath).toAbsolutePath().normalize());
+                var converter = new HirConverter(initConfig.getServices(), output.specs());
+                converter.convertCrate(output.crate());
+            } catch (IOException e) {
+                throw new ProofInputException(e);
+            }
+        }
+        File initialFile = envInput.getInitialFile();
+        initConfig.getServices().setRustModel(
+            RustModel.create(rustPath, includes, initialFile));
     }
 
     public void readEnvInput(EnvInput envInput, InitConfig initConfig) throws ProofInputException {

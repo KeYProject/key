@@ -21,10 +21,7 @@ import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.ty.*;
 import org.key_project.rusty.logic.op.ProgramVariable;
-import org.key_project.rusty.parser.hir.DefKind;
-import org.key_project.rusty.parser.hir.HirId;
-import org.key_project.rusty.parser.hir.Ident;
-import org.key_project.rusty.parser.hir.LocalDefId;
+import org.key_project.rusty.parser.hir.*;
 import org.key_project.rusty.parser.hir.expr.BinOpKind;
 import org.key_project.rusty.parser.hir.expr.ExprKind;
 import org.key_project.rusty.parser.hir.expr.Lit;
@@ -41,14 +38,30 @@ import org.key_project.rusty.parser.hir.stmt.LetStmt;
 import org.key_project.rusty.parser.hir.stmt.Stmt;
 import org.key_project.rusty.parser.hir.stmt.StmtKind;
 import org.key_project.rusty.parser.hir.ty.Ty;
+import org.key_project.rusty.speclang.FnSpecConverter;
+import org.key_project.rusty.speclang.spec.FnSpec;
+import org.key_project.rusty.speclang.spec.SpecMap;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 public class HirConverter {
     private final Services services;
+    private final Map<DefId, FnSpec> fnSpecs;
+    private final FnSpecConverter fnSpecConverter;
 
-    public HirConverter(Services services) {
+    public HirConverter(Services services, @Nullable SpecMap specs) {
         this.services = services;
+        fnSpecConverter = new FnSpecConverter(services);
+        if (specs != null) {
+            fnSpecs = new HashMap<>(specs.fnSpecs().length);
+            for (var e : specs.fnSpecs()) {
+                fnSpecs.put(e.id(), e.value());
+            }
+        } else {
+            fnSpecs = null;
+        }
     }
 
     public Services getServices() {
@@ -58,6 +71,8 @@ public class HirConverter {
     private final Map<HirId, ProgramVariable> pvs = new HashMap<>();
     private final Map<HirId, Type> types = new HashMap<>();
     private final Map<LocalDefId, Function> localFns = new HashMap<>();
+    private final Map<Function, FnSpec> fn2Spec = new HashMap<>();
+
     /**
      * We first convert all functions except their bodies. Then we convert those later.
      */
@@ -79,6 +94,7 @@ public class HirConverter {
             types.put(m.hirId(), ty);
         }
         for (var fn : fnsToComplete.keySet()) {
+            var spec = fn2Spec.get(fn);
             var hirFn = fnsToComplete.get(fn);
             boolean isCtxFn = fn.name().toString().equals(Context.TMP_FN_NAME);
             int paramLength = hirFn.sig().decl().inputs().length;
@@ -97,6 +113,11 @@ public class HirConverter {
             fn.setParams(new ImmutableArray<>(params));
             fn.setBody((BlockExpression) convertExpr(hirFn.body().value()));
             services.getRustInfo().registerFunction(fn);
+            if (spec != null) {
+                var contracts =
+                    fnSpecConverter.convert(spec, services.getRustInfo().getFunction(fn));
+                System.out.println(contracts);
+            }
         }
         return crate1;
     }
@@ -138,6 +159,10 @@ public class HirConverter {
         var retTy = convertFnRetTy(fn.sig().decl().output());
         Function function = new Function(name, Function.ImplicitSelfKind.None,
             null, retTy, null);
+        if (fnSpecs != null) {
+            var spec = fnSpecs.get(new DefId(id.localDefIndex(), 0));
+            fn2Spec.put(function, spec);
+        }
         localFns.put(id, function);
         fnsToComplete.put(function, fn);
         return function;

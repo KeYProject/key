@@ -379,6 +379,4 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             originalModifiable, originalParamVars, originalResultVar, globalDefs, newId, toBeSaved,
             services);
     }
-
-
 }
