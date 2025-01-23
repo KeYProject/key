@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.prover.GoalChooser;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.AppliedRuleStopCondition;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
@@ -15,6 +15,7 @@ import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.engine.GoalChooser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,7 @@ public class StrategySettings extends AbstractSettings {
      * to select the next {@link Goal} to apply a rule on. If no one is defined the default one of
      * the {@link ApplyStrategy}, which is defined by the user interface, is used.
      */
-    private GoalChooser customApplyStrategyGoalChooser;
+    private GoalChooser<Proof, Goal> customApplyStrategyGoalChooser;
 
     /**
      * returns the maximal amount of heuristics steps before a user interaction is required
@@ -314,7 +315,7 @@ public class StrategySettings extends AbstractSettings {
      * @return The customized {@link GoalChooser} to use or {@code null} to use the default one of
      *         the {@link ApplyStrategy}.
      */
-    public GoalChooser getCustomApplyStrategyGoalChooser() {
+    public GoalChooser<Proof, Goal> getCustomApplyStrategyGoalChooser() {
         return customApplyStrategyGoalChooser;
     }
 
@@ -326,7 +327,7 @@ public class StrategySettings extends AbstractSettings {
      * @param customGoalChooser The customized {@link GoalChooser} to use or {@code null} to use the
      *        default one of the {@link ApplyStrategy}.
      */
-    public void setCustomApplyStrategyGoalChooser(GoalChooser customGoalChooser) {
+    public void setCustomApplyStrategyGoalChooser(GoalChooser<Proof, Goal> customGoalChooser) {
         this.customApplyStrategyGoalChooser = customGoalChooser;
     }
 }

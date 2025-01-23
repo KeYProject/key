@@ -9,13 +9,15 @@ import java.util.Set;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -164,7 +166,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
      * {@inheritDoc}
      */
     @Override
-    public void updateGoalList(Node node, ImmutableList<Goal> newGoals) {
+    public void updateGoalList(Object node, @NonNull ImmutableList<Goal> newGoals) {
         // Update available goals in super class
         super.updateGoalList(node, newGoals);
         // Remove no longer relevant goals from preferred set

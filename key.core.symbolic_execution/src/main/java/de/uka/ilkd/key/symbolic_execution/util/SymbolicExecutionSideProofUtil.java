@@ -632,7 +632,7 @@ public final class SymbolicExecutionSideProofUtil {
             StrategyProperties.QUANTIFIERS_NON_SPLITTING);
         starter.setStrategyProperties(sp);
         // Execute proof in the current thread
-        return starter.start();
+        return (ApplyStrategyInfo) starter.start();
     }
 
     /**

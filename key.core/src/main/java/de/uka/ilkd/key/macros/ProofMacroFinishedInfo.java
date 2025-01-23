@@ -11,9 +11,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 
+import org.key_project.prover.engine.ApplyStrategyInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -98,7 +98,8 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
 
     ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ApplyStrategyInfo stratInfo,
             ImmutableList<Goal> goals) {
-        this(info.getMacro(), goals, stratInfo.getProof(), info.getTime() + stratInfo.getTime(),
+        this(info.getMacro(), goals, (Proof) stratInfo.getProof(),
+            info.getTime() + stratInfo.getTime(),
             info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
             goals.size() <= info.getGoals().size() ? (info.getGoals().size() - goals.size()) : 0);
     }

@@ -6,10 +6,11 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.prover.GoalChooserBuilder;
 import de.uka.ilkd.key.prover.impl.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -18,10 +19,13 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.engine.GoalChooserBuilder;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 public abstract class AbstractProfile implements Profile {
     /**
@@ -35,18 +39,18 @@ public abstract class AbstractProfile implements Profile {
     private final ImmutableSet<StrategyFactory> strategies;
 
     private final ImmutableSet<String> supportedGC;
-    private final ImmutableSet<GoalChooserBuilder> supportedGCB;
+    private final ImmutableSet<GoalChooserBuilder<Proof, Goal>> supportedGCB;
 
-    private GoalChooserBuilder prototype;
+    private GoalChooserBuilder<Proof, Goal> prototype;
 
     private TermLabelManager termLabelManager;
 
     private static ImmutableSet<String> extractNames(
-            ImmutableSet<GoalChooserBuilder> supportedGCB) {
+            ImmutableSet<GoalChooserBuilder<Proof, Goal>> supportedGCB) {
 
         ImmutableSet<String> result = DefaultImmutableSet.nil();
 
-        for (GoalChooserBuilder goalChooserBuilder : supportedGCB) {
+        for (var goalChooserBuilder : supportedGCB) {
             result = result.add(goalChooserBuilder.name());
         }
 
@@ -64,8 +68,9 @@ public abstract class AbstractProfile implements Profile {
         initTermLabelManager();
     }
 
-    protected ImmutableSet<GoalChooserBuilder> computeSupportedGoalChooserBuilder() {
-        return DefaultImmutableSet.<GoalChooserBuilder>nil().add(new DefaultGoalChooserBuilder())
+    protected ImmutableSet<GoalChooserBuilder<Proof, Goal>> computeSupportedGoalChooserBuilder() {
+        return DefaultImmutableSet.<GoalChooserBuilder<Proof, Goal>>nil()
+                .add(new DefaultGoalChooserBuilder())
                 .add(new DepthFirstGoalChooserBuilder());
     }
 
@@ -125,7 +130,8 @@ public abstract class AbstractProfile implements Profile {
      *
      * @return this implementation returns a new instance of {@link DefaultGoalChooserBuilder}
      */
-    public GoalChooserBuilder getDefaultGoalChooserBuilder() {
+    @Override
+    public GoalChooserBuilder<Proof, @NonNull Goal> getDefaultGoalChooserBuilder() {
         return new DefaultGoalChooserBuilder();
     }
 
@@ -152,8 +158,8 @@ public abstract class AbstractProfile implements Profile {
      * @return a new instance of the builder or <code>null</code> if the demanded chooser is not
      *         supported
      */
-    public GoalChooserBuilder lookupGC(String name) {
-        for (GoalChooserBuilder supprotedGCB : supportedGCB) {
+    public GoalChooserBuilder<Proof, Goal> lookupGC(String name) {
+        for (var supprotedGCB : supportedGCB) {
             if (supprotedGCB.name().equals(name)) {
                 return supprotedGCB.copy();
             }
@@ -164,7 +170,8 @@ public abstract class AbstractProfile implements Profile {
     /**
      * returns a copy of the selected goal chooser builder
      */
-    public GoalChooserBuilder getSelectedGoalChooserBuilder() {
+    @Override
+    public GoalChooserBuilder<Proof, @NonNull Goal> getSelectedGoalChooserBuilder() {
         return prototype.copy();
     }
 

@@ -5,6 +5,8 @@ package org.key_project.prover.proof;
 
 import org.key_project.logic.LogicServices;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A proof object provides an interface to the current proof status.
@@ -16,7 +18,7 @@ import org.key_project.logic.LogicServices;
  * goals.
  * </p>
  */
-public interface ProofObject<G extends ProofGoal<G>> {
+public interface ProofObject<G extends ProofGoal<@Nullable G>> {
     /**
      * returns an iterable collection of open goals
      *
@@ -45,6 +47,13 @@ public interface ProofObject<G extends ProofGoal<G>> {
      * @param goalToClose the goal to close
      */
     void closeGoal(G goalToClose);
+
+    /**
+     * returns true iff the specified property could be proven valid and the proof has been closed
+     *
+     * @return true if the proof (i.e., all its goals) have been closed
+     */
+    boolean closed();
 
     /**
      * returns the services which provide access to the meta infrastructure like

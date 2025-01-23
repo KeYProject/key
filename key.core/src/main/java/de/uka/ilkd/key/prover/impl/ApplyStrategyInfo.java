@@ -9,14 +9,15 @@ import de.uka.ilkd.key.proof.Proof;
 /**
  * The final result of the strategy application is stored in this container and returned to the
  * instance that started the strategies.
- *
+ * <p>
  * It contains statistic information about the number of applied rules, time needed or number of
  * closed goals. In case the rule application stopped at a non-closeable goal, this goal is also
  * stored to allow the caller to e.g. present it to the user for interaction.
- *
+ * </p>
  * In case of an unexpected, the thrown exception can be also retrieved from this container.
  */
-public class ApplyStrategyInfo {
+public class ApplyStrategyInfo
+        implements org.key_project.prover.engine.ApplyStrategyInfo<Proof, Goal> {
     private final String message;
     private final Goal nonCloseableGoal;
 
@@ -38,34 +39,42 @@ public class ApplyStrategyInfo {
         this.nrClosedGoals = nrClosedGoals;
     }
 
+    @Override
     public String reason() {
         return message;
     }
 
+    @Override
     public Goal nonCloseableGoal() {
         return nonCloseableGoal;
     }
 
+    @Override
     public boolean isError() {
         return error != null;
     }
 
+    @Override
     public Throwable getException() {
         return error;
     }
 
+    @Override
     public long getTime() {
         return timeInMillis;
     }
 
+    @Override
     public int getClosedGoals() {
         return nrClosedGoals;
     }
 
+    @Override
     public int getAppliedRuleApps() {
         return appliedRuleAppsCount;
     }
 
+    @Override
     public Proof getProof() {
         return proof;
     }

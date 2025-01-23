@@ -657,6 +657,7 @@ public class Proof implements ProofObject<Goal>, Named {
     /**
      * returns true if the root node is marked as closed and all goals have been removed
      */
+    @Override
     public boolean closed() {
         return root.isClosed() && openGoals.isEmpty();
     }

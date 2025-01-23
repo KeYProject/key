@@ -877,7 +877,8 @@ public final class SymbolicExecutionUtil {
     }
 
     /**
-     * Utility method of {@link #internalCollectAllElementaryUpdateTerms(Services, List, Term)}
+     * Utility method of
+     * {@link #internalCollectAllElementaryUpdateTerms(Services, List, org.key_project.logic.Term)}
      * which collects static field manipulations on the given heap update.
      *
      * @param services The {@link Services} to use.
@@ -1497,7 +1498,7 @@ public final class SymbolicExecutionUtil {
 
     /**
      * Utility class used to find the maximal modality Term used by
-     * {@link SymbolicExecutionUtil#findModalityWithMaxSymbolicExecutionLabelId(Term)}.
+     * {@link SymbolicExecutionUtil#findModalityWithMaxSymbolicExecutionLabelId(org.key_project.logic.Term)}.
      *
      * @author Martin Hentschel
      */

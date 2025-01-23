@@ -8,12 +8,14 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.key_project.prover.engine.AbstractProverCore;
+import org.key_project.prover.engine.GoalChooser;
+import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -30,7 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Richard Bubel
  */
-public class ApplyStrategy extends AbstractProverCore {
+public class ApplyStrategy extends AbstractProverCore<Proof, Goal> {
     public static final Logger LOGGER = LoggerFactory.getLogger(ApplyStrategy.class);
 
     public static final AtomicLong PERF_GOAL_APPLY = new AtomicLong();
@@ -46,7 +48,7 @@ public class ApplyStrategy extends AbstractProverCore {
      * The default {@link GoalChooser} to choose goals to which rules are applied if the
      * {@link StrategySettings} of the proof provides no customized one.
      */
-    private final GoalChooser defaultGoalChooser;
+    private final GoalChooser<Proof, Goal> defaultGoalChooser;
 
     private long time;
 
@@ -64,12 +66,12 @@ public class ApplyStrategy extends AbstractProverCore {
     /** a configurable condition indicating that the prover has to stop, */
     private StopCondition stopCondition;
     /** the goal choose picks the next goal to work on */
-    private GoalChooser goalChooser;
+    private GoalChooser<Proof, Goal> goalChooser;
 
     // Please create this object beforehand and re-use it.
     // Otherwise, the addition/removal of the InteractiveProofListener
     // can cause a ConcurrentModificationException during ongoing operation
-    public ApplyStrategy(GoalChooser defaultGoalChooser) {
+    public ApplyStrategy(GoalChooser<Proof, Goal> defaultGoalChooser) {
         this.defaultGoalChooser = defaultGoalChooser;
     }
 
@@ -78,7 +80,8 @@ public class ApplyStrategy extends AbstractProverCore {
      *
      * @return information whether the rule application was successful or not
      */
-    private synchronized SingleRuleApplicationInfo applyAutomaticRule(final GoalChooser goalChooser,
+    private synchronized SingleRuleApplicationInfo applyAutomaticRule(
+            final GoalChooser<Proof, Goal> goalChooser,
             final StopCondition stopCondition, boolean stopAtFirstNonClosableGoal) {
         // Look for the strategy ...
         RuleApp app = null;
@@ -123,7 +126,7 @@ public class ApplyStrategy extends AbstractProverCore {
     /**
      * applies rules until this is no longer possible or the thread is interrupted.
      */
-    private synchronized ApplyStrategyInfo doWork(final GoalChooser goalChooser,
+    private synchronized ApplyStrategyInfo doWork(final GoalChooser<Proof, Goal> goalChooser,
             final StopCondition stopCondition) {
         time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
@@ -196,7 +199,9 @@ public class ApplyStrategy extends AbstractProverCore {
         assert goalChooser != null;
         goalChooser.init(newProof, goals);
         setAutoModeActive(true);
-        fireTaskStarted(stopCondition.getMaximalWork(maxSteps, timeout, newProof));
+        fireTaskStarted(
+            new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Strategy, PROCESSING_STRATEGY,
+                stopCondition.getMaximalWork(maxSteps, timeout, newProof)));
     }
 
     /*
@@ -231,8 +236,9 @@ public class ApplyStrategy extends AbstractProverCore {
      */
     @Override
     public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals,
-            StrategySettings stratSet) {
+            Object strategySettings) {
 
+        final StrategySettings stratSet = (StrategySettings) strategySettings;
         int maxSteps = stratSet.getMaxSteps();
         long timeout = stratSet.getTimeout();
 
@@ -312,8 +318,8 @@ public class ApplyStrategy extends AbstractProverCore {
      * @param proof The {@link Proof} for which an {@link GoalChooser} is required.
      * @return The {@link GoalChooser} to use.
      */
-    private GoalChooser getGoalChooserForProof(Proof proof) {
-        GoalChooser chooser = null;
+    private GoalChooser<Proof, Goal> getGoalChooserForProof(Proof proof) {
+        GoalChooser<Proof, Goal> chooser = null;
         if (proof != null) {
             chooser = proof.getSettings().getStrategySettings().getCustomApplyStrategyGoalChooser();
         }
@@ -332,7 +338,8 @@ public class ApplyStrategy extends AbstractProverCore {
                 return;
             }
 
-            final GoalChooser goalChooser = getGoalChooserForProof(rai.getOriginalNode().proof());
+            final GoalChooser<Proof, Goal> goalChooser =
+                getGoalChooserForProof(rai.getOriginalNode().proof());
             synchronized (goalChooser) {
                 // reverse just to keep old order
                 goalChooser.updateGoalList(rai.getOriginalNode(), e.getNewGoals().reverse());
@@ -355,7 +362,7 @@ public class ApplyStrategy extends AbstractProverCore {
      */
     @Override
     public void clear() {
-        final GoalChooser goalChooser = getGoalChooserForProof(proof);
+        final GoalChooser<Proof, Goal> goalChooser = getGoalChooserForProof(proof);
         proof = null;
         if (goalChooser != null) {
             goalChooser.init(null, ImmutableSLList.nil());
