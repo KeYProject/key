@@ -4,23 +4,33 @@
 package org.key_project.rusty.speclang;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
+import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.fn.FunctionParamPattern;
+import org.key_project.rusty.ast.pat.BindingPattern;
 import org.key_project.rusty.logic.RustyDLTheory;
 import org.key_project.rusty.logic.TermBuilder;
 import org.key_project.rusty.logic.TermFactory;
 import org.key_project.rusty.logic.op.*;
+import org.key_project.rusty.parser.hir.HirId;
+import org.key_project.rusty.parser.hir.QPath;
 import org.key_project.rusty.parser.hir.expr.BinOp;
 import org.key_project.rusty.parser.hir.expr.BinOpKind;
 import org.key_project.rusty.parser.hir.expr.LitKind;
 import org.key_project.rusty.parser.hir.expr.UnOp;
+import org.key_project.rusty.parser.hir.item.Param;
+import org.key_project.rusty.parser.hir.pat.PatKind;
 import org.key_project.rusty.speclang.spec.FnSpec;
 import org.key_project.rusty.speclang.spec.SpecCase;
 import org.key_project.rusty.speclang.spec.TermKind;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.rusty.speclang.spec.WithParams;
+import org.key_project.util.collection.ImmutableList;
 
 public class FnSpecConverter {
     private final Services services;
@@ -40,19 +50,26 @@ public class FnSpecConverter {
     public Stream<FunctionalOperationContract> convert(SpecCase specCase, ProgramFunction target) {
         final var kind = specCase.kind();
         final var name = specCase.name();
-        var pre = mapAndJoinTerms(specCase.pre());
-        var post = mapAndJoinTerms(specCase.post());
-        var variant = specCase.variant() == null ? null : convert(specCase.variant());
-        var diverges = convert(specCase.diverges());
-        var paramVars = ImmutableSLList.<ProgramVariable>nil();
+        var pre = mapAndJoinTerms(specCase.pre(), target);
+        var post = mapAndJoinTerms(specCase.post(), target);
+        var variant = specCase.variant() == null ? null
+                : convert(specCase.variant().value(),
+                    params2PVs(specCase.variant().params(), target), target);
+        var diverges = convert(specCase.diverges().value(),
+            params2PVs(specCase.diverges().params(), target), target);
+        var paramVars = ImmutableList.fromList(target.getFunction().params().stream().map(p -> {
+            var fp = (FunctionParamPattern) p;
+            var bp = (BindingPattern) fp.pattern();
+            return bp.pv();
+        }).toList());
         ProgramVariable resultVar = null;
         if (diverges == tb.ff()) {
-            return Stream.of(new FunctionalOperationContractImpl(name, name, null,
+            return Stream.of(new FunctionalOperationContractImpl(name, name, target,
                 Modality.RustyModalityKind.DIA, pre, variant, post, null, paramVars, resultVar,
                 null, 0, true, services));
         }
         if (diverges == tb.tt()) {
-            return Stream.of(new FunctionalOperationContractImpl(name, name, null,
+            return Stream.of(new FunctionalOperationContractImpl(name, name, target,
                 Modality.RustyModalityKind.BOX, pre, variant, post, null, paramVars, resultVar,
                 null, 0, true, services));
         }
@@ -60,19 +77,35 @@ public class FnSpecConverter {
         return null;
     }
 
-    private Term mapAndJoinTerms(org.key_project.rusty.speclang.spec.Term[] terms) {
-        return Arrays.stream(terms).map(this::convert).reduce(tb.tt(), (a, b) -> tb.and(a, b));
+    private Term mapAndJoinTerms(WithParams<org.key_project.rusty.speclang.spec.Term>[] terms,
+            ProgramFunction target) {
+        return Arrays.stream(terms)
+                .map(wp -> convert(wp.value(), params2PVs(wp.params(), target), target))
+                .reduce(tb.tt(), (a, b) -> tb.and(a, b));
     }
 
-    public Term convert(org.key_project.rusty.speclang.spec.Term term) {
-        return switch (term.kind()){
+    private Map<HirId, ProgramVariable> params2PVs(Param[] params, ProgramFunction target) {
+        // TODO: Get same PVs as in target or create new ones? Ask RB!
+        var map = new HashMap<HirId, ProgramVariable>();
+        for (int i = 0; i < params.length; i++) {
+            var param = params[i];
+            if (param.pat().kind() instanceof PatKind.Binding bp) {
+                map.put(bp.hirId(),
+                    new ProgramVariable(new Name(bp.ident().name()), target.getParamType(i)));
+            }
+        }
+        return map;
+    }
+
+    public Term convert(org.key_project.rusty.speclang.spec.Term term, Map<HirId, ProgramVariable> pvMap, ProgramFunction target) {
+        return switch (term.kind()) {
             case TermKind.Binary(var op, var left, var right) -> {
-                var l = convert(left);
-                var r = convert(right);
+                var l = convert(left,pvMap, target);
+                var r = convert(right,pvMap,  target);
                 yield convert(op, l, r);
             }
             case TermKind.Unary(var op, var child) -> {
-                var c = convert(child);
+                var c = convert(child,pvMap,  target);
                 yield convert(op, c);
             }
             case TermKind.Lit(var l) -> switch (l.node()) {
@@ -80,6 +113,7 @@ public class FnSpecConverter {
                 case LitKind.Int(var i, var ignored) -> tb.zTerm(i);
                 default -> throw new IllegalStateException("Unexpected value: " + l.node());
             };
+            case TermKind.Path(var p) -> convertPath(p, pvMap, target);
             default -> throw new IllegalStateException("Unexpected value: " + term);
         };
     }
@@ -119,5 +153,16 @@ public class FnSpecConverter {
                 : tb.equals(child, boolLDT.getFalseTerm());
         case Neg -> tf.createTerm(intLDT.getNeg(), child);
         };
+    }
+
+    public Term convertPath(QPath path, Map<HirId, ProgramVariable> pvMap, ProgramFunction target) {
+        if (path instanceof org.key_project.rusty.parser.hir.QPath.Resolved r
+                && r.path().segments().length == 1
+                && r.path().res() instanceof org.key_project.rusty.parser.hir.Res.Local lr) {
+            var pvo = pvMap.get(lr.id());
+            if (pvo != null)
+                return tb.var(pvo);
+        }
+        throw new IllegalArgumentException("Unknown path: " + path);
     }
 }
