@@ -12,9 +12,9 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.util.Quadruple;
 
 import org.key_project.slicing.RuleStatistics;
+import org.key_project.slicing.RuleStatistics.RuleStatisticEntry;
 import org.key_project.slicing.analysis.AnalysisResults;
 
 /**
@@ -87,8 +87,7 @@ public class RuleStatisticsDialog extends JDialog {
 
         statisticsPane.setText(genTable(
             statistics.sortBy(
-                Comparator
-                        .comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second())
+                Comparator.comparing(RuleStatisticEntry::numberOfApplications)
                         .reversed())));
         statisticsPane.setCaretPosition(0);
         setLocationRelativeTo(window);
@@ -111,36 +110,28 @@ public class RuleStatisticsDialog extends JDialog {
         JButton sortButton1 = new JButton("Sort by name");
         sortButton1.addActionListener(event -> {
             statisticsPane.setText(genTable(
-                statistics.sortBy(Comparator.comparing(Quadruple::first))));
+                statistics.sortBy(Comparator.comparing(RuleStatisticEntry::ruleName))));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton2 = new JButton("Sort by total");
         sortButton2.addActionListener(event -> {
             statisticsPane.setText(genTable(
                 statistics.sortBy(
-                    Comparator
-                            .comparing(
-                                (Quadruple<String, Integer, Integer, Integer> it) -> it.second())
-                            .reversed())));
+                    Comparator.comparing(RuleStatisticEntry::numberOfApplications).reversed())));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton3 = new JButton("Sort by useless");
         sortButton3.addActionListener(event -> {
             statisticsPane.setText(genTable(
-                statistics.sortBy(
-                    Comparator
-                            .comparing(
-                                (Quadruple<String, Integer, Integer, Integer> it) -> it.third())
-                            .reversed())));
+                statistics.sortBy(Comparator
+                        .comparing(RuleStatisticEntry::numberOfUselessApplications).reversed())));
             statisticsPane.setCaretPosition(0);
         });
         JButton sortButton4 = new JButton("Sort by initial useless");
         sortButton4.addActionListener(event -> {
             statisticsPane.setText(genTable(
                 statistics.sortBy(
-                    Comparator
-                            .comparing(
-                                (Quadruple<String, Integer, Integer, Integer> it) -> it.fourth())
+                    Comparator.comparing(RuleStatisticEntry::numberOfInitialUselessApplications)
                             .reversed())));
             statisticsPane.setCaretPosition(0);
         });
@@ -170,33 +161,38 @@ public class RuleStatisticsDialog extends JDialog {
      * @param rules statistics on rule apps (see {@link RuleStatistics})
      * @return HTML
      */
-    private String genTable(List<Quadruple<String, Integer, Integer, Integer>> rules) {
+    private String genTable(List<RuleStatisticEntry> rules) {
         List<String> columns = List.of("Rule name", "Total applications", "Useless applications",
             "Initial useless applications");
 
         List<Collection<String>> rows = new ArrayList<>();
         // summary row
         int uniqueRules = rules.size();
-        int totalSteps = rules.stream().mapToInt(Quadruple::second).sum();
-        int uselessSteps = rules.stream().mapToInt(Quadruple::third).sum();
-        int initialUseless = rules.stream().mapToInt(Quadruple::fourth).sum();
+        int totalSteps = rules.stream().mapToInt(RuleStatisticEntry::numberOfApplications).sum();
+        int uselessSteps =
+            rules.stream().mapToInt(RuleStatisticEntry::numberOfUselessApplications).sum();
+        int initialUseless =
+            rules.stream().mapToInt(RuleStatisticEntry::numberOfInitialUselessApplications).sum();
         rows.add(List.of(String.format("(all %d rules)", uniqueRules), Integer.toString(totalSteps),
             Integer.toString(uselessSteps), Integer.toString(initialUseless)));
         // next summary row
-        List<Quadruple<String, Integer, Integer, Integer>> rulesBranching =
-            rules.stream().filter(it -> statistics.branches(it.first())).toList();
+        List<RuleStatisticEntry> rulesBranching =
+            rules.stream().filter(it -> statistics.branches(it.ruleName())).toList();
         int uniqueRules2 = rulesBranching.size();
-        totalSteps = rulesBranching.stream().mapToInt(Quadruple::second).sum();
-        uselessSteps = rulesBranching.stream().mapToInt(Quadruple::third).sum();
-        initialUseless = rulesBranching.stream().mapToInt(Quadruple::fourth).sum();
+        totalSteps =
+            rulesBranching.stream().mapToInt(RuleStatisticEntry::numberOfApplications).sum();
+        uselessSteps =
+            rulesBranching.stream().mapToInt(RuleStatisticEntry::numberOfUselessApplications).sum();
+        initialUseless = rulesBranching.stream()
+                .mapToInt(RuleStatisticEntry::numberOfInitialUselessApplications).sum();
         rows.add(List.of(String.format("(%d branching rules)", uniqueRules2),
             Integer.toString(totalSteps), Integer.toString(uselessSteps),
             Integer.toString(initialUseless)));
         rules.forEach(a -> {
-            String name = a.first();
-            Integer all = a.second();
-            Integer useless = a.third();
-            Integer iua = a.fourth();
+            String name = a.ruleName();
+            Integer all = a.numberOfApplications();
+            Integer useless = a.numberOfUselessApplications();
+            Integer iua = a.numberOfInitialUselessApplications();
             rows.add(List.of(name, all.toString(), useless.toString(), iua.toString()));
         });
 
