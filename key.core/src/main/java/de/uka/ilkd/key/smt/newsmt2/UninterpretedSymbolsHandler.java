@@ -59,7 +59,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         SortedOperator op = (SortedOperator) term.op();
-        String name = PREFIX + op.name().toString();
+        String name = PREFIX + op.name();
         if (!trans.isKnownSymbol(name)) {
             trans.addDeclaration(HandlerUtil.funDeclaration(op, name));
             if (op.sort() != JavaDLTheory.FORMULA && (enableQuantifiers || op.arity() == 0)) {

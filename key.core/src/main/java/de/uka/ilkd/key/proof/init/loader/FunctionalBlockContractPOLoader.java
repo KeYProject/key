@@ -9,6 +9,8 @@ import de.uka.ilkd.key.speclang.Contract;
 
 import org.jspecify.annotations.NullMarked;
 
+import java.util.Objects;
+
 /**
  * Loader for proof obligation arises from functional block contracts.
  *
@@ -27,7 +29,9 @@ public class FunctionalBlockContractPOLoader implements ProofObligationLoader {
     @Override
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
             Configuration properties) {
-        String contractName = properties.getString("contract");
+        String contractName =
+                Objects.requireNonNull(properties.getString("contract"),
+                        "Contract name is required");
         int proofNum = 0;
         String baseContractName;
         int ind = -1;

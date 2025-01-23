@@ -30,6 +30,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.proof.LocationVariableTracker;
 import org.key_project.util.collection.ImmutableList;
@@ -48,17 +49,17 @@ public class NodeInfo {
     private static final Set<Name> symbolicExecNames = new HashSet<>(9);
 
     /** firstStatement stripped of method frames */
-    private SourceElement activeStatement = null;
+    private @Nullable SourceElement activeStatement = null;
 
-    private String branchLabel = null;
+    private @Nullable String branchLabel = null;
 
     /** flag true if the first and active statement have been determined */
     private boolean determinedFstAndActiveStatement = false;
 
     /** used for proof tree annotation when applicable */
-    private SourceElement firstStatement = null;
+    private @Nullable SourceElement firstStatement = null;
 
-    private String firstStatementString = null;
+    private @Nullable String firstStatementString = null;
 
     /** the node this info object belongs to */
     private final Node node;
@@ -75,10 +76,10 @@ public class NodeInfo {
     private boolean uselessApplication = false;
 
     /** User-provided plain-text annotations to the node. */
-    private String notes;
+    private @Nullable String notes;
 
     /** Information about changes respective to the parent of this node. */
-    private SequentChangeInfo sequentChangeInfo;
+    private @Nullable SequentChangeInfo sequentChangeInfo;
 
     public NodeInfo(Node node) {
         this.node = node;
@@ -141,7 +142,7 @@ public class NodeInfo {
      * @param ruleApp The given {@link RuleApp}.
      * @return The active statement or {@code null} if no one is provided.
      */
-    public static SourceElement computeActiveStatement(RuleApp ruleApp) {
+    public static @Nullable SourceElement computeActiveStatement(RuleApp ruleApp) {
         SourceElement firstStatement = computeFirstStatement(ruleApp);
         return computeActiveStatement(firstStatement);
     }
@@ -158,7 +159,7 @@ public class NodeInfo {
      * @param ruleApp The given {@link RuleApp}.
      * @return The first statement or {@code null} if no one is provided.
      */
-    public static SourceElement computeFirstStatement(RuleApp ruleApp) {
+    public static @Nullable SourceElement computeFirstStatement(RuleApp ruleApp) {
         SourceElement firstStatement = null;
         // TODO: unify with MiscTools getActiveStatement
         if (ruleApp instanceof PosTacletApp pta) {
@@ -186,7 +187,7 @@ public class NodeInfo {
      * @param firstStatement The given {@link SourceElement}.
      * @return The active statement or {@code null} if no one is provided.
      */
-    public static SourceElement computeActiveStatement(SourceElement firstStatement) {
+    public static @Nullable SourceElement computeActiveStatement(@Nullable SourceElement firstStatement) {
         SourceElement activeStatement = null;
         // TODO: unify with MiscTools getActiveStatement
         if (firstStatement != null) {
@@ -213,7 +214,7 @@ public class NodeInfo {
      * @param node The {@link Node} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
-    public static boolean isSymbolicExecutionRuleApplied(Node node) {
+    public static boolean isSymbolicExecutionRuleApplied(@Nullable Node node) {
         if (node != null) {
             return isSymbolicExecutionRuleApplied(node.getAppliedRuleApp());
         } else {
@@ -227,7 +228,7 @@ public class NodeInfo {
      * @param app The {@link RuleApp} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
-    public static boolean isSymbolicExecutionRuleApplied(RuleApp app) {
+    public static boolean isSymbolicExecutionRuleApplied(@Nullable RuleApp app) {
         return app instanceof AbstractAuxiliaryContractBuiltInRuleApp
                 || app instanceof AbstractContractRuleApp
                 || app instanceof LoopInvariantBuiltInRuleApp || app instanceof TacletApp
@@ -255,7 +256,7 @@ public class NodeInfo {
      *
      * @return active statement as described above
      */
-    public SourceElement getActiveStatement() {
+    public @Nullable SourceElement getActiveStatement() {
         determineFirstAndActiveStatement();
         return activeStatement;
     }
@@ -265,7 +266,7 @@ public class NodeInfo {
      *
      * @return branch label
      */
-    public String getBranchLabel() {
+    public @Nullable String getBranchLabel() {
         return branchLabel;
     }
 
@@ -284,12 +285,9 @@ public class NodeInfo {
      *
      * @return string representation of first statement as described above
      */
-    public String getFirstStatementString() {
+    public @Nullable String getFirstStatementString() {
         determineFirstAndActiveStatement();
         if (firstStatement != null) {
-            if (firstStatementString == null) {
-                firstStatementString = String.valueOf(firstStatement);
-            }
             firstStatementString = String.valueOf(activeStatement);
             return firstStatementString;
         }
@@ -302,7 +300,7 @@ public class NodeInfo {
      *
      * @param s the String to be set
      */
-    public void setBranchLabel(String s) {
+    public void setBranchLabel(@Nullable String s) {
         determineFirstAndActiveStatement();
         if (s == null) {
             return;
@@ -406,7 +404,7 @@ public class NodeInfo {
      *
      * @param newNotes annotations as described above
      */
-    public void setNotes(String newNotes) {
+    public void setNotes(@Nullable String newNotes) {
         String oldNotes = notes;
         notes = newNotes;
         if (!Objects.equals(oldNotes, newNotes)) {
@@ -419,11 +417,11 @@ public class NodeInfo {
      *
      * @return annotations as described above
      */
-    public String getNotes() {
+    public @Nullable String getNotes() {
         return notes;
     }
 
-    public SequentChangeInfo getSequentChangeInfo() {
+    public @Nullable SequentChangeInfo getSequentChangeInfo() {
         return sequentChangeInfo;
     }
 

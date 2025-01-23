@@ -24,7 +24,7 @@ public class CcatchContinueParameterDeclaration extends CcatchNonstandardParamet
 
     @Override
     public ProgramElement getChildAt(int index) {
-        return null;
+        throw new ArrayIndexOutOfBoundsException();
     }
 
     @Override

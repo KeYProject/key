@@ -67,8 +67,8 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
      * @param <T>
      * @return
      */
-    protected <T> T peek() {
-        return (T) (parameters.size() == 0 ? null : parameters.peek());
+    protected <T> @Nullable T peek() {
+        return (T) (parameters.isEmpty() ? null : parameters.peek());
     }
 
     protected <T> T acceptFirst(Collection<? extends RuleContext> seq) {

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 
@@ -18,6 +19,7 @@ public interface IfFormulaInstantiation extends EqualsModProofIrrelevancy {
     /**
      * @return the cf this is pointing to
      */
+    @Nullable
     SequentFormula getConstrainedFormula();
 
     String toString(Services services);

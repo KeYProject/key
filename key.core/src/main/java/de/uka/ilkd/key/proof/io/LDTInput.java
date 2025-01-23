@@ -32,9 +32,9 @@ public class LDTInput implements EnvInput {
     private static final String NAME = "language data types";
 
     private final KeYFile[] keyFiles;
-    private final LDTInputListener listener;
     private final Profile profile;
 
+    private final @Nullable LDTInputListener listener;
     private @Nullable InitConfig initConfig = null;
 
     /**
@@ -44,7 +44,7 @@ public class LDTInput implements EnvInput {
      * @param listener an LDTInputListener for stsus reports while loading
      * @param profile the Profile for which the LDTs are load
      */
-    public LDTInput(KeYFile[] keyFiles, LDTInputListener listener, Profile profile) {
+    public LDTInput(KeYFile[] keyFiles, @Nullable LDTInputListener listener, Profile profile) {
         assert profile != null;
         this.keyFiles = keyFiles;
         this.listener = listener;

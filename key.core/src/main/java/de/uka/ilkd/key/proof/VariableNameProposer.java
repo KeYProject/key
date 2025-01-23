@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
@@ -46,11 +47,10 @@ public class VariableNameProposer implements InstantiationProposer {
      * Returns an instantiation proposal for the schema variable var. Currently supports names for
      * skolemterm SVs, variable SVs, and labels.
      */
-    public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
-            ImmutableList<String> previousProposals) {
+    public @Nullable String getProposal(TacletApp app, SchemaVariable var, Services services, @Nullable Node undoAnchor,
+                                        ImmutableList<String> previousProposals) {
         if (var instanceof SkolemTermSV) {
-            return getNameProposalForSkolemTermVariable(app, var, services, undoAnchor,
-                previousProposals);
+            return getNameProposalForSkolemTermVariable(app, var, services, undoAnchor, previousProposals);
         } else if (var instanceof VariableSV) {
             return getNameProposalForVariableSV(app, var, services, previousProposals);
         } else if (var instanceof ProgramSV psv && psv.sort() == ProgramSVSort.LABEL) {

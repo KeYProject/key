@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.proof.io.intermediate;
 
 import de.uka.ilkd.key.logic.PosInTerm;
-
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
@@ -16,16 +16,20 @@ import org.key_project.util.collection.Pair;
  */
 public class BuiltInAppIntermediate extends AppIntermediate {
 
-    private String ruleName = null;
-    private Pair<Integer, PosInTerm> posInfo = null;
-    private String contract = null;
-    private String modality = null;
-    private ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts = null;
-    private ImmutableList<Name> newNames = null;
+    private final String ruleName;
+    private final Pair<Integer, PosInTerm> posInfo;
+    private final @Nullable String contract;
+    private final @Nullable String modality;
+    private final @Nullable ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts;
+    private final @Nullable ImmutableList<Name> newNames;
 
-    public BuiltInAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos, String contract,
-            String modality, ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
-            ImmutableList<Name> newNames) {
+    public BuiltInAppIntermediate(
+            String ruleName,
+            Pair<Integer, PosInTerm> pos,
+            @Nullable String contract,
+            @Nullable String modality,
+            @Nullable ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
+            @Nullable ImmutableList<Name> newNames) {
         this.ruleName = ruleName;
         this.posInfo = pos;
         this.contract = contract;
@@ -34,7 +38,7 @@ public class BuiltInAppIntermediate extends AppIntermediate {
         this.newNames = newNames;
     }
 
-    public String getRuleName() {
+    public @Nullable String getRuleName() {
         return ruleName;
     }
 
@@ -42,13 +46,15 @@ public class BuiltInAppIntermediate extends AppIntermediate {
         return posInfo;
     }
 
-    public String getContract() {
+    public @Nullable String getContract() {
         return contract;
     }
 
-    public String getModality() { return modality; }
+    public @Nullable String getModality() {
+        return modality;
+    }
 
-    public ImmutableList<Pair<Integer, PosInTerm>> getBuiltInIfInsts() {
+    public @Nullable ImmutableList<Pair<Integer, PosInTerm>> getBuiltInIfInsts() {
         return builtInIfInsts;
     }
 
@@ -58,7 +64,7 @@ public class BuiltInAppIntermediate extends AppIntermediate {
      * @see de.uka.ilkd.key.proof.io.intermediate.AppIntermediate#getNewNames()
      */
     @Override
-    public ImmutableList<Name> getNewNames() {
+    public @Nullable ImmutableList<Name> getNewNames() {
         return newNames;
     }
 

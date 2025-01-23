@@ -326,7 +326,7 @@ public class KeYFile implements EnvInput {
         return DefaultImmutableSet.nil();
     }
 
-    protected @NonNull ProblemFinder getProblemFinder() {
+    protected @Nullable ProblemFinder getProblemFinder() {
         if (problemFinder == null) {
             assert initConfig != null;
             problemFinder = new ProblemFinder(initConfig.getServices(), initConfig.namespaces());

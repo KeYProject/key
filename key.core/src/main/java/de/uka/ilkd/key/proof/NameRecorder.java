@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -14,11 +15,7 @@ public class NameRecorder {
     private ImmutableList<Name> post = ImmutableSLList.nil();
 
     public void setProposals(ImmutableList<Name> proposals) {
-        if (proposals == null) {
-            pre = ImmutableSLList.nil();
-        } else {
-            pre = proposals;
-        }
+        pre = proposals;
     }
 
     /**
@@ -48,10 +45,10 @@ public class NameRecorder {
      *
      * @return the first proposal
      */
-    public Name getProposal() {
+    public @Nullable Name getProposal() {
         Name proposal = null;
 
-        if (pre != null && !pre.isEmpty()) {
+        if (!pre.isEmpty()) {
             proposal = pre.head();
             pre = pre.tail();
         }

@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.Streams;
 
 import org.jspecify.annotations.NonNull;
@@ -24,10 +25,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class provides some infrastructure to the smt translation process.
- *
+ * <p>
  * In particular, it collects the preamble and the snippets for the handlers such that they need not
  * be read from disk multiple times.
- *
+ * <p>
  * This class is a singleton.
  *
  * @author Mattias Ulbrich
@@ -45,11 +46,11 @@ public class SMTHandlerServices {
     private static final String DEFAULT_HANDLERS = "defaultHandlers.txt";
 
     /** Singleton instance */
-    private static SMTHandlerServices theInstance;
+    private static @Nullable SMTHandlerServices theInstance;
 
     /**
      * A map from template handler objects to their smt2 snippets.
-     *
+     * <p>
      * Before removing the ServiceLoader from #getOriginalHandlers, an IdentityHashMap was used
      * here. Since the removal of the ServiceLoader leads to snippetMap being modified even after
      * creation, concurrent modification by different solver threads becomes possible. Hence, either
@@ -62,7 +63,7 @@ public class SMTHandlerServices {
     // preamble is volatile since sonarcube tells me the synchronisation scheme
     // for loading would be broken otherwise. (MU 2021)
     /** The smt2 preamble */
-    private volatile String preamble;
+    private volatile @Nullable String preamble;
 
     /** lock for synchronisation */
     private final Object handlerModificationLock = new Object();
@@ -87,13 +88,13 @@ public class SMTHandlerServices {
      * specified as arguments. Add fresh handlers to the snippetMap and load the snippets that
      * belong to these instances if that has not happened yet for any object of a given handler
      * class.
-     *
+     * <p>
      * <strong>Caution: Do not call this method too often since it may add to the static map of
      * instances to snippets.</strong>
-     *
+     * <p>
      * It would be a good idea to call this method (at most) once for each solver type with a custom
      * array of handler names.
-     *
+     * <p>
      * An empty handlerNames list leads to the usage of the handlers defined by defaultHandlers.txt.
      *
      * @param handlerNames a non-null list of non-null strings with class names (s. above)
@@ -227,7 +228,7 @@ public class SMTHandlerServices {
 
     /**
      * There is a fixed SMT2lib preamble first sent to the solver.
-     *
+     * <p>
      * Get this preamble.
      *
      * @return a non-null string, always the same

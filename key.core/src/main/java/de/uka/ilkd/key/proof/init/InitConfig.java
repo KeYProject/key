@@ -24,6 +24,7 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -72,7 +73,7 @@ public class InitConfig {
     private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
 
     /** HashMap for quick lookups taclet name->taclet */
-    private Map<Name, Taclet> activatedTacletCache = null;
+    private @Nullable Map<Name, Taclet> activatedTacletCache = null;
 
     /** the fileRepo which is responsible for consistency between source code and proof */
     private FileRepo fileRepo;

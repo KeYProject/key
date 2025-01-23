@@ -3,16 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
-import java.net.URI;
-import java.util.Objects;
-
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.parser.Location;
-
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
+import java.net.URI;
+import java.util.Objects;
 
 /**
  * A string with associated position information (file and line number). The position information is
@@ -20,13 +17,13 @@ import org.jspecify.annotations.NonNull;
  */
 public class PositionedString {
 
-    public final @NonNull String text;
+    public final String text;
 
-    public final @NonNull Location location;
+    public final Location location;
 
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST = new ImmutableArray<>();
 
-    public PositionedString(@NonNull String text, @NonNull Location location) {
+    public PositionedString(String text, Location location) {
         if (text == null || location == null) {
             throw new IllegalArgumentException();
         }
@@ -35,13 +32,13 @@ public class PositionedString {
         this.location = location;
     }
 
-    public PositionedString(@NonNull String text, URI fileName) {
+    public PositionedString(String text, URI fileName) {
         this(text, new Location(fileName, Position.UNDEFINED));
     }
 
 
     public PositionedString(String text) {
-        this(text, (URI) null);
+        this(text, Location.UNDEFINED);
     }
 
     /**
@@ -58,15 +55,15 @@ public class PositionedString {
 
     public String toString() {
         return text + " ("
-            + (location.getFileURI().isPresent() ? location.getFileURI().get() + ", " : "")
-            + location.getPosition() + ")";
+                + (location.getFileURI().isPresent() ? location.getFileURI().get() + ", " : "")
+                + location.getPosition() + ")";
     }
 
-    public @NonNull String getText() {
+    public String getText() {
         return text;
     }
 
-    public @NonNull Location getLocation() {
+    public Location getLocation() {
         return location;
     }
 

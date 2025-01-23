@@ -165,17 +165,17 @@ public abstract class AbstractProblemLoader {
      * The instantiated {@link InitConfig} which provides access to the loaded source elements and
      * specifications.
      */
-    private InitConfig initConfig;
+    private @Nullable InitConfig initConfig;
 
     /**
      * The instantiate proof or {@code null} if no proof was instantiated during loading process.
      */
-    private Proof proof;
+    private @Nullable Proof proof;
 
     /**
      * The {@link ReplayResult} if available or {@code null} otherwise.
      */
-    private ReplayResult result;
+    private @Nullable ReplayResult result;
 
     /**
      * Whether warnings (generated when loading the proof) should be ignored
@@ -221,7 +221,7 @@ public abstract class AbstractProblemLoader {
      *        the loaded {@link InitConfig}.
      */
     public AbstractProblemLoader(File file, List<File> classPath, File bootClassPath,
-            List<File> includes, Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
+            List<File> includes, @Nullable Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
             ProblemLoaderControl control,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
             Properties poPropertiesToForce) {
@@ -264,7 +264,7 @@ public abstract class AbstractProblemLoader {
      * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    public final void load(Consumer<Proof> callbackProofLoaded)
+    public final void load(@Nullable Consumer<Proof> callbackProofLoaded)
             throws Exception {
         control.loadingStarted(this);
 
@@ -547,7 +547,7 @@ public abstract class AbstractProblemLoader {
      * @return The {@link LoadedPOContainer} or {@code null} if not available.
      * @throws IOException Occurred Exception.
      */
-    protected LoadedPOContainer createProofObligationContainer() throws Exception {
+    protected @Nullable LoadedPOContainer createProofObligationContainer() throws Exception {
         final String chooseContract;
         final Configuration proofObligation;
 
@@ -560,8 +560,7 @@ public abstract class AbstractProblemLoader {
         }
 
         // Instantiate proof obligation
-        if (envInput instanceof ProofOblInput && chooseContract == null
-                && proofObligation == null) {
+        if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
             return new LoadedPOContainer((ProofOblInput) envInput);
         } else if (chooseContract != null && !chooseContract.isEmpty()) {
             return loadByChosenContract(chooseContract);
@@ -806,7 +805,7 @@ public abstract class AbstractProblemLoader {
      * @return The instantiate proof or {@code null} if no proof was instantiated during loading
      *         process.
      */
-    public Proof getProof() {
+    public @Nullable Proof getProof() {
         return proof;
     }
 

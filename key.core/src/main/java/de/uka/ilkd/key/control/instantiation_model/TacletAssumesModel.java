@@ -24,15 +24,10 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.RecognitionException;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiation> {
-
-    /**
-     * generated UID
-     */
-    private static final long serialVersionUID = -5388696072469119661L;
-
     private static final IfFormulaInstantiation manualTextIF = new IfFormulaInstantiation() {
 
         @Override
@@ -41,7 +36,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
         }
 
         @Override
-        public SequentFormula getConstrainedFormula() {
+        public @Nullable SequentFormula getConstrainedFormula() {
             return null;
         }
     };

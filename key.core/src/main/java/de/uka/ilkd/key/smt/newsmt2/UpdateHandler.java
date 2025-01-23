@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * This handler treats KeY updated terms ({x:=5}x>4).
@@ -23,7 +24,7 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
  */
 public class UpdateHandler implements SMTHandler {
 
-    private Services services;
+    private @MonotonicNonNull Services services;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,

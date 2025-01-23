@@ -3,20 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.parser;
 
-import java.net.MalformedURLException;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.util.MiscTools;
+import org.antlr.v4.runtime.IntStream;
+import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
-
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.util.MiscTools;
-
-import org.antlr.v4.runtime.IntStream;
-import org.antlr.v4.runtime.Token;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -46,7 +44,7 @@ public record Location(@Nullable URI fileUri, Position position) implements Comp
      * @deprecated Use {@link #Location(URI, Position)} instead.
      */
     @Deprecated
-    public static Location fromFileName(String filename, Position position) {
+    public static Location fromFileName(@Nullable String filename, Position position) {
         try {
             return new Location(filename == null ? null : MiscTools.parseURL(filename),
                     position);

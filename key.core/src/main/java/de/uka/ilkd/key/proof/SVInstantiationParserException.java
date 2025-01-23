@@ -3,21 +3,18 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.java.Position;
+import org.jspecify.annotations.Nullable;
+
 import java.util.Optional;
 
-import de.uka.ilkd.key.java.Position;
-
 public class SVInstantiationParserException extends SVInstantiationExceptionWithPosition {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 4411508672178909020L;
     private final String instantiation;
     private final String detail;
 
-    public SVInstantiationParserException(String instantiation, Position position, String detail,
-            boolean inIfSequent) {
+    public SVInstantiationParserException(String instantiation, Position position,
+                                          @Nullable String detail,
+                                          boolean inIfSequent) {
         super("Parser Error", position, inIfSequent);
         this.instantiation = instantiation;
         this.detail = (detail == null) ? "" : detail;
@@ -63,7 +60,7 @@ public class SVInstantiationParserException extends SVInstantiationExceptionWith
     }
 
     @Override
-    public SVInstantiationParserException initCause(Throwable cause) {
+    public SVInstantiationParserException initCause(@Nullable Throwable cause) {
         super.initCause(cause);
         return this;
     }

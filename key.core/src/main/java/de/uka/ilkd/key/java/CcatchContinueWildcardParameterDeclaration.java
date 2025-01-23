@@ -25,7 +25,7 @@ public class CcatchContinueWildcardParameterDeclaration
 
     @Override
     public ProgramElement getChildAt(int index) {
-        return null;
+        throw new ArrayIndexOutOfBoundsException();
     }
 
     @Override
