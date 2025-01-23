@@ -93,7 +93,7 @@ public final class PosInOccurrence {
      * @return true if both objects are equal
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (!(obj instanceof PosInOccurrence cmp)) {
             return false;
         }

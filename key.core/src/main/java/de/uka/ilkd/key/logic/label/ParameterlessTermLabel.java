@@ -166,7 +166,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * This object is equal to another {@link ParameterlessTermLabel} iff they bear the same name.
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (obj instanceof ParameterlessTermLabel other) {
             return name.equals(other.name);
         } else {

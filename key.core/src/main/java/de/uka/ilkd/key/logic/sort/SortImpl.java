@@ -98,7 +98,7 @@ public class SortImpl extends org.key_project.logic.sort.AbstractSort {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o instanceof SortImpl) {
             return ((SortImpl) o).name().equals(name());
         } else {

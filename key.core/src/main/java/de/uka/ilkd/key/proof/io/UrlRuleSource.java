@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.CharStreams;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -20,21 +21,24 @@ import java.nio.file.Paths;
 
 public class UrlRuleSource extends RuleSource {
 
-    private final URI url;
+    private final URI uri;
     private final long numberOfBytes;
 
-    UrlRuleSource(final URI url) throws IOException {
-        this.url = url;
-        if ("file".equals(url.getScheme())) {
-            numberOfBytes = Files.size(Paths.get(url));
-        } else {
-            numberOfBytes = countBytesByReadingStream();
+    UrlRuleSource(final URI url) {
+        long tempSize;
+        this.uri = url;
+        try {
+            var path = Paths.get(url);
+            tempSize = Files.size(path);
+        } catch (IOException e) {
+            tempSize = countBytesByReadingStream();
         }
+        numberOfBytes = tempSize;
     }
 
     private long countBytesByReadingStream() {
         try {
-            final InputStream input = url.toURL().openStream();
+            final InputStream input = uri.toURL().openStream();
             long localNumberOfBytes = 0;
             for (int readValue = input.read(); readValue != -1; localNumberOfBytes++, readValue =
                     input.read()) {
@@ -53,23 +57,32 @@ public class UrlRuleSource extends RuleSource {
 
     @Override
     public File file() {
-        return new File(url.getFile());
+        return new File(url().getFile());
     }
 
     @Override
     public URL url() {
-        return url;
+        try {
+            return uri().toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public URI uri() {
+        return uri;
     }
 
     @Override
     public String getExternalForm() {
-        return url.toURL().toExternalForm();
+        return url().toExternalForm();
     }
 
     @Override
     public InputStream getNewStream() {
         try {
-            return url.openStream();
+            return url().openStream();
         } catch (final IOException exception) {
             throw new RuntimeException("Error while reading rules.", exception);
         }
@@ -77,14 +90,14 @@ public class UrlRuleSource extends RuleSource {
 
     @Override
     public String toString() {
-        return url.toString();
+        return uri.toString();
     }
 
     @Override
     public CharStream getCharStream() throws IOException {
         try (ReadableByteChannel channel = Channels.newChannel(getNewStream())) {
             return CharStreams.fromChannel(channel, StandardCharsets.UTF_8, 4096,
-                    CodingErrorAction.REPLACE, url.toString(), -1);
+                    CodingErrorAction.REPLACE, uri.toString(), -1);
         }
     }
 }

@@ -5,4 +5,7 @@
  * This package contains a transformer from input RIFL files (XML) and
  * original Java files to JML* annotated files.
  */
+@NullMarked
 package de.uka.ilkd.key.util.rifl;
+
+import org.jspecify.annotations.NullMarked;

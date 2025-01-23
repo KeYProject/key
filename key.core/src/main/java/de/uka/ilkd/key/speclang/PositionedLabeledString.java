@@ -70,7 +70,7 @@ public class PositionedLabeledString extends PositionedString {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof PositionedLabeledString cmp)) {
             return false;
         }

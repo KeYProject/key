@@ -36,7 +36,7 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof TextualJMLInitially ci)) {
             return false;
         }

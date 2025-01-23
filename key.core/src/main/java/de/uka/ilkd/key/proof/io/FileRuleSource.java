@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 
@@ -39,6 +40,11 @@ public class FileRuleSource extends RuleSource {
     @Override
     public URL url() throws IOException {
         return file().toURI().toURL();
+    }
+
+    @Override
+    public URI uri() {
+        return file().toURI();
     }
 
     @Override

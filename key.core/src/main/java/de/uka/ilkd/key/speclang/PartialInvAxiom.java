@@ -77,7 +77,7 @@ public final class PartialInvAxiom extends ClassAxiom {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == null || this.getClass() != o.getClass()) {
             return false;
         }

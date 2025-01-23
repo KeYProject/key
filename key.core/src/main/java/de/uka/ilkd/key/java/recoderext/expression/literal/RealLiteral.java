@@ -71,7 +71,7 @@ public final class RealLiteral extends Literal implements KeYRecoderExtension {
         return value;
     }
 
-    public boolean equals(Object o) {
+    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o instanceof RealLiteral) {
             return value.equals(((RealLiteral) o).getValue());
         } else {

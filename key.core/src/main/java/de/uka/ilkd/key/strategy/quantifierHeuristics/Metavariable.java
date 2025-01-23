@@ -73,7 +73,7 @@ public final class Metavariable extends AbstractSortedOperator
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof Metavariable)) {
             return false;
         }

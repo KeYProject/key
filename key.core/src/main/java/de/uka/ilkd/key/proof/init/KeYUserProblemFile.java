@@ -211,7 +211,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == null || o.getClass() != this.getClass()) {
             return false;
         }

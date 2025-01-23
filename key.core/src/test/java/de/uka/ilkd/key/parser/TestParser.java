@@ -45,10 +45,10 @@ public class TestParser {
         assumeTrue(include.exists());
 
         final Includes expected = new Includes();
-        expected.put(include.toString(), RuleSourceFactory.initRuleFile(include.toURI().toURL()));
+        expected.put(include.toString(), RuleSourceFactory.initRuleFile(include.toURI()));
         final String keyFile = "\\include \"" + include.getPath() + "\";";
         KeyAst.File file = ParsingFacade.parseFile(CharStreams.fromString(keyFile));
-        Includes actual = file.getIncludes(new File(".").toURI().toURL());
+        Includes actual = file.getIncludes(new File(".").toURI());
 
         // `Includes` does not provide an `Object#equals()` redefinition for the
         // moment, at least compare the list of filenames

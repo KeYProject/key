@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.pp;
 
+import de.uka.ilkd.key.logic.Term;
+import org.key_project.util.collection.Pair;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
-
-import de.uka.ilkd.key.logic.Term;
-
-import org.key_project.util.collection.Pair;
 
 public class AbbrevMap {
 
@@ -37,10 +36,10 @@ public class AbbrevMap {
     /**
      * Associates a Term and its abbreviation in this map.
      *
-     * @param t a term
+     * @param t            a term
      * @param abbreviation the abbreviation for of this term
-     * @param enabled true if the abbreviation should be used (e.g. when printing the term), false
-     *        otherwise.
+     * @param enabled      true if the abbreviation should be used (e.g. when printing the term), false
+     *                     otherwise.
      */
     public void put(Term t, String abbreviation, boolean enabled) throws AbbrevException {
         AbbrevWrapper scw;
@@ -49,7 +48,7 @@ public class AbbrevMap {
         }
         if (containsAbbreviation(abbreviation)) {
             throw new AbbrevException("The abbreviation " + abbreviation + " is already"
-                + " in use for: " + getTerm(abbreviation), false);
+                    + " in use for: " + getTerm(abbreviation), false);
         }
         scw = new AbbrevWrapper(t);
         termstring.put(scw, abbreviation);
@@ -68,7 +67,7 @@ public class AbbrevMap {
             AbbrevWrapper scw;
             if (containsAbbreviation(abbreviation)) {
                 throw new AbbrevException("The abbreviation " + abbreviation + " is already"
-                    + " in use for: " + getTerm(abbreviation), false);
+                        + " in use for: " + getTerm(abbreviation), false);
             }
             scw = new AbbrevWrapper(t);
             stringterm.remove(termstring.get(scw));
@@ -142,7 +141,7 @@ public class AbbrevMap {
     /**
      * Sets the mapping of the term t to its abbreviation enabled or disabled
      *
-     * @param t a Term
+     * @param t       a Term
      * @param enabled true if the abbreviation of t may be used.
      */
     public void setEnabled(Term t, boolean enabled) {
@@ -162,18 +161,18 @@ public class AbbrevMap {
     public record AbbrevWrapper(Term t) {
 
         @Override
-            public boolean equals(Object o) {
-                if (!(o instanceof AbbrevWrapper scw)) {
-                    return false;
-                }
-                if (scw.getTerm() == t) {
-                    return true;
-                }
-                return t.equals(scw.getTerm());
+        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+            if (!(o instanceof AbbrevWrapper scw)) {
+                return false;
             }
-
-            public Term getTerm() {
-                return t;
+            if (scw.getTerm() == t) {
+                return true;
             }
+            return t.equals(scw.getTerm());
         }
+
+        public Term getTerm() {
+            return t;
+        }
+    }
 }

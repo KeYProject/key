@@ -35,7 +35,6 @@ public class AddFormulaToAntecedentAction extends ExplorationAction {
             return;
         }
         ProofExplorationService service = ProofExplorationService.get(getMediator());
-        @NonNull
         Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, true);
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }

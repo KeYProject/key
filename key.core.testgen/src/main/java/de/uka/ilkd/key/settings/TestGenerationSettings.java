@@ -84,15 +84,7 @@ public class TestGenerationSettings extends AbstractSettings {
 
     }
 
-    /**
-     * @deprecated weigl: This method seems broken. I would expect: clone() = new TGS(this)
-     */
-    @Deprecated(forRemoval = true)
-    public TestGenerationSettings clone(TestGenerationSettings data) {
-        return new TestGenerationSettings(data);
-    }
-
-    public TestGenerationSettings clone() {
+    public TestGenerationSettings copy() {
         return new TestGenerationSettings(this);
     }
 

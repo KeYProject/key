@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
 
+import org.jspecify.annotations.Nullable;
 import recoder.abstraction.ClassType;
 import recoder.java.*;
 import recoder.java.declaration.*;
@@ -49,16 +50,11 @@ public class SpecificationInjector extends SourceVisitor {
 
         private final String indentation;
         private final Map<String, Set<Entry<String, Type>>> respects = new HashMap<>();
-        private SpecificationContainer sc;
+        private final SpecificationContainer sc;
 
         JMLFactory(SpecificationContainer sc) {
             indentation = DEFAULT_INDENTATION;
             this.sc = sc;
-        }
-
-        @SuppressWarnings("unused")
-        JMLFactory(int indent) {
-            indentation = " ".repeat(indent);
         }
 
         @SuppressWarnings("unused")
@@ -85,7 +81,7 @@ public class SpecificationInjector extends SourceVisitor {
         }
 
         String getRespects(String domain, final Type t) {
-            return getRespects(respects.get(domain), t);
+            return getRespects(Objects.requireNonNull(respects.get(domain)), t);
         }
 
         String getRespects(Set<String> oneRespect) {
@@ -157,13 +153,13 @@ public class SpecificationInjector extends SourceVisitor {
                 sb.append(JML_END);
                 return sb.toString();
             } else {
-                return null;
+                return "";
             }
 
 
         }
 
-        private void put(String key, Entry<String, Type> value) {
+        private void put(@Nullable String key, Entry<String, Type> value) {
             if (key == null) {
                 return;
             }
@@ -206,7 +202,7 @@ public class SpecificationInjector extends SourceVisitor {
         }
     }
 
-    private void addComment(JavaProgramElement se, String comment) {
+    private void addComment(JavaProgramElement se, @Nullable String comment) {
         // remember which methods were specified and generate po files only for them
         if (se instanceof MethodDeclaration) {
             specifiedMethodDeclarations.add((MethodDeclaration) se);

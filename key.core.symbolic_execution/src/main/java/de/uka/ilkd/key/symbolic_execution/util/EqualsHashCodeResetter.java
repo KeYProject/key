@@ -41,7 +41,7 @@ public record EqualsHashCodeResetter<T>(T wrappedElement) {
      * Overwritten to restore default Java implementation with reference based equality.
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (obj instanceof EqualsHashCodeResetter<?>) {
             return wrappedElement() == ((EqualsHashCodeResetter<?>) obj).wrappedElement();
         } else {

@@ -579,7 +579,7 @@ public class EqualityConstraint implements Constraint {
      * checks equality of constraints by subsuming relation (only equal if no new sorts need to be
      * introduced for subsumption)
      */
-    public boolean equals(Object obj) {
+    @Override public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (this == obj) {
             return true;
         }
@@ -814,7 +814,7 @@ public class EqualityConstraint implements Constraint {
         private Constraint second;
         private int hash;
 
-        public boolean equals(Object o) {
+        @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (!(o instanceof ECPair e)) {
                 return false;
             }

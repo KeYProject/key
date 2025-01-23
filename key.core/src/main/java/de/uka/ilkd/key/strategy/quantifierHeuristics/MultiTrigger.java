@@ -95,7 +95,7 @@ class MultiTrigger implements Trigger {
     }
 
     @Override
-    public boolean equals(Object arg0) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object arg0) {
         if (!(arg0 instanceof MultiTrigger a)) {
             return false;
         }

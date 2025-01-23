@@ -243,7 +243,7 @@ public class ContractFactory {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o instanceof ContractFactory) {
             return Objects.equals(services, ((ContractFactory) o).services);
         } else {

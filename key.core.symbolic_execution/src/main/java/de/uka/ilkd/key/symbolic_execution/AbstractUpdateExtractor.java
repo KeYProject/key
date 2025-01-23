@@ -1046,7 +1046,7 @@ public abstract class AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (obj instanceof ExtractLocationParameter other) {
                 return Objects.equals(arrayIndex, other.arrayIndex)
                         && stateMember == other.stateMember
@@ -1775,7 +1775,7 @@ public abstract class AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (obj instanceof ExecutionVariableValuePair other) {
                 return isArrayRange()
                         ? (getArrayStartIndex().equals(other.getArrayStartIndex())

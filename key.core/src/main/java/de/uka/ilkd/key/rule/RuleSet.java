@@ -37,7 +37,7 @@ public record RuleSet(Name name) implements Named {
     /**
      * returns true it the o is the same object as this
      */
-    public boolean equals(Object o) {
+    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o instanceof RuleSet) {
             return this.name().equals(((RuleSet) o).name());
         }

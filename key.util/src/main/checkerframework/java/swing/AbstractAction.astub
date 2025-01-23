@@ -1,0 +1,25 @@
+package javax.swing;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serial;
+import java.io.Serializable;
+import java.security.AccessController;
+
+import javax.swing.event.SwingPropertyChangeSupport;
+
+import sun.security.action.GetPropertyAction;
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
+@AnnotatedFor("nullness")
+public abstract class AbstractAction implements Action, Cloneable, Serializable {
+    public void putValue(@UnderInitialization AbstractAction this, String key, Object newValue);
+    public boolean isEnabled(@UnderInitialization AbstractAction this);
+    public void setEnabled(
+            @UnderInitialization AbstractAction this,
+            boolean newValue);
+}

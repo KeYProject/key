@@ -280,7 +280,7 @@ public abstract class AbstractPO implements IPersistablePO {
             this.lowLink = lowLink;
         }
 
-        public boolean equals(Object o) {
+        @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (o instanceof Vertex other) {
                 return core.equals(other.core);
             } else {

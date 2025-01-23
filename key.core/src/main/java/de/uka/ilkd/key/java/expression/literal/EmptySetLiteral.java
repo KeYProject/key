@@ -19,7 +19,7 @@ public class EmptySetLiteral extends Literal {
     public static final EmptySetLiteral LOCSET = new EmptySetLiteral();
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         return o == this;
     }
 

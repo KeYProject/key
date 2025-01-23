@@ -284,7 +284,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (obj instanceof ProgramMethodSubsetPO other) {
             return super.equals(obj)
                     && Objects.equals(getStartPosition(), other.getStartPosition())

@@ -83,7 +83,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == null || o.getClass() != getClass()) {
             return false;
         }

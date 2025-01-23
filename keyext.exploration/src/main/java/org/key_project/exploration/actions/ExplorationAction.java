@@ -14,15 +14,13 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.exploration.ExplorationModeModel;
 
 /**
  * Common functionalities for proof exploration actions.
  */
 public abstract class ExplorationAction extends MainWindowAction {
-
-    private static final long serialVersionUID = -1662459714803539089L;
-
     public ExplorationAction(MainWindow mw) {
         super(mw);
     }
@@ -31,7 +29,7 @@ public abstract class ExplorationAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
     }
 
-    Term promptForTerm(MainWindow window, Term term) {
+    @Nullable Term promptForTerm(MainWindow window, @Nullable Term term) {
         final String initialValue =
             term == null ? "" : LogicPrinter.quickPrintTerm(term, getMediator().getServices());
 

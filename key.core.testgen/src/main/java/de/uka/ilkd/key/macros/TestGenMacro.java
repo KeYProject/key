@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -17,13 +14,17 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.feature.MutableState;
-
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
+
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 public class TestGenMacro extends StrategyProofMacro {
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
-        return new TestGenStrategy(proof.getActiveStrategy());
+        return new TestGenStrategy(Objects.requireNonNull(proof.getActiveStrategy()));
     }
 
     @Override
@@ -38,7 +39,7 @@ public class TestGenMacro extends StrategyProofMacro {
 
     @Override
     public String getCategory() {
-        return null;
+        return "";
     }
 
 
@@ -54,8 +55,11 @@ class TestGenStrategy extends FilterStrategy {
     private static final Set<String> unwindRules;
     private static final int UNWIND_COST = 1000;
     private final int limit;
-    /** the modality cache used by this strategy */
+    /**
+     * the modality cache used by this strategy
+     */
     private final ModalityCache modalityCache = new ModalityCache();
+
     static {
         unwindRules = new HashSet<>();
         TestGenStrategy.unwindRules.add("loopUnwind");
@@ -66,7 +70,7 @@ class TestGenStrategy extends FilterStrategy {
         TestGenStrategy.unwindRules.add("staticMethodCallWithAssignment");
     }
 
-    private static boolean isUnwindRule(Rule rule) {
+    private static boolean isUnwindRule(@Nullable Rule rule) {
         if (rule == null) {
             return false;
         }
@@ -81,7 +85,7 @@ class TestGenStrategy extends FilterStrategy {
 
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal,
-            MutableState mState) {
+                                   MutableState mState) {
         if (TestGenStrategy.isUnwindRule(app.rule())) {
             return NumberRuleAppCost.create(TestGenStrategy.UNWIND_COST);
         }

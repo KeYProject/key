@@ -51,7 +51,7 @@ public class NewDependingOn {
         return "\\newDependingOn(" + first() + ", " + second() + ")";
     }
 
-    public boolean equals(Object o) {
+    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof NewDependingOn nfi)) {
             return false;
         }

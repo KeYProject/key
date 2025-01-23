@@ -78,7 +78,7 @@ public class Location {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (obj instanceof Location other) {
             return Objects.equals(accesses, other.getAccesses());
         } else {
