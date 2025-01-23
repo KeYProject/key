@@ -10,8 +10,9 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.StopCondition;
-import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
+
+import org.key_project.prover.engine.SingleRuleApplicationInfo;
+import org.key_project.prover.engine.StopCondition;
 
 /**
  * This {@link StopCondition} contains other {@link StopCondition} as children and stops the auto
@@ -19,7 +20,7 @@ import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
  *
  * @author Martin Hentschel
  */
-public class CompoundStopCondition implements StopCondition {
+public class CompoundStopCondition implements StopCondition<Proof, Goal> {
     /**
      * The child {@link StopCondition}s to use.
      */

@@ -5,7 +5,8 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.StopCondition;
+
+import org.key_project.prover.engine.StopCondition;
 
 /**
  * This {@link StopCondition} stops the auto mode when a "step over" is completed. This is the case

@@ -8,14 +8,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.key_project.prover.engine.AbstractProverCore;
-import org.key_project.prover.engine.GoalChooser;
-import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.engine.*;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;

@@ -7,9 +7,10 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
+
+import org.key_project.prover.engine.StopCondition;
 
 /**
  * Defines the basic functionality of a breakpoint.

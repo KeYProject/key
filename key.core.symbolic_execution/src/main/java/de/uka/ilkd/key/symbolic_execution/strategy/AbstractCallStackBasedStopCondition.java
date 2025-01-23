@@ -10,10 +10,10 @@ import java.util.Map;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.StopCondition;
-import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
+import org.key_project.prover.engine.SingleRuleApplicationInfo;
+import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.rules.RuleApp;
 
 /**
@@ -25,7 +25,7 @@ import org.key_project.prover.rules.RuleApp;
  * @see StepOverSymbolicExecutionTreeNodesStopCondition
  * @see StepReturnSymbolicExecutionTreeNodesStopCondition
  */
-public abstract class AbstractCallStackBasedStopCondition implements StopCondition {
+public abstract class AbstractCallStackBasedStopCondition implements StopCondition<Proof, Goal> {
     /**
      * Maps a {@link Goal} to the initial call stack size at which the auto mode was started.
      */

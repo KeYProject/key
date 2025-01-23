@@ -9,11 +9,11 @@ import java.util.Set;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.prover.engine.GoalChooser;
+import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
