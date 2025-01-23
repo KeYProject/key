@@ -53,8 +53,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Node node) {
         if (activeStatement instanceof Assignment assignment) {
             SourceElement firstElement = assignment.getChildAt(0);
             if (firstElement instanceof FieldReference) {
@@ -64,15 +63,15 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
                 Term term = TermBuilder.goBelowUpdates(t);
                 if (((FieldReference) firstElement).getProgramVariable().name().toString()
                         .equals(fullFieldName) && isModification && hitcountExceeded(node)) {
-                    return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+                    return super.isBreakpointHit(activeStatement, ruleApp, node);
                 }
             }
             if (checkChildrenOfSourceElement(assignment) && hitcountExceeded(node)) {
-                return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+                return super.isBreakpointHit(activeStatement, ruleApp, node);
             }
         } else if (activeStatement != null) {
             if (checkChildrenOfSourceElement(activeStatement) && hitcountExceeded(node)) {
-                return super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+                return super.isBreakpointHit(activeStatement, ruleApp, node);
             }
         }
         return false;

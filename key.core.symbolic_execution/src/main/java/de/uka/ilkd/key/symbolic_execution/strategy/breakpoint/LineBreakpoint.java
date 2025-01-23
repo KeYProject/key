@@ -116,13 +116,12 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     }
 
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Node node) {
         if (ruleApp instanceof LoopInvariantBuiltInRuleApp) {
             activeStatement = ((LoopInvariantBuiltInRuleApp) ruleApp).getLoopStatement();
         }
         return isInLine(activeStatement)
-                && super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+                && super.isBreakpointHit(activeStatement, ruleApp, node);
     }
 
     private boolean isInLine(SourceElement activeStatement) {

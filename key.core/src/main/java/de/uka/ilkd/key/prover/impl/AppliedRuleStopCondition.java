@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.engine.StopCondition;
@@ -20,12 +19,12 @@ import org.key_project.prover.engine.StopCondition;
  *
  * @author Martin Hentschel
  */
-public final class AppliedRuleStopCondition implements StopCondition<Proof, Goal> {
+public final class AppliedRuleStopCondition implements StopCondition<Goal> {
     /**
      * {@inheritDoc}
      */
     @Override
-    public int getMaximalWork(int maxApplications, long timeout, Proof proof) {
+    public int getMaximalWork(int maxApplications, long timeout) {
         return maxApplications;
     }
 
@@ -33,8 +32,8 @@ public final class AppliedRuleStopCondition implements StopCondition<Proof, Goal
      * {@inheritDoc}
      */
     @Override
-    public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
+    public boolean isGoalAllowed(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
         return true; // Default behavior is to accept all rules.
     }
 
@@ -42,8 +41,8 @@ public final class AppliedRuleStopCondition implements StopCondition<Proof, Goal
      * {@inheritDoc}
      */
     @Override
-    public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof,
-            long startTime, int countApplied, Goal goal) {
+    public String getGoalNotAllowedMessage(Goal goal, int maxApplications, long timeout,
+            long startTime, int countApplied) {
         return null;
     }
 
@@ -51,7 +50,7 @@ public final class AppliedRuleStopCondition implements StopCondition<Proof, Goal
      * {@inheritDoc}
      */
     @Override
-    public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime,
+    public boolean shouldStop(int maxApplications, long timeout, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return countApplied >= maxApplications
                 || timeout >= 0 && System.currentTimeMillis() - startTime >= timeout;
@@ -61,7 +60,7 @@ public final class AppliedRuleStopCondition implements StopCondition<Proof, Goal
      * {@inheritDoc}
      */
     @Override
-    public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime,
+    public String getStopMessage(int maxApplications, long timeout, long startTime,
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return "Maximal number of rule applications reached or timed out.";
     }

@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 
 import org.key_project.prover.engine.StopCondition;
@@ -17,7 +16,7 @@ import org.key_project.prover.engine.StopCondition;
  *
  * @author Martin Hentschel
  */
-public interface IBreakpointStopCondition extends StopCondition<Proof, Goal> {
+public interface IBreakpointStopCondition extends StopCondition<Goal> {
     /**
      * Adds a new {@link IBreakpoint}.
      *

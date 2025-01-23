@@ -45,21 +45,21 @@ public class SymbolicExecutionBreakpointStopCondition extends
      * {@inheritDoc}
      */
     @Override
-    public int getMaximalWork(int maxApplications, long timeout, Proof proof) {
+    public int getMaximalWork(int maxApplications, long timeout) {
         setMaximalNumberOfSetNodesToExecutePerGoal(Integer.MAX_VALUE);
-        return super.getMaximalWork(maxApplications, timeout, proof);
+        return super.getMaximalWork(maxApplications, timeout);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
+    public boolean isGoalAllowed(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
         for (IBreakpoint breakpoint : breakpoints) {
-            breakpoint.updateState(maxApplications, timeout, proof, startTime, countApplied, goal);
+            breakpoint.updateState(goal, maxApplications, timeout, startTime, countApplied);
         }
-        return super.isGoalAllowed(maxApplications, timeout, proof, startTime, countApplied, goal);
+        return super.isGoalAllowed(goal, maxApplications, timeout, startTime, countApplied);
     }
 
     /**
@@ -96,7 +96,7 @@ public class SymbolicExecutionBreakpointStopCondition extends
         while (!result && iter.hasNext()) {
             IBreakpoint next = iter.next();
             result =
-                next.isEnabled() && next.isBreakpointHit(activeStatement, ruleApp, proof, node);
+                next.isEnabled() && next.isBreakpointHit(activeStatement, ruleApp, node);
         }
         return result;
     }

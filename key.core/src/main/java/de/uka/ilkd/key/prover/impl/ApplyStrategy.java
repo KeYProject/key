@@ -61,7 +61,7 @@ public class ApplyStrategy extends AbstractProverCore<Proof, Goal> {
     /** indicates whether the prover has been interrupted and should stop */
     private boolean cancelled;
     /** a configurable condition indicating that the prover has to stop, */
-    private StopCondition stopCondition;
+    private StopCondition<Goal> stopCondition;
     /** the goal choose picks the next goal to work on */
     private GoalChooser<Proof, Goal> goalChooser;
 
@@ -79,15 +79,14 @@ public class ApplyStrategy extends AbstractProverCore<Proof, Goal> {
      */
     private synchronized SingleRuleApplicationInfo applyAutomaticRule(
             final GoalChooser<Proof, Goal> goalChooser,
-            final StopCondition stopCondition, boolean stopAtFirstNonClosableGoal) {
+            final StopCondition<Goal> stopCondition, boolean stopAtFirstNonClosableGoal) {
         // Look for the strategy ...
         RuleApp app = null;
         Goal g;
         while ((g = goalChooser.getNextGoal()) != null) {
-            if (!stopCondition.isGoalAllowed(maxApplications, timeout, proof, time, countApplied,
-                g)) {
+            if (!stopCondition.isGoalAllowed(g, maxApplications, timeout, time, countApplied)) {
                 return new SingleRuleApplicationInfo(stopCondition.getGoalNotAllowedMessage(
-                    maxApplications, timeout, proof, time, countApplied, g), g, null);
+                    g, maxApplications, timeout, time, countApplied), g, null);
             }
             app = g.getRuleAppManager().next();
             // Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
@@ -124,7 +123,7 @@ public class ApplyStrategy extends AbstractProverCore<Proof, Goal> {
      * applies rules until this is no longer possible or the thread is interrupted.
      */
     private synchronized ApplyStrategyInfo doWork(final GoalChooser<Proof, Goal> goalChooser,
-            final StopCondition stopCondition) {
+            final StopCondition<Goal> stopCondition) {
         time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
 
@@ -132,7 +131,7 @@ public class ApplyStrategy extends AbstractProverCore<Proof, Goal> {
         long applyAutomatic = 0;
         try {
             LOGGER.trace("Strategy started.");
-            boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, time,
+            boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, time,
                 countApplied, srInfo);
 
             while (!shouldStop) {
@@ -152,12 +151,12 @@ public class ApplyStrategy extends AbstractProverCore<Proof, Goal> {
                 if (Thread.interrupted()) {
                     throw new InterruptedException();
                 }
-                shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, time,
+                shouldStop = stopCondition.shouldStop(maxApplications, timeout, time,
                     countApplied, srInfo);
             }
             if (shouldStop) {
                 return new ApplyStrategyInfo(
-                    stopCondition.getStopMessage(maxApplications, timeout, proof, time,
+                    stopCondition.getStopMessage(maxApplications, timeout, time,
                         countApplied, srInfo),
                     proof, null, null, System.currentTimeMillis() - time, countApplied,
                     closedGoals);
@@ -198,7 +197,7 @@ public class ApplyStrategy extends AbstractProverCore<Proof, Goal> {
         setAutoModeActive(true);
         fireTaskStarted(
             new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Strategy, PROCESSING_STRATEGY,
-                stopCondition.getMaximalWork(maxSteps, timeout, newProof)));
+                stopCondition.getMaximalWork(maxSteps, timeout)));
     }
 
     /*

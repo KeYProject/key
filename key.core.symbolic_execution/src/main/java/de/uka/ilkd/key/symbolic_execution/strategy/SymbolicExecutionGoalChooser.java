@@ -72,7 +72,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
             // accepts the next rule
             if (stopCondition != null && goalsToPrefer.isEmpty()) {
                 for (Goal goalToPrefer : selectedList) {
-                    if (stopCondition.isGoalAllowed(-1, -1L, proof, -1L, -1, goalToPrefer)) {
+                    if (stopCondition.isGoalAllowed(goalToPrefer, -1, -1L, -1L, -1)) {
                         goalsToPrefer.add(goalToPrefer);
                     }
                 }
@@ -101,7 +101,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
                     if (goalsToPrefer.remove(next) || goalsToPrefer.isEmpty()) {
                         // Goal is preferred, so check if next rule is allowed
                         if (stopCondition == null
-                                || stopCondition.isGoalAllowed(-1, -1L, proof, -1L, -1, next)) {
+                                || stopCondition.isGoalAllowed(next, -1, -1L, -1L, -1)) {
                             // Next rule allowed, goal is preferred so return it as result
                             goal = next;
                         } else {
