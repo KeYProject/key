@@ -50,7 +50,7 @@ public class StrategySettings extends AbstractSettings {
      * An optional customized {@link StopCondition} which is used in an {@link ApplyStrategy}
      * instance to determine after each applied rule if more rules should be applied or not.
      */
-    private StopCondition customApplyStrategyStopCondition;
+    private StopCondition<Goal> customApplyStrategyStopCondition;
 
     /**
      * An optional customized {@link GoalChooser} which is used in an {@link ApplyStrategy} instance
@@ -91,7 +91,7 @@ public class StrategySettings extends AbstractSettings {
     /**
      * Set the name of the active strategy
      *
-     * @param name
+     * @param name the name of teh strategy
      */
     public void setStrategy(Name name) {
         var old = this.activeStrategy;
@@ -279,7 +279,7 @@ public class StrategySettings extends AbstractSettings {
      *
      * @return The {@link StopCondition} to use in an {@link ApplyStrategy} instance.
      */
-    public StopCondition getApplyStrategyStopCondition() {
+    public StopCondition<Goal> getApplyStrategyStopCondition() {
         return Objects.requireNonNullElseGet(customApplyStrategyStopCondition,
             AppliedRuleStopCondition::new);
     }
@@ -291,7 +291,7 @@ public class StrategySettings extends AbstractSettings {
      * @return The customized {@link StopCondition} or {@code null} if the default one should be
      *         used.
      */
-    public StopCondition getCustomApplyStrategyStopCondition() {
+    public StopCondition<Goal> getCustomApplyStrategyStopCondition() {
         return customApplyStrategyStopCondition;
     }
 
@@ -303,7 +303,7 @@ public class StrategySettings extends AbstractSettings {
      *        {@code null} to use the default one.
      */
     public void setCustomApplyStrategyStopCondition(
-            StopCondition customApplyStrategyStopCondition) {
+            StopCondition<Goal> customApplyStrategyStopCondition) {
         this.customApplyStrategyStopCondition = customApplyStrategyStopCondition;
     }
 

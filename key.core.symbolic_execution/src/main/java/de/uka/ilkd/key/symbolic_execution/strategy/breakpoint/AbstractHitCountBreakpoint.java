@@ -76,8 +76,7 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Node node) {
         return hitcountExceeded(node);
     }
 

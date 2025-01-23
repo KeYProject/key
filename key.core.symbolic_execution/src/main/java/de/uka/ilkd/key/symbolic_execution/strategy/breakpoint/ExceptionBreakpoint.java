@@ -100,8 +100,7 @@ public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Node node) {
         Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
         if (activeStatement instanceof Throw throwStatement && isEnabled()) {
             for (int i = 0; i < throwStatement.getChildCount(); i++) {
@@ -112,7 +111,7 @@ public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
                         exceptionParentNodes.add(SETParent);
                         return true;
                     } else if (suspendOnSubclasses) {
-                        JavaInfo info = proof.getServices().getJavaInfo();
+                        JavaInfo info = node.proof().getServices().getJavaInfo();
                         KeYJavaType kjt = locVar.getKeYJavaType();
                         ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
                         for (KeYJavaType kjtloc : kjts) {

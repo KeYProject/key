@@ -84,12 +84,12 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
      * {@inheritDoc}
      */
     @Override
-    public void updateState(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
+    public void updateState(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
         if (goal != null) {
             Node node = goal.node();
             // Check if goal is allowed
-            org.key_project.prover.rules.RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+            RuleApp ruleApp = goal.getRuleAppManager().peekNext();
             SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
             Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
             if (activeStatement instanceof Throw throwStatement && isEnabled()) {
@@ -101,7 +101,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
                             exceptionNodes.add(node);
                             exceptionParentNodes.add(SETParent);
                         } else if (suspendOnSubclasses) {
-                            JavaInfo info = proof.getServices().getJavaInfo();
+                            JavaInfo info = goal.proof().getJavaInfo();
                             KeYJavaType kjt = locVar.getKeYJavaType();
                             ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
                             for (KeYJavaType kjtloc : kjts) {
@@ -146,8 +146,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
      * {@inheritDoc}
      */
     @Override
-    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof,
-            Node node) {
+    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Node node) {
         Node parent = null;
         for (Node parents : exceptionNodes) {
             if (isParentNode(node, parents)) {

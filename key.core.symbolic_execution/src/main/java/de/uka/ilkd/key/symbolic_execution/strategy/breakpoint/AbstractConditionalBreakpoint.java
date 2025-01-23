@@ -126,9 +126,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * {@inheritDoc}
      */
     @Override
-    public void updateState(int maxApplications, long timeout, Proof proof, long startTime,
-            int countApplied, Goal goal) {
-        super.updateState(maxApplications, timeout, proof, startTime, countApplied, goal);
+    public void updateState(Goal goal, int maxApplications, long timeout, long startTime,
+            int countApplied) {
+        super.updateState(goal, maxApplications, timeout, startTime, countApplied);
         if (goal != null) {
             Node node = goal.node();
             org.key_project.prover.rules.RuleApp ruleApp = goal.getRuleAppManager().peekNext();
@@ -349,39 +349,36 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * the proof
      *
      * @param ruleApp the {@link RuleApp} to be executed next
-     * @param proof the current {@link Proof}
      * @param node the current {@link Node}
      * @return true if the condition evaluates to true
      */
-    protected boolean conditionMet(org.key_project.prover.rules.RuleApp ruleApp, Proof proof,
-            Node node) {
+    protected boolean conditionMet(org.key_project.prover.rules.RuleApp ruleApp, Node node) {
         ApplyStrategyInfo info = null;
         try {
             // initialize values
             PosInOccurrence pio = ruleApp.posInOccurrence();
             var t = pio.subTerm();
-            getProof().getServices().getTermBuilder();
             Term term = TermBuilder.goBelowUpdates(t);
             IExecutionContext ec =
-                JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+                JavaTools.getInnermostExecutionContext(term.javaBlock(), getProof().getServices());
             // put values into map which have to be replaced
             if (ec != null) {
                 getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
             }
             // replace renamings etc.
+            final TermBuilder tb = getProof().getServices().getTermBuilder();
             OpReplacer replacer =
-                new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
+                new OpReplacer(getVariableNamingMap(), tb.tf());
             Term termForSideProof = replacer.replace(condition);
             // start side proof
-            Term toProof = getProof().getServices().getTermBuilder()
-                    .equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+            Term toProof = tb.equals(tb.tt(), termForSideProof);
             // New OneStepSimplifier is required because it has an internal state and the default
             // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                     .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false);
             Sequent sequent =
                 SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
-            info = SymbolicExecutionSideProofUtil.startSideProof(proof, sideProofEnv, sequent,
+            info = SymbolicExecutionSideProofUtil.startSideProof(getProof(), sideProofEnv, sequent,
                 StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
                 StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_DELAYED);
             return info.getProof().closed();
@@ -398,10 +395,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      */
     @Override
     public boolean isBreakpointHit(SourceElement activeStatement,
-            org.key_project.prover.rules.RuleApp ruleApp, Proof proof,
-            Node node) {
-        return (!conditionEnabled || conditionMet(ruleApp, proof, node))
-                && super.isBreakpointHit(activeStatement, ruleApp, proof, node);
+            org.key_project.prover.rules.RuleApp ruleApp, Node node) {
+        return (!conditionEnabled || conditionMet(ruleApp, node))
+                && super.isBreakpointHit(activeStatement, ruleApp, node);
     }
 
     /**

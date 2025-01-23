@@ -83,12 +83,11 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
 
     @Override
     public boolean isBreakpointHit(SourceElement activeStatement,
-            org.key_project.prover.rules.RuleApp ruleApp, Proof proof,
-            Node node) {
-        return !proof.isDisposed()
+            RuleApp ruleApp, Node node) {
+        return !node.proof().isDisposed()
                 && ((isEntry && isMethodCallNode(node, ruleApp))
                         || (isExit && isMethodReturnNode(node, ruleApp)))
-                && (!isConditionEnabled() || conditionMet(ruleApp, proof, node)) && isEnabled()
+                && (!isConditionEnabled() || conditionMet(ruleApp, node)) && isEnabled()
                 && hitcountExceeded(node);
     }
 
