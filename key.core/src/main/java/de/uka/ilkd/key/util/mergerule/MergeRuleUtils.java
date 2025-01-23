@@ -32,7 +32,6 @@ import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -653,7 +652,7 @@ public class MergeRuleUtils {
             return JavaBlock.EMPTY_JAVABLOCK;
         }
 
-        if (term.subs().size() == 0 || !term.javaBlock().isEmpty()) {
+        if (term.subs().isEmpty() || !term.javaBlock().isEmpty()) {
             return term.javaBlock();
         } else {
             for (Term sub : term.subs()) {
@@ -1032,7 +1031,7 @@ public class MergeRuleUtils {
 
         SymbolicExecutionStateWithProgCnt triple = sequentToSETriple(node, pio, services);
 
-        return new SymbolicExecutionState(triple.first, triple.second, node);
+        return new SymbolicExecutionState(triple.symbolicState(), triple.pathCondition(), node);
     }
 
     /**
@@ -1099,11 +1098,12 @@ public class MergeRuleUtils {
             final Node node = sequentInfo.getGoal().node();
             final Services services = sequentInfo.getGoal().proof().getServices();
 
-            Triple<Term, Term, Term> partnerSEState =
+            SymbolicExecutionStateWithProgCnt partnerSEState =
                 sequentToSETriple(node, sequentInfo.getPio(), services);
 
             result = result.prepend(
-                new SymbolicExecutionState(partnerSEState.first, partnerSEState.second, node));
+                new SymbolicExecutionState(partnerSEState.symbolicState(),
+                    partnerSEState.pathCondition(), node));
         }
 
         return result;
@@ -1378,7 +1378,7 @@ public class MergeRuleUtils {
      */
     private static Term joinListToAndTerm(ImmutableList<SequentFormula> formulae,
             Services services) {
-        if (formulae.size() == 0) {
+        if (formulae.isEmpty()) {
             return services.getTermBuilder().tt();
         } else if (formulae.size() == 1) {
             return formulae.head().formula();
