@@ -1,16 +1,13 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.prover;
+package org.key_project.prover.engine;
 
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import de.uka.ilkd.key.settings.StrategySettings;
-
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.proof.ProofObject;
 import org.key_project.util.collection.ImmutableList;
 
-public interface ProverCore {
+public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
 
     /**
      * constant used by some listeners to determine if a proof macro is running
@@ -25,7 +22,7 @@ public interface ProverCore {
      * @param goal the goal to prove
      * @return an information object about the performed work (e.g. number of rules applied)
      */
-    ApplyStrategyInfo start(Proof proof, Goal goal);
+    ApplyStrategyInfo<P, G> start(P proof, G goal);
 
     /**
      * starts a proof search for a set of goals using the given strategy settings instead the ones
@@ -35,7 +32,7 @@ public interface ProverCore {
      * @param goals list of goals to prove
      * @return an information object about the performed work (e.g. number of rules applied)
      */
-    ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals);
+    ApplyStrategyInfo<P, G> start(P proof, ImmutableList<G> goals);
 
     /**
      * starts a proof search for a set of goals using the given strategy settings instead the ones
@@ -46,7 +43,7 @@ public interface ProverCore {
      * @param stratSet the strategy settings to use
      * @return an information object about the performed work (e.g. number of rules applied)
      */
-    ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, StrategySettings stratSet);
+    ApplyStrategyInfo<P, G> start(P proof, ImmutableList<G> goals, Object stratSet);
 
     /**
      * This entry point to the proof may provide inconsistent data. The properties within the proof
@@ -61,7 +58,7 @@ public interface ProverCore {
      *        non-closable goal
      * @return an information object about the performed work (e.g. number of rules applied)
      */
-    ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout,
+    ApplyStrategyInfo<P, G> start(P proof, ImmutableList<G> goals, int maxSteps, long timeout,
             boolean stopAtFirstNonCloseableGoal);
 
     /**

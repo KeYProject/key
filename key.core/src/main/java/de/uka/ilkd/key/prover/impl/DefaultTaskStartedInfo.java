@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.prover.impl;
 
-import de.uka.ilkd.key.prover.TaskStartedInfo;
+import org.key_project.prover.engine.TaskStartedInfo;
 
 /**
  * Default implementation of a {@link TaskStartedInfo}.

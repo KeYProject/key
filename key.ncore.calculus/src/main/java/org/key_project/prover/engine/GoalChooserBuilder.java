@@ -1,18 +1,23 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.prover;
+package org.key_project.prover.engine;
+
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.proof.ProofObject;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * interface to be implemented by builders returning a goal chooser
  */
-public interface GoalChooserBuilder {
+public interface GoalChooserBuilder<P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> {
 
     /** returns a new goal chooser */
-    GoalChooser create();
+    GoalChooser<P, G> create();
 
     /** returns a clone of this goal chooser */
-    GoalChooserBuilder copy();
+    GoalChooserBuilder<P, G> copy();
 
     /** returns the name of the goal chooser */
     String name();

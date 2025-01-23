@@ -172,6 +172,8 @@ public class TriggeredInstantiations implements TermGenerator {
         long cost = PredictCostProver.computerInstanceCost(
             new Substitution(DefaultImmutableMap.nilMap()), cond,
             axioms, services);
+
+
         return cost == -1;
     }
 

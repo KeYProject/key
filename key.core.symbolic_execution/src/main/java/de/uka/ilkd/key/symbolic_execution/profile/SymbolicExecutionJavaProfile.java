@@ -12,11 +12,11 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.prover.GoalChooserBuilder;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.label.BlockContractValidityTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.FormulaTermLabelMerger;
@@ -39,6 +39,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.engine.GoalChooserBuilder;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -105,7 +106,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * {@inheritDoc}
      */
     @Override
-    protected ImmutableSet<GoalChooserBuilder> computeSupportedGoalChooserBuilder() {
+    protected ImmutableSet<GoalChooserBuilder<Proof, Goal>> computeSupportedGoalChooserBuilder() {
         return super.computeSupportedGoalChooserBuilder()
                 .add(new SymbolicExecutionGoalChooserBuilder());
     }

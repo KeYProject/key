@@ -10,6 +10,8 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.settings.StrategySettings;
 
+import org.key_project.prover.engine.GoalChooser;
+
 /**
  * <p>
  * Implementation of this interface are used in {@link ApplyStrategy} to determine if the strategy

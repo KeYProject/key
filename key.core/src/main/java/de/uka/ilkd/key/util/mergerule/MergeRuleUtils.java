@@ -25,7 +25,6 @@ import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -38,6 +37,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.engine.ApplyStrategyInfo;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
@@ -1571,7 +1571,7 @@ public class MergeRuleUtils {
     private static boolean isProvable(Sequent toProve, Services services, boolean doSplit,
             int timeout) {
         try {
-            final ApplyStrategyInfo proofResult =
+            final ApplyStrategyInfo<Proof, Goal> proofResult =
                 tryToProve(toProve, services, doSplit, "Provability check", timeout);
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
@@ -1598,7 +1598,7 @@ public class MergeRuleUtils {
 
         final Services services = parentProof.getServices();
 
-        final ApplyStrategyInfo info =
+        final ApplyStrategyInfo<Proof, Goal> info =
             tryToProve(term, services, true, "Term simplification", timeout);
 
         // The simplified formula is the conjunction of all open goals

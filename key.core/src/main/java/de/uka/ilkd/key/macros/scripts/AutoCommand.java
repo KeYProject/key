@@ -12,12 +12,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 
+import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -55,7 +56,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         // create the rule application engine
         final ProverCore applyStrategy =
-            new ApplyStrategy(profile.getSelectedGoalChooserBuilder().create());
+            new ApplyStrategy(profile.<Proof, Goal>getSelectedGoalChooserBuilder().create());
 
         // find the targets
         final ImmutableList<Goal> goals;

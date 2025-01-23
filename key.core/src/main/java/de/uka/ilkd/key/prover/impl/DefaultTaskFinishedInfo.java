@@ -4,12 +4,23 @@
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
+
+import org.key_project.prover.engine.TaskFinishedInfo;
 
 public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
 
     /**
-     * See {@link TaskFinishedInfo#getSource()} for possible values.
+     * The task that has finished. May be one of:
+     * <ul>
+     * <li>{@link de.uka.ilkd.key.macros.ProofMacro}</li>
+     * <li>{@link de.uka.ilkd.key.prover.impl.ApplyStrategy}</li>
+     * <li>{@code de.uka.ilkd.key.core.KeYMediator} (when pruning)</li>
+     * <li>{@code de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem}
+     * (when applying a merge rule)</li>
+     * <li>{@link de.uka.ilkd.key.proof.io.AbstractProblemLoader} (when loading a proof)</li>
+     * </ul>
+     *
+     * @return the source
      */
     private final Object source;
 
