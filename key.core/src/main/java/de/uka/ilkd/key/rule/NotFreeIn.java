@@ -49,7 +49,7 @@ public class NotFreeIn {
         return "\\notFreeIn(" + first() + "," + second() + ")";
     }
 
-    public boolean equals(Object o) {
+    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof NotFreeIn nfi)) {
             return false;
         }

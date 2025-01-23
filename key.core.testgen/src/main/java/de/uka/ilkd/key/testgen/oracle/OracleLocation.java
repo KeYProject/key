@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.testgen.oracle;
 
+import org.jspecify.annotations.Nullable;
+
 public class OracleLocation {
 
     public static final String ALL_FIELDS = "<allFields>";
@@ -35,14 +37,13 @@ public class OracleLocation {
         return field.equals(ALL_FIELDS);
     }
 
-    public boolean equals(Object o) {
-
+    @Override
+    public boolean equals(@Nullable Object o) {
         if (o instanceof OracleLocation l) {
             return object.equals(l.object) && field.equals(l.field);
         }
 
         return false;
-
     }
 
     public String toString() {

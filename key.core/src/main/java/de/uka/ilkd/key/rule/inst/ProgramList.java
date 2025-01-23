@@ -23,7 +23,7 @@ public class ProgramList implements SyntaxElement {
         return list;
     }
 
-    public boolean equals(Object o) {
+    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof ProgramList)) {
             return false;
         }

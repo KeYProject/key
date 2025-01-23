@@ -3,13 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
-import java.awt.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import javax.swing.*;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -30,11 +23,17 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
-
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationStepsList;
 
-import org.jspecify.annotations.NonNull;
+import javax.swing.*;
+import java.awt.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Entry point for the Proof Exploration Extension.
@@ -43,26 +42,26 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (16.04.19)
  */
 @KeYGuiExtension.Info(name = "Exploration",
-    description = "Author: Sarah Grebing <grebing@ira.uka.de>, Alexander Weigl <weigl@ira.uka.de>",
-    experimental = true, optional = true, priority = 10000)
+        description = "Author: Sarah Grebing <grebing@ira.uka.de>, Alexander Weigl <weigl@ira.uka.de>",
+        experimental = true, optional = true, priority = 10000)
 @HelpInfo(path = "/user/Exploration/")
 public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.MainMenu,
         KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine, ProofDisposedListener {
     private final ExplorationModeModel model = new ExplorationModeModel();
 
-    private JToolBar explorationToolbar;
+    private @Nullable JToolBar explorationToolbar;
 
-    private ExplorationStepsList leftPanel;
+    private @Nullable ExplorationStepsList leftPanel;
 
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
         public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-                PosInSequent pos) {
+                                              PosInSequent pos) {
             if (model.isExplorationModeSelected()) {
                 return Arrays.asList(new AddFormulaToAntecedentAction(),
-                    new AddFormulaToSuccedentAction(), new EditFormulaAction(pos),
-                    new DeleteFormulaAction(pos));
+                        new AddFormulaToSuccedentAction(), new EditFormulaAction(pos),
+                        new DeleteFormulaAction(pos));
             }
             return super.getContextActions(mediator, kind, pos);
         }
@@ -71,14 +70,16 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
     private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 
         public void proofPruned(de.uka.ilkd.key.proof.ProofTreeEvent e) {
-            e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class),
-                ExplorationNodeData.class);
+            final var obj = e.getNode().lookup(ExplorationNodeData.class);
+            if (obj != null) {
+                e.getNode().deregister(obj, ExplorationNodeData.class);
+            }
         }
     };
 
     @Override
     public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
-            @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
+                                                   @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
@@ -99,12 +100,16 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         ExplorationExtension extension = this;
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
                 // ignored
             }
 
             @Override
-            public void selectedProofChanged(KeYSelectionEvent e) {
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+                if (leftPanel == null) {
+                    return;
+                }
+
                 Proof oldProof = leftPanel.getProof();
                 Proof newProof = mediator.getSelectedProof();
                 if (oldProof != newProof) {
@@ -127,12 +132,12 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         leftPanel = new ExplorationStepsList(window);
         leftPanel.setEnabled(model.isExplorationModeSelected());
         model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE,
-            e -> leftPanel.setEnabled(model.isExplorationModeSelected()));
+                e -> leftPanel.setEnabled(model.isExplorationModeSelected()));
     }
 
     @Override
     public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window,
-            @NonNull KeYMediator mediator) {
+                                                   @NonNull KeYMediator mediator) {
         if (leftPanel == null) {
             initLeftPanel(window);
         }
@@ -152,7 +157,7 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
     @Override
     public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         return Arrays.asList(new ToggleExplorationAction(model, mainWindow),
-            new ShowInteractiveBranchesAction(model, mainWindow));
+                new ShowInteractiveBranchesAction(model, mainWindow));
     }
 
     @Override
@@ -171,9 +176,9 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
 class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
     public static final ColorSettings.ColorProperty DARK_PURPLE_COLOR =
-        ColorSettings.define("[proofTree]darkPurple", "", new Color(112, 17, 191));
+            ColorSettings.define("[proofTree]darkPurple", "", new Color(112, 17, 191));
     public static final ColorSettings.ColorProperty LIGHT_PURPLE_COLOR =
-        ColorSettings.define("[proofTree]lightPurple", "", new Color(165, 146, 191));
+            ColorSettings.define("[proofTree]lightPurple", "", new Color(165, 146, 191));
 
     @Override
     public void style(@NonNull Style style, GUIAbstractTreeNode treeNode) {

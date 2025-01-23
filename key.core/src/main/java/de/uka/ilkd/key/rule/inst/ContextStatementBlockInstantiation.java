@@ -13,28 +13,36 @@ import de.uka.ilkd.key.logic.PosInProgram;
  */
 public class ContextStatementBlockInstantiation {
 
-    /** the end position of the prefix omega */
+    /**
+     * the end position of the prefix omega
+     */
     private final PosInProgram prefixEnd;
 
-    /** the start position of the suffix omega */
+    /**
+     * the start position of the suffix omega
+     */
     private final PosInProgram suffixStart;
 
-    /** the execution context of the first active statement */
+    /**
+     * the execution context of the first active statement
+     */
     private final ExecutionContext activeStatementContext;
 
-    /** the whole program element this context term inst refers to */
+    /**
+     * the whole program element this context term inst refers to
+     */
     private final ProgramElement programElement;
 
     /**
      * creates a ContextStatementBlockInstantiation of a context term
      *
-     * @param prefixEnd the PosInProgram describing the first statement after the end of the prefix
-     * @param suffixStart the PosInProgram describing the statement just before the suffix begins
+     * @param prefixEnd              the PosInProgram describing the first statement after the end of the prefix
+     * @param suffixStart            the PosInProgram describing the statement just before the suffix begins
      * @param activeStatementContext the ExecutionContext of the first active statement
-     * @param pe the ProgramElement the context positions are related to
+     * @param pe                     the ProgramElement the context positions are related to
      */
     public ContextStatementBlockInstantiation(PosInProgram prefixEnd, PosInProgram suffixStart,
-            ExecutionContext activeStatementContext, ProgramElement pe) {
+                                              ExecutionContext activeStatementContext, ProgramElement pe) {
 
         this.prefixEnd = prefixEnd;
         this.suffixStart = suffixStart;
@@ -75,7 +83,8 @@ public class ContextStatementBlockInstantiation {
         return programElement;
     }
 
-    public boolean equals(Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof ContextStatementBlockInstantiation inst)) {
             return false;
         }
@@ -121,7 +130,9 @@ public class ContextStatementBlockInstantiation {
         return hashCode;
     }
 
-    /** toString */
+    /**
+     * toString
+     */
     public String toString() {
         String result = "ContextStatementBlockInstantiation:\n";
         result += "Prefix ends before " + prefixEnd.toString();

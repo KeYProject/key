@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 public abstract class SpecificationEntity {
 
-    enum Type {
+    public enum Type {
         SOURCE, SINK
     }
 
@@ -34,7 +34,7 @@ public abstract class SpecificationEntity {
         }
 
         @Override
-        public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (super.equals(o) && o instanceof Field) {
                 return name.equals(((Field) o).name);
             } else {
@@ -92,7 +92,7 @@ public abstract class SpecificationEntity {
         }
 
         @Override
-        public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (super.equals(o) && o instanceof Parameter) {
                 return (methodName.equals(((Parameter) o).methodName)
                         && Arrays.equals(((Parameter) o).paramTypes, paramTypes)
@@ -164,7 +164,7 @@ public abstract class SpecificationEntity {
         }
 
         @Override
-        public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (super.equals(o) && o instanceof ReturnValue) {
                 return (methodName.equals(((ReturnValue) o).methodName)
                         && Arrays.equals(paramTypes, ((ReturnValue) o).paramTypes));
@@ -209,7 +209,7 @@ public abstract class SpecificationEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o instanceof SpecificationEntity) {
             return (inPackage.equals(((SpecificationEntity) o).inPackage)
                     && inClass.equals(((SpecificationEntity) o).inClass)

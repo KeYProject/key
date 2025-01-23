@@ -117,7 +117,7 @@ public class RIFLTransformer {
 
     private static File getBaseDirPath(File origSourcePath) {
         if (origSourcePath.isFile()) {
-            return origSourcePath.getParentFile();
+            return Objects.requireNonNull(origSourcePath.getParentFile());
         } else {
             return origSourcePath;
         }

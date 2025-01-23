@@ -50,7 +50,7 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof TextualJMLClassAxiom ci)) {
             return false;
         }

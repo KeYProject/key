@@ -5,6 +5,6 @@ public class Object
    /* @ public ghost instance Object owner; @*/
 
    public Object() { };
-   public boolean equals(Object obj);
+   boolean equals(@org.jspecify.annotations.Nullable Object obj);
 
 }

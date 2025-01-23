@@ -62,7 +62,7 @@ public class DisjunctivePredicateAbstractionDomainElement
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         return obj instanceof DisjunctivePredicateAbstractionDomainElement
                 && (this != TOP || obj == TOP) && (this != BOTTOM || obj == BOTTOM)
                 && this.getPredicates().equals(

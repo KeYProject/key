@@ -247,7 +247,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         if (!(obj instanceof AbstractionPredicate otherPred)) {
             return false;
         }

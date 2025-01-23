@@ -3,16 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.rifl;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Field;
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Parameter;
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.ReturnValue;
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Default implementation of {@link SpecificationContainer}.
@@ -27,7 +24,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
     private final Set<Entry<String, String>> flow = new LinkedHashSet<>();
 
     public DefaultSpecificationContainer(Map<SpecificationEntity, String> domainAssignments,
-            Set<Entry<String, String>> flow2) {
+                                         Set<Entry<String, String>> flow2) {
         // TODO: this copying is ugly and inefficient
         for (final Entry<SpecificationEntity, String> e : domainAssignments.entrySet()) {
             if (e.getKey() instanceof Field) {
@@ -44,7 +41,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
     @Override
     public String toString() {
         return "Fields: " + field2domain + "\nParameters: " + param2domain + "\nReturns: "
-            + return2domain + "\nFlows: " + flow;
+                + return2domain + "\nFlows: " + flow;
     }
 
     private String[] extractParamTypes(recoder.java.declaration.MethodDeclaration md) {
@@ -52,7 +49,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
         final String[] paramTypes = new String[params];
         for (int i = 0; i < params; i++) {
             final recoder.java.declaration.ParameterDeclaration pd =
-                md.getParameterDeclarationAt(i);
+                    md.getParameterDeclarationAt(i);
             paramTypes[i] = pd.getTypeReference().getName();
         }
         return paramTypes;
@@ -69,7 +66,8 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 
     @Override
     public String field(String inPackage, String inClass, String name, Type type) {
-        return field2domain.get(new Field(name, inPackage, inClass, type));
+        return Objects.requireNonNull(field2domain.get(new Field(name, inPackage, inClass, type)),
+                "Could not find field");
     }
 
     @Override
@@ -77,27 +75,30 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
         final String[] paramTypes = extractParamTypes(md);
         final recoder.abstraction.ClassType ctype = md.getContainingClassType();
         return parameter(ctype.getPackage().getFullName(), ctype.getName(), md.getName(),
-            paramTypes, index, type);
+                paramTypes, index, type);
     }
 
     @Override
     public String parameter(String inPackage, String inClass, String methodName,
-            String[] paramTypes, int index, Type type) {
-        return param2domain
-                .get(new Parameter(index, methodName, paramTypes, inPackage, inClass, type));
+                            String[] paramTypes, int index, Type type) {
+        return Objects.requireNonNull(
+                param2domain.get(new Parameter(index, methodName, paramTypes, inPackage, inClass, type)),
+                "Parameter not found");
     }
 
     @Override
     public String returnValue(recoder.java.declaration.MethodDeclaration md, Type type) {
         final recoder.abstraction.ClassType ctype = md.getContainingClassType();
         return returnValue(ctype.getPackage().getFullName(), ctype.getName(), md.getName(),
-            extractParamTypes(md), type);
+                extractParamTypes(md), type);
     }
 
     @Override
     public String returnValue(String inPackage, String inClass, String methodName,
-            String[] paramTypes, Type type) {
-        return return2domain.get(new ReturnValue(methodName, paramTypes, inPackage, inClass, type));
+                              String[] paramTypes, Type type) {
+        return Objects.requireNonNull(
+                return2domain.get(new ReturnValue(methodName, paramTypes, inPackage, inClass, type)),
+                "Return value not found");
     }
 
     @Override

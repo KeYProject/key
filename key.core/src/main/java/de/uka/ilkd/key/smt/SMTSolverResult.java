@@ -84,7 +84,7 @@ public class SMTSolverResult {
     }
 
 
-    public boolean equals(Object o) {
+    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof SMTSolverResult ssr)) {
             return false;
         }

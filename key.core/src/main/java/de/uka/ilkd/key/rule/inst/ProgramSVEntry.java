@@ -50,7 +50,7 @@ public class ProgramSVEntry implements Serializable {
      *
      * @return true iff the keys and the mapped values are equal
      */
-    public boolean equals(Object o) {
+    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof ProgramSVEntry cmp)) {
             return false;
         }

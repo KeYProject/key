@@ -20,6 +20,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class ProofInfo {
         this.services = proof.getServices();
     }
 
-    public IProgramMethod getMUT() {
+    public @Nullable IProgramMethod getMUT() {
         SpecificationRepository spec = services.getSpecificationRepository();
         IObserverFunction f = spec.getTargetOfProof(proof);
         if (f instanceof IProgramMethod) {
@@ -47,7 +48,7 @@ public class ProofInfo {
         }
     }
 
-    public KeYJavaType getTypeOfClassUnderTest() {
+    public @Nullable KeYJavaType getTypeOfClassUnderTest() {
         if (getMUT() == null) {
             return null;
         }
@@ -180,7 +181,7 @@ public class ProofInfo {
         return result.toString();
     }
 
-    public JavaBlock getJavaBlock(Term t) {
+    public @Nullable JavaBlock getJavaBlock(Term t) {
         if (t.containsJavaBlockRecursive()) {
             if (!t.javaBlock().isEmpty()) {
                 return t.javaBlock();

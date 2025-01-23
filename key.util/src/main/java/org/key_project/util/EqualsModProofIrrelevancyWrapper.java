@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.util;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Wrapper around an object that implements {@link EqualsModProofIrrelevancy}.
  * Forwards calls to {@link #equals(Object)} and {@link #hashCode()} to
@@ -30,7 +32,7 @@ public class EqualsModProofIrrelevancyWrapper<T extends EqualsModProofIrrelevanc
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

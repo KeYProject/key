@@ -449,7 +449,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      * <code>this</code> contain no mutually exclusive taclet options.
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == this) {
             return true;
         }

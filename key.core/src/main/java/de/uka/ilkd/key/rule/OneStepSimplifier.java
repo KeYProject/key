@@ -744,7 +744,7 @@ public final class OneStepSimplifier implements BuiltInRule {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (obj instanceof TermReplacementKey) {
                 obj = ((TermReplacementKey) obj).term;
             }

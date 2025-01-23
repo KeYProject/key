@@ -78,7 +78,7 @@ public record Location(@Nullable URI fileUri, Position position) implements Comp
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())

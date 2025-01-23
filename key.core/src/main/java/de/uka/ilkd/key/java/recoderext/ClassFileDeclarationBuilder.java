@@ -777,7 +777,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof ClassFileDeclarationBuilder)) {
             return false;
         }

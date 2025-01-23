@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.util.LinkedHashMap;
 
+import org.checkerframework.checker.units.qual.N;
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.collection.Pair;
 
@@ -81,13 +83,13 @@ class RIFLHandler extends DefaultHandler {
     private final Map<SpecificationEntity, Pair<String, String>> sinks2categories =
         new LinkedHashMap<>();
     private final Map<Pair<String, String>, String> categories2domains = new LinkedHashMap<>();
-    private final Map<String, String> handles2categories = new LinkedHashMap<>();
+    private final Map<@Nullable String, String> handles2categories = new LinkedHashMap<>();
     private Set<String> domains = new LinkedHashSet<>();
     private Set<Entry<String, String>> flow = new LinkedHashSet<>();
-    private Map<SpecificationEntity, Pair<String, String>> tmpMap = null;
-    private Type type = null;
+    private Map<SpecificationEntity, Pair<String, String>> tmpMap = new HashMap<>();
+    private Type type = Type.SOURCE;
 
-    private String tmpHandle = null;
+    private @Nullable String tmpHandle = null;
 
     private String category = DEFAULT_CATEGORY;
 
@@ -150,7 +152,7 @@ class RIFLHandler extends DefaultHandler {
         final String methodName = attributes.getValue("method");
         final SpecificationEntity se = new ReturnValue(methodName, packageName, className, type);
         handles2categories.put(tmpHandle, category);
-        tmpMap.put(se, new Pair<>(tmpHandle, category));
+        tmpMap.put(se, new Pair<@Nullable String, String>(tmpHandle, category));
     }
 
     private void putFlow(Attributes attributes) {

@@ -335,7 +335,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
              * {@inheritDoc}
              */
             @Override
-            public boolean equals(Object obj) {
+            public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
                 if (obj instanceof ParentDef other) {
                     return Objects.equals(parent, other.parent)
                             && Objects.equals(goalNode, other.goalNode);
@@ -369,7 +369,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
              * {@inheritDoc}
              */
             @Override
-            public boolean equals(Object obj) {
+            public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
                 if (obj instanceof LocationDef other) {
                     return programVariable == other.programVariable
                             && Objects.equals(arrayIndex, other.arrayIndex);

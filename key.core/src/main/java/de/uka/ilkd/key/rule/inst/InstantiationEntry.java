@@ -36,7 +36,7 @@ public abstract class InstantiationEntry<E> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o != null && o.getClass() == getClass()) {
             return (instantiation.equals(((InstantiationEntry<E>) o).instantiation));
         }

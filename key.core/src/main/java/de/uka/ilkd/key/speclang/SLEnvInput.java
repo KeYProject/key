@@ -3,26 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
-import java.io.File;
-import java.net.URL;
-import java.util.*;
-
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.JavaReduxFileCollection;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.statement.JmlAssert;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.java.statement.SetStatement;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -39,10 +26,16 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.util.KeYResourceManager;
-
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -56,16 +49,15 @@ public final class SLEnvInput extends AbstractEnvInput {
     // -------------------------------------------------------------------------
 
     public SLEnvInput(String javaPath, List<File> classPath, File bootClassPath, Profile profile,
-            List<File> includes) {
+                      List<File> includes) {
         super(getLanguage() + " specifications", javaPath, classPath, bootClassPath, profile,
-            includes);
+                includes);
     }
 
 
     public SLEnvInput(String javaPath, Profile profile) {
         this(javaPath, null, null, profile, null);
     }
-
 
 
     // -------------------------------------------------------------------------
@@ -92,13 +84,13 @@ public final class SLEnvInput extends AbstractEnvInput {
 
 
     private ImmutableSet<PositionedString> createDLLibrarySpecsHelper(Set<KeYJavaType> allKJTs,
-            String path) throws ProofInputException {
+                                                                      String path) throws ProofInputException {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         for (KeYJavaType kjt : allKJTs) {
             if (kjt.getJavaType() instanceof TypeDeclaration
                     && ((TypeDeclaration) kjt.getJavaType()).isLibraryClass()) {
                 final String filePath =
-                    String.format("%s/%s.key", path, kjt.getFullName().replace(".", "/"));
+                        String.format("%s/%s.key", path, kjt.getFullName().replace(".", "/"));
                 RuleSource rs = null;
 
                 // external or internal path?
@@ -106,10 +98,13 @@ public final class SLEnvInput extends AbstractEnvInput {
                 if (file.isFile()) {
                     rs = RuleSourceFactory.initRuleFile(file);
                 } else {
-                    URL url = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class,
-                        filePath);
+                    URL url = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, filePath);
                     if (url != null) {
-                        rs = RuleSourceFactory.initRuleFile(url);
+                        try {
+                            rs = RuleSourceFactory.initRuleFile(url.toURI());
+                        } catch (URISyntaxException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
 
@@ -131,7 +126,7 @@ public final class SLEnvInput extends AbstractEnvInput {
      */
     private ImmutableSet<PositionedString> createDLLibrarySpecs() throws ProofInputException {
         final Set<KeYJavaType> allKJTs =
-            initConfig.getServices().getJavaInfo().getAllKeYJavaTypes();
+                initConfig.getServices().getJavaInfo().getAllKeYJavaTypes();
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         // either boot class path or JavaRedux
         if (bootClassPath != null) {
@@ -149,14 +144,14 @@ public final class SLEnvInput extends AbstractEnvInput {
         if (classPath != null) {
             for (File file : classPath) {
                 warnings =
-                    warnings.union(createDLLibrarySpecsHelper(allKJTs, file.getAbsolutePath()));
+                        warnings.union(createDLLibrarySpecsHelper(allKJTs, file.getAbsolutePath()));
             }
         }
         return warnings;
     }
 
     private void addLoopInvariants(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final KeYJavaType kjt, final IProgramMethod pm)
+                                   final SpecificationRepository specRepos, final KeYJavaType kjt, final IProgramMethod pm)
             throws ProofInputException {
         // Loop invariants.
         final JavaASTCollector collector = new JavaASTCollector(pm.getBody(), LoopStatement.class);
@@ -170,7 +165,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addLoopContracts(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final KeYJavaType kjt, final IProgramMethod pm)
+                                  final SpecificationRepository specRepos, final KeYJavaType kjt, final IProgramMethod pm)
             throws ProofInputException {
         // Loop contracts on loops.
         // For loop contracts on blocks, see addBlockAndLoopContracts.
@@ -179,7 +174,7 @@ public final class SLEnvInput extends AbstractEnvInput {
 
         for (ProgramElement loop : collector.getNodes()) {
             final ImmutableSet<LoopContract> loopContracts =
-                specExtractor.extractLoopContracts(pm, (LoopStatement) loop);
+                    specExtractor.extractLoopContracts(pm, (LoopStatement) loop);
 
             for (LoopContract specification : loopContracts) {
                 specRepos.addLoopContract(specification, true);
@@ -188,22 +183,22 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addBlockAndLoopContracts(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final IProgramMethod pm)
+                                          final SpecificationRepository specRepos, final IProgramMethod pm)
             throws ProofInputException {
         // Block and loop contracts.
         final JavaASTCollector blockCollector =
-            new JavaASTCollector(pm.getBody(), StatementBlock.class);
+                new JavaASTCollector(pm.getBody(), StatementBlock.class);
         blockCollector.start();
         for (ProgramElement block : blockCollector.getNodes()) {
             final ImmutableSet<BlockContract> blockContracts =
-                specExtractor.extractBlockContracts(pm, (StatementBlock) block);
+                    specExtractor.extractBlockContracts(pm, (StatementBlock) block);
 
             for (BlockContract specification : blockContracts) {
                 specRepos.addBlockContract(specification, true);
             }
 
             final ImmutableSet<LoopContract> loopContracts =
-                specExtractor.extractLoopContracts(pm, (StatementBlock) block);
+                    specExtractor.extractLoopContracts(pm, (StatementBlock) block);
 
             for (LoopContract specification : loopContracts) {
                 specRepos.addLoopContract(specification, true);
@@ -212,30 +207,30 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addMergePointStatements(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final IProgramMethod pm,
-            final ImmutableSet<SpecificationElement> methodSpecs) throws ProofInputException {
+                                         final SpecificationRepository specRepos, final IProgramMethod pm,
+                                         final ImmutableSet<SpecificationElement> methodSpecs) throws ProofInputException {
         // merge point statements
         final JavaASTCollector mpsCollector =
-            new JavaASTCollector(pm.getBody(), MergePointStatement.class);
+                new JavaASTCollector(pm.getBody(), MergePointStatement.class);
         mpsCollector.start();
         for (ProgramElement mps : mpsCollector.getNodes()) {
             final ImmutableSet<MergeContract> mergeContracts = //
-                specExtractor.extractMergeContracts(pm, (MergePointStatement) mps,
-                    ((Contract) methodSpecs.iterator().next()).getOrigVars().params);
+                    specExtractor.extractMergeContracts(pm, (MergePointStatement) mps,
+                            ((Contract) methodSpecs.iterator().next()).getOrigVars().params);
 
             mergeContracts.forEach(specRepos::addMergeContract);
         }
     }
 
     private void addLabeledBlockContracts(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final IProgramMethod pm)
+                                          final SpecificationRepository specRepos, final IProgramMethod pm)
             throws ProofInputException {
         final JavaASTCollector labeledCollector =
-            new JavaASTCollector(pm.getBody(), LabeledStatement.class);
+                new JavaASTCollector(pm.getBody(), LabeledStatement.class);
         labeledCollector.start();
         for (ProgramElement labeled : labeledCollector.getNodes()) {
             final ImmutableSet<BlockContract> blockContracts =
-                specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
+                    specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
             for (BlockContract specification : blockContracts) {
                 specRepos.addBlockContract(specification, true);
             }
@@ -243,14 +238,14 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addLabeledLoopContracts(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final IProgramMethod pm)
+                                         final SpecificationRepository specRepos, final IProgramMethod pm)
             throws ProofInputException {
         final JavaASTCollector labeledCollector =
-            new JavaASTCollector(pm.getBody(), LabeledStatement.class);
+                new JavaASTCollector(pm.getBody(), LabeledStatement.class);
         labeledCollector.start();
         for (ProgramElement labeled : labeledCollector.getNodes()) {
             final ImmutableSet<LoopContract> loopContracts =
-                specExtractor.extractLoopContracts(pm, (LabeledStatement) labeled);
+                    specExtractor.extractLoopContracts(pm, (LabeledStatement) labeled);
             for (LoopContract specification : loopContracts) {
                 specRepos.addLoopContract(specification, true);
             }
@@ -289,7 +284,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             throws ProofInputException {
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
         final SpecificationRepository specRepos =
-            initConfig.getServices().getSpecificationRepository();
+                initConfig.getServices().getSpecificationRepository();
 
         // read DL library specs before any other specs
         ImmutableSet<PositionedString> warnings = createDLLibrarySpecs();
@@ -297,7 +292,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         // sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
         final KeYJavaType[] kjts =
-            sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[0]));
+                sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[0]));
 
         // create specifications for all types
         for (KeYJavaType kjt : kjts) {
@@ -308,7 +303,7 @@ public final class SLEnvInput extends AbstractEnvInput {
 
             // class invariants, represents clauses, ...
             final ImmutableSet<SpecificationElement> classSpecs =
-                specExtractor.extractClassSpecs(kjt);
+                    specExtractor.extractClassSpecs(kjt);
             specRepos.addSpecs(classSpecs);
 
             // Check whether a static invariant is present.
@@ -324,11 +319,11 @@ public final class SLEnvInput extends AbstractEnvInput {
 
             // contracts, loop invariants
             final ImmutableList<ProgramMethod> pms =
-                javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
+                    javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
             for (IProgramMethod pm : pms) {
                 // contracts
                 final ImmutableSet<SpecificationElement> methodSpecs =
-                    specExtractor.extractMethodSpecs(pm, staticInvPresent);
+                        specExtractor.extractMethodSpecs(pm, staticInvPresent);
                 specRepos.addSpecs(methodSpecs);
 
                 Type declaringType = pm.getContainerType().getJavaType();
@@ -340,9 +335,9 @@ public final class SLEnvInput extends AbstractEnvInput {
                         && !declaringType.getFullName().equals("java.lang.Object")
                         && !pm.isImplicit()) {
                     specRepos.addContract(specExtractor.createDefaultContract(pm,
-                        initConfig.getActivatedChoices().exists(
-                            choice -> choice.category().equals("soundDefaultContracts")
-                                    && choice.name().toString()
+                            initConfig.getActivatedChoices().exists(
+                                    choice -> choice.category().equals("soundDefaultContracts")
+                                            && choice.name().toString()
                                             .equals("soundDefaultContracts:on"))));
                 }
 
@@ -360,7 +355,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             for (IProgramMethod constructor : constructors) {
                 assert constructor.isConstructor();
                 final ImmutableSet<SpecificationElement> constructorSpecs =
-                    specExtractor.extractMethodSpecs(constructor, staticInvPresent);
+                        specExtractor.extractMethodSpecs(constructor, staticInvPresent);
                 specRepos.addSpecs(constructorSpecs);
             }
             specRepos.addRepresentsTermToWdChecksForModelFields(kjt);
@@ -371,7 +366,7 @@ public final class SLEnvInput extends AbstractEnvInput {
 
         // update warnings to user
         final ImmutableSet<PositionedString> jmlWarnings =
-            DefaultImmutableSet.fromImmutableList(specExtractor.getWarnings());
+                DefaultImmutableSet.fromImmutableList(specExtractor.getWarnings());
         warnings = warnings.union(jmlWarnings);
         return warnings;
     }

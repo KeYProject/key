@@ -252,7 +252,7 @@ public class TestEqualsHashCodeResetter {
              * Overwritten to make {@link MyBean}s equal if they have the same value.
              */
             @Override
-            public boolean equals(Object obj) {
+            boolean equals(@org.jspecify.annotations.Nullable Object obj) {
                 if (obj instanceof MyBean) {
                     return value.equals(((MyBean) obj).value);
                 } else {

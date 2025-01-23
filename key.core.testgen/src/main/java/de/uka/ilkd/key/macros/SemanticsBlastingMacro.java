@@ -70,7 +70,7 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 
     @Override
     public String getCategory() {
-        return null;
+        return "";
     }
 
     @Override

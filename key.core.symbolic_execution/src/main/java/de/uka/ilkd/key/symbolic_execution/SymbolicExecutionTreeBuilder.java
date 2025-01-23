@@ -1850,7 +1850,7 @@ public class SymbolicExecutionTreeBuilder {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (super.equals(o)) {
                 if (o instanceof JavaPair other) {
                     if (second.size() == other.second.size()) {

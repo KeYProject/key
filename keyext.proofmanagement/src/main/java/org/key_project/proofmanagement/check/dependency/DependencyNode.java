@@ -117,7 +117,7 @@ public class DependencyNode {
 
     // TODO: equals and hashCode needed for HashMaps?
     // @Override
-    // public boolean equals(Object o) {
+    // boolean equals(@org.jspecify.annotations.Nullable Object o) {
     // if (o instanceof DependencyNode) {
     // DependencyNode node = (DependencyNode) o;
     // if (node.contract.equals(contract)) {

@@ -246,7 +246,7 @@ public final class PosInTerm {
         return hash;
     }
 
-    public boolean equals(Object o) {
+    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == this) {
             return true;
         }

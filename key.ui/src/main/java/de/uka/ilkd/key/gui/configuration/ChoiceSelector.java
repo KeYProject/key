@@ -395,7 +395,7 @@ public class ChoiceSelector extends JDialog {
              * {@inheritDoc}
              */
             @Override
-            public boolean equals(Object obj) {
+            public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
                 if (obj instanceof ChoiceEntry other) {
                     return choice.equals(other.choice()) && incomplete == other.incomplete()
                             && unsound == other.unsound()

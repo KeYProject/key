@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -35,7 +36,11 @@ public class RuleSourceFactory {
             // a more specific exception type would probably be better
             throw new RuntimeException("Could not find rule file " + PATH_TO_RULES + ruleFileName);
         }
-        return new UrlRuleSource(u);
+        try {
+            return new UrlRuleSource(u.toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static RuleSource initRuleFile(final URI url) {

@@ -16,7 +16,7 @@ import org.jspecify.annotations.Nullable;
  * @param <T1> type of first element
  * @param <T2> type of second element
  */
-public class Pair<T1, T2> {
+public class Pair<T1 extends @Nullable Object, T2 extends @Nullable Object> {
     /**
      * First element.
      */

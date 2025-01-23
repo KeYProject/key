@@ -10,6 +10,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.Icons;
 
@@ -38,7 +40,7 @@ public class ShowInteractiveBranchesAction extends KeyAction {
         updateEnable();
     }
 
-    private void updateEnable() {
+    private void updateEnable(@UnderInitialization ShowInteractiveBranchesAction this) {
         setSelected(!model.isShowInteractiveBranches());
         setEnabled(model.isExplorationModeSelected());
 

@@ -435,7 +435,7 @@ public abstract class LoopStatement extends JavaStatement
     public abstract boolean isCheckedBeforeIteration();
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (!(o instanceof LoopStatement cmp)) {
             return false;
         }

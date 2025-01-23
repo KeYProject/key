@@ -70,7 +70,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (this == o) {
             return true;
         }

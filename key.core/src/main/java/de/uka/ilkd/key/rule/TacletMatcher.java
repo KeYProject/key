@@ -88,9 +88,7 @@ public interface TacletMatcher {
      * @param services the Services
      * @return the found schema variable mapping or <code>null</code> if the matching failed
      */
-    MatchConditions matchFind(Term term, MatchConditions matchCond,
-            Services services);
-
+    MatchConditions matchFind(Term term, MatchConditions matchCond, Services services);
 
     /**
      * checks whether the given {@link SchemaVariable} {@code sv} matches the {@link Term}

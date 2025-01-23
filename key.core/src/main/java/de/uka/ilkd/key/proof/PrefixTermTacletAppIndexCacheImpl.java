@@ -92,7 +92,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
             this.analysedTerm = analysedTerm;
         }
 
-        public boolean equals(Object obj) {
+        @Override public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (!(obj instanceof CacheKey objKey)) {
                 return false;
             }

@@ -97,7 +97,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     }
 
     @Override
-    public boolean equals(Object p_obj) {
+    public boolean equals(@org.jspecify.annotations.Nullable Object p_obj) {
         if (!(p_obj instanceof IfFormulaInstSeq other)) {
             return false;
         }
