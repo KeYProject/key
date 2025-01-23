@@ -5,7 +5,7 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    implementation 'org.ow2.asm:asm:9.7'
+    implementation 'org.ow2.asm:asm:9.7.1'
     implementation 'org.apache-extras.beanshell:bsh:2.0b6'
     implementation 'net.sf.retrotranslator:retrotranslator-runtime:1.2.9'
     implementation 'net.sf.retrotranslator:retrotranslator-transformer:1.2.9'
