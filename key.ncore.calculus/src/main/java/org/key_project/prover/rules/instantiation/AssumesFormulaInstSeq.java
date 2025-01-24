@@ -57,7 +57,7 @@ public class AssumesFormulaInstSeq
     /**
      * Create a list with all formulas of a given semisequent
      */
-    private static <SF extends SequentFormula> ImmutableArray<AssumesFormulaInstantiation> createListHelp(
+    private static ImmutableArray<AssumesFormulaInstantiation> createListHelp(
             Sequent p_s,
             boolean antec) {
         Semisequent semi;
@@ -79,7 +79,7 @@ public class AssumesFormulaInstSeq
         return new ImmutableArray<>(assumesInstFromSeq);
     }
 
-    public static <SF extends SequentFormula> ImmutableArray<AssumesFormulaInstantiation> createList(
+    public static ImmutableArray<AssumesFormulaInstantiation> createList(
             Sequent p_s, boolean antec) {
         return createListHelp(p_s, antec);
     }
