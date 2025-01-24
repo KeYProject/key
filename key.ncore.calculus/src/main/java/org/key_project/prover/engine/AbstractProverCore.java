@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.engine;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Common class for provers which takes care of listener registration and task event propagation
@@ -23,8 +23,8 @@ public abstract class AbstractProverCore<P extends ProofObject<G>, G extends Pro
      * We use an immutable list to store listeners to allow for addition/removal within listener
      * code without causing a deadlock
      */
-    private ImmutableList<ProverTaskListener> proverTaskObservers = ImmutableSLList.nil();
-
+    private final CopyOnWriteArrayList<ProverTaskListener> proverTaskObservers =
+        new CopyOnWriteArrayList<>();
 
     /**
      * propagation method for the event that a task started
@@ -73,9 +73,7 @@ public abstract class AbstractProverCore<P extends ProofObject<G>, G extends Pro
      */
     @Override
     public void addProverTaskObserver(ProverTaskListener observer) {
-        synchronized (proverTaskObservers) {
-            proverTaskObservers = proverTaskObservers.prepend(observer);
-        }
+        proverTaskObservers.add(observer);
     }
 
     /**
@@ -84,10 +82,8 @@ public abstract class AbstractProverCore<P extends ProofObject<G>, G extends Pro
      * @param observer the listener
      */
     @Override
-    public void removeProverTaskObserver(ProverTaskListener observer) {
-        synchronized (proverTaskObservers) {
-            proverTaskObservers = proverTaskObservers.removeAll(observer);
-        }
+    public void removeProverTaskObserver(final ProverTaskListener observer) {
+        proverTaskObservers.removeIf(o -> o.equals(observer));
     }
 
 }
