@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules;
 
+import java.io.Serial;
+
 /**
  *
  * @author jomi
@@ -12,6 +14,7 @@ package org.key_project.prover.rules;
  */
 public class RuleAbortException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = -645034125571021135L;
 
     public RuleAbortException() {

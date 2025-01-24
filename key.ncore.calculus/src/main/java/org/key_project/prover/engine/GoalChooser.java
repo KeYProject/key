@@ -39,8 +39,7 @@ public interface GoalChooser<P extends @Nullable ProofObject<@NonNull G>, G exte
      * are the given goals
      *
      * @param previousGoalContent the content of the goal which has been replaced by the new goals;
-     *        it is used
-     *        to identify outdated goals managed by this chooser (a typical argument is
+     *        it is used to identify outdated goals managed by this chooser (a typical argument is
      *        the node of proof tree which is now an inner node)
      *
      * @param newGoals the goals associated with node's children

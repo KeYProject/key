@@ -22,7 +22,6 @@ package org.key_project.prover.engine;
  */
 public interface TaskStartedInfo {
 
-
     /**
      * Enumerates the kinds of tasks that can be represented.
      */

@@ -17,8 +17,9 @@ public interface ProverTaskListener {
 
     /**
      * Called when progress is made on a task.
-     *
+     * <p>
      * This method is called after every single step of the task
+     * </p>
      *
      * @param position indicates how much work has been done relative to the value of {@code size}
      *        passed in {@link #taskStarted(TaskStartedInfo)}.
