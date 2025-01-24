@@ -476,7 +476,7 @@ public class LogicPrinter {
         Trigger trigger = taclet.getTrigger();
         printSchemaVariable(trigger.triggerVar());
         layouter.print("} ");
-        printTerm((Term) trigger.getTerm());
+        printTerm((Term) trigger.trigger());
         if (trigger.hasAvoidConditions()) {
             layouter.brk(1, 2);
             layouter.print(" \\avoid ");
