@@ -19,9 +19,9 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
@@ -32,6 +32,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.base.ApplyStrategyInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -510,7 +511,7 @@ public abstract class AbstractSlicer {
                 // default instance can't be used parallel.
                 ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true);
-                ApplyStrategyInfo info = null;
+                ApplyStrategyInfo<Proof,Goal> info = null;
                 try {
                     // Create location terms
                     List<Location> resultLocations =
@@ -577,7 +578,7 @@ public abstract class AbstractSlicer {
                 // default instance can't be used parallel.
                 ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true);
-                ApplyStrategyInfo info = null;
+                ApplyStrategyInfo<Proof,Goal> info = null;
                 try {
                     // Create location terms
                     List<Location> resultLocations =

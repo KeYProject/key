@@ -15,11 +15,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -119,11 +119,11 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
                     maybeMatchesRegEx.get(), services))
                 : Optional.empty();
 
-        final AutomatedRuleApplicationManager realManager = //
+        final RuleApplicationManager realManager = //
             goal.getRuleAppManager();
         goal.setRuleAppManager(null);
 
-        final AutomatedRuleApplicationManager focusManager = //
+        final RuleApplicationManager focusManager = //
             new FocussedBreakpointRuleApplicationManager(realManager, goal, focus, breakpointArg);
         goal.setRuleAppManager(focusManager);
 

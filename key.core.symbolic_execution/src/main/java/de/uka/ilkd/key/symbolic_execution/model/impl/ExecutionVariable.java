@@ -21,7 +21,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 
+import org.key_project.prover.base.ApplyStrategyInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
@@ -193,7 +193,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @throws ProofInputException Occurred Exception.
      */
     protected ExecutionValue[] instantiateValuesFromSideProof(InitConfig initConfig,
-            Services services, TermBuilder tb, ApplyStrategyInfo info, Operator resultOperator,
+            Services services, TermBuilder tb, ApplyStrategyInfo<Proof,Goal> info, Operator resultOperator,
             Term siteProofSelectTerm, Term siteProofCondition) throws ProofInputException {
         List<ExecutionValue> result =
             new ArrayList<>(info.getProof().openGoals().size());

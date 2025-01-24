@@ -1,11 +1,13 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.prover.impl;
+package org.key_project.prover.base;
 
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.proof.ProofObject;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A container class representing the final result of a proof strategy application.
@@ -34,7 +36,7 @@ import de.uka.ilkd.key.proof.Proof;
  *
  * @see org.key_project.prover.engine.ApplyStrategyInfo
  */
-public class ApplyStrategyInfo
+public class ApplyStrategyInfo<Proof extends ProofObject<@NonNull Goal>, Goal extends ProofGoal<@NonNull Goal>>
         implements org.key_project.prover.engine.ApplyStrategyInfo<Proof, Goal> {
 
     /**
@@ -47,7 +49,7 @@ public class ApplyStrategyInfo
      * One of the non-closeable goals that lead to termination of the strategy execution, if one
      * exists.
      */
-    private final Goal nonCloseableGoal;
+    private final @Nullable Goal nonCloseableGoal;
 
     /** The exception encountered during the strategy application, if any. */
     private final Throwable error;
@@ -76,7 +78,8 @@ public class ApplyStrategyInfo
      * @param appliedRuleAppsCount the number of applied rule applications
      * @param nrClosedGoals the number of successfully closed goals
      */
-    public ApplyStrategyInfo(String message, Proof proof, Throwable error, Goal nonCloseableGoal,
+    public ApplyStrategyInfo(String message, Proof proof, Throwable error,
+            @Nullable Goal nonCloseableGoal,
             long timeInMillis, int appliedRuleAppsCount, int nrClosedGoals) {
         this.message = message;
         this.proof = proof;

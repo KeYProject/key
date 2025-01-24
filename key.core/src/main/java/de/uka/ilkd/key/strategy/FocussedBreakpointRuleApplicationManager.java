@@ -14,6 +14,8 @@ import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
+import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -23,22 +25,23 @@ import org.key_project.util.collection.ImmutableSLList;
  * only filters rule applications
  */
 public class FocussedBreakpointRuleApplicationManager
-        implements DelegationBasedAutomatedRuleApplicationManager {
+        implements DelegationBasedRuleApplicationManager<Goal> {
 
-    private final AutomatedRuleApplicationManager delegate;
+    private final RuleApplicationManager<Goal> delegate;
     private final Optional<String> breakpoint;
 
-    private FocussedBreakpointRuleApplicationManager(AutomatedRuleApplicationManager delegate,
+    private FocussedBreakpointRuleApplicationManager(RuleApplicationManager<Goal> delegate,
             Optional<String> breakpoint) {
         this.delegate = delegate;
         this.breakpoint = breakpoint;
     }
 
-    public FocussedBreakpointRuleApplicationManager(AutomatedRuleApplicationManager delegate,
+    public FocussedBreakpointRuleApplicationManager(RuleApplicationManager<Goal> delegate,
             Goal goal, Optional<PosInOccurrence> focussedSubterm,
             Optional<String> breakpoint) {
+        // noinspection unchecked
         this(focussedSubterm.map(pio -> new FocussedRuleApplicationManager(delegate, goal, pio))
-                .map(AutomatedRuleApplicationManager.class::cast).orElse(delegate),
+                .map(RuleApplicationManager.class::cast).orElse(delegate),
             breakpoint);
 
         clearCache();
@@ -50,8 +53,8 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public AutomatedRuleApplicationManager copy() {
-        return (AutomatedRuleApplicationManager) clone();
+    public RuleApplicationManager<Goal> copy() {
+        return (RuleApplicationManager<Goal>) clone();
     }
 
     @Override
@@ -60,14 +63,13 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public org.key_project.prover.rules.RuleApp peekNext() {
+    public RuleApp peekNext() {
         return delegate.peekNext();
     }
 
     @Override
-    public org.key_project.prover.rules.RuleApp next() {
-        final org.key_project.prover.rules.RuleApp app = delegate.next();
-        return app;
+    public RuleApp next() {
+        return delegate.next();
     }
 
     @Override
@@ -76,18 +78,18 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public void ruleAdded(org.key_project.prover.rules.RuleApp rule, PosInOccurrence pos) {
+    public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
         if (mayAddRule(rule, pos)) {
             delegate.ruleAdded(rule, pos);
         }
     }
 
     @Override
-    public void rulesAdded(ImmutableList<? extends org.key_project.prover.rules.RuleApp> rules,
+    public void rulesAdded(ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos) {
-        ImmutableList<org.key_project.prover.rules.RuleApp> applicableRules = //
+        ImmutableList<RuleApp> applicableRules = //
             ImmutableSLList.nil();
-        for (org.key_project.prover.rules.RuleApp r : rules) {
+        for (RuleApp r : rules) {
             if (mayAddRule(r, pos)) {
                 applicableRules = applicableRules.prepend(r);
             }
@@ -125,9 +127,9 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
-    public AutomatedRuleApplicationManager getDelegate() {
-        if (delegate instanceof FocussedRuleApplicationManager) {
-            return ((FocussedRuleApplicationManager) delegate).getDelegate();
+    public RuleApplicationManager<Goal> getDelegate() {
+        if (delegate instanceof FocussedRuleApplicationManager focussedManager) {
+            return focussedManager.getDelegate();
         } else {
             return delegate;
         }

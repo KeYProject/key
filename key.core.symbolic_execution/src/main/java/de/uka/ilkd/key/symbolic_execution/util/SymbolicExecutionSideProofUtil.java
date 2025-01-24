@@ -24,7 +24,6 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
@@ -40,6 +39,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
+import org.key_project.prover.base.ApplyStrategyInfo;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
@@ -116,7 +116,7 @@ public final class SymbolicExecutionSideProofUtil {
             String description, String methodTreatment, String loopTreatment, String queryTreatment,
             String splittingOption, boolean addNamesToServices) throws ProofInputException {
         // Execute side proof
-        ApplyStrategyInfo info = startSideProof(proof, sideProofEnvironment, sequentToProve,
+        ApplyStrategyInfo<Proof,Goal> info = startSideProof(proof, sideProofEnvironment, sequentToProve,
             methodTreatment, loopTreatment, queryTreatment, splittingOption);
         try {
             // Extract results and conditions from side proof
@@ -181,7 +181,7 @@ public final class SymbolicExecutionSideProofUtil {
             String queryTreatment, String splittingOption, boolean addNamesToServices)
             throws ProofInputException {
         // Execute side proof
-        ApplyStrategyInfo info = startSideProof(proof, sideProofEnvironment, sequentToProve,
+        ApplyStrategyInfo<Proof,Goal> info = startSideProof(proof, sideProofEnvironment, sequentToProve,
             methodTreatment, loopTreatment, queryTreatment, splittingOption);
         try {
             // Extract relevant things
@@ -670,7 +670,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The operator term of the formula with the given {@link Operator}.
      * @throws ProofInputException Occurred Exception.
      */
-    public static Term extractOperatorTerm(ApplyStrategyInfo info, Operator operator)
+    public static Term extractOperatorTerm(ApplyStrategyInfo<Proof,Goal> info, Operator operator)
             throws ProofInputException {
         // Make sure that valid parameters are given
         assert info != null;
@@ -843,7 +843,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @param description The description.
      * @param info The {@link ApplyStrategyInfo} to store or dispose its {@link Proof}.
      */
-    public static void disposeOrStore(String description, ApplyStrategyInfo info) {
+    public static void disposeOrStore(String description, ApplyStrategyInfo<Proof,Goal> info) {
         if (info != null) {
             if (SideProofStore.DEFAULT_INSTANCE.isEnabled()) {
                 SideProofStore.DEFAULT_INSTANCE.addProof(description, info.getProof());

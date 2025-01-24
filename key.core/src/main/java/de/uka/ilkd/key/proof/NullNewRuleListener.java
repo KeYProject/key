@@ -5,6 +5,7 @@ package de.uka.ilkd.key.proof;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
 
 /**

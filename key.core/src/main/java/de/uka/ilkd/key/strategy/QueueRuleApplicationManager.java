@@ -12,6 +12,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.Feature;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
@@ -20,7 +21,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Implementation of {@link AutomatedRuleApplicationManager} that stores possible {@link RuleApp}s
+ * Implementation of {@link RuleApplicationManager} that stores possible {@link RuleApp}s
  * in a priority queue. The element with highest priority in the queue can be obtained via
  * {@link #next()}. This operation will remove the element from the queue. The priority of a given
  * {@link RuleApp} corresponds to its {@link RuleAppCost}. A {@link RuleApp} can be equipped with a
@@ -28,7 +29,7 @@ import org.jspecify.annotations.Nullable;
  * {@link RuleApp} is computed according to a given {@link Strategy} (see
  * {@link Feature#computeCost(org.key_project.prover.rules.RuleApp, PosInOccurrence, Goal, de.uka.ilkd.key.strategy.feature.MutableState)}).
  */
-public class QueueRuleApplicationManager implements AutomatedRuleApplicationManager {
+public class QueueRuleApplicationManager implements RuleApplicationManager<Goal> {
     public static final AtomicLong PERF_QUEUE_OPS = new AtomicLong();
     public static final AtomicLong PERF_PEEK = new AtomicLong();
     public static final AtomicLong PERF_CREATE_CONTAINER = new AtomicLong();
@@ -375,8 +376,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     }
 
     @Override
-    public AutomatedRuleApplicationManager copy() {
-        return (AutomatedRuleApplicationManager) clone();
+    public RuleApplicationManager copy() {
+        return (RuleApplicationManager) clone();
     }
 
     @Override

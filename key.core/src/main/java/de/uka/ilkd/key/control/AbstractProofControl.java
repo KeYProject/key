@@ -14,8 +14,6 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
-import de.uka.ilkd.key.strategy.DelegationBasedAutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 
@@ -25,6 +23,8 @@ import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
+import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -619,9 +619,9 @@ public abstract class AbstractProofControl implements ProofControl {
         if (focus != null) {
             // exchange the rule app manager of that goal to filter rule apps
 
-            final AutomatedRuleApplicationManager realManager = goal.getRuleAppManager();
+            final RuleApplicationManager realManager = goal.getRuleAppManager();
             goal.setRuleAppManager(null);
-            final AutomatedRuleApplicationManager focusManager =
+            final RuleApplicationManager focusManager =
                 new FocussedRuleApplicationManager(realManager, goal, focus);
             goal.setRuleAppManager(focusManager);
         }
@@ -653,13 +653,13 @@ public abstract class AbstractProofControl implements ProofControl {
             for (final Goal goal : proof.openGoals()) {
                 // remove any filtering rule app managers that are left in the
                 // proof goals
-                final AutomatedRuleApplicationManager ruleAppManager = goal.getRuleAppManager();
+                final RuleApplicationManager ruleAppManager = goal.getRuleAppManager();
                 if (ruleAppManager instanceof FocussedRuleApplicationManager
                         || ruleAppManager instanceof FocussedBreakpointRuleApplicationManager) {
-                    final DelegationBasedAutomatedRuleApplicationManager focusManager = //
-                        (DelegationBasedAutomatedRuleApplicationManager) ruleAppManager;
+                    final DelegationBasedRuleApplicationManager focusManager = //
+                        (DelegationBasedRuleApplicationManager) ruleAppManager;
                     goal.setRuleAppManager(null);
-                    final AutomatedRuleApplicationManager realManager = focusManager.getDelegate();
+                    final RuleApplicationManager realManager = focusManager.getDelegate();
                     realManager.clearCache();
                     goal.setRuleAppManager(realManager);
                 }

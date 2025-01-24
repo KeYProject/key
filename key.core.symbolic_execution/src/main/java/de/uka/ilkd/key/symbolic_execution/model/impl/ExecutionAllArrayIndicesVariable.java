@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.prover.base.ApplyStrategyInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.*;
+import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.*;
 
 /**

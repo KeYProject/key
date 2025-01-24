@@ -32,7 +32,6 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
@@ -44,6 +43,7 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.key_project.prover.base.ApplyStrategyInfo;
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
@@ -164,7 +164,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
             }
-            ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
+            ApplyStrategyInfo<Proof, Goal> result =
+                (ApplyStrategyInfo<Proof, Goal>) info.getResult();
 
             final Proof proof = (Proof) info.getProof();
             if (proof != null && !proof.isDisposed() && !proof.closed()

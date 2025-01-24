@@ -19,6 +19,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

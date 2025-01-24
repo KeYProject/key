@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
 
@@ -19,6 +18,7 @@ import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -29,7 +29,7 @@ import org.key_project.util.collection.ImmutableList;
  * {@link #createStrategy(Proof, PosInOccurrence)}.
  *
  * This class is aware of Position in occurrences and can also be applied to inner nodes. Both
- * {@link AutomatedRuleApplicationManager} and {@link Strategy} are changed for the course of the
+ * {@link RuleApplicationManager} and {@link Strategy} are changed for the course of the
  * macro but are restored afterwards using a {@link ProverTaskListener}.
  *
  * @see ProverTaskListener
@@ -92,7 +92,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         applyStrategy.addProverTaskObserver(pml);
         // add a focus manager if there is a focus
         if (posInOcc != null) {
-            AutomatedRuleApplicationManager realManager;
+            RuleApplicationManager realManager;
             FocussedRuleApplicationManager manager;
             for (Goal goal : goals) {
                 realManager = goal.getRuleAppManager();
@@ -122,7 +122,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             // this resets the proof strategy and the managers after the automation
             // has run
             for (final Goal openGoal : proof.openGoals()) {
-                AutomatedRuleApplicationManager manager = openGoal.getRuleAppManager();
+                RuleApplicationManager manager = openGoal.getRuleAppManager();
                 // touch the manager only if necessary
                 if (manager instanceof FocussedRuleApplicationManager) {
                     manager = ((FocussedRuleApplicationManager) manager).rootManager;

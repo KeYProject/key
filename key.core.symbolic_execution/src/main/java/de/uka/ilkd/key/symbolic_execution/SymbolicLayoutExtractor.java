@@ -14,7 +14,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.base.ApplyStrategyInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
