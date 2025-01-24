@@ -31,10 +31,9 @@ public abstract class BinaryTacletAppFeature extends BinaryFeature {
 
     @Override
     final protected boolean filter(RuleApp app, PosInOccurrence pos,
-            Goal goal,
-            MutableState mState) {
-        if (app instanceof TacletApp) {
-            return filter((TacletApp) app, pos, goal, mState);
+            Goal goal, MutableState mState) {
+        if (app instanceof TacletApp tacletApp) {
+            return filter(tacletApp, pos, goal, mState);
         }
         return nonTacletValue;
     }

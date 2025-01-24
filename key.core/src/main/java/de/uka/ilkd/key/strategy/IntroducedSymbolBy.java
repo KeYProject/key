@@ -20,16 +20,16 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     private final Name ruleSetName;
     private final Name schemaVar;
-    private final ProjectionToTerm term;
+    private final ProjectionToTerm<Goal> term;
 
-    public static Feature<Goal> create(ProjectionToTerm termWithTopLevelOpToCheck,
+    public static Feature<Goal> create(ProjectionToTerm<Goal> termWithTopLevelOpToCheck,
             String ruleSetName,
             String schemaVar) {
         return new IntroducedSymbolBy(termWithTopLevelOpToCheck, new Name(ruleSetName),
             new Name(schemaVar));
     }
 
-    protected IntroducedSymbolBy(ProjectionToTerm termWithTopLevelOpToCheck, Name ruleSetName,
+    protected IntroducedSymbolBy(ProjectionToTerm<Goal> termWithTopLevelOpToCheck, Name ruleSetName,
             Name schemaVar) {
         this.term = termWithTopLevelOpToCheck;
         this.ruleSetName = ruleSetName;

@@ -40,9 +40,8 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
             return false;
         }
         for (Term aList1 : list1) {
-            final Term te1 = aList1;
             for (Term aList2 : list2) {
-                if (!lessThan(te1, aList2, focus, currentGoal)) {
+                if (!lessThan(aList1, aList2, focus, currentGoal)) {
                     return false;
                 }
             }

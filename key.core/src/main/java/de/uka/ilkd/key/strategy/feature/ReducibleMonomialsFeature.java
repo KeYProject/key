@@ -20,15 +20,16 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * reduction ordering) by adding or subtracting <code>divisorSV</code>
  */
 public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
-    private final ProjectionToTerm dividend, divisor;
+    private final ProjectionToTerm<Goal> dividend, divisor;
 
-    private ReducibleMonomialsFeature(ProjectionToTerm dividend, ProjectionToTerm divisor) {
+    private ReducibleMonomialsFeature(ProjectionToTerm<Goal> dividend,
+            ProjectionToTerm<Goal> divisor) {
         this.dividend = dividend;
         this.divisor = divisor;
     }
 
-    public static Feature<Goal> createReducible(ProjectionToTerm dividend,
-            ProjectionToTerm divisor) {
+    public static Feature<Goal> createReducible(ProjectionToTerm<Goal> dividend,
+            ProjectionToTerm<Goal> divisor) {
         return new ReducibleMonomialsFeature(dividend, divisor) {
             protected boolean checkReducibility(Monomial mDividend, Monomial mDivisor) {
                 return mDivisor.reducible(mDividend);
@@ -36,7 +37,8 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         };
     }
 
-    public static Feature<Goal> createDivides(ProjectionToTerm dividend, ProjectionToTerm divisor) {
+    public static Feature<Goal> createDivides(ProjectionToTerm<Goal> dividend,
+            ProjectionToTerm<Goal> divisor) {
         return new ReducibleMonomialsFeature(dividend, divisor) {
             protected boolean checkReducibility(Monomial mDividend, Monomial mDivisor) {
                 return mDivisor.divides(mDividend);

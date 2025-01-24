@@ -24,22 +24,22 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  */
 public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
 
-    private final ProjectionToTerm left, right, leftCoeff, rightCoeff;
+    private final ProjectionToTerm<Goal> left, right, leftCoeff, rightCoeff;
 
-    protected PolynomialValuesCmpFeature(ProjectionToTerm left, ProjectionToTerm right,
-            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
+    protected PolynomialValuesCmpFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         this.left = left;
         this.right = right;
         this.leftCoeff = leftCoeff;
         this.rightCoeff = rightCoeff;
     }
 
-    public static Feature<Goal> lt(ProjectionToTerm left, ProjectionToTerm right) {
+    public static Feature<Goal> lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
         return lt(left, right, null, null);
     }
 
-    public static Feature<Goal> lt(ProjectionToTerm left, ProjectionToTerm right,
-            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
+    public static Feature<Goal> lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
             protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
                 return leftPoly.valueLess(rightPoly);
@@ -47,12 +47,12 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
         };
     }
 
-    public static Feature<Goal> leq(ProjectionToTerm left, ProjectionToTerm right) {
+    public static Feature<Goal> leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
         return leq(left, right, null, null);
     }
 
-    public static Feature<Goal> leq(ProjectionToTerm left, ProjectionToTerm right,
-            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
+    public static Feature<Goal> leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
             protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
                 return leftPoly.valueLeq(rightPoly);
@@ -60,12 +60,12 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
         };
     }
 
-    public static Feature<Goal> eq(ProjectionToTerm left, ProjectionToTerm right) {
+    public static Feature<Goal> eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
         return eq(left, right, null, null);
     }
 
-    public static Feature<Goal> eq(ProjectionToTerm left, ProjectionToTerm right,
-            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
+    public static Feature<Goal> eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
             protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
                 return leftPoly.valueEq(rightPoly);
@@ -73,12 +73,12 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
         };
     }
 
-    public static Feature<Goal> divides(ProjectionToTerm left, ProjectionToTerm right) {
+    public static Feature<Goal> divides(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
         return divides(left, right, null, null);
     }
 
-    public static Feature<Goal> divides(ProjectionToTerm left, ProjectionToTerm right,
-            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
+    public static Feature<Goal> divides(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
             protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
                 // we currently only support constant polynomials
@@ -104,7 +104,8 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
 
     protected abstract boolean compare(Polynomial leftPoly, Polynomial rightPoly);
 
-    private Polynomial getPolynomial(ProjectionToTerm polyProj, ProjectionToTerm coeffProj,
+    private Polynomial getPolynomial(ProjectionToTerm<Goal> polyProj,
+            ProjectionToTerm<Goal> coeffProj,
             TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
         final Polynomial poly =

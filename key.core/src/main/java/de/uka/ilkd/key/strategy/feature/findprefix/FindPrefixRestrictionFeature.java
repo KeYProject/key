@@ -19,7 +19,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
     public enum PrefixChecker {
-
         // checks, whether the position in occurrence is in the antecedent
         ANTEC(new AntecChecker()),
         // checks, whether the position in occurrence is in the succedent
@@ -61,7 +60,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
         PosInOccurrence modifyPosistion(
                 PosInOccurrence pos) {
-            return modifier.modifyPosistion(pos);
+            return modifier.modifyPosition(pos);
         }
     }
 

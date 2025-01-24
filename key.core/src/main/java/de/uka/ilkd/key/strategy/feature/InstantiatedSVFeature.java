@@ -19,7 +19,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  */
 public class InstantiatedSVFeature extends BinaryTacletAppFeature {
 
-    private final ProjectionToTerm instProj;
+    private final ProjectionToTerm<Goal> instProj;
 
     public static Feature<Goal> create(Name svName) {
         return new InstantiatedSVFeature(svName);

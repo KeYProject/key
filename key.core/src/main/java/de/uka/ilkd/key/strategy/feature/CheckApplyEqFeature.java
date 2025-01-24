@@ -41,10 +41,10 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
     }
 
     private boolean isNotSelfApplication(PosInOccurrence pos,
-            AssumesFormulaInstantiation ifInst) {
-        if (!(ifInst instanceof AssumesFormulaInstSeq)
-                || ifInst.getSequentFormula() != pos.sequentFormula()
-                || ((AssumesFormulaInstSeq) ifInst).inAntecedent() != pos.isInAntec()) {
+            AssumesFormulaInstantiation assumesInstantiation) {
+        if (!(assumesInstantiation instanceof AssumesFormulaInstSeq assumesFormulaInstSeq)
+                || assumesInstantiation.getSequentFormula() != pos.sequentFormula()
+                || assumesFormulaInstSeq.inAntecedent() != pos.isInAntec()) {
             return true;
         }
 

@@ -21,14 +21,14 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * "A critical-pair/completion algorithm for finitely generated ideals in rings"
  */
 public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
-    private final ProjectionToTerm a, b;
+    private final ProjectionToTerm<Goal> a, b;
 
-    private TrivialMonomialLCRFeature(ProjectionToTerm a, ProjectionToTerm b) {
+    private TrivialMonomialLCRFeature(ProjectionToTerm<Goal> a, ProjectionToTerm<Goal> b) {
         this.a = a;
         this.b = b;
     }
 
-    public static Feature<Goal> create(ProjectionToTerm a, ProjectionToTerm b) {
+    public static Feature<Goal> create(ProjectionToTerm<Goal> a, ProjectionToTerm<Goal> b) {
         return new TrivialMonomialLCRFeature(a, b);
     }
 
