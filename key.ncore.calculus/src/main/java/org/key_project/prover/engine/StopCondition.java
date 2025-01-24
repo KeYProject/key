@@ -14,29 +14,27 @@ import org.key_project.prover.proof.ProofGoal;
  * <p>
  * The first check is done before a rule is applied on a {@link G} via
  * {@link #isGoalAllowed(ProofGoal, int, long, long, int)}. If this
- * method returns {@code false} the strategy stops and the reason shown to the user is computed via
- * {@link #getGoalNotAllowedMessage(ProofGoal, int, long, long, int)}.
+ * method returns {@code false} the strategy stops and the reason shown to the user is computed
+ * via {@link #getGoalNotAllowedMessage(ProofGoal, int, long, long, int)}.
  * </p>
  * <p>
  * The second check is after a rule was applied via
  * {@link #shouldStop(int, long, long, int, SingleRuleApplicationInfo)}.
  * If this method returns {@code true} the strategy stops and the reason shown to the user is
- * computed via
- * {@link #getStopMessage(int, long, long, int, SingleRuleApplicationInfo)}.
+ * computed via {@link #getStopMessage(int, long, long, int, SingleRuleApplicationInfo)}.
  * </p>
  * <p>
  * <b>Attention: </b> It is possible that a {@link StopCondition} has to check one {@link ProofGoal}
  * with the same underlying sequent multiple times. It is required that the called check method
- * always returns the
- * same result.
+ * always returns the same result.
  * </p>
  *
  * @author Martin Hentschel
  */
 public interface StopCondition<G extends ProofGoal<G>> {
     /**
-     * Returns the maximal amount of work needed to complete the task, used to display a progress
-     * bar. Pass {@code 0} to indicate unknown size.
+     * Returns the maximal amount of work needed to complete the task, used to display a
+     * progress bar. Pass {@code 0} to indicate unknown size.
      *
      * @param maxApplications The defined maximal number of rules to apply.
      * @param timeout The defined timeout in ms or {@code -1} if disabled.
@@ -46,14 +44,14 @@ public interface StopCondition<G extends ProofGoal<G>> {
 
     /**
      * Checks if it is allowed to apply the next rule on the selected {@link ProofGoal} chosen by
-     * the
-     * {@link GoalChooser} before it is applied. If it is not allowed the apply strategy will stop.
+     * the {@link GoalChooser} before it is applied. If it is not allowed the apply strategy
+     * will stop.
      *
      * @param goal The current {@link ProofGoal} on which the next rule will be applied.
      * @param maxApplications The defined maximal number of rules to apply.
      * @param timeout The defined timeout in ms or {@code -1} if disabled.
-     * @param startTime The timestamp when the apply strategy has started, computed via
-     *        {@link System#currentTimeMillis()}
+     * @param startTime The timestamp when the proof search (apply strategy) has started, computed
+     *        via {@link System#currentTimeMillis()}
      * @param countApplied The number of already applied rules.
      * @return {@code true} rule application is allowed, {@code false} rule application is not
      *         allowed so stop apply strategy
@@ -69,8 +67,8 @@ public interface StopCondition<G extends ProofGoal<G>> {
      * @param goal The current {@link ProofGoal} on which the next rule will be applied.
      * @param maxApplications The defined maximal number of rules to apply.
      * @param timeout The defined timeout in ms or {@code -1} if disabled.
-     * @param startTime The timestamp when the apply strategy has started, computed via
-     *        {@link System#currentTimeMillis()}
+     * @param startTime The timestamp when the apply strategy has started,
+     *        computed via {@link System#currentTimeMillis()}
      * @param countApplied The number of already applied rules.
      * @return description of the reason why automatic proof search has stopped
      */

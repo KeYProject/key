@@ -92,15 +92,15 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ApplyStrategyInfo stratInfo) {
         this(info.getMacro(), info.getGoals(), info.getProof(),
             info.getTime() + stratInfo.getTime(),
-            info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
-            info.getClosedGoals() + stratInfo.getClosedGoals());
+            info.getAppliedRules() + stratInfo.getNumberOfAppliedRuleApps(),
+            info.getClosedGoals() + stratInfo.getNumberOfClosedGoals());
     }
 
     ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ApplyStrategyInfo stratInfo,
             ImmutableList<Goal> goals) {
         this(info.getMacro(), goals, (Proof) stratInfo.getProof(),
             info.getTime() + stratInfo.getTime(),
-            info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
+            info.getAppliedRules() + stratInfo.getNumberOfAppliedRuleApps(),
             goals.size() <= info.getGoals().size() ? (info.getGoals().size() - goals.size()) : 0);
     }
 

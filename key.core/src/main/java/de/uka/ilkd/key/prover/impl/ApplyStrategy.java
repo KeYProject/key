@@ -303,7 +303,7 @@ public class ApplyStrategy extends AbstractProverCore<Proof, Goal> {
         assert result != null; // CS
         proof.addAutoModeTime(result.getTime());
         fireTaskFinished(new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
-            result.getAppliedRuleApps(), result.getClosedGoals()));
+            result.getNumberOfAppliedRuleApps(), result.getNumberOfClosedGoals()));
     }
 
     /**
