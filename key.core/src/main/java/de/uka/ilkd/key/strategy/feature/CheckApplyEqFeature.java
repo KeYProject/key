@@ -42,7 +42,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
             AssumesFormulaInstantiation ifInst) {
         if (!(ifInst instanceof AssumesFormulaInstSeq)
                 || ifInst.getSequentFormula() != pos.sequentFormula()
-                || ((AssumesFormulaInstSeq) ifInst).inAntec() != pos.isInAntec()) {
+                || ((AssumesFormulaInstSeq) ifInst).inAntecedent() != pos.isInAntec()) {
             return true;
         }
 

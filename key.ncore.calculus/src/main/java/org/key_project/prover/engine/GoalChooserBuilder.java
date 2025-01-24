@@ -9,7 +9,7 @@ import org.key_project.prover.proof.ProofObject;
 import org.jspecify.annotations.NonNull;
 
 /**
- * interface to be implemented by builders returning a goal chooser
+ * Interface to be implemented by builders returning a goal chooser.
  */
 public interface GoalChooserBuilder<P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> {
 

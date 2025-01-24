@@ -777,8 +777,9 @@ public class TestApplyTaclet {
 
         Sequent correctSeq = proof[p_proof + 1].root().sequent();
 
-        Term resultFormula = (Term) goals.head().sequent().getFormulabyNr(1).formula();
-        Term correctFormula = (Term) correctSeq.getFormulabyNr(1).formula();
+        Sequent sequentFormulas = goals.head().sequent();
+        Term resultFormula = (Term) sequentFormulas.getFormulaByNr(1).formula();
+        Term correctFormula = (Term) correctSeq.getFormulaByNr(1).formula();
 
         assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(resultFormula, correctFormula),
             "Wrong result. Expected:"
@@ -853,10 +854,12 @@ public class TestApplyTaclet {
         assertEquals(1, goals.size(), "Expected one goal.");
 
         // the content of the diamond must not have changed
+        Sequent sequentFormulas1 = proof[22].root().sequent();
         ProgramElement expected =
-            ((Term) proof[22].root().sequent().getFormulabyNr(1).formula()).javaBlock().program();
+            ((Term) sequentFormulas1.getFormulaByNr(1).formula()).javaBlock().program();
+        Sequent sequentFormulas = goals.head().sequent();
         ProgramElement is =
-            ((Term) goals.head().sequent().getFormulabyNr(1).formula().sub(0)).javaBlock()
+            ((Term) sequentFormulas.getFormulaByNr(1).formula().sub(0)).javaBlock()
                     .program();
         assertEquals(expected, is, "Context has been thrown away.");
 
@@ -892,8 +895,9 @@ public class TestApplyTaclet {
             TacletForTests.parsePrg("{try{ ; while (1==1) {if (1==2) {break;}} return 1==3; "
                 + "int i=17; } catch (Exception e) { return null;}}");
 
+        Sequent sequentFormulas = goals.head().sequent();
         ProgramElement is =
-            ((Term) goals.head().sequent().getFormulabyNr(1).formula()).javaBlock().program();
+            ((Term) sequentFormulas.getFormulaByNr(1).formula()).javaBlock().program();
         // FIXME weigl: This test case is spurious:
         // actual.toString() == expected.toString() but internally there is a difference.
         assertTrue(
@@ -935,8 +939,9 @@ public class TestApplyTaclet {
             TacletForTests.parsePrg("{try{while (1==1) {if (1==2) {break;}} return 1==3; "
                 + "int i=17; } catch (Exception e) { return null;}}");
 
+        Sequent sequentFormulas = goals.head().sequent();
         ProgramElement is =
-            ((Term) goals.head().sequent().getFormulabyNr(1).formula()).javaBlock().program();
+            ((Term) sequentFormulas.getFormulaByNr(1).formula()).javaBlock().program();
         assertTrue(
             expected.equalsModProperty(is, RENAMING_SOURCE_ELEMENT_PROPERTY,
                 new NameAbstractionTable()),

@@ -23,7 +23,7 @@ public class InstantiationEntry<E> {
      * @param instantiation the instantiation to be stored
      */
     public InstantiationEntry(@NonNull E instantiation) {
-        assert instantiation != null : "An instantiation for a schemavariable cannot be null.";
+        assert instantiation != null : "An instantiation for a SchemaVariable cannot be null.";
         this.instantiation = instantiation;
     }
 

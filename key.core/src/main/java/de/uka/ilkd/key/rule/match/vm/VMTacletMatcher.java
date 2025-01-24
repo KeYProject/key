@@ -198,22 +198,24 @@ public class VMTacletMatcher implements TacletMatcher {
 
         for (final AssumesFormulaInstantiation candidateInst : p_toMatch) {
             // Part of fix for #1716: match antecedent with antecedent, succ with succ
-            boolean candidateInAntec = (candidateInst instanceof AssumesFormulaInstSeq)
-                    // Only IfFormulaInstSeq has inAntec() property ...
-                    && (((AssumesFormulaInstSeq) candidateInst).inAntec())
-                    || !(candidateInst instanceof AssumesFormulaInstSeq)
-                            // ... and it seems we don't need the check for other implementations.
-                            // Default: just take the next ante formula, else succ formula
-                            && anteIterator.hasNext();
+            boolean candidateInAntec =
+                (candidateInst instanceof AssumesFormulaInstSeq candidateInSeq)
+                        // Only IfFormulaInstSeq has inAntec() property ...
+                        && (candidateInSeq.inAntecedent())
+                        || !(candidateInst instanceof AssumesFormulaInstSeq)
+                                // ... and it seems we don't need the check for other
+                                // implementations.
+                                // Default: just take the next ante formula, else succ formula
+                                && anteIterator.hasNext();
 
-            Iterator<SequentFormula> itIfSequent = candidateInAntec ? anteIterator : succIterator;
+            final var assumesSequentIterator = candidateInAntec ? anteIterator : succIterator;
             // Fix end
 
-            assert itIfSequent.hasNext()
+            assert assumesSequentIterator.hasNext()
                     : "p_toMatch and assumes sequent must have same number of elements";
             newMC = matchAssumes(
                 ImmutableSLList.<AssumesFormulaInstantiation>nil().prepend(candidateInst),
-                itIfSequent.next().formula(), p_matchCond, p_services).matchConditions();
+                assumesSequentIterator.next().formula(), p_matchCond, p_services).matchConditions();
 
             if (newMC.isEmpty()) {
                 return null;

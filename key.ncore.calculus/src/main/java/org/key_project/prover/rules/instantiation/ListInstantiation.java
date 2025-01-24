@@ -6,7 +6,7 @@ package org.key_project.prover.rules.instantiation;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- * This class is used to store the instantiation of a schemavariable if it is a ProgramElement.
+ * This class is used to store the instantiation of a SchemaVariable if it is a ProgramElement.
  */
 
 public class ListInstantiation<T> extends InstantiationEntry<ImmutableArray<T>> {

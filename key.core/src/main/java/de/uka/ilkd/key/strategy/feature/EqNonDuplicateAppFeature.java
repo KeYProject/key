@@ -25,7 +25,7 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
             Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        if (!app.ifInstsComplete()) {
+        if (!app.assumesInstantionsComplete()) {
             return true;
         }
 

@@ -340,7 +340,8 @@ public final class TruthValueTracingUtil {
             }
         }
         if (isClosingRule(tacletApp.taclet())) {
-            if (tacletApp.ifInstsComplete() && tacletApp.assumesFormulaInstantiations() != null) {
+            if (tacletApp.assumesInstantionsComplete()
+                    && tacletApp.assumesFormulaInstantiations() != null) {
                 for (AssumesFormulaInstantiation ifInst : tacletApp
                         .assumesFormulaInstantiations()) {
                     assert ifInst instanceof AssumesFormulaInstSeq;
@@ -348,7 +349,7 @@ public final class TruthValueTracingUtil {
                     TermLabel label = term.getLabel(termLabelName);
                     if (label instanceof FormulaTermLabel) {
                         result.add(new LabelOccurrence((FormulaTermLabel) label,
-                            ((AssumesFormulaInstSeq) ifInst).inAntec()));
+                            ((AssumesFormulaInstSeq) ifInst).inAntecedent()));
                     }
                 }
             }
@@ -559,7 +560,8 @@ public final class TruthValueTracingUtil {
                 }
                 // Check if instantiations
                 if (parentRuleApp instanceof TacletApp ta) {
-                    if (ta.ifInstsComplete() && ta.assumesFormulaInstantiations() != null) {
+                    if (ta.assumesInstantionsComplete()
+                            && ta.assumesFormulaInstantiations() != null) {
                         for (AssumesFormulaInstantiation ifInst : ta
                                 .assumesFormulaInstantiations()) {
                             checkForNewMinorIds(childNode,

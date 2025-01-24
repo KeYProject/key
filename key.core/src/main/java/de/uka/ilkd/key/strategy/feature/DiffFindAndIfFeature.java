@@ -39,7 +39,7 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
             final SequentFormula ifFormula = iffi.getSequentFormula();
 
             final boolean result =
-                findIsInAntec != iffi.inAntec() || !findFormula.equals(ifFormula);
+                findIsInAntec != iffi.inAntecedent() || !findFormula.equals(ifFormula);
             if (!result) {
                 return false;
             }

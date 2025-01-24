@@ -30,12 +30,12 @@ public abstract class AbstractProverCore<P extends ProofObject<G>, G extends Pro
      * propagation method for the event that a task started
      *
      * @param startedInfo an information object describing the started task
-     *        (may contain, for example, the maximal number of steps to be performed by the current
-     *        task)
+     *        (may contain, for example, the maximal number of steps
+     *        to be performed by the current task)
      */
     protected void fireTaskStarted(TaskStartedInfo startedInfo) {
-        // no need to synchronize here as we use immutable list and hence
-        // the add/remove task observer methods won't interfere
+        // proverTaskObserver is a thread safe implementation, hence we do not need
+        // to synchronize here
         for (final ProverTaskListener ptl : proverTaskObservers) {
             ptl.taskStarted(startedInfo);
         }
@@ -45,8 +45,8 @@ public abstract class AbstractProverCore<P extends ProofObject<G>, G extends Pro
      * propagation of task progress information to be displayed e.g. in a progress bar
      */
     protected void fireTaskProgress() {
-        // no need to synchronize here as we use immutable list and hence
-        // the add/remove task observer methods won't interfere
+        // proverTaskObserver is a thread safe implementation, hence we do not need
+        // to synchronize here
         for (final ProverTaskListener ptl : proverTaskObservers) {
             ptl.taskProgress(countApplied);
         }
@@ -59,8 +59,8 @@ public abstract class AbstractProverCore<P extends ProofObject<G>, G extends Pro
      *        rules
      */
     protected void fireTaskFinished(TaskFinishedInfo info) {
-        // no need to synchronize here as we use immutable list and hence
-        // the add/remove task observer methods won't interfere
+        // proverTaskObserver is a thread safe implementation, hence we do not need
+        // to synchronize here
         for (final ProverTaskListener ptl : proverTaskObservers) {
             ptl.taskFinished(info);
         }
@@ -73,6 +73,8 @@ public abstract class AbstractProverCore<P extends ProofObject<G>, G extends Pro
      */
     @Override
     public void addProverTaskObserver(ProverTaskListener observer) {
+        // proverTaskObserver is a thread safe implementation, hence we do not need
+        // to synchronize here
         proverTaskObservers.add(observer);
     }
 
@@ -83,6 +85,8 @@ public abstract class AbstractProverCore<P extends ProofObject<G>, G extends Pro
      */
     @Override
     public void removeProverTaskObserver(final ProverTaskListener observer) {
+        // proverTaskObserver is a thread safe implementation, hence we do not need
+        // to synchronize here
         proverTaskObservers.removeIf(o -> o.equals(observer));
     }
 

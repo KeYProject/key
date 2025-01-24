@@ -247,7 +247,8 @@ public class PosTacletApp extends TacletApp {
      */
     @Override
     public boolean complete() {
-        return posInOccurrence() != null && uninstantiatedVars().isEmpty() && ifInstsComplete();
+        return posInOccurrence() != null && uninstantiatedVars().isEmpty()
+                && assumesInstantionsComplete();
     }
 
     /**

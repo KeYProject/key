@@ -17,7 +17,7 @@ import org.jspecify.annotations.Nullable;
 public interface GoalChooser<P extends @Nullable ProofObject<@NonNull G>, G extends @Nullable ProofGoal<@NonNull G>> {
 
     /**
-     * Initialise this DefaultGoalChooser for use with a given Proof and a list of goals.
+     * Initialise this GoalChooser for use with a given Proof and a list of goals.
      *
      * @param p_proof *param p_goals the initial list of goals
      */

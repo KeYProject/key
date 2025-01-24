@@ -58,7 +58,7 @@ public class SimpleFilteredStrategy implements Strategy {
         }
 
         long cost = goal.getTime();
-        if (app instanceof TacletApp && !((TacletApp) app).ifInstsComplete()) {
+        if (app instanceof TacletApp && !((TacletApp) app).assumesInstantionsComplete()) {
             cost += IF_NOT_MATCHED_MALUS;
         }
 

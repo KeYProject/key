@@ -23,6 +23,7 @@ import org.jspecify.annotations.NonNull;
 
 public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App extends @NonNull RuleApp>
         implements RuleExecutor<Goal> {
+
     protected static final String AUTO_NAME = "_taclet";
 
     protected final Taclet taclet;
@@ -37,8 +38,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      *
      * @param p_goal the {@link Goal} on which the taclet is applied
      * @param p_list the list of {@link AssumesFormulaInstantiation} containing the instantiations
-     *        for
-     *        the assumes formulas
+     *        for the assumes formulas
      * @param p_matchCond the {@link MatchConditions} with the instantiations of the schema
      *        variables
      * @param p_numberOfNewGoals the number of new goals the {@link Taclet} creates in any case
@@ -68,7 +68,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
 
             for (final AssumesFormulaInstantiation inst : p_list) {
                 if (!(inst instanceof AssumesFormulaInstSeq)) {
-                    // build the if obligation formula
+                    // build the assumes-obligation formula
                     assumesPart = inst.getSequentFormula().formula();
 
                     // negate formulas of the assumes-succedent
@@ -133,24 +133,25 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
     protected abstract Term and(Term t1, Term t2, Goal p_goal);
 
     /**
-     * adds SequentFormula to antecedent or succedent depending on position information or the
-     * boolean antec contrary to "addToPos" frm will not be modified
+     * adds the given SequentFormula to antecedent or succedent depending on position information
+     * or the boolean {@code addToAntecedent} contrary to "addToPos" the formula {@code frm} will
+     * not be modified
      *
      * @param frm the {@link SequentFormula} that should be added
      * @param currentSequent the {@link SequentChangeInfo} which is the current (intermediate)
      *        result of applying the taclet
      * @param pos the {@link PosInOccurrence} describing the place in the sequent
-     * @param antec boolean true(false) if elements have to be added to the antecedent(succedent)
-     *        (only looked at if pos == null)
+     * @param addToAntecedent boolean true(false) if elements have to be added to the
+     *        antecedent(succedent) (only looked at if {@code pos == null})
      */
     private void addToPosWithoutInst(SequentFormula frm, SequentChangeInfo currentSequent,
-            PosInOccurrence pos, boolean antec) {
+            PosInOccurrence pos, boolean addToAntecedent) {
         if (pos != null) {
             currentSequent.combine(currentSequent.sequent().addFormula(frm, pos));
         } else {
-            // cf : formula to be added , 1. true/false: antec/succ,
+            // cf : formula to be added , 1. true/false: addToAntecedent/succ,
             // 2. true: at head
-            currentSequent.combine(currentSequent.sequent().addFormula(frm, antec, true));
+            currentSequent.combine(currentSequent.sequent().addFormula(frm, addToAntecedent, true));
         }
     }
 
@@ -159,10 +160,10 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * of the given goal)
      *
      * @param rules the rules to be added
-     * @param goal the goal describing the node where the rules should be added
-     * @param services the LogicServices encapsulating all logic and program information
-     * @param matchCond the MatchConditions containing in particular the instantiations of the
-     *        schemavariables
+     * @param goal the {@link Goal} describing the node where the rules should be added
+     * @param services the {@link LogicServices} encapsulating all logic and program information
+     * @param matchCond the {@link MatchConditions} containing in particular the instantiations of
+     *        the schemavariables
      */
     protected abstract void applyAddrule(ImmutableList<? extends Taclet> rules, Goal goal,
             LogicServices services,
@@ -177,16 +178,17 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
      * it is added at the head of the antecedent). Of course, it has to be ensured that the position
      * information describes one occurrence in the antecedent of the sequent.
      *
-     * @param semi the Semisequent with the ConstrainedFormulae to be added
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the
-     *        taclet
-     * @param pos the PosInOccurrence describing the place in the sequent or null for head of
-     *        antecedent
+     * @param semi the {@link Semisequent} with the {@link SequentFormula}s to be added
+     * @param currentSequent the {@link SequentChangeInfo} which represent {@link Sequent} the
+     *        current (intermediate) result of applying the taclet
+     * @param pos the {@link PosInOccurrence} describing the place in the sequent or null for head
+     *        of antecedent
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
      *        rewritten
-     * @param matchCond the MatchConditions containing in particular the instantiations of the
-     *        schemavariables
-     * @param services the LogicServices encapsulating all logic and program information
+     * @param matchCond the {@link MatchConditions} containing in particular the instantiations of
+     *        the
+     *        SchemaVariables
+     * @param services the {@link LogicServices} encapsulating all logic and program information
      */
     protected void addToAntec(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos,
@@ -198,18 +200,18 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
 
     /**
      * adds SequentFormula to succedent depending on position information (if none is handed over it
-     * is added at the head of the succedent). Of course it has to be ensured that the position
+     * is added at the head of the succedent). Of course, it has to be ensured that the position
      * information describes one occurrence in the succedent of the sequent.
      *
-     * @param semi the Semisequent with the the ConstrainedFormulae to be added
-     * @param pos the PosInOccurrence describing the place in the sequent or null for head of
-     *        antecedent
+     * @param semi the {@link Semisequent} with the {@link SequentFormula}s to be added
+     * @param pos the {@link PosInOccurrence} describing the place in the sequent or null for head
+     *        of antecedent
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
      *        rewritten
-     * @param matchCond the MatchConditions containing in particular the instantiations of the
-     *        schemavariables
-     * @param goal the Goal that knows the node the formulae have to be added
-     * @param services the LogicServices encapsulating all logic information
+     * @param matchCond the {@link MatchConditions} containing in particular the instantiations of
+     *        the schemavariables
+     * @param goal the {@link Goal} that knows the node the formulae have to be added
+     * @param services the {@link LogicServices} encapsulating all logic information
      */
     protected void addToSucc(Semisequent semi, SequentChangeInfo currentSequent,
             PosInOccurrence pos,
@@ -220,15 +222,15 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
     }
 
     /**
-     * replaces the constrained formula at the given position with the first formula in the given
-     * semisequent and adds possible other formulas of the semisequent starting at the position
+     * Replaces the formula at the given position with the first formula in the given
+     * semisequent and adds possible other formulas of the semisequent starting at the position.
      *
-     * @param semi the Semisequent with the the ConstrainedFormulae to be added
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the
-     *        taclet
-     * @param pos the PosInOccurrence describing the place in the sequent
-     * @param matchCond the MatchConditions containing in particular
-     * @param services the LogicServices encapsulating all logic and program information
+     * @param semi the {@link Semisequent} with the {@link SequentFormula}s to be added
+     * @param currentSequent the {@link SequentChangeInfo} which represent {@link Sequent} the
+     *        current (intermediate) result of applying the taclet
+     * @param pos the {@link PosInOccurrence} describing the place in the sequent
+     * @param matchCond the {@link MatchConditions} containing in particular
+     * @param services the {@link LogicServices} encapsulating all logic and program information
      */
     protected void replaceAtPos(Semisequent semi,
             SequentChangeInfo currentSequent, PosInOccurrence pos, MatchConditions matchCond,
@@ -244,19 +246,20 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
     }
 
     /**
-     * instantiates the constrained formulas of semisequent <code>semi</code> and adds the
-     * instantiatied formulas at the specified position to <code>goal</code>
+     * instantiates the formulas of semisequent <code>semi</code> and adds the
+     * instantiated formulas at the specified position to <code>goal</code>
      *
-     * @param semi the Semisequent with the the ConstrainedFormulae to be added
-     * @param currentSequent the Sequent which is the current (intermediate) result of applying the
-     *        taclet
-     * @param pos the PosInOccurrence describing the place in the sequent
+     * @param semi the Semisequent with the {@link SequentFormula}s to be added
+     * @param currentSequent the {@link SequentChangeInfo} which represent {@link Sequent} the
+     *        current (intermediate)
+     *        result of applying the taclet
+     * @param pos the {@link PosInOccurrence} describing the place in the sequent
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
      *        rewritten
      * @param antec boolean true(false) if elements have to be added to the antecedent(succedent)
-     *        (only looked at if pos == null)
-     * @param matchCond the MatchConditions containing in particular
-     * @param services the LogicServices encapsulating all logic and program information
+     *        (only looked at if {@code pos == null})
+     * @param matchCond the {@link MatchConditions} containing in particular
+     * @param services the {@link LogicServices} encapsulating all logic and program information
      * @param instantiationInfo additional instantiation information concerning label:
      */
     protected void addToPos(Semisequent semi,
@@ -277,7 +280,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
     }
 
     /**
-     * the given constrained formula is instantiated and then the result (usually a complete
+     * The given formula is instantiated and then the result (usually a complete
      * instantiated formula) is returned.
      *
      * @param schemaFormula the SequentFormula to be instantiated
@@ -323,14 +326,14 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
             MatchConditions mc, Goal goal, App ruleApp, LogicServices services, Object... args);
 
     /**
-     * instantiates the given semisequent with the instantiations found in Matchconditions
+     * instantiates the given semisequent with the instantiations found in the match conditions
      *
-     * @param semi the Semisequent to be instantiated
+     * @param semi the {@link Semisequent} to be instantiated
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is
      *        rewritten
-     * @param matchCond the MatchConditions including the mapping Schemavariables to concrete logic
-     *        elements
-     * @param services the LogicServices
+     * @param matchCond the {@link MatchConditions} including the mapping {@link SchemaVariable}s to
+     *        concrete logic elements
+     * @param services the {@link LogicServices} with the logic and program model information
      * @return the instantiated formulas of the semisequent as list
      */
     protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi,
@@ -338,7 +341,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
             App tacletApp, LogicServices services, Object... instantiationInfo) {
         ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
 
-        for (SequentFormula sf : semi) {
+        for (final SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(sf, services,
                 matchCond, applicationPosInOccurrence, goal, tacletApp, instantiationInfo));
         }

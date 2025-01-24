@@ -260,7 +260,7 @@ public class NoPosTacletApp extends TacletApp {
     @Override
     public boolean complete() {
         return (uninstantiatedVars().isEmpty() && taclet() instanceof NoFindTaclet
-                && ifInstsComplete());
+                && assumesInstantionsComplete());
 
     }
 

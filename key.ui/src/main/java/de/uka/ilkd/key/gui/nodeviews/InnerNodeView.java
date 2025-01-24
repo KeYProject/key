@@ -126,7 +126,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
             }
             final PosInOccurrence pos =
                 new PosInOccurrence(inst.getSequentFormula(),
-                    PosInTerm.getTopLevel(), inst.inAntec());
+                    PosInTerm.getTopLevel(), inst.inAntecedent());
             highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
         }
     }

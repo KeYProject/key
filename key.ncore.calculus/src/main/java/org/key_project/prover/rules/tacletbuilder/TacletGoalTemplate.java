@@ -14,9 +14,9 @@ import org.key_project.util.collection.ImmutableSet;
 import org.jspecify.annotations.NonNull;
 
 /**
- * this class contains the goals of the schematic theory specific rules (Taclet). There are new
- * sequents that have to be added, new rules and rule variables. The replacewith-goal is implemented
- * in subclasses
+ * This class contains the goal of a taclet. There are new
+ * sequents that have to be added, new rules and rule variables.
+ * The replacewith-goal is implemented in subclasses
  */
 public abstract class TacletGoalTemplate {
     /** stores sequent that is one of the new goals */
@@ -31,7 +31,7 @@ public abstract class TacletGoalTemplate {
     private String name = null;
 
     /**
-     * creates new Goaldescription
+     * Creates a new goal template for a taclet
      *
      * @param addedSeq new Sequent to be added
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
