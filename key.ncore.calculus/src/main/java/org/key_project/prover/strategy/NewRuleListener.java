@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.proof;
+package org.key_project.prover.strategy;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -15,7 +15,7 @@ public interface NewRuleListener {
     /**
      * Called when a new RuleApp is added
      */
-    void ruleAdded(org.key_project.prover.rules.RuleApp rule, PosInOccurrence pos);
+    void ruleAdded(RuleApp rule, PosInOccurrence pos);
 
     /**
      * Called when a collection of new RuleApps is added

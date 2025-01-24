@@ -3,7 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.proof;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.strategy.RuleApplicationManager;
+import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Interface for proof goals of a sequent proof.
@@ -24,4 +29,16 @@ public interface ProofGoal<G extends ProofGoal<G>> {
      * @return the sequent associated with this goal
      */
     Sequent sequent();
+
+    /**
+     * Perform the provided rule application on this goal and return
+     * the new goal(s), if any.
+     *
+     * @param ruleApp the {@link RuleApp} to be applied
+     * @return new goal(s)
+     */
+    ImmutableList<G> apply(@NonNull final RuleApp ruleApp);
+
+
+    RuleApplicationManager<G> getRuleAppManager();
 }

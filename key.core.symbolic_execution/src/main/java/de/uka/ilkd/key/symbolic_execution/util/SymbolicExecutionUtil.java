@@ -37,7 +37,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
@@ -67,6 +66,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.base.ApplyStrategyInfo;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableArray;
@@ -196,7 +196,7 @@ public final class SymbolicExecutionUtil {
                     .addFormula(new SequentFormula(term), false, true)
                     .sequent();
         // Return created Sequent and the used predicate to identify the value interested in.
-        ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(parentProof,
+        ApplyStrategyInfo<Proof,Goal> info = SymbolicExecutionSideProofUtil.startSideProof(parentProof,
             sideProofEnv, sequentToProve);
         try {
             // The simplified formula is the conjunction of all open goals
@@ -2922,7 +2922,7 @@ public final class SymbolicExecutionUtil {
         Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalAntecedent,
             nullExpected ? isNull : isNotNull, false);
         // Execute proof in the current thread
-        ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(),
+        ApplyStrategyInfo<Proof,Goal> info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(),
             sideProofEnv, sequentToProve, StrategyProperties.METHOD_CONTRACT,
             StrategyProperties.LOOP_INVARIANT, StrategyProperties.QUERY_ON,
             StrategyProperties.SPLITTING_NORMAL);

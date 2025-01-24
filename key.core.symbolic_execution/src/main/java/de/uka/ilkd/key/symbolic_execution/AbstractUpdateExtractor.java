@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionAllArrayIndicesVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.base.ApplyStrategyInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -1124,7 +1124,7 @@ public abstract class AbstractUpdateExtractor {
         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node,
             modalityPio, layoutCondition, updateLayoutTerm, null, false);
         // Instantiate and run proof
-        ApplyStrategyInfo info =
+        ApplyStrategyInfo<Proof, Goal> info =
             SymbolicExecutionSideProofUtil.startSideProof(getProof(), sideProofEnv, sequent,
                 StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
                 StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_NORMAL);

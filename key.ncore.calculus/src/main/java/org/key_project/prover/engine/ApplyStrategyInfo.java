@@ -6,6 +6,9 @@ package org.key_project.prover.engine;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents a contract for gathering and accessing information about the application
  * of a proof strategy during automated reasoning in the KeY system.
@@ -40,7 +43,7 @@ import org.key_project.prover.proof.ProofObject;
  * @see org.key_project.prover.proof.ProofObject
  * @see org.key_project.prover.proof.ProofGoal
  */
-public interface ApplyStrategyInfo<P extends ProofObject<G>, G extends ProofGoal<G>> {
+public interface ApplyStrategyInfo<P extends ProofObject<@NonNull G>, G extends ProofGoal<@NonNull G>> {
 
     /**
      * Retrieves the explanation or reason wjy the proof search (strategy execution) finished.
@@ -80,6 +83,7 @@ public interface ApplyStrategyInfo<P extends ProofObject<G>, G extends ProofGoal
      *
      * @return the unresolved goal of type {@code G}, or {@code null} if all goals were closed
      */
+    @Nullable
     G nonCloseableGoal();
 
     /**

@@ -12,6 +12,8 @@ import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
+import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -21,9 +23,9 @@ import org.key_project.util.collection.ImmutableSLList;
  * only filters rule applications
  */
 public class FocussedRuleApplicationManager
-        implements DelegationBasedAutomatedRuleApplicationManager {
+        implements DelegationBasedRuleApplicationManager<Goal> {
 
-    private final AutomatedRuleApplicationManager delegate;
+    private final RuleApplicationManager<Goal> delegate;
     public final QueueRuleApplicationManager rootManager;
 
     private final FormulaTag focussedFormula;
@@ -39,7 +41,7 @@ public class FocussedRuleApplicationManager
     // <code>QueueRuleApplicationManager</code>)
     private boolean onlyModifyFocussedFormula;
 
-    private FocussedRuleApplicationManager(AutomatedRuleApplicationManager delegate, Goal goal,
+    private FocussedRuleApplicationManager(RuleApplicationManager<Goal> delegate, Goal goal,
             FormulaTag focussedFormula,
             PosInOccurrence focussedSubterm,
             boolean onlyModifyFocussedFormula) {
@@ -53,7 +55,7 @@ public class FocussedRuleApplicationManager
         this.onlyModifyFocussedFormula = onlyModifyFocussedFormula;
     }
 
-    public FocussedRuleApplicationManager(AutomatedRuleApplicationManager delegate, Goal goal,
+    public FocussedRuleApplicationManager(RuleApplicationManager<Goal> delegate, Goal goal,
             PosInOccurrence focussedSubterm) {
         this(delegate, goal, goal.getFormulaTagManager().getTagForPos(focussedSubterm.topLevel()),
             focussedSubterm, true);
@@ -67,8 +69,8 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public AutomatedRuleApplicationManager copy() {
-        return (AutomatedRuleApplicationManager) clone();
+    public RuleApplicationManager<Goal> copy() {
+        return (RuleApplicationManager<Goal>) clone();
     }
 
     @Override
@@ -78,13 +80,13 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public org.key_project.prover.rules.RuleApp peekNext() {
+    public RuleApp peekNext() {
         return delegate.peekNext();
     }
 
     @Override
-    public org.key_project.prover.rules.RuleApp next() {
-        final org.key_project.prover.rules.RuleApp app = delegate.next();
+    public RuleApp next() {
+        final RuleApp app = delegate.next();
         onlyModifyFocussedFormula = false;
         return app;
     }
@@ -96,13 +98,13 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public void ruleAdded(org.key_project.prover.rules.RuleApp rule, PosInOccurrence pos) {
+    public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
         if (isRuleApplicationForFocussedFormula(rule, pos)) {
             delegate.ruleAdded(rule, pos);
         }
     }
 
-    protected boolean isRuleApplicationForFocussedFormula(org.key_project.prover.rules.RuleApp rule,
+    protected boolean isRuleApplicationForFocussedFormula(RuleApp rule,
             PosInOccurrence pos) {
         /*
          * filter the rule applications, only allow applications within the focussed subterm or to
@@ -129,9 +131,9 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public void rulesAdded(ImmutableList<? extends org.key_project.prover.rules.RuleApp> rules,
+    public void rulesAdded(ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos) {
-        ImmutableList<org.key_project.prover.rules.RuleApp> applicableRules = ImmutableSLList.nil();
+        ImmutableList<RuleApp> applicableRules = ImmutableSLList.nil();
         for (RuleApp r : rules) {
             if (isRuleApplicationForFocussedFormula(r, pos)) {
                 applicableRules = applicableRules.prepend(r);
@@ -176,7 +178,7 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
-    public AutomatedRuleApplicationManager getDelegate() {
+    public RuleApplicationManager<Goal> getDelegate() {
         return delegate;
     }
 }

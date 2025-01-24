@@ -1,18 +1,17 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy;
+package org.key_project.prover.strategy;
 
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.NewRuleListener;
-
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.NonNull;
 
 /**
  *
  */
-public interface AutomatedRuleApplicationManager extends NewRuleListener {
+public interface RuleApplicationManager<G extends ProofGoal<@NonNull G>> extends NewRuleListener {
 
     /**
      * Clear existing caches of applicable rules
@@ -25,7 +24,7 @@ public interface AutomatedRuleApplicationManager extends NewRuleListener {
      *         the method nextAndCache() or next() is called. A call of next() empties the cache
      *         again.
      */
-    org.key_project.prover.rules.RuleApp peekNext();
+    RuleApp peekNext();
 
     /**
      * @return the next rule that is supposed to be applied
@@ -35,8 +34,8 @@ public interface AutomatedRuleApplicationManager extends NewRuleListener {
     /**
      * Set the goal <code>this</code> is the rule app manager for
      */
-    void setGoal(Goal p_goal);
+    void setGoal(G p_goal);
 
-    AutomatedRuleApplicationManager copy();
+    RuleApplicationManager<G> copy();
 
 }
