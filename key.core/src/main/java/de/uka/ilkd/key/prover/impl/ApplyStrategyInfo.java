@@ -6,28 +6,76 @@ package de.uka.ilkd.key.prover.impl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
+
 /**
- * The final result of the strategy application is stored in this container and returned to the
- * instance that started the strategies.
+ * A container class representing the final result of a proof strategy application.
+ *
  * <p>
- * It contains statistic information about the number of applied rules, time needed or number of
- * closed goals. In case the rule application stopped at a non-closeable goal, this goal is also
- * stored to allow the caller to e.g. present it to the user for interaction.
+ * This implementation of {@link org.key_project.prover.engine.ApplyStrategyInfo}
+ * provides detailed statistical information about the proof process, such as the
+ * number of applied rules, time taken, and the number of closed goals. It also
+ * retains information about unresolved goals or exceptions encountered during
+ * the strategy execution.
  * </p>
- * In case of an unexpected, the thrown exception can be also retrieved from this container.
+ *
+ * <p>
+ * Instances of this class are designed to be immutable and are returned to the
+ * caller of the strategy application to provide insights or for user interaction.
+ * </p>
+ *
+ * <p>
+ * Key features include:
+ * <ul>
+ * <li>Tracking the time taken for the strategy execution.</li>
+ * <li>Recording the number of applied rule applications and closed goals.</li>
+ * <li>Providing details of unresolved goals and any errors encountered.</li>
+ * </ul>
+ * </p>
+ *
+ * @see org.key_project.prover.engine.ApplyStrategyInfo
  */
 public class ApplyStrategyInfo
         implements org.key_project.prover.engine.ApplyStrategyInfo<Proof, Goal> {
+
+    /**
+     * The reason why the strategy stopped, for example, proof finished, maximal number of rule
+     * applications reached etc.
+     */
     private final String message;
+
+    /**
+     * One of the non-closeable goals that lead to termination of the strategy execution, if one
+     * exists.
+     */
     private final Goal nonCloseableGoal;
 
+    /** The exception encountered during the strategy application, if any. */
     private final Throwable error;
 
+    /** The total time taken for the strategy execution, in milliseconds. */
     private final long timeInMillis;
+
+    /** The number of rule applications applied during the strategy execution. */
     private final int appliedRuleAppsCount;
+
+    /** The number of goals that were successfully closed during the strategy execution. */
     private final int nrClosedGoals;
+
+    /** The proof object associated with this strategy application. */
     private final Proof proof;
 
+    /**
+     * Constructs an {@code ApplyStrategyInfo} object with all necessary details
+     * of the strategy execution.
+     *
+     * @param message the message explaining the reason for the termination of strategy execution
+     * @param proof the proof object associated with the strategy execution
+     * @param error the exception encountered during execution, or {@code null} if no error occurred
+     * @param nonCloseableGoal the non-closeable goal, or {@code null} if all goals were closed
+     * @param timeInMillis the total execution time in milliseconds
+     * @param appliedRuleAppsCount the number of applied rule applications
+     * @param nrClosedGoals the number of successfully closed goals
+     */
     public ApplyStrategyInfo(String message, Proof proof, Throwable error, Goal nonCloseableGoal,
             long timeInMillis, int appliedRuleAppsCount, int nrClosedGoals) {
         this.message = message;
@@ -39,46 +87,61 @@ public class ApplyStrategyInfo
         this.nrClosedGoals = nrClosedGoals;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String reason() {
         return message;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Goal nonCloseableGoal() {
         return nonCloseableGoal;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isError() {
         return error != null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Throwable getException() {
         return error;
     }
 
+    /** {@inheritDoc} */
     @Override
     public long getTime() {
         return timeInMillis;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public int getClosedGoals() {
+    public int getNumberOfClosedGoals() {
         return nrClosedGoals;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public int getAppliedRuleApps() {
+    public int getNumberOfAppliedRuleApps() {
         return appliedRuleAppsCount;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Proof getProof() {
         return proof;
     }
 
+    /**
+     * Provides a string representation of this {@code ApplyStrategyInfo} object,
+     * including all key details such as message, error status, applied rules,
+     * execution time, and closed goals.
+     *
+     * @return a string summarizing the state of this {@code ApplyStrategyInfo} object
+     */
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Apply Strategy Info:");
