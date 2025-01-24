@@ -27,7 +27,7 @@ public class PosInOccurrence {
      */
     public static PosInOccurrence findInSequent(Sequent seq, int formulaNumber, PosInTerm pos) {
         return new PosInOccurrence(seq.getFormulaByNr(formulaNumber), pos,
-            seq.numberInAntec(formulaNumber));
+            seq.numberInAntecedent(formulaNumber));
     }
 
     // saves 8 bytes (due to alignment issues) per instance if we use a

@@ -3,30 +3,34 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.prover.rules;
 
-
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 
+import org.jspecify.annotations.NonNull;
+
 /**
- * this class represents a heuristic. Taclets can belong to different heuristics and are executed
- * automatic if these are selected. A heuristic is just a name.
+ * This class represents a heuristic. Taclets can belong to different rulesets and are executed
+ * automatic if these are selected. A ruleset is just a name.
+ * <p>
+ *     Rulesets had been originally called heuristics.
+ * </p>
  */
 public record RuleSet(Name name) implements Named {
     /**
-     * creates a heuristic
+     * creates a ruleset
      *
-     * @param name Name object that contains name of the heuristic
+     * @param name the {@link Name} of the ruleset
      */
     public RuleSet {
     }
 
     /**
-     * gets name of the heuristic
+     * retrieves name of the ruleset
      *
-     * @return Name object that is the name of the heuristic
+     * @return the {@link Name} of the ruleset
      */
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return name;
     }
 
@@ -35,15 +39,20 @@ public record RuleSet(Name name) implements Named {
     }
 
     /**
-     * returns true it the o is the same object as this
+     *
+     * Checks whether the given object is equal to this instance.
+     * Two rulesets are equal if and only if their names are equal.
+     *
+     * @param other the Object with which this instance is compared
+     * @return true it the {@code other} is a ruleset of the same name
+     * as this ruleset
      */
-    public boolean equals(Object o) {
-        if (o instanceof RuleSet) {
-            return this.name().equals(((RuleSet) o).name());
+    public boolean equals(Object other) {
+        if (other instanceof RuleSet(Name otherName)) {
+            return this.name().equals(otherName);
         }
         return false;
     }
-
 
     /**
      * toString

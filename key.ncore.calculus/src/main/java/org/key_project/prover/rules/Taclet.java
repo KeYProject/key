@@ -22,6 +22,10 @@ import org.jspecify.annotations.NonNull;
 
 import static org.key_project.util.Strings.formatAsList;
 
+/**
+ * A taclet (formerly known as schematic theory specific rule) is a rule representation used
+ * within the KeY verification system.
+ */
 public abstract class Taclet implements Rule {
 
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
@@ -109,7 +113,7 @@ public abstract class Taclet implements Rule {
     /**
      * The taclet executor
      */
-    protected TacletExecutor<? extends ProofGoal<?>, ? extends RuleApp> executor;
+    protected TacletExecutor<? extends @NonNull ProofGoal<?>, ? extends @NonNull RuleApp> executor;
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
@@ -195,7 +199,7 @@ public abstract class Taclet implements Rule {
      * computes and returns all variables that occur bound in the taclet including the taclets
      * defined in <tt>addrules</tt> sections. The result is cached and therefore only computed once.
      *
-     * @return all variables occuring bound in the taclet
+     * @return all variables occurring bound in the taclet
      */
     public abstract ImmutableSet<QuantifiableVariable> getBoundVariables();
 
@@ -295,8 +299,8 @@ public abstract class Taclet implements Rule {
      * method cacheMatchInfo
      */
     public boolean hasReplaceWith() {
-        for (final TacletGoalTemplate goalDescr : goalTemplates) {
-            if (goalDescr.replaceWithExpressionAsObject() != null) {
+        for (final TacletGoalTemplate goalTemplate : goalTemplates) {
+            if (goalTemplate.replaceWithExpressionAsObject() != null) {
                 return true;
             }
         }
@@ -439,8 +443,8 @@ public abstract class Taclet implements Rule {
         return sb;
     }
 
-    public @NonNull TacletExecutor getExecutor() {
-        return executor;
+    public @NonNull <G extends ProofGoal<@NonNull G>> TacletExecutor<@NonNull G, ?> getExecutor() {
+        return (TacletExecutor<@NonNull G, ?>) executor;
     }
 
     public abstract Taclet setName(String s);

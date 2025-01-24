@@ -14,8 +14,9 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Instantiation of an assumes-formula that is present as a formula of the proof goal's sequent.
  * <p>
- * This instantiation kind is used if the formula used as an instantiation for one of the sequent's
- * assumes formulas is syntactically present. In that case the instantiation has not to be proven
+ * This instantiation kind is used if the formula used as an instantiation for one of the
+ * assumes-formulas
+ * is syntactically present in the sequent. In that case the instantiation has not to be proven
  * to be valid as part of a separate proof goal.
  * </p>
  *
@@ -27,18 +28,18 @@ public class AssumesFormulaInstSeq
      * Sequent and formula
      */
     private final Sequent seq;
-    private final boolean antec; // formula is in antecedent?
+    private final boolean inAntecedent; // formula is in antecedent?
     private final SequentFormula instantiation;
 
-    public AssumesFormulaInstSeq(Sequent seq, boolean antec, SequentFormula instantiation) {
+    public AssumesFormulaInstSeq(Sequent seq, boolean inAntecedent, SequentFormula instantiation) {
         this.seq = seq;
-        this.antec = antec;
+        this.inAntecedent = inAntecedent;
         this.instantiation = instantiation;
     }
 
     public AssumesFormulaInstSeq(Sequent instantiation, int indexPositionInSequent) {
-        this(instantiation, instantiation.numberInAntec(indexPositionInSequent),
-            instantiation.getFormulabyNr(indexPositionInSequent));
+        this(instantiation, instantiation.numberInAntecedent(indexPositionInSequent),
+            instantiation.getFormulaByNr(indexPositionInSequent));
     }
 
     /**
@@ -55,13 +56,12 @@ public class AssumesFormulaInstSeq
     }
 
     /**
-     * Create a list with all formulas of a given semisequent
+     * Create a list with all formulas of a given semi-sequent
      */
-    private static ImmutableArray<AssumesFormulaInstantiation> createListHelp(
-            Sequent p_s,
-            boolean antec) {
+    public static ImmutableArray<AssumesFormulaInstantiation> createList(Sequent p_s,
+            boolean inAntecedent) {
         Semisequent semi;
-        if (antec) {
+        if (inAntecedent) {
             semi = p_s.antecedent();
         } else {
             semi = p_s.succedent();
@@ -72,16 +72,11 @@ public class AssumesFormulaInstSeq
         int i = assumesInstFromSeq.length - 1;
 
         for (final var sf : semi) {
-            assumesInstFromSeq[i] = new AssumesFormulaInstSeq(p_s, antec, sf);
+            assumesInstFromSeq[i] = new AssumesFormulaInstSeq(p_s, inAntecedent, sf);
             --i;
         }
 
         return new ImmutableArray<>(assumesInstFromSeq);
-    }
-
-    public static ImmutableArray<AssumesFormulaInstantiation> createList(
-            Sequent p_s, boolean antec) {
-        return createListHelp(p_s, antec);
     }
 
     @Override
@@ -94,7 +89,8 @@ public class AssumesFormulaInstSeq
         if (!(p_obj instanceof AssumesFormulaInstSeq other)) {
             return false;
         }
-        return seq == other.seq && instantiation == other.instantiation && antec == other.antec;
+        return seq == other.seq && instantiation == other.instantiation
+                && inAntecedent == other.inAntecedent;
     }
 
     @Override
@@ -102,21 +98,19 @@ public class AssumesFormulaInstSeq
         int result = 17;
         result = 37 * result + seq.hashCode();
         result = 37 * result + instantiation.hashCode();
-        result = 37 * result + (antec ? 0 : 1);
+        result = 37 * result + (inAntecedent ? 0 : 1);
         return result;
     }
 
-    public boolean inAntec() {
-        return antec;
+    public boolean inAntecedent() {
+        return inAntecedent;
     }
 
     private volatile PosInOccurrence pioCache = null;
 
     public PosInOccurrence toPosInOccurrence() {
         if (pioCache == null) {
-            PosInOccurrence localPioCache =
-                new PosInOccurrence(instantiation, PosInTerm.getTopLevel(), antec);
-            pioCache = localPioCache;
+            pioCache = new PosInOccurrence(instantiation, PosInTerm.getTopLevel(), inAntecedent);
         }
         return pioCache;
     }

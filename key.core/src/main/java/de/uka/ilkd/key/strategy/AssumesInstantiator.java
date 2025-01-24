@@ -62,7 +62,7 @@ public class AssumesInstantiator {
      * Find all possible instantiations of the assumes-sequent formulas within the sequent
      * {@code goal.sequent()}
      */
-    public void findIfFormulaInstantiations() {
+    public void findAssumesFormulaInstantiations() {
         final Sequent p_seq = goal.sequent();
 
         Debug.assertTrue(tacletAppContainer.getTacletApp().assumesFormulaInstantiations() == null,
@@ -141,7 +141,7 @@ public class AssumesInstantiator {
      *         (container) have been matched
      */
     private boolean isNewFormula(AssumesFormulaInstSeq p_ifInstantiation) {
-        final boolean antec = p_ifInstantiation.inAntec();
+        final boolean antec = p_ifInstantiation.inAntecedent();
 
         final ImmutableArray<AssumesFormulaInstantiation> cache =
             getNewSequentFormulasFromCache(antec);
@@ -159,7 +159,7 @@ public class AssumesInstantiator {
      *         (container) have been matched (this method does not use the cache)
      */
     private boolean isNewFormulaDirect(AssumesFormulaInstSeq p_ifInstantiation) {
-        final boolean antec = p_ifInstantiation.inAntec();
+        final boolean antec = p_ifInstantiation.inAntecedent();
 
         final SequentFormula cfma =
             p_ifInstantiation.getSequentFormula();

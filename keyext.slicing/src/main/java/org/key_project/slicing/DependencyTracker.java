@@ -208,7 +208,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         for (final var parentFormula : seqParent) {
             if (!seqNew.contains(parentFormula)) {
                 removed.add(new PosInOccurrence(parentFormula, PosInTerm.getTopLevel(),
-                    seqParent.numberInAntec(i)));
+                    seqParent.numberInAntecedent(i)));
             }
             i++;
         }
@@ -252,7 +252,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             for (var f : newSeq) {
                 if (!oldSeq.contains(f)) {
                     var pio = new PosInOccurrence(f, PosInTerm.getTopLevel(),
-                        newSeq.numberInAntec(index));
+                        newSeq.numberInAntecedent(index));
                     outputs.add(new Pair<>(pio, node.childrenCount() > 1 ? sibling : -1));
                 }
                 index++;

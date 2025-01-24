@@ -23,6 +23,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.Assertions;
@@ -153,8 +154,9 @@ public class TestLocalSymbols {
         Goal goal = goals.head();
 
         TacletApp app;
+        Sequent sequentFormulas = goal.node().sequent();
         PosInOccurrence pio =
-            new PosInOccurrence(goal.node().sequent().getFormulabyNr(formulaNo),
+            new PosInOccurrence(sequentFormulas.getFormulaByNr(formulaNo),
                 PosInTerm.getTopLevel(), false);
 
         app = rule.matchFind(pio, services);

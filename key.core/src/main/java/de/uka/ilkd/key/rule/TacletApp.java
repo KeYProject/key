@@ -961,7 +961,7 @@ public abstract class TacletApp implements RuleApp {
     /**
      * @return true iff the if-instantiation list is not null or no if sequent is needed
      */
-    public boolean ifInstsComplete() {
+    public boolean assumesInstantionsComplete() {
         return ifInstantiations != null || taclet().assumesSequent().isEmpty();
     }
 

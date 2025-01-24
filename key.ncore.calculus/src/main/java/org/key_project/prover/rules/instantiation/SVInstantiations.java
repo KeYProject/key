@@ -10,8 +10,7 @@ import org.key_project.util.collection.ImmutableMap;
 
 /**
  * Implementations of this interface know which schema variables have been matched and their
- * respective
- * instantiations.
+ * respective instantiations.
  */
 public interface SVInstantiations {
 

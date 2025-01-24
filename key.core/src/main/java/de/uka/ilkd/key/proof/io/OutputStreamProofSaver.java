@@ -356,7 +356,7 @@ public class OutputStreamProofSaver {
         final ImmutableList<AssumesFormulaInstantiation> l =
             appliedRuleApp.assumesFormulaInstantiations();
         if (l != null) {
-            output.append(ifFormulaInsts(node, l));
+            output.append(assumesFormulaInsts(node, l));
         }
         output.append("");
         userInteraction2Proof(node, output);
@@ -548,7 +548,7 @@ public class OutputStreamProofSaver {
         output.append(posInOccurrence2Proof(node.sequent(), appliedRuleApp.posInOccurrence()));
 
         output.append(newNames2Proof(node));
-        output.append(builtinRuleIfInsts(node, appliedRuleApp.assumesInsts()));
+        output.append(builtinRuleAssumesInsts(node, appliedRuleApp.assumesInsts()));
 
         if (appliedRuleApp.rule() instanceof UseOperationContractRule
                 || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
@@ -765,36 +765,38 @@ public class OutputStreamProofSaver {
         return s.toString();
     }
 
-    public String ifFormulaInsts(Node node, ImmutableList<AssumesFormulaInstantiation> l) {
+    public String assumesFormulaInsts(Node node,
+            ImmutableList<AssumesFormulaInstantiation> instantiations) {
         StringBuilder s = new StringBuilder();
-        for (final AssumesFormulaInstantiation aL : l) {
-            if (aL instanceof AssumesFormulaInstSeq) {
-                final SequentFormula f = aL.getSequentFormula();
+        for (final AssumesFormulaInstantiation assumesFormulaInstantiation : instantiations) {
+            final SequentFormula sequentFormula = assumesFormulaInstantiation.getSequentFormula();
+            if (assumesFormulaInstantiation instanceof AssumesFormulaInstSeq assumesFormulaInSequent) {
                 s.append(" (ifseqformula \"")
                         .append(node.sequent()
-                                .formulaNumberInSequent(((AssumesFormulaInstSeq) aL).inAntec(), f))
+                                .formulaNumberInSequent(assumesFormulaInSequent.inAntecedent(),
+                                    sequentFormula))
                         .append("\")");
-            } else if (aL instanceof AssumesFormulaInstDirect) {
+            } else if (assumesFormulaInstantiation instanceof AssumesFormulaInstDirect) {
 
                 final String directInstantiation =
-                    printTerm((Term) aL.getSequentFormula().formula(), node.proof().getServices());
+                    printTerm((Term) sequentFormula.formula(), node.proof().getServices());
 
                 s.append(" (ifdirectformula \"").append(escapeCharacters(directInstantiation))
                         .append("\")");
             } else {
-                throw new IllegalArgumentException("Unknown If-Seq-Formula type");
+                throw new IllegalArgumentException("Unknown Assumes-Seq-Formula type");
             }
         }
 
         return s.toString();
     }
 
-    public String builtinRuleIfInsts(Node node,
-            ImmutableList<PosInOccurrence> ifInsts) {
+    public String builtinRuleAssumesInsts(Node node,
+            ImmutableList<PosInOccurrence> assumesInstantiations) {
         StringBuilder s = new StringBuilder();
-        for (final PosInOccurrence ifInst : ifInsts) {
+        for (final PosInOccurrence posOfAssumesInstatiation : assumesInstantiations) {
             s.append(" (ifInst \"\" ");
-            s.append(posInOccurrence2Proof(node.sequent(), ifInst));
+            s.append(posInOccurrence2Proof(node.sequent(), posOfAssumesInstatiation));
             s.append(")");
         }
         return s.toString();

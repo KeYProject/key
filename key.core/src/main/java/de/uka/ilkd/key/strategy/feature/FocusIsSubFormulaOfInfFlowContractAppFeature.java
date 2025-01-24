@@ -42,7 +42,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;
 
-        if (!app.ifInstsComplete()) {
+        if (!app.assumesInstantionsComplete()) {
             return NumberRuleAppCost.getZeroCost();
         }
 

@@ -174,7 +174,7 @@ public final class ReferenceSearcher {
         ProgramMethodFinder f = new ProgramMethodFinder();
         Sequent seq = node.sequent();
         for (int i = 1; i <= seq.size(); i++) {
-            Term term = (Term) seq.getFormulabyNr(i).formula();
+            Term term = (Term) seq.getFormulaByNr(i).formula();
             // first, check for a java block
             if (term.containsJavaBlockRecursive()) {
                 // not suitable for caching

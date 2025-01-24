@@ -80,14 +80,14 @@ public class JavaDLSequentKit extends SequentKit {
     /**
      * creates a new Sequent
      *
-     * @param ante the Semisequent that plays the antecedent part
-     * @param succ the Semisequent that plays the succedent part
+     * @param antecedent the Semisequent that plays the antecedent part
+     * @param succedent the Semisequent that plays the succedent part
      * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
      *         EMPTY_SEMISEQUENT
      */
     @Override
-    protected Sequent createSequent(Semisequent ante, Semisequent succ) {
-        return new de.uka.ilkd.key.proof.calculus.Sequent(ante, succ);
+    protected Sequent createSequent(Semisequent antecedent, Semisequent succedent) {
+        return new de.uka.ilkd.key.proof.calculus.Sequent(antecedent, succedent);
     }
 
     /** the empty semisequent (using singleton pattern) */

@@ -45,7 +45,7 @@ public final class RuleAppUtil {
                 for (AssumesFormulaInstantiation x : posTacletApp.assumesFormulaInstantiations()) {
 
                     if (x instanceof AssumesFormulaInstSeq assumes) {
-                        boolean antec = assumes.inAntec();
+                        boolean antec = assumes.inAntecedent();
                         inputs.add(new PosInOccurrence(assumes.getSequentFormula(),
                             PosInTerm.getTopLevel(), antec));
                     }

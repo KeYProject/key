@@ -95,7 +95,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
             PosInOccurrence pio = null;
 
             if (args.occ > -1) {
-                pio = new PosInOccurrence(sequent.getFormulabyNr(args.occ + 1),
+                pio = new PosInOccurrence(sequent.getFormulaByNr(args.occ + 1),
                     PosInTerm.getTopLevel(), args.occ + 1 <= sequent.antecedent().size());
             }
 
@@ -133,14 +133,14 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
 
         for (int i = 1; i < sequent.size() + 1; i++) {
             final boolean matchesRegex = formatTermString(
-                LogicPrinter.quickPrintTerm((Term) sequent.getFormulabyNr(i).formula(), services))
+                LogicPrinter.quickPrintTerm((Term) sequent.getFormulaByNr(i).formula(), services))
                         .matches(".*" + matchRegEx + ".*");
             if (matchesRegex) {
                 if (matched) {
                     throw new ScriptException("More than one occurrence of a matching term.");
                 }
                 matched = true;
-                pio = new PosInOccurrence(sequent.getFormulabyNr(i), PosInTerm.getTopLevel(),
+                pio = new PosInOccurrence(sequent.getFormulaByNr(i), PosInTerm.getTopLevel(),
                     i <= sequent.antecedent().size());
             }
         }

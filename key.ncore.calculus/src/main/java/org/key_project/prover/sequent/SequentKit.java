@@ -12,94 +12,126 @@ public abstract class SequentKit {
     protected SequentKit() {
     }
 
+    /**
+     * Returns a semisequent with no formulas.
+     * <p>
+     * This factory method is implemented by inheriting classes. It is encouraged but not enforced
+     * to use a singleton pattern for empty semisequents.
+     * </p>
+     *
+     * @return the empty semisequent
+     */
     public abstract Semisequent getEmptySemisequent();
 
+    /**
+     * Returns a sequent with no formulas.
+     * <p>
+     * This factory method is implemented by inheriting classes. It is encouraged but not enforced
+     * to use a singleton pattern for empty sequents.
+     * </p>
+     *
+     * @return the empty sequent
+     */
     public abstract Sequent getEmptySequent();
 
     /**
-     * creates a new Sequent with empty succedent
+     * creates a new {@link Sequent} with empty succedent
      *
-     * @param ante the Semisequent that plays the antecedent part
-     * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
-     *         EMPTY_SEMISEQUENT
+     * @param antecedent the {@link Semisequent} that will become the antecedent
+     * @return the new sequent or the {@link #getEmptySequent()}
+     *         if {@code antecedent} is empty
      */
-    protected Sequent newAntecedent(Semisequent ante) {
-        if (ante.isEmpty()) {
+    protected Sequent newAntecedent(Semisequent antecedent) {
+        if (antecedent.isEmpty()) {
             return getEmptySequent();
         }
-        return createSequent(ante, getEmptySemisequent());
+        return createSequent(antecedent, getEmptySemisequent());
     }
 
     /**
-     * creates a new Sequent with empty succedent
+     * creates a new {@link Sequent} with empty succedent
      *
-     * @param ante the list of sequent formulas constituting the antecedent (must be redundant-free)
-     * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
-     *         EMPTY_SEMISEQUENT
+     * @param antecedent the {@link ImmutableList} of {@link SequentFormula}s constituting the
+     *        antecedent
+     * @return the new sequent or the {@link #getEmptySequent()} if {@code antecedent} is the empty
+     *         list
      */
-    public Sequent newAntecedent(ImmutableList<SequentFormula> ante) {
+    public Sequent newAntecedent(ImmutableList<SequentFormula> antecedent) {
         return newAntecedent(
-            ante.isEmpty() ? getEmptySemisequent() : createSemisequent(ante));
+            antecedent.isEmpty() ? getEmptySemisequent() : createSemisequent(antecedent));
     }
 
     abstract protected Semisequent createSemisequent(ImmutableList<SequentFormula> ante);
 
     /**
-     * creates a new Sequent
+     * creates a new {@link Sequent}
      *
-     * @param ante the Semisequent that plays the antecedent part
-     * @param succ the Semisequent that plays the succedent part
-     * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
-     *         EMPTY_SEMISEQUENT
+     * @param antecedent the {@link Semisequent} that will become the antecedent
+     * @param succedent the {@link Semisequent} that will become the succedent
+     *
+     * @return the new sequent or the {@link #getEmptySequent()} if both antecedent and succedent
+     *         are empty
      */
-    protected Sequent newSequent(Semisequent ante, Semisequent succ) {
-        if (ante.isEmpty() && succ.isEmpty()) {
+    protected Sequent newSequent(Semisequent antecedent, Semisequent succedent) {
+        if (antecedent.isEmpty() && succedent.isEmpty()) {
             return getEmptySequent();
         }
-        return createSequent(ante, succ);
+        return createSequent(antecedent, succedent);
     }
 
     /**
-     * creates a new Sequent
+     * creates a new {@link Sequent}
      *
-     * @param ante the Semisequent that plays the antecedent part
-     * @param succ the Semisequent that plays the succedent part
-     * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
-     *         EMPTY_SEMISEQUENT
+     * @param antecedent the {@link Semisequent} that will become the antecedent
+     * @param succedent the {@link Semisequent} that will become the succedent
+     *
+     * @return the new sequent or the {@link #getEmptySequent()} if both antecedent
+     *         and succedent are empty
      */
-    abstract protected Sequent createSequent(Semisequent ante, Semisequent succ);
+    abstract protected Sequent createSequent(Semisequent antecedent, Semisequent succedent);
 
     /**
-     * creates a new Sequent
+     * creates a new {@link Sequent}
      *
-     * @param ante the Semisequent that plays the antecedent part
-     * @param succ the Semisequent that plays the succedent part
-     * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
-     *         EMPTY_SEMISEQUENT
+     * @param antecedent the {@link ImmutableList} of {@link SequentFormula}s constituting the
+     *        antecedent
+     * @param succedent the {@link ImmutableList} of {@link SequentFormula}s constituting the
+     *        succedent
+     *
+     * @return the new sequent or the {@link #getEmptySequent()} if both antecedent
+     *         and succedent are empty
      */
-    public Sequent newSequent(ImmutableList<SequentFormula> ante,
-            ImmutableList<SequentFormula> succ) {
+    public Sequent newSequent(ImmutableList<SequentFormula> antecedent,
+            ImmutableList<SequentFormula> succedent) {
         return newSequent(
-            ante.isEmpty() ? getEmptySemisequent() : createSemisequent(ante),
-            succ.isEmpty() ? getEmptySemisequent() : createSemisequent(succ));
+            antecedent.isEmpty() ? getEmptySemisequent() : createSemisequent(antecedent),
+            succedent.isEmpty() ? getEmptySemisequent() : createSemisequent(succedent));
     }
 
     /**
-     * creates a new Sequent with empty antecedent
+     * creates a new {@link Sequent} with empty antecedent
      *
-     * @param succ the Semisequent that plays the succedent part
-     * @return the new sequent or the EMPTY_SEQUENT if both antec and succ are same as
-     *         EMPTY_SEMISEQUENT
+     * @param succedent the {@link Semisequent} that plays the succedent part
+     *
+     * @return the new sequent or the {@link #getEmptySequent()} if the succedent is empty
      */
-    protected Sequent newSuccedent(Semisequent succ) {
-        if (succ.isEmpty()) {
+    protected Sequent newSuccedent(Semisequent succedent) {
+        if (succedent.isEmpty()) {
             return getEmptySequent();
         }
-        return createSequent(getEmptySemisequent(), succ);
+        return createSequent(getEmptySemisequent(), succedent);
     }
 
-    public Sequent newSuccedent(ImmutableList<SequentFormula> succ) {
+    /**
+     * creates a new {@link Sequent} with an empty antecedent
+     *
+     * @param succedent the {@link ImmutableList} of {@link SequentFormula}s constituting the
+     *        succedent
+     * @return the new sequent or the {@link #getEmptySequent()} if {@code succedent} is the empty
+     *         list
+     */
+    public Sequent newSuccedent(ImmutableList<SequentFormula> succedent) {
         return newSuccedent(
-            succ.isEmpty() ? getEmptySemisequent() : createSemisequent(succ));
+            succedent.isEmpty() ? getEmptySemisequent() : createSemisequent(succedent));
     }
 }
