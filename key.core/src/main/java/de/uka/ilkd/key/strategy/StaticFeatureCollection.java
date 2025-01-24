@@ -17,7 +17,6 @@ import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.strategy.feature.ApplyTFFeature;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.CompareCostsFeature;
 import de.uka.ilkd.key.strategy.feature.ComprehendedSumFeature;
@@ -53,6 +52,7 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.*;
+import org.key_project.prover.strategy.costbased.termfeature.ApplyTFFeature;
 
 /**
  * Collection of strategy features that can be accessed statically. This class is essentially a
