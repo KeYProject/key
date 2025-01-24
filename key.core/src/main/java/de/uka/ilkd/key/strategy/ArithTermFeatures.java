@@ -5,13 +5,12 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.strategy.costbased.termfeature.ConstantTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 class ArithTermFeatures extends StaticFeatureCollection {
 
@@ -91,18 +90,18 @@ class ArithTermFeatures extends StaticFeatureCollection {
 
     final Sort intS;
 
-    final JFunction Z;
+    final Function Z;
     final Function C;
-    final JFunction add;
-    final JFunction mul;
-    final JFunction mod;
+    final Function add;
+    final Function mul;
+    final Function mod;
     final Function div;
     final Function jmod;
     final Function jdiv;
 
     final Operator eq;
-    final JFunction leq;
-    final JFunction geq;
+    final Function leq;
+    final Function geq;
 
     final TermFeature intF;
 

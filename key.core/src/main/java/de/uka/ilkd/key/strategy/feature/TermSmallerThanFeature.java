@@ -5,9 +5,11 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
  * Feature that returns zero iff one term is smaller than another term in the current term ordering
@@ -16,7 +18,7 @@ public class TermSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm left, right;
 
-    public static Feature create(ProjectionToTerm left, ProjectionToTerm right) {
+    public static Feature<Goal> create(ProjectionToTerm left, ProjectionToTerm right) {
         return new TermSmallerThanFeature(left, right);
     }
 

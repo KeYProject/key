@@ -511,7 +511,7 @@ public abstract class AbstractSlicer {
                 // default instance can't be used parallel.
                 ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true);
-                ApplyStrategyInfo<Proof,Goal> info = null;
+                ApplyStrategyInfo<Proof, Goal> info = null;
                 try {
                     // Create location terms
                     List<Location> resultLocations =
@@ -578,7 +578,7 @@ public abstract class AbstractSlicer {
                 // default instance can't be used parallel.
                 ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true);
-                ApplyStrategyInfo<Proof,Goal> info = null;
+                ApplyStrategyInfo<Proof, Goal> info = null;
                 try {
                     // Create location terms
                     List<Location> resultLocations =

@@ -7,10 +7,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
  * Term projection for constructing a bigger term from a sequence of direct subterms and an
@@ -19,20 +20,20 @@ import org.key_project.prover.sequent.PosInOccurrence;
  * NB: this is a rather restricted version of term construction, one can think of also allowing
  * bound variables, etc to be specified
  */
-public class TermConstructionProjection implements ProjectionToTerm {
+public class TermConstructionProjection implements ProjectionToTerm<Goal> {
 
     private final Operator op;
-    private final ProjectionToTerm[] subTerms;
+    private final ProjectionToTerm<Goal>[] subTerms;
 
 
-    private TermConstructionProjection(Operator op, ProjectionToTerm[] subTerms) {
+    private TermConstructionProjection(Operator op, ProjectionToTerm<Goal>[] subTerms) {
         assert !(op instanceof Modality); // XXX
         this.op = op;
         this.subTerms = subTerms;
         assert op.arity() == subTerms.length;
     }
 
-    public static ProjectionToTerm create(Operator op, ProjectionToTerm[] subTerms) {
+    public static ProjectionToTerm<Goal> create(Operator op, ProjectionToTerm<Goal>[] subTerms) {
         return new TermConstructionProjection(op, subTerms);
     }
 

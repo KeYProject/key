@@ -5,18 +5,18 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
  * Feature that returns the number of branches after instantiated the quantifier formula.
  */
-public class InstantiationCost implements Feature {
+public class InstantiationCost implements Feature<Goal> {
 
     final private ProjectionToTerm varInst;
 
@@ -24,7 +24,7 @@ public class InstantiationCost implements Feature {
         varInst = var;
     }
 
-    public static Feature create(ProjectionToTerm varInst) {
+    public static Feature<Goal> create(ProjectionToTerm varInst) {
         return new InstantiationCost(varInst);
     }
 

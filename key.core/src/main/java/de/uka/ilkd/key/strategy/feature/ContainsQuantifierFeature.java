@@ -5,9 +5,11 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.RuleAppCost;
+import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 
 /**
@@ -17,7 +19,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  */
 public class ContainsQuantifierFeature extends AbstractBetaFeature {
 
-    public final static Feature INSTANCE = new ContainsQuantifierFeature();
+    public final static Feature<Goal> INSTANCE = new ContainsQuantifierFeature();
 
     private ContainsQuantifierFeature() {}
 

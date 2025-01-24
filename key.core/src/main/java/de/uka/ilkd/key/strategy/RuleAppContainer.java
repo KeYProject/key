@@ -10,8 +10,11 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Container for RuleApp instances with cost as determined by a given Strategy. Instances of this
@@ -64,7 +67,8 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return container for the currently applicable RuleApp, the cost may be an instance of
      *         <code>TopRuleAppCost</code>.
      */
-    public static RuleAppContainer createAppContainer(org.key_project.prover.rules.RuleApp p_app,
+    public static @NonNull RuleAppContainer createAppContainer(
+            org.key_project.prover.rules.RuleApp p_app,
             PosInOccurrence p_pio,
             Goal p_goal) {
 

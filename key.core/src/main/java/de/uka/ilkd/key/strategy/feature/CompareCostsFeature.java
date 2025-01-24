@@ -7,17 +7,19 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 public abstract class CompareCostsFeature extends BinaryFeature {
 
-    protected final Feature a, b;
+    protected final Feature<Goal> a, b;
 
-    private CompareCostsFeature(Feature a, Feature b) {
+    private CompareCostsFeature(Feature<Goal> a, Feature<Goal> b) {
         this.a = a;
         this.b = b;
     }
 
-    public static Feature less(Feature a, Feature b) {
+    public static Feature<Goal> less(Feature<Goal> a, Feature<Goal> b) {
         return new CompareCostsFeature(a, b) {
             protected boolean filter(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
                     Goal goal,
@@ -28,7 +30,7 @@ public abstract class CompareCostsFeature extends BinaryFeature {
         };
     }
 
-    public static Feature leq(Feature a, Feature b) {
+    public static Feature<Goal> leq(Feature<Goal> a, Feature<Goal> b) {
         return new CompareCostsFeature(a, b) {
             protected boolean filter(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
                     Goal goal,
@@ -39,7 +41,7 @@ public abstract class CompareCostsFeature extends BinaryFeature {
         };
     }
 
-    public static Feature eq(Feature a, Feature b) {
+    public static Feature<Goal> eq(Feature<Goal> a, Feature<Goal> b) {
         return new CompareCostsFeature(a, b) {
             protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
                     MutableState mState) {

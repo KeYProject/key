@@ -6,16 +6,19 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
+import org.key_project.prover.strategy.costbased.feature.instantiator.CPBranch;
+import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
+import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
 
 /**
@@ -23,11 +26,11 @@ import org.key_project.prover.sequent.PosInOccurrence;
  * <code>TermGenerator</code>. The terms are stored in a <code>TermBuffer</code> one after the other
  * and can subsequently be used to instantiate a rule application
  */
-public class ForEachCP implements Feature {
+public class ForEachCP implements Feature<Goal> {
 
     private final TermBuffer var;
     private final TermGenerator generator;
-    private final Feature body;
+    private final Feature<Goal> body;
 
     /**
      * @param var <code>TermBuffer</code> in which the terms are going to be stored
@@ -35,11 +38,12 @@ public class ForEachCP implements Feature {
      * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
      *        <code>var</code>
      */
-    public static Feature create(TermBuffer var, TermGenerator generator, Feature body) {
+    public static Feature<Goal> create(TermBuffer var, TermGenerator generator,
+            Feature<Goal> body) {
         return new ForEachCP(var, generator, body);
     }
 
-    private ForEachCP(TermBuffer var, TermGenerator generator, Feature body) {
+    private ForEachCP(TermBuffer var, TermGenerator generator, Feature<Goal> body) {
         this.var = var;
         this.generator = generator;
         this.body = body;

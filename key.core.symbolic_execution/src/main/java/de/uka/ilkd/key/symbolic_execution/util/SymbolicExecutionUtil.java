@@ -196,8 +196,9 @@ public final class SymbolicExecutionUtil {
                     .addFormula(new SequentFormula(term), false, true)
                     .sequent();
         // Return created Sequent and the used predicate to identify the value interested in.
-        ApplyStrategyInfo<Proof,Goal> info = SymbolicExecutionSideProofUtil.startSideProof(parentProof,
-            sideProofEnv, sequentToProve);
+        ApplyStrategyInfo<Proof, Goal> info =
+            SymbolicExecutionSideProofUtil.startSideProof(parentProof,
+                sideProofEnv, sequentToProve);
         try {
             // The simplified formula is the conjunction of all open goals
             ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
@@ -2922,10 +2923,11 @@ public final class SymbolicExecutionUtil {
         Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalAntecedent,
             nullExpected ? isNull : isNotNull, false);
         // Execute proof in the current thread
-        ApplyStrategyInfo<Proof,Goal> info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(),
-            sideProofEnv, sequentToProve, StrategyProperties.METHOD_CONTRACT,
-            StrategyProperties.LOOP_INVARIANT, StrategyProperties.QUERY_ON,
-            StrategyProperties.SPLITTING_NORMAL);
+        ApplyStrategyInfo<Proof, Goal> info =
+            SymbolicExecutionSideProofUtil.startSideProof(node.proof(),
+                sideProofEnv, sequentToProve, StrategyProperties.METHOD_CONTRACT,
+                StrategyProperties.LOOP_INVARIANT, StrategyProperties.QUERY_ON,
+                StrategyProperties.SPLITTING_NORMAL);
         try {
             return !info.getProof().openEnabledGoals().isEmpty();
         } finally {

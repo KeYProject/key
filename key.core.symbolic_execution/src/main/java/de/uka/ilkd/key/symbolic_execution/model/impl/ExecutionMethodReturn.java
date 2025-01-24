@@ -262,10 +262,11 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                             mbs.getBodySourceAsTypeReference(), mbs.getProgramMethod(services),
                             mbs.getDesignatedContext(), methodReturnNode, getProofNode(),
                             resultVar);
-                    ApplyStrategyInfo<Proof,Goal> info = SymbolicExecutionSideProofUtil.startSideProof(
-                        getProof(), sideProofEnv, input.getSequentToProve(),
-                        StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
-                        StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_NORMAL);
+                    ApplyStrategyInfo<Proof, Goal> info =
+                        SymbolicExecutionSideProofUtil.startSideProof(
+                            getProof(), sideProofEnv, input.getSequentToProve(),
+                            StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
+                            StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_NORMAL);
                     try {
                         if (info.getProof().openGoals().size() == 1) {
                             Goal goal = info.getProof().openGoals().head();

@@ -1,18 +1,19 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.feature;
+package org.key_project.prover.strategy.costbased.feature;
 
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
 /**
  * A {@link Feature} is a class that is able to compute the cost of a {@link RuleApp}.
  */
-public interface Feature {
+public interface Feature<Goal extends ProofGoal<Goal>> {
 
     /**
      * Evaluate the cost of a <code>RuleApp</code>.
@@ -23,11 +24,11 @@ public interface Feature {
      * @param mState variable bank / local storage for feature who might require to store temporary
      *        information
      *        that changes during computation, e.g.
-     *        {@link de.uka.ilkd.key.strategy.termProjection.TermBuffer}s
+     *        {@link TermBuffer}s
      * @return the cost of the rule application expressed as a <code>RuleAppCost</code> object.
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
+    RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
             Goal goal, MutableState mState);
 }

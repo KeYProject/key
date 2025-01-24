@@ -4,17 +4,19 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 public class SortComparisonFeature extends BinaryFeature {
 
     public final static int SUBSORT = 0;
 
-    public static Feature create(ProjectionToTerm s1, ProjectionToTerm s2, int cmp) {
+    public static Feature<Goal> create(ProjectionToTerm s1, ProjectionToTerm s2, int cmp) {
         return new SortComparisonFeature(s1, s2, cmp);
     }
 

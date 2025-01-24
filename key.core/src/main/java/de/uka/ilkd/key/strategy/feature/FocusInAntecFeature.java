@@ -7,12 +7,14 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 public class FocusInAntecFeature extends BinaryFeature {
 
     private FocusInAntecFeature() {}
 
-    public static final Feature INSTANCE = new FocusInAntecFeature();
+    public static final Feature<Goal> INSTANCE = new FocusInAntecFeature();
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";

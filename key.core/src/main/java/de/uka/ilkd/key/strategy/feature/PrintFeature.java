@@ -4,10 +4,12 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,18 +17,18 @@ import org.slf4j.LoggerFactory;
 /**
  * For debugging purposes. Wraps a feature and prints the computed value
  */
-public class PrintFeature implements Feature {
+public class PrintFeature implements Feature<Goal> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PrintFeature.class);
 
-    private final Feature f;
+    private final Feature<Goal> f;
     private final String prefix;
 
-    public PrintFeature(String prefix, Feature f) {
+    public PrintFeature(String prefix, Feature<Goal> f) {
         this.f = f;
         this.prefix = prefix;
     }
 
-    public PrintFeature(Feature f) {
+    public PrintFeature(Feature<Goal> f) {
         this("", f);
     }
 

@@ -16,7 +16,6 @@ import de.uka.ilkd.key.rule.AssumesFormulaInstantiationCache;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.feature.AppliedRuleAppsNameCache;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;

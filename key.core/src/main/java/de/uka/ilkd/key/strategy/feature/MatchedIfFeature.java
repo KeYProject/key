@@ -7,6 +7,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * Binary features that returns zero iff the if-formulas of a Taclet are instantiated or the Taclet
@@ -14,7 +16,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  */
 public final class MatchedIfFeature extends BinaryTacletAppFeature {
 
-    public static final Feature INSTANCE = new MatchedIfFeature();
+    public static final Feature<Goal> INSTANCE = new MatchedIfFeature();
 
     private MatchedIfFeature() {}
 

@@ -8,6 +8,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -16,7 +18,7 @@ import org.key_project.util.collection.ImmutableSet;
  */
 public class TacletRequiringInstantiationFeature extends BinaryTacletAppFeature {
 
-    public final static Feature INSTANCE = new TacletRequiringInstantiationFeature();
+    public final static Feature<Goal> INSTANCE = new TacletRequiringInstantiationFeature();
 
     private TacletRequiringInstantiationFeature() {
         super(false);

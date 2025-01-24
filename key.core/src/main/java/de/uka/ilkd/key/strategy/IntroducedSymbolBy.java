@@ -8,21 +8,22 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     private final Name ruleSetName;
     private final Name schemaVar;
     private final ProjectionToTerm term;
 
-    public static Feature create(ProjectionToTerm termWithTopLevelOpToCheck, String ruleSetName,
+    public static Feature<Goal> create(ProjectionToTerm termWithTopLevelOpToCheck,
+            String ruleSetName,
             String schemaVar) {
         return new IntroducedSymbolBy(termWithTopLevelOpToCheck, new Name(ruleSetName),
             new Name(schemaVar));

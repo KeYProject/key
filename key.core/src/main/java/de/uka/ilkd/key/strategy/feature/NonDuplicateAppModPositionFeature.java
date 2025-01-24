@@ -4,10 +4,12 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -17,7 +19,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  */
 public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
 
-    public static final Feature INSTANCE = new NonDuplicateAppModPositionFeature();
+    public static final Feature<Goal> INSTANCE = new NonDuplicateAppModPositionFeature();
 
     @Override
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp,

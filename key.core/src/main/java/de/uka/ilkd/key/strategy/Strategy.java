@@ -6,17 +6,18 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Named;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy
  */
-public interface Strategy extends Named, Feature {
+public interface Strategy extends Named, Feature<Goal> {
     /**
      * Evaluate the cost of a <code>RuleApp</code>. Starts a new independent computation.
      *

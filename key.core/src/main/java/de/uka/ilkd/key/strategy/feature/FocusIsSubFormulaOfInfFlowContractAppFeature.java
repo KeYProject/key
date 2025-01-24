@@ -8,12 +8,14 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -26,9 +28,9 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  *
  * @author christoph
  */
-public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
+public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature<Goal> {
 
-    public static final Feature INSTANCE = new FocusIsSubFormulaOfInfFlowContractAppFeature();
+    public static final Feature<Goal> INSTANCE = new FocusIsSubFormulaOfInfFlowContractAppFeature();
 
 
     protected FocusIsSubFormulaOfInfFlowContractAppFeature() {

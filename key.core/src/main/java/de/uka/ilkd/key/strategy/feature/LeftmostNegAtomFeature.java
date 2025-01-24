@@ -8,10 +8,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.strategy.RuleAppCost;
+import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * Feature that returns zero if there is no atom with negative polarity on a common d-path and on
@@ -20,7 +22,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  */
 public class LeftmostNegAtomFeature extends AbstractBetaFeature {
 
-    public final static Feature INSTANCE = new LeftmostNegAtomFeature();
+    public final static Feature<Goal> INSTANCE = new LeftmostNegAtomFeature();
 
     private LeftmostNegAtomFeature() {}
 

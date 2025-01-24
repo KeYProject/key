@@ -13,6 +13,8 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * This feature checks that an equation is not applied to itself. This means that the focus of the
@@ -21,7 +23,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  */
 public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
-    public static final Feature INSTANCE = new CheckApplyEqFeature();
+    public static final Feature<Goal> INSTANCE = new CheckApplyEqFeature();
 
     private CheckApplyEqFeature() {}
 

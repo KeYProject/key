@@ -7,17 +7,19 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * A feature that computes the sum of a given list (vector) of features
  */
-public class SumFeature implements Feature {
+public class SumFeature implements Feature<Goal> {
 
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
@@ -33,12 +35,12 @@ public class SumFeature implements Feature {
         return res;
     }
 
-    private SumFeature(Feature[] p_features) {
+    private SumFeature(Feature<Goal>[] p_features) {
         features = p_features;
     }
 
-    static void flatten(Feature[] sumF, LinkedHashSet<Feature> p_features) {
-        for (Feature f : sumF) {
+    static void flatten(Feature<Goal>[] sumF, LinkedHashSet<Feature<Goal>> p_features) {
+        for (Feature<Goal> f : sumF) {
             if (f instanceof SumFeature) {
                 flatten(((SumFeature) f).features, p_features);
             } else {
@@ -47,19 +49,20 @@ public class SumFeature implements Feature {
         }
     }
 
-    public static Feature createSum(Feature... fs) {
+    @SafeVarargs
+    public static Feature<Goal> createSum(Feature<Goal>... fs) {
         Debug.assertFalse(fs.length == 0, "Cannot compute the sum of zero features");
 
         if (fs.length == 1) {
             return fs[0];
         }
-        LinkedHashSet<Feature> featureSet = new LinkedHashSet<>();
+        LinkedHashSet<Feature<Goal>> featureSet = new LinkedHashSet<>();
         flatten(fs, featureSet);
 
-        return new SumFeature(featureSet.toArray(new Feature[fs.length]));
+        return new SumFeature(featureSet.<Feature<Goal>>toArray(new Feature[fs.length]));
     }
 
-    private final Feature[] features;
+    private final Feature<Goal>[] features;
 
     @Override
     public String toString() {

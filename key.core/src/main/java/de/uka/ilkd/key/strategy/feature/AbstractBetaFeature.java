@@ -10,17 +10,19 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 
 /**
  * This abstract class contains some auxiliary methods for the selection of beta rules that are
  * supposed to be applied. Used terminology is defined in Diss. by Martin Giese.
  */
-public abstract class AbstractBetaFeature implements Feature {
+public abstract class AbstractBetaFeature implements Feature<Goal> {
     /** helper for computing maxPosPath_* in TermInfo */
     private static final MaxPosPathHelper maxPosPathHelper = new MaxPosPathHelper();
 

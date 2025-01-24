@@ -10,6 +10,8 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -20,7 +22,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
 public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
 
     /** the single instance of this feature */
-    public static final Feature INSTANCE = new DiffFindAndReplacewithFeature();
+    public static final Feature<Goal> INSTANCE = new DiffFindAndReplacewithFeature();
 
     private DiffFindAndReplacewithFeature() {}
 

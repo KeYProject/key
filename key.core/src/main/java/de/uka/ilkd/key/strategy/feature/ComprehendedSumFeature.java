@@ -4,25 +4,27 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
 /**
  * A feature that computes the sum of the values of a feature term when a given variable ranges over
  * a sequence of terms
  */
-public class ComprehendedSumFeature implements Feature {
+public class ComprehendedSumFeature implements Feature<Goal> {
 
-    private final TermBuffer var;
+    private final TermBuffer<Goal> var;
     private final TermGenerator generator;
-    private final Feature body;
+    private final Feature<Goal> body;
 
     /**
      * @param var <code>TermBuffer</code> in which the terms are going to be stored
@@ -30,11 +32,13 @@ public class ComprehendedSumFeature implements Feature {
      * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
      *        <code>var</code>
      */
-    public static Feature create(TermBuffer var, TermGenerator generator, Feature body) {
+    public static Feature<Goal> create(TermBuffer<Goal> var, TermGenerator generator,
+            Feature<Goal> body) {
         return new ComprehendedSumFeature(var, generator, body);
     }
 
-    private ComprehendedSumFeature(TermBuffer var, TermGenerator generator, Feature body) {
+    private ComprehendedSumFeature(TermBuffer<Goal> var, TermGenerator generator,
+            Feature<Goal> body) {
         this.var = var;
         this.generator = generator;
         this.body = body;

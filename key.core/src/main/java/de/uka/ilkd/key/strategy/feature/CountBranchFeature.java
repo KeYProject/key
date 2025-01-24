@@ -5,19 +5,21 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * Feature that returns the number of branches for a given taclet application Size of "assumes"
  * sequents is currently not considered
  */
-public class CountBranchFeature implements Feature {
+public class CountBranchFeature implements Feature<Goal> {
 
-    public static final Feature INSTANCE = new CountBranchFeature();
+    public static final Feature<Goal> INSTANCE = new CountBranchFeature();
 
     private CountBranchFeature() {
     }

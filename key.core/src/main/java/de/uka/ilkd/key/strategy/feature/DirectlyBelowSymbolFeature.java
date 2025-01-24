@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.proof.Goal;
+
+import org.key_project.logic.op.Operator;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * This feature returns zero if and only if the focus of the given rule application exists, is not
@@ -20,11 +23,11 @@ public class DirectlyBelowSymbolFeature extends DirectlyBelowFeature {
         super(badSymbol, index);
     }
 
-    public static Feature create(Operator badSymbol) {
+    public static Feature<Goal> create(Operator badSymbol) {
         return new DirectlyBelowSymbolFeature(badSymbol, -1);
     }
 
-    public static Feature create(Operator badSymbol, int index) {
+    public static Feature<Goal> create(Operator badSymbol, int index) {
         return new DirectlyBelowSymbolFeature(badSymbol, index);
     }
 

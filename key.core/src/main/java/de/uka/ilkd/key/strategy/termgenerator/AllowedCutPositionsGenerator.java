@@ -8,11 +8,11 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
 
 /**
  * Enumerate potential subformulas of a formula that could be used for a cut (taclet cut_direct).

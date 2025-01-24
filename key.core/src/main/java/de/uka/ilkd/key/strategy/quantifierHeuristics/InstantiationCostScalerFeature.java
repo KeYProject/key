@@ -4,29 +4,30 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
-public class InstantiationCostScalerFeature implements Feature {
+public class InstantiationCostScalerFeature implements Feature<Goal> {
 
-    private final Feature costFeature;
-    private final Feature allowSplitting;
+    private final Feature<Goal> costFeature;
+    private final Feature<Goal> allowSplitting;
 
     private static final RuleAppCost ONE_COST = NumberRuleAppCost.create(1);
     private static final RuleAppCost MINUS_3000_COST = NumberRuleAppCost.create(-3000);
 
-    private InstantiationCostScalerFeature(Feature costFeature, Feature allowSplitting) {
+    private InstantiationCostScalerFeature(Feature<Goal> costFeature,
+            Feature<Goal> allowSplitting) {
         this.costFeature = costFeature;
         this.allowSplitting = allowSplitting;
     }
 
-    public static Feature create(Feature costFeature, Feature allowSplitting) {
+    public static Feature<Goal> create(Feature<Goal> costFeature, Feature<Goal> allowSplitting) {
         return new InstantiationCostScalerFeature(costFeature, allowSplitting);
     }
 

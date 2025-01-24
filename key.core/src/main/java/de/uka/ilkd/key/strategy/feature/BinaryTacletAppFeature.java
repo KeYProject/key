@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
 
 /**
  * Abstract superclass for features of TacletApps that have either zero or top cost.

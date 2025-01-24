@@ -6,11 +6,11 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
  * Binary feature that return zero if two given projection term is CS-Releated.
@@ -24,7 +24,7 @@ public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeatur
         this.for1 = for1;
     }
 
-    public static Feature create(ProjectionToTerm for0, ProjectionToTerm for1) {
+    public static Feature<Goal> create(ProjectionToTerm for0, ProjectionToTerm for1) {
         return new ExistentiallyConnectedFormulasFeature(for0, for1);
     }
 

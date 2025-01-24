@@ -10,6 +10,8 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -20,7 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
 
     /** the single instance of this feature */
-    public static final Feature INSTANCE = new DiffFindAndIfFeature();
+    public static final Feature<Goal> INSTANCE = new DiffFindAndIfFeature();
 
     private DiffFindAndIfFeature() {}
 

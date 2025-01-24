@@ -5,14 +5,15 @@ package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-public class FocusFormulaProjection implements ProjectionToTerm {
+public class FocusFormulaProjection implements ProjectionToTerm<Goal> {
 
-    public static final ProjectionToTerm INSTANCE = new FocusFormulaProjection();
+    public static final ProjectionToTerm<Goal> INSTANCE = new FocusFormulaProjection();
 
     private FocusFormulaProjection() {}
 

@@ -8,6 +8,8 @@ import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * This feature checks if a rule may be applied automatically. Currently this does not apply to
@@ -15,7 +17,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  */
 public class AutomatedRuleFeature extends BinaryTacletAppFeature {
 
-    public static final Feature INSTANCE = new AutomatedRuleFeature();
+    public static final Feature<Goal> INSTANCE = new AutomatedRuleFeature();
 
     private AutomatedRuleFeature() {}
 

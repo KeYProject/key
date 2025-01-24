@@ -14,9 +14,16 @@ import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.rules.RuleApp;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A default implementation of prover that can be easily reused via subclassing.
+ *
+ * @param <Proof> the type of {@link ProofObject} which the prover constructs
+ * @param <Goal> the type of goals {@link ProofGoal} manipulated by this prover
+ */
 public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Goal extends ProofGoal<@NonNull Goal>>
         extends AbstractProverCore<Proof, Goal> {
 
@@ -53,7 +60,21 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
     /** the goal choose picks the next goal to work on */
     protected GoalChooser<Proof, Goal> goalChooser;
 
-    protected abstract RuleApp updateBuiltInRuleIndex(Goal g, RuleApp app);
+    /**
+     * This is currently a hook method for the JavaDL prover as according to a
+     * comment the built-in-rule index is not updated when rules are applied.
+     * <p>
+     * Ultimately, this has to be fixed in the listener structure of JavaDL.
+     * But for the moment we move it up. Other implementations should implement
+     * this method as an empty method.
+     * </p>
+     *
+     * @param goal the {@link Goal} on which the prover currently works
+     * @param app the {@link RuleApp} to be applied next (if null, the built-in-rule
+     *        index is updated and queried whether a built-in rule is applicable)
+     * @return the next rule app to be applied or {@code null} if none
+     */
+    protected abstract @Nullable RuleApp updateBuiltInRuleIndex(Goal goal, @Nullable RuleApp app);
 
     /**
      * applies rules until this is no longer possible or the thread is interrupted.
