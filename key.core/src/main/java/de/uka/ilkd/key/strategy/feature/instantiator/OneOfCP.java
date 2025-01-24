@@ -6,25 +6,28 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
+import org.key_project.prover.strategy.costbased.feature.instantiator.CPBranch;
+import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 
-public class OneOfCP implements Feature {
+public class OneOfCP implements Feature<Goal> {
 
-    private final Feature[] features;
+    private final Feature<Goal>[] features;
 
     private int theChosenOne;
     private final ChoicePoint cp = new CP();
 
-    private OneOfCP(Feature[] features) {
+    private OneOfCP(Feature<Goal>[] features) {
         this.features = features;
     }
 
-    public static Feature create(Feature[] features) {
+    public static Feature<Goal> create(Feature<Goal>[] features) {
         return new OneOfCP(features);
     }
 

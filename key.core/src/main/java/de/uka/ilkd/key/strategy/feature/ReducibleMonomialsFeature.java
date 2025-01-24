@@ -7,10 +7,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 
 /**
@@ -25,7 +27,8 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         this.divisor = divisor;
     }
 
-    public static Feature createReducible(ProjectionToTerm dividend, ProjectionToTerm divisor) {
+    public static Feature<Goal> createReducible(ProjectionToTerm dividend,
+            ProjectionToTerm divisor) {
         return new ReducibleMonomialsFeature(dividend, divisor) {
             protected boolean checkReducibility(Monomial mDividend, Monomial mDivisor) {
                 return mDivisor.reducible(mDividend);
@@ -33,7 +36,7 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         };
     }
 
-    public static Feature createDivides(ProjectionToTerm dividend, ProjectionToTerm divisor) {
+    public static Feature<Goal> createDivides(ProjectionToTerm dividend, ProjectionToTerm divisor) {
         return new ReducibleMonomialsFeature(dividend, divisor) {
             protected boolean checkReducibility(Monomial mDividend, Monomial mDivisor) {
                 return mDivisor.divides(mDividend);

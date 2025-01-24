@@ -10,11 +10,11 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -22,7 +22,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
 
     private SplittableQuantifiedFormulaFeature() {}
 
-    public static final Feature INSTANCE = new SplittableQuantifiedFormulaFeature();
+    public static final Feature<Goal> INSTANCE = new SplittableQuantifiedFormulaFeature();
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";

@@ -9,6 +9,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * Feature for investigating whether the focus of a rule application is a top-level formula, a
@@ -41,37 +43,37 @@ public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
         }
     }
 
-    public final static Feature ANTEC_OR_SUCC = new TopLevelWithoutUpdate() {
+    public final static Feature<Goal> ANTEC_OR_SUCC = new TopLevelWithoutUpdate() {
         protected boolean matches(PosInOccurrence pos) {
             return true;
         }
     };
 
-    public final static Feature ANTEC = new TopLevelWithoutUpdate() {
+    public final static Feature<Goal> ANTEC = new TopLevelWithoutUpdate() {
         protected boolean matches(PosInOccurrence pos) {
             return pos.isInAntec();
         }
     };
 
-    public final static Feature SUCC = new TopLevelWithoutUpdate() {
+    public final static Feature<Goal> SUCC = new TopLevelWithoutUpdate() {
         protected boolean matches(PosInOccurrence pos) {
             return !pos.isInAntec();
         }
     };
 
-    public final static Feature ANTEC_OR_SUCC_WITH_UPDATE = new TopLevelWithUpdate() {
+    public final static Feature<Goal> ANTEC_OR_SUCC_WITH_UPDATE = new TopLevelWithUpdate() {
         protected boolean matches(PosInOccurrence pos) {
             return true;
         }
     };
 
-    public final static Feature ANTEC_WITH_UPDATE = new TopLevelWithUpdate() {
+    public final static Feature<Goal> ANTEC_WITH_UPDATE = new TopLevelWithUpdate() {
         protected boolean matches(PosInOccurrence pos) {
             return pos.isInAntec();
         }
     };
 
-    public final static Feature SUCC_WITH_UPDATE = new TopLevelWithUpdate() {
+    public final static Feature<Goal> SUCC_WITH_UPDATE = new TopLevelWithUpdate() {
         protected boolean matches(PosInOccurrence pos) {
             return !pos.isInAntec();
         }

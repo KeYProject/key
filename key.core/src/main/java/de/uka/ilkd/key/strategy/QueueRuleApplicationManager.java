@@ -8,16 +8,22 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.feature.Feature;
 
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.RuleApplicationManager;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -27,8 +33,9 @@ import org.jspecify.annotations.Nullable;
  * {@link RuleApp} corresponds to its {@link RuleAppCost}. A {@link RuleApp} can be equipped with a
  * {@link RuleAppCost} by converting it into a {@link RuleAppContainer}. The cost of a
  * {@link RuleApp} is computed according to a given {@link Strategy} (see
- * {@link Feature#computeCost(org.key_project.prover.rules.RuleApp, PosInOccurrence, Goal, de.uka.ilkd.key.strategy.feature.MutableState)}).
+ * {@link Feature#computeCost(RuleApp, PosInOccurrence, ProofGoal, MutableState)}).
  */
+@NullMarked
 public class QueueRuleApplicationManager implements RuleApplicationManager<Goal> {
     public static final AtomicLong PERF_QUEUE_OPS = new AtomicLong();
     public static final AtomicLong PERF_PEEK = new AtomicLong();
@@ -37,26 +44,26 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     /**
      * The goal this manager belongs to.
      */
-    private Goal goal = null;
+    private @Nullable Goal goal = null;
 
     /**
      * Priority queue containing all {@link RuleAppContainer}s that are candidates for application
      * on a {@link Goal}.
      */
-    private ImmutableHeap<RuleAppContainer> queue = null;
+    private @Nullable ImmutableHeap<RuleAppContainer> queue = null;
 
     /**
      * The minimum {@link RuleAppContainer} from a previous round. It is taken out of queue
      * temporarily and is put back in during the next round. After all, the corresponding rule still
      * needs to be taken into consideration for future rule applications.
      */
-    private RuleAppContainer previousMinimum = null;
+    private @Nullable RuleAppContainer previousMinimum = null;
 
     /**
      * The next automatic {@link RuleApp} determined by the strategy. Aka result of methods
      * {@link #next()} and {@link #peekNext()}.
      */
-    private org.key_project.prover.rules.RuleApp nextRuleApp = null;
+    private @Nullable RuleApp nextRuleApp = null;
 
     private long nextRuleTime;
 
@@ -111,7 +118,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      * the heap
      */
     @Override
-    public void ruleAdded(org.key_project.prover.rules.RuleApp rule, PosInOccurrence pos) {
+    public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
         if (queue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
@@ -131,7 +138,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      * the heap
      */
     @Override
-    public void rulesAdded(ImmutableList<? extends org.key_project.prover.rules.RuleApp> rules,
+    public void rulesAdded(ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos) {
         if (queue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
@@ -213,7 +220,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      *         again.
      */
     @Override
-    public org.key_project.prover.rules.RuleApp peekNext() {
+    public RuleApp peekNext() {
         var otime = System.nanoTime();
         try {
             ensureQueueExists();
@@ -234,7 +241,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
              * Create further appcontainers from previous minimum, which was removed from queue in a
              * previous round.
              */
-            ImmutableHeap<RuleAppContainer> furtherAppsQueue =
+            ImmutableHeap<@NonNull RuleAppContainer> furtherAppsQueue =
                 createFurtherApps(previousMinimum, goal);
             previousMinimum = null;
 
@@ -250,8 +257,8 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      *         not obsolete
      */
     @Override
-    public org.key_project.prover.rules.RuleApp next() {
-        final org.key_project.prover.rules.RuleApp res = peekNext();
+    public RuleApp next() {
+        final RuleApp res = peekNext();
         clearNextRuleApp();
         return res;
     }
@@ -265,7 +272,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      * iteration includes all rule app containers that are contained either in primary or secondary
      * queue.
      */
-    private void computeNextRuleApp(ImmutableHeap<RuleAppContainer> furtherAppsQueue) {
+    private void computeNextRuleApp(ImmutableHeap<@NonNull RuleAppContainer> furtherAppsQueue) {
         /*
          * Working list contains rule apps that cannot be completed in the current round but will be
          * reconsidered during the next round.
@@ -376,8 +383,9 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     }
 
     @Override
-    public RuleApplicationManager copy() {
-        return (RuleApplicationManager) clone();
+    public RuleApplicationManager<Goal> copy() {
+        // noinspection unchecked
+        return (RuleApplicationManager<Goal>) clone();
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface for proof goals of a sequent proof.
@@ -37,6 +38,7 @@ public interface ProofGoal<G extends ProofGoal<G>> {
      * @param ruleApp the {@link RuleApp} to be applied
      * @return new goal(s)
      */
+    @Nullable
     ImmutableList<G> apply(@NonNull final RuleApp ruleApp);
 
 

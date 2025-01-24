@@ -5,19 +5,22 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * A feature that evaluates one of two given features, depending on the result of a
  * <code>RuleFilter</code>
  */
-public class ConditionalFeature implements Feature {
+public class ConditionalFeature implements Feature<Goal> {
 
-    private ConditionalFeature(RuleFilter p_cond, Feature p_thenFeature, Feature p_elseFeature) {
+    private ConditionalFeature(RuleFilter p_cond, Feature<Goal> p_thenFeature,
+            Feature<Goal> p_elseFeature) {
         cond = p_cond;
         thenFeature = p_thenFeature;
         elseFeature = p_elseFeature;
@@ -36,7 +39,7 @@ public class ConditionalFeature implements Feature {
      * @param cond the filter that decides which value is to be returned
      * @param thenValue the value of the feature, if <code>filter</code> returns true
      */
-    public static Feature createConditional(RuleFilter cond, RuleAppCost thenValue) {
+    public static Feature<Goal> createConditional(RuleFilter cond, RuleAppCost thenValue) {
         return createConditional(cond, ConstFeature.createConst(thenValue));
     }
 
@@ -45,7 +48,7 @@ public class ConditionalFeature implements Feature {
      * @param thenValue the value of the feature, if <code>filter</code> returns true
      * @param elseValue the value of the feature, if <code>filter</code> returns false
      */
-    public static Feature createConditional(RuleFilter cond, RuleAppCost thenValue,
+    public static Feature<Goal> createConditional(RuleFilter cond, RuleAppCost thenValue,
             RuleAppCost elseValue) {
         return createConditional(cond, ConstFeature.createConst(thenValue),
             ConstFeature.createConst(elseValue));
@@ -56,7 +59,7 @@ public class ConditionalFeature implements Feature {
      * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true returns
      *        false
      */
-    public static Feature createConditional(RuleFilter cond, Feature thenFeature) {
+    public static Feature<Goal> createConditional(RuleFilter cond, Feature<Goal> thenFeature) {
         return createConditional(cond, thenFeature, NumberRuleAppCost.getZeroCost());
     }
 
@@ -65,7 +68,7 @@ public class ConditionalFeature implements Feature {
      * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true
      * @param elseValue the value of the feature, if <code>filter</code> returns false
      */
-    public static Feature createConditional(RuleFilter cond, Feature thenFeature,
+    public static Feature<Goal> createConditional(RuleFilter cond, Feature<Goal> thenFeature,
             RuleAppCost elseValue) {
         return createConditional(cond, thenFeature, ConstFeature.createConst(elseValue));
     }
@@ -75,8 +78,8 @@ public class ConditionalFeature implements Feature {
      * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true
      * @param elseFeature the feature that is evaluted, if <code>filter</code> returns false
      */
-    public static Feature createConditional(RuleFilter cond, Feature thenFeature,
-            Feature elseFeature) {
+    public static Feature<Goal> createConditional(RuleFilter cond, Feature<Goal> thenFeature,
+            Feature<Goal> elseFeature) {
         return new ConditionalFeature(cond, thenFeature, elseFeature);
     }
 
@@ -88,10 +91,10 @@ public class ConditionalFeature implements Feature {
     /**
      * The feature for positive results of <code>filter</code>
      */
-    private final Feature thenFeature;
+    private final Feature<Goal> thenFeature;
 
     /**
      * The feature for negative results of <code>filter</code>
      */
-    private final Feature elseFeature;
+    private final Feature<Goal> elseFeature;
 }

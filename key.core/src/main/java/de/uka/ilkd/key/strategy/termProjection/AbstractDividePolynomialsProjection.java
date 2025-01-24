@@ -9,14 +9,15 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm {
+public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm<Goal> {
 
     private final ProjectionToTerm leftCoefficient, polynomial;
 
@@ -26,6 +27,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
         this.polynomial = polynomial;
     }
 
+    @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Term coeffT = leftCoefficient.toTerm(app, pos, goal, mState);
         final Term polyT = polynomial.toTerm(app, pos, goal, mState);

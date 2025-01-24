@@ -4,15 +4,17 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.RuleAppCost;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * A feature that returns a constant value
  */
-public class ConstFeature implements Feature {
+public class ConstFeature implements Feature<Goal> {
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         return val;
@@ -22,7 +24,7 @@ public class ConstFeature implements Feature {
         val = p_val;
     }
 
-    public static Feature createConst(RuleAppCost p_val) {
+    public static Feature<Goal> createConst(RuleAppCost p_val) {
         return new ConstFeature(p_val);
     }
 

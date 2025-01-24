@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 /**
  * A termfeature that can be used to check whether a term has a specific label
@@ -21,15 +23,14 @@ public class TermLabelTermFeature extends BinaryTermFeature {
         return new TermLabelTermFeature(label);
     }
 
-
     private final TermLabel label;
 
-    private TermLabelTermFeature(TermLabel label) {
+    protected TermLabelTermFeature(TermLabel label) {
         this.label = label;
     }
 
     @Override
-    protected boolean filter(Term t, MutableState mState, Services services) {
+    protected boolean filter(Term t, MutableState mState, LogicServices services) {
         var term = (de.uka.ilkd.key.logic.Term) t;
         if (label == null) {
             return term.hasLabels();

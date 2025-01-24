@@ -9,12 +9,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * Costs for the {@link MergeRule}; cheap if the first statement in the chosen top-level formula is
@@ -22,8 +24,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
  *
  * @author Dominic Scheurer
  */
-public class MergeRuleFeature implements Feature {
-    public static final Feature INSTANCE = new MergeRuleFeature();
+public class MergeRuleFeature implements Feature<Goal> {
+    public static final Feature<Goal> INSTANCE = new MergeRuleFeature();
 
     private MergeRuleFeature() {
         // Singleton constructor

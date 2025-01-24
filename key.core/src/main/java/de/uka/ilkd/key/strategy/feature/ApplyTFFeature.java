@@ -4,20 +4,22 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 /**
  * Feature for invoking a term feature on the instantiation of a schema variable
  */
-public class ApplyTFFeature implements Feature {
+public class ApplyTFFeature implements Feature<Goal> {
 
     private final ProjectionToTerm proj;
     private final TermFeature termFeature;
@@ -39,12 +41,12 @@ public class ApplyTFFeature implements Feature {
         this.demandInst = demandInst;
     }
 
-    public static Feature createNonStrict(ProjectionToTerm proj, TermFeature tf,
+    public static Feature<Goal> createNonStrict(ProjectionToTerm proj, TermFeature tf,
             RuleAppCost noInstCost) {
         return new ApplyTFFeature(proj, tf, noInstCost, false);
     }
 
-    public static Feature create(ProjectionToTerm proj, TermFeature tf) {
+    public static Feature<Goal> create(ProjectionToTerm proj, TermFeature tf) {
         return new ApplyTFFeature(proj, tf, TopRuleAppCost.INSTANCE, true);
     }
 

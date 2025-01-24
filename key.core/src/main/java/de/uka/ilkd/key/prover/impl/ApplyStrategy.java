@@ -19,6 +19,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -193,11 +194,11 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
     }
 
     @Override
-    protected RuleApp updateBuiltInRuleIndex(Goal g, RuleApp app) {
+    protected final @Nullable RuleApp updateBuiltInRuleIndex(Goal goal, @Nullable RuleApp app) {
         // Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
         if (app == null) {
-            g.ruleAppIndex().scanBuiltInRules(g);
-            app = g.getRuleAppManager().next();
+            goal.ruleAppIndex().scanBuiltInRules(goal);
+            app = goal.getRuleAppManager().next();
         }
         // <-------
         return app;

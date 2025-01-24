@@ -8,10 +8,12 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
 
-    public static final Feature INSTANCE = new TriggerVarInstantiatedFeature();
+    public static final Feature<Goal> INSTANCE = new TriggerVarInstantiatedFeature();
 
     private TriggerVarInstantiatedFeature() {
     }

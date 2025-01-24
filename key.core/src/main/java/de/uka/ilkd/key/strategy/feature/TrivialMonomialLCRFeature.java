@@ -7,9 +7,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 
 /**
@@ -26,7 +28,7 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
         this.b = b;
     }
 
-    public static Feature create(ProjectionToTerm a, ProjectionToTerm b) {
+    public static Feature<Goal> create(ProjectionToTerm a, ProjectionToTerm b) {
         return new TrivialMonomialLCRFeature(a, b);
     }
 

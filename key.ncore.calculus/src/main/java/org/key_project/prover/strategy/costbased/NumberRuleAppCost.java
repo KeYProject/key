@@ -1,9 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy;
-
-import de.uka.ilkd.key.util.Debug;
+package org.key_project.prover.strategy.costbased;
 
 import org.key_project.util.LRUCache;
 
@@ -101,7 +99,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         } else if (cost2 instanceof TopRuleAppCost) {
             return TopRuleAppCost.INSTANCE;
         } else {
-            Debug.fail("Can't add costs of class " + cost2.getClass());
+            assert false : "Can't add costs of class " + cost2.getClass();
             // Should not be reached
             return null;
         }

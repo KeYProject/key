@@ -1,16 +1,18 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.feature;
+package org.key_project.prover.strategy.costbased;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.feature.instantiator.BackTrackingManager;
-import de.uka.ilkd.key.strategy.feature.instantiator.ChoicePoint;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
-
 import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
+import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
+import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -31,7 +33,7 @@ import org.key_project.logic.Term;
 public class MutableState {
 
     /** maps a term buffer to its value */
-    private HashMap<TermBuffer, Term> content;
+    private HashMap<TermBuffer<?>, Term> content;
 
     /** manages backtracking for features that create {@link ChoicePoint}s */
     private BackTrackingManager btManager;
@@ -42,7 +44,7 @@ public class MutableState {
      * @param v the {@link TermBuffer}
      * @param value the Term which is assigned as the value
      */
-    public void assign(TermBuffer v, Term value) {
+    public <Goal extends ProofGoal<@NonNull Goal>> void assign(TermBuffer<Goal> v, Term value) {
         if (content == null) {
             content = new HashMap<>();
         }
@@ -55,7 +57,7 @@ public class MutableState {
      * @param v the TermBuffer whose value is asked for
      * @return the current value of the {@link TermBuffer} or {@code null} if there is none
      */
-    public Term read(TermBuffer v) {
+    public <Goal extends ProofGoal<@NonNull Goal>> Term read(TermBuffer<Goal> v) {
         if (content == null) {
             return null;
         }

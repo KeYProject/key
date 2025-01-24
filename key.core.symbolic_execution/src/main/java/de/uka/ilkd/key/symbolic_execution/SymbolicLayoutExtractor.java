@@ -271,7 +271,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true);
                 Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation();
-                ApplyStrategyInfo info = null;
+                ApplyStrategyInfo<Proof, Goal> info = null;
                 try {
                     // Instantiate proof in which equivalent classes of symbolic objects are
                     // computed.
@@ -423,8 +423,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
 
                 TacletApp t2 = c.addInstantiation(cutF, term, false, getServices());
 
-                final ImmutableList<Goal> branches = g.apply(t2);
-                starter.start(branches);
+                starter.start(g.apply(t2));
             }
         }
     }

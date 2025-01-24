@@ -7,12 +7,14 @@ import de.uka.ilkd.key.java.recoderext.MergePointStatement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 /**
  * Costs for the {@link DeleteMergePointRuleFeature}; incredibly cheap if the previous rule
@@ -23,8 +25,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
  *
  * @author Dominic Scheurer
  */
-public class DeleteMergePointRuleFeature implements Feature {
-    public static final Feature INSTANCE = new DeleteMergePointRuleFeature();
+public class DeleteMergePointRuleFeature implements Feature<Goal> {
+    public static final Feature<Goal> INSTANCE = new DeleteMergePointRuleFeature();
 
     private DeleteMergePointRuleFeature() {
         // Singleton constructor

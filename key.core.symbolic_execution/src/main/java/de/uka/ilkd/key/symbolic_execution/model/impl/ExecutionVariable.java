@@ -193,7 +193,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
      * @throws ProofInputException Occurred Exception.
      */
     protected ExecutionValue[] instantiateValuesFromSideProof(InitConfig initConfig,
-            Services services, TermBuilder tb, ApplyStrategyInfo<Proof,Goal> info, Operator resultOperator,
+            Services services, TermBuilder tb, ApplyStrategyInfo<Proof, Goal> info,
+            Operator resultOperator,
             Term siteProofSelectTerm, Term siteProofCondition) throws ProofInputException {
         List<ExecutionValue> result =
             new ArrayList<>(info.getProof().openGoals().size());

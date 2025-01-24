@@ -19,8 +19,8 @@ import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
-import de.uka.ilkd.key.strategy.termfeature.ContainsLabelFeature;
+import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
+import de.uka.ilkd.key.strategy.termfeature.TermLabelTermFeature;
 import de.uka.ilkd.key.symbolic_execution.rule.ModalitySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -28,6 +28,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * {@link Strategy} to use for symbolic execution.
@@ -62,12 +67,12 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
         clearRuleSetBindings(costRsd, "simplify_prog_subset");
         bindRuleSet(costRsd, "simplify_prog_subset", 10000);
 
-        Feature splitF = ScaleFeature.createScaled(CountBranchFeature.INSTANCE, -4000);
+        Feature<Goal> splitF = ScaleFeature.createScaled(CountBranchFeature.INSTANCE, -4000);
         bindRuleSet(costRsd, "split_if", splitF); // The costs of rules in heuristic "split_if" is
-                                                  // reduced at runtime by numberOfBranches * -400.
-                                                  // The result is that rules of "split_if"
-                                                  // preferred to "split_cond" and run and step into
-                                                  // has the same behavior
+        // reduced at runtime by numberOfBranches * -400.
+        // The result is that rules of "split_if"
+        // preferred to "split_cond" and run and step into
+        // has the same behavior
         bindRuleSet(costRsd, "instanceof_to_exists", inftyConst());
 
         // Update instantiation dispatcher
@@ -78,8 +83,8 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
             RuleSetDispatchFeature instRsd = getInstantiationDispatcher();
             enableInstantiate();
             final TermBuffer buffer = new TermBuffer();
-            Feature originalCut = instRsd.get(getHeuristic("cut"));
-            Feature newCut = forEach(buffer, new CutHeapObjectsTermGenerator(),
+            Feature<Goal> originalCut = instRsd.get(getHeuristic("cut"));
+            Feature<Goal> newCut = forEach(buffer, new CutHeapObjectsTermGenerator(),
                 add(instantiate("cutFormula", buffer), longConst(-10000)));
             if (originalCut instanceof OneOfCP) {
                 clearRuleSetBindings(instRsd, "cut");
@@ -96,8 +101,8 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      * {@inheritDoc}
      */
     @Override
-    protected Feature setupApprovalF() {
-        Feature result = super.setupApprovalF();
+    protected Feature<Goal> setupApprovalF() {
+        Feature<Goal> result = super.setupApprovalF();
         // Make sure that cuts are only applied if the cut term is not already part of the sequent.
         // This check is performed exactly before the rule is applied because the sequent might has
         // changed in the time after the schema variable instantiation was instantiated.
@@ -112,8 +117,8 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      * {@inheritDoc}
      */
     @Override
-    protected Feature setupGlobalF(Feature dispatcher) {
-        Feature globalF = super.setupGlobalF(dispatcher);
+    protected Feature<Goal> setupGlobalF(Feature<Goal> dispatcher) {
+        Feature<Goal> globalF = super.setupGlobalF(dispatcher);
         // Make sure that modalities without symbolic execution label are executed first because
         // they might forbid rule application on modalities with symbolic execution label (see loop
         // body branches)
@@ -128,8 +133,10 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
         // Make sure that the modality which executes a loop body is preferred against the
         // modalities which executes special loop terminations like return, exceptions or break.
         globalF =
-            add(globalF, ifZero(new ContainsLabelFeature(SymbolicExecutionUtil.LOOP_BODY_LABEL),
-                longConst(-2000)));
+            add(globalF,
+                ifZero(applyTF(FocusProjection.INSTANCE,
+                    TermLabelTermFeature.create(SymbolicExecutionUtil.LOOP_BODY_LABEL)),
+                    longConst(-2000)));
         globalF = add(globalF, querySideProofFeature());
         globalF = add(globalF, modalitySideProofFeature());
         return globalF;
@@ -140,7 +147,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      *
      * @return The cost {@link Feature} for the {@link ModalitySideProofRule}.
      */
-    protected Feature modalitySideProofFeature() {
+    protected Feature<Goal> modalitySideProofFeature() {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(ModalitySideProofRule.INSTANCE);
         if (StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(
@@ -157,19 +164,19 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      *
      * @return The cost {@link Feature} for the {@link QuerySideProofRule}.
      */
-    protected Feature querySideProofFeature() {
+    protected Feature<Goal> querySideProofFeature() {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(QuerySideProofRule.INSTANCE);
         if (StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(
             strategyProperties.get(
                 StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY))) {
             return ConditionalFeature.createConditional(filter, longConst(-3050)); // Rule must be
-                                                                                   // preferred to
-                                                                                   // rules with
-                                                                                   // heuristic
-                                                                                   // "query_axiom"
-                                                                                   // and rule
-                                                                                   // QueryExpand
+            // preferred to
+            // rules with
+            // heuristic
+            // "query_axiom"
+            // and rule
+            // QueryExpand
         } else {
             return ConditionalFeature.createConditional(filter, inftyConst());
         }
@@ -179,7 +186,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      * {@inheritDoc}
      */
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return name;
     }
 

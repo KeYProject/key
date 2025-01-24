@@ -7,6 +7,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 
 /**
@@ -17,7 +19,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  */
 public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
-    public static final Feature INSTANCE = new EqNonDuplicateAppFeature();
+    public static final Feature<Goal> INSTANCE = new EqNonDuplicateAppFeature();
 
     private EqNonDuplicateAppFeature() {}
 

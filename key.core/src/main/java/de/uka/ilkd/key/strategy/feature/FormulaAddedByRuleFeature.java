@@ -11,6 +11,8 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 
 /**
@@ -25,7 +27,7 @@ public class FormulaAddedByRuleFeature extends BinaryFeature {
         filter = p_filter;
     }
 
-    public static Feature create(RuleFilter p_filter) {
+    public static Feature<Goal> create(RuleFilter p_filter) {
         return new FormulaAddedByRuleFeature(p_filter);
     }
 

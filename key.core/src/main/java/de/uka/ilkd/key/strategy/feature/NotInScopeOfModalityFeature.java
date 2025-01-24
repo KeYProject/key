@@ -11,6 +11,8 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 
 /**
@@ -20,7 +22,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  */
 public class NotInScopeOfModalityFeature extends BinaryFeature {
 
-    public static final Feature INSTANCE = new NotInScopeOfModalityFeature();
+    public static final Feature<Goal> INSTANCE = new NotInScopeOfModalityFeature();
 
     private NotInScopeOfModalityFeature() {}
 

@@ -4,16 +4,21 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
-import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
+import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * {@link Strategy} used to simplify {@link Term}s in side proofs.
@@ -40,7 +45,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
      * {@inheritDoc}
      */
     @Override
-    public Name name() {
+    public @NonNull Name name() {
         return name;
     }
 
@@ -48,9 +53,9 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
      * {@inheritDoc}
      */
     @Override
-    protected Feature setupApprovalF() {
-        Feature superFeature = super.setupApprovalF();
-        Feature labelFeature = (app, pos, goal, mState) -> {
+    protected Feature<Goal> setupApprovalF() {
+        Feature<Goal> superFeature = super.setupApprovalF();
+        Feature<Goal> labelFeature = (app, pos, goal, mState) -> {
             boolean hasLabel = false;
             if (pos != null && app instanceof TacletApp) {
                 Term findTerm = (Term) pos.subTerm();

@@ -5,18 +5,19 @@ package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 
 /**
  * Term projection that delivers the assumptions of a taclet application (the formulas that the
  * \assumes clause of the taclet refers to).
  */
-public class AssumptionProjection implements ProjectionToTerm {
+public class AssumptionProjection implements ProjectionToTerm<Goal> {
 
     private final int no;
 
@@ -24,7 +25,7 @@ public class AssumptionProjection implements ProjectionToTerm {
         this.no = no;
     }
 
-    public static ProjectionToTerm create(int no) {
+    public static ProjectionToTerm<Goal> create(int no) {
         return new AssumptionProjection(no);
     }
 

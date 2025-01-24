@@ -7,13 +7,13 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
  * Ordering used to sort the clauses in a quantified formula. This ordering should only be applied
@@ -36,7 +36,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
             (LiteralsSmallerThanFeature) LiteralsSmallerThanFeature.create(left, right, numbers);
     }
 
-    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
+    public static Feature<Goal> create(ProjectionToTerm left, ProjectionToTerm right,
             IntegerLDT numbers) {
         return new ClausesSmallerThanFeature(left, right, numbers);
     }

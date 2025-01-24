@@ -9,6 +9,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
 
 
 /**
@@ -17,7 +19,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  */
 public class OnlyInScopeOfQuantifiersFeature extends BinaryTacletAppFeature {
 
-    public final static Feature INSTANCE = new OnlyInScopeOfQuantifiersFeature();
+    public final static Feature<Goal> INSTANCE = new OnlyInScopeOfQuantifiersFeature();
 
     private OnlyInScopeOfQuantifiersFeature() {}
 

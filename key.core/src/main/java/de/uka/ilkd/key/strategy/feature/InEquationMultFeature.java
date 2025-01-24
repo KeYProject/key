@@ -7,9 +7,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
  * Feature that decides whether the multiplication of two inequations (using rules of set
@@ -32,7 +34,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
      * @param targetCandidate the left side of the inequation that is supposed to bound the other
      *        two inequations
      */
-    public static Feature partiallyBounded(ProjectionToTerm mult1Candidate,
+    public static Feature<Goal> partiallyBounded(ProjectionToTerm mult1Candidate,
             ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
@@ -45,7 +47,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     /**
      * Return zero iff the product of mult1 and mult2 is a factor of target
      */
-    public static Feature totallyBounded(ProjectionToTerm mult1Candidate,
+    public static Feature<Goal> totallyBounded(ProjectionToTerm mult1Candidate,
             ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
@@ -57,7 +59,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     /**
      * Return zero iff the product of mult1 and mult2 is target
      */
-    public static Feature exactlyBounded(ProjectionToTerm mult1Candidate,
+    public static Feature<Goal> exactlyBounded(ProjectionToTerm mult1Candidate,
             ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {

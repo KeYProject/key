@@ -5,11 +5,13 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
  * Feature that returns zero iff a certain schema variable is instantiated. If the schemavariable is
@@ -19,7 +21,7 @@ public class InstantiatedSVFeature extends BinaryTacletAppFeature {
 
     private final ProjectionToTerm instProj;
 
-    public static Feature create(Name svName) {
+    public static Feature<Goal> create(Name svName) {
         return new InstantiatedSVFeature(svName);
     }
 

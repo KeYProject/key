@@ -9,7 +9,12 @@ import org.key_project.prover.rules.RuleApp;
 import org.jspecify.annotations.NonNull;
 
 /**
- *
+ * This interface provides the next rule application to be applied to the
+ * main loop of the prover.
+ * <p>
+ * Rule application managers are associated with a specific proof goal.
+ * Each proof goal has its own copy of a manager (see {@link #copy()}).
+ * </p>
  */
 public interface RuleApplicationManager<G extends ProofGoal<@NonNull G>> extends NewRuleListener {
 
@@ -36,6 +41,10 @@ public interface RuleApplicationManager<G extends ProofGoal<@NonNull G>> extends
      */
     void setGoal(G p_goal);
 
+    /**
+     * Copies this rule application manager.
+     *
+     * @return copy of this manager
+     */
     RuleApplicationManager<G> copy();
-
 }

@@ -9,15 +9,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
-import de.uka.ilkd.key.strategy.feature.instantiator.BackTrackingManager;
 import de.uka.ilkd.key.strategy.feature.instantiator.ForEachCP;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
 import de.uka.ilkd.key.strategy.feature.instantiator.SVInstantiationCP;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.key_project.logic.Name;
@@ -25,8 +20,17 @@ import org.key_project.logic.Namespace;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.jspecify.annotations.NonNull;
 
 public abstract class AbstractFeatureStrategy extends StaticFeatureCollection implements Strategy {
 
@@ -49,16 +53,17 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
      * @return the conditional feature return true when the rule belongs to one of the given
      *         heuristics
      */
-    protected Feature ifHeuristics(String[] heuristics, Feature thenFeature) {
+    protected Feature<Goal> ifHeuristics(String[] heuristics, Feature<Goal> thenFeature) {
         return ConditionalFeature.createConditional(getFilterFor(heuristics), thenFeature);
     }
 
-    protected Feature ifHeuristics(String[] heuristics, Feature thenFeature, Feature elseFeature) {
+    protected Feature<Goal> ifHeuristics(String[] heuristics, Feature<Goal> thenFeature,
+            Feature<Goal> elseFeature) {
         return ConditionalFeature.createConditional(getFilterFor(heuristics), thenFeature,
             elseFeature);
     }
 
-    protected Feature ifHeuristics(String[] names, int priority) {
+    protected Feature<Goal> ifHeuristics(String[] names, int priority) {
         return ConditionalFeature.createConditional(getFilterFor(names), c(priority), c(0));
     }
 
@@ -72,10 +77,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
 
     protected RuleSet getHeuristic(String p_name) {
         final NamespaceSet nss = getProof().getNamespaces();
-
-        assert nss != null : "Rule set namespace not available.";
-
-        final Namespace<RuleSet> ns = nss.ruleSets();
+        final Namespace<@NonNull RuleSet> ns = nss.ruleSets();
         final RuleSet h = ns.lookup(new Name(p_name));
 
         assert h != null : "Did not find the rule set " + p_name;
@@ -83,7 +85,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         return h;
     }
 
-    protected void bindRuleSet(RuleSetDispatchFeature d, RuleSet ruleSet, Feature f) {
+    protected void bindRuleSet(RuleSetDispatchFeature d, RuleSet ruleSet, Feature<Goal> f) {
         d.add(ruleSet, f);
     }
 
@@ -91,7 +93,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         bindRuleSet(d, ruleSet, longConst(cost));
     }
 
-    protected void bindRuleSet(RuleSetDispatchFeature d, String ruleSet, Feature f) {
+    protected void bindRuleSet(RuleSetDispatchFeature d, String ruleSet, Feature<Goal> f) {
         bindRuleSet(d, getHeuristic(ruleSet), f);
     }
 
@@ -108,7 +110,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     }
 
 
-    public void instantiateApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
+    public void instantiateApp(RuleApp app, PosInOccurrence pio,
             Goal goal,
             RuleAppCostCollector collector) {
         final MutableState mState = new MutableState();
@@ -119,7 +121,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
             if (cost instanceof TopRuleAppCost) {
                 continue;
             }
-            final org.key_project.prover.rules.RuleApp res = btManager.getResultingapp();
+            final RuleApp res = btManager.getResultingapp();
             if (res == app || res == null) {
                 continue;
             }
@@ -130,15 +132,16 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     protected abstract RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             MutableState mState);
 
-    protected Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {
+    protected Feature<Goal> forEach(TermBuffer<Goal> x, TermGenerator gen, Feature<Goal> body) {
         return ForEachCP.create(x, gen, body);
     }
 
-    protected Feature oneOf(Feature[] features) {
+    protected Feature<Goal> oneOf(Feature<Goal>[] features) {
         return OneOfCP.create(features);
     }
 
-    protected Feature oneOf(Feature feature0, Feature feature1) {
+    protected Feature<Goal> oneOf(Feature<Goal> feature0, Feature<Goal> feature1) {
+        // noinspection unchecked
         return oneOf(new Feature[] { feature0, feature1 });
     }
 
@@ -156,7 +159,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         instantiateActive = false;
     }
 
-    protected Feature instantiate(Name sv, ProjectionToTerm value) {
+    protected Feature<Goal> instantiate(Name sv, ProjectionToTerm<Goal> value) {
         if (instantiateActive) {
             return SVInstantiationCP.create(sv, value);
         } else {
@@ -164,7 +167,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         }
     }
 
-    protected Feature instantiateTriggeredVariable(ProjectionToTerm value) {
+    protected Feature<Goal> instantiateTriggeredVariable(ProjectionToTerm<Goal> value) {
         if (instantiateActive) {
             return SVInstantiationCP.createTriggeredVarCP(value);
         } else {
@@ -172,7 +175,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         }
     }
 
-    protected Feature instantiate(String sv, ProjectionToTerm value) {
+    protected Feature<Goal> instantiate(String sv, ProjectionToTerm<Goal> value) {
         return instantiate(new Name(sv), value);
     }
 
