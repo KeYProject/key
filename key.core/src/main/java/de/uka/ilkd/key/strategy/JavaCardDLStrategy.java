@@ -116,7 +116,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     protected Feature<Goal> setupGlobalF(Feature<Goal> dispatcher) {
-        final Feature<Goal> ifMatchedF = ifZero(MatchedIfFeature.INSTANCE, longConst(+1));
+        final Feature<Goal> ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
 
         final Feature<Goal> methodSpecF;
         final String methProp =
@@ -271,9 +271,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupSelectSimplification(d);
 
         bindRuleSet(d, "no_self_application",
-            ifZero(MatchedIfFeature.INSTANCE, NoSelfApplicationFeature.INSTANCE));
+            ifZero(MatchedAssumesFeature.INSTANCE, NoSelfApplicationFeature.INSTANCE));
 
-        bindRuleSet(d, "find_term_not_in_assumes", ifZero(MatchedIfFeature.INSTANCE,
+        bindRuleSet(d, "find_term_not_in_assumes", ifZero(MatchedAssumesFeature.INSTANCE,
             not(contains(AssumptionProjection.create(0), FocusProjection.INSTANCE))));
 
         bindRuleSet(d, "update_elim",
@@ -305,7 +305,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupReplaceKnown(d);
 
         bindRuleSet(d, "confluence_restricted",
-            ifZero(MatchedIfFeature.INSTANCE, DiffFindAndIfFeature.INSTANCE));
+            ifZero(MatchedAssumesFeature.INSTANCE, DiffFindAndIfFeature.INSTANCE));
 
         setupApplyEq(d, numbers);
 
@@ -638,9 +638,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "defOpsStartsEndsWith", longConst(250));
 
-        bindRuleSet(d, "stringsConcatNotBothLiterals", ifZero(MatchedIfFeature.INSTANCE, ifZero(
-            add(applyTF(instOf("leftStr"), seqLiteral), applyTF(instOf("rightStr"), seqLiteral)),
-            inftyConst()), inftyConst()));
+        bindRuleSet(d, "stringsConcatNotBothLiterals",
+            ifZero(MatchedAssumesFeature.INSTANCE, ifZero(
+                add(applyTF(instOf("leftStr"), seqLiteral),
+                    applyTF(instOf("rightStr"), seqLiteral)),
+                inftyConst()), inftyConst()));
 
         bindRuleSet(d, "stringsReduceConcat", longConst(100));
 
@@ -659,7 +661,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupReplaceKnown(RuleSetDispatchFeature d) {
         final Feature<Goal> commonF =
-            add(ifZero(MatchedIfFeature.INSTANCE, DiffFindAndIfFeature.INSTANCE), longConst(-5000),
+            add(ifZero(MatchedAssumesFeature.INSTANCE, DiffFindAndIfFeature.INSTANCE),
+                longConst(-5000),
                 add(DiffFindAndReplacewithFeature.INSTANCE,
                     ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0)));
 
@@ -685,7 +688,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupSystemInvariantSimp(RuleSetDispatchFeature d) {
         bindRuleSet(d, "system_invariant",
-            ifZero(MatchedIfFeature.INSTANCE, add(applyTF("negLit", tf.negLiteral),
+            ifZero(MatchedAssumesFeature.INSTANCE, add(applyTF("negLit", tf.negLiteral),
                 applyTFNonStrict("nonNegLit", tf.nonNegLiteral))));
     }
 
@@ -886,7 +889,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             SumFeature.createSum(ifZero(applyTF(FocusProjection.create(0), tf.intF),
                 add(applyTF(FocusProjection.create(0), tf.monomial),
                     ScaleFeature.createScaled(FindRightishFeature.create(numbers), 5.0))),
-                ifZero(MatchedIfFeature.INSTANCE,
+                ifZero(MatchedAssumesFeature.INSTANCE,
                     add(CheckApplyEqFeature.INSTANCE, let(equation, AssumptionProjection.create(0),
                         add(not(applyTF(equation, ff.update)),
                             // there might be updates in
@@ -1211,7 +1214,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ReducibleMonomialsFeature.createReducible(focus, eqLeft));
 
         final Feature<Goal> eqMonomialFeature = add(not(DirectlyBelowSymbolFeature.create(tf.mul)),
-            ifZero(MatchedIfFeature.INSTANCE, let(focus, FocusProjection.create(0),
+            ifZero(MatchedAssumesFeature.INSTANCE, let(focus, FocusProjection.create(0),
                 let(eqLeft, sub(AssumptionProjection.create(0), 0), validEqApplication))));
 
         bindRuleSet(d, "polySimp_applyEq", add(eqMonomialFeature, longConst(1)));
@@ -1225,8 +1228,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // category "saturate"
 
         bindRuleSet(d, "polySimp_critPair",
-            ifZero(MatchedIfFeature.INSTANCE, add(monSmallerThan("cpLeft1", "cpLeft2", numbers),
-                not(TrivialMonomialLCRFeature.create(instOf("cpLeft1"), instOf("cpLeft2"))))));
+            ifZero(MatchedAssumesFeature.INSTANCE,
+                add(monSmallerThan("cpLeft1", "cpLeft2", numbers),
+                    not(TrivialMonomialLCRFeature.create(instOf("cpLeft1"), instOf("cpLeft2"))))));
     }
 
     // For taclets that need instantiation, but where the instantiation is
@@ -1262,7 +1266,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "polySimp_applyEqPseudo",
             add(applyTF("aePseudoTargetLeft", tf.monomial),
                 applyTF("aePseudoTargetRight", tf.polynomial),
-                ifZero(MatchedIfFeature.INSTANCE,
+                ifZero(MatchedAssumesFeature.INSTANCE,
                     SumFeature.createSum(DiffFindAndIfFeature.INSTANCE,
                         applyTF("aePseudoLeft", add(tf.nonCoeffMonomial, not(tf.atom))),
                         applyTF("aePseudoLeftCoeff", tf.atLeastTwoLiteral),
@@ -1352,7 +1356,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "inEqSimp_exactShadow",
             SumFeature.createSum(applyTF("esLeft", tf.nonCoeffMonomial),
                 applyTFNonStrict("esCoeff2", tf.nonNegLiteral), applyTF("esRight2", tf.polynomial),
-                ifZero(MatchedIfFeature.INSTANCE,
+                ifZero(MatchedAssumesFeature.INSTANCE,
                     SumFeature.createSum(applyTFNonStrict("esCoeff1", tf.nonNegLiteral),
                         applyTF("esRight1", tf.polynomial),
                         not(PolynomialValuesCmpFeature.leq(instOf("esRight2"), instOf("esRight1"),
@@ -1362,7 +1366,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "inEqSimp_contradInEqs",
             add(applyTF("contradLeft", tf.monomial),
-                ifZero(MatchedIfFeature.INSTANCE,
+                ifZero(MatchedAssumesFeature.INSTANCE,
                     SumFeature.createSum(DiffFindAndIfFeature.INSTANCE,
                         applyTF("contradRightSmaller", tf.polynomial),
                         applyTF("contradRightBigger", tf.polynomial),
@@ -1374,7 +1378,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "inEqSimp_contradEqs",
             add(applyTF("contradLeft", tf.monomial),
-                ifZero(MatchedIfFeature.INSTANCE,
+                ifZero(MatchedAssumesFeature.INSTANCE,
                     SumFeature.createSum(applyTF("contradRightSmaller", tf.polynomial),
                         applyTF("contradRightBigger", tf.polynomial), PolynomialValuesCmpFeature
                                 .lt(instOf("contradRightSmaller"), instOf("contradRightBigger")))),
@@ -1384,7 +1388,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "inEqSimp_subsumption",
             add(applyTF("subsumLeft", tf.monomial),
-                ifZero(MatchedIfFeature.INSTANCE,
+                ifZero(MatchedAssumesFeature.INSTANCE,
                     SumFeature.createSum(DiffFindAndIfFeature.INSTANCE,
                         applyTF("subsumRightSmaller", tf.polynomial),
                         applyTF("subsumRightBigger", tf.polynomial),
@@ -1509,7 +1513,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // re-cost-computation delay and the normal costs for a rule application
         bindRuleSet(d, "inEqSimp_nonLin_multiply", add(applyTF("multLeft", tf.nonNegMonomial),
             applyTF("multRight", tf.polynomial),
-            ifZero(MatchedIfFeature.INSTANCE,
+            ifZero(MatchedAssumesFeature.INSTANCE,
                 SumFeature.createSum(applyTF("multFacLeft", tf.nonNegMonomial),
                     ifZero(applyTF("multRight", tf.literal), longConst(-100)),
                     ifZero(applyTF("multFacRight", tf.literal), longConst(-100),
@@ -1570,7 +1574,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             applyTF("divProd", tf.nonCoeffMonomial),
             applyTFNonStrict("divProdBoundNonPos", tf.nonPosLiteral),
             applyTFNonStrict("divProdBoundNonNeg", tf.nonNegLiteral),
-            ifZero(MatchedIfFeature.INSTANCE,
+            ifZero(MatchedAssumesFeature.INSTANCE,
                 let(divisor, instOf("divX"), let(dividend, instOf("divProd"),
                     SumFeature.createSum(applyTF(divisor, tf.nonCoeffMonomial),
                         not(eq(dividend, divisor)), applyTFNonStrict("divXBoundPos", tf.posLiteral),
@@ -1593,7 +1597,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     .createSum(applyTF("divProd", tf.nonCoeffMonomial),
                         applyTFNonStrict("divProdBoundPos", tf.posLiteral),
                         applyTFNonStrict("divProdBoundNeg", tf.negLiteral),
-                        ifZero(MatchedIfFeature.INSTANCE,
+                        ifZero(MatchedAssumesFeature.INSTANCE,
                             let(divisor, instOf("divX"), let(dividend, instOf("divProd"),
                                 SumFeature.createSum(applyTF(divisor, tf.nonCoeffMonomial),
                                     not(applyTF(dividend, eq(divisor))),

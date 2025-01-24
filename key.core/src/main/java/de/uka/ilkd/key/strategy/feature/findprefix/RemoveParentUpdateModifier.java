@@ -19,9 +19,9 @@ public class RemoveParentUpdateModifier implements Modifier {
 
 
     @Override
-    public PosInOccurrence modifyPosistion(PosInOccurrence pos) {
+    public PosInOccurrence modifyPosition(PosInOccurrence pos) {
         if (!pos.isTopLevel() && pos.up().subTerm().op() instanceof UpdateApplication) {
-            return modifyPosistion(pos.up());
+            return modifyPosition(pos.up());
         } else {
             return pos;
         }

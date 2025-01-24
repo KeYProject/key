@@ -16,18 +16,20 @@ public class SortComparisonFeature extends BinaryFeature {
 
     public final static int SUBSORT = 0;
 
-    public static Feature<Goal> create(ProjectionToTerm s1, ProjectionToTerm s2, int cmp) {
+    public static Feature<Goal> create(ProjectionToTerm<Goal> s1, ProjectionToTerm<Goal> s2,
+            int cmp) {
         return new SortComparisonFeature(s1, s2, cmp);
     }
 
-    private final ProjectionToTerm s1;
-    private final ProjectionToTerm s2;
+    private final ProjectionToTerm<Goal> s1;
+    private final ProjectionToTerm<Goal> s2;
     private final int comparator;
 
     /**
      * creates a new comparison term feature
      */
-    private SortComparisonFeature(ProjectionToTerm s1, ProjectionToTerm s2, int comparator) {
+    private SortComparisonFeature(ProjectionToTerm<Goal> s1, ProjectionToTerm<Goal> s2,
+            int comparator) {
         this.s1 = s1;
         this.s2 = s2;
         this.comparator = comparator;

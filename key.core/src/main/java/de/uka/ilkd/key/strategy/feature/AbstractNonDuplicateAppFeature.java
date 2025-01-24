@@ -40,9 +40,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * application <code>newApp</code> at position <code>newPio</code>.<code>newPio</code> can be
      * <code>null</code>
      */
-    protected boolean sameApplication(org.key_project.prover.rules.RuleApp ruleCmp,
-            TacletApp newApp,
-            PosInOccurrence newPio) {
+    protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp, PosInOccurrence newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;
@@ -127,7 +125,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         final Node node = goal.node();
         final AppliedRuleAppsNameCache cache =
             node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();
-        List<org.key_project.prover.rules.RuleApp> apps = cache.get(node, app.rule().name());
+        List<RuleApp> apps = cache.get(node, app.rule().name());
 
         // Check all rules with this name
         for (RuleApp a : apps) {

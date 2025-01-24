@@ -82,7 +82,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
             // find out if they can be the same or not
             RuleSetDispatchFeature instRsd = getInstantiationDispatcher();
             enableInstantiate();
-            final TermBuffer buffer = new TermBuffer();
+            final TermBuffer<Goal> buffer = new TermBuffer<>();
             Feature<Goal> originalCut = instRsd.get(getHeuristic("cut"));
             Feature<Goal> newCut = forEach(buffer, new CutHeapObjectsTermGenerator(),
                 add(instantiate("cutFormula", buffer), longConst(-10000)));
@@ -281,7 +281,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
          * {@inheritDoc}
          */
         @Override
-        public Name name() {
+        public @NonNull Name name() {
             return name;
         }
 

@@ -14,11 +14,11 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * Binary features that returns zero iff the if-formulas of a Taclet are instantiated or the Taclet
  * does not have any if-formulas.
  */
-public final class MatchedIfFeature extends BinaryTacletAppFeature {
+public final class MatchedAssumesFeature extends BinaryTacletAppFeature {
 
-    public static final Feature<Goal> INSTANCE = new MatchedIfFeature();
+    public static final Feature<Goal> INSTANCE = new MatchedAssumesFeature();
 
-    private MatchedIfFeature() {}
+    private MatchedAssumesFeature() {}
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return app.assumesInstantionsComplete();

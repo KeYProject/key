@@ -16,19 +16,20 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  */
 public class TermSmallerThanFeature extends SmallerThanFeature {
 
-    private final ProjectionToTerm left, right;
+    private final ProjectionToTerm<Goal> left, right;
 
-    public static Feature<Goal> create(ProjectionToTerm left, ProjectionToTerm right) {
+    public static Feature<Goal> create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
         return new TermSmallerThanFeature(left, right);
     }
 
-    private TermSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right) {
+    private TermSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
         this.left = left;
         this.right = right;
     }
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return lessThan(left.toTerm(app, pos, goal, mState), right.toTerm(app, pos, goal, mState),
+        return lessThan(left.toTerm(app, pos, goal, mState),
+            right.toTerm(app, pos, goal, mState),
             pos, goal);
     }
 

@@ -16,9 +16,9 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 
 public class ImplicitCastNecessary extends BinaryFeature {
 
-    private final ProjectionToTerm projection;
+    private final ProjectionToTerm<Goal> projection;
 
-    private ImplicitCastNecessary(ProjectionToTerm projection) {
+    private ImplicitCastNecessary(ProjectionToTerm<Goal> projection) {
         this.projection = projection;
     }
 
@@ -31,7 +31,7 @@ public class ImplicitCastNecessary extends BinaryFeature {
         return projection.toTerm(app, pos, goal, mState).sort().extendsTrans(maxSort);
     }
 
-    public static Feature<Goal> create(ProjectionToTerm s1) {
+    public static Feature<Goal> create(ProjectionToTerm<Goal> s1) {
         return new ImplicitCastNecessary(s1);
     }
 

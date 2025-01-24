@@ -22,20 +22,20 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 
 public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
-    private final ProjectionToTerm left, right;
+    private final ProjectionToTerm<Goal> left, right;
     private final IntegerLDT numbers;
 
     private final QuanEliminationAnalyser quanAnalyser = new QuanEliminationAnalyser();
 
 
-    private LiteralsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
+    private LiteralsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         this.left = left;
         this.right = right;
         this.numbers = numbers;
     }
 
-    public static Feature<Goal> create(ProjectionToTerm left, ProjectionToTerm right,
+    public static Feature<Goal> create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         return new LiteralsSmallerThanFeature(left, right, numbers);
     }
@@ -75,12 +75,12 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
         // HACK: we move literals that do not contain any variables to the left,
         // so that they can be moved out of the scope of the quantifiers
-        if (t1.freeVars().size() == 0) {
-            if (t2.freeVars().size() > 0) {
+        if (t1.freeVars().isEmpty()) {
+            if (!t2.freeVars().isEmpty()) {
                 return false;
             }
         } else {
-            if (t2.freeVars().size() == 0) {
+            if (t2.freeVars().isEmpty()) {
                 return true;
             }
         }
