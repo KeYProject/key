@@ -7,88 +7,99 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 import org.key_project.util.collection.ImmutableList;
 
+/**
+ * The {@code ProverCore} interface defines the core operations for managing
+ * and executing automated proof strategies in the KeY framework. Implementations
+ * of this interface provide mechanisms to start proof searches, manage listeners
+ * for proof tasks, and handle interruption or resource cleanup.
+ *
+ * @param <P> The type of proof object, which extends {@link ProofObject}.
+ * @param <G> The type of proof goal, which extends {@link ProofGoal}.
+ */
 public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
 
     /**
-     * constant used by some listeners to determine if a proof macro is running
+     * A constant used by some listeners to identify that a proof macro is running.
      */
     String PROCESSING_STRATEGY = "Processing Strategy";
 
     /**
-     * starts a proof search for a given goals using the given strategy settings instead the ones
-     * configures in the proof
+     * Starts a proof search for the given goal using the specified proof instance and
+     * the strategy settings provided by the proof instance.
      *
-     * @param proof the Proof instance
-     * @param goal the goal to prove
-     * @return an information object about the performed work (e.g. number of rules applied)
+     * @param proof The {@link ProofObject} representing the proof instance.
+     * @param goal The {@link ProofGoal} to prove.
+     * @return An {@link ApplyStrategyInfo} object containing information about the performed work,
+     *         such as the number of rules applied.
      */
     ApplyStrategyInfo<P, G> start(P proof, G goal);
 
     /**
-     * starts a proof search for a set of goals using the given strategy settings instead the ones
-     * configures in the proof
+     * Starts a proof search for a list of goals using the specified proof instance and
+     * strategy settings provided by the proof instance.
      *
-     * @param proof the Proof instance
-     * @param goals list of goals to prove
-     * @return an information object about the performed work (e.g. number of rules applied)
+     * @param proof The {@link ProofObject} representing the proof instance.
+     * @param goals An {@link ImmutableList} of {@link ProofGoal} objects to prove.
+     * @return An {@link ApplyStrategyInfo} object containing information about the performed work,
+     *         such as the number of rules applied.
      */
     ApplyStrategyInfo<P, G> start(P proof, ImmutableList<G> goals);
 
     /**
-     * starts a proof search for a set of goals using the given strategy settings instead the ones
-     * configures in the proof
+     * Starts a proof search for a list of goals using the specified proof instance and
+     * the provided strategy settings.
      *
-     * @param proof the Proof instance
-     * @param goals list of goals to prove
-     * @param stratSet the strategy settings to use
-     * @return an information object about the performed work (e.g. number of rules applied)
+     * @param proof The {@link ProofObject} representing the proof instance.
+     * @param goals An {@link ImmutableList} of {@link ProofGoal} objects to prove.
+     * @param stratSet The strategy settings to use during the proof search.
+     * @return An {@link ApplyStrategyInfo} object containing information about the performed work,
+     *         such as the number of rules applied.
      */
     ApplyStrategyInfo<P, G> start(P proof, ImmutableList<G> goals, Object stratSet);
 
     /**
-     * This entry point to the proof may provide inconsistent data. The properties within the proof
-     * may differ to the explicit data. This is discouraged. starts a proof search for a set of
-     * goals
+     * Starts a proof search for a list of goals using the specified proof instance,
+     * with configurable options for maximum steps, timeout, and early termination.
      *
-     * @param proof the Proof instance
-     * @param goals list of goals to prove
-     * @param maxSteps an int with the maximal number of rule applications to be performed
-     * @param timeout a long with a timeout when tyo stop the proof search at latest
-     * @param stopAtFirstNonCloseableGoal true if the prover shall stop at the first encountered
-     *        non-closable goal
-     * @return an information object about the performed work (e.g. number of rules applied)
+     * @param proof The {@link ProofObject} representing the proof instance.
+     * @param goals An {@link ImmutableList} of {@link ProofGoal} objects to prove.
+     * @param maxSteps The maximum number of rule applications to perform.
+     * @param timeout The maximum duration (in milliseconds) to perform the proof search.
+     * @param stopAtFirstNonCloseableGoal If {@code true}, the proof search stops at the
+     *        first encountered non-closeable goal.
+     * @return An {@link ApplyStrategyInfo} object containing information about the performed work,
+     *         such as the number of rules applied.
      */
     ApplyStrategyInfo<P, G> start(P proof, ImmutableList<G> goals, int maxSteps, long timeout,
             boolean stopAtFirstNonCloseableGoal);
 
     /**
-     * adds a task listener
+     * Adds a listener to monitor proof task events.
      *
-     * @param observer the listener to add
+     * @param observer The {@link ProverTaskListener} to add.
      */
     void addProverTaskObserver(ProverTaskListener observer);
 
     /**
-     * removes a task listener
+     * Removes a listener that monitors proof task events.
      *
-     * @param observer the listener to remove
+     * @param observer The {@link ProverTaskListener} to remove.
      */
     void removeProverTaskObserver(ProverTaskListener observer);
 
     /**
-     * Used by, e.g., {@code InteractiveProver.clear()} in order to prevent memory leaking. When a
-     * proof obligation is abandoned all references to the proof must be reset.
-     *
-     * @author gladisch
+     * Clears all resources and state associated with the current proof session.
+     * This is typically called when a proof obligation is abandoned to prevent
+     * memory leaks and ensure that references to the proof are reset.
      */
     void clear();
 
     /**
-     * Returns true iff the last run has been stopped due to a received
-     * {@link InterruptedException}. This exception would have been swallowed by the system.
-     * However, the cancelled flag is set in this case which allows detection of such a condition.
+     * Indicates whether the last proof run was interrupted due to an {@link InterruptedException}.
+     * This flag allows detection of interruptions even when the exception has been swallowed
+     * by the system.
      *
-     * @return whether the last run has been interrupted
+     * @return {@code true} if the last run was interrupted, {@code false} otherwise.
      */
     boolean hasBeenInterrupted();
 

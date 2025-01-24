@@ -10,13 +10,9 @@ import org.key_project.prover.rules.instantiation.MatchConditions;
 
 /**
  * The instantiations of a schema variable can be restricted on rule scope by attaching conditions
- * on
- * these variables. Such a condition is realized by a class which implements this interface.
+ * on these variables. Such a condition is realized by a class which implements this interface.
  * <br>
- * The usual place where to put these implementations is inside package
- * <code>de.uka.ilkd.key.rule.conditions</code>. For variable conditions that know only black and
- * white answers there exists a convenience class
- * .
+ * For variable conditions that know only black and white answers there exists a convenience class.
  */
 public interface VariableCondition {
     /**
@@ -27,7 +23,7 @@ public interface VariableCondition {
      * @param matchCond the MatchCondition with the current matching state and in particular the
      *        SVInstantiations that are already known to be needed
      * @param services the logic and program information object
-     * @return modified match results if the condition can be satisfied, or <code>null</code>
+     * @return modified match results if the condition can be satisfied, or {@code null}
      *         otherwise
      */
     MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,

@@ -402,7 +402,7 @@ public abstract class Taclet implements Rule {
             sb.append("\n\\trigger{");
             sb.append(trigger.triggerVar());
             sb.append("} ");
-            sb.append(trigger.getTerm());
+            sb.append(trigger.trigger());
             if (trigger.hasAvoidConditions()) {
                 sb.append(" \\avoid ");
                 sb.append(formatAsList(trigger.avoidConditions(), "", ", ", ""));

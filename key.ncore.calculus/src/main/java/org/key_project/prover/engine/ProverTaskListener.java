@@ -9,7 +9,9 @@ package org.key_project.prover.engine;
  */
 public interface ProverTaskListener {
     /**
-
+     * Called when a task is about to start.
+     *
+     * @param info a TaskStartedInfo object with information about the task
      */
     void taskStarted(TaskStartedInfo info);
 

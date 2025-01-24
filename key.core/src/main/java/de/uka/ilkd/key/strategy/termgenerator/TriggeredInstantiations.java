@@ -114,7 +114,7 @@ public class TriggeredInstantiations implements TermGenerator {
                     final Metavariable mv = new Metavariable(new Name("$MV$" + sv.name()), svSort);
 
                     final Term trigger =
-                        instantiateTerm((Term) taclet.getTrigger().getTerm(), services,
+                        instantiateTerm((Term) taclet.getTrigger().trigger(), services,
                             svInst.replace(sv, services.getTermFactory().createTerm(mv), services));
 
                     final Set<org.key_project.logic.Term> instances =
