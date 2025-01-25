@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.proof.Node;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -62,7 +63,7 @@ public class SearchNodeReversePreorderIterator {
      * Computes the previous element and updates {@link #previous()}.
      */
     protected void updatePrevious() {
-        if(previous != null) {
+        if (previous != null) {
             Node parent = previous.parent();
             if (parent != null) {
                 int index = parent.getChildNr(previous);

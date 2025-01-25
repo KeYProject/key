@@ -36,13 +36,13 @@ public class ContextStatementBlockInstantiation {
     /**
      * creates a ContextStatementBlockInstantiation of a context term
      *
-     * @param prefixEnd              the PosInProgram describing the first statement after the end of the prefix
-     * @param suffixStart            the PosInProgram describing the statement just before the suffix begins
+     * @param prefixEnd the PosInProgram describing the first statement after the end of the prefix
+     * @param suffixStart the PosInProgram describing the statement just before the suffix begins
      * @param activeStatementContext the ExecutionContext of the first active statement
-     * @param pe                     the ProgramElement the context positions are related to
+     * @param pe the ProgramElement the context positions are related to
      */
     public ContextStatementBlockInstantiation(PosInProgram prefixEnd, PosInProgram suffixStart,
-                                              ExecutionContext activeStatementContext, ProgramElement pe) {
+            ExecutionContext activeStatementContext, ProgramElement pe) {
 
         this.prefixEnd = prefixEnd;
         this.suffixStart = suffixStart;

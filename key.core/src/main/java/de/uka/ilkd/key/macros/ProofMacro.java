@@ -187,9 +187,9 @@ public interface ProofMacro {
      * @throws InterruptedException if the application of the macro has been interrupted.
      */
     ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-                                   ImmutableList<Goal> goals,
-                                   @Nullable PosInOccurrence posInOcc,
-                                   @Nullable ProverTaskListener listener)
+            ImmutableList<Goal> goals,
+            @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception;
 
     /**
@@ -213,7 +213,7 @@ public interface ProofMacro {
      * @throws InterruptedException if the application of the macro has been interrupted.
      */
     ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
-                                   @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
+            @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
             throws Exception;
 
     /**

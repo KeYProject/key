@@ -1709,17 +1709,17 @@ public final class SpecificationRepository {
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
             switch (spec) {
-                case Contract contract -> addContract(contract);
-                case ClassInvariant classInvariant -> addClassInvariant(classInvariant);
-                case InitiallyClause initiallyClause -> addInitiallyClause(initiallyClause);
-                case ClassAxiom classAxiom -> addClassAxiom(classAxiom);
-                case LoopSpecification loopSpecification -> addLoopInvariant(loopSpecification);
-                case BlockContract blockContract -> addBlockContract(blockContract);
-                case LoopContract loopContract -> addLoopContract(loopContract);
-                case MergeContract mergeContract -> addMergeContract(mergeContract);
-                default -> {
-                    assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
-                }
+            case Contract contract -> addContract(contract);
+            case ClassInvariant classInvariant -> addClassInvariant(classInvariant);
+            case InitiallyClause initiallyClause -> addInitiallyClause(initiallyClause);
+            case ClassAxiom classAxiom -> addClassAxiom(classAxiom);
+            case LoopSpecification loopSpecification -> addLoopInvariant(loopSpecification);
+            case BlockContract blockContract -> addBlockContract(blockContract);
+            case LoopContract loopContract -> addLoopContract(loopContract);
+            case MergeContract mergeContract -> addMergeContract(mergeContract);
+            default -> {
+                assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
+            }
             }
         }
     }

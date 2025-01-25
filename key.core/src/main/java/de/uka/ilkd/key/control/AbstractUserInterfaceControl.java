@@ -207,13 +207,13 @@ public abstract class AbstractUserInterfaceControl
      */
     @Override
     public AbstractProblemLoader load(@Nullable Profile profile,
-                                      @Nullable File file,
-                                      @Nullable List<File> classPath,
-                                      @Nullable File bootClassPath,
-                                      @Nullable List<File> includes,
-                                      @Nullable Properties poPropertiesToForce,
-                                      boolean forceNewProfileOfNewProofs,
-                                      @Nullable Consumer<Proof> callback) throws ProblemLoaderException {
+            @Nullable File file,
+            @Nullable List<File> classPath,
+            @Nullable File bootClassPath,
+            @Nullable List<File> includes,
+            @Nullable Properties poPropertiesToForce,
+            boolean forceNewProfileOfNewProofs,
+            @Nullable Consumer<Proof> callback) throws ProblemLoaderException {
         AbstractProblemLoader loader = null;
         try {
             loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, includes,
@@ -260,7 +260,8 @@ public abstract class AbstractUserInterfaceControl
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-                                @Nullable ProofAggregate proofList, @Nullable ReplayResult result) throws ProblemLoaderException {
+            @Nullable ProofAggregate proofList, @Nullable ReplayResult result)
+            throws ProblemLoaderException {
         if (proofList != null) {
             // avoid double registration at spec repos as that is done already earlier in
             // createProof

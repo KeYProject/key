@@ -20,7 +20,8 @@ public class TopRuleAppCost implements RuleAppCost {
         return 1;
     }
 
-    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o instanceof RuleAppCost) {
             return compareTo((RuleAppCost) o) == 0;
         }

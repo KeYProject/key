@@ -7,10 +7,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -37,8 +38,8 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     // -------------------------------------------------------------------------
 
     public ObserverFunction(String baseName, Sort sort, @Nullable KeYJavaType type, Sort heapSort,
-                            KeYJavaType container, boolean isStatic, ImmutableArray<KeYJavaType> paramTypes,
-                            int heapCount, int stateCount) {
+            KeYJavaType container, boolean isStatic, ImmutableArray<KeYJavaType> paramTypes,
+            int heapCount, int stateCount) {
         super(createName(baseName, container), sort,
             getArgSorts(heapSort, container, isStatic, paramTypes, heapCount, stateCount));
         assert type == null || type.getSort() == sort;

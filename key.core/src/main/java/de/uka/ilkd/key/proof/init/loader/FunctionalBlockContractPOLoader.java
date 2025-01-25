@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init.loader;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
 
 import org.jspecify.annotations.NullMarked;
-
-import java.util.Objects;
 
 /**
  * Loader for proof obligation arises from functional block contracts.
@@ -30,8 +30,8 @@ public class FunctionalBlockContractPOLoader implements ProofObligationLoader {
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
             Configuration properties) {
         String contractName =
-                Objects.requireNonNull(properties.getString("contract"),
-                        "Contract name is required");
+            Objects.requireNonNull(properties.getString("contract"),
+                "Contract name is required");
         int proofNum = 0;
         String baseContractName;
         int ind = -1;

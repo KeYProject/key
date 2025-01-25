@@ -9,6 +9,7 @@ import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.Nullable;
 
 /**

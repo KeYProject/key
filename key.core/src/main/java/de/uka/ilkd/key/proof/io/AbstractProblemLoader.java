@@ -221,7 +221,8 @@ public abstract class AbstractProblemLoader {
      *        the loaded {@link InitConfig}.
      */
     public AbstractProblemLoader(File file, List<File> classPath, File bootClassPath,
-            List<File> includes, @Nullable Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs,
+            List<File> includes, @Nullable Profile profileOfNewProofs,
+            boolean forceNewProfileOfNewProofs,
             ProblemLoaderControl control,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
             Properties poPropertiesToForce) {
@@ -333,7 +334,7 @@ public abstract class AbstractProblemLoader {
      * @see AbstractProblemLoader#load()
      */
     protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
-                                     @Nullable Consumer<Proof> callbackProofLoaded) {
+            @Nullable Consumer<Proof> callbackProofLoaded) {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());
 
@@ -560,7 +561,8 @@ public abstract class AbstractProblemLoader {
         }
 
         // Instantiate proof obligation
-        if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
+        if (envInput instanceof ProofOblInput && chooseContract == null
+                && proofObligation == null) {
             return new LoadedPOContainer((ProofOblInput) envInput);
         } else if (chooseContract != null && !chooseContract.isEmpty()) {
             return loadByChosenContract(chooseContract);

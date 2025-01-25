@@ -1252,7 +1252,7 @@ public final class SourceView extends JComponent {
         }
 
         @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (this == obj) {
                 return true;
             }

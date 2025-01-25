@@ -14,8 +14,9 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.exploration.ExplorationModeModel;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Common functionalities for proof exploration actions.
@@ -29,7 +30,8 @@ public abstract class ExplorationAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
     }
 
-    @Nullable Term promptForTerm(MainWindow window, @Nullable Term term) {
+    @Nullable
+    Term promptForTerm(MainWindow window, @Nullable Term term) {
         final String initialValue =
             term == null ? "" : LogicPrinter.quickPrintTerm(term, getMediator().getServices());
 

@@ -101,7 +101,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     /**
      * the <tt>if</tt> sequent of the taclet
      */
-    private final Sequent ifSequent;
+    private final @Nullable Sequent ifSequent;
 
     /**
      * Variables that have to be created each time the taclet is applied. Those variables occur in
@@ -118,7 +118,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      * formula(SV) Used by skolemization rules.
      */
     @Deprecated
-    private final ImmutableList<NewDependingOn> varsNewDependingOn;
+    private final @Nullable ImmutableList<NewDependingOn> varsNewDependingOn;
 
     /** Additional generic conditions for schema variable instantiations. */
     private final ImmutableList<VariableCondition> variableConditions;
@@ -142,21 +142,21 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     protected final ImmutableMap<SchemaVariable, TacletPrefix> prefixMap;
 
     /** cache; contains set of all bound variables */
-    private ImmutableSet<QuantifiableVariable> boundVariables = null;
+    private @Nullable ImmutableSet<QuantifiableVariable> boundVariables = null;
 
     /** tracks state of pre-computation */
     private boolean contextInfoComputed = false;
     private boolean contextIsInPrefix = false;
 
-    protected String tacletAsString;
+    protected@Nullable String tacletAsString;
 
     /** Set of schemavariables of the if part */
-    private ImmutableSet<SchemaVariable> ifVariables = null;
+    private @Nullable ImmutableSet<SchemaVariable> ifVariables = null;
 
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in this taclet
      */
-    private ImmutableMap<SchemaVariable, SchemaVariable> svNameCorrespondences = null;
+    private @Nullable ImmutableMap<SchemaVariable, SchemaVariable> svNameCorrespondences = null;
 
     /** Integer to cache the hashcode */
     private int hashcode = 0;
@@ -178,12 +178,12 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
     /**
      * The taclet matcher
      */
-    private TacletMatcher matcher;
+    private @Nullable TacletMatcher matcher;
 
     /**
      * The taclet executor
      */
-    protected TacletExecutor<? extends Taclet> executor;
+    protected @Nullable TacletExecutor<? extends Taclet> executor;
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
@@ -312,7 +312,7 @@ public abstract class Taclet implements Rule, Named, EqualsModProofIrrelevancy {
      * @param var the SchemaVariable to look for
      * @return the sort of the SV to match or the SV it shares the same match-sort with
      */
-    public NewVarcond varDeclaredNew(SchemaVariable var) {
+    public @Nullable NewVarcond varDeclaredNew(SchemaVariable var) {
         for (final NewVarcond nv : varsNew) {
             if (nv.getSchemaVariable() == var) {
                 return nv;

@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
-import org.checkerframework.checker.initialization.qual.UnderInitialization;
-
 import javax.swing.*;
+
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
+
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
 
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
 
@@ -87,7 +88,8 @@ public abstract class KeyAction extends AbstractAction {
         KeyStrokeManager.lookupAndOverride(this);
     }
 
-    protected void lookupAcceleratorKey(@UnderInitialization KeyAction this, KeyStroke defaultValue) {
+    protected void lookupAcceleratorKey(@UnderInitialization KeyAction this,
+            KeyStroke defaultValue) {
         KeyStrokeManager.lookupAndOverride(this, defaultValue.toString());
     }
 

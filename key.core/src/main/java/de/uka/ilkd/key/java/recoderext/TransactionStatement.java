@@ -67,7 +67,8 @@ public class TransactionStatement extends JavaStatement {
         return false;
     }
 
-    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o instanceof TransactionStatement) {
             return ((TransactionStatement) o).type == this.type;
         }

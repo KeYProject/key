@@ -18,12 +18,12 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -233,29 +233,29 @@ public final class JavaInfo {
      */
     private String translateArrayType(String s) {
         return switch (s) {
-            case "byte[]" -> "[B";
-            case "int[]" -> "[I";
-            case "long[]" -> "[J";
-            case "short[]" -> "[S";
-            case "char[]" -> "[C";
-            default ->
-                /*
-                 Strangely, this one is not n
-                 else if ("boolean[]".equals(s))
-                 return "[Z";
-                 Not sure if these are needed, commented out for efficiency
-                 else if ("char[]".equals(s))
-                 return "[C";
-                 else if ("double[]".equals(s))
-                 return "[D";
-                 else if ("float[]".equals(s))
-                 return "[F";
-                 else if ("\\real[]".equals(s))
-                 return "[R";
-                 else if ("\\bigint[]".equals(s))
-                 return "[Y";
-                */
-                    s;
+        case "byte[]" -> "[B";
+        case "int[]" -> "[I";
+        case "long[]" -> "[J";
+        case "short[]" -> "[S";
+        case "char[]" -> "[C";
+        default ->
+            /*
+             * Strangely, this one is not n
+             * else if ("boolean[]".equals(s))
+             * return "[Z";
+             * Not sure if these are needed, commented out for efficiency
+             * else if ("char[]".equals(s))
+             * return "[C";
+             * else if ("double[]".equals(s))
+             * return "[D";
+             * else if ("float[]".equals(s))
+             * return "[F";
+             * else if ("\\real[]".equals(s))
+             * return "[R";
+             * else if ("\\bigint[]".equals(s))
+             * return "[Y";
+             */
+            s;
         };
     }
 
@@ -1051,7 +1051,8 @@ public final class JavaInfo {
      * on an object of (dynamic) type {@code kjt} during Java program execution would end up in the
      * same type as the type of the returned {@link ProgramVariable}.
      */
-    public @Nullable ProgramVariable getCanonicalFieldProgramVariable(String fieldName, KeYJavaType kjt) {
+    public @Nullable ProgramVariable getCanonicalFieldProgramVariable(String fieldName,
+            KeYJavaType kjt) {
         ImmutableList<ProgramVariable> allAttributes = getAllAttributes(fieldName, kjt, false);
         if (allAttributes.isEmpty()) {
             return null;
@@ -1567,7 +1568,7 @@ public final class JavaInfo {
      * @param containerType the KeYJavaType of the context in which the type should be resolved
      * @return the KeYJavaType of the given type or <code>null</code> if type name is unknown
      */
-    public KeYJavaType getTypeByClassName(String name,@Nullable KeYJavaType containerType) {
+    public KeYJavaType getTypeByClassName(String name, @Nullable KeYJavaType containerType) {
         KeYJavaType result = getTypeByName(name);
         if (result == null) {
             if (containerType != null) {

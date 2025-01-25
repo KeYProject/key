@@ -5,7 +5,7 @@ package de.uka.ilkd.key.logic.util;
 
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.equality.Property;
-import org.jspecify.annotations.NullMarked;
+
 import org.jspecify.annotations.Nullable;
 
 public class EqualityUtils {

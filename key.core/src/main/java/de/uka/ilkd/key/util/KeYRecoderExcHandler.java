@@ -4,11 +4,11 @@
 package de.uka.ilkd.key.util;
 
 
-import org.checkerframework.checker.initialization.qual.UnderInitialization;
-
 import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
 
 
 public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
@@ -61,7 +61,8 @@ public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {
 
 
     @Override
-    public final void setErrorThreshold(@UnderInitialization KeYRecoderExcHandler this, int maxCount) {
+    public final void setErrorThreshold(@UnderInitialization KeYRecoderExcHandler this,
+            int maxCount) {
         if (maxCount < 0) {
             throw new IllegalArgumentException("Recoder: Threshold should be >= 0");
         }

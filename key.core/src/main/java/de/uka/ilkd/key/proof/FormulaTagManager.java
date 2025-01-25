@@ -3,14 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.util.Debug;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Class to manage the tags of the formulas of a sequent (node). Instances of this class are stored
@@ -40,7 +42,7 @@ public class FormulaTagManager {
     }
 
     private FormulaTagManager(HashMap<FormulaTag, FormulaInfo> p_tagToPIO,
-                              HashMap<PosInOccurrence, FormulaTag> p_pioToTag) {
+            HashMap<PosInOccurrence, FormulaTag> p_pioToTag) {
         tagToFormulaInfo = p_tagToPIO;
         pioToTag = p_pioToTag;
     }
@@ -54,8 +56,8 @@ public class FormulaTagManager {
 
     /**
      * @return The current position of the formula with the given tag; the sequent attribute of the
-     * returned <code>PosInOccurrence</code> can be obsolete and refer to a previous node.
-     * If no formula is assigned to the given tag, <code>null</code> is returned
+     *         returned <code>PosInOccurrence</code> can be obsolete and refer to a previous node.
+     *         If no formula is assigned to the given tag, <code>null</code> is returned
      */
     public @Nullable PosInOccurrence getPosForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
@@ -67,8 +69,8 @@ public class FormulaTagManager {
 
     /**
      * @return The age (as obtained by <code>Goal.getTime()</code>) of the formula, i.e. the time
-     * when the formula was introduced resp. when the last modification was applied to the
-     * formula. If no formula is assigned to the given tag, <code>0</code> is returned
+     *         when the formula was introduced resp. when the last modification was applied to the
+     *         formula. If no formula is assigned to the given tag, <code>0</code> is returned
      */
     public long getAgeForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
@@ -80,7 +82,7 @@ public class FormulaTagManager {
 
     /**
      * @return All modifications that were applied to the formula with the given tag since the
-     * creation of the tag, starting with the most recent one
+     *         creation of the tag, starting with the most recent one
      */
     public ImmutableList<FormulaChangeInfo> getModifications(FormulaTag p_tag) {
         return getFormulaInfo(p_tag).modifications;
@@ -108,7 +110,7 @@ public class FormulaTagManager {
     private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula constrainedFormula : sci.addedFormulas(p_antec)) {
             final PosInOccurrence pio =
-                    new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
+                new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
     }
@@ -116,7 +118,7 @@ public class FormulaTagManager {
     private void removeTags(SequentChangeInfo sci, boolean p_antec) {
         for (SequentFormula constrainedFormula : sci.removedFormulas(p_antec)) {
             final PosInOccurrence pio =
-                    new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
+                new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
             removeTag(pio);
         }
     }
@@ -124,7 +126,7 @@ public class FormulaTagManager {
     @SuppressWarnings("unchecked")
     public FormulaTagManager copy() {
         return new FormulaTagManager((HashMap<FormulaTag, FormulaInfo>) tagToFormulaInfo.clone(),
-                (HashMap<PosInOccurrence, FormulaTag>) pioToTag.clone());
+            (HashMap<PosInOccurrence, FormulaTag>) pioToTag.clone());
     }
 
 
@@ -141,7 +143,7 @@ public class FormulaTagManager {
     /**
      * Create new tags for all formulas of a semisequent
      *
-     * @param p_goal  The sequent that contains the semisequent
+     * @param p_goal The sequent that contains the semisequent
      * @param p_antec true iff the formulas of the antecedent should be added
      */
     private void createNewTags(Goal p_goal, boolean p_antec) {
@@ -227,7 +229,7 @@ public class FormulaTagManager {
         @Override
         public String toString() {
             return "FormulaInfo [pio=" + pio + ", modifications=" + modifications + ", age=" + age
-                    + "]";
+                + "]";
         }
 
         public final PosInOccurrence pio;
@@ -248,7 +250,7 @@ public class FormulaTagManager {
         }
 
         private FormulaInfo(PosInOccurrence p_pio, ImmutableList<FormulaChangeInfo> p_modifications,
-                            long p_age) {
+                long p_age) {
             pio = p_pio;
             modifications = p_modifications;
             age = p_age;
@@ -256,7 +258,7 @@ public class FormulaTagManager {
 
         public FormulaInfo addModification(FormulaChangeInfo p_info, Sequent newSeq, long p_age) {
             final PosInOccurrence newPIO = new PosInOccurrence(p_info.newFormula(),
-                    PosInTerm.getTopLevel(), pio.isInAntec());
+                PosInTerm.getTopLevel(), pio.isInAntec());
 
             return new FormulaInfo(newPIO, modifications.prepend(p_info), p_age);
         }

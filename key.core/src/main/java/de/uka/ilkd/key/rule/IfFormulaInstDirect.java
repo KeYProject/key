@@ -34,7 +34,8 @@ public class IfFormulaInstDirect implements IfFormulaInstantiation {
         return toString(null);
     }
 
-    @Override public boolean equals(@org.jspecify.annotations.Nullable Object p_obj) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object p_obj) {
         if (!(p_obj instanceof IfFormulaInstDirect)) {
             return false;
         }

@@ -20,11 +20,12 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface for predicates used for predicate abstraction. An abstraction predicate is a mapping
@@ -184,7 +185,8 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      */
     public String toParseableString(final Services services) {
         StringBuilder sb = new StringBuilder();
-        Pair<LocationVariable, Term> predicateFormWithPlaceholder = getPredicateFormWithPlaceholder();
+        Pair<LocationVariable, Term> predicateFormWithPlaceholder =
+            getPredicateFormWithPlaceholder();
 
         sb.append("(").append("'").append(predicateFormWithPlaceholder.first.sort()).append(" ")
                 .append(predicateFormWithPlaceholder.first).append("', '")
@@ -254,7 +256,8 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
         }
 
         return Objects.equals(otherPred.placeholderVariable, placeholderVariable)
-                && Objects.equals(otherPred.predicateFormWithPlaceholder, predicateFormWithPlaceholder);
+                && Objects.equals(otherPred.predicateFormWithPlaceholder,
+                    predicateFormWithPlaceholder);
     }
 
 }

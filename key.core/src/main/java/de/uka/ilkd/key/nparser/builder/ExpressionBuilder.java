@@ -211,7 +211,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         return cur;
     }
 
-    private Term binaryTerm(ParserRuleContext ctx, Operator operator, Term left, @Nullable Term right) {
+    private Term binaryTerm(ParserRuleContext ctx, Operator operator, Term left,
+            @Nullable Term right) {
         if (right == null) {
             return updateOrigin(left, ctx, services);
         }

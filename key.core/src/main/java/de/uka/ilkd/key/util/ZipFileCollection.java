@@ -88,7 +88,8 @@ public class ZipFileCollection implements FileCollection {
                 throw new NoSuchElementException();
             } else if (fileRepo != null) {
                 // request an InputStream from the FileRepo
-                URI uri = MiscTools.getZipEntryURI(Objects.requireNonNull(zipFile), currentEntry.getName());
+                URI uri = MiscTools.getZipEntryURI(Objects.requireNonNull(zipFile),
+                    currentEntry.getName());
                 return fileRepo.getInputStream(uri.toURL());
             } else {
                 return openCurrent(); // fallback without FileRepo
@@ -119,7 +120,8 @@ public class ZipFileCollection implements FileCollection {
             // dont use ArchiveDataLocation this keeps the zip open and keeps reference to it!
             try {
                 // since we actually return a zip/jar, we use URLDataLocation
-                URI uri = MiscTools.getZipEntryURI(Objects.requireNonNull(zipFile), currentEntry.getName());
+                URI uri = MiscTools.getZipEntryURI(Objects.requireNonNull(zipFile),
+                    currentEntry.getName());
                 return new URLDataLocation(uri.toURL());
             } catch (IOException e) {
                 LOGGER.warn("Failed to get zip entry uri", e);

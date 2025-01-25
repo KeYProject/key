@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import org.jspecify.annotations.Nullable;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Iterator over subtree. Current implementation iteratively traverses the tree depth-first.

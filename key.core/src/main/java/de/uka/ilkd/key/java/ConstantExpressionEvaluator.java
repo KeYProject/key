@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 
@@ -12,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import recoder.java.JavaProgramFactory;
 import recoder.service.ConstantEvaluator;
 import recoder.service.DefaultConstantEvaluator;
-
-import java.util.Objects;
 
 public class ConstantExpressionEvaluator {
 

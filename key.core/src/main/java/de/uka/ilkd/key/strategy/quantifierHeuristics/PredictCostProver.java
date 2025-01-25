@@ -256,7 +256,7 @@ public class PredictCostProver {
         }
 
         @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (!(o instanceof Clause other)) {
                 return false;
             }

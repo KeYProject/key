@@ -335,7 +335,7 @@ public class HTMLSyntaxHighlighter {
         }
 
         @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (this == o) {
                 return true;
             }

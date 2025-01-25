@@ -4,10 +4,12 @@
 package de.uka.ilkd.key.proof.io.intermediate;
 
 import de.uka.ilkd.key.logic.PosInTerm;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Encapsulates intermediate information for constructing a built-in rule application.

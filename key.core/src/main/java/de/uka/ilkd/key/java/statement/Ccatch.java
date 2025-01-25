@@ -6,10 +6,11 @@ package de.uka.ilkd.key.java.statement;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.util.ExtList;
 
-import java.util.Optional;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Ccatch.
@@ -41,7 +42,7 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
     /**
      * Ccatch.
      *
-     * @param e    a parameter declaration.
+     * @param e a parameter declaration.
      * @param body a statement.
      */
     public Ccatch(ParameterDeclaration e, StatementBlock body) {
@@ -54,7 +55,7 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
     /**
      * Ccatch.
      *
-     * @param e    a parameter declaration.
+     * @param e a parameter declaration.
      * @param body a statement.
      */
     public Ccatch(CcatchNonstandardParameterDeclaration e, StatementBlock body) {
@@ -68,8 +69,8 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
      * Constructor for the transformation of COMPOST ASTs to KeY.
      *
      * @param children the children of this AST element as KeY classes. May contain: Comments, a
-     *                 ParameterDeclaration (declaring the catched exceptions) a StatementBlock (as the
-     *                 action to do when catching)
+     *        ParameterDeclaration (declaring the catched exceptions) a StatementBlock (as the
+     *        action to do when catching)
      */
     public Ccatch(ExtList children) {
         super(children);
@@ -84,11 +85,11 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
     }
 
     public boolean hasParameterDeclaration() {
-        return parameter!=null;
+        return parameter != null;
     }
 
     public boolean hasNonStdParameterDeclaration() {
-        return nonStdParameter!=null;
+        return nonStdParameter != null;
     }
 
     /**

@@ -1055,7 +1055,7 @@ public abstract class SequentView extends JEditorPane {
         }
 
         @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object o) {
             if (o instanceof PIO_age c) {
                 return this.age == c.age && this.pio == c.pio;
             }

@@ -64,8 +64,9 @@ public final class SolverTypes {
      * Z3 counterexample solver.
      */
     public static final @Nullable SolverType Z3_CE_SOLVER =
-            getSolverTypes().stream()
-                    .filter(it -> it.getClass().equals(SolverTypeImplementation.class) && it.getName().equals("Z3_CE"))
-                    .findFirst()
-                    .orElse(null);
+        getSolverTypes().stream()
+                .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
+                        && it.getName().equals("Z3_CE"))
+                .findFirst()
+                .orElse(null);
 }

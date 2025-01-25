@@ -24,7 +24,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
@@ -52,7 +51,6 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
@@ -63,6 +61,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,7 +176,7 @@ public class IntermediateProofReplayer {
      * @return result of the replay procedure (see {@link Result})
      */
     public Result replay(ProblemInitializerListener listener,
-                         ProgressMonitor progressMonitor) {
+            ProgressMonitor progressMonitor) {
         return replay(listener, progressMonitor, true);
     }
 
@@ -193,7 +192,7 @@ public class IntermediateProofReplayer {
      * @return result of the replay procedure (see {@link Result})
      */
     public Result replay(@Nullable ProblemInitializerListener listener,
-                         @Nullable ProgressMonitor progressMonitor, boolean deleteIntermediateTree) {
+            @Nullable ProgressMonitor progressMonitor, boolean deleteIntermediateTree) {
         // initialize progress monitoring
         int stepIndex = 0;
         int reportInterval = 1;
@@ -238,7 +237,8 @@ public class IntermediateProofReplayer {
                             .setProposals(currInterm.getIntermediateRuleApp().getNewNames());
 
                     if (currInterm.getIntermediateRuleApp() instanceof TacletAppIntermediate) {
-                        TacletAppIntermediate appInterm = (TacletAppIntermediate) currInterm.getIntermediateRuleApp();
+                        TacletAppIntermediate appInterm =
+                            (TacletAppIntermediate) currInterm.getIntermediateRuleApp();
 
                         try {
                             currGoal.apply(constructTacletApp(appInterm, currGoal));

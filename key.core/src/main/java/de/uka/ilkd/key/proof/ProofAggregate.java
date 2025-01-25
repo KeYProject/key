@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
-import org.checkerframework.checker.nonempty.qual.EnsuresNonEmpty;
+
 import org.jspecify.annotations.Nullable;
 
 public abstract class ProofAggregate {

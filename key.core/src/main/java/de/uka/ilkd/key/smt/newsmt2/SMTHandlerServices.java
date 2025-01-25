@@ -16,10 +16,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.Streams;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

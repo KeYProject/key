@@ -15,12 +15,12 @@ import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.ParsableVariable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +52,8 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     private final @Nullable KeYJavaType containingType;
 
     protected ProgramVariable(ProgramElementName name, @Nullable Sort s, @Nullable KeYJavaType t,
-                              @Nullable KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost,
+            @Nullable KeYJavaType containingType, boolean isStatic, boolean isModel,
+            boolean isGhost,
             boolean isFinal) {
         super(name, s == null ? t.getSort() : s, false);
         this.type = t;
@@ -68,7 +69,8 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     }
 
     protected ProgramVariable(ProgramElementName name, Sort s, @Nullable KeYJavaType t,
-                              @Nullable KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost) {
+            @Nullable KeYJavaType containingType, boolean isStatic, boolean isModel,
+            boolean isGhost) {
         this(name, s, t, containingType, isStatic, isModel, isGhost, false);
     }
 

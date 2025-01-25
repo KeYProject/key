@@ -30,11 +30,11 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.proof.LocationVariableTracker;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -187,7 +187,8 @@ public class NodeInfo {
      * @param firstStatement The given {@link SourceElement}.
      * @return The active statement or {@code null} if no one is provided.
      */
-    public static @Nullable SourceElement computeActiveStatement(@Nullable SourceElement firstStatement) {
+    public static @Nullable SourceElement computeActiveStatement(
+            @Nullable SourceElement firstStatement) {
         SourceElement activeStatement = null;
         // TODO: unify with MiscTools getActiveStatement
         if (firstStatement != null) {

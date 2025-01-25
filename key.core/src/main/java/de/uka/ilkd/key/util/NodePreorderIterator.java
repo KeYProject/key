@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.proof.Node;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -88,7 +89,7 @@ public class NodePreorderIterator {
      * <b>Attention:</b> Needs to be called before {@link #next()} is called.
      *
      * @return The child index of {@link #next()} on its parent or {@code -1} if no parent is
-     * available.
+     *         available.
      */
     public int getChildIndexOnParent() {
         return childIndexOnParent;

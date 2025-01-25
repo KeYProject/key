@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
+
 import org.jspecify.annotations.Nullable;
 
 public final class JavaModel {
@@ -32,10 +33,11 @@ public final class JavaModel {
     /**
      *
      */
-    public static JavaModel createJavaModel(@Nullable String javaPath, @Nullable List<File> classPath,
-                                            @Nullable File bootClassPath,
-                                            @Nullable Includes includes,
-                                            @Nullable File initialFile) {
+    public static JavaModel createJavaModel(@Nullable String javaPath,
+            @Nullable List<File> classPath,
+            @Nullable File bootClassPath,
+            @Nullable Includes includes,
+            @Nullable File initialFile) {
         JavaModel result;
         if (javaPath == null) {
             result = JavaModel.NO_MODEL;
@@ -57,8 +59,9 @@ public final class JavaModel {
         initialFile = null;
     }
 
-    private JavaModel(String modelDir, @Nullable List<File> classPathEntries, @Nullable File bootClassPath,
-                      @Nullable Includes includes, @Nullable File initialFile) {
+    private JavaModel(String modelDir, @Nullable List<File> classPathEntries,
+            @Nullable File bootClassPath,
+            @Nullable Includes includes, @Nullable File initialFile) {
         this.modelDir = (new File(modelDir)).getAbsolutePath();
         this.modelTag = "KeY_" + (new Date()).getTime();
         this.descr = "model " + (new File(modelDir)).getName() + "@"

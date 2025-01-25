@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.mergerule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.Pair;
 
-import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A symbolic execution state is a pair of a symbolic state in form of a parallel update, and a path
@@ -71,7 +72,8 @@ public class SymbolicExecutionState extends Pair<Term, Term> {
 
     @Override
     public String toString() {
-        final Services services = Objects.requireNonNull(getCorrespondingNode()).proof().getServices();
+        final Services services =
+            Objects.requireNonNull(getCorrespondingNode()).proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
             + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("

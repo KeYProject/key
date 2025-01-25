@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**

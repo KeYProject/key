@@ -10,8 +10,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.key_project.logic.op.Function;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 

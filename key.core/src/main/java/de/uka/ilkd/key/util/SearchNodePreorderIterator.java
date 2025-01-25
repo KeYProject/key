@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.proof.Node;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -66,7 +67,7 @@ public class SearchNodePreorderIterator {
             return;
         }
 
-        var next = this.next; //safe non-null type info
+        var next = this.next; // safe non-null type info
 
         if (!next.leaf()) {
             this.next = next.child(0);

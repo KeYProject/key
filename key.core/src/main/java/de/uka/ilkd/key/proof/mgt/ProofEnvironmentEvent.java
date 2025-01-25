@@ -7,6 +7,7 @@ import java.util.EventObject;
 
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+
 import org.jspecify.annotations.Nullable;
 
 public class ProofEnvironmentEvent extends EventObject {
@@ -14,8 +15,8 @@ public class ProofEnvironmentEvent extends EventObject {
     private final ProofAggregate proofList;
 
     public ProofEnvironmentEvent(ProofEnvironment source,
-                                 @Nullable ProofOblInput po,
-                                 ProofAggregate proofList) {
+            @Nullable ProofOblInput po,
+            ProofAggregate proofList) {
         super(source);
         this.po = po;
         this.proofList = proofList;

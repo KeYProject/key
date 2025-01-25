@@ -131,7 +131,8 @@ public class ProgramSVInstantiation {
      *
      * @return true if the given object and this one have the same listpings
      */
-    @Override public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
         ProgramSVInstantiation cmp;
         if (!(obj instanceof ProgramSVInstantiation)) {
             return false;

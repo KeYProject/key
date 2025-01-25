@@ -221,7 +221,8 @@ public final class PosInOccurrence {
     private final class PIOPathIteratorImpl implements PIOPathIterator {
         int child;
         int count = 0;
-        @Nullable IntIterator currentPathIt;
+        @Nullable
+        IntIterator currentPathIt;
         @Nullable
         Term currentSubTerm = null;
 

@@ -479,7 +479,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
          * {@inheritDoc}
          */
         @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (obj instanceof ChoiceEntry other) {
                 return choice.equals(other.getChoice()) && incomplete == other.isIncomplete()
                         && unsound == other.isUnsound()

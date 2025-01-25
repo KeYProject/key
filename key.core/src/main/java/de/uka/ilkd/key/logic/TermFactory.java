@@ -12,11 +12,11 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The TermFactory is the <em>only</em> way to create terms using constructors of class Term or any
@@ -58,9 +58,9 @@ public final class TermFactory {
      * entire system.
      */
     public Term createTerm(Operator op,
-                           @Nullable ImmutableArray<Term> subs,
-                           @Nullable ImmutableArray<QuantifiableVariable> boundVars,
-                           @Nullable ImmutableArray<TermLabel> labels) {
+            @Nullable ImmutableArray<Term> subs,
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<TermLabel> labels) {
         if (op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -117,8 +117,8 @@ public final class TermFactory {
     }
 
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
-                              @Nullable ImmutableArray<QuantifiableVariable> boundVars,
-                              @Nullable ImmutableArray<TermLabel> labels, String origin) {
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<TermLabel> labels, String origin) {
 
         final TermImpl newTerm =
             (labels == null || labels.isEmpty()
