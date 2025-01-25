@@ -1,25 +1,24 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.feature;
+package org.key_project.prover.strategy.costbased.feature;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.util.Debug;
-
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
-import org.key_project.prover.strategy.costbased.feature.Feature;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A feature that computes the sum of a given list (vector) of features
  */
-public class SumFeature implements Feature<Goal> {
+public class SumFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature<Goal> {
 
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
@@ -39,9 +38,10 @@ public class SumFeature implements Feature<Goal> {
         features = p_features;
     }
 
-    static void flatten(Feature<Goal>[] sumF, LinkedHashSet<Feature<Goal>> p_features) {
+    static <Goal extends ProofGoal<@NonNull Goal>> void flatten(Feature<Goal>[] sumF,
+            LinkedHashSet<Feature<Goal>> p_features) {
         for (Feature<Goal> f : sumF) {
-            if (f instanceof SumFeature sumFeature) {
+            if (f instanceof SumFeature<Goal> sumFeature) {
                 flatten(sumFeature.features, p_features);
             } else {
                 p_features.add(f);
@@ -50,8 +50,9 @@ public class SumFeature implements Feature<Goal> {
     }
 
     @SafeVarargs
-    public static Feature<Goal> createSum(Feature<Goal>... fs) {
-        Debug.assertFalse(fs.length == 0, "Cannot compute the sum of zero features");
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createSum(
+            Feature<Goal>... fs) {
+        assert fs.length != 0 : "Cannot compute the sum of zero features";
 
         if (fs.length == 1) {
             return fs[0];
@@ -59,7 +60,8 @@ public class SumFeature implements Feature<Goal> {
         LinkedHashSet<Feature<Goal>> featureSet = new LinkedHashSet<>();
         flatten(fs, featureSet);
 
-        return new SumFeature(featureSet.<Feature<Goal>>toArray(new Feature[fs.length]));
+        // noinspection unchecked
+        return new SumFeature<Goal>(featureSet.<Feature<Goal>>toArray(new Feature[0]));
     }
 
     private final Feature<Goal>[] features;

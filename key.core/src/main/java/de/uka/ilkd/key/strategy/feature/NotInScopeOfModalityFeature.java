@@ -11,6 +11,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 
@@ -19,7 +20,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * program block or an update). Note that terms and formulas within (but not behind) updates are not
  * in the scope of the update
  */
-public class NotInScopeOfModalityFeature extends BinaryFeature {
+public class NotInScopeOfModalityFeature extends BinaryFeature<Goal> {
 
     public static final Feature<Goal> INSTANCE = new NotInScopeOfModalityFeature();
 

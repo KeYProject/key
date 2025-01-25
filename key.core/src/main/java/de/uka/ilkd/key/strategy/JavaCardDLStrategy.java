@@ -48,7 +48,10 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.BelowBinderFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.FocusInAntecFeature;
+import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.IsNonRigidTermFeature;
@@ -925,7 +928,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private void setupFormulaNormalisation(RuleSetDispatchFeature d, IntegerLDT numbers,
             LocSetLDT locSetLDT) {
 
-        bindRuleSet(d, "negationNormalForm", add(BelowBinderFeature.INSTANCE,
+        bindRuleSet(d, "negationNormalForm", add(BelowBinderFeature.getInstance(),
             longConst(-500), ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 10.0)));
 
         bindRuleSet(d, "moveQuantToLeft",
@@ -935,7 +938,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "conjNormalForm",
             ifZero(
-                add(or(FocusInAntecFeature.INSTANCE, notBelowQuantifier()),
+                add(or(FocusInAntecFeature.getInstance(), notBelowQuantifier()),
                     NotInScopeOfModalityFeature.INSTANCE),
                 add(longConst(-150), ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 20)),
                 inftyConst()));
@@ -966,7 +969,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         EliminableQuantifierTF.INSTANCE)),
                 SumFeature.createSum(onlyInScopeOfQuantifiers(),
                     SplittableQuantifiedFormulaFeature.INSTANCE,
-                    ifZero(FocusInAntecFeature.INSTANCE,
+                    ifZero(FocusInAntecFeature.getInstance(),
                         applyTF(FocusProjection.INSTANCE, sub(ff.andF)),
                         applyTF(FocusProjection.INSTANCE, sub(ff.orF))))),
                 longConst(-300)));
@@ -1016,11 +1019,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
                 applyTF(superFor, or(ff.quantifiedFor, ff.andF, ff.orF)));
 
-        final Feature<Goal> belowUnskolemisableQuantifier = ifZero(FocusInAntecFeature.INSTANCE,
-            not(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
-                not(applyTF(superFor, op(Quantifier.ALL))))),
-            not(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
-                not(applyTF(superFor, op(Quantifier.EX))))));
+        final Feature<Goal> belowUnskolemisableQuantifier =
+            ifZero(FocusInAntecFeature.getInstance(),
+                not(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
+                    not(applyTF(superFor, op(Quantifier.ALL))))),
+                not(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
+                    not(applyTF(superFor, op(Quantifier.EX))))));
 
         bindRuleSet(d, "cnf_expandIfThenElse", add(
             isBelow(OperatorClassTF.create(Quantifier.class)),
@@ -1033,10 +1037,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "pullOutQuantifierUnifying", -20);
 
         bindRuleSet(d, "pullOutQuantifierAll", add(pullOutQuantifierAllowed,
-            ifZero(FocusInAntecFeature.INSTANCE, longConst(-20), longConst(-40))));
+            ifZero(FocusInAntecFeature.getInstance(), longConst(-20), longConst(-40))));
 
         bindRuleSet(d, "pullOutQuantifierEx", add(pullOutQuantifierAllowed,
-            ifZero(FocusInAntecFeature.INSTANCE, longConst(-40), longConst(-20))));
+            ifZero(FocusInAntecFeature.getInstance(), longConst(-40), longConst(-20))));
     }
 
     private Feature<Goal> clausesSmallerThan(String smaller, String bigger, IntegerLDT numbers) {
@@ -1058,7 +1062,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     .create(InstantiationCost.create(varInst), allowQuantifierSplitting());
 
             bindRuleSet(d, "gamma",
-                SumFeature.createSum(FocusInAntecFeature.INSTANCE,
+                SumFeature.createSum(FocusInAntecFeature.getInstance(),
                     applyTF(FocusProjection.create(0),
                         add(ff.quantifiedClauseSet,
                             instQuantifiersWithQueries() ? longTermConst(0)
@@ -1216,7 +1220,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             // otherwise, the normal equation rules can and should
             // be used
             ifZero(applyTF(AssumptionProjection.create(0), atLeastTwoLCEquation),
-                add(FocusInAntecFeature.INSTANCE,
+                add(FocusInAntecFeature.getInstance(),
                     applyTF(FocusFormulaProjection.INSTANCE, atLeastTwoLCEquation))),
             ReducibleMonomialsFeature.createReducible(focus, eqLeft));
 

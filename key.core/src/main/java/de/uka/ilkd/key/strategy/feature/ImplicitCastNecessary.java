@@ -10,10 +10,11 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-public class ImplicitCastNecessary extends BinaryFeature {
+public class ImplicitCastNecessary extends BinaryFeature<Goal> {
 
     private final ProjectionToTerm<Goal> projection;
 

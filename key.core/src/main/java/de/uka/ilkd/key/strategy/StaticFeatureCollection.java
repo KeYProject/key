@@ -19,19 +19,15 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.CompareCostsFeature;
 import de.uka.ilkd.key.strategy.feature.ComprehendedSumFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.ConstFeature;
 import de.uka.ilkd.key.strategy.feature.ImplicitCastNecessary;
 import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
-import de.uka.ilkd.key.strategy.feature.LetFeature;
 import de.uka.ilkd.key.strategy.feature.MergeRuleFeature;
 import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
 import de.uka.ilkd.key.strategy.feature.ShannonFeature;
-import de.uka.ilkd.key.strategy.feature.SortComparisonFeature;
-import de.uka.ilkd.key.strategy.feature.SumFeature;
 import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.TriggerVarInstantiatedFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
@@ -49,7 +45,11 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.CompareCostsFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.LetFeature;
+import org.key_project.prover.strategy.costbased.feature.SortComparisonFeature;
+import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.*;
 import org.key_project.prover.strategy.costbased.termfeature.ApplyTFFeature;
@@ -402,11 +402,11 @@ public abstract class StaticFeatureCollection {
     }
 
 
-    protected static Feature directlyBelowSymbolAtIndex(Operator symbol, int index) {
+    protected static Feature<Goal> directlyBelowSymbolAtIndex(Operator symbol, int index) {
         return directlyBelowSymbolAtIndex(op(symbol), index);
     }
 
-    protected static Feature directlyBelowSymbolAtIndex(TermFeature symbolTF, int index) {
+    protected static Feature<Goal> directlyBelowSymbolAtIndex(TermFeature symbolTF, int index) {
         final var oneUp = FocusProjection.create(1);
         if (index == -1) {
             return applyTF(oneUp, symbolTF);

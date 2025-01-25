@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.proof.Goal;
-
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -13,7 +12,10 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-public class InstantiationCostScalerFeature implements Feature<Goal> {
+import org.jspecify.annotations.NonNull;
+
+public class InstantiationCostScalerFeature<Goal extends ProofGoal<@NonNull Goal>>
+        implements Feature<Goal> {
 
     private final Feature<Goal> costFeature;
     private final Feature<Goal> allowSplitting;
@@ -27,8 +29,9 @@ public class InstantiationCostScalerFeature implements Feature<Goal> {
         this.allowSplitting = allowSplitting;
     }
 
-    public static Feature<Goal> create(Feature<Goal> costFeature, Feature<Goal> allowSplitting) {
-        return new InstantiationCostScalerFeature(costFeature, allowSplitting);
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> create(
+            Feature<Goal> costFeature, Feature<Goal> allowSplitting) {
+        return new InstantiationCostScalerFeature<>(costFeature, allowSplitting);
     }
 
     @Override
