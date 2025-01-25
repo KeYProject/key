@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
@@ -15,6 +14,7 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 /**
  * A feature that computes the sum of the values of a feature term when a given variable ranges over
@@ -23,7 +23,7 @@ import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 public class ComprehendedSumFeature implements Feature<Goal> {
 
     private final TermBuffer<Goal> var;
-    private final TermGenerator generator;
+    private final TermGenerator<Goal> generator;
     private final Feature<Goal> body;
 
     /**
@@ -32,12 +32,12 @@ public class ComprehendedSumFeature implements Feature<Goal> {
      * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
      *        <code>var</code>
      */
-    public static Feature<Goal> create(TermBuffer<Goal> var, TermGenerator generator,
+    public static Feature<Goal> create(TermBuffer<Goal> var, TermGenerator<Goal> generator,
             Feature<Goal> body) {
         return new ComprehendedSumFeature(var, generator, body);
     }
 
-    private ComprehendedSumFeature(TermBuffer<Goal> var, TermGenerator generator,
+    private ComprehendedSumFeature(TermBuffer<Goal> var, TermGenerator<Goal> generator,
             Feature<Goal> body) {
         this.var = var;
         this.generator = generator;

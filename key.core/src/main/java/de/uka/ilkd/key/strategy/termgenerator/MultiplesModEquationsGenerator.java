@@ -21,6 +21,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -38,17 +39,19 @@ import org.key_project.util.collection.ImmutableSLList;
  * In the future, this class should also be used for instantiating explicit quantifiers over the
  * integers.
  */
-public class MultiplesModEquationsGenerator implements TermGenerator {
+public class MultiplesModEquationsGenerator implements TermGenerator<Goal> {
 
-    private final ProjectionToTerm source;
-    private final ProjectionToTerm target;
+    private final ProjectionToTerm<Goal> source;
+    private final ProjectionToTerm<Goal> target;
 
-    private MultiplesModEquationsGenerator(ProjectionToTerm source, ProjectionToTerm target) {
+    private MultiplesModEquationsGenerator(ProjectionToTerm<Goal> source,
+            ProjectionToTerm<Goal> target) {
         this.source = source;
         this.target = target;
     }
 
-    public static TermGenerator create(ProjectionToTerm source, ProjectionToTerm target) {
+    public static TermGenerator<Goal> create(ProjectionToTerm<Goal> source,
+            ProjectionToTerm<Goal> target) {
         return new MultiplesModEquationsGenerator(source, target);
     }
 

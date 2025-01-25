@@ -29,7 +29,9 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
+import org.key_project.prover.strategy.costbased.feature.ConditionalFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
 import org.jspecify.annotations.NonNull;

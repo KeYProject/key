@@ -27,11 +27,11 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 
+import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.util.collection.ImmutableList;

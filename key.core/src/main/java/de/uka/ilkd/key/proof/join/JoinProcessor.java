@@ -15,11 +15,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.delayedcut.NodeGoalPair;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;

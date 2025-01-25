@@ -14,11 +14,11 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.*;

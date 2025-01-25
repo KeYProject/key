@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;

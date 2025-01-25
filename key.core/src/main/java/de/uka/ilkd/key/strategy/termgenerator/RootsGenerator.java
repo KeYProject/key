@@ -20,6 +20,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableSLList;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -32,19 +33,20 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  * addition or multiplication) and {@code l} is a literal. The generator will then produce at most
  * one formula that describes the solutions of the formula using linear (in)equations.
  */
-public class RootsGenerator implements TermGenerator {
+public class RootsGenerator implements TermGenerator<Goal> {
 
-    private final ProjectionToTerm powerRelation;
+    private final ProjectionToTerm<Goal> powerRelation;
 
     private final TermBuilder tb;
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf(2);
 
-    public static TermGenerator create(ProjectionToTerm powerRelation, TermServices services) {
+    public static TermGenerator<Goal> create(ProjectionToTerm<Goal> powerRelation,
+            TermServices services) {
         return new RootsGenerator(powerRelation, services.getTermBuilder());
     }
 
-    private RootsGenerator(ProjectionToTerm powerRelation, TermBuilder tb) {
+    private RootsGenerator(ProjectionToTerm<Goal> powerRelation, TermBuilder tb) {
         this.powerRelation = powerRelation;
         this.tb = tb;
     }

@@ -32,15 +32,16 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.*;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-public class TriggeredInstantiations implements TermGenerator {
+public class TriggeredInstantiations implements TermGenerator<Goal> {
 
-    public static TermGenerator create(boolean skipConditions) {
+    public static TermGenerator<Goal> create(boolean skipConditions) {
         return new TriggeredInstantiations(skipConditions);
     }
 

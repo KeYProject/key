@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.feature.instantiator;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
@@ -19,6 +18,7 @@ import org.key_project.prover.strategy.costbased.feature.instantiator.BackTracki
 import org.key_project.prover.strategy.costbased.feature.instantiator.CPBranch;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 
 /**
