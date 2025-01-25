@@ -35,25 +35,24 @@ import org.key_project.util.collection.ImmutableSet;
 public class SVInstantiationCP implements Feature<Goal> {
 
     private final Name svToInstantiate;
-    private final ProjectionToTerm value;
+    private final ProjectionToTerm<Goal> value;
 
-    public static Feature<Goal> create(Name svToInstantiate, ProjectionToTerm value) {
+    public static Feature<Goal> create(Name svToInstantiate, ProjectionToTerm<Goal> value) {
         return new SVInstantiationCP(svToInstantiate, value);
     }
 
-    public static Feature<Goal> createTriggeredVarCP(ProjectionToTerm value) {
+    public static Feature<Goal> createTriggeredVarCP(ProjectionToTerm<Goal> value) {
         return new SVInstantiationCP(null, value);
     }
 
 
-    private SVInstantiationCP(Name svToInstantiate, ProjectionToTerm value) {
+    private SVInstantiationCP(Name svToInstantiate, ProjectionToTerm<Goal> value) {
         this.svToInstantiate = svToInstantiate;
         this.value = value;
     }
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
-            Goal goal,
-            MutableState mState) {
+            Goal goal, MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
         manager.passChoicePoint(new CP(app, pos, goal, mState), this);
         return NumberRuleAppCost.getZeroCost();

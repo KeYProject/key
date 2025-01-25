@@ -925,7 +925,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private void setupFormulaNormalisation(RuleSetDispatchFeature d, IntegerLDT numbers,
             LocSetLDT locSetLDT) {
 
-        bindRuleSet(d, "negationNormalForm", add(not(NotBelowBinderFeature.INSTANCE),
+        bindRuleSet(d, "negationNormalForm", add(BelowBinderFeature.INSTANCE,
             longConst(-500), ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 10.0)));
 
         bindRuleSet(d, "moveQuantToLeft",
@@ -1858,11 +1858,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 ifZero(applyTF("divDenom", tf.addF),
                     let(denomLC, sub(instOf("divDenom"), 1), not(isReduciblePoly)),
                     let(denomLC, instOf("divDenom"), ifZero(isReduciblePoly,
-                        // no possible division
-                        // has been found so far
+                        // no possible division has been found so far
                         add(NotInScopeOfModalityFeature.INSTANCE, ifZero(isReduciblePolyE,
-                            // try again
-                            // later
+                            // try again later
                             longConst(-POLY_DIVISION_COST)))))),
                 longConst(100)));
 
@@ -1959,9 +1957,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             final Feature<Goal> needsInstantiation = SVNeedsInstantiation.create("sv_heap");
             /*
              * if 'sv_heap' is present and instantiated, allow application only if the heap used to
-             * instantiate 'sv_heap' still occurs in the sequent. Otherwise this was a rather short
-             * lived heap term which has been rewritten since. Hence, we discard it to avoid too
-             * many most likely useless applications.
+             * instantiate 'sv_heap' still occurs in the sequent. Otherwise, this was a rather
+             * short-lived heap term which has been rewritten since. Hence, we discard it to avoid
+             * too many most likely useless applications.
              */
             final Feature<Goal> approveInst = ifZero(isInstantiated("sv_heap"),
                 /*

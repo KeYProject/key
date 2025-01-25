@@ -9,7 +9,6 @@ import de.uka.ilkd.key.logic.op.Operator;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.strategy.costbased.termfeature.ConstantTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 class ArithTermFeatures extends StaticFeatureCollection {
@@ -57,7 +56,7 @@ class ArithTermFeatures extends StaticFeatureCollection {
 
         charLiteral = op(C);
 
-        constant = ConstantTermFeature.INSTANCE;
+        constant = constantTermFeature();
 
         atom = add(not(addF), not(mulF));
         linearMonomial = or(atom, opSub(mul, atom, literal));
