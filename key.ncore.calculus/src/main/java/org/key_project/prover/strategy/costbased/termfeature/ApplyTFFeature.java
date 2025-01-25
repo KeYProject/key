@@ -52,6 +52,7 @@ public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
         return new ApplyTFFeature<>(proj, tf, TopRuleAppCost.INSTANCE, true);
     }
 
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         final Term te = proj.toTerm(app, pos, goal, mState);

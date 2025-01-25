@@ -162,6 +162,7 @@ public abstract class ScaleFeature implements Feature<Goal> {
             offset = p_offset;
         }
 
+        @Override
         public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
                 MutableState mState) {
             final RuleAppCost cost = getFeature().computeCost(app, pos, goal, mState);

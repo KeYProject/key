@@ -25,6 +25,7 @@ public class FindDepthFeature implements Feature<Goal> {
 
     private FindDepthFeature() {}
 
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         // assert pos != null : "Feature is only applicable to rules with find";

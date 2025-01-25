@@ -31,6 +31,7 @@ public class InstantiationCostScalerFeature implements Feature<Goal> {
         return new InstantiationCostScalerFeature(costFeature, allowSplitting);
     }
 
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
 

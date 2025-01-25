@@ -33,6 +33,7 @@ public class CountBranchFeature implements Feature<Goal> {
      * @param mState
      * @return the cost of <code>app</code>
      */
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         if (app.rule() instanceof Taclet tac) {

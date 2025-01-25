@@ -994,8 +994,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             SumFeature.createSum(applyTF("commLeft", ff.clause),
                 applyTF("commRight", ff.clauseSet), applyTFNonStrict("commResidue", ff.clauseSet),
                 // at least one of the subformulas has to be a literal;
-                // otherwise,
-                // sorting is not likely to have any big effect
+                // otherwise, sorting is not likely to have any big effect
                 ifZero(
                     add(applyTF("commLeft", not(ff.literal)),
                         applyTF("commRight", rec(ff.andF, not(ff.literal)))),

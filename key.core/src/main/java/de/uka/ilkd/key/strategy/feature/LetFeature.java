@@ -35,6 +35,7 @@ public class LetFeature implements Feature<Goal> {
         this.body = body;
     }
 
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         final var outerVarContent = var.getContent(mState);

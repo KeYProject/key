@@ -30,6 +30,7 @@ public class RuleSetDispatchFeature implements Feature<Goal> {
 
     private final Map<RuleSet, Feature<Goal>> rulesetToFeature = new LinkedHashMap<>();
 
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         if (!(app instanceof TacletApp)) {
