@@ -10,7 +10,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermLabelTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.TermPredicateTermFeature;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
@@ -89,7 +89,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
             String name = ruleApp.rule().name().toString();
             if (name.equals("hide_right")) {
                 return applyTF("b",
-                    TermLabelTermFeature.create(ParameterlessTermLabel.POST_CONDITION_LABEL))
+                    create(ParameterlessTermLabel.POST_CONDITION_LABEL))
                             .computeCost(ruleApp, pio,
                                 goal, mState);
             } else if (name.equals(AND_RIGHT_RULENAME)) {

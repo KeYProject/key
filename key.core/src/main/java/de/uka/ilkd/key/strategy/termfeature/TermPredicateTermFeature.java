@@ -3,38 +3,36 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.termfeature;
 
+import java.util.function.Predicate;
+
 import de.uka.ilkd.key.logic.label.TermLabel;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
-import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 /**
  * A termfeature that can be used to check whether a term has a specific label
- * {@link #create(TermLabel)} or any label {{@link #HAS_ANY_LABEL} at all.
+ * {@link #create(Predicate<Term>)}.
  */
-public class TermLabelTermFeature extends BinaryTermFeature {
+public class TermPredicateTermFeature extends BinaryTermFeature {
 
-    public static final TermFeature HAS_ANY_LABEL = new TermLabelTermFeature(null);
 
-    public static TermFeature create(TermLabel label) {
-        return new TermLabelTermFeature(label);
+    public static BinaryTermFeature create(Predicate<Term> predicate) {
+        return new TermPredicateTermFeature(predicate);
     }
 
-    private final TermLabel label;
+    private Predicate<Term> property;
 
-    protected TermLabelTermFeature(TermLabel label) {
-        this.label = label;
+    private TermLabel label;
+
+    protected TermPredicateTermFeature(Predicate<Term> property) {
+        this.property = property;
     }
 
     @Override
     protected boolean filter(Term t, MutableState mState, LogicServices services) {
-        var term = (de.uka.ilkd.key.logic.Term) t;
-        if (label == null) {
-            return term.hasLabels();
-        }
-        return term.containsLabel(label);
+        return property.test(t);
     }
 }

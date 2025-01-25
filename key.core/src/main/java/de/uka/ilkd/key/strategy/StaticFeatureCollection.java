@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
@@ -36,7 +37,7 @@ import de.uka.ilkd.key.strategy.feature.TriggerVarInstantiatedFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermLabelTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.TermPredicateTermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
@@ -494,7 +495,6 @@ public abstract class StaticFeatureCollection {
         return SortComparisonFeature.create(s1, s2, SortComparisonFeature.SUBSORT);
     }
 
-
     // Specific features
 
     protected static Feature<Goal> implicitCastNecessary(ProjectionToTerm<Goal> s1) {
@@ -507,13 +507,23 @@ public abstract class StaticFeatureCollection {
 
     protected static TermFeature selectSkolemConstantTermFeature() {
         return add(OperatorClassTF.create(Function.class),
-            ConstantTermFeature.INSTANCE,
-            TermLabelTermFeature.create(ParameterlessTermLabel.SELECT_SKOLEM_LABEL));
+            constantTermFeature(),
+            create(ParameterlessTermLabel.SELECT_SKOLEM_LABEL));
+    }
+
+    public static TermFeature create(TermLabel label) {
+        return TermPredicateTermFeature.create(
+            (t -> t instanceof de.uka.ilkd.key.logic.Term jTerm &&
+                    jTerm.containsLabel(label)));
     }
 
     protected static TermFeature anonHeapTermFeature() {
         return add(OperatorClassTF.create(Function.class),
-            ConstantTermFeature.INSTANCE,
-            TermLabelTermFeature.create(ParameterlessTermLabel.ANON_HEAP_LABEL));
+            constantTermFeature(), create(ParameterlessTermLabel.ANON_HEAP_LABEL));
+    }
+
+    protected static TermFeature constantTermFeature() {
+        return TermPredicateTermFeature
+                .create(term -> term.op() instanceof Function && term.arity() == 0);
     }
 }

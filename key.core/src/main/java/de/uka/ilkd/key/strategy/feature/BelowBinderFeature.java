@@ -17,16 +17,16 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * Returns zero iff the position of a rule application is not below any operators that bind
  * variables
  */
-public class NotBelowBinderFeature extends BinaryFeature {
+public class BelowBinderFeature extends BinaryFeature {
 
-    public static final Feature<Goal> INSTANCE = new NotBelowBinderFeature();
+    public static final Feature<Goal> INSTANCE = new BelowBinderFeature();
 
-    private NotBelowBinderFeature() {}
+    private BelowBinderFeature() {}
 
     public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        return !belowBinder(pos);
+        return belowBinder(pos);
     }
 
     private boolean belowBinder(PosInOccurrence pos) {
