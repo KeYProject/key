@@ -328,6 +328,7 @@ public abstract class AbstractBetaFeature implements Feature<Goal> {
      * @param mState
      * @return the cost of <code>app</code>
      */
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";

@@ -31,6 +31,7 @@ public class InstantiationCost implements Feature<Goal> {
     /**
      * Compute the cost of a RuleApp.
      */
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         assert pos != null : "Projection is only applicable to rules with find";

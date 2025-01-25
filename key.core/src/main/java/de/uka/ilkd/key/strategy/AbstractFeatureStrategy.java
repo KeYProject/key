@@ -64,7 +64,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     }
 
     protected Feature<Goal> ifHeuristics(String[] names, int priority) {
-        return ConditionalFeature.createConditional(getFilterFor(names), c(priority), c(0));
+        return ConditionalFeature.createConditional(getFilterFor(names), cost(priority), cost(0));
     }
 
     protected TacletFilter getFilterFor(String[] p_names) {

@@ -31,6 +31,7 @@ public class OneOfCP implements Feature<Goal> {
         return new OneOfCP(features);
     }
 
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
             Goal goal,
             MutableState mState) {

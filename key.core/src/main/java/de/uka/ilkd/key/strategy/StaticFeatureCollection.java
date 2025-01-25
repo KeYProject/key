@@ -37,7 +37,6 @@ import de.uka.ilkd.key.strategy.feature.TriggerVarInstantiatedFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermPredicateTermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
@@ -54,6 +53,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.*;
 import org.key_project.prover.strategy.costbased.termfeature.ApplyTFFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermPredicateTermFeature;
 
 /**
  * Collection of strategy features that can be accessed statically. This class is essentially a
@@ -149,8 +149,8 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static Feature<Goal> countOccurrences(ProjectionToTerm<Goal> cutFormula) {
-        TermBuffer sf = new TermBuffer();
-        TermBuffer sub = new TermBuffer();
+        final TermBuffer sf = new TermBuffer();
+        final TermBuffer sub = new TermBuffer();
 
         return sum(sf, SequentFormulasGenerator.sequent(),
             sum(sub, SubtermGenerator.leftTraverse(sf, any()),
@@ -179,7 +179,7 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static Feature<Goal> longConst(long a) {
-        return ConstFeature.createConst(c(a));
+        return ConstFeature.createConst(cost(a));
     }
 
     protected static Feature<Goal> inftyConst() {
@@ -191,7 +191,7 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static TermFeature longTermConst(long a) {
-        return ConstTermFeature.createConst(c(a));
+        return ConstTermFeature.createConst(cost(a));
     }
 
     protected static TermFeature inftyTermConst() {
@@ -291,7 +291,7 @@ public abstract class StaticFeatureCollection {
         return CompareCostsFeature.leq(a, b);
     }
 
-    protected static RuleAppCost c(long p) {
+    protected static RuleAppCost cost(long p) {
         return NumberRuleAppCost.create(p);
     }
 

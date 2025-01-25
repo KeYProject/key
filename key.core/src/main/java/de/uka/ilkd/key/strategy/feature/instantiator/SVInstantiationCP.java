@@ -51,6 +51,7 @@ public class SVInstantiationCP implements Feature<Goal> {
         this.value = value;
     }
 
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();

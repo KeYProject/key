@@ -49,6 +49,7 @@ public class ForEachCP implements Feature<Goal> {
         this.body = body;
     }
 
+    @Override
     public RuleAppCost computeCost(final RuleApp app,
             final PosInOccurrence pos, final Goal goal,
             MutableState mState) {

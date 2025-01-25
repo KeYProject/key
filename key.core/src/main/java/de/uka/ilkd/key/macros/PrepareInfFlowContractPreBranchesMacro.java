@@ -10,7 +10,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermPredicateTermFeature;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;

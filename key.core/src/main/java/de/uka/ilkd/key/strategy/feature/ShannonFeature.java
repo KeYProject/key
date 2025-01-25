@@ -50,6 +50,7 @@ public class ShannonFeature implements Feature<Goal> {
         elseFeature = p_elseFeature;
     }
 
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         if (cond.computeCost(app, pos, goal, mState).equals(trueCost)) {

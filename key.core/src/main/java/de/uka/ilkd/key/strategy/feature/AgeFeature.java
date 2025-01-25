@@ -22,6 +22,7 @@ public class AgeFeature implements Feature<Goal> {
 
     private AgeFeature() {}
 
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         return NumberRuleAppCost.create(goal.getTime());

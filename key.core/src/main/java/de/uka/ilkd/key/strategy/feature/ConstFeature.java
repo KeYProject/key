@@ -15,6 +15,8 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * A feature that returns a constant value
  */
 public class ConstFeature implements Feature<Goal> {
+
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         return val;

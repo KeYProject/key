@@ -26,6 +26,7 @@ public class ConditionalFeature implements Feature<Goal> {
         elseFeature = p_elseFeature;
     }
 
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         if (cond.filter(app.rule())) {
