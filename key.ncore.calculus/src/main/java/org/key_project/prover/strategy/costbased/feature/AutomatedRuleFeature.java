@@ -6,6 +6,7 @@ package org.key_project.prover.strategy.costbased.feature;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.AnyRuleSetTacletFilter;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 
@@ -29,6 +30,7 @@ public class AutomatedRuleFeature<Goal extends ProofGoal<@NonNull Goal>>
 
     @Override
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return AnyRuleSetTacletFilter.INSTANCE.filter(app.rule());
+        return !(app.rule() instanceof Taclet)
+                || AnyRuleSetTacletFilter.INSTANCE.filter(app.rule());
     }
 }
