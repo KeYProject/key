@@ -25,7 +25,6 @@ import de.uka.ilkd.key.strategy.definition.*;
 import de.uka.ilkd.key.ui.core.KeYMediator;
 import de.uka.ilkd.key.ui.core.KeYSelectionEvent;
 import de.uka.ilkd.key.ui.core.KeYSelectionListener;
-import de.uka.ilkd.key.util.Triple;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
