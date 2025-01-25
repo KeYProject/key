@@ -12,6 +12,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 
@@ -19,7 +20,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * Binary feature that returns zero iff the find-formula of the concerned rule app was introduced by
  * a certain kind rule of rule (described via a <code>RuleFilter</code>)
  */
-public class FormulaAddedByRuleFeature extends BinaryFeature {
+public class FormulaAddedByRuleFeature extends BinaryFeature<Goal> {
 
     private final RuleFilter filter;
 

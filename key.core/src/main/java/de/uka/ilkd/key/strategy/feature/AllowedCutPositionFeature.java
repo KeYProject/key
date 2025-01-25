@@ -11,6 +11,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 
@@ -18,7 +19,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * Feature that returns zero iff the application focus of a rule is a potential cut position (taclet
  * cut_direct). For positions that are below quantifiers, the feature generally returns zero.
  */
-public class AllowedCutPositionFeature extends BinaryFeature {
+public class AllowedCutPositionFeature extends BinaryFeature<Goal> {
 
     public static final Feature<Goal> INSTANCE = new AllowedCutPositionFeature();
 

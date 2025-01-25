@@ -28,6 +28,7 @@ import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
@@ -121,7 +122,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
         // Make sure that modalities without symbolic execution label are executed first because
         // they might forbid rule application on modalities with symbolic execution label (see loop
         // body branches)
-        globalF = add(globalF, ifZero(not(new BinaryFeature() {
+        globalF = add(globalF, ifZero(not(new BinaryFeature<>() {
             @Override
             protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
                     MutableState mState) {

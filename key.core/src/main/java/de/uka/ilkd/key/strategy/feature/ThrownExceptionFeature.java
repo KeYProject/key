@@ -23,9 +23,10 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-public class ThrownExceptionFeature extends BinaryFeature {
+public class ThrownExceptionFeature extends BinaryFeature<Goal> {
 
     public static Feature<Goal> create(String[] blockedExceptions, Services services) {
         return new ThrownExceptionFeature(blockedExceptions, services);
