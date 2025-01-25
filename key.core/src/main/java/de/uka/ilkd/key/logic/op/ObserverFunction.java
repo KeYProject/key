@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -26,7 +27,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     private final Qualifier<KeYJavaType> container;
     private final boolean isStatic;
     private final ImmutableArray<KeYJavaType> paramTypes;
-    private final KeYJavaType type;
+    private final @Nullable KeYJavaType type;
     private final int heapCount;
     private final int stateCount;
 
@@ -35,9 +36,9 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     // constructors
     // -------------------------------------------------------------------------
 
-    public ObserverFunction(String baseName, Sort sort, KeYJavaType type, Sort heapSort,
-            KeYJavaType container, boolean isStatic, ImmutableArray<KeYJavaType> paramTypes,
-            int heapCount, int stateCount) {
+    public ObserverFunction(String baseName, Sort sort, @Nullable KeYJavaType type, Sort heapSort,
+                            KeYJavaType container, boolean isStatic, ImmutableArray<KeYJavaType> paramTypes,
+                            int heapCount, int stateCount) {
         super(createName(baseName, container), sort,
             getArgSorts(heapSort, container, isStatic, paramTypes, heapCount, stateCount));
         assert type == null || type.getSort() == sort;
@@ -96,7 +97,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
      * @see de.uka.ilkd.key.logic.op.IObserverFunction#getType()
      */
     @Override
-    public final KeYJavaType getType() {
+    public final @Nullable KeYJavaType getType() {
         return type;
     }
 

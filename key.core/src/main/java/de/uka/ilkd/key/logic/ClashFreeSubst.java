@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -58,8 +59,8 @@ public class ClashFreeSubst {
     }
 
     // XXX
-    protected static ImmutableArray<QuantifiableVariable> getSingleArray(
-            ImmutableArray<QuantifiableVariable>[] bv) {
+    protected static @Nullable ImmutableArray<QuantifiableVariable> getSingleArray(
+            @Nullable ImmutableArray<QuantifiableVariable> @Nullable [] bv) {
         if (bv == null) {
             return null;
         }
@@ -84,8 +85,7 @@ public class ClashFreeSubst {
     private Term applyOnSubterms(Term t) {
         final int arity = t.arity();
         final Term[] newSubterms = new Term[arity];
-        @SuppressWarnings("unchecked")
-        final ImmutableArray<QuantifiableVariable>[] newBoundVars = new ImmutableArray[arity];
+        @SuppressWarnings("unchecked") final ImmutableArray<QuantifiableVariable>[] newBoundVars = new ImmutableArray[arity];
         for (int i = 0; i < arity; i++) {
             applyOnSubterm(t, i, newSubterms, newBoundVars);
         }
@@ -98,13 +98,13 @@ public class ClashFreeSubst {
      * <code>newBoundVars</code> (at index <code>subtermIndex</code>)
      */
     protected void applyOnSubterm(Term completeTerm, int subtermIndex, Term[] newSubterms,
-            ImmutableArray<QuantifiableVariable>[] newBoundVars) {
+                                  ImmutableArray<QuantifiableVariable>[] newBoundVars) {
         if (subTermChanges(completeTerm.varsBoundHere(subtermIndex),
-            completeTerm.sub(subtermIndex))) {
+                completeTerm.sub(subtermIndex))) {
             final QuantifiableVariable[] nbv =
-                new QuantifiableVariable[completeTerm.varsBoundHere(subtermIndex).size()];
+                    new QuantifiableVariable[completeTerm.varsBoundHere(subtermIndex).size()];
             applyOnSubterm(0, completeTerm.varsBoundHere(subtermIndex), nbv, subtermIndex,
-                completeTerm.sub(subtermIndex), newSubterms);
+                    completeTerm.sub(subtermIndex), newSubterms);
             newBoundVars[subtermIndex] = new ImmutableArray<>(nbv);
         } else {
             newBoundVars[subtermIndex] = completeTerm.varsBoundHere(subtermIndex);
@@ -118,13 +118,13 @@ public class ClashFreeSubst {
      * resulting bound variables (which might be new) into <code>newBoundVars</code>, starting from
      * position <code>varInd</code>, and the resulting subTerm into
      * <code>newSubterms[subInd]</code>.
-     * <P>
+     * <p>
      * It is assumed that <code>v</code> occurrs free in in this quantified subterm, i.e. it occurrs
      * free in <code>subTerm</code>, but does not occurr in <code>boundVars</code> from
      * <code>varInd</code> upwards..
      */
     private void applyOnSubterm(int varInd, ImmutableArray<QuantifiableVariable> boundVars,
-            QuantifiableVariable[] newBoundVars, int subInd, Term subTerm, Term[] newSubterms) {
+                                QuantifiableVariable[] newBoundVars, int subInd, Term subTerm, Term[] newSubterms) {
         if (varInd >= boundVars.size()) {
             newSubterms[subInd] = apply1(subTerm);
         } else {
@@ -147,10 +147,10 @@ public class ClashFreeSubst {
                 // Substitute that for the old one.
                 newBoundVars[varInd] = qv1;
                 new ClashFreeSubst(qv, tb.var(qv1), tb).applyOnSubterm1(varInd + 1, boundVars,
-                    newBoundVars, subInd, subTerm, newSubterms);
+                        newBoundVars, subInd, subTerm, newSubterms);
                 // then continue recursively, on the result.
                 applyOnSubterm(varInd + 1, new ImmutableArray<>(newBoundVars),
-                    newBoundVars, subInd, newSubterms[subInd], newSubterms);
+                        newBoundVars, subInd, newSubterms[subInd], newSubterms);
             } else {
                 newBoundVars[varInd] = qv;
                 applyOnSubterm(varInd + 1, boundVars, newBoundVars, subInd, subTerm, newSubterms);
@@ -163,7 +163,7 @@ public class ClashFreeSubst {
      * subterm. It is however assumed that no more clash can occurr.
      */
     private void applyOnSubterm1(int varInd, ImmutableArray<QuantifiableVariable> boundVars,
-            QuantifiableVariable[] newBoundVars, int subInd, Term subTerm, Term[] newSubterms) {
+                                 QuantifiableVariable[] newBoundVars, int subInd, Term subTerm, Term[] newSubterms) {
         if (varInd >= boundVars.size()) {
             newSubterms[subInd] = apply(subTerm);
         } else {
@@ -186,7 +186,7 @@ public class ClashFreeSubst {
      * <code>subTerm</code>, but does not occurr in <code>boundVars</code>.
      *
      * @returns true if <code>subTerm</code> bound by <code>boundVars</code> would change under
-     *          application of this substitution
+     * application of this substitution
      */
     protected boolean subTermChanges(ImmutableArray<QuantifiableVariable> boundVars, Term subTerm) {
         if (!subTerm.freeVars().contains(v)) {
@@ -204,11 +204,11 @@ public class ClashFreeSubst {
     /**
      * returns a new variable that has a name derived from that of <code>var</code>, that is
      * different from any of the names of variables in <code>usedVars</code>.
-     * <P>
+     * <p>
      * Assumes that <code>var</code> is a @link{LogicVariable}.
      */
     protected LogicVariable newVarFor(QuantifiableVariable var,
-            ImmutableSet<QuantifiableVariable> usedVars) {
+                                      ImmutableSet<QuantifiableVariable> usedVars) {
         LogicVariable lv = (LogicVariable) var;
         String stem = var.name().toString();
         int i = 1;
@@ -232,14 +232,19 @@ public class ClashFreeSubst {
 
     // This helper is used in other places as well. Perhaps make it toplevel one
     // day.
+
     /**
      * A Visitor class to collect all (not just the free) variables occurring in a term.
      */
     public static class VariableCollectVisitor implements DefaultVisitor {
-        /** the collected variables */
+        /**
+         * the collected variables
+         */
         private ImmutableSet<QuantifiableVariable> vars;
 
-        /** creates the Variable collector */
+        /**
+         * creates the Variable collector
+         */
         public VariableCollectVisitor() {
             vars = DefaultImmutableSet.nil();
         }
@@ -258,7 +263,9 @@ public class ClashFreeSubst {
             }
         }
 
-        /** the set of all occurring variables. */
+        /**
+         * the set of all occurring variables.
+         */
         public ImmutableSet<QuantifiableVariable> vars() {
             return vars;
         }

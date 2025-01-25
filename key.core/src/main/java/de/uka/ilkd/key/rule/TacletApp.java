@@ -67,7 +67,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * set of schema variables that appear in the Taclet and need to be instantiated but are not
      * instantiated yet. This means SchemaVariables in addrule-sections have to be ignored
      */
-    private volatile ImmutableSet<SchemaVariable> missingVars = null;
+    private volatile @Nullable ImmutableSet<SchemaVariable> missingVars = null;
 
     /**
      * the update context given by the current instantiations must not be changed
@@ -895,7 +895,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return a list of tacletapps with the found if formula instantiations
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
-            ImmutableList<SequentFormula> ruleSuccTail, ImmutableList<SequentFormula> ruleAntecTail,
+            @Nullable ImmutableList<SequentFormula> ruleSuccTail,
+            @Nullable ImmutableList<SequentFormula> ruleAntecTail,
             ImmutableArray<IfFormulaInstantiation> instSucc,
             ImmutableArray<IfFormulaInstantiation> instAntec,
             ImmutableList<IfFormulaInstantiation> instAlreadyMatched, MatchConditions matchCond,
@@ -1144,7 +1145,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         return taclet().admissible(interactive, ruleSets);
     }
 
-    public ProgramElement getProgramElement(String instantiation, ProgramSV sv,
+    public @Nullable ProgramElement getProgramElement(String instantiation, ProgramSV sv,
             Services services) {
         Sort svSort = sv.sort();
         if (svSort == ProgramSVSort.LABEL) {

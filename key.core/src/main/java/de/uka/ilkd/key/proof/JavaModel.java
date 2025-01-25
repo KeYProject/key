@@ -9,20 +9,21 @@ import java.util.Date;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
+import org.jspecify.annotations.Nullable;
 
 public final class JavaModel {
 
     /**
      * Directory of Java source files. May be null if the proof doesn't refer to any Java code.
      */
-    private final String modelDir;
-    private final String modelTag;
+    private final @Nullable String modelDir;
+    private final @Nullable String modelTag;
     private final String descr;
-    private final String classPath;
-    private final List<File> classPathEntries;
-    private final String bootClassPath;
-    private final String includedFiles;
-    private final File initialFile;
+    private final @Nullable String classPath;
+    private final @Nullable List<File> classPathEntries;
+    private final @Nullable String bootClassPath;
+    private final @Nullable String includedFiles;
+    private final @Nullable File initialFile;
 
     public static final JavaModel NO_MODEL = new JavaModel();
 
@@ -31,8 +32,10 @@ public final class JavaModel {
     /**
      *
      */
-    public static JavaModel createJavaModel(String javaPath, List<File> classPath,
-            File bootClassPath, Includes includes, File initialFile) {
+    public static JavaModel createJavaModel(@Nullable String javaPath, @Nullable List<File> classPath,
+                                            @Nullable File bootClassPath,
+                                            @Nullable Includes includes,
+                                            @Nullable File initialFile) {
         JavaModel result;
         if (javaPath == null) {
             result = JavaModel.NO_MODEL;
@@ -54,8 +57,8 @@ public final class JavaModel {
         initialFile = null;
     }
 
-    private JavaModel(String modelDir, List<File> classPathEntries, File bootClassPath,
-            Includes includes, File initialFile) {
+    private JavaModel(String modelDir, @Nullable List<File> classPathEntries, @Nullable File bootClassPath,
+                      @Nullable Includes includes, @Nullable File initialFile) {
         this.modelDir = (new File(modelDir)).getAbsolutePath();
         this.modelTag = "KeY_" + (new Date()).getTime();
         this.descr = "model " + (new File(modelDir)).getName() + "@"
@@ -84,31 +87,31 @@ public final class JavaModel {
         this.initialFile = initialFile;
     }
 
-    public String getModelDir() {
+    public @Nullable String getModelDir() {
         return modelDir;
     }
 
-    public String getModelTag() {
+    public @Nullable String getModelTag() {
         return modelTag;
     }
 
-    public String getClassPath() {
+    public @Nullable String getClassPath() {
         return classPath;
     }
 
-    public List<File> getClassPathEntries() {
+    public @Nullable List<File> getClassPathEntries() {
         return classPathEntries;
     }
 
-    public String getBootClassPath() {
+    public @Nullable String getBootClassPath() {
         return bootClassPath;
     }
 
-    public String getIncludedFiles() {
+    public @Nullable String getIncludedFiles() {
         return includedFiles;
     }
 
-    public File getInitialFile() {
+    public @Nullable File getInitialFile() {
         return initialFile;
     }
 

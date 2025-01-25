@@ -4,9 +4,12 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
+import org.checkerframework.checker.nonempty.qual.EnsuresNonEmpty;
+import org.jspecify.annotations.Nullable;
 
 public abstract class ProofAggregate {
 
@@ -24,7 +27,7 @@ public abstract class ProofAggregate {
         }
     }
 
-    public static ProofAggregate createProofAggregate(Proof[] proofs, String name) {
+    public static @Nullable ProofAggregate createProofAggregate(Proof[] proofs, String name) {
         if (proofs.length == 0) {
             return null; // needed for tests
         }
@@ -43,16 +46,18 @@ public abstract class ProofAggregate {
         return new SingleProof(proof, name);
     }
 
-    public abstract Proof[] getProofs();
+    public abstract Proof @Nullable [] getProofs();
 
-    public Proof getFirstProof() {
+    public @Nullable Proof getFirstProof() {
         return getProofs() != null && getProofs().length >= 1 ? getProofs()[0] : null;
     }
 
     public void setProofEnv(ProofEnvironment env) {
         Proof[] proofs = getProofs();
-        for (Proof proof : proofs) {
-            proof.setEnv(env);
+        if (proofs != null) {
+            for (Proof proof : proofs) {
+                proof.setEnv(env);
+            }
         }
     }
 
@@ -63,7 +68,7 @@ public abstract class ProofAggregate {
     }
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
@@ -88,7 +93,7 @@ public abstract class ProofAggregate {
     public abstract ProofAggregate getChildrenAt(int i);
 
     public Proof getProof(int proofNum) {
-        return getProofs()[proofNum];
+        return Objects.requireNonNull(getProofs())[proofNum];
     }
 
 

@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -35,8 +36,10 @@ public interface ProblemLoaderControl extends ProblemInitializerListener, Progre
      * @param result The occurred {@link ReplayResult}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException;
+    void loadingFinished(AbstractProblemLoader loader,
+                         @Nullable LoadedPOContainer poContainer,
+                         @Nullable ProofAggregate proofList,
+                         @Nullable ReplayResult result) throws ProblemLoaderException;
 
     /**
      * This method is called if no {@link LoadedPOContainer} was created via

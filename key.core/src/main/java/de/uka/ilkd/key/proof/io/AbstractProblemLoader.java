@@ -106,7 +106,7 @@ public abstract class AbstractProblemLoader {
     /**
      * The filename of the proof in the zipped file (null if file is not a proof bundle).
      */
-    private File proofFilename;
+    private @Nullable File proofFilename;
 
     /**
      * The optional class path entries to use.
@@ -154,12 +154,12 @@ public abstract class AbstractProblemLoader {
     /**
      * The instantiated {@link EnvInput} which describes the file to load.
      */
-    private EnvInput envInput;
+    private @Nullable EnvInput envInput;
 
     /**
      * The instantiated {@link ProblemInitializer} used during the loading process.
      */
-    private ProblemInitializer problemInitializer;
+    private @Nullable ProblemInitializer problemInitializer;
 
     /**
      * The instantiated {@link InitConfig} which provides access to the loaded source elements and
@@ -333,7 +333,7 @@ public abstract class AbstractProblemLoader {
      * @see AbstractProblemLoader#load()
      */
     protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
-            Consumer<Proof> callbackProofLoaded) {
+                                     @Nullable Consumer<Proof> callbackProofLoaded) {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());
 

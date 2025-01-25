@@ -34,8 +34,8 @@ public class JFunction extends Function implements Operator, Sorted {
     // -------------------------------------------------------------------------
 
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-           @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
-            boolean isSkolemConstant) {
+              @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
+              boolean isSkolemConstant) {
         super(name, argSorts, sort, whereToBind, isRigid, unique, isSkolemConstant);
 
         assert sort != JavaDLTheory.UPDATE;
@@ -45,27 +45,27 @@ public class JFunction extends Function implements Operator, Sorted {
     }
 
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-           @Nullable ImmutableArray<Boolean> whereToBind, boolean unique) {
+                     @Nullable ImmutableArray<Boolean> whereToBind, boolean unique) {
         this(name, sort, argSorts, whereToBind, unique, true, false);
     }
 
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isSkolemConstant) {
+                     @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, boolean isSkolemConstant) {
         this(name, sort, argSorts, whereToBind, unique, true, isSkolemConstant);
     }
 
-    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean @Nullable[] whereToBind,
-            boolean unique) {
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean @Nullable [] whereToBind,
+                     boolean unique) {
         this(name, sort, new ImmutableArray<>(argSorts),
-            whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
+                whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
     }
 
-    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
-            boolean unique,
-            boolean isSkolemConstant) {
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean @Nullable [] whereToBind,
+                     boolean unique,
+                     boolean isSkolemConstant) {
         this(name, sort, new ImmutableArray<>(argSorts),
-            whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique,
-            isSkolemConstant);
+                whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique,
+                isSkolemConstant);
     }
 
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
@@ -96,7 +96,7 @@ public class JFunction extends Function implements Operator, Sorted {
      * checks if a given Term could be subterm (at the at'th subterm position) of a term with this
      * function at its top level. The validity of the given subterm is NOT checked.
      *
-     * @param at theposition of the term where this method should check the validity.
+     * @param at          theposition of the term where this method should check the validity.
      * @param possibleSub the subterm to be ckecked.
      * @return true iff the given term can be subterm at the indicated position
      */
