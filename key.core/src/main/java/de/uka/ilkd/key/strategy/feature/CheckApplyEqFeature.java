@@ -7,7 +7,6 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
@@ -28,12 +27,11 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
     private CheckApplyEqFeature() {}
 
     protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        Debug.assertTrue(pos != null,
-            "Need to know the position of " + "the application of the taclet");
+        assert pos != null : "Need to know the position of " + "the application of the taclet";
 
         AssumesFormulaInstantiation ifInst = p_app.assumesFormulaInstantiations().head();
 
-        Debug.assertTrue(ifInst != null, "Need to know the equation the taclet" + " is used with");
+        assert ifInst != null : "Need to know the equation the taclet is used with";
 
         return isNotSelfApplication(pos, ifInst)
         // && equationIsDirected ( ifInst, p_app.constraint() )

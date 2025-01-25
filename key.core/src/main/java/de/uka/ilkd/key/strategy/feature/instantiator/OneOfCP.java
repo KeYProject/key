@@ -31,7 +31,7 @@ public class OneOfCP implements Feature<Goal> {
         return new OneOfCP(features);
     }
 
-    public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
             Goal goal,
             MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
@@ -42,9 +42,9 @@ public class OneOfCP implements Feature<Goal> {
     private final class CP implements ChoicePoint {
         private final class BranchIterator implements Iterator<CPBranch> {
             private int num = 0;
-            private final org.key_project.prover.rules.RuleApp oldApp;
+            private final RuleApp oldApp;
 
-            public BranchIterator(org.key_project.prover.rules.RuleApp oldApp) {
+            public BranchIterator(RuleApp oldApp) {
                 this.oldApp = oldApp;
             }
 
@@ -59,7 +59,7 @@ public class OneOfCP implements Feature<Goal> {
                         theChosenOne = chosen;
                     }
 
-                    public org.key_project.prover.rules.RuleApp getRuleAppForBranch() {
+                    public RuleApp getRuleAppForBranch() {
                         return oldApp;
                     }
                 };

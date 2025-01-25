@@ -400,6 +400,20 @@ public abstract class StaticFeatureCollection {
         return let(buf, t1, applyTF(t2, eq(buf)));
     }
 
+
+    protected static Feature directlyBelowSymbolAtIndex(Operator symbol, int index) {
+        return directlyBelowSymbolAtIndex(op(symbol), index);
+    }
+
+    protected static Feature directlyBelowSymbolAtIndex(TermFeature symbolTF, int index) {
+        final var oneUp = FocusProjection.create(1);
+        if (index == -1) {
+            return applyTF(oneUp, symbolTF);
+        }
+        return ifZero(applyTF(oneUp, symbolTF), eq(sub(oneUp, index), FocusProjection.INSTANCE),
+            inftyConst());
+    }
+
     protected static Feature<Goal> contains(ProjectionToTerm<Goal> bigTerm,
             ProjectionToTerm<Goal> searchedTerm) {
         final TermBuffer buf = new TermBuffer();
@@ -479,6 +493,9 @@ public abstract class StaticFeatureCollection {
             ProjectionToTerm<Goal> s2) {
         return SortComparisonFeature.create(s1, s2, SortComparisonFeature.SUBSORT);
     }
+
+
+    // Specific features
 
     protected static Feature<Goal> implicitCastNecessary(ProjectionToTerm<Goal> s1) {
         return ImplicitCastNecessary.create(s1);

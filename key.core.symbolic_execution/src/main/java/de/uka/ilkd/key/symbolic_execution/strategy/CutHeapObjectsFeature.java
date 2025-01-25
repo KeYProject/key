@@ -49,8 +49,7 @@ public class CutHeapObjectsFeature extends BinaryFeature {
                 Term cutFormulaC0 = cutFormula.sub(0);
                 Term cutFormulaC1 = cutFormula.sub(1);
                 boolean contains = false;
-                Iterator<org.key_project.prover.sequent.SequentFormula> iter =
-                    goal.sequent().iterator();
+                Iterator<SequentFormula> iter = goal.sequent().iterator();
                 while (!contains && iter.hasNext()) {
                     var formula = iter.next().formula();
                     if (formula.op() == Junctor.NOT) {

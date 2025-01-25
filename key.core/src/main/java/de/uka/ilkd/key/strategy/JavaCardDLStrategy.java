@@ -667,9 +667,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0)));
 
         bindRuleSet(d, "replace_known_left", commonF);
+
         bindRuleSet(d, "replace_known_right",
-            add(commonF, ifZero(DirectlyBelowSymbolFeature.create(Junctor.IMP, 1), longConst(100),
-                ifZero(DirectlyBelowSymbolFeature.create(Equality.EQV), longConst(100)))));
+            add(commonF, ifZero(directlyBelowSymbolAtIndex(Junctor.IMP, 1), longConst(100),
+                ifZero(directlyBelowSymbolAtIndex(Equality.EQV, -1), longConst(100)))));
     }
 
     private void setupUserTaclets(RuleSetDispatchFeature d) {
@@ -829,8 +830,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     .createSum(
                         not(TopLevelFindFeature.ANTEC_OR_SUCC_WITH_UPDATE),
                         AllowedCutPositionFeature.INSTANCE,
-                        ifZero(
-                            NotBelowQuantifierFeature.INSTANCE, add(
+                        ifZero(notBelowQuantifier(),
+                            add(
                                 applyTF(cutFormula, add(ff.cutAllowed,
                                     // do not cut over formulas containing
                                     // auxiliary variables
@@ -852,6 +853,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                             longConst(100))))));
     }
 
+    protected Feature<Goal> notBelowQuantifier() {
+        final TermBuffer superFor = new TermBuffer();
+        return sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
+            not(applyTF(superFor, OperatorClassTF.create(Quantifier.class))));
+    }
+
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
         bindRuleSet(d, "beta", allowSplitting(FocusFormulaProjection.INSTANCE));
 
@@ -865,7 +872,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             sum(subFor, AllowedCutPositionsGenerator.INSTANCE, compareCutAllowed);
 
         bindRuleSet(d, "cut_direct", add(allowSplitting(FocusFormulaProjection.INSTANCE),
-            ifZero(NotBelowQuantifierFeature.INSTANCE, noBetterCut)));
+            ifZero(notBelowQuantifier(), noBetterCut)));
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -928,7 +935,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "conjNormalForm",
             ifZero(
-                add(or(FocusInAntecFeature.INSTANCE, NotBelowQuantifierFeature.INSTANCE),
+                add(or(FocusInAntecFeature.INSTANCE, notBelowQuantifier()),
                     NotInScopeOfModalityFeature.INSTANCE),
                 add(longConst(-150), ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 20)),
                 inftyConst()));
@@ -954,18 +961,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "distrQuantifier",
             add(or(
-                applyTF(FocusProjection.create(0),
+                applyTF(FocusProjection.INSTANCE,
                     add(ff.quantifiedClauseSet, not(opSub(Quantifier.ALL, ff.orF)),
                         EliminableQuantifierTF.INSTANCE)),
-                SumFeature.createSum(OnlyInScopeOfQuantifiersFeature.INSTANCE,
+                SumFeature.createSum(onlyInScopeOfQuantifiers(),
                     SplittableQuantifiedFormulaFeature.INSTANCE,
                     ifZero(FocusInAntecFeature.INSTANCE,
-                        applyTF(FocusProjection.create(0), sub(ff.andF)),
-                        applyTF(FocusProjection.create(0), sub(ff.orF))))),
+                        applyTF(FocusProjection.INSTANCE, sub(ff.andF)),
+                        applyTF(FocusProjection.INSTANCE, sub(ff.orF))))),
                 longConst(-300)));
 
         bindRuleSet(d, "swapQuantifiers",
-            add(applyTF(FocusProjection.create(0), add(ff.quantifiedClauseSet,
+            add(applyTF(FocusProjection.INSTANCE, add(ff.quantifiedClauseSet,
                 EliminableQuantifierTF.INSTANCE, sub(not(EliminableQuantifierTF.INSTANCE)))),
                 longConst(-300)));
 
@@ -1016,11 +1023,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             not(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
                 not(applyTF(superFor, op(Quantifier.EX))))));
 
-        bindRuleSet(d, "cnf_expandIfThenElse", add(not(NotBelowQuantifierFeature.INSTANCE),
+        bindRuleSet(d, "cnf_expandIfThenElse", add(
+            isBelow(OperatorClassTF.create(Quantifier.class)),
             onlyBelowQuanAndOr, belowUnskolemisableQuantifier));
 
         final Feature<Goal> pullOutQuantifierAllowed =
-            add(not(NotBelowQuantifierFeature.INSTANCE), onlyBelowQuanAndOr, applyTF(
+            add(isBelow(OperatorClassTF.create(Quantifier.class)), onlyBelowQuanAndOr, applyTF(
                 FocusProjection.create(0), sub(ff.quantifiedClauseSet, ff.quantifiedClauseSet)));
 
         bindRuleSet(d, "pullOutQuantifierUnifying", -20);
@@ -1213,7 +1221,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     applyTF(FocusFormulaProjection.INSTANCE, atLeastTwoLCEquation))),
             ReducibleMonomialsFeature.createReducible(focus, eqLeft));
 
-        final Feature<Goal> eqMonomialFeature = add(not(DirectlyBelowSymbolFeature.create(tf.mul)),
+        final Feature<Goal> eqMonomialFeature = add(not(directlyBelowSymbolAtIndex(tf.mul, -1)),
             ifZero(MatchedAssumesFeature.INSTANCE, let(focus, FocusProjection.create(0),
                 let(eqLeft, sub(AssumptionProjection.create(0), 0), validEqApplication))));
 
@@ -1803,7 +1811,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     longConst(-3500))));
     }
 
-    private Feature<Goal> isBelow(TermFeature t) {
+    protected final Feature<Goal> onlyInScopeOfQuantifiers() {
+        final TermBuffer buf = new TermBuffer();
+        return sum(buf, SuperTermGenerator.upwards(any(), getServices()),
+            applyTF(buf, ff.quantifiedFor));
+    }
+
+    protected final Feature<Goal> isBelow(TermFeature t) {
         final TermBuffer superTerm = new TermBuffer();
         return not(sum(superTerm, SuperTermGenerator.upwards(any(), getServices()),
             not(applyTF(superTerm, t))));

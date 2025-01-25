@@ -21,7 +21,7 @@ public abstract class CompareCostsFeature extends BinaryFeature {
 
     public static Feature<Goal> less(Feature<Goal> a, Feature<Goal> b) {
         return new CompareCostsFeature(a, b) {
-            protected boolean filter(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
+            protected boolean filter(RuleApp app, PosInOccurrence pos,
                     Goal goal,
                     MutableState mState) {
                 return a.computeCost(app, pos, goal, mState)
@@ -32,7 +32,7 @@ public abstract class CompareCostsFeature extends BinaryFeature {
 
     public static Feature<Goal> leq(Feature<Goal> a, Feature<Goal> b) {
         return new CompareCostsFeature(a, b) {
-            protected boolean filter(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
+            protected boolean filter(RuleApp app, PosInOccurrence pos,
                     Goal goal,
                     MutableState mState) {
                 return a.computeCost(app, pos, goal, mState)

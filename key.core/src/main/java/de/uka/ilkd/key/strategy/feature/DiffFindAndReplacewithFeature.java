@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.feature;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -31,9 +32,9 @@ public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
         assert pos != null && app.rule() instanceof RewriteTaclet
                 : "Feature is only applicable to rewrite taclets";
 
-        for (TacletGoalTemplate temp : app.rule().goalTemplates()) {
-            final RewriteTacletGoalTemplate rwtemp = (RewriteTacletGoalTemplate) temp;
-            if (rwtemp.replaceWith().equalsModProperty(pos.subTerm(),
+        for (TacletGoalTemplate template : app.rule().goalTemplates()) {
+            final Term replaceWith = ((RewriteTacletGoalTemplate) template).replaceWith();
+            if (replaceWith.equalsModProperty(pos.subTerm(),
                 IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 return false;
             }
