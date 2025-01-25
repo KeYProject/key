@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
 
+import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
@@ -70,11 +71,7 @@ public class OriginTermLabel implements TermLabel {
      * @param pis the position of the term whose origin to find.
      * @return the term's origin, or the origin of one of its parents.
      */
-    public static Origin getOrigin(PosInSequent pis) {
-        if (pis == null) {
-            return null;
-        }
-
+    public static @Nullable Origin getOrigin(PosInSequent pis) {
         return getOrigin(pis.getPosInOccurrence());
     }
 
@@ -85,11 +82,7 @@ public class OriginTermLabel implements TermLabel {
      * @param pio the position of the term whose origin to find.
      * @return the term's origin, or the origin of one of its parents.
      */
-    public static Origin getOrigin(PosInOccurrence pio) {
-        if (pio == null) {
-            return null;
-        }
-
+    public static @Nullable Origin getOrigin(PosInOccurrence pio) {
         Term term = pio.subTerm();
 
         OriginTermLabel originLabel = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
@@ -247,7 +240,7 @@ public class OriginTermLabel implements TermLabel {
      * @param services services.
      * @return the resulting sequent change info.
      */
-    public static SequentChangeInfo removeOriginLabels(Sequent seq, Services services) {
+    public static @Nullable SequentChangeInfo removeOriginLabels(Sequent seq, Services services) {
         SequentChangeInfo changes = null;
 
         for (int i = 1; i <= seq.size(); ++i) {
@@ -275,10 +268,6 @@ public class OriginTermLabel implements TermLabel {
      * @return the transformed term.
      */
     public static Term removeOriginLabels(Term term, Services services) {
-        if (term == null) {
-            return null;
-        }
-
         List<TermLabel> labels = term.getLabels().toList();
         final TermLabel originTermLabel = term.getLabel(NAME);
         final TermFactory tf = services.getTermFactory();
@@ -596,7 +585,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             return obj != null && obj.getClass().equals(getClass())
                     && ((Origin) obj).specType == specType;
         }
@@ -651,7 +640,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -744,7 +733,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             if (this == obj) {
                 return true;
             }

@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.io;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +15,9 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 
 public class UrlRuleSource extends RuleSource {
 
@@ -41,7 +41,7 @@ public class UrlRuleSource extends RuleSource {
             final InputStream input = uri.toURL().openStream();
             long localNumberOfBytes = 0;
             for (int readValue = input.read(); readValue != -1; localNumberOfBytes++, readValue =
-                    input.read()) {
+                input.read()) {
             }
             input.close();
             return localNumberOfBytes;
@@ -97,7 +97,7 @@ public class UrlRuleSource extends RuleSource {
     public CharStream getCharStream() throws IOException {
         try (ReadableByteChannel channel = Channels.newChannel(getNewStream())) {
             return CharStreams.fromChannel(channel, StandardCharsets.UTF_8, 4096,
-                    CodingErrorAction.REPLACE, uri.toString(), -1);
+                CodingErrorAction.REPLACE, uri.toString(), -1);
         }
     }
 }

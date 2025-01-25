@@ -24,8 +24,9 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.RecognitionException;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiation> {
     private static final IfFormulaInstantiation manualTextIF = new IfFormulaInstantiation() {

@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.speclang.PositionedString;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.Nullable;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public record BuildingIssue(String message, @Nullable Throwable cause, boolean isWarning,
                             Position position,

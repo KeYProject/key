@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import org.key_project.util.java.StringUtil;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URI;
+import org.key_project.util.java.StringUtil;
 
 /**
  * This visitor finds all includes in the given ASTs.

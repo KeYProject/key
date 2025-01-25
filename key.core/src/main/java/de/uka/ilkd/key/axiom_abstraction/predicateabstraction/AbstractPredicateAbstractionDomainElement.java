@@ -11,10 +11,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * A base class for abstract domain elements in a predicate abstraction lattice.
@@ -30,7 +31,8 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      * Constructs a new {@link AbstractPredicateAbstractionDomainElement} from a given list of
      * abstraction predicates.
      */
-    public AbstractPredicateAbstractionDomainElement(ImmutableSet<AbstractionPredicate> predicates) {
+    public AbstractPredicateAbstractionDomainElement(
+            ImmutableSet<AbstractionPredicate> predicates) {
         this.predicates = predicates;
     }
 

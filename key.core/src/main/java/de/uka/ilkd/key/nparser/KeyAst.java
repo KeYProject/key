@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.nparser;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Position;

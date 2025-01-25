@@ -33,7 +33,8 @@ public class RuleKey {
         this(r.name(), (r instanceof Taclet ? ((Taclet) r).getChoices() : ChoiceExpr.TRUE), r);
     }
 
-    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == null) {
             return false;
         }

@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
-import de.uka.ilkd.key.proof.Node;
-import org.jspecify.annotations.Nullable;
-
 import java.util.Objects;
+
+import de.uka.ilkd.key.proof.Node;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Information on exploration that is attached to nodes. If such an object is attached to a node,

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -15,11 +17,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
-import org.jspecify.annotations.Nullable;
+
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /**
  * ExplorationAction that handles the addition of formulas to the sequent. This action is
@@ -90,19 +92,19 @@ public class ProofExplorationService {
      */
     public Taclet getCutTaclet() {
         return Objects.requireNonNull(
-                proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut")));
+            proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut")));
     }
 
     /**
      * Create a new Tacletapp that add a formula to the sequent using the cut rule and disabeling
      * one of the branches
      *
-     * @param t          Term to add to teh sequent
+     * @param t Term to add to teh sequent
      * @param antecedent whether to add teh term to antecedent
      */
     public Node soundAddition(Goal g, Term t, boolean antecedent) {
         Taclet cut =
-                g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
+            g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
         Semisequent semisequent = new Semisequent(new SequentFormula(t));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
@@ -146,8 +148,8 @@ public class ProofExplorationService {
         // taint goal with exploration
         ExplorationNodeData data = ExplorationNodeData.get(g.node());
         data.setExplorationAction(
-                String.format("Edit %s to %s", LogicPrinter.quickPrintTerm(term, services),
-                        LogicPrinter.quickPrintTerm(newTerm, services)));
+            String.format("Edit %s to %s", LogicPrinter.quickPrintTerm(term, services),
+                LogicPrinter.quickPrintTerm(newTerm, services)));
 
         // apply cut
         ImmutableList<Goal> result = g.apply(app);
@@ -162,8 +164,8 @@ public class ProofExplorationService {
         // region hide
         FindTaclet tap = getHideTaclet(pio.isInAntec());
         TacletApp weakening = PosTacletApp.createPosTacletApp(tap,
-                tap.getMatcher().matchFind(pio.subTerm(), MatchConditions.EMPTY_MATCHCONDITIONS, null),
-                pio, services);
+            tap.getMatcher().matchFind(pio.subTerm(), MatchConditions.EMPTY_MATCHCONDITIONS, null),
+            pio, services);
         String posToWeakening = pio.isInAntec() ? "TRUE" : "FALSE";
 
         Node toBeSelected = null;
@@ -200,7 +202,7 @@ public class ProofExplorationService {
     private TacletApp createHideTerm(PosInOccurrence pio) {
         FindTaclet tap = getHideTaclet(pio.isInAntec());
         MatchConditions match = tap.getMatcher().matchFind(pio.subTerm(),
-                MatchConditions.EMPTY_MATCHCONDITIONS, services);
+            MatchConditions.EMPTY_MATCHCONDITIONS, services);
         return PosTacletApp.createPosTacletApp(tap, match, pio, services);
     }
 }

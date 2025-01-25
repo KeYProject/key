@@ -183,7 +183,8 @@ public final class KeYTypeUtil {
      * @return The full qualified type name or {@code null} if the given
      *         {@link ParameterDeclaration} is {@code null}.
      */
-    public static @Nullable String resolveType(@Nullable ParameterDeclaration parameterDeclaration) {
+    public static @Nullable String resolveType(
+            @Nullable ParameterDeclaration parameterDeclaration) {
         return parameterDeclaration != null ? resolveType(parameterDeclaration.getTypeReference())
                 : null;
     }

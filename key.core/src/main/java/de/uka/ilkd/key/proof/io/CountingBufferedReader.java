@@ -10,8 +10,9 @@ import java.io.InputStreamReader;
 
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.java.IOUtil;
+
+import org.jspecify.annotations.Nullable;
 
 public class CountingBufferedReader extends BufferedReader {
 

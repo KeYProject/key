@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.exploration.ProofExplorationService;
 
-import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl

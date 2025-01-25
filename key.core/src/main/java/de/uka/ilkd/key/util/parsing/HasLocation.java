@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.parsing;
 
-import de.uka.ilkd.key.parser.Location;
-import org.jspecify.annotations.Nullable;
-
 import java.net.MalformedURLException;
+
+import de.uka.ilkd.key.parser.Location;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * This interface simply states, that an exception has locational information.

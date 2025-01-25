@@ -177,7 +177,7 @@ public interface Constraint {
         }
 
         @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
+        public boolean equals(@org.jspecify.annotations.Nullable Object obj) {
             return (obj instanceof Top);
         }
 

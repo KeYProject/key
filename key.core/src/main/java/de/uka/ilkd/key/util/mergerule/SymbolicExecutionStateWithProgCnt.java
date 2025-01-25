@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.mergerule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.Nullable;
-
-import java.util.Objects;
 
 /**
  * A symbolic execution state with program counter is a triple of a symbolic state in form of a

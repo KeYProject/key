@@ -5,15 +5,15 @@ package de.uka.ilkd.key.java.abstraction;
 
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The KeY java type realises a tuple (sort, type) of a logic sort and the java type (for example a
@@ -93,14 +93,16 @@ public class KeYJavaType implements Type {
         Type type = getJavaType();
         if (type != null) {
             String fullName = type.getFullName();
-            if (fullName != null) return fullName;
+            if (fullName != null)
+                return fullName;
         }
         return getSort().name().toString();
     }
 
     public String getName() {
         Type type = getJavaType();
-        if (type != null) return type.getName();
+        if (type != null)
+            return type.getName();
         return getSort().name().toString();
     }
 

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.prover.ProverTaskListener;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -75,11 +76,11 @@ public interface UserInterfaceControl {
      * @throws ProblemLoaderException Occurred Exception.
      */
     AbstractProblemLoader load(@Nullable Profile profile, @Nullable File file,
-                               @Nullable List<File> classPaths,
-                               @Nullable File bootClassPath, @Nullable List<File> includes,
-                               @Nullable Properties poPropertiesToForce,
-                               boolean forceNewProfileOfNewProofs,
-                               @Nullable Consumer<Proof> callbackProofLoaded) throws ProblemLoaderException;
+            @Nullable List<File> classPaths,
+            @Nullable File bootClassPath, @Nullable List<File> includes,
+            @Nullable Properties poPropertiesToForce,
+            boolean forceNewProfileOfNewProofs,
+            @Nullable Consumer<Proof> callbackProofLoaded) throws ProblemLoaderException;
 
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterfaceControl} for the given

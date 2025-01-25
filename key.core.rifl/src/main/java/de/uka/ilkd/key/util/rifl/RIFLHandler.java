@@ -8,11 +8,10 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.util.LinkedHashMap;
 
-import org.checkerframework.checker.units.qual.N;
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;

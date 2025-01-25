@@ -3,6 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.nio.file.Paths;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
@@ -10,6 +17,7 @@ import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.parser.proofjava.TokenMgrError;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.parsing.HasLocation;
+
 import org.antlr.v4.runtime.InputMismatchException;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
@@ -18,13 +26,6 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.nio.file.Paths;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -41,7 +42,7 @@ public final class ExceptionTools {
      * fields
      */
     public static final Pattern TOKEN_MGR_ERR_PATTERN =
-            Pattern.compile("^Lexical error at line (\\d+), column (\\d+)\\.");
+        Pattern.compile("^Lexical error at line (\\d+), column (\\d+)\\.");
 
     private ExceptionTools() {
     }
@@ -70,17 +71,17 @@ public final class ExceptionTools {
 
     public static String getNiceMessage(InputMismatchException ime) {
         return getNiceMessageInternal(ime.getInputStream(), ime.getOffendingToken(),
-                ime.getRecognizer().getVocabulary(), ime.getExpectedTokens());
+            ime.getRecognizer().getVocabulary(), ime.getExpectedTokens());
     }
 
     public static String getNiceMessage(NoViableAltException ime) {
         return getNiceMessageInternal(ime.getInputStream(), ime.getOffendingToken(),
-                ime.getRecognizer().getVocabulary(), ime.getExpectedTokens());
+            ime.getRecognizer().getVocabulary(), ime.getExpectedTokens());
     }
 
     private static String getNiceMessageInternal(IntStream inputStream,
-                                                 org.antlr.v4.runtime.Token offendingToken, Vocabulary vocabulary,
-                                                 IntervalSet expectedTokens) {
+            org.antlr.v4.runtime.Token offendingToken, Vocabulary vocabulary,
+            IntervalSet expectedTokens) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Syntax error in input file ");
@@ -147,9 +148,9 @@ public final class ExceptionTools {
 
         return token == null ? null
                 : new Location(
-                Paths.get(Paths.get("").toString(), exc.getInputStream().getSourceName())
-                        .normalize().toUri(),
-                Position.fromToken(token));
+                    Paths.get(Paths.get("").toString(), exc.getInputStream().getSourceName())
+                            .normalize().toUri(),
+                    Position.fromToken(token));
     }
 
     private static @Nullable Location getLocation(InputMismatchException exc) {
@@ -157,9 +158,9 @@ public final class ExceptionTools {
 
         return token == null ? null
                 : new Location(
-                Paths.get(Paths.get("").toString(), exc.getInputStream().getSourceName())
-                        .normalize().toUri(),
-                Position.fromToken(token));
+                    Paths.get(Paths.get("").toString(), exc.getInputStream().getSourceName())
+                            .normalize().toUri(),
+                    Position.fromToken(token));
     }
 
     private static @Nullable Location getLocation(TokenMgrError exc) {

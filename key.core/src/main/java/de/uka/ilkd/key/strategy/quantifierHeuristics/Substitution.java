@@ -116,7 +116,8 @@ public class Substitution {
         return t;
     }
 
-    @Override public boolean equals(@org.jspecify.annotations.Nullable Object arg0) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object arg0) {
         if (!(arg0 instanceof Substitution s)) {
             return false;
         }

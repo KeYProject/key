@@ -3,18 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.java.Position;
-import org.jspecify.annotations.Nullable;
-
 import java.util.Optional;
+
+import de.uka.ilkd.key.java.Position;
+
+import org.jspecify.annotations.Nullable;
 
 public class SVInstantiationParserException extends SVInstantiationExceptionWithPosition {
     private final String instantiation;
     private final String detail;
 
     public SVInstantiationParserException(String instantiation, Position position,
-                                          @Nullable String detail,
-                                          boolean inIfSequent) {
+            @Nullable String detail,
+            boolean inIfSequent) {
         super("Parser Error", position, inIfSequent);
         this.instantiation = instantiation;
         this.detail = (detail == null) ? "" : detail;

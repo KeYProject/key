@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.exploration;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
-import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 
 /**
@@ -61,7 +61,7 @@ public class ExplorationModeModel {
         boolean old = this.explorationModeSelected;
         this.explorationTacletAppState = explorationTacletAppState;
         changeSupport.firePropertyChange(PROP_EXPLORE_TACLET_APP_STATE, old,
-                explorationModeSelected);
+            explorationModeSelected);
     }
 
     /**
@@ -106,9 +106,9 @@ public class ExplorationModeModel {
      */
     public void setShowInteractiveBranches(boolean showInteractiveBranches) {
         GUIProofTreeModel delegateModel =
-                MainWindow.getInstance().getProofTreeView().getDelegateModel();
+            MainWindow.getInstance().getProofTreeView().getDelegateModel();
         delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS,
-                !showInteractiveBranches);
+            !showInteractiveBranches);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

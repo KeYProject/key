@@ -7,7 +7,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
-import org.jspecify.annotations.NonNull;
 
 /**
  * This interface describes a commands that manipulate taclets during construction in the parser.

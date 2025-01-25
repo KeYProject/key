@@ -35,12 +35,13 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
+
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
@@ -116,7 +117,8 @@ public class HelperClassForTests {
                 ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
         }
 
-        return Objects.equals(props.get(StrategyProperties.OSS_OPTIONS_KEY), StrategyProperties.OSS_ON);
+        return Objects.equals(props.get(StrategyProperties.OSS_OPTIONS_KEY),
+            StrategyProperties.OSS_ON);
     }
 
     /**

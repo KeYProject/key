@@ -76,7 +76,8 @@ public final class JavaBlock implements EqualsModProofIrrelevancy, Program {
     }
 
     /** returns true iff the program elements are equal */
-    @Override public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
         if (o == this) {
             return true;
         } else if (!(o instanceof JavaBlock block)) {

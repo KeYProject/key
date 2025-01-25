@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.speclang;
 
+import java.net.URI;
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.parser.Location;
-import org.key_project.util.collection.ImmutableArray;
 
-import java.net.URI;
-import java.util.Objects;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A string with associated position information (file and line number). The position information is
@@ -55,8 +56,8 @@ public class PositionedString {
 
     public String toString() {
         return text + " ("
-                + (location.getFileURI().isPresent() ? location.getFileURI().get() + ", " : "")
-                + location.getPosition() + ")";
+            + (location.getFileURI().isPresent() ? location.getFileURI().get() + ", " : "")
+            + location.getPosition() + ")";
     }
 
     public String getText() {

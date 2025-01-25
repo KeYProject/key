@@ -27,7 +27,7 @@ public class ProofEnvironment {
     private final Set<ProofAggregate> proofs = new LinkedHashSet<>(); // of ProofList
 
     private final List<ProofEnvironmentListener> listeners =
-            new LinkedList<>();
+        new LinkedList<>();
 
     /**
      * constructs a proof environment with the given initial configuration of the proofs contained

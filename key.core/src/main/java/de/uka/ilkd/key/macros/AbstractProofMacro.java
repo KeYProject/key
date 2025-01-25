@@ -69,7 +69,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
-                                          @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
+            @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
             throws Exception {
         return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }

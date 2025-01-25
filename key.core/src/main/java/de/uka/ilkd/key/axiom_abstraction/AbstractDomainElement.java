@@ -6,7 +6,6 @@ package de.uka.ilkd.key.axiom_abstraction;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Named;
 
 /**

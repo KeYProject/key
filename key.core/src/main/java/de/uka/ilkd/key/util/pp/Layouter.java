@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.util.pp;
 
-import org.jspecify.annotations.NonNull;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Queue;
 import java.util.StringTokenizer;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class pretty-prints information using line breaks and indentation. For instance, it can be
@@ -117,7 +117,8 @@ import java.util.StringTokenizer;
  *         .brk(1, -4).print("and ").print("Ugly").end().print("]...");
  * </pre>
  * <p>
- * Again, the first argument to {@link #ind(int, int)} is a number of spaces to print if the block we
+ * Again, the first argument to {@link #ind(int, int)} is a number of spaces to print if the block
+ * we
  * are in is printed on one line. The second argument is an offset to be added to the current
  * indentation level to determine the column to which we should skip.
  *
@@ -222,7 +223,7 @@ public class Layouter<M> {
      * Constructs a newly allocated Layouter which will send output to the given {@link Backend} and
      * has the given default indentation.
      *
-     * @param back        the Backend
+     * @param back the Backend
      * @param indentation the default indentation
      */
 
@@ -293,8 +294,8 @@ public class Layouter<M> {
      * broken. The indentation level is increased by <code>indent</code>.
      *
      * @param consistent <code>true</code> for consistent block
-     * @param relative   <code>true</code> for indentation relative to parent block
-     * @param indent     increment to indentation level
+     * @param relative <code>true</code> for indentation relative to parent block
+     * @param indent increment to indentation level
      * @return this
      */
     public Layouter<M> begin(boolean consistent, boolean relative, int indent) {
@@ -337,7 +338,7 @@ public class Layouter<M> {
      * at this point. If it <em>is</em> broken, indentation is added to the current indentation
      * level, plus the value of <code>offset</code>.
      *
-     * @param width  space to insert if not broken
+     * @param width space to insert if not broken
      * @param offset offset relative to current indentation level
      * @return this
      */
@@ -364,7 +365,7 @@ public class Layouter<M> {
      * on the current line. If that is the case, nothing is printed. No line break is possible at
      * this point.
      *
-     * @param width  space to insert if not broken
+     * @param width space to insert if not broken
      * @param offset offset relative to current indentation level
      * @return this
      */
@@ -419,7 +420,7 @@ public class Layouter<M> {
      * broken. The indentation level is increased by <code>indent</code>.
      *
      * @param consistent <code>true</code> for consistent block
-     * @param indent     increment to indentation level
+     * @param indent increment to indentation level
      * @return this
      */
     public Layouter<M> begin(boolean consistent, int indent) {
@@ -432,7 +433,7 @@ public class Layouter<M> {
      * broken. The indentation level is increased by <code>indent</code>.
      *
      * @param consistent <code>true</code> for consistent block
-     * @param indent     increment to indentation level
+     * @param indent increment to indentation level
      * @return this
      */
     public Layouter<M> beginRelative(boolean consistent, int indent) {
