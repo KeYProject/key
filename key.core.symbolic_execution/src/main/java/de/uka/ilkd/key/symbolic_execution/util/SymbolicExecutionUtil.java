@@ -66,7 +66,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.base.ApplyStrategyInfo;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableArray;

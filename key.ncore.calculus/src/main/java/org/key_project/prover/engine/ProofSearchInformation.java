@@ -43,7 +43,7 @@ import org.jspecify.annotations.Nullable;
  * @see org.key_project.prover.proof.ProofObject
  * @see org.key_project.prover.proof.ProofGoal
  */
-public interface ApplyStrategyInfo<P extends ProofObject<@NonNull G>, G extends ProofGoal<@NonNull G>> {
+public interface ProofSearchInformation<P extends ProofObject<@NonNull G>, G extends ProofGoal<@NonNull G>> {
 
     /**
      * Retrieves the explanation or reason wjy the proof search (strategy execution) finished.

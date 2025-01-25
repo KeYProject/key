@@ -11,7 +11,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
-import org.key_project.prover.engine.ApplyStrategyInfo;
+import org.key_project.prover.engine.ProofSearchInformation;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -69,7 +69,7 @@ public class TestProofStarter {
             ProofStarter ps = new ProofStarter(false);
             ps.init(proof);
             HelperClassForTests.setOneStepSimplificationEnabled(proof, oneStepSimplification);
-            ApplyStrategyInfo<Proof, Goal> info = ps.start();
+            ProofSearchInformation<Proof, Goal> info = ps.start();
             assertNotNull(info);
             assertTrue(proof.closed());
         } finally {
