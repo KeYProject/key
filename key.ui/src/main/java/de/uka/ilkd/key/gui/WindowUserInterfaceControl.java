@@ -43,10 +43,10 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
-import org.key_project.prover.base.ApplyStrategyInfo;
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.SwingUtil;

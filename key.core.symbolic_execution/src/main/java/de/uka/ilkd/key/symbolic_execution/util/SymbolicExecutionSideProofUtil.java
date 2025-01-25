@@ -39,7 +39,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
-import org.key_project.prover.base.ApplyStrategyInfo;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;

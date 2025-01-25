@@ -1,8 +1,9 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package org.key_project.prover.base;
+package org.key_project.prover.engine.impl;
 
+import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 
@@ -13,7 +14,7 @@ import org.jspecify.annotations.Nullable;
  * A container class representing the final result of a proof strategy application.
  *
  * <p>
- * This implementation of {@link org.key_project.prover.engine.ApplyStrategyInfo}
+ * This implementation of {@link ProofSearchInformation}
  * provides detailed statistical information about the proof process, such as the
  * number of applied rules, time taken, and the number of closed goals. It also
  * retains information about unresolved goals or exceptions encountered during
@@ -34,10 +35,10 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  * </p>
  *
- * @see org.key_project.prover.engine.ApplyStrategyInfo
+ * @see ProofSearchInformation
  */
 public class ApplyStrategyInfo<Proof extends ProofObject<@NonNull Goal>, Goal extends ProofGoal<@NonNull Goal>>
-        implements org.key_project.prover.engine.ApplyStrategyInfo<Proof, Goal> {
+        implements ProofSearchInformation<Proof, Goal> {
 
     /**
      * The reason why the strategy stopped, for example, proof finished, maximal number of rule

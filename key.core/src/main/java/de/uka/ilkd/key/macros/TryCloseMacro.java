@@ -10,7 +10,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 
-import org.key_project.prover.engine.ApplyStrategyInfo;
+import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -172,7 +172,7 @@ public class TryCloseMacro extends AbstractProofMacro {
                 Node node = goal.node();
                 int maxSteps = numberSteps > 0 ? numberSteps
                         : proof.getSettings().getStrategySettings().getMaxSteps();
-                final ApplyStrategyInfo<Proof, Goal> result = applyStrategy.start(proof,
+                final ProofSearchInformation<Proof, Goal> result = applyStrategy.start(proof,
                     ImmutableSLList.<Goal>nil().prepend(goal), maxSteps, -1, false);
                 // final Goal closedGoal;
 

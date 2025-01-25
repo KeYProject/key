@@ -37,7 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.key_project.prover.base.ApplyStrategyInfo;
+import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.util.java.StringUtil;
 
 /**

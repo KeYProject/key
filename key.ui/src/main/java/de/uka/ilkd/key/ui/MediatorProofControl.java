@@ -23,7 +23,7 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.key_project.prover.engine.ApplyStrategyInfo;
+import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
@@ -153,12 +153,12 @@ public class MediatorProofControl extends AbstractProofControl {
      * mediator().stopInterface(true); mediator().setInteractive(false); }. The thread itself
      * unfreezes the UI when it is finished. </p>
      */
-    private class AutoModeWorker extends SwingWorker<ApplyStrategyInfo<Proof, Goal>, Object> {
+    private class AutoModeWorker extends SwingWorker<ProofSearchInformation<Proof, Goal>, Object> {
         private final Proof proof;
         private final List<Node> initialGoals;
         private final ImmutableList<Goal> goals;
         private final ApplyStrategy applyStrategy;
-        private ApplyStrategyInfo<Proof, Goal> info;
+        private ProofSearchInformation<Proof, Goal> info;
 
         public AutoModeWorker(final Proof proof, final ImmutableList<Goal> goals,
                 ProverTaskListener ptl) {
@@ -204,7 +204,7 @@ public class MediatorProofControl extends AbstractProofControl {
         }
 
         protected void emitInteractiveAutoMode(List<Node> initialGoals, Proof proof,
-                ApplyStrategyInfo<Proof, Goal> info) {
+                ProofSearchInformation<Proof, Goal> info) {
             interactionListeners.forEach((l) -> l.runAutoMode(initialGoals, proof, info));
         }
 
@@ -214,7 +214,7 @@ public class MediatorProofControl extends AbstractProofControl {
         }
 
         @Override
-        protected ApplyStrategyInfo<Proof, Goal> doInBackground() {
+        protected ProofSearchInformation<Proof, Goal> doInBackground() {
             boolean stopMode =
                 proof.getSettings().getStrategySettings().getActiveStrategyProperties()
                         .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)

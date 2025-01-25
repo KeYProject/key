@@ -37,7 +37,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.engine.ApplyStrategyInfo;
+import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
@@ -1480,7 +1480,8 @@ public class MergeRuleUtils {
      * @param timeout A timeout for the proof in milliseconds.
      * @return The proof result.
      */
-    private static ApplyStrategyInfo tryToProve(Term toProve, Services services, boolean doSplit,
+    private static ProofSearchInformation tryToProve(Term toProve, Services services,
+            boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
         return tryToProve(// Sequent to prove
             JavaDLSequentKit.createSequent(ImmutableSLList.nil(),
@@ -1498,7 +1499,8 @@ public class MergeRuleUtils {
      * @param timeout A timeout for the proof in milliseconds. Set to -1 for no timeout.
      * @return The proof result.
      */
-    private static ApplyStrategyInfo tryToProve(Sequent toProve, Services services, boolean doSplit,
+    private static ProofSearchInformation tryToProve(Sequent toProve, Services services,
+            boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
         final ProofEnvironment sideProofEnv =
             SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
@@ -1549,7 +1551,7 @@ public class MergeRuleUtils {
     private static boolean isProvable(Term toProve, Services services, boolean doSplit,
             int timeout) {
         try {
-            final ApplyStrategyInfo proofResult =
+            final ProofSearchInformation proofResult =
                 tryToProve(toProve, services, doSplit, "Provability check", timeout);
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
@@ -1571,7 +1573,7 @@ public class MergeRuleUtils {
     private static boolean isProvable(Sequent toProve, Services services, boolean doSplit,
             int timeout) {
         try {
-            final ApplyStrategyInfo<Proof, Goal> proofResult =
+            final ProofSearchInformation<Proof, Goal> proofResult =
                 tryToProve(toProve, services, doSplit, "Provability check", timeout);
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
@@ -1598,7 +1600,7 @@ public class MergeRuleUtils {
 
         final Services services = parentProof.getServices();
 
-        final ApplyStrategyInfo<Proof, Goal> info =
+        final ProofSearchInformation<Proof, Goal> info =
             tryToProve(term, services, true, "Term simplification", timeout);
 
         // The simplified formula is the conjunction of all open goals

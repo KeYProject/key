@@ -29,10 +29,11 @@ public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
      *
      * @param proof The {@link ProofObject} representing the proof instance.
      * @param goal The {@link ProofGoal} to prove.
-     * @return An {@link ApplyStrategyInfo} object containing information about the performed work,
+     * @return An {@link ProofSearchInformation} object containing information about the performed
+     *         work,
      *         such as the number of rules applied.
      */
-    ApplyStrategyInfo<P, G> start(P proof, G goal);
+    ProofSearchInformation<P, G> start(P proof, G goal);
 
     /**
      * Starts a proof search for a list of goals using the specified proof instance and
@@ -40,10 +41,11 @@ public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
      *
      * @param proof The {@link ProofObject} representing the proof instance.
      * @param goals An {@link ImmutableList} of {@link ProofGoal} objects to prove.
-     * @return An {@link ApplyStrategyInfo} object containing information about the performed work,
+     * @return An {@link ProofSearchInformation} object containing information about the performed
+     *         work,
      *         such as the number of rules applied.
      */
-    ApplyStrategyInfo<P, G> start(P proof, ImmutableList<G> goals);
+    ProofSearchInformation<P, G> start(P proof, ImmutableList<G> goals);
 
     /**
      * Starts a proof search for a list of goals using the specified proof instance and
@@ -52,10 +54,11 @@ public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
      * @param proof The {@link ProofObject} representing the proof instance.
      * @param goals An {@link ImmutableList} of {@link ProofGoal} objects to prove.
      * @param stratSet The strategy settings to use during the proof search.
-     * @return An {@link ApplyStrategyInfo} object containing information about the performed work,
+     * @return An {@link ProofSearchInformation} object containing information about the performed
+     *         work,
      *         such as the number of rules applied.
      */
-    ApplyStrategyInfo<P, G> start(P proof, ImmutableList<G> goals, Object stratSet);
+    ProofSearchInformation<P, G> start(P proof, ImmutableList<G> goals, Object stratSet);
 
     /**
      * Starts a proof search for a list of goals using the specified proof instance,
@@ -67,10 +70,11 @@ public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
      * @param timeout The maximum duration (in milliseconds) to perform the proof search.
      * @param stopAtFirstNonCloseableGoal If {@code true}, the proof search stops at the
      *        first encountered non-closeable goal.
-     * @return An {@link ApplyStrategyInfo} object containing information about the performed work,
+     * @return An {@link ProofSearchInformation} object containing information about the performed
+     *         work,
      *         such as the number of rules applied.
      */
-    ApplyStrategyInfo<P, G> start(P proof, ImmutableList<G> goals, int maxSteps, long timeout,
+    ProofSearchInformation<P, G> start(P proof, ImmutableList<G> goals, int maxSteps, long timeout,
             boolean stopAtFirstNonCloseableGoal);
 
     /**

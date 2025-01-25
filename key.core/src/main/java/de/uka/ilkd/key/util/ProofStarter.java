@@ -22,7 +22,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.key_project.prover.engine.ApplyStrategyInfo;
+import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.Sequent;
@@ -221,7 +221,7 @@ public class ProofStarter {
      *
      * @throws NullPointerException if the proof object is not yet created
      */
-    public ApplyStrategyInfo<Proof, Goal> start() {
+    public ProofSearchInformation<Proof, Goal> start() {
         return start(proof.openGoals());
     }
 
@@ -231,7 +231,7 @@ public class ProofStarter {
      * @return the proof after the attempt terminated
      * @throws NullPointerException if the proof object is not yet created
      */
-    public ApplyStrategyInfo<Proof, Goal> start(ImmutableList<Goal> goals) {
+    public ProofSearchInformation<Proof, Goal> start(ImmutableList<Goal> goals) {
         try {
             final Profile profile = proof.getInitConfig().getProfile();
 
@@ -258,7 +258,7 @@ public class ProofStarter {
                 prover.addProverTaskObserver(autoSaver);
             }
 
-            ApplyStrategyInfo<Proof, Goal> result;
+            ProofSearchInformation<Proof, Goal> result;
             proof.setRuleAppIndexToAutoMode();
 
             result = prover.start(proof, goals, maxSteps, timeout,

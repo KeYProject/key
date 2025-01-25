@@ -14,7 +14,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.Settings;
 
-import org.key_project.prover.engine.ApplyStrategyInfo;
+import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
@@ -34,7 +34,8 @@ public interface InteractionListener {
     void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos,
             boolean forced);
 
-    void runAutoMode(List<Node> initialGoals, Proof proof, ApplyStrategyInfo<Proof, Goal> info);
+    void runAutoMode(List<Node> initialGoals, Proof proof,
+            ProofSearchInformation<Proof, Goal> info);
 
     void runRule(Node goal, RuleApp app);
 
