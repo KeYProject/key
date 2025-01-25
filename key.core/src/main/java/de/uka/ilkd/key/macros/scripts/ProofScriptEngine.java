@@ -5,6 +5,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -93,7 +94,13 @@ public class ProofScriptEngine {
 
         // add the filename (if available) to the statemap.
         URI url = script.getUrl();
-        stateMap.setBaseFileName(Paths.get(url));
+        try {
+            stateMap.setBaseFileName(Paths.get(url));
+        } catch (InvalidPathException ignored) {
+            // weigl: occurs on windows platforms, due to the fact
+            // that the URI contains "<unknown>" from ANTLR4 when read by string
+            // "<" is illegal on windows
+        }
 
         // add the observer (if installed) to the state map
         if (commandMonitor != null) {
