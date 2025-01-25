@@ -56,12 +56,13 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
             PosInOccurrence posInOcc) {
-        if (goals == null || goals.isEmpty() || goals.head().node() == null
+        if (goals == null || posInOcc == null || goals.isEmpty() || goals.head().node() == null
                 || goals.head().node().parent() == null) {
             return false;
         }
         Term subTerm = (Term) posInOcc.subTerm();
-        if (posInOcc == null || subTerm == null) {
+
+        if (subTerm == null) {
             return false;
         }
 
