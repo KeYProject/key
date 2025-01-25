@@ -20,22 +20,16 @@ import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.ComprehendedSumFeature;
-import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
-import de.uka.ilkd.key.strategy.feature.ConstFeature;
 import de.uka.ilkd.key.strategy.feature.ImplicitCastNecessary;
 import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
 import de.uka.ilkd.key.strategy.feature.MergeRuleFeature;
 import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
-import de.uka.ilkd.key.strategy.feature.ShannonFeature;
 import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.TriggerVarInstantiatedFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
-import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -46,14 +40,20 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.CompareCostsFeature;
+import org.key_project.prover.strategy.costbased.feature.ConditionalFeature;
+import org.key_project.prover.strategy.costbased.feature.ConstFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.LetFeature;
+import org.key_project.prover.strategy.costbased.feature.ShannonFeature;
 import org.key_project.prover.strategy.costbased.feature.SortComparisonFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.*;
 import org.key_project.prover.strategy.costbased.termfeature.ApplyTFFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermPredicateTermFeature;
+import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
+import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 /**
  * Collection of strategy features that can be accessed statically. This class is essentially a
@@ -481,7 +481,7 @@ public abstract class StaticFeatureCollection {
         return ApplyTFFeature.createNonStrict(term, tf, NumberRuleAppCost.getZeroCost());
     }
 
-    protected static Feature<Goal> sum(TermBuffer x, TermGenerator gen, Feature<Goal> body) {
+    protected static Feature<Goal> sum(TermBuffer x, TermGenerator<Goal> gen, Feature<Goal> body) {
         return ComprehendedSumFeature.create(x, gen, body);
     }
 

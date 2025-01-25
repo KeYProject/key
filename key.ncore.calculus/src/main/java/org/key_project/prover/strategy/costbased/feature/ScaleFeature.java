@@ -1,24 +1,23 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.feature;
+package org.key_project.prover.strategy.costbased.feature;
 
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.util.Debug;
-
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
-import org.key_project.prover.strategy.costbased.feature.Feature;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A feature that applies an affine transformation to the result of a given feature. As a special
  * case, it can be used to scale the given feature.
  */
-public abstract class ScaleFeature implements Feature<Goal> {
+public abstract class ScaleFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature<Goal> {
 
     /** the base feature */
     private final Feature<Goal> feature;
@@ -33,7 +32,8 @@ public abstract class ScaleFeature implements Feature<Goal> {
      * @param f the base feature
      * @param coeff the coefficient to be applied to the result of <code>f</code>
      */
-    public static Feature<Goal> createScaled(Feature<Goal> f, double coeff) {
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createScaled(
+            Feature<Goal> f, double coeff) {
         return createAffine(f, coeff, 0);
     }
 
@@ -46,8 +46,9 @@ public abstract class ScaleFeature implements Feature<Goal> {
      * @param offset the offset to be added to the result of <code>f</code> (after multiplication
      *        with <code>coeff</code>)
      */
-    public static Feature<Goal> createAffine(Feature<Goal> f, double coeff, long offset) {
-        return new MultFeature(f, coeff, offset);
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createAffine(
+            Feature<Goal> f, double coeff, long offset) {
+        return new MultFeature<>(f, coeff, offset);
     }
 
     /**
@@ -60,10 +61,11 @@ public abstract class ScaleFeature implements Feature<Goal> {
      * @param img0 point 0 in the image
      * @param img1 point 1 in the image
      */
-    public static Feature<Goal> createAffine(Feature<Goal> f, RuleAppCost dom0, RuleAppCost dom1,
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createAffine(
+            Feature<Goal> f, RuleAppCost dom0, RuleAppCost dom1,
             RuleAppCost img0, RuleAppCost img1) {
-        Debug.assertFalse(dom0.equals(dom1),
-            "Two different points are needed to define the " + "affine transformation");
+        assert !dom0.equals(dom1)
+                : "Two different points are needed to define the affine transformation";
         if (img0.equals(img1)) {
             return ConstFeature.createConst(img0);
         }
@@ -92,7 +94,8 @@ public abstract class ScaleFeature implements Feature<Goal> {
         }
     }
 
-    private static Feature<Goal> firstDomInfty(Feature<Goal> f, RuleAppCost dom1, RuleAppCost img0,
+    private static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> firstDomInfty(
+            Feature<Goal> f, RuleAppCost dom1, RuleAppCost img0,
             RuleAppCost img1) {
         if (img0 instanceof TopRuleAppCost) {
             final long img1Val = getValue(img1);
@@ -108,12 +111,14 @@ public abstract class ScaleFeature implements Feature<Goal> {
         }
     }
 
-    private static Feature<Goal> firstImgInfty(Feature<Goal> f, RuleAppCost dom0, RuleAppCost dom1,
+    private static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> firstImgInfty(
+            Feature<Goal> f, RuleAppCost dom0, RuleAppCost dom1,
             RuleAppCost img1) {
         return ShannonFeature.createConditional(f, dom1, img1, TopRuleAppCost.INSTANCE);
     }
 
-    public static Feature<Goal> realAffine(Feature<Goal> f, RuleAppCost dom0, RuleAppCost dom1,
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> realAffine(Feature<Goal> f,
+            RuleAppCost dom0, RuleAppCost dom1,
             RuleAppCost img0, RuleAppCost img1) {
         final double img0Val = getValue(img0);
         final double img1Val = getValue(img1);
@@ -139,7 +144,7 @@ public abstract class ScaleFeature implements Feature<Goal> {
     }
 
     protected static void illegalCostError(final RuleAppCost cost) {
-        Debug.fail("Don't know what to do with cost class " + cost.getClass());
+        assert false : "Don't know what to do with cost class " + cost.getClass();
     }
 
     protected Feature<Goal> getFeature() {
@@ -150,7 +155,8 @@ public abstract class ScaleFeature implements Feature<Goal> {
         return Math.abs(p) < 0.0000001;
     }
 
-    private static class MultFeature extends ScaleFeature {
+    private static class MultFeature<Goal extends ProofGoal<@NonNull Goal>>
+            extends ScaleFeature<Goal> {
         /** the coefficient */
         private final double coeff;
         /** the offset */

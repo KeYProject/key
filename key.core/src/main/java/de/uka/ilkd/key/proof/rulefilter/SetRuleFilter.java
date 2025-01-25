@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.rulefilter;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
+import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.rules.Rule;
 
 /**

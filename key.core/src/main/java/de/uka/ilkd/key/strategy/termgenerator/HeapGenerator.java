@@ -16,6 +16,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 /**
  * The heap generator returns an iterator over all terms of sort heap that
@@ -25,10 +26,10 @@ import org.key_project.prover.strategy.costbased.MutableState;
  * <li>depending on the mode: heaps just occurring in updates are included or ignored</li>
  * </ol>
  */
-public class HeapGenerator implements TermGenerator {
+public class HeapGenerator implements TermGenerator<Goal> {
 
-    public static final TermGenerator INSTANCE = new HeapGenerator(true);
-    public static final TermGenerator INSTANCE_EXCLUDE_UPDATES = new HeapGenerator(false);
+    public static final TermGenerator<Goal> INSTANCE = new HeapGenerator(true);
+    public static final TermGenerator<Goal> INSTANCE_EXCLUDE_UPDATES = new HeapGenerator(false);
 
     private final boolean includeUpdates;
 

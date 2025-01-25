@@ -35,8 +35,6 @@ import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
@@ -48,15 +46,14 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
-import org.key_project.prover.strategy.costbased.feature.BelowBinderFeature;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.FocusInAntecFeature;
-import org.key_project.prover.strategy.costbased.feature.SumFeature;
+import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.IsNonRigidTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
+import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
+import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
 
 import org.jspecify.annotations.NonNull;
 
@@ -213,7 +210,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         // final Feature smtF = smtFeature(inftyConst());
 
-        return SumFeature.createSum(AutomatedRuleFeature.INSTANCE, NonDuplicateAppFeature.INSTANCE,
+        return SumFeature.createSum(AutomatedRuleFeature.getInstance(),
+            NonDuplicateAppFeature.INSTANCE,
             // splitF,
             // strengthenConstraints,
             AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
@@ -251,8 +249,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "delta", -6000);
         bindRuleSet(d, "simplify_boolean", -200);
 
+        final Feature<Goal> findDepthFeature =
+            FindDepthFeature.getInstance();
+
         bindRuleSet(d, "concrete",
-            add(longConst(-11000), ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 10.0)));
+            add(longConst(-11000),
+                ScaleFeature.createScaled(findDepthFeature, 10.0)));
         bindRuleSet(d, "simplify", -4500);
         bindRuleSet(d, "simplify_enlarging", -2000);
         bindRuleSet(d, "simplify_ENLARGING", -1900);
@@ -280,9 +282,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             not(contains(AssumptionProjection.create(0), FocusProjection.INSTANCE))));
 
         bindRuleSet(d, "update_elim",
-            add(longConst(-8000), ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 10.0)));
+            add(longConst(-8000), ScaleFeature.createScaled(findDepthFeature, 10.0)));
         bindRuleSet(d, "update_apply_on_update",
-            add(longConst(-7000), ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 10.0)));
+            add(longConst(-7000), ScaleFeature.createScaled(findDepthFeature, 10.0)));
         bindRuleSet(d, "update_join", -4600);
         bindRuleSet(d, "update_apply", -4500);
 
@@ -819,7 +821,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             // likely to be simplified away)
             applyTF(splitCondition,
                 rec(ff.quantifiedFor, ifZero(ff.quantifiedFor, longTermConst(-10)))),
-            FindDepthFeature.INSTANCE, // prefer top level splits
+            FindDepthFeature.getInstance(), // prefer top level splits
             ScaleFeature.createAffine(countOccurrences(splitCondition), -10, 10),
             sum(superF, SuperTermGenerator.upwards(any(), getServices()),
                 applyTF(superF, not(ff.elemUpdate))),
@@ -929,7 +931,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             LocSetLDT locSetLDT) {
 
         bindRuleSet(d, "negationNormalForm", add(BelowBinderFeature.getInstance(),
-            longConst(-500), ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 10.0)));
+            longConst(-500),
+            ScaleFeature.createScaled(FindDepthFeature.<Goal>getInstance(), 10.0)));
 
         bindRuleSet(d, "moveQuantToLeft",
             add(quantifiersMightSplit() ? longConst(0)
@@ -940,7 +943,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ifZero(
                 add(or(FocusInAntecFeature.getInstance(), notBelowQuantifier()),
                     NotInScopeOfModalityFeature.INSTANCE),
-                add(longConst(-150), ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 20)),
+                add(longConst(-150),
+                    ScaleFeature.createScaled(FindDepthFeature.<Goal>getInstance(), 20)),
                 inftyConst()));
 
         bindRuleSet(d, "setEqualityBlastingRight", longConst(-100));

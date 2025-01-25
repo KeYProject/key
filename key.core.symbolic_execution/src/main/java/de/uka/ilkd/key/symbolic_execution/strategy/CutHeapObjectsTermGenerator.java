@@ -13,13 +13,13 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 /**
  * This {@link TermGenerator} is used by the {@link SymbolicExecutionStrategy} to add early alias
@@ -28,7 +28,7 @@ import org.key_project.prover.strategy.costbased.MutableState;
  *
  * @author Martin Hentschel
  */
-public class CutHeapObjectsTermGenerator implements TermGenerator {
+public class CutHeapObjectsTermGenerator implements TermGenerator<Goal> {
     /**
      * {@inheritDoc}
      */
@@ -101,12 +101,9 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
     protected void collectStoreLocations(org.key_project.logic.Term term,
             final Set<org.key_project.logic.Term> storeLocations,
             final HeapLDT heapLDT) {
-        term.execPreOrder(new DefaultVisitor() {
-            @Override
-            public void visit(Term visited) {
-                if (visited.op() == heapLDT.getStore()) {
-                    storeLocations.add(visited.sub(1));
-                }
+        term.execPreOrder((DefaultVisitor) visited -> {
+            if (visited.op() == heapLDT.getStore()) {
+                storeLocations.add(visited.sub(1));
             }
         });
     }

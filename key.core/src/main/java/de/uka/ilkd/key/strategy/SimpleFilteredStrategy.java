@@ -4,12 +4,12 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.rulefilter.RuleFilter;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;

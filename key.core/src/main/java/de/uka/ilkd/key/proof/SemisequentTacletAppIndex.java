@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.sequent.*;
 import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.*;

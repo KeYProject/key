@@ -23,9 +23,10 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableArray;
 
-public abstract class SuperTermGenerator implements TermGenerator {
+public abstract class SuperTermGenerator implements TermGenerator<Goal> {
 
     private final TermFeature cond;
 
@@ -33,7 +34,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
         this.cond = cond;
     }
 
-    public static TermGenerator upwards(TermFeature cond, final Services services) {
+    public static TermGenerator<Goal> upwards(TermFeature cond, final Services services) {
         return new SuperTermGenerator(cond) {
             @Override
             protected Iterator<Term> createIterator(
@@ -43,7 +44,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
         };
     }
 
-    public static TermGenerator upwardsWithIndex(TermFeature cond, final Services services) {
+    public static TermGenerator<Goal> upwardsWithIndex(TermFeature cond, final Services services) {
         return new SuperTermWithIndexGenerator(cond) {
             @Override
             protected Iterator<Term> createIterator(

@@ -23,7 +23,7 @@ import org.jspecify.annotations.NonNull;
  */
 public class AppliedRuleAppsNameCache {
     /** cache of all applied rules by name of a node */
-    private final LRUCache<Node, HashMap<Name, List<org.key_project.prover.rules.RuleApp>>> cache =
+    private final LRUCache<Node, HashMap<Name, List<RuleApp>>> cache =
         new LRUCache<>(32);
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -38,15 +38,15 @@ public class AppliedRuleAppsNameCache {
      * @param node the node
      * @return the value
      */
-    private @NonNull HashMap<Name, List<org.key_project.prover.rules.RuleApp>> fillCacheForNode(
+    private @NonNull HashMap<Name, List<RuleApp>> fillCacheForNode(
             Node node) {
-        HashMap<Name, List<org.key_project.prover.rules.RuleApp>> nodeCache;
+        HashMap<Name, List<RuleApp>> nodeCache;
         try {
             writeLock.lock();
             nodeCache = cache.get(node);
             if (nodeCache == null) {
                 // Try to use parent cache to initialize the new cache
-                HashMap<Name, List<org.key_project.prover.rules.RuleApp>> parentCache =
+                HashMap<Name, List<RuleApp>> parentCache =
                     node.root() ? null : cache.get(node.parent());
                 nodeCache = new HashMap<>();
 
@@ -56,7 +56,7 @@ public class AppliedRuleAppsNameCache {
                         nodeCache = parentCache;
                     } else {
                         // Copy the parent cache
-                        for (Map.Entry<Name, List<org.key_project.prover.rules.RuleApp>> entry : parentCache
+                        for (Map.Entry<Name, List<RuleApp>> entry : parentCache
                                 .entrySet()) {
                             nodeCache.put(entry.getKey(), new ArrayList<>(entry.getValue()));
                         }
@@ -65,7 +65,7 @@ public class AppliedRuleAppsNameCache {
                     // Parent did not have a rule applied when we calculated this, add the rule
                     // applied
                     // there
-                    org.key_project.prover.rules.RuleApp parentApp =
+                    RuleApp parentApp =
                         node.parent().getAppliedRuleApp();
                     nodeCache.computeIfAbsent(parentApp.rule().name(), k -> new ArrayList<>())
                             .add(parentApp);
@@ -82,7 +82,7 @@ public class AppliedRuleAppsNameCache {
                     while (!current.root()) {
                         final Node par = current.parent();
 
-                        org.key_project.prover.rules.RuleApp a = par.getAppliedRuleApp();
+                        RuleApp a = par.getAppliedRuleApp();
                         nodeCache.computeIfAbsent(a.rule().name(), k -> new ArrayList<>()).add(a);
 
                         current = par;
@@ -111,13 +111,13 @@ public class AppliedRuleAppsNameCache {
      * @param name the name
      * @return rule apps
      */
-    public @NonNull List<org.key_project.prover.rules.RuleApp> get(@NonNull Node node,
+    public @NonNull List<RuleApp> get(@NonNull Node node,
             @NonNull Name name) {
         if (node.getAppliedRuleApp() != null || node.childrenCount() != 0) {
             throw new AssertionFailure("Expected an empty leaf node");
         }
 
-        HashMap<Name, List<org.key_project.prover.rules.RuleApp>> nodeCache;
+        HashMap<Name, List<RuleApp>> nodeCache;
         try {
             readLock.lock();
             nodeCache = cache.get(node);

@@ -13,16 +13,17 @@ import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 /**
  * Enumerate potential subformulas of a formula that could be used for a cut (taclet cut_direct).
  * This term-generator does not descend below quantifiers, only below propositional junctors
  */
-public class AllowedCutPositionsGenerator implements TermGenerator {
+public class AllowedCutPositionsGenerator implements TermGenerator<Goal> {
 
     private AllowedCutPositionsGenerator() {}
 
-    public final static TermGenerator INSTANCE = new AllowedCutPositionsGenerator();
+    public final static TermGenerator<Goal> INSTANCE = new AllowedCutPositionsGenerator();
 
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
