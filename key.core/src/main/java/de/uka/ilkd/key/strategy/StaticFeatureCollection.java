@@ -7,7 +7,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BlockContractInternalRule;
 import de.uka.ilkd.key.rule.LoopApplyHeadRule;
@@ -18,15 +17,7 @@ import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.ComprehendedSumFeature;
-import de.uka.ilkd.key.strategy.feature.ImplicitCastNecessary;
-import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
-import de.uka.ilkd.key.strategy.feature.MergeRuleFeature;
-import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
-import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.TriggerVarInstantiatedFeature;
+import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
@@ -36,6 +27,7 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
@@ -409,10 +401,11 @@ public abstract class StaticFeatureCollection {
     protected static Feature<Goal> directlyBelowSymbolAtIndex(TermFeature symbolTF, int index) {
         final var oneUp = FocusProjection.create(1);
         if (index == -1) {
-            return applyTF(oneUp, symbolTF);
+            return add(not(TopLevelFindFeature.ANTEC_OR_SUCC), applyTF(oneUp, symbolTF));
         }
-        return ifZero(applyTF(oneUp, symbolTF), eq(sub(oneUp, index), FocusProjection.INSTANCE),
-            inftyConst());
+        return add(not(TopLevelFindFeature.ANTEC_OR_SUCC),
+            ifZero(applyTF(oneUp, symbolTF), eq(sub(oneUp, index), FocusProjection.INSTANCE),
+                inftyConst()));
     }
 
     protected static Feature<Goal> contains(ProjectionToTerm<Goal> bigTerm,
@@ -508,10 +501,10 @@ public abstract class StaticFeatureCollection {
     protected static TermFeature selectSkolemConstantTermFeature() {
         return add(OperatorClassTF.create(Function.class),
             constantTermFeature(),
-            create(ParameterlessTermLabel.SELECT_SKOLEM_LABEL));
+            hasLabel(ParameterlessTermLabel.SELECT_SKOLEM_LABEL));
     }
 
-    public static TermFeature create(TermLabel label) {
+    public static TermFeature hasLabel(TermLabel label) {
         return TermPredicateTermFeature.create(
             (t -> t instanceof de.uka.ilkd.key.logic.Term jTerm &&
                     jTerm.containsLabel(label)));
@@ -519,7 +512,7 @@ public abstract class StaticFeatureCollection {
 
     protected static TermFeature anonHeapTermFeature() {
         return add(OperatorClassTF.create(Function.class),
-            constantTermFeature(), create(ParameterlessTermLabel.ANON_HEAP_LABEL));
+            constantTermFeature(), hasLabel(ParameterlessTermLabel.ANON_HEAP_LABEL));
     }
 
     protected static TermFeature constantTermFeature() {

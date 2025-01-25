@@ -19,7 +19,6 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
@@ -41,6 +40,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -856,12 +856,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                             ff.quantifiedClauseSet),
                                         ifZero(allowQuantifierSplitting(), longConst(0),
                                             longConst(100))))));
-    }
-
-    protected Feature<Goal> notBelowQuantifier() {
-        final TermBuffer superFor = new TermBuffer();
-        return sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
-            not(applyTF(superFor, OperatorClassTF.create(Quantifier.class))));
     }
 
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
@@ -1818,16 +1812,23 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     longConst(-3500))));
     }
 
+    protected final Feature<Goal> isBelow(TermFeature t) {
+        final TermBuffer superTerm = new TermBuffer();
+        return not(sum(superTerm, SuperTermGenerator.upwards(any(), getServices()),
+            not(applyTF(superTerm, t))));
+    }
+
     protected final Feature<Goal> onlyInScopeOfQuantifiers() {
         final TermBuffer buf = new TermBuffer();
         return sum(buf, SuperTermGenerator.upwards(any(), getServices()),
             applyTF(buf, ff.quantifiedFor));
     }
 
-    protected final Feature<Goal> isBelow(TermFeature t) {
-        final TermBuffer superTerm = new TermBuffer();
-        return not(sum(superTerm, SuperTermGenerator.upwards(any(), getServices()),
-            not(applyTF(superTerm, t))));
+    protected Feature<Goal> notBelowQuantifier() {
+        final TermBuffer superFor = new TermBuffer();
+        return or(TopLevelFindFeature.ANTEC_OR_SUCC,
+            sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
+                not(applyTF(superFor, OperatorClassTF.create(Quantifier.class)))));
     }
 
     private void setupDivModDivision(RuleSetDispatchFeature d) {

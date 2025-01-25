@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -137,7 +137,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
         globalF =
             add(globalF,
                 ifZero(applyTF(FocusProjection.INSTANCE,
-                    create(SymbolicExecutionUtil.LOOP_BODY_LABEL)),
+                    hasLabel(SymbolicExecutionUtil.LOOP_BODY_LABEL)),
                     longConst(-2000)));
         globalF = add(globalF, querySideProofFeature());
         globalF = add(globalF, modalitySideProofFeature());

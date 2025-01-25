@@ -88,7 +88,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
             String name = ruleApp.rule().name().toString();
             if (name.equals("hide_right")) {
                 return applyTF("b",
-                    create(ParameterlessTermLabel.POST_CONDITION_LABEL))
+                    hasLabel(ParameterlessTermLabel.POST_CONDITION_LABEL))
                             .computeCost(ruleApp, pio,
                                 goal, mState);
             } else if (name.equals(AND_RIGHT_RULENAME)) {

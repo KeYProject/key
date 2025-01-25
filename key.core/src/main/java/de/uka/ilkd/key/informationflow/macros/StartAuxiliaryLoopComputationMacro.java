@@ -58,7 +58,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         }
 
         Term term = (Term) posInOcc.subTerm();
-        if (posInOcc == null || term == null) {
+        if (term == null) {
             return false;
         }
         final Services services = proof.getServices();

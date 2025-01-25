@@ -4,12 +4,12 @@
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.rulefilter.NotRuleFilter;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.proof.rulefilter.AnyRuleSetTacletFilter;
+import org.key_project.prover.proof.rulefilter.NotRuleFilter;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
