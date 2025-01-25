@@ -97,7 +97,8 @@ public class MyKeyClient {
         var sel = fc.showOpenDialog(null);
         if (sel != null) {
             try {
-                loadedProof = keyApi.load(new LoadParams(sel, null, null, null, null))
+                loadedProof = keyApi.load(
+                        new LoadParams(sel, null, null, null, null))
                         .get().getRight();
                 var root = keyApi.root(loadedProof).get();
                 var sequent

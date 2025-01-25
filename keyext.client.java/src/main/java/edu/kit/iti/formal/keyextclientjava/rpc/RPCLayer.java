@@ -15,10 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @version 1 (22.11.24)
  */
 public final class RPCLayer {
-    private final GsonBuilder builder = new GsonBuilder();
-    // unclear whether concurrent use is possible
-    private final Gson gson = builder.create();
-
     private final BufferedReader incoming;
     private final Writer outgoing;
 
@@ -122,7 +118,7 @@ public final class RPCLayer {
 
     public static class JsonStreamListener implements Runnable {
         private final char[] CLENGTH = (JsonRPC.CONTENT_LENGTH + " ").toCharArray();
-        private final Reader incoming;
+        private final PushbackReader incoming;
         private final ArrayBlockingQueue<JsonObject> incomingMessageQueue;
         /**
          * Internal buffer for reading efficient.
@@ -130,7 +126,7 @@ public final class RPCLayer {
         private char[] buf = new char[4 * 1024];
 
         public JsonStreamListener(Reader incoming, ArrayBlockingQueue<JsonObject> queue) {
-            this.incoming = new BufferedReader(incoming); // ensure bufferness
+            this.incoming = new PushbackReader(new BufferedReader(incoming)); // ensure bufferness
             this.incomingMessageQueue = queue;
         }
 
@@ -167,6 +163,7 @@ public final class RPCLayer {
 
             int count = incoming.read(buf, 0, len);
             assert count == len;
+            consumeCRNL();
             return new String(buf, 0, count).trim();
         }
 
@@ -196,6 +193,16 @@ public final class RPCLayer {
                 if (e != c) {
                     throw new IllegalStateException("Expected: '%c', but got '%c'".formatted(e, c));
                 }
+            }
+        }
+
+        private void consumeCRNL() throws IOException {
+            int c = incoming.read();
+            if (c == '\r') {
+                c = incoming.read();
+                assert c == '\n';
+            } else {
+                incoming.unread(c);
             }
         }
     }

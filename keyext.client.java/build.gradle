@@ -14,11 +14,11 @@ tasks.withType(JavaCompile) {
 }
 
 application {
-    mainClass = 'edu.kit.iti.formal.keyextclientjava.HelloApplication'
+    mainClass = 'edu.kit.iti.formal.keyextclientjava.Main'
 }
 
 javafx {
-    version = "23.0.1"
+    version = "23.0.2"
     modules = [ 'javafx.controls' ]
 }
 

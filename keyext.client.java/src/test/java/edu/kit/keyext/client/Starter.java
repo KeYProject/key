@@ -13,7 +13,7 @@ import java.io.IOException;
 public class Starter {
     @Test
     void test() throws IOException {
-        var file = "/home/weigl/work/key/keyext.api/build/libs/keyext.api-2.12.4-dev-all.jar";
+        var file = "../keyext.api/build/libs/keyext.api-2.12.4-dev-all.jar";
         final var rpcLayer = RPCLayer.startWithCLI(file);
         rpcLayer.start();
         var remote = new KeyRemote(rpcLayer);
