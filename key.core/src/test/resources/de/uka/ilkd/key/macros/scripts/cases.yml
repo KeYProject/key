@@ -1,0 +1,90 @@
+- name: andRight
+  key: |
+    \predicates { a; b; }
+    \problem { a & b }
+  script: |
+    rule andRight;
+  goals:
+    - ==> b
+    - ==> a
+- name: hide.exec
+  key: |
+    \predicates { a; b; c; d; e; f; }
+    \problem { a -> b }
+
+  script: |
+    macro split-prop;
+    hide "b ==>";
+
+  exception: |
+
+    Error while executing script: This formula is not on the sequent: b
+    
+    Command: hide "b ==>";
+- name: hide
+  key: |
+    \predicates { a; b; c; d; e; f; }
+
+    \problem { a & b & c -> d | e | f }
+
+  script: |
+    macro split-prop;
+    hide "a ==> d, e";
+
+  goals:
+    - "b, c ==> f"
+
+- name: "rule.exc"
+  key: |
+    \predicates { a; b; }
+    \problem { a & b }
+
+  script: |
+    rule andLeft;
+
+  exception: |
+    Error while executing script: No matching applications.
+
+    Command: rule andLeft;
+
+- name: "selectFormula"
+  key: |
+    \predicates { a; b; c; }
+    \problem { a & b & c}
+
+  script: |
+    macro split-prop;
+    select formula="b";
+
+  goals:
+    - "==> b"
+    - "==> a"
+    - "==> c"
+
+  selectedGoal: 0
+
+- name: "unhide"
+  key: |
+
+    \problem { 2=3 -> 3=4 }
+
+  script: |
+    rule impRight;
+    hide   "2=3 ==> 3=4";
+    unhide "2=3 ==>";
+    unhide "==> 3=4";
+
+  goals:
+    - "2 = 3 ==> 3 = 4"
+- name: unhide2
+  key: |
+
+    \problem { 2=3 -> 3=4 }
+
+  script: |
+    rule impRight;
+    hide "2=3 ==> 3=4";
+    unhide "2=3 ==> 3=4";
+
+  goals:
+    - 2 = 3 ==> 3 = 4
