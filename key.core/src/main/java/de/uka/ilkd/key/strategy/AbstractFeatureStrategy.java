@@ -178,5 +178,4 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     protected Feature<Goal> instantiate(String sv, ProjectionToTerm<Goal> value) {
         return instantiate(new Name(sv), value);
     }
-
 }

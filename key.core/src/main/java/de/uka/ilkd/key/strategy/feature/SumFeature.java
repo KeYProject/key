@@ -41,8 +41,8 @@ public class SumFeature implements Feature<Goal> {
 
     static void flatten(Feature<Goal>[] sumF, LinkedHashSet<Feature<Goal>> p_features) {
         for (Feature<Goal> f : sumF) {
-            if (f instanceof SumFeature) {
-                flatten(((SumFeature) f).features, p_features);
+            if (f instanceof SumFeature sumFeature) {
+                flatten(sumFeature.features, p_features);
             } else {
                 p_features.add(f);
             }

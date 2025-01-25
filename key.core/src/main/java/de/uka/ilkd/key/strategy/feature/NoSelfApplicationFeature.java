@@ -5,7 +5,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -25,22 +24,24 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
 
     @Override
     protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        Debug.assertTrue(pos != null,
-            "NoSelfApplicationFeature: Need to know the position of the application of the taclet");
+        assert pos != null
+                : "NoSelfApplicationFeature: Need to know the position of the application of the taclet";
 
         if (!p_app.assumesInstantionsComplete()) {
             return true;
         }
 
-        ImmutableList<AssumesFormulaInstantiation> ifInsts = p_app.assumesFormulaInstantiations();
+        ImmutableList<AssumesFormulaInstantiation> assumesInstantiations =
+            p_app.assumesFormulaInstantiations();
 
-        Debug.assertTrue(ifInsts != null && !ifInsts.isEmpty(),
-            "NoSelfApplicationFeature: Need to know the equation the taclet is used with");
+        assert assumesInstantiations != null && !assumesInstantiations.isEmpty()
+                : "NoSelfApplicationFeature: Need to know the equation the taclet is used with";
 
         boolean noSelfApplication = true;
-        for (AssumesFormulaInstantiation ifInst : ifInsts) {
+        for (var assumesInstantiation : assumesInstantiations) {
             noSelfApplication =
-                noSelfApplication && (ifInst.getSequentFormula() != pos.sequentFormula());
+                noSelfApplication
+                        && assumesInstantiation.getSequentFormula() != pos.sequentFormula();
         }
         return noSelfApplication;
     }

@@ -36,12 +36,14 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
         assert list != null;
 
         for (final AssumesFormulaInstantiation aList : list) {
-            final AssumesFormulaInstSeq iffi = (AssumesFormulaInstSeq) aList;
-            assert iffi != null;
-            final SequentFormula ifFormula = iffi.getSequentFormula();
+            final AssumesFormulaInstSeq instantiationOfAssumesFormula =
+                (AssumesFormulaInstSeq) aList;
+            assert instantiationOfAssumesFormula != null;
+            final SequentFormula assumesFormula = instantiationOfAssumesFormula.getSequentFormula();
 
             final boolean result =
-                findIsInAntec != iffi.inAntecedent() || !findFormula.equals(ifFormula);
+                findIsInAntec != instantiationOfAssumesFormula.inAntecedent() ||
+                        !findFormula.equals(assumesFormula);
             if (!result) {
                 return false;
             }

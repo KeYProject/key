@@ -49,7 +49,7 @@ public class ForEachCP implements Feature<Goal> {
         this.body = body;
     }
 
-    public RuleAppCost computeCost(final org.key_project.prover.rules.RuleApp app,
+    public RuleAppCost computeCost(final RuleApp app,
             final PosInOccurrence pos, final Goal goal,
             MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
@@ -72,12 +72,12 @@ public class ForEachCP implements Feature<Goal> {
     private final class CP implements ChoicePoint {
         private final class BranchIterator implements Iterator<CPBranch> {
             private final Iterator<Term> terms;
-            private final org.key_project.prover.rules.RuleApp oldApp;
+            private final RuleApp oldApp;
 
             private final MutableState mState;
 
             private BranchIterator(Iterator<Term> terms,
-                    org.key_project.prover.rules.RuleApp oldApp, MutableState mState) {
+                    RuleApp oldApp, MutableState mState) {
                 this.terms = terms;
                 this.oldApp = oldApp;
                 this.mState = mState;
@@ -94,7 +94,7 @@ public class ForEachCP implements Feature<Goal> {
                         var.setContent(generatedTerm, mState);
                     }
 
-                    public org.key_project.prover.rules.RuleApp getRuleAppForBranch() {
+                    public RuleApp getRuleAppForBranch() {
                         return oldApp;
                     }
                 };
@@ -106,11 +106,11 @@ public class ForEachCP implements Feature<Goal> {
         }
 
         private final PosInOccurrence pos;
-        private final org.key_project.prover.rules.RuleApp app;
+        private final RuleApp app;
         private final Goal goal;
         private final MutableState mState;
 
-        private CP(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos, Goal goal,
+        private CP(RuleApp app, PosInOccurrence pos, Goal goal,
                 MutableState mState) {
             this.pos = pos;
             this.app = app;

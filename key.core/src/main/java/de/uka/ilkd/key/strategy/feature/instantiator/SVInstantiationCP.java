@@ -51,7 +51,7 @@ public class SVInstantiationCP implements Feature<Goal> {
         this.value = value;
     }
 
-    public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
             Goal goal,
             MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
@@ -83,11 +83,11 @@ public class SVInstantiationCP implements Feature<Goal> {
     private class CP implements ChoicePoint {
 
         private final PosInOccurrence pos;
-        private final org.key_project.prover.rules.RuleApp app;
+        private final RuleApp app;
         private final Goal goal;
         private final MutableState mState;
 
-        private CP(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos, Goal goal,
+        private CP(RuleApp app, PosInOccurrence pos, Goal goal,
                 MutableState mState) {
             this.pos = pos;
             this.app = app;
@@ -95,7 +95,7 @@ public class SVInstantiationCP implements Feature<Goal> {
             this.mState = mState;
         }
 
-        public Iterator<CPBranch> getBranches(org.key_project.prover.rules.RuleApp oldApp) {
+        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
             if (!(oldApp instanceof final TacletApp tapp)) {
                 Debug.fail("Instantiation feature is only applicable to " + "taclet apps, but got ",
                     oldApp);
@@ -106,7 +106,7 @@ public class SVInstantiationCP implements Feature<Goal> {
             final SchemaVariable sv = findSVWithName(tapp);
             final Term instTerm = value.toTerm(app, pos, goal, mState);
 
-            final org.key_project.prover.rules.RuleApp newApp =
+            final RuleApp newApp =
                 tapp.addCheckedInstantiation(sv, (de.uka.ilkd.key.logic.Term) instTerm,
                     goal.proof().getServices(), true);
 

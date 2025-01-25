@@ -53,7 +53,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
         };
     }
 
-    public Iterator<Term> generate(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos,
             Goal goal,
             MutableState mState) {
         return createIterator(pos, mState);

@@ -64,6 +64,8 @@ class FormulaTermFeatures extends StaticFeatureCollection {
             rec(any(), longTermConst(1)));
         // directCutAllowed = add ( tf.intInEquation, notContainsQuery );
 
+
+
     }
 
     final TermFeature forF;
