@@ -27,7 +27,7 @@ public class ProofEnvironment {
     private final Set<ProofAggregate> proofs = new LinkedHashSet<>(); // of ProofList
 
     private final List<ProofEnvironmentListener> listeners =
-        new LinkedList<>();
+            new LinkedList<>();
 
     /**
      * constructs a proof environment with the given initial configuration of the proofs contained
@@ -80,15 +80,11 @@ public class ProofEnvironment {
     }
 
     public void addProofEnvironmentListener(ProofEnvironmentListener l) {
-        if (l != null) {
-            listeners.add(l);
-        }
+        listeners.add(l);
     }
 
     public void removeProofEnvironmentListener(ProofEnvironmentListener l) {
-        if (l != null) {
-            listeners.remove(l);
-        }
+        listeners.remove(l);
     }
 
     public ProofEnvironmentListener[] getProofEnvironmentListeners() {
@@ -135,7 +131,8 @@ public class ProofEnvironment {
      * returns true iff the java model equals those of the argument proof environment. TODO: extend
      * to available rules and specs.
      */
-    @Override public boolean equals(@org.jspecify.annotations.Nullable Object cmp) {
+    @Override
+    public boolean equals(@org.jspecify.annotations.Nullable Object cmp) {
         if (!(cmp instanceof ProofEnvironment pe)) {
             return false;
         }

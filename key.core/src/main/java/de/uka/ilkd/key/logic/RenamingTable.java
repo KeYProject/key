@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.SourceElement;
+import org.jspecify.annotations.Nullable;
 
 
 public abstract class RenamingTable {
@@ -16,14 +17,14 @@ public abstract class RenamingTable {
 
     public abstract Iterator<? extends SourceElement> getRenamingIterator();
 
-    public static RenamingTable getRenamingTable(
+    public static @Nullable RenamingTable getRenamingTable(
             HashMap<? extends SourceElement, ? extends SourceElement> hmap) {
         if (hmap.size() == 0) {
             return null;
         }
         if (hmap.size() == 1) {
             Entry<? extends SourceElement, ? extends SourceElement> entry =
-                hmap.entrySet().iterator().next();
+                    hmap.entrySet().iterator().next();
             return new SingleRenamingTable(entry.getKey(), entry.getValue());
         } else {
             return new MultiRenamingTable(hmap);

@@ -8,6 +8,7 @@ import java.util.Objects;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
@@ -22,7 +23,7 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
         super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
     }
 
-    public LocationVariable(ProgramElementName name, KeYJavaType t, KeYJavaType containingType,
+    public LocationVariable(ProgramElementName name, KeYJavaType t, @Nullable KeYJavaType containingType,
             boolean isStatic, boolean isModel) {
         super(name, t.getSort(), t, containingType, isStatic, isModel, false);
     }

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.PositionInfo;
@@ -37,13 +38,13 @@ class TermImpl implements Term {
      * A static empty list of quantifiable variables used for memory reasons.
      */
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST =
-        new ImmutableArray<>();
+            new ImmutableArray<>();
 
     /**
      * A static empty list of term labels used for memory reasons.
      */
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST =
-        new ImmutableArray<>();
+            new ImmutableArray<>();
 
     private static final AtomicInteger serialNumberCounter = new AtomicInteger();
     private final int serialNumber = serialNumberCounter.incrementAndGet();
@@ -63,13 +64,13 @@ class TermImpl implements Term {
      * A cached value for computing the term's rigidness.
      */
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
-    private ImmutableSet<QuantifiableVariable> freeVars = null;
+    private @Nullable ImmutableSet<QuantifiableVariable> freeVars = null;
     /**
      * Cached {@link #hashCode()} value.
      */
     private int hashcode = -1;
 
-    private Sort sort;
+    private @Nullable Sort sort;
 
     /**
      * This flag indicates that the {@link Term} itself or one of its children contains a non-empty
@@ -87,14 +88,15 @@ class TermImpl implements Term {
      * Constructs a term for the given operator, with the given sub terms, bounded variables and (if
      * applicable) the code block on this term.
      *
-     * @param op the operator of the term, e.g., some arithmetic operation
-     * @param subs the sub terms of the constructed term (whose type is constrained by the used
-     *        operator)
+     * @param op        the operator of the term, e.g., some arithmetic operation
+     * @param subs      the sub terms of the constructed term (whose type is constrained by the used
+     *                  operator)
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
      */
-    public TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            String origin) {
+    public TermImpl(Operator op,
+                    ImmutableArray<Term> subs,
+                    @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+                    String origin) {
         assert op != null;
         assert subs != null;
         this.op = op;
@@ -104,7 +106,7 @@ class TermImpl implements Term {
     }
 
     TermImpl(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars) {
+             ImmutableArray<QuantifiableVariable> boundVars) {
         this(op, subs, boundVars, "");
     }
 
@@ -126,7 +128,7 @@ class TermImpl implements Term {
 
     private ImmutableSet<QuantifiableVariable> determineFreeVars() {
         ImmutableSet<QuantifiableVariable> localFreeVars =
-            DefaultImmutableSet.nil();
+                DefaultImmutableSet.nil();
 
         if (op instanceof QuantifiableVariable) {
             localFreeVars = localFreeVars.add((QuantifiableVariable) op);
@@ -169,7 +171,7 @@ class TermImpl implements Term {
     public <T> T op(Class<T> opClass) throws IllegalArgumentException {
         if (!opClass.isInstance(op)) {
             throw new IllegalArgumentException("Operator does not match the expected type:\n"
-                + "Operator type was: " + op.getClass() + "\n" + "Expected type was: " + opClass);
+                    + "Operator type was: " + op.getClass() + "\n" + "Expected type was: " + opClass);
         }
         return opClass.cast(op);
     }
@@ -183,7 +185,7 @@ class TermImpl implements Term {
 
     @Override
     public Term sub(int nr) {
-        return subs.get(nr);
+        return Objects.requireNonNull(subs.get(nr));
     }
 
 
@@ -378,7 +380,7 @@ class TermImpl implements Term {
             sb.append("(").append(sub(0)).append(")");
             return sb.toString();
         } else {
-            sb.append(op().name().toString());
+            sb.append(op().name());
             if (!boundVars.isEmpty()) {
                 sb.append(Strings.formatAsList(boundVars(), "{", ",", "}"));
             }
@@ -408,7 +410,7 @@ class TermImpl implements Term {
     }
 
     @Override
-    public TermLabel getLabel(Name termLabelName) {
+    public @Nullable TermLabel getLabel(Name termLabelName) {
         return null;
     }
 

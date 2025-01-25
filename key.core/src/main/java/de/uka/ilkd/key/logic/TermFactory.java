@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.TermCreationException;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -38,7 +40,7 @@ public final class TermFactory {
 
 
     public TermFactory() {
-        this.cache = null;
+        this.cache = new HashMap<>();
     }
 
     public TermFactory(Map<Term, Term> cache) {
@@ -55,9 +57,10 @@ public final class TermFactory {
      * Master method for term creation. Should be the only place where terms are created in the
      * entire system.
      */
-    public Term createTerm(@NonNull Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
+    public Term createTerm(Operator op,
+                           @Nullable ImmutableArray<Term> subs,
+                           @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+                           @Nullable ImmutableArray<TermLabel> labels) {
         if (op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -114,8 +117,8 @@ public final class TermFactory {
     }
 
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels, String origin) {
+                              @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+                              @Nullable ImmutableArray<TermLabel> labels, String origin) {
 
         final TermImpl newTerm =
             (labels == null || labels.isEmpty()

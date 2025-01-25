@@ -9,6 +9,7 @@ import java.util.List;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.util.KeYConstants;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The Entry Point.
@@ -33,7 +34,6 @@ public abstract class KeYApi {
     }
 
     /**
-     *
      * @return
      */
     public static String getVersion() {
@@ -72,10 +72,13 @@ public abstract class KeYApi {
      * @return
      * @throws ProblemLoaderException
      */
-    public static ProofManagementApi loadProof(File location, List<File> classPath,
-            File bootClassPath, List<File> includes) throws ProblemLoaderException {
+    public static ProofManagementApi
+    loadProof(File location,
+              @Nullable List<File> classPath,
+              @Nullable File bootClassPath,
+              @Nullable List<File> includes) throws ProblemLoaderException {
         return new ProofManagementApi(
-            KeYEnvironment.load(location, classPath, bootClassPath, includes));
+                KeYEnvironment.load(location, classPath, bootClassPath, includes));
     }
 
     /**
@@ -91,12 +94,12 @@ public abstract class KeYApi {
      * Load a proof file, creates a KeY environment that can be accessed with other methods from
      * this facade
      *
-     * @param file Path to the source code folder/file or to a *.proof file
-     * @param classPaths Optionally: Additional specifications for API classes
+     * @param file          Path to the source code folder/file or to a *.proof file
+     * @param classPaths    Optionally: Additional specifications for API classes
      * @param bootClassPath Optionally: Different default specifications for Java API
-     * @param includes Optionally: Additional includes to consider
+     * @param includes      Optionally: Additional includes to consider
      */
     public abstract void loadProofFile(File file, List<File> classPaths, File bootClassPath,
-            List<File> includes);
+                                       List<File> includes);
 
 }

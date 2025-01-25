@@ -12,7 +12,7 @@ checkerFramework {
         extraJavacArgs = [
                 //"-AonlyDefs=^org\\.key_project\\.logic",
                 "-Xmaxerrs", "10000",
-                "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework${File.pathSeparatorChar}permit-nullness-assertion-exception.astub",
                 "-AstubNoWarnIfNotFound",
                 "-Werror",
                 "-Aversion",

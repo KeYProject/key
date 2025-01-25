@@ -9,6 +9,8 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.RuleSet;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.sort.Sort;
@@ -156,7 +158,7 @@ public class NamespaceSet {
      * @return the element with the given name if found in the given namespaces, otherwise
      *         <tt>null</tt>
      */
-    private Named lookup(Name name, final Namespace<?>[] spaces) {
+    private @Nullable Named lookup(Name name, final Namespace<?>[] spaces) {
         for (Namespace<?> space : spaces) {
             final Named n = space.lookup(name);
             if (n != null) {

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class describes a position in an occurrence of a term. A SequentFormula and a PosInTerm
  * determine an object of this class exactly.
@@ -34,7 +36,7 @@ public final class PosInOccurrence {
     /**
      * The subterm this object points to, or <code>null</code>
      */
-    private volatile Term subTermCache = null;
+    private volatile @Nullable Term subTermCache = null;
 
     public PosInOccurrence(SequentFormula sequentFormula, PosInTerm posInTerm, boolean inAntec) {
         assert posInTerm != null;
@@ -219,7 +221,8 @@ public final class PosInOccurrence {
     private final class PIOPathIteratorImpl implements PIOPathIterator {
         int child;
         int count = 0;
-        IntIterator currentPathIt;
+        @Nullable IntIterator currentPathIt;
+        @Nullable
         Term currentSubTerm = null;
 
         private PIOPathIteratorImpl() {
@@ -255,7 +258,7 @@ public final class PosInOccurrence {
          *         <code>next()</code>-call); this method satisfies
          *         <code>getPosInOccurrence().subTerm()==getSubTerm()</code>
          */
-        public Term getSubTerm() {
+        public @Nullable Term getSubTerm() {
             return currentSubTerm;
         }
 

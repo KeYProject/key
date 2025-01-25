@@ -13,6 +13,7 @@ import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.util.Position;
 
 import org.antlr.v4.runtime.CharStream;
+import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -107,7 +108,7 @@ public class Configuration {
      * @param defaultValue the returned instead of {@code null}.
      */
     @SuppressWarnings("unchecked")
-    public <T> T get(String name, T defaultValue) {
+    public <T extends @NonNull Object> T get(String name, T defaultValue) {
         if (exists(name, defaultValue.getClass()))
             return (T) defaultValue.getClass().cast(data.get(name));
         else
@@ -154,7 +155,7 @@ public class Configuration {
      * @throws NullPointerException if no such value entry exists
      */
     public long getLong(String name) {
-        return get(name, Long.class);
+        return Objects.requireNonNull(get(name, Long.class));
     }
 
     /**
@@ -177,7 +178,7 @@ public class Configuration {
      * @throw NullPointerException if no such value entry exists
      */
     public boolean getBool(String name) {
-        return get(name, Boolean.class);
+        return Objects.requireNonNull(get(name, Boolean.class));
     }
 
     /**
@@ -200,7 +201,7 @@ public class Configuration {
      * @throws NullPointerException if no such value entry exists
      */
     public double getDouble(String name) {
-        return get(name, Double.class);
+        return Objects.requireNonNull(get(name, Double.class));
     }
 
     /**
@@ -209,8 +210,7 @@ public class Configuration {
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link String}
      */
-    @Nullable
-    public String getString(String name) {
+    public @Nullable String getString(String name) {
         return get(name, String.class);
     }
 
@@ -241,8 +241,7 @@ public class Configuration {
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link List}
      */
-    @Nullable
-    public List<Object> getList(String name) {
+    public @Nullable List<Object> getList(String name) {
         return getList(name, Object.class);
     }
 
@@ -298,8 +297,7 @@ public class Configuration {
      * @param defaultValue a default value
      * @throws ClassCastException if the given entry has non-string elements
      */
-    @NonNull
-    public String[] getStringArray(String name, @NonNull String[] defaultValue) {
+    public String[] getStringArray(String name, String[] defaultValue) {
         if (exists(name)) {
             return getStringList(name).toArray(String[]::new);
         } else
@@ -336,15 +334,13 @@ public class Configuration {
     /**
      * Returns the meta data corresponding to the given entry.
      */
-    @Nullable
-    public ConfigurationMeta getMeta(String name) {
+    public @Nullable ConfigurationMeta getMeta(String name) {
         return meta.get(name);
     }
 
     /**
      * Returns the meta data corresponding to the given entry, creates the entry if not existing.
      */
-    @NonNull
     private ConfigurationMeta getOrCreateMeta(String name) {
         return Objects.requireNonNull(meta.putIfAbsent(name, new ConfigurationMeta()));
     }
@@ -403,7 +399,7 @@ public class Configuration {
         return set(name, (Object) Arrays.asList(seq));
     }
 
-    public Set<Map.Entry<String, Object>> getEntries() {
+    public Set<Map.Entry<@KeyFor("this.data") String, Object>> getEntries() {
         return data.entrySet();
     }
 

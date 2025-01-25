@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Modifier;
@@ -21,23 +22,23 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
         implements Operator, Sorted {
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            ImmutableArray<Boolean> whereToBind, Modifier modifier) {
+                                     @Nullable ImmutableArray<Boolean> whereToBind, Modifier modifier) {
         super(name, argSorts, sort, whereToBind, modifier);
     }
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            ImmutableArray<Boolean> whereToBind, boolean isRigid) {
+                                     @Nullable ImmutableArray<Boolean> whereToBind, boolean isRigid) {
         this(name, argSorts, sort, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
     }
 
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
-            boolean isRigid) {
+                                     boolean isRigid) {
         this(name, new ImmutableArray<>(argSorts), sort,
-            new ImmutableArray<>(whereToBind), isRigid);
+                new ImmutableArray<>(whereToBind), isRigid);
     }
 
     protected AbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            boolean isRigid) {
+                                     boolean isRigid) {
         this(name, argSorts, sort, null, isRigid);
     }
 
@@ -53,7 +54,7 @@ public abstract class AbstractSortedOperator extends org.key_project.logic.op.Ab
      * checks if a given Term could be subterm (at the at'th subterm position) of a term with this
      * function at its top level. The validity of the given subterm is NOT checked.
      *
-     * @param at theposition of the term where this method should check the validity.
+     * @param at          theposition of the term where this method should check the validity.
      * @param possibleSub the subterm to be ckecked.
      * @return true iff the given term can be subterm at the indicated position
      */

@@ -278,7 +278,7 @@ checkerFramework {
                 //"-AonlyDefs=^de\\.uka\\.ilkd\\.key\\.(nparser\\.varexp|ldt|util|proof|control|macros|settings)(\\.*)?",
                 "-AassumeInitialized",
                 "-Xmaxerrs", "10000",
-                "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework${File.pathSeparatorChar}permit-nullness-assertion-exception.astub",
                 "-AstubNoWarnIfNotFound",
                 "-Werror",
                 "-Aversion",
