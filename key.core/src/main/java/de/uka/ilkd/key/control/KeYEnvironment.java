@@ -9,6 +9,8 @@ import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -24,6 +26,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
 import org.jspecify.annotations.Nullable;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Instances of this class are used to collect and access all relevant information for verification
