@@ -91,4 +91,23 @@ public interface Term extends LogicElement, Sorted {
      * @param visitor the Visitor
      */
     <T extends Term> void execPreOrder(Visitor<T> visitor);
+
+    @Override
+    default int getChildCount() {
+        return 1 + boundVars().size() + subs().size();
+    }
+
+    @Override
+    default SyntaxElement getChild(int n) {
+        if (n == 0)
+            return op();
+        n--;
+        if (n < boundVars().size())
+            return boundVars().get(n);
+        n -= boundVars().size();
+        if (n < subs().size())
+            return sub(n);
+        throw new IndexOutOfBoundsException(
+            "Term " + this + " has only " + getChildCount() + " children");
+    }
 }

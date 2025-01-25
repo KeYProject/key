@@ -25,6 +25,16 @@ public class NullLiteral extends Literal {
         super();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return o == this;
+    }
+
+    @Override
+    protected int computeHashCode() {
+        return System.identityHashCode(this);
+    }
+
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element

@@ -4,11 +4,10 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
-import de.uka.ilkd.key.logic.equality.TermEqualsModProperty;
+import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Visitor;
@@ -43,7 +42,7 @@ import org.jspecify.annotations.Nullable;
  * supported: {@link Term#execPostOrder(Visitor)} and {@link Term#execPreOrder(Visitor)}.
  */
 public interface Term
-        extends SVSubstitute, Sorted, TermEqualsModProperty, org.key_project.logic.Term {
+        extends Sorted, EqualsModProperty<Term>, org.key_project.logic.Term {
     @Override
     Operator op();
 

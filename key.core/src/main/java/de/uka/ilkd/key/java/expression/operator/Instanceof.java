@@ -31,13 +31,13 @@ public class Instanceof extends TypeOperator {
 
     public Instanceof(ExtList children) {
         super(children);
-        assert getChildCount() == 2 : "not 2 children but " + getChildCount();
+        assert this.getChildCount() == 2 : "not 2 children but " + this.getChildCount();
     }
 
 
     public Instanceof(Expression unaryChild, TypeReference typeref) {
         super(unaryChild, typeref);
-        assert getChildCount() == 2 : "not 2 children but " + getChildCount();
+        assert this.getChildCount() == 2 : "not 2 children but " + this.getChildCount();
     }
 
     /**

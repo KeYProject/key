@@ -10,7 +10,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -19,6 +18,8 @@ import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.logic.SyntaxElement;
 
 
 public final class DropEffectlessElementariesCondition implements VariableCondition {
@@ -85,7 +86,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
+    public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
+            MatchConditions mc,
             Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         Term uInst = (Term) svInst.getInstantiation(u);

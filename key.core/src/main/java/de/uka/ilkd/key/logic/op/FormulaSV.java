@@ -7,12 +7,13 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.util.pp.Layouter;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.TerminalSyntaxElement;
 
 
 /**
  * A schema variable that is used as placeholder for formulas.
  */
-public final class FormulaSV extends OperatorSV {
+public final class FormulaSV extends OperatorSV implements TerminalSyntaxElement {
 
     /**
      * @param name the name of the SchemaVariable

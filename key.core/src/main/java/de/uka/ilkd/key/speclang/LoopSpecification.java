@@ -96,18 +96,6 @@ public interface LoopSpecification extends SpecificationElement {
             Services services);
 
     /**
-     * Returns the free modifiable clause.
-     *
-     * @param selfTerm the self term.
-     * @param atPres the operators used for the pre-heap.
-     * @param services the Services object.
-     * @return The modifiable clause as a term.
-     */
-    Term getFreeModifiable(Term selfTerm,
-            Map<LocationVariable, Term> atPres,
-            Services services);
-
-    /**
      * Returns the information flow specification clause.
      */
     ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap);

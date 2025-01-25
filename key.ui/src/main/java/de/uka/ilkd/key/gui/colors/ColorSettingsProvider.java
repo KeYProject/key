@@ -75,7 +75,12 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
             }
 
             private Icon drawRect(Color c, int size) {
-                BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+                /*
+                 * Not sure if the alpha channel is used. Highlights seem to be blended correctly
+                 * even if the color is not transparent at all. However, make sure to use ARGB to
+                 * avoid black icons here ...
+                 */
+                BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
                 Graphics g = bi.getGraphics();
                 g.setColor(c);
                 g.fillRect(0, 0, size, size);
@@ -167,6 +172,10 @@ class HexColorCellEditor extends DefaultCellEditor {
 
     HexColorCellEditor(JTextField textField) {
         super(textField);
+
+        // this is somehow important to avoid visual artifacts such as overlapping text:
+        textField.setOpaque(false);
+
         textField.addActionListener(e -> stopCellEditing());
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override

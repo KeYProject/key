@@ -20,7 +20,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -44,7 +44,6 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.collection.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,48 +131,56 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         super.taskFinished(info);
         progressMax = 0; // reset progress bar marker
         final Proof proof = info.getProof();
+        final Object result = info.getResult();
         if (proof == null) {
-            final Object error = info.getResult();
             LOGGER.info("Proof loading failed");
-            if (error instanceof Throwable) {
-                LOGGER.info("Proof loading failed", (Throwable) error);
+            if (result instanceof Throwable thrown) {
+                LOGGER.info("Proof loading failed", thrown);
             } else {
                 LOGGER.info("Proof loading failed");
             }
             System.exit(1);
         }
         final int openGoals = proof.openGoals().size();
-        final Object result2 = info.getResult();
         if (info.getSource() instanceof ProverCore || info.getSource() instanceof ProofMacro) {
             if (!isAtLeastOneMacroRunning()) {
-                printResults(openGoals, info, result2);
+                printResults(openGoals, info, result);
             }
         } else if (info.getSource() instanceof ProblemLoader) {
-            LOGGER.debug("{}", result2);
-            System.exit(-1);
-        }
-        if (loadOnly || openGoals == 0) {
-            LOGGER.info("Number of open goals after loading: {}", openGoals);
-            System.exit(0);
-        }
-        ProblemLoader problemLoader = (ProblemLoader) info.getSource();
-        if (problemLoader.hasProofScript()) {
-            try {
-                Pair<String, Location> script = problemLoader.readProofScript();
-                ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-                this.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
-                pse.execute(this, proof);
-                // The start and end messages are fake to persuade the system ...
-                // All this here should refactored anyway ...
-                this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
-            } catch (Exception e) {
-                LOGGER.debug("", e);
+            if (result != null) {
+                LOGGER.debug("{}", result);
+                if (result instanceof Throwable thrown) {
+                    LOGGER.debug("Exception: ", thrown);
+                }
                 System.exit(-1);
             }
-        } else if (macroChosen()) {
-            applyMacro();
-        } else {
-            finish(proof);
+            if (loadOnly || openGoals == 0) {
+                LOGGER.info("Number of open goals after loading: {}", openGoals);
+                System.exit(0);
+            }
+            ProblemLoader problemLoader = (ProblemLoader) info.getSource();
+            if (problemLoader.hasProofScript()) {
+                try {
+                    ProofScriptEntry script = problemLoader.getProofScript();
+                    if (script != null) {
+                        ProofScriptEngine pse =
+                            new ProofScriptEngine(script.script(), script.location());
+                        this.taskStarted(
+                            new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
+                        pse.execute(this, proof);
+                        // The start and end messages are fake to persuade the system ...
+                        // All this here should refactored anyway ...
+                        this.taskFinished(new ProofMacroFinishedInfo(new SkipMacro(), proof));
+                    }
+                } catch (Exception e) {
+                    LOGGER.debug("", e);
+                    System.exit(-1);
+                }
+            } else if (macroChosen()) {
+                applyMacro();
+            } else {
+                finish(proof);
+            }
         }
     }
 

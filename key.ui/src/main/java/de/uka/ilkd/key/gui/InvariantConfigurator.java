@@ -18,7 +18,6 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -102,8 +101,6 @@ public class InvariantConfigurator {
         index = 0;
 
         class InvariantDialog extends JDialog {
-            private final LocationVariable HEAP_LDT =
-                services.getTypeConverter().getHeapLDT().getHeap();
             private final Color COLOR_SUCCESS = Color.GREEN;
             private final Color COLOR_ERROR = Color.RED;
 
@@ -187,11 +184,6 @@ public class InvariantConfigurator {
                 setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
                 final NamespaceSet nss = services.getNamespaces().copyWithParent();
-                Term self = loopInv.getInternalSelfTerm();
-                if (self != null) {
-                    nss.programVariables()
-                            .add(new LocationVariable(new ProgramElementName("self"), self.sort()));
-                }
                 parser = new KeyIO(services, nss);
                 parser.setAbbrevMap(getAbbrevMap());
 
@@ -593,15 +585,18 @@ public class InvariantConfigurator {
                 JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
+
+                    final LocationVariable baseHeap =
+                        services.getTypeConverter().getHeapLDT().getHeap();
                     final String k = heap.name().toString();
                     String title =
-                        format("Invariant%s - Status: ", heap == HEAP_LDT ? "" : "[" + k + "]");
+                        format("Invariant%s - Status: ", heap == baseHeap ? "" : "[" + k + "]");
                     String errorMessage = invMsgs == null ? "OK" : invMsgs.get(k);
                     Color invColor = invColors == null ? COLOR_SUCCESS : invColors.get(k);
                     JTextArea textArea = createErrorTextField(title, errorMessage, invColor);
                     invPane.add(k, textArea);
                     title =
-                        format("Modifiable%s - Status: ", heap == HEAP_LDT ? "" : "[" + k + "]");
+                        format("Modifiable%s - Status: ", heap == baseHeap ? "" : "[" + k + "]");
                     String errorMessage2 = modMsgs == null ? "OK" : modMsgs.get(k);
                     Color modColor = modColors == null ? COLOR_SUCCESS : modColors.get(k);
                     textArea = createErrorTextField(title, errorMessage2, modColor);
@@ -852,7 +847,7 @@ public class InvariantConfigurator {
                         setError(modErrors, modCols, heap.toString(), e.getMessage());
                     }
                 }
-                LocationVariable baseHeap = HEAP_LDT;
+                LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
                 // TODO: add post expressions and new objects
                 try {
                     infFlowSpecs.put(baseHeap, parseInfFlowSpec(baseHeap));

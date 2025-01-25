@@ -10,7 +10,7 @@ import java.util.List;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -103,12 +103,12 @@ public class ProveTest {
         try {
             LOGGER.info("({}) Start proving", caseId);
             // Initialize KeY environment and load proof.
-            Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair =
+            Pair<KeYEnvironment<DefaultUserInterfaceControl>, ProofScriptEntry> pair =
                 load(keyFile);
             LOGGER.info("({}) Proving done", caseId);
 
             env = pair.first;
-            Pair<String, Location> script = pair.second;
+            ProofScriptEntry script = pair.second;
             loadedProof = env.getLoadedProof();
 
             AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
@@ -182,14 +182,14 @@ public class ProveTest {
      * want to use a different strategy.
      */
     private void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            Pair<String, Location> script) throws Exception {
+            ProofScriptEntry script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
             env.getProofControl().startAndWaitForAutoMode(loadedProof);
         } else {
             // ... script
-            ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
+            ProofScriptEngine pse = new ProofScriptEngine(script.script(), script.location());
             pse.execute(env.getUi(), env.getLoadedProof());
         }
     }
@@ -197,7 +197,7 @@ public class ProveTest {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> load(
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, ProofScriptEntry> load(
             File keyFile) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());

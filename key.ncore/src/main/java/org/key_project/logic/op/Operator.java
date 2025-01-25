@@ -4,11 +4,12 @@
 package org.key_project.logic.op;
 
 import org.key_project.logic.Named;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.sort.Sort;
 
-public interface Operator extends Named {
+public interface Operator extends Named, SyntaxElement {
     /**
      * the arity of this operator
      */

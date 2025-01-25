@@ -158,7 +158,7 @@ public class SettingsManager {
     public static class ShowSettingsAction extends MainWindowAction {
         public ShowSettingsAction(MainWindow mainWindow) {
             super(mainWindow);
-            setName("Show Settings");
+            setName("Settings");
             setIcon(IconFactory.editFile(16));
         }
 

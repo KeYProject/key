@@ -22,7 +22,7 @@ import org.key_project.util.ExtList;
  * Generic data type, which has no predefined theory. It is meant as a basis to implement an
  * additional abstract data type, e.g., binary trees, stacks, etc. in <code>.key</code> files.
  *
- * @author daniel
+ * @author Daniel Grahl
  *
  */
 public final class FreeLDT extends LDT {

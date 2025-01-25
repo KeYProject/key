@@ -20,7 +20,7 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.util.collection.ImmutableList;
 
-import static de.uka.ilkd.key.logic.equality.RenamingProperty.RENAMING_PROPERTY;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public SelectCommand() {
@@ -135,7 +135,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private boolean contains(Semisequent semiseq, Term formula) {
         for (SequentFormula sf : semiseq.asList()) {
-            if (sf.formula().equalsModProperty(formula, RENAMING_PROPERTY)) {
+            if (sf.formula().equalsModProperty(formula, RENAMING_TERM_PROPERTY)) {
                 return true;
             }
         }

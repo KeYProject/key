@@ -22,7 +22,6 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.smt.SMTRuleApp;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -627,7 +626,7 @@ public final class Goal {
         } else {
             proof.replace(this, goalList);
             if (ruleApp instanceof TacletApp tacletApp && tacletApp.taclet().closeGoal()
-                    || ruleApp instanceof SMTRuleApp) {
+                    || ruleApp instanceof AbstractExternalSolverRuleApp) {
                 // the first new goal is the one to be closed
                 proof.closeGoal(goalList.head());
             }

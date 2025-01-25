@@ -129,8 +129,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         TermLabel label = term.getLabel(OriginTermLabel.NAME);
 
         if (label != null) {
-            result.add((Origin) label.getChild(0));
-            result.addAll((Set<Origin>) label.getChild(1));
+            result.add((Origin) label.getTLChild(0));
+            result.addAll((Set<Origin>) label.getTLChild(1));
         }
 
         ImmutableArray<Term> subterms = term.subs();

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.gui.docking.DynamicCMenu;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
@@ -39,6 +40,7 @@ public class ProofTreeSettingsMenuFactory {
             menu.addSeparator();
 
             menu.add(createExpandOSSToggle(view));
+            menu.add(createTooltipToggle());
             menu.add(createTacletInfoToggle());
             return menu;
         };
@@ -131,6 +133,27 @@ public class ProofTreeSettingsMenuFactory {
         };
         check.setText("Show taclet info (inner nodes only)");
         check.setSelected(MainWindow.getInstance().isShowTacletInfo());
+        return check;
+    }
+
+    private static CCheckBox createTooltipToggle() {
+        CCheckBox check = new CCheckBox() {
+            @Override
+            protected void changed() {
+                /*
+                 * The ToogleProofTreeTooltipAction (in the View menu) is updated via
+                 * PropertyChangeListener, no manual update needed!
+                 */
+                final boolean selected = isSelected();
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                        .setShowProofTreeTooltips(selected);
+            }
+        };
+        check.setText("Show Tooltips");
+        // No PropertyChangeListener needed, since the menu is always freshly generated.
+        final boolean setting =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isShowProofTreeTooltips();
+        check.setSelected(setting);
         return check;
     }
 

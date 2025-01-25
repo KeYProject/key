@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
@@ -103,14 +102,14 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
         ImmutableSet<Term> result = DefaultImmutableSet.nil();
 
         if (distinguishingFormula == null) {
-            final Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
+            final MergeByIfThenElse.DistanceFormRightSide distFormAndRightSidesForITEUpd =
                 MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm,
                     elseTerm, services);
 
-            final Term cond = distFormAndRightSidesForITEUpd.first();
-            final Term ifForm = distFormAndRightSidesForITEUpd.second();
-            final Term elseForm = distFormAndRightSidesForITEUpd.third();
-            final boolean isSwapped = distFormAndRightSidesForITEUpd.fourth();
+            final Term cond = distFormAndRightSidesForITEUpd.distinguishingFormula();
+            final Term ifForm = distFormAndRightSidesForITEUpd.ifTerm();
+            final Term elseForm = distFormAndRightSidesForITEUpd.elseTerm();
+            final boolean isSwapped = distFormAndRightSidesForITEUpd.sideCommuted();
 
             final Term varEqualsIfForm = tb.equals(constrained, ifForm);
             final Term varEqualsElseForm = tb.equals(constrained, elseForm);
