@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.loader.JP2KeYConverter;
@@ -38,8 +39,9 @@ class TranslationTest {
         sorts.add(new SortImpl(new Name("float"), ImmutableSet.empty(), false));
         services.activateJava(null);
     }
-    private final KeYJPMapping mapping = new KeYJPMapping();
-    private final TypeSolver typeSolver = new ReflectionTypeSolver(true);
+    private final KeYJPMapping mapping = services.getJavaService().getMapping();
+    //private final TypeSolver typeSolver = new ReflectionTypeSolver(true);
+    private final TypeSolver typeSolver = new JavaParserTypeSolver(ReduxTest.PATHTOREDUX);
     private final JP2KeYConverter converter = new JP2KeYConverter(services, mapping,
         new Namespace<>(), new JP2KeYTypeConverter(services, typeSolver, mapping));
 

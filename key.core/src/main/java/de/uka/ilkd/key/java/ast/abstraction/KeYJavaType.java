@@ -44,27 +44,27 @@ public class KeYJavaType implements Type {
 
     /** creates a new KeYJavaType */
     public KeYJavaType(Sort sort) {
-        this.sort = sort;
+        setSort(Objects.requireNonNull(sort));
     }
 
     /** creates a new KeYJavaType */
     public KeYJavaType(Type type) {
-        this.javaType = type;
+        setJavaType(Objects.requireNonNull(type));
     }
 
-    public void setJavaType(Type type) {
+    public void setJavaType(@Nullable Type type) {
         javaType = type;
     }
 
-    public void setSort(Sort s) {
+    public void setSort(@Nullable Sort s) {
         sort = s;
     }
 
-    public Type getJavaType() {
+    public @Nullable Type getJavaType() {
         return javaType;
     }
 
-    public Sort getSort() {
+    public @Nullable Sort getSort() {
         return sort;
     }
 

@@ -107,8 +107,7 @@ public class JP2KeYTypeConverter {
      * This method retrieves the recoder nameinfo and queries it for the type for typeName and
      * passes this result to {@link #getKeYJavaType(ResolvedType)}
      *
-     * @param typeName
-     *        name of a type to be converted
+     * @param typeName name of a type to be converted
      * @return the KJT for the string representation.
      * @author mu
      * @see #getKeYJavaType(ResolvedType)
@@ -123,13 +122,10 @@ public class JP2KeYTypeConverter {
      * <p>
      * Returned the cached value if present - otherwise create a new type.
      *
-     * @param type
-     *        type to be converted, may be null
+     * @param type type to be converted, may be null
      * @return a keytype.
      */
-    @NonNull
-    public KeYJavaType getKeYJavaType(ResolvedType type) {
-        // change from 2012-02-07: there must be a definite KJT
+    public @NonNull KeYJavaType getKeYJavaType(ResolvedType type) {
         if (type == null) {
             throw new NullPointerException("null cannot be converted into a KJT");
         }
@@ -199,7 +195,7 @@ public class JP2KeYTypeConverter {
         // I may not use JavaInfo here because the classes may not yet be cached!
         Type elemType = kjt.getJavaType();
         var arraySort = ArraySort.getArraySort(kjt.getSort(), elemType, getObjectType().getSort(),
-            getCloneableType().getSort(), getSerializableType().getSort());
+                getCloneableType().getSort(), getSerializableType().getSort());
         var result = new KeYJavaType(arraySort);
         if (getSortsNamespace().lookup(arraySort.name()) == null) {
             getSortsNamespace().add(arraySort);
@@ -249,6 +245,7 @@ public class JP2KeYTypeConverter {
         if (getSortsNamespace().lookup(sort.name()) == null) {
             getSortsNamespace().add(sort);
         }
+
         // Important: javaType is null until being set by visiting the class/interface/enum
         // declaration!
         storeInCache(type, new KeYJavaType(sort));
@@ -266,8 +263,7 @@ public class JP2KeYTypeConverter {
     /**
      * get all direct super sorts of a class type (not transitive)
      *
-     * @param classType
-     *        type to examine, not null
+     * @param classType type to examine, not null
      * @return a freshly created set of sorts
      */
     private ImmutableSet<Sort> directSuperSorts(ResolvedReferenceTypeDeclaration classType) {
@@ -285,10 +281,8 @@ public class JP2KeYTypeConverter {
     /**
      * create a sort out of a recoder class
      *
-     * @param ct
-     *        classtype to create for, not null
-     * @param supers
-     *        the set of (direct?) super-sorts
+     * @param ct     classtype to create for, not null
+     * @param supers the set of (direct?) super-sorts
      * @return a freshly created Sort object
      */
     private Sort createObjectSort(ResolvedTypeDeclaration ct, ImmutableSet<Sort> supers) {
@@ -335,13 +329,13 @@ public class JP2KeYTypeConverter {
             baseTypeRef = new TypeRef(baseType);
         } else {
             baseTypeRef = new TypeRef(new ProgramElementName(baseType.getSort().name().toString()),
-                0, null, baseType);
+                    0, null, baseType);
         }
 
         ExtList members = new ExtList();
         members.add(baseTypeRef);
         addImplicitArrayMembers(members, arrayType, baseType,
-            (ProgramVariable) length.getFieldSpecifications().get(0).getProgramVariable());
+                (ProgramVariable) length.getFieldSpecifications().get(0).getProgramVariable());
 
         return new ArrayDeclaration(members, baseTypeRef, sat);
     }
@@ -357,10 +351,10 @@ public class JP2KeYTypeConverter {
 
         var superArrayType = new KeYJavaType();
         var specLength =
-            new FieldSpecification(new LocationVariable(new ProgramElementName("length"),
-                integerType, superArrayType, false, false, false, true));
-        var f = new FieldDeclaration(new Modifier[] { new Public(), new Final() },
-            new TypeRef(integerType), new FieldSpecification[] { specLength }, false);
+                new FieldSpecification(new LocationVariable(new ProgramElementName("length"),
+                        integerType, superArrayType, false, false, false, true));
+        var f = new FieldDeclaration(new Modifier[]{new Public(), new Final()},
+                new TypeRef(integerType), new FieldSpecification[]{specLength}, false);
         superArrayType.setJavaType(new SuperArrayDeclaration(f));
         return superArrayType;
     }
@@ -368,21 +362,18 @@ public class JP2KeYTypeConverter {
     /**
      * Adds several implicit fields and methods to given list of members.
      *
-     * @param members
-     *        an ExtList with the members of parent
-     * @param parent
-     *        the KeYJavaType of the array to be enriched by its implicit members
-     * @param baseType
-     *        the KeYJavaType of the parent's element type
+     * @param members  an ExtList with the members of parent
+     * @param parent   the KeYJavaType of the array to be enriched by its implicit members
+     * @param baseType the KeYJavaType of the parent's element type
      */
     private void addImplicitArrayMembers(ExtList members, KeYJavaType parent, KeYJavaType baseType,
-            ProgramVariable len) {
+                                         ProgramVariable len) {
 
         Type base = baseType.getJavaType();
         int dimension = base instanceof ArrayType ? ((ArrayType) base).getDimension() + 1 : 1;
         TypeRef parentReference =
-            new TypeRef(new ProgramElementName(String.valueOf(parent.getSort().name())),
-                dimension, null, parent);
+                new TypeRef(new ProgramElementName(String.valueOf(parent.getSort().name())),
+                        dimension, null, parent);
 
         // add methods
         // the only situation where base can be null is in case of a
@@ -398,7 +389,7 @@ public class JP2KeYTypeConverter {
         }
 
         final IProgramMethod prepare =
-            arrayMethodBuilder.getPrepareArrayMethod(parentReference, length, defaultValue, fields);
+                arrayMethodBuilder.getPrepareArrayMethod(parentReference, length, defaultValue, fields);
 
         members.add(arrayMethodBuilder.getArrayInstanceAllocatorMethod(parentReference));
         members.add(prepare);
@@ -409,10 +400,9 @@ public class JP2KeYTypeConverter {
     /**
      * extracts all fields out of fielddeclaration
      *
-     * @param field
-     *        the FieldDeclaration of which the field specifications have to be extracted
+     * @param field the FieldDeclaration of which the field specifications have to be extracted
      * @return a IList<Field> the includes all field specifications found int the field declaration
-     *         of the given list
+     * of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableSLList.nil();
@@ -427,10 +417,9 @@ public class JP2KeYTypeConverter {
      * extracts all field specifications out of the given list. Therefore it descends into field
      * declarations.
      *
-     * @param list
-     *        the ExtList with the members of a type declaration
+     * @param list the ExtList with the members of a type declaration
      * @return a IList<Field> the includes all field specifications found int the field declaration
-     *         of the given list
+     * of the given list
      */
     private ImmutableList<Field> filterField(ExtList list) {
         ImmutableList<Field> result = ImmutableSLList.nil();
@@ -449,6 +438,6 @@ public class JP2KeYTypeConverter {
         Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
         int heapCount = (heapLDT == null) ? 1 : (heapLDT.getAllHeaps().size() - 1);
         arrayMethodBuilder =
-            new CreateArrayMethodBuilder(integerType, getObjectType(), heapSort, heapCount);
+                new CreateArrayMethodBuilder(integerType, getObjectType(), heapSort, heapCount);
     }
 }

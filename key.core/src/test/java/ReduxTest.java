@@ -39,7 +39,7 @@ public class ReduxTest {
         "../key.core/src/main/resources/de/uka/ilkd/key/java/JavaRedux";
 
     private final Services services = new Services(JavaProfile.getDefaultProfile());
-    private final KeYJPMapping mapping = new KeYJPMapping();
+    private final KeYJPMapping mapping = services.getJavaService().getMapping();
     private final TypeSolver typeSolver = new JavaParserTypeSolver(Paths.get(PATHTOREDUX));
     private final JP2KeYConverter converter = new JP2KeYConverter(services, mapping,
         new Namespace<>(), new JP2KeYTypeConverter(services, typeSolver, mapping));

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.java;
 
 import java.util.*;
 
+import com.github.javaparser.resolution.declarations.AssociableToAST;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
@@ -59,8 +60,11 @@ public class KeYJPMapping {
 
     private final Set<String> packageNames;
 
+    private final JavaService converter;
 
-    public KeYJPMapping() {
+    public KeYJPMapping(JavaService converter) {
+        this.converter = converter;
+
         this.map = new IdentityHashMap<>(4096);
         this.revMap = new IdentityHashMap<>(4096);
         this.typeMap = new LinkedHashMap<>(4096);
@@ -73,8 +77,7 @@ public class KeYJPMapping {
      * creates a KeYRecoderMapping object.
      * Used for cloning and testing.
      *
-     * @param o
-     *        what to clone
+     * @param o what to clone
      */
     KeYJPMapping(KeYJPMapping o) {
         this.map = new IdentityHashMap<>(o.map);
@@ -85,17 +88,28 @@ public class KeYJPMapping {
         this.superArrayType = o.superArrayType;
         this.parsedSpecial = o.parsedSpecial;
         this.parsingLibraries = o.parsingLibraries;
+        this.converter = o.converter;
     }
 
     /**
      * returns a matching ModelElement (KeY) to a given recoder.ModelElement
      *
-     * @param pe
-     *        a recoder.ModelElement
+     * @param pe a recoder.ModelElement
      */
     @Nullable
     public KeYJavaType resolvedTypeToKeY(ResolvedType pe) {
-        return typeMap.get(pe);
+        var type = typeMap.get(pe);
+        if (type != null && type.getJavaType() == null && pe.isReferenceType()) {
+            try {
+                pe.asReferenceType()
+                        .getTypeDeclaration()
+                        .flatMap(AssociableToAST::toAst)
+                        .ifPresent(converter.getConverter(null)::process);
+            } catch (ClassCastException e) {
+                // This class does not exist
+            }
+        }
+        return type;
     }
 
     public ResolvedType resolveType(KeYJavaType pe) {
@@ -125,7 +139,7 @@ public class KeYJPMapping {
         var formerNode = revMap.putIfAbsent(value, node);
         if (formerValue != null && formerValue != value)
             LOGGER.error("Duplicate registration of value: {}, formerValue: {}", value,
-                formerValue);
+                    formerValue);
         if (formerNode != null && formerNode != node)
             LOGGER.error("Duplicate registration of node: {}, formerNode: {}", node, formerNode);
     }
@@ -137,7 +151,7 @@ public class KeYJPMapping {
         var formerType = typeMapRev.putIfAbsent(key, rec);
         if (formerType != null && !Objects.equals(rec, formerType))
             LOGGER.error("Duplicate registration of resolved type: {}, former: {}", rec,
-                formerType);
+                    formerType);
     }
 
     public boolean mapped(Node rec) {
@@ -209,9 +223,8 @@ public class KeYJPMapping {
      * this method sets a flag whether the special have been parsed in or
      * not
      *
-     * @param b
-     *        boolean indicating if the special classes have been
-     *        parsed in
+     * @param b boolean indicating if the special classes have been
+     *          parsed in
      */
     public void setParsedSpecial(boolean b) {
         parsedSpecial = b;

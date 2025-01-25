@@ -293,14 +293,15 @@ public class Services implements TermServices, LogicServices {
      * copy the {@link InitConfig} via {@link InitConfig#deepCopy()} or one of the other copy
      * methods first.
      *
-     * @param p_proof the Proof to which this {@link Services} instance belongs
+     * @param proof
+     *        the Proof to which this {@link Services} instance belongs
      */
-    public void setProof(Proof p_proof) {
+    public void setProof(Proof proof) {
         if (this.proof != null) {
             throw new IllegalStateException(
-                "Services are already owned by another proof:" + proof.name());
+                "Services are already owned by another proof:" + this.proof.name());
         }
-        proof = p_proof;
+        this.proof = proof;
     }
 
 
@@ -483,8 +484,7 @@ public class Services implements TermServices, LogicServices {
         return javaService;
     }
 
-    private JavaService activateJavaPath(@NonNull Path bootClassPath,
-            @NonNull Collection<Path> libraryPaths) {
+    private JavaService activateJavaPath(@NonNull Path bootClassPath, @NonNull Collection<Path> libraryPaths) {
         if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
                 && CollectionUtil.containsSame(javaService.getLibraryPath(), libraryPaths)) {
             return javaService;
@@ -495,8 +495,7 @@ public class Services implements TermServices, LogicServices {
         return javaService;
     }
 
-    public JavaService activateJava(@Nullable Path bootClassPath,
-            @Nullable Collection<Path> libraryPaths) {
+    public JavaService activateJava(@Nullable Path bootClassPath, @NonNull Collection<Path> libraryPaths) {
         Path path;
         if (bootClassPath != null) {
             path = bootClassPath;

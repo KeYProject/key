@@ -27,28 +27,22 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (05.03.22)
  */
+@NullMarked
 public class JavaParserFactory {
+    private @Nullable ParserConfiguration config;
+
     private final Services services;
-    @Nullable
-    private ParserConfiguration config;
-
-    @NonNull
     private final DynamicTypeSolver typeSolver = new DynamicTypeSolver();
-
-    @NonNull
     private final JavaSymbolSolver symbolResolver = new JavaSymbolSolver(typeSolver);
-
-    @NonNull
     private final List<CompilationUnit> bootClasses;
-    @NonNull
     private final List<CompilationUnit> libraryClasses;
-    @NonNull
     private final List<CompilationUnit> userClasses;
 
 
@@ -104,17 +98,14 @@ public class JavaParserFactory {
         return config;
     }
 
-    @NonNull
     public JavaParser createJavaParser() {
         return new JavaParser(getConfiguration());
     }
 
-    @NonNull
     public TypeSolver getTypeSolver() {
         return typeSolver;
     }
 
-    @NonNull
     public JavaSymbolSolver getSymbolSolver() {
         return symbolResolver;
     }

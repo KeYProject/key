@@ -404,7 +404,7 @@ public final class ProblemInitializer {
     private void activateInitConfigJava(InitConfig config, EnvInput envInput) {
         var bootClassPath = envInput.readBootClassPath();
         var classPath = envInput.readClassPath();
-        config.getServices().activateJava(bootClassPath, classPath);
+        config.getServices().activateJava(bootClassPath, classPath != null ? classPath : Collections.emptyList());
     }
 
     /**

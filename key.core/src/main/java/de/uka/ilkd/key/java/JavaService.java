@@ -125,7 +125,7 @@ public class JavaService {
     public JavaService(Services services, @NonNull Path bootClassPath,
             @NonNull Collection<Path> libraryPath) {
         this.services = services;
-        this.mapping = new KeYJPMapping();
+        this.mapping = new KeYJPMapping(this);
         this.bootClassPath = bootClassPath;
         this.libraryPath = libraryPath;
         programFactory = new JavaParserFactory(services);
@@ -522,14 +522,6 @@ public class JavaService {
     private void parseBootClasspath(FileRepo fileRepo) throws IOException {
         LOGGER.debug("Parsing internal classes from {}", bootClassPath);
         var bootClasses = parseBootClasses(fileRepo);
-
-        /*
-         * var defaultCu = unwrapParseResult(programFactory.parseCompilationUnit(
-         * new StringReader("public class " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS +
-         * " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD
-         * + "() {}  }")));
-         * bootClasses.add(defaultCu);
-         */
 
         programFactory.setBootClasses(bootClasses);
         LOGGER.debug("Finished parsing internal classes");
