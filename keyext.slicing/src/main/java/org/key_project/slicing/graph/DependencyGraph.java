@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.DependencyTracker;
@@ -121,15 +120,27 @@ public class DependencyGraph {
     }
 
     /**
+     * Represents an edge in the dependency graph.
+     *
+     * @param fromNode the outgoing node of the edge
+     * @param toNode the incoming node of the edge
+     * @param annotation annotation associated to the edge
+     */
+    public record Edge(Node fromNode, GraphNode toNode, AnnotatedEdge annotation) {}
+
+    /**
+     * Returns the incoming edges of the given node.
+     *
      * @param node a graph node
      * @return the incoming (graph edges, graph sources) of that node
      */
-    public Stream<Triple<Node, GraphNode, AnnotatedEdge>> incomingGraphEdgesOf(GraphNode node) {
+    public Stream<Edge> incomingGraphEdgesOf(GraphNode node) {
         if (!graph.containsVertex(node)) {
             return Stream.of();
         }
         return graph.incomingEdgesOf(node).stream()
-                .map(edge -> new Triple<>(edge.getProofStep(), graph.getEdgeSource(edge), edge));
+                .map(
+                    edge -> new Edge(edge.getProofStep(), graph.getEdgeSource(edge), edge));
     }
 
     /**
@@ -144,15 +155,18 @@ public class DependencyGraph {
     }
 
     /**
+     * Returns the outgoing edges of the given node.
+     *
      * @param node a graph node
      * @return the outgoing (graph edges, graph targets) of that node
      */
-    public Stream<Triple<Node, GraphNode, AnnotatedEdge>> outgoingGraphEdgesOf(GraphNode node) {
+    public Stream<Edge> outgoingGraphEdgesOf(GraphNode node) {
         if (!graph.containsVertex(node)) {
             return Stream.of();
         }
         return graph.outgoingEdgesOf(node).stream()
-                .map(edge -> new Triple<>(edge.getProofStep(), graph.getEdgeTarget(edge), edge));
+                .map(
+                    edge -> new Edge(edge.getProofStep(), graph.getEdgeTarget(edge), edge));
     }
 
     /**
@@ -280,7 +294,7 @@ public class DependencyGraph {
      * @return the outgoing edges of that node
      */
     public Stream<AnnotatedEdge> edgesUsing(GraphNode node) {
-        return outgoingGraphEdgesOf(node).map(it -> it.third);
+        return outgoingGraphEdgesOf(node).map(it -> it.annotation);
     }
 
     /**
@@ -289,8 +303,8 @@ public class DependencyGraph {
      */
     public Stream<AnnotatedEdge> edgesConsuming(GraphNode node) {
         return outgoingGraphEdgesOf(node)
-                .filter(it -> it.third.replacesInputNode())
-                .map(it -> it.third);
+                .filter(it -> it.annotation.replacesInputNode())
+                .map(it -> it.annotation);
     }
 
     /**
@@ -299,7 +313,7 @@ public class DependencyGraph {
      */
     public Stream<AnnotatedEdge> edgesProducing(GraphNode node) {
         return incomingGraphEdgesOf(node)
-                .map(it -> it.third);
+                .map(it -> it.annotation);
     }
 
     /**
@@ -392,12 +406,12 @@ public class DependencyGraph {
             // whose hyperedge should not connect more nodes
             // (otherwise we cannot remove the edge without
             // making the graph inconsistent)
-            Node startNode = incoming.get(0).first;
+            Node startNode = incoming.get(0).fromNode;
             if (edgesOf(startNode).size() != 1) {
                 continue;
             }
-            GraphNode startGraphNode = incoming.get(0).second;
-            AnnotatedEdge edge = incoming.get(0).third;
+            GraphNode startGraphNode = incoming.get(0).toNode;
+            AnnotatedEdge edge = incoming.get(0).annotation;
 
             // get real initial node
             // (in case of repeated shortenings)
@@ -411,9 +425,9 @@ public class DependencyGraph {
             // whose hyperedge should not connect more nodes
             // (otherwise we cannot remove the edge without
             // making the graph inconsistent)
-            Node endNode = outgoing.get(0).first;
-            GraphNode endGraphNode = outgoing.get(0).second;
-            var edge2 = outgoing.get(0).third;
+            Node endNode = outgoing.get(0).fromNode;
+            GraphNode endGraphNode = outgoing.get(0).toNode;
+            var edge2 = outgoing.get(0).annotation;
             if (edgesOf(endNode).size() != 1) {
                 continue;
             }

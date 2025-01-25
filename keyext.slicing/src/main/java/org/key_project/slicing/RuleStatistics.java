@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.util.Quadruple;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * Simple data object to store a mapping of rules to various counters.
@@ -24,7 +22,7 @@ public class RuleStatistics {
      * that used this rule and didn't contribute to the proof ("useless" proof steps), and the
      * number of "useless" proof steps that initiate a chain of further (useless) proof steps.
      */
-    private final Map<String, Triple<Integer, Integer, Integer>> map = new HashMap<>();
+    private final Map<String, StatisticEntry> map = new HashMap<>();
     /**
      * Mapping of rule name to whether this rule introduces new proof branches.
      */
@@ -40,9 +38,10 @@ public class RuleStatistics {
         String name = rule.displayName();
         ruleBranched.put(name, branches);
 
-        Triple<Integer, Integer, Integer> entry =
-            map.computeIfAbsent(name, it -> new Triple<>(0, 0, 0));
-        map.put(name, new Triple<>(entry.first + 1, entry.second, entry.third));
+        StatisticEntry entry =
+            map.computeIfAbsent(name, it -> new StatisticEntry(0, 0, 0));
+        map.put(name, new StatisticEntry(entry.numberOfApplications + 1,
+            entry.numberOfUselessApplications, entry.numberOfInitialUselessApplications));
     }
 
     /**
@@ -55,9 +54,10 @@ public class RuleStatistics {
         String name = rule.displayName();
         ruleBranched.put(name, branches);
 
-        Triple<Integer, Integer, Integer> entry =
-            map.computeIfAbsent(name, it -> new Triple<>(0, 0, 0));
-        map.put(name, new Triple<>(entry.first + 1, entry.second + 1, entry.third));
+        StatisticEntry entry =
+            map.computeIfAbsent(name, it -> new StatisticEntry(0, 0, 0));
+        map.put(name, new StatisticEntry(entry.numberOfApplications + 1,
+            entry.numberOfUselessApplications + 1, entry.numberOfInitialUselessApplications));
     }
 
     /**
@@ -70,9 +70,10 @@ public class RuleStatistics {
         String name = rule.displayName();
         ruleBranched.put(name, branches);
 
-        Triple<Integer, Integer, Integer> entry =
-            map.computeIfAbsent(name, it -> new Triple<>(0, 0, 0));
-        map.put(name, new Triple<>(entry.first + 1, entry.second + 1, entry.third + 1));
+        StatisticEntry entry =
+            map.computeIfAbsent(name, it -> new StatisticEntry(0, 0, 0));
+        map.put(name, new StatisticEntry(entry.numberOfApplications + 1,
+            entry.numberOfUselessApplications + 1, entry.numberOfInitialUselessApplications + 1));
     }
 
     /**
@@ -83,11 +84,12 @@ public class RuleStatistics {
      * @param comparator custom comparator
      * @return list of rule names + counters
      */
-    public List<Quadruple<String, Integer, Integer, Integer>> sortBy(
-            Comparator<Quadruple<String, Integer, Integer, Integer>> comparator) {
+    public List<RuleStatisticEntry> sortBy(Comparator<RuleStatisticEntry> comparator) {
         return map.entrySet().stream()
-                .map(entry -> new Quadruple<>(entry.getKey(), entry.getValue().first,
-                    entry.getValue().second, entry.getValue().third))
+                .map(entry -> new RuleStatisticEntry(entry.getKey(),
+                    entry.getValue().numberOfApplications,
+                    entry.getValue().numberOfUselessApplications,
+                    entry.getValue().numberOfInitialUselessApplications))
                 .sorted(comparator)
                 .collect(Collectors.toList());
     }
@@ -99,4 +101,29 @@ public class RuleStatistics {
     public boolean branches(String rule) {
         return ruleBranched.get(rule);
     }
+
+    /**
+     * Usage statistic of a rule.
+     * <p>
+     * TODO weigl: refactoring task, combine {@link RuleStatisticEntry} with {@link StatisticEntry}
+     * to avoid repetition.
+     *
+     * @param ruleName
+     * @param numberOfApplications
+     * @param numberOfUselessApplications
+     * @param numberOfInitialUselessApplications
+     */
+    public record RuleStatisticEntry(String ruleName, int numberOfApplications,
+            int numberOfUselessApplications, int numberOfInitialUselessApplications) {
+    }
+
+    /**
+     * Usage statistic of a rule.
+     *
+     * @param numberOfApplications
+     * @param numberOfUselessApplications
+     * @param numberOfInitialUselessApplications
+     */
+    public record StatisticEntry(int numberOfApplications, int numberOfUselessApplications,
+            int numberOfInitialUselessApplications) {}
 }

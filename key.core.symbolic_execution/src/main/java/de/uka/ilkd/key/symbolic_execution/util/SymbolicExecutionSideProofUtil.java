@@ -32,9 +32,9 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.profile.SimplifyTermProfile;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
+import de.uka.ilkd.key.symbolic_execution.rule.ResultsAndCondition;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableArray;
@@ -169,7 +169,8 @@ public final class SymbolicExecutionSideProofUtil {
      * @return The found result {@link Term} and the conditions.
      * @throws ProofInputException Occurred Exception.
      */
-    public static List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services,
+    public static List<ResultsAndCondition> computeResultsAndConditions(
+            Services services,
             Proof proof, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
             Operator operator, String description, String methodTreatment, String loopTreatment,
             String queryTreatment, String splittingOption, boolean addNamesToServices)
@@ -182,8 +183,7 @@ public final class SymbolicExecutionSideProofUtil {
             Set<Operator> relevantThingsInSequentToProve =
                 extractRelevantThings(info.getProof().getServices(), sequentToProve);
             // Extract results and conditions from side proof
-            List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
-                new LinkedList<>();
+            List<ResultsAndCondition> conditionsAndResultsMap = new LinkedList<>();
             for (Goal resultGoal : info.getProof().openGoals()) {
                 if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
                     throw new IllegalStateException("Not all applicable rules are applied.");
@@ -245,8 +245,8 @@ public final class SymbolicExecutionSideProofUtil {
                 if (result == null) {
                     result = services.getTermBuilder().ff();
                 }
-                conditionsAndResultsMap.add(
-                    new Triple<>(result, resultConditions, resultGoal.node()));
+                conditionsAndResultsMap
+                        .add(new ResultsAndCondition(result, resultConditions, resultGoal.node()));
             }
             return conditionsAndResultsMap;
         } finally {
@@ -303,14 +303,11 @@ public final class SymbolicExecutionSideProofUtil {
         final Namespace<JFunction> functions = services.getNamespaces().functions();
         final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
         // LogicVariables are always local bound
-        term.execPreOrder(new DefaultVisitor() {
-            @Override
-            public void visit(Term visited) {
-                if (visited.op() instanceof JFunction) {
-                    functions.add((JFunction) visited.op());
-                } else if (visited.op() instanceof IProgramVariable) {
-                    progVars.add((IProgramVariable) visited.op());
-                }
+        term.execPreOrder((DefaultVisitor) visited -> {
+            if (visited.op() instanceof JFunction) {
+                functions.add((JFunction) visited.op());
+            } else if (visited.op() instanceof IProgramVariable) {
+                progVars.add((IProgramVariable) visited.op());
             }
         });
     }
@@ -385,12 +382,9 @@ public final class SymbolicExecutionSideProofUtil {
             Sequent sequentToProve) {
         final Set<Operator> result = new HashSet<>();
         for (SequentFormula sf : sequentToProve) {
-            sf.formula().execPreOrder(new DefaultVisitor() {
-                @Override
-                public void visit(Term visited) {
-                    if (isRelevantThing(services, visited)) {
-                        result.add(visited.op());
-                    }
+            sf.formula().execPreOrder((DefaultVisitor) visited -> {
+                if (isRelevantThing(services, visited)) {
+                    result.add(visited.op());
                 }
             });
         }

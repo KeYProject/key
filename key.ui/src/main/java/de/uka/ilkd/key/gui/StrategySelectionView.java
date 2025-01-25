@@ -405,9 +405,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         existingPredefs[0] = "Defaults";
 
         int i = 1;
-        for (Triple<String, Integer, IDefaultStrategyPropertiesFactory> furtherDefault : DEFINITION
+        for (StrategySettingsDefinition.StrategySettingEntry furtherDefault : DEFINITION
                 .getFurtherDefaults()) {
-            existingPredefs[i] = furtherDefault.first;
+            existingPredefs[i] = furtherDefault.name();
             i++;
         }
 
@@ -425,10 +425,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 newProps =
                     DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties();
             } else {
-                Triple<String, Integer, IDefaultStrategyPropertiesFactory> chosenDefault =
-                    DEFINITION.getFurtherDefaults().get(selIndex - 1);
-                newMaxSteps = chosenDefault.second;
-                newProps = chosenDefault.third.createDefaultStrategyProperties();
+                var chosenDefault = DEFINITION.getFurtherDefaults().get(selIndex - 1);
+                newMaxSteps = chosenDefault.order();
+                newProps = chosenDefault.factory().createDefaultStrategyProperties();
             }
 
             mediator.getSelectedProof().getSettings().getStrategySettings()
