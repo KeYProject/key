@@ -25,7 +25,8 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * Returns the return value.
      *
      * @return The return value.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     Term getReturnValue() throws ProofInputException;
 
@@ -33,7 +34,8 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * Returns the return value as human readable {@link String}.
      *
      * @return The return value as human readable {@link String}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     String getReturnValueString() throws ProofInputException;
 
@@ -50,7 +52,8 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * Returns the optional condition under which the return value is valid.
      *
      * @return The optional condition under which the return value is valid.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     Term getCondition() throws ProofInputException;
 
@@ -59,7 +62,8 @@ public interface IExecutionMethodReturnValue extends IExecutionElement {
      * {@link String}.
      *
      * @return The optional condition as human readable {@link String}.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     String getConditionString() throws ProofInputException;
 }

@@ -95,16 +95,19 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
     /**
      * parses and returns the term encoded as string 's'
      *
-     * @param s the String to parse
+     * @param s
+     *        the String to parse
      * @return the term encoded in 's'
-     * @throws RecognitionException In case an exception occurs during parse.
+     * @throws RecognitionException
+     *         In case an exception occurs during parse.
      */
     public Term parseFormula(String s) throws RecognitionException {
         return new KeyIO(services).parseExpression(s);
     }
 
     /**
-     * @param pos int describes position of the if-sequent (only required for error message)
+     * @param pos
+     *        int describes position of the if-sequent (only required for error message)
      * @return the selected instantiation of the if sequent
      * @throws SVInstantiationParserException
      * @throws MissingInstantiationException
@@ -130,7 +133,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
             return new IfFormulaInstDirect(new SequentFormula(term));
         } catch (RecognitionException e) {
             throw new SVInstantiationParserException(manualInput,
-                Position.fromOneZeroBased(pos, e.charPositionInLine),
+                Position.newOneBased(pos, e.position.column()),
                 "Problem occured parsing a manual input" + " of an '\\assumes'-sequent.\n"
                     + e.getMessage(),
                 true).initCause(e);

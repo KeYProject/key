@@ -42,7 +42,8 @@ public class CompoundStopCondition implements StopCondition {
     /**
      * Constructor.
      *
-     * @param children The child {@link StopCondition}s to use.
+     * @param children
+     *        The child {@link StopCondition}s to use.
      */
     public CompoundStopCondition(StopCondition... children) {
         Collections.addAll(this.children, children);
@@ -51,7 +52,8 @@ public class CompoundStopCondition implements StopCondition {
     /**
      * Adds new child {@link StopCondition}s.
      *
-     * @param children The child {@link StopCondition}s to use.
+     * @param children
+     *        The child {@link StopCondition}s to use.
      */
     public void addChildren(StopCondition... children) {
         Collections.addAll(this.children, children);

@@ -60,13 +60,18 @@ public interface SMTHandler {
      * This method may also allocate additional resources that it needs for translation.
      *
      *
-     * @param masterHandler the MasterHandler coordinating the other handlers (including the one at
+     * @param masterHandler
+     *        the MasterHandler coordinating the other handlers (including the one at
      *        hand)
-     * @param services the non-null services object which is relevant for this handler
-     * @param handlerSnippets the snippets loaded for this handler, null if no snippet property file
+     * @param services
+     *        the non-null services object which is relevant for this handler
+     * @param handlerSnippets
+     *        the snippets loaded for this handler, null if no snippet property file
      *        is available for this handler
-     * @param handlerOptions arbitrary options for the handler to take into account
-     * @throws IOException if resources cannot be read.
+     * @param handlerOptions
+     *        arbitrary options for the handler to take into account
+     * @throws IOException
+     *         if resources cannot be read.
      */
     void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) throws IOException;
@@ -78,7 +83,8 @@ public interface SMTHandler {
      * toplevel operator of the term is in the list of supported operators, but the handler can also
      * choose to use other aspects of the term to decide.
      *
-     * @param term a non-null term to translate
+     * @param term
+     *        a non-null term to translate
      * @return {@link Capability#YES_THIS_OPERATOR} if this handler can successfully translate any
      *         term with the same toplevel operator, {@link Capability#YES_THIS_INSTANCE} if this
      *         handler can successfully translate this particular term, {@link Capability#UNABLE} if
@@ -93,7 +99,8 @@ public interface SMTHandler {
      *
      * Test if this handler can translate any term with the given argument top level operator.
      *
-     * @param op a non-null operator to translate
+     * @param op
+     *        a non-null operator to translate
      * @return true if this handler can successfully translate all terms with op as toplevel
      *         operator
      */
@@ -108,10 +115,13 @@ public interface SMTHandler {
      * The translation may add to the set of assumptions and declarations using corresponding calls
      * to the {@link MasterHandler} that it receives.
      *
-     * @param trans the non-null master handler to which it belongs
-     * @param term the non-null term to translate
+     * @param trans
+     *        the non-null master handler to which it belongs
+     * @param term
+     *        the non-null term to translate
      * @return an SExpr representing the term
-     * @throws SMTTranslationException if the translation fails unexpectedly.
+     * @throws SMTTranslationException
+     *         if the translation fails unexpectedly.
      */
     SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException;
 

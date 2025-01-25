@@ -67,8 +67,10 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      * applies the specified rule at the specified position if all schema variables have been
      * instantiated
      *
-     * @param goal the Goal where to apply the rule
-     * @param services the Services encapsulating all java information
+     * @param goal
+     *        the Goal where to apply the rule
+     * @param services
+     *        the Services encapsulating all java information
      * @return list of new created goals
      */
     @Override

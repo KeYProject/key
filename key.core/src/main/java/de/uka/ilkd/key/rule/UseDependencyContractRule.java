@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.*;
@@ -46,8 +46,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     // constructors
     // -------------------------------------------------------------------------
 
-    private UseDependencyContractRule() {
-    }
+    private UseDependencyContractRule() {}
 
 
     // -------------------------------------------------------------------------

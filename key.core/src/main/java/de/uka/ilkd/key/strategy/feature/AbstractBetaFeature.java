@@ -29,7 +29,8 @@ public abstract class AbstractBetaFeature implements Feature {
     /**
      * Get the informations about a term
      *
-     * @param caches TODO
+     * @param caches
+     *        TODO
      */
     private static TermInfo termInfo(Term p_t, ServiceCaches caches) {
         TermInfo ti;
@@ -119,7 +120,8 @@ public abstract class AbstractBetaFeature implements Feature {
      * maxPosPath/maxDPath, however different return types pose a problem. Perhaps this could be
      * solved using generics?
      *
-     * @param caches TODO
+     * @param caches
+     *        TODO
      */
     private static boolean hasPurePosPathHelp(Term p_t, boolean p_positive, ServiceCaches caches) {
         if (p_t.op() == (p_positive ? Junctor.AND : Junctor.OR)) {
@@ -212,7 +214,8 @@ public abstract class AbstractBetaFeature implements Feature {
     /**
      * p_t contains a d-path consisting only of positive literals (as a formula of the antecedent)
      *
-     * @param caches TODO
+     * @param caches
+     *        TODO
      */
     protected static boolean hasPurePosPath(Term p_t, boolean p_positive, ServiceCaches caches) {
         TermInfo ti = termInfo(p_t, caches);
@@ -223,7 +226,8 @@ public abstract class AbstractBetaFeature implements Feature {
      * The maximal number of positive literals occurring within a d-path of "p_t" as a formula of
      * the antecedent
      *
-     * @param caches TODO
+     * @param caches
+     *        TODO
      */
     protected static int maxPosPath(Term p_t, boolean p_positive, ServiceCaches caches) {
         TermInfo ti = termInfo(p_t, caches);
@@ -234,7 +238,8 @@ public abstract class AbstractBetaFeature implements Feature {
      * The length (number of literals) of the maximum d-path of the given formula as a formula of
      * the antecedent
      *
-     * @param caches TODO
+     * @param caches
+     *        TODO
      */
     protected static int maxDPath(Term p_t, boolean p_positive, ServiceCaches caches) {
         TermInfo ti = termInfo(p_t, caches);
@@ -242,7 +247,8 @@ public abstract class AbstractBetaFeature implements Feature {
     }
 
     /**
-     * @param caches TODO
+     * @param caches
+     *        TODO
      * @return true iff "p_t" contains a quantifier or a modality
      */
     protected static boolean containsQuantifier(Term p_t, ServiceCaches caches) {
@@ -251,7 +257,8 @@ public abstract class AbstractBetaFeature implements Feature {
     }
 
     /**
-     * @param caches TODO
+     * @param caches
+     *        TODO
      * @return true iff the given formula contains a negated atom as a formula of the antecedent
      */
     protected static boolean containsNegAtom(Term p_t, boolean p_positive, ServiceCaches caches) {
@@ -268,7 +275,8 @@ public abstract class AbstractBetaFeature implements Feature {
     }
 
     /**
-     * @param caches TODO
+     * @param caches
+     *        TODO
      * @return true iff the formula p_t could be splitted using the beta rule
      */
     protected static boolean isBetaCandidate(Term p_t, boolean p_inAntec, ServiceCaches caches) {
@@ -319,9 +327,12 @@ public abstract class AbstractBetaFeature implements Feature {
     /**
      * Compute the cost of a RuleApp.
      *
-     * @param app the RuleApp
-     * @param pos position where <code>app</code> is to be applied
-     * @param goal the goal on which <code>app</code> is to be applied
+     * @param app
+     *        the RuleApp
+     * @param pos
+     *        position where <code>app</code> is to be applied
+     * @param goal
+     *        the goal on which <code>app</code> is to be applied
      * @param mState
      * @return the cost of <code>app</code>
      */

@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 import org.key_project.util.collection.ImmutableList;
@@ -31,13 +31,13 @@ public class ProgramSVInstantiation {
 
 
     /** creates a new ProgramSVInstantiation object with an empty list */
-    private ProgramSVInstantiation() {
-    }
+    private ProgramSVInstantiation() {}
 
     /**
      * creates a new ProgramSVInstantiation object using the given list
      *
-     * @param list the ListFromSchemaVariableToJavaProgramElement with the instantiations
+     * @param list
+     *        the ListFromSchemaVariableToJavaProgramElement with the instantiations
      */
     private ProgramSVInstantiation(ImmutableList<ProgramSVEntry> list) {
         this.list = list;
@@ -47,8 +47,10 @@ public class ProgramSVInstantiation {
      * adds the given pair to the instantiations. If the given SchemaVariable has been instantiated
      * already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param prgElement the JavaProgramElement The SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param prgElement
+     *        the JavaProgramElement The SchemaVariable is instantiated with
      * @return ProgramSVInstantiation the new ProgramSVInstantiation containing the given pair
      */
     public ProgramSVInstantiation add(SchemaVariable sv, JavaProgramElement prgElement) {
@@ -63,8 +65,10 @@ public class ProgramSVInstantiation {
      * replaces the given pair in the instantiations. If the given SchemaVariable has been
      * instantiated already, the new pair is taken without a warning.
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param prgElement the JavaProgramElement The SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param prgElement
+     *        the JavaProgramElement The SchemaVariable is instantiated with
      * @return ProgramSVInstantiation the new ProgramSVInstantiation containing the given pair
      */
     public ProgramSVInstantiation replace(SchemaVariable sv, JavaProgramElement prgElement) {

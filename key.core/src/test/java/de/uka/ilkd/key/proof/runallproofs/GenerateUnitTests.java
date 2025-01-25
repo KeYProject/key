@@ -100,8 +100,10 @@ public class GenerateUnitTests {
      * Generates the test classes for the given proof collection, and writes the
      * java files.
      *
-     * @param unit a group of proof collection units
-     * @throws IOException if the file is not writable
+     * @param unit
+     *        a group of proof collection units
+     * @throws IOException
+     *         if the file is not writable
      */
     private static void createUnitClass(RunAllProofsTestUnit unit)
             throws IOException {
@@ -110,7 +112,7 @@ public class GenerateUnitTests {
         String className = '_' + name // avoids name clashes, i.e., group "switch"
                 .replaceAll("\\.java", "")
                 .replaceAll("\\.key", "")
-                .replaceAll("[^a-zA-Z0-9]+", "_");
+                .replaceAll("[^a-zA-Z0-9]+", "_").toUpperCase();
 
         ProofCollectionSettings settings = unit.getSettings();
         Map<String, String> vars = new TreeMap<>();
@@ -164,13 +166,17 @@ public class GenerateUnitTests {
 
             switch (file.getTestProperty()) {
             case PROVABLE -> methods.append("assertProvability(\"")
-                    .append(keyFile.getAbsolutePath()).append("\");");
+                    .append(keyFile.getAbsolutePath())
+                    .append("\");");
             case NOTPROVABLE -> methods.append("assertUnProvability(\"")
-                    .append(keyFile.getAbsolutePath()).append("\");");
+                    .append(keyFile.getAbsolutePath())
+                    .append("\");");
             case LOADABLE -> methods.append("assertLoadability(\"")
-                    .append(keyFile.getAbsolutePath()).append("\");");
+                    .append(keyFile.getAbsolutePath())
+                    .append("\");");
             case NOTLOADABLE -> methods.append("assertUnLoadability(\"")
-                    .append(keyFile.getAbsolutePath()).append("\");");
+                    .append(keyFile.getAbsolutePath())
+                    .append("\");");
             }
             methods.append("}");
         }

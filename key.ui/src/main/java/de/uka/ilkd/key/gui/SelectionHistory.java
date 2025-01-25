@@ -54,7 +54,8 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
     /**
      * Construct a new selection history.
      *
-     * @param mediator mediator
+     * @param mediator
+     *        mediator
      */
     public SelectionHistory(KeYMediator mediator) {
         this.mediator = mediator;
@@ -184,8 +185,7 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
     }
 
     @Override
-    public void proofDisposing(ProofDisposedEvent e) {
-    }
+    public void proofDisposing(ProofDisposedEvent e) {}
 
     @Override
     public void proofDisposed(ProofDisposedEvent e) {

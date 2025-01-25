@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -71,9 +72,11 @@ public abstract class TacletLoader {
      * Taclets are stored in ImmutableSets which fortunately enough still have a fixed order due to
      * their implementation using immutable lists.
      *
-     * @param initConfig the initial config from which the taclet to prove and all following taclets
+     * @param initConfig
+     *        the initial config from which the taclet to prove and all following taclets
      *        have been removed.
-     * @param tacletToProve the taclet for which PO will be generated. Remove all taclets after this
+     * @param tacletToProve
+     *        the taclet for which PO will be generated. Remove all taclets after this
      *        taclet.
      *
      */
@@ -152,8 +155,9 @@ public abstract class TacletLoader {
                 loader.listener);
         }
 
-        private void prepareKeYFile(File file) throws ProofInputException {
-            KeYFile keyFileDefs = new KeYFile(file.getName(), file, monitor, profile);
+        private void prepareKeYFile(Path file) throws ProofInputException {
+            KeYFile keyFileDefs =
+                new KeYFile(file.getFileName().toString(), file, monitor, profile);
             if (initConfig != null) {
                 problemInitializer.readEnvInput(keyFileDefs, initConfig);
             } else {
@@ -171,7 +175,7 @@ public abstract class TacletLoader {
 
             int sizeBefore = initConfig.getTaclets().size();
 
-            prepareKeYFile(fileForTaclets);
+            prepareKeYFile(fileForTaclets.toPath());
 
             ImmutableList<Taclet> listAfter = initConfig.getTaclets();
 
@@ -182,7 +186,7 @@ public abstract class TacletLoader {
         public ImmutableSet<Taclet> loadAxioms() throws ProofInputException {
             ImmutableSet<Taclet> axioms = DefaultImmutableSet.nil();
             for (File f : filesForAxioms) {
-                prepareKeYFile(f);
+                prepareKeYFile(f.toPath());
             }
 
             return axioms;

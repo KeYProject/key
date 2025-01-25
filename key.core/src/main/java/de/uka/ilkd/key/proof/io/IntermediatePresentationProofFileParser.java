@@ -76,7 +76,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private final LinkedList<Throwable> errors = new LinkedList<>();
 
     /**
-     * @param proof Proof object for storing meta information about the parsed proof.
+     * @param proof
+     *        Proof object for storing meta information about the parsed proof.
      */
     public IntermediatePresentationProofFileParser(Proof proof) {
         this.proof = proof;
@@ -325,7 +326,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     /**
      * Loads proof settings.
      *
-     * @param preferences The preferences to load.
+     * @param preferences
+     *        The preferences to load.
      */
     private void loadPreferences(String preferences) {
         final ProofSettings proofSettings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
@@ -414,8 +416,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      *
      * @author Dominic Scheurer
      */
-    public record Result(List<Throwable> errors, String status,
-            BranchNodeIntermediate parsedResult) {
-    }
+    public record Result(
+            List<Throwable> errors, String status,
+            BranchNodeIntermediate parsedResult) {}
 
 }

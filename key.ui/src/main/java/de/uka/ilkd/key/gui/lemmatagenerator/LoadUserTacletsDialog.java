@@ -154,7 +154,8 @@ public class LoadUserTacletsDialog extends JPanel {
     /**
      * Creates a new dialog for loading user-defined taclets
      *
-     * @param mode either {@link Mode#PROVE} or {@link Mode#LOAD}
+     * @param mode
+     *        either {@link Mode#PROVE} or {@link Mode#LOAD}
      */
     public LoadUserTacletsDialog(Mode mode) {
 

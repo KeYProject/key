@@ -6,7 +6,7 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -115,7 +115,8 @@ public class ProofObligationVars {
     /**
      * Build variable for try statement.
      *
-     * @param services the services object.
+     * @param services
+     *        the services object.
      * @return the generated variable.
      */
     private Term buildExceptionParameter(Services services) {

@@ -49,7 +49,8 @@ public class NodePreorderIterator {
     /**
      * Constructor.
      *
-     * @param start The {@link Node} to iterate over its sub tree.
+     * @param start
+     *        The {@link Node} to iterate over its sub tree.
      */
     public NodePreorderIterator(Node start) {
         this.start = start;
@@ -125,7 +126,8 @@ public class NodePreorderIterator {
     /**
      * Returns the next element to select if all children of the given {@link Node} are visited.
      *
-     * @param node The visited {@link Node}.
+     * @param node
+     *        The visited {@link Node}.
      * @return The next {@link Node} to visit.
      */
     protected @Nullable Node getNextOnParent(Node node) {

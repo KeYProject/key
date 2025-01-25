@@ -7,13 +7,14 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
+@Tag("slow")
 public class TestZ3 extends TestSMTSolver {
 
 
@@ -44,7 +45,8 @@ public class TestZ3 extends TestSMTSolver {
             if (isInstalled && !getSolverType().supportHasBeenChecked()) {
                 if (!getSolverType().checkForSupport()) {
                     LOGGER.warn("Warning: " + "The version of the solver {} used for the "
-                        + "following tests may not be supported.", getSolverType().getName());
+                        + "following tests may not be supported.",
+                        getSolverType().getName());
                 }
             }
         }

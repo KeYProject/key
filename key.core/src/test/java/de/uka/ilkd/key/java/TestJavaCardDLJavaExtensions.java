@@ -7,13 +7,12 @@ import java.io.File;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class TestJavaCardDLJavaExtensions {
-
-    private final HelperClassForTests helper = new HelperClassForTests();
 
     public static final String testpath = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
         + "javacardDLExtensions" + File.separator;
@@ -25,22 +24,18 @@ public class TestJavaCardDLJavaExtensions {
 
     @Test
     public void testTypeNotInScopeShouldNotBeFound() {
-        try {
-            helper.parseThrowException(new File(testpath + "typeResolutionInMethodFrame.key"));
-        } catch (Throwable t) {
-            return;
-        }
-        Assertions.fail("Something with type resolution in method frames is corrupt. "
+        var message = "Something with type resolution in method frames is corrupt. "
             + "The type Test should not be found in the default scope as it is "
-            + "declared inside package test.");
+            + "declared inside package test.";
+        Assertions.assertThrows(BuildingException.class,
+            () -> HelperClassForTests
+                    .parseThrowException(new File(testpath + "typeResolutionInMethodFrame.key")),
+            message);
     }
 
     @Test
     public void testMethodFrameRedirectsScope() throws ProofInputException {
-        helper.parseThrowException(new File(testpath + "typeResolutionInMethodFrame2.key"));
-        /*
-         * fail("Something with type resolution in method frames is corrupt. " +
-         * "The type Test should be found as the scope to look for " +
-         * "is redirected to test.Test");
-         */ }
+        HelperClassForTests
+                .parseThrowException(new File(testpath + "typeResolutionInMethodFrame2.key"));
+    }
 }

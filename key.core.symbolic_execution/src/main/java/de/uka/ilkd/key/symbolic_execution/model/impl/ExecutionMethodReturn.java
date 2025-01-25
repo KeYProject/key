@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.reference.MethodReference;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
@@ -64,10 +64,13 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     /**
      * Constructor.
      *
-     * @param settings The {@link ITreeSettings} to use.
-     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this
+     * @param settings
+     *        The {@link ITreeSettings} to use.
+     * @param proofNode
+     *        The {@link Node} of KeY's proof tree which is represented by this
      *        {@link IExecutionNode}.
-     * @param methodCall The {@link IExecutionMethodCall} which is now returned.
+     * @param methodCall
+     *        The {@link IExecutionMethodCall} which is now returned.
      */
     public ExecutionMethodReturn(ITreeSettings settings, Node proofNode,
             ExecutionMethodCall methodCall) {
@@ -227,7 +230,8 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * Computes the return value lazily when {@link #getReturnValues()} is called the first time.
      *
      * @return The return value.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     protected IExecutionMethodReturnValue[] lazyComputeReturnValues() throws ProofInputException {
         InitConfig initConfig = getInitConfig();
@@ -327,7 +331,8 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                     } finally {
                         SymbolicExecutionSideProofUtil
                                 .disposeOrStore("Return value computation on method return node "
-                                    + methodReturnNode.serialNr() + ".", info);
+                                    + methodReturnNode.serialNr() + ".",
+                                    info);
                     }
                 } else {
                     return new IExecutionMethodReturnValue[0];
@@ -344,7 +349,8 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      * Searches from the given {@link Node} the parent which applies the rule "methodCallReturn" in
      * the same modality.
      *
-     * @param node The {@link Node} to start search from.
+     * @param node
+     *        The {@link Node} to start search from.
      * @return The found {@link Node} with rule "methodCallReturn" or {@code null} if no node was
      *         found.
      */
@@ -370,8 +376,10 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     /**
      * Creates the human readable name which is shown in {@link IExecutionMethodReturn} instances.
      *
-     * @param returnValue The return value.
-     * @param methodName The name of the method that is completely executed.
+     * @param returnValue
+     *        The return value.
+     * @param methodName
+     *        The name of the method that is completely executed.
      * @return The created human readable name.
      */
     public static String createMethodReturnName(Object returnValue, String methodName) {

@@ -199,7 +199,7 @@ public class ProveTest {
      */
     private Pair<KeYEnvironment<DefaultUserInterfaceControl>, ProofScriptEntry> load(
             File keyFile) throws ProblemLoaderException {
-        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile.toPath());
         return new Pair<>(env, env.getProofScript());
     }
 
@@ -207,7 +207,8 @@ public class ProveTest {
      * Reload proof that was previously saved at the location corresponding to the given
      * {@link File} object.
      *
-     * @param proofFile File that contains the proof that will be (re-)loaded.
+     * @param proofFile
+     *        File that contains the proof that will be (re-)loaded.
      */
     private boolean reloadProof(File proofFile) throws Exception {
         /*
@@ -217,7 +218,7 @@ public class ProveTest {
         KeYEnvironment<DefaultUserInterfaceControl> proofLoadEnvironment = null;
         Proof reloadedProof = null;
         try {
-            proofLoadEnvironment = KeYEnvironment.load(proofFile);
+            proofLoadEnvironment = KeYEnvironment.load(proofFile.toPath());
 
             AbstractProblemLoader.ReplayResult result = proofLoadEnvironment.getReplayResult();
             if (result.hasErrors()) {

@@ -64,10 +64,10 @@ public record SymbolicExecutionStateWithProgCnt(Term symbolicState, Term pathCon
         final Services services = getCorrespondingNode().proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
-            + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
-            + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services))
-            + "), Program Counter=("
-            + rmN(LogicPrinter.quickPrintTerm(getProgramCounter(), services)) + ")]";
+                + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
+                + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services))
+                + "), Program Counter=("
+                + rmN(LogicPrinter.quickPrintTerm(getProgramCounter(), services)) + ")]";
     }
 
     /**

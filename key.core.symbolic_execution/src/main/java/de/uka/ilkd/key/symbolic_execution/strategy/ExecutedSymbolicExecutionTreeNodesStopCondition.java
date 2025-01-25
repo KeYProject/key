@@ -76,7 +76,8 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
     /**
      * Constructor to stop after the given number of symbolic execution tree nodes.
      *
-     * @param maximalNumberOfSetNodesToExecutePerGoal The maximal number of allowed symbolic
+     * @param maximalNumberOfSetNodesToExecutePerGoal
+     *        The maximal number of allowed symbolic
      *        execution tree nodes per goal.
      */
     public ExecutedSymbolicExecutionTreeNodesStopCondition(
@@ -145,18 +146,27 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
     /**
      * Handles the state that the node limit is exceeded.
      *
-     * @param maxApplications The defined maximal number of rules to apply. Can be different to
+     * @param maxApplications
+     *        The defined maximal number of rules to apply. Can be different to
      *        {@link StrategySettings#getMaxSteps()} in side proofs.
-     * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to
+     * @param timeout
+     *        The defined timeout in ms or {@code -1} if disabled. Can be different to
      *        {@link StrategySettings#getTimeout()} in side proofs.
-     * @param proof The current {@link Proof}.
-     * @param startTime The timestamp when the apply strategy has started, computed via
+     * @param proof
+     *        The current {@link Proof}.
+     * @param startTime
+     *        The timestamp when the apply strategy has started, computed via
      *        {@link System#nanoTime()}
-     * @param countApplied The number of already applied rules.
-     * @param goal The current {@link Goal} on which the next rule will be applied.
-     * @param node The {@link Node} of the current {@link Goal}.
-     * @param ruleApp The current {@link RuleApp}.
-     * @param executedNumberOfSetNodes The executed number of SET nodes.
+     * @param countApplied
+     *        The number of already applied rules.
+     * @param goal
+     *        The current {@link Goal} on which the next rule will be applied.
+     * @param node
+     *        The {@link Node} of the current {@link Goal}.
+     * @param ruleApp
+     *        The current {@link RuleApp}.
+     * @param executedNumberOfSetNodes
+     *        The executed number of SET nodes.
      */
     protected void handleNodeLimitExceeded(int maxApplications, long timeout, Proof proof,
             long startTime, int countApplied, Goal goal, Node node, RuleApp ruleApp,
@@ -167,18 +177,27 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
     /**
      * Handles the state that the node limit is not exceeded.
      *
-     * @param maxApplications The defined maximal number of rules to apply. Can be different to
+     * @param maxApplications
+     *        The defined maximal number of rules to apply. Can be different to
      *        {@link StrategySettings#getMaxSteps()} in side proofs.
-     * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to
+     * @param timeout
+     *        The defined timeout in ms or {@code -1} if disabled. Can be different to
      *        {@link StrategySettings#getTimeout()} in side proofs.
-     * @param proof The current {@link Proof}.
-     * @param startTime The timestamp when the apply strategy has started, computed via
+     * @param proof
+     *        The current {@link Proof}.
+     * @param startTime
+     *        The timestamp when the apply strategy has started, computed via
      *        {@link System#nanoTime()}
-     * @param countApplied The number of already applied rules.
-     * @param goal The current {@link Goal} on which the next rule will be applied.
-     * @param node The {@link Node} of the current {@link Goal}.
-     * @param ruleApp The current {@link RuleApp}.
-     * @param executedNumberOfSetNodes The executed number of SET nodes.
+     * @param countApplied
+     *        The number of already applied rules.
+     * @param goal
+     *        The current {@link Goal} on which the next rule will be applied.
+     * @param node
+     *        The {@link Node} of the current {@link Goal}.
+     * @param ruleApp
+     *        The current {@link RuleApp}.
+     * @param executedNumberOfSetNodes
+     *        The executed number of SET nodes.
      */
     protected void handleNodeLimitNotExceeded(int maxApplications, long timeout, Proof proof,
             long startTime, int countApplied, Goal goal, Node node, RuleApp ruleApp,
@@ -259,7 +278,8 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
     /**
      * Sets the maximal number of executed symbolic execution tree nodes per goal per auto mode run.
      *
-     * @param maximalNumberOfSetNodesToExecute The maximal number of executed symbolic execution
+     * @param maximalNumberOfSetNodesToExecute
+     *        The maximal number of executed symbolic execution
      *        tree nodes per per goal auto mode run.
      */
     public void setMaximalNumberOfSetNodesToExecutePerGoal(int maximalNumberOfSetNodesToExecute) {

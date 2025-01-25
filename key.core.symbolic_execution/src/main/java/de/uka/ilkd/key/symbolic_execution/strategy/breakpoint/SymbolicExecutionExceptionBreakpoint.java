@@ -7,9 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.statement.Throw;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * This{@link SymbolicExecutionExceptionBreakpoint} represents an exception breakpoint and is
@@ -60,14 +59,21 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     /**
      * Creates a new {@link AbstractHitCountBreakpoint}.
      *
-     * @param proof the {@link Proof} that will be executed and should stop
-     * @param exceptionName the name of the exception to watch for
-     * @param caught flag to tell if caught exceptions lead to a stop
-     * @param uncaught flag to tell if uncaught exceptions lead to a stop
-     * @param suspendOnSubclasses flag to tell if the execution should suspend on subclasses of the
+     * @param proof
+     *        the {@link Proof} that will be executed and should stop
+     * @param exceptionName
+     *        the name of the exception to watch for
+     * @param caught
+     *        flag to tell if caught exceptions lead to a stop
+     * @param uncaught
+     *        flag to tell if uncaught exceptions lead to a stop
+     * @param suspendOnSubclasses
+     *        flag to tell if the execution should suspend on subclasses of the
      *        exception aswell
-     * @param enabled flag if the Breakpoint is enabled
-     * @param hitCount the number of hits after which the execution should hold at this breakpoint
+     * @param enabled
+     *        flag if the Breakpoint is enabled
+     * @param hitCount
+     *        the number of hits after which the execution should hold at this breakpoint
      */
     public SymbolicExecutionExceptionBreakpoint(Proof proof, String exceptionName, boolean caught,
             boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount) {
@@ -103,8 +109,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
                         } else if (suspendOnSubclasses) {
                             JavaInfo info = proof.getServices().getJavaInfo();
                             KeYJavaType kjt = locVar.getKeYJavaType();
-                            ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(kjt);
-                            for (KeYJavaType kjtloc : kjts) {
+                            for (KeYJavaType kjtloc : info.getAllSupertypes(kjt)) {
                                 if (kjtloc.getSort().toString().equals(exceptionName)
                                         && !exceptionParentNodes.contains(SETParent)) {
                                     exceptionNodes.add(node);
@@ -121,8 +126,10 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     /**
      * Checks if the given node is a parent of the other given node.
      *
-     * @param node The {@link Node} to start search in.
-     * @param parent The {@link Node} that is thought to be the parent.
+     * @param node
+     *        The {@link Node} to start search in.
+     * @param parent
+     *        The {@link Node} that is thought to be the parent.
      * @return true if the parent node is one of the nodes parents
      */
     public boolean isParentNode(Node node, Node parent) {
@@ -180,7 +187,8 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     }
 
     /**
-     * @param isCaught the isCaught to set
+     * @param isCaught
+     *        the isCaught to set
      */
     public void setCaught(boolean isCaught) {
         this.caught = isCaught;
@@ -194,7 +202,8 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     }
 
     /**
-     * @param isUncaught the isUncaught to set
+     * @param isUncaught
+     *        the isUncaught to set
      */
     public void setUncaught(boolean isUncaught) {
         this.uncaught = isUncaught;
@@ -208,7 +217,8 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     }
 
     /**
-     * @param suspendOnSubclasses the suspendOnSubclasses to set
+     * @param suspendOnSubclasses
+     *        the suspendOnSubclasses to set
      */
     public void setSuspendOnSubclasses(boolean suspendOnSubclasses) {
         this.suspendOnSubclasses = suspendOnSubclasses;

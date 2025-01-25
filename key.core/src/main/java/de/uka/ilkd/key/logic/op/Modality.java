@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
@@ -32,8 +32,10 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
     /**
      * Retrieves the modality of the given kind and program.
      *
-     * @param kind the kind of the modality such as diamond or box
-     * @param jb the program of this modality
+     * @param kind
+     *        the kind of the modality such as diamond or box
+     * @param jb
+     *        the program of this modality
      * @return the modality of the given kind and program.
      */
     public static Modality getModality(Modality.JavaModalityKind kind, JavaBlock jb) {
@@ -74,8 +76,10 @@ public class Modality extends org.key_project.logic.op.Modality implements Opera
      * checks if a given Term could be subterm (at the at'th subterm position) of a term with this
      * function at its top level. The validity of the given subterm is NOT checked.
      *
-     * @param at the position of the term where this method should check the validity.
-     * @param possibleSub the subterm to be checked.
+     * @param at
+     *        the position of the term where this method should check the validity.
+     * @param possibleSub
+     *        the subterm to be checked.
      * @return true iff the given term can be subterm at the indicated position
      */
     private boolean possibleSub(int at, Term possibleSub) {

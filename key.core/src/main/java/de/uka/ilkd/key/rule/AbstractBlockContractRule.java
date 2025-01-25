@@ -18,10 +18,10 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowBlockContractTacletBuilder;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.JavaStatement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.JavaStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -61,9 +61,12 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param instantiation an instantiation.
-     * @param goal the current goal.
-     * @param services services.
+     * @param instantiation
+     *        an instantiation.
+     * @param goal
+     *        the current goal.
+     * @param services
+     *        services.
      * @return all applicable block contracts for the instantiation.
      */
     public static ImmutableSet<BlockContract> getApplicableContracts(
@@ -76,10 +79,14 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     /**
-     * @param specifications a specification repository.
-     * @param statement a block.
-     * @param modalityKind the current goal's modality.
-     * @param goal the current goal.
+     * @param specifications
+     *        a specification repository.
+     * @param statement
+     *        a block.
+     * @param modalityKind
+     *        the current goal's modality.
+     * @param goal
+     *        the current goal.
      * @return all applicable block contracts for the block from the repository.
      */
     public static ImmutableSet<BlockContract> getApplicableContracts(
@@ -106,8 +113,10 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param collectedContracts a set of block contracts.
-     * @param goal the current goal.
+     * @param collectedContracts
+     *        a set of block contracts.
+     * @param goal
+     *        the current goal.
      * @return the set with all non-applicable contracts filtered out.
      */
     protected static ImmutableSet<BlockContract> filterAppliedContracts(
@@ -123,8 +132,10 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param contract a block contract.
-     * @param goal the current goal.
+     * @param contract
+     *        a block contract.
+     * @param goal
+     *        the current goal.
      * @return {@code true} if the contract has already been applied.
      */
     protected static boolean contractApplied(final BlockContract contract, final Goal goal) {
@@ -168,9 +179,12 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param variables variables.
-     * @param contract a block contract.
-     * @param services services.
+     * @param variables
+     *        variables.
+     * @param contract
+     *        a block contract.
+     * @param services
+     *        services.
      * @return a map from every variable that is changed in the block to its anonymization constant.
      */
     protected static Map<LocationVariable, JFunction> createAndRegisterAnonymisationVariables(
@@ -374,9 +388,12 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param formula the formula on which the rule is to be applied.
-     * @param goal the current goal.
-     * @param services services.
+     * @param formula
+     *        the formula on which the rule is to be applied.
+     * @param goal
+     *        the current goal.
+     * @param services
+     *        services.
      * @return a new instantiation.
      */
     public Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
@@ -480,9 +497,12 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
         /**
          *
-         * @param formula the formula on which the rule is to be applied.
-         * @param goal the current goal.
-         * @param services services.
+         * @param formula
+         *        the formula on which the rule is to be applied.
+         * @param goal
+         *        the current goal.
+         * @param services
+         *        services.
          */
         public Instantiator(final Term formula, final Goal goal, final Services services) {
             super(formula, goal, services);

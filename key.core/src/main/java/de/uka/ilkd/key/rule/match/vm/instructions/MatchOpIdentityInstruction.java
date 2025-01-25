@@ -14,7 +14,8 @@ import de.uka.ilkd.key.rule.match.vm.TermNavigator;
  * the <strong>same</strong>(identical) operator like the one for which this instruction has been
  * instantiated
  *
- * @param <T> the type of the operator used as template
+ * @param <T>
+ *        the type of the operator used as template
  */
 public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<T>
         implements MatchOperatorInstruction {

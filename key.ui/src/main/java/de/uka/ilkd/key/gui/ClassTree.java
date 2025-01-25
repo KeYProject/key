@@ -9,10 +9,10 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -214,8 +214,10 @@ public class ClassTree extends JTree {
      * static utility method.
      * </p>
      *
-     * @param services The {@link Services} to use.
-     * @param ov The {@link ObserverFunction} for that a display name is needed.
+     * @param services
+     *        The {@link Services} to use.
+     * @param ov
+     *        The {@link ObserverFunction} for that a display name is needed.
      * @return The display name for the given {@link ObserverFunction}.
      */
     public static final String getDisplayName(Services services, IObserverFunction ov) {
@@ -247,19 +249,18 @@ public class ClassTree extends JTree {
     private static DefaultMutableTreeNode createTree(boolean addContractTargets,
             boolean skipLibraryClasses, Services services) {
         // get all classes
-        final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
-        kjts.removeIf(kjt -> !(kjt.getJavaType() instanceof ClassDeclaration
+        var types = new ArrayList<>(services.getJavaInfo().getAllKeYJavaTypes());
+        types.removeIf(kjt -> !(kjt.getJavaType() instanceof ClassDeclaration
                 || kjt.getJavaType() instanceof InterfaceDeclaration)
                 || (((TypeDeclaration) kjt.getJavaType()).isLibraryClass()
                         && skipLibraryClasses));
 
         // sort classes alphabetically
-        final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[0]);
-        Arrays.sort(kjtsarr, Comparator.comparing(KeYJavaType::getFullName));
+        types.sort(Comparator.comparing(KeYJavaType::getFullName));
 
         // build tree
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(new Entry(""));
-        for (KeYJavaType keYJavaType : kjtsarr) {
+        for (KeYJavaType keYJavaType : types) {
             insertIntoTree(rootNode, keYJavaType, addContractTargets, services);
         }
 
@@ -332,8 +333,10 @@ public class ClassTree extends JTree {
     /**
      * Searches the {@link DefaultMutableTreeNode} child with the given text.
      *
-     * @param parent The {@link DefaultMutableTreeNode} to search in.
-     * @param text The text of the {@link DefaultMutableTreeNode} to search.
+     * @param parent
+     *        The {@link DefaultMutableTreeNode} to search in.
+     * @param text
+     *        The text of the {@link DefaultMutableTreeNode} to search.
      * @return The first found {@link DefaultMutableTreeNode} with the given text or {@code null} if
      *         no {@link DefaultMutableTreeNode} was found.
      */

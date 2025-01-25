@@ -58,7 +58,8 @@ public class DependencyGraph {
         /**
          * Creates a new SCC with the given id.
          *
-         * @param id the unique id for the new node
+         * @param id
+         *        the unique id for the new node
          */
         public SCC(int id) {
             this.id = id;
@@ -84,7 +85,8 @@ public class DependencyGraph {
          * Filters the edges starting from the given node to those where the end node
          * is also inside the SCC.
          *
-         * @param node the start node of the edge
+         * @param node
+         *        the start node of the edge
          * @return all edges of node inside the SCC
          */
         public Map<DependencyNode, EdgeType> internalEdges(DependencyNode node) {
@@ -133,8 +135,7 @@ public class DependencyGraph {
      * This constructor exists only to restrict visibility.
      * Use {@link DependencyGraphBuilder#buildGraph(List, Logger)} to build a graph.
      */
-    DependencyGraph() {
-    }
+    DependencyGraph() {}
 
     public Map<DependencyNode, SCC> getNode2SCC() {
         return node2SCC;
@@ -148,7 +149,8 @@ public class DependencyGraph {
      * Adds a node to the graph if not already present. This invalidates the SCCs
      * if already computed.
      *
-     * @param node the DependencyNode to add
+     * @param node
+     *        the DependencyNode to add
      */
     public void addNode(DependencyNode node) {
         if (!nodes.contains(node)) {
@@ -177,7 +179,8 @@ public class DependencyGraph {
     /**
      * Searches for a node with the given contract name.
      *
-     * @param contractName the contract name to search for (only exact matches will be found)
+     * @param contractName
+     *        the contract name to search for (only exact matches will be found)
      * @return the DependencyNode for the given contractName or null, if none found
      */
     public DependencyNode getNodeByName(String contractName) {
@@ -212,7 +215,8 @@ public class DependencyGraph {
      * Calculates the SCC of the subgraph containing the given node
      * (as well as SCCs reachable from node).
      *
-     * @param node the node to start from
+     * @param node
+     *        the node to start from
      */
     private void calculateSCCForNode(DependencyNode node) {
         // each SCC is identified by its first visited node (lowlink)

@@ -6,14 +6,14 @@ package de.uka.ilkd.key.proof.init;
 import java.util.*;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
@@ -76,8 +76,10 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     /**
      * Constructor.
      *
-     * @param initConfig The {@link InitConfig} to use.
-     * @param contract The {@link FunctionalOperationContractPO} to prove.
+     * @param initConfig
+     *        The {@link InitConfig} to use.
+     * @param contract
+     *        The {@link FunctionalOperationContractPO} to prove.
      */
     public FunctionalOperationContractPO(InitConfig initConfig,
             FunctionalOperationContract contract) {
@@ -88,11 +90,15 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     /**
      * Constructor.
      *
-     * @param initConfig The {@link InitConfig} to use.
-     * @param contract The {@link FunctionalOperationContractPO} to prove.
-     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate,
+     * @param initConfig
+     *        The {@link InitConfig} to use.
+     * @param contract
+     *        The {@link FunctionalOperationContractPO} to prove.
+     * @param addUninterpretedPredicate
+     *        {@code true} postcondition contains uninterpreted predicate,
      *        {@code false} uninterpreted predicate is not contained in postcondition.
-     * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel}
+     * @param addSymbolicExecutionLabel
+     *        {@code true} to add the {@link SymbolicExecutionTermLabel}
      *        to the modality, {@code false} to not label the modality.
      */
     public FunctionalOperationContractPO(InitConfig initConfig,

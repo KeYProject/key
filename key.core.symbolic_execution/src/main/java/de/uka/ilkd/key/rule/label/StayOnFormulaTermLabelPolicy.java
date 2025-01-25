@@ -132,7 +132,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
     /**
      * Checks if the currently treated taclet {@link Term} is a child of an if-then-else operation.
      *
-     * @param visitStack The taclet {@link Term} stack.
+     * @param visitStack
+     *        The taclet {@link Term} stack.
      * @return {@code true} is below if-then-else, {@code false} otherwise.
      */
     protected boolean isBelowIfThenElse(Deque<Term> visitStack) {
@@ -147,7 +148,8 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
     /**
      * Searches the {@link FormulaTermLabel} in the given {@link TermLabel}s.
      *
-     * @param labels The {@link TermLabel}s to search in.
+     * @param labels
+     *        The {@link TermLabel}s to search in.
      * @return The found {@link FormulaTermLabel} or {@code null} if not available.
      */
     public static FormulaTermLabel searchFormulaTermLabel(ImmutableArray<TermLabel> labels) {
@@ -159,8 +161,10 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
     /**
      * Checks if the given taclet {@link Term} is top level.
      *
-     * @param tacletHint The {@link TacletLabelHint} to use.
-     * @param tacletTerm The taclet {@link Term} to check.
+     * @param tacletHint
+     *        The {@link TacletLabelHint} to use.
+     * @param tacletTerm
+     *        The taclet {@link Term} to check.
      * @return {@code true} is top level, {@code false} is not top level.
      */
     protected boolean isTopLevel(TacletLabelHint tacletHint, Term tacletTerm) {

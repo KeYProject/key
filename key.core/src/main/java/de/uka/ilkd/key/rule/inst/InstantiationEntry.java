@@ -18,7 +18,8 @@ public abstract class InstantiationEntry<E> {
     /**
      * creates a new instantiation entry for the instantiation to be stored
      *
-     * @param instantiation the instantiation to be stored
+     * @param instantiation
+     *        the instantiation to be stored
      */
     InstantiationEntry(E instantiation) {
         assert instantiation != null : "An instantiation for a schemavariable cannot be null.";

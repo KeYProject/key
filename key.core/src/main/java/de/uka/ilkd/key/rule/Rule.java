@@ -20,12 +20,16 @@ public interface Rule extends HasOrigin {
     /**
      * the rule is applied on the given goal using the information of rule application.
      *
-     * @param goal the Goal on which to apply <tt>ruleApp</tt>
-     * @param services the Services with the necessary information about the java programs
-     * @param ruleApp the rule application to be executed
+     * @param goal
+     *        the Goal on which to apply <tt>ruleApp</tt>
+     * @param services
+     *        the Services with the necessary information about the java programs
+     * @param ruleApp
+     *        the rule application to be executed
      * @return all open goals below \old(goal.node()), i.e. the goals resulting from the rule
      *         application
-     * @throws RuleAbortException when this rule was aborted
+     * @throws RuleAbortException
+     *         when this rule was aborted
      */
     @NonNull
     ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)

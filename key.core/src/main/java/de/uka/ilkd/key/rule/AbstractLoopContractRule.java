@@ -8,9 +8,9 @@ import java.util.Map;
 
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.statement.JavaStatement;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -40,9 +40,12 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
     /**
      *
-     * @param instantiation an instantiation.
-     * @param goal the current goal.
-     * @param services services.
+     * @param instantiation
+     *        an instantiation.
+     * @param goal
+     *        the current goal.
+     * @param services
+     *        services.
      * @return all applicable loop contracts for the instantiation.
      */
     public static ImmutableSet<LoopContract> getApplicableContracts(
@@ -55,10 +58,14 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
     }
 
     /**
-     * @param specifications a specification repository.
-     * @param statement a statement.
-     * @param modalityKind the current goal's modality.
-     * @param goal the current goal.
+     * @param specifications
+     *        a specification repository.
+     * @param statement
+     *        a statement.
+     * @param modalityKind
+     *        the current goal's modality.
+     * @param goal
+     *        the current goal.
      * @return all applicable loop contracts for the block from the repository.
      */
     public static ImmutableSet<LoopContract> getApplicableContracts(
@@ -98,8 +105,10 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
     /**
      *
-     * @param collectedContracts a set of loop contracts.
-     * @param goal the current goal.
+     * @param collectedContracts
+     *        a set of loop contracts.
+     * @param goal
+     *        the current goal.
      * @return the set with all non-applicable contracts filtered out.
      */
     protected static ImmutableSet<LoopContract> filterAppliedContracts(
@@ -115,8 +124,10 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
     /**
      *
-     * @param contract a loop contract.
-     * @param goal the current goal.
+     * @param contract
+     *        a loop contract.
+     * @param goal
+     *        the current goal.
      * @return {@code true} if the contract has already been applied.
      */
     protected static boolean contractApplied(final LoopContract contract, final Goal goal) {
@@ -186,9 +197,12 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
     /**
      *
-     * @param formula the formula on which the rule is to be applied.
-     * @param goal the current goal.
-     * @param services services.
+     * @param formula
+     *        the formula on which the rule is to be applied.
+     * @param goal
+     *        the current goal.
+     * @param services
+     *        services.
      * @return a new instantiation.
      */
     public Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
@@ -204,9 +218,12 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
     /**
      *
-     * @param variables variables.
-     * @param contract a loop contract.
-     * @param services services.
+     * @param variables
+     *        variables.
+     * @param contract
+     *        a loop contract.
+     * @param services
+     *        services.
      * @return a map from every variable that is changed in the block to its anonymization constant.
      */
     protected Map<LocationVariable, JFunction> createAndRegisterAnonymisationVariables(
@@ -234,9 +251,12 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
         /**
          *
-         * @param formula the formula on which the rule is to be applied.
-         * @param goal the current goal.
-         * @param services services.
+         * @param formula
+         *        the formula on which the rule is to be applied.
+         * @param goal
+         *        the current goal.
+         * @param services
+         *        services.
          */
         public Instantiator(final Term formula, final Goal goal, final Services services) {
             super(formula, goal, services);

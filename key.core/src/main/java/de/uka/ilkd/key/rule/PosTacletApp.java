@@ -6,8 +6,8 @@ package de.uka.ilkd.key.rule;
 import java.util.Iterator;
 import java.util.Objects;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -41,9 +41,12 @@ public class PosTacletApp extends TacletApp {
      * ifInstantiations parameter is not matched against the if sequence, but only stored. For
      * matching use the method "setIfFormulaInstantiations".
      *
-     * @param taclet the FindTaclet
-     * @param instantiations the SVInstantiations
-     * @param pos the PosInOccurrence storing the position where to apply the Taclet
+     * @param taclet
+     *        the FindTaclet
+     * @param instantiations
+     *        the SVInstantiations
+     * @param pos
+     *        the PosInOccurrence storing the position where to apply the Taclet
      * @return new PosTacletApp or null if conditions (assertions) have been hurted
      */
     public static PosTacletApp createPosTacletApp(FindTaclet taclet,
@@ -75,8 +78,10 @@ public class PosTacletApp extends TacletApp {
     /**
      * creates a PosTacletApp for the given taclet and a position information
      *
-     * @param taclet the FindTaclet
-     * @param pos the PosInOccurrence storing the position where to apply the Taclet
+     * @param taclet
+     *        the FindTaclet
+     * @param pos
+     *        the PosInOccurrence storing the position where to apply the Taclet
      */
     private PosTacletApp(FindTaclet taclet, PosInOccurrence pos) {
         super(taclet);
@@ -87,9 +92,12 @@ public class PosTacletApp extends TacletApp {
      * creates a PosTacletApp for the given taclet with some known instantiations and a position
      * information
      *
-     * @param taclet the FindTaclet
-     * @param instantiations the SVInstantiations
-     * @param pos the PosInOccurrence storing the position where to apply the Taclet
+     * @param taclet
+     *        the FindTaclet
+     * @param instantiations
+     *        the SVInstantiations
+     * @param pos
+     *        the PosInOccurrence storing the position where to apply the Taclet
      */
     private PosTacletApp(FindTaclet taclet, SVInstantiations instantiations,
             ImmutableList<IfFormulaInstantiation> ifInstantiations, PosInOccurrence pos) {
@@ -134,7 +142,8 @@ public class PosTacletApp extends TacletApp {
     /**
      * resolves collisions with the context in an SVInstantiation
      *
-     * @param insts the original SVInstantiations
+     * @param insts
+     *        the original SVInstantiations
      * @return the resolved SVInstantiations
      */
     private static SVInstantiations resolveCollisionWithContext(Taclet taclet,
@@ -158,8 +167,10 @@ public class PosTacletApp extends TacletApp {
     /**
      * adds a new instantiation to this TacletApp
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param term the Term the SchemaVariable is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param term
+     *        the Term the SchemaVariable is instantiated with
      * @return the new TacletApp
      */
     @Override
@@ -180,8 +191,10 @@ public class PosTacletApp extends TacletApp {
     /**
      * adds a new instantiation to this TacletApp
      *
-     * @param sv the SchemaVariable to be instantiated
-     * @param pe the ProgramElement the SV is instantiated with
+     * @param sv
+     *        the SchemaVariable to be instantiated
+     * @param pe
+     *        the ProgramElement the SV is instantiated with
      * @return the new TacletApp
      */
     @Override
@@ -219,7 +232,8 @@ public class PosTacletApp extends TacletApp {
      * creates a new Taclet application containing all the instantiations given by the
      * SVInstantiations and the ones of this TacletApp
      *
-     * @param svi the SVInstantiations whose entries are the needed instantiations
+     * @param svi
+     *        the SVInstantiations whose entries are the needed instantiations
      * @return the new Taclet application
      */
     @Override
@@ -233,7 +247,8 @@ public class PosTacletApp extends TacletApp {
      * creates a new Taclet application containing all the instantiations given by the
      * SVInstantiations and forget the old ones.
      *
-     * @param svi the SVInstantiations whose entries are the needed instantiations
+     * @param svi
+     *        the SVInstantiations whose entries are the needed instantiations
      * @return the new Taclet application
      */
     @Override

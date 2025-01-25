@@ -67,8 +67,7 @@ public final class SideProofStore {
     /**
      * Forbid other instances.
      */
-    private SideProofStore() {
-    }
+    private SideProofStore() {}
 
     /**
      * Checks if the {@link SideProofStore} is enabled or not.
@@ -82,7 +81,8 @@ public final class SideProofStore {
     /**
      * Defines the enabled state.
      *
-     * @param enabled {@code true} enabled, {@code false} disabled.
+     * @param enabled
+     *        {@code true} enabled, {@code false} disabled.
      */
     public void setEnabled(boolean enabled) {
         boolean oldValue = isEnabled();
@@ -93,8 +93,10 @@ public final class SideProofStore {
     /**
      * Adds a new {@link Proof}.
      *
-     * @param description The description.
-     * @param proof The {@link Proof} to add.
+     * @param description
+     *        The description.
+     * @param proof
+     *        The {@link Proof} to add.
      */
     public void addProof(String description, Proof proof) {
         synchronized (entries) {
@@ -111,7 +113,8 @@ public final class SideProofStore {
     /**
      * Removes the given {@link Entry}s.
      *
-     * @param entries The {@link Entry}s to remove.
+     * @param entries
+     *        The {@link Entry}s to remove.
      */
     public void removeEntries(Collection<Entry> entries) {
         synchronized (entries) {
@@ -135,7 +138,8 @@ public final class SideProofStore {
     /**
      * Checks if an {@link Entry} for the given {@link Proof} exist.
      *
-     * @param proof The {@link Proof} to check.
+     * @param proof
+     *        The {@link Proof} to check.
      * @return {@code true} {@link Entry} for {@link Proof} exist, {@code false} otherwise.
      */
     public boolean containsEntry(Proof proof) {
@@ -145,7 +149,8 @@ public final class SideProofStore {
     /**
      * Returns the {@link Entry} for the given {@link Proof}.
      *
-     * @param proof The {@link Proof} for which the {@link Entry} is requested.
+     * @param proof
+     *        The {@link Proof} for which the {@link Entry} is requested.
      * @return The {@link Entry} with the given {@link Proof} or {@code null} if not available.
      */
     public Entry getEntry(final Proof proof) {
@@ -156,7 +161,8 @@ public final class SideProofStore {
     /**
      * Checks if the given {@link Entry} is contained.
      *
-     * @param entry The {@link Entry} to check.
+     * @param entry
+     *        The {@link Entry} to check.
      * @return {@code true} {@link Entry} is contained, {@code false} {@link Entry} is not
      *         contained.
      */
@@ -176,7 +182,8 @@ public final class SideProofStore {
     /**
      * Returns the {@link Entry} at the given index.
      *
-     * @param index The index.
+     * @param index
+     *        The index.
      * @return The {@link Entry} at the given index.
      */
     public Entry getEntryAt(int index) {
@@ -195,7 +202,8 @@ public final class SideProofStore {
     /**
      * Registers the {@link ISideProofStoreListener}.
      *
-     * @param l The {@link ISideProofStoreListener} to register.
+     * @param l
+     *        The {@link ISideProofStoreListener} to register.
      */
     public void addProofStoreListener(ISideProofStoreListener l) {
         if (l != null) {
@@ -206,7 +214,8 @@ public final class SideProofStore {
     /**
      * Unregisters the {@link ISideProofStoreListener}.
      *
-     * @param l The {@link ISideProofStoreListener} to unregister.
+     * @param l
+     *        The {@link ISideProofStoreListener} to unregister.
      */
     public void removeProofStoreListener(ISideProofStoreListener l) {
         if (l != null) {
@@ -226,7 +235,8 @@ public final class SideProofStore {
     /**
      * Fires the event {@link ISideProofStoreListener#entriesAdded(SideProofStoreEvent)}.
      *
-     * @param e The event.
+     * @param e
+     *        The event.
      */
     private void fireEntriesAdded(SideProofStoreEvent e) {
         ISideProofStoreListener[] listener = getProofStoreListener();
@@ -238,7 +248,8 @@ public final class SideProofStore {
     /**
      * Fires the event {@link ISideProofStoreListener#entriesRemoved(SideProofStoreEvent)}.
      *
-     * @param e The event.
+     * @param e
+     *        The event.
      */
     private void fireEntriesRemoved(SideProofStoreEvent e) {
         ISideProofStoreListener[] listener = getProofStoreListener();
@@ -250,7 +261,8 @@ public final class SideProofStore {
     /**
      * Adds the given listener.
      *
-     * @param listener The listener to add.
+     * @param listener
+     *        The listener to add.
      */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
@@ -259,8 +271,10 @@ public final class SideProofStore {
     /**
      * Adds the given listener for the given property only.
      *
-     * @param propertyName The property to observe.
-     * @param listener The listener to add.
+     * @param propertyName
+     *        The property to observe.
+     * @param listener
+     *        The listener to add.
      */
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(propertyName, listener);
@@ -269,7 +283,8 @@ public final class SideProofStore {
     /**
      * Removes the given listener.
      *
-     * @param listener The listener to remove.
+     * @param listener
+     *        The listener to remove.
      */
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(listener);
@@ -278,8 +293,10 @@ public final class SideProofStore {
     /**
      * Removes the given listener from the given property.
      *
-     * @param propertyName The property to no longer observe.
-     * @param listener The listener to remove.
+     * @param propertyName
+     *        The property to no longer observe.
+     * @param listener
+     *        The listener to remove.
      */
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(propertyName, listener);
@@ -309,8 +326,10 @@ public final class SideProofStore {
         /**
          * Constructor.
          *
-         * @param description The description.
-         * @param proof The {@link Proof}.
+         * @param description
+         *        The description.
+         * @param proof
+         *        The {@link Proof}.
          */
         public Entry(String description, Proof proof) {
             this.description = description;

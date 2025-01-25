@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
@@ -25,7 +25,8 @@ public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IEx
      * Returns a human readable signature which describes this element.
      *
      * @return The human readable signature which describes this element.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProofInputException
+     *         Occurred Exception.
      */
     String getSignature() throws ProofInputException;
 

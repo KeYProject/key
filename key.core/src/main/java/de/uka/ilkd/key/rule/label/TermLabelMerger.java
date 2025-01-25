@@ -32,13 +32,20 @@ public interface TermLabelMerger {
     /**
      * Merges the existing and the rejected {@link TermLabel} by updating the merged {@link List}.
      *
-     * @param existingSF The existing {@link SequentFormula}.
-     * @param existingTerm The {@link Term} of the existing {@link SequentFormula}.
-     * @param existingLabel The existing {@link TermLabel} if available or {@code null} otherwise.
-     * @param rejectedSF The rejected {@link SequentFormula}.
-     * @param rejectedTerm The {@link Term} of the rejected {@link SequentFormula}.
-     * @param rejectedLabel The rejected {@link TermLabel}.
-     * @param mergedLabels The {@link List} with new {@link TermLabel}s which will be visible in the
+     * @param existingSF
+     *        The existing {@link SequentFormula}.
+     * @param existingTerm
+     *        The {@link Term} of the existing {@link SequentFormula}.
+     * @param existingLabel
+     *        The existing {@link TermLabel} if available or {@code null} otherwise.
+     * @param rejectedSF
+     *        The rejected {@link SequentFormula}.
+     * @param rejectedTerm
+     *        The {@link Term} of the rejected {@link SequentFormula}.
+     * @param rejectedLabel
+     *        The rejected {@link TermLabel}.
+     * @param mergedLabels
+     *        The {@link List} with new {@link TermLabel}s which will be visible in the
      *        resulting {@link Sequent}.
      * @return {@code true} if the {@link List} of {@link TermLabel} was modified and {@code false}
      *         otherwise.

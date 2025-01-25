@@ -122,8 +122,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     /**
      * Constructor to forbid multiple instances.
      */
-    private QuerySideProofRule() {
-    }
+    private QuerySideProofRule() {}
 
     /**
      * {@inheritDoc}
@@ -151,9 +150,12 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * Checks if the query term is supported. The functionality is identical to
      * {@link QueryExpand#isApplicable(Goal, PosInOccurrence)}.
      *
-     * @param goal The {@link Goal}.
-     * @param pmTerm The {@link Term} to with the query to check.
-     * @param pio The {@link PosInOccurrence} in the {@link Goal}.
+     * @param goal
+     *        The {@link Goal}.
+     * @param pmTerm
+     *        The {@link Term} to with the query to check.
+     * @param pio
+     *        The {@link PosInOccurrence} in the {@link Goal}.
      * @return {@code true} is applicable, {@code false} is not applicable
      */
     private boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence pio) {

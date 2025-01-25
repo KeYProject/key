@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.util.pp;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 /**
  * The intermediate layer of the pretty printing library. Using the block size information provided
@@ -143,6 +144,7 @@ class Printer<M> {
         try {
             marginStack.remove(marginStack.size() - 1);
         } catch (IndexOutOfBoundsException e) {
+            // FIXME weigl: ignore this exception.
             throw new UnbalancedBlocksException();
         }
     }
@@ -150,8 +152,8 @@ class Printer<M> {
     /** return the topmost element of the space stack without popping it. */
     private int top() {
         try {
-            return marginStack.get(marginStack.size() - 1);
-        } catch (IndexOutOfBoundsException e) {
+            return marginStack.getLast();
+        } catch (NoSuchElementException e) {
             throw new UnbalancedBlocksException();
         }
     }

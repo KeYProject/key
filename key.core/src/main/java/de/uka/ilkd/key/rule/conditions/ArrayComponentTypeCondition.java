@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -31,8 +31,10 @@ public final class ArrayComponentTypeCondition extends VariableConditionAdapter 
      * creates an instance of this condition checking if array var has reference or primitive
      * component type depending on the value of <code>checkReferenceType</code>
      *
-     * @param var the SchemaVariable to be checked
-     * @param checkReferenceType the boolean flag which when is set (<tt>true</tt>) FIXME weigl:
+     * @param var
+     *        the SchemaVariable to be checked
+     * @param checkReferenceType
+     *        the boolean flag which when is set (<tt>true</tt>) FIXME weigl:
      *        this is not true! checkReferenceType is just the negated flag. checks for reference
      *        otherwise for primitive type
      */

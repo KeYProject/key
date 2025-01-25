@@ -97,8 +97,10 @@ public final class SortDependingFunction extends JFunction {
     /**
      * returns the variant for the given sort
      *
-     * @param sort the {@link Sort} for which to retrieve the corresponding variant of this function
-     * @param services the {@link Services}
+     * @param sort
+     *        the {@link Sort} for which to retrieve the corresponding variant of this function
+     * @param services
+     *        the {@link Services}
      * @return the variant for the given sort
      */
     public synchronized SortDependingFunction getInstanceFor(Sort sort, TermServices services) {
@@ -186,9 +188,9 @@ public final class SortDependingFunction extends JFunction {
     // inner classes
     // -------------------------------------------------------------------------
 
-    private record SortDependingFunctionTemplate(GenericSort sortDependingOn, Name kind, Sort sort,
-            ImmutableArray<Sort> argSorts, boolean unique) {
-    }
+    private record SortDependingFunctionTemplate(
+            GenericSort sortDependingOn, Name kind, Sort sort,
+            ImmutableArray<Sort> argSorts, boolean unique) {}
 
     @Override
     public int getChildCount() {

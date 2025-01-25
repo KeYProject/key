@@ -57,9 +57,12 @@ public class ProofScriptEngine {
     /**
      * Instantiates a new proof script engine.
      *
-     * @param script the script
-     * @param initLocation the initial location
-     * @param initiallySelectedGoal the initially selected goal
+     * @param script
+     *        the script
+     * @param initLocation
+     *        the initial location
+     * @param initiallySelectedGoal
+     *        the initially selected goal
      */
     public ProofScriptEngine(String script, Location initLocation, Goal initiallySelectedGoal) {
         this.script = script;
@@ -185,7 +188,8 @@ public class ProofScriptEngine {
     /**
      * Set the routine that is executed before every successfully executed command.
      *
-     * @param monitor the monitor to set
+     * @param monitor
+     *        the monitor to set
      */
     public void setCommandMonitor(Consumer<Message> monitor) {
         this.commandMonitor = monitor;
@@ -198,9 +202,7 @@ public class ProofScriptEngine {
     public interface Message {
     }
 
-    public record EchoMessage(String message) implements Message {
-    }
+    public record EchoMessage(String message) implements Message {}
 
-    public record ExecuteInfo(String command, Location location, int nodeSerial) implements Message {
-    }
+    public record ExecuteInfo(String command, Location location, int nodeSerial) implements Message {}
 }

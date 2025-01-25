@@ -214,8 +214,8 @@ public class ProofDifference {
     record Matching(String left, String right, int distance) {
 
         @Override
-            public String toString() {
-                return String.format("(%s, %s)", left, right);
-            }
+        public String toString() {
+            return String.format("(%s, %s)", left, right);
         }
+    }
 }

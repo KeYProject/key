@@ -11,6 +11,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -49,8 +50,8 @@ public class UrlRuleSource extends RuleSource {
     }
 
     @Override
-    public File file() {
-        return new File(url.getFile());
+    public Path file() {
+        return Path.of(url.toString());
     }
 
     @Override

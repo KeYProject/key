@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -31,7 +31,8 @@ import org.key_project.util.java.MapUtil;
  *
  * @author lanzinger
  *
- * @param <T> the type of {@link AuxiliaryContract} for which this class generated POs.
+ * @param <T>
+ *        the type of {@link AuxiliaryContract} for which this class generated POs.
  */
 public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> implements Contract {
 
@@ -63,7 +64,8 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
 
     /**
      *
-     * @param contract a block contract.
+     * @param contract
+     *        a block contract.
      */
     FunctionalAuxiliaryContract(T contract) {
         this(contract, Contract.INVALID_ID);
@@ -71,8 +73,10 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
 
     /**
      *
-     * @param contract a block contract.
-     * @param id an ID.
+     * @param contract
+     *        a block contract.
+     * @param id
+     *        an ID.
      */
     FunctionalAuxiliaryContract(T contract, int id) {
         this.contract = contract;
@@ -92,8 +96,10 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
 
     /**
      *
-     * @param baseName a base name.
-     * @param generator a name generator.
+     * @param baseName
+     *        a base name.
+     * @param generator
+     *        a name generator.
      * @return the generated name.
      */
     private String generateName(String baseName, UnaryOperator<String> generator) {
@@ -318,7 +324,8 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      * Returns <code>true</code> iff the method (according to the contract) does not modify the heap
      * at all, i.e., iff it is "strictly pure."
      *
-     * @param heap the heap to use.
+     * @param heap
+     *        the heap to use.
      * @return <code>true</code> iff this contract is strictly pure.
      * @see AuxiliaryContract#hasModifiableClause(LocationVariable)
      */
