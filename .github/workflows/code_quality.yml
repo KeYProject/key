@@ -52,7 +52,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew --parallel --continue checkstyleMainChanged
       - name: "Touch files to avoid errors"
-        run: "touch build/reports/checkstyle/main_diff.{md,sarif.json}"
+        run: "mkdir -p build/reports/checkstyle/ && touch build/reports/checkstyle/main_diff.{md,sarif.json}"
       - name: "Job summary"
         run: "cat build/reports/checkstyle/main_diff.md >> $GITHUB_STEP_SUMMARY"
       - name: Upload checkstyle report

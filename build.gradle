@@ -136,7 +136,7 @@ subprojects {
         systemProperty "testcases", "src/test/resources/testcase"
         systemProperty "TACLET_PROOFS", "tacletProofs"
         systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
-        systemProperty "RUNALLPROOFS_DIR", "${layout.buildDirectory}/report/runallproves"
+        systemProperty "RUNALLPROOFS_DIR", layout.buildDirectory.dir("report/runallproves")
 
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
@@ -230,9 +230,9 @@ subprojects {
         classpath = checkstyleMain.classpath
         reports {
             html.required = true
-            html.outputLocation = file("${layout.buildDirectory}/reports/pmd/main_diff.html")
+            html.outputLocation = layout.buildDirectory.file("reports/pmd/main_diff.html")
             xml.required = true
-            xml.outputLocation = file("${layout.buildDirectory}/reports/pmd/main_diff.xml")
+            xml.outputLocation = layout.buildDirectory.file("reports/pmd/main_diff.xml")
         }
     }
 
