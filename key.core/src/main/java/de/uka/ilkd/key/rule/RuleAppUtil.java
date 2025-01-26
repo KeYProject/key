@@ -34,9 +34,9 @@ public final class RuleAppUtil {
      * @param node proof node which contains that rule application
      * @return sequent formulas used
      */
-    public static Set<PosInOccurrence> ifInstsOfRuleApp(
+    public static Set<PosInOccurrence> assumesInstantiationsOfRuleApp(
             RuleApp ruleApp, Node node) {
-        // replayer requires that ifInsts are provided in order (!)
+        // replayer requires that assumesFormulaInstantiations are provided in order (!)
         Set<PosInOccurrence> inputs = new LinkedHashSet<>();
         // taclets with \find or similar
         if (ruleApp instanceof PosTacletApp posTacletApp) {
