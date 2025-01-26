@@ -5,13 +5,16 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Modality;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.rules.Taclet;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -20,7 +23,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * Cache that is used for accelerating <code>TermTacletAppIndex</code>. Basically, this is a mapping
  * from terms to objects of <code>TermTacletAppIndex</code>, following the idea that the same
  * taclets will be applicable to an occurrence of the same term in different places.
- *
+ * <p>
  * There are different categories of locations/areas in a term that have to be separated, because
  * different taclets could be applicable. These are:
  * <ul>
@@ -34,7 +37,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * <li>Below programs. Again, we also have to distinguish different prefixes of a position.</li>
  * <li>Below other "bad" operators. We do not cache at all in such places.</li>
  * </ul>
- *
+ * </p>
  * We identify these different areas with an automaton that walks from the root of a formula to a
  * subformula or subterm, roughly following the state design pattern. The transition function is
  * realised by the method <code>ITermTacletAppIndexCache.descend</code>.
@@ -137,7 +140,7 @@ public class TermTacletAppIndexCacheSet {
     }
 
     /**
-     * @return <code>true</code> iff <code>t</code> is a taclet that might possibly be cached by any
+     * @return <code>true</code> iff <code>t</code> is a taclet that might be cached by any
      *         of the caches of this set
      */
     public boolean isRelevantTaclet(Taclet t) {
