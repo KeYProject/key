@@ -68,7 +68,7 @@ public final class ProgVarReplacer {
      * replaces in the partially instantiated apps of a taclet index
      */
     public void replace(TacletIndex tacletIndex) {
-        ImmutableList<NoPosTacletApp> noPosTacletApps = tacletIndex.getPartialInstantiatedApps();
+        final var noPosTacletApps = tacletIndex.getPartialInstantiatedApps();
         ImmutableSet<NoPosTacletApp> appsToBeRemoved, appsToBeAdded;
         appsToBeRemoved = DefaultImmutableSet.nil();
         appsToBeAdded = DefaultImmutableSet.nil();
