@@ -109,7 +109,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (ruleApp.posInOccurrence() != null) {
             inputs.add(ruleApp.posInOccurrence().topLevel());
         }
-        inputs.addAll(RuleAppUtil.ifInstsOfRuleApp(ruleApp, node));
+        inputs.addAll(RuleAppUtil.assumesInstantiationsOfRuleApp(ruleApp, node));
         return inputs;
     }
 
