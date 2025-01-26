@@ -18,46 +18,57 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 /**
- * A default implementation of prover that can be easily reused via subclassing.
+ * A default implementation of a prover that provides reusable functionality
+ * for constructing and manipulating proofs by applying rules to goals.
+ * <p>
+ * This class can be subclassed to define custom provers with specific strategies
+ * and behaviors for proof construction.
+ * </p>
  *
- * @param <Proof> the type of {@link ProofObject} which the prover constructs
- * @param <Goal> the type of goals {@link ProofGoal} manipulated by this prover
+ * @param <Proof> the type of {@link ProofObject} that the prover constructs
+ * @param <Goal>  the type of {@link ProofGoal} instances manipulated by this prover
  */
 public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Goal extends ProofGoal<@NonNull Goal>>
         extends AbstractProverCore<Proof, Goal> {
 
+    /** Logger for tracing and debugging the prover's execution. */
     private final static Logger LOGGER = LoggerFactory.getLogger(DefaultProver.class);
+
+    /** Counter for tracking performance metrics related to goal application. */
     public static final AtomicLong PERF_GOAL_APPLY = new AtomicLong();
 
-    /**
-     * the proof that is worked with
-     */
+    /** The proof currently being constructed or manipulated by this prover. */
     protected Proof proof;
-    /**
-     * the maximum of allowed rule applications
-     */
+
+    /** The maximum number of rule applications allowed during the proof process. */
     protected int maxApplications;
 
-    /** the start time of the most recent prover invocation */
+    /** The start time of the most recent prover invocation, measured in milliseconds. */
     protected long time;
 
-    /** time in ms after which rule application shall be aborted, -1 disables timeout */
+    /**
+     * The timeout duration, in milliseconds, after which rule application will be aborted.
+     * A value of {@code -1} disables the timeout.
+     */
     protected long timeout = -1;
 
-    /** true if the prover should stop as soon as a non-closable goal is detected */
+    /**
+     * Indicates whether the prover should stop as soon as a non-closable goal is detected.
+     */
     protected boolean stopAtFirstNonClosableGoal;
 
-    /** the number of (so far) closed goal by the current running strategy */
+    /** The number of goals closed during the current proof process. */
     protected int closedGoals;
 
-    /** indicates whether the prover has been interrupted and should stop */
+    /** Indicates whether the prover has been interrupted and should stop. */
     protected boolean cancelled;
 
-    /** a configurable condition indicating that the prover has to stop, */
+    /** A condition that determines whether the prover should stop its execution. */
     protected StopCondition<Goal> stopCondition;
 
-    /** the goal choose picks the next goal to work on */
+    /** A strategy component that selects the next goal to be processed. */
     protected GoalChooser<Proof, Goal> goalChooser;
 
     /**
@@ -69,15 +80,20 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
      * this method as an empty method.
      * </p>
      *
-     * @param goal the {@link Goal} on which the prover currently works
+     * @param goal the {@link Goal} currently being processed
      * @param app the {@link RuleApp} to be applied next (if null, the built-in-rule
      *        index is updated and queried whether a built-in rule is applicable)
-     * @return the next rule app to be applied or {@code null} if none
+     * @return the next {@link RuleApp} to apply, or {@code null} if no rule is applicable
      */
     protected abstract @Nullable RuleApp updateBuiltInRuleIndex(Goal goal, @Nullable RuleApp app);
 
     /**
-     * applies rules until this is no longer possible or the thread is interrupted.
+     * Executes the proof strategy by applying rules to goals until no further rules
+     * can be applied, a stop condition is met, or the thread is interrupted.
+     *
+     * @param goalChooser  the {@link GoalChooser} that determines the next goal to process
+     * @param stopCondition the {@link StopCondition} that dictates when the prover should stop
+     * @return an {@link ApplyStrategyInfo} instance containing details about the proof process
      */
     protected final synchronized ApplyStrategyInfo<Proof, Goal> doWork(
             final GoalChooser<Proof, Goal> goalChooser,
@@ -131,9 +147,13 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
     }
 
     /**
-     * applies rules that are chosen by the active strategy
+     * Applies rules to goals using the active strategy until a stopping condition is met.
      *
-     * @return information whether the rule application was successful or not
+     * @param goalChooser             the {@link GoalChooser} for selecting the next goal
+     * @param stopCondition           the {@link StopCondition} to evaluate during processing
+     * @param startTime               the start time of the current proof process, in milliseconds
+     * @param stopAtFirstNonClosableGoal whether to stop if a non-closable goal is detected
+     * @return a {@link SingleRuleApplicationInfo} instance containing the result of the rule application
      */
     protected final synchronized SingleRuleApplicationInfo applyAutomaticRule(
             final GoalChooser<Proof, Goal> goalChooser,

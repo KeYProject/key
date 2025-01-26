@@ -49,11 +49,8 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
     public DefaultGoalChooser() {
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see de.uka.ilkd.key.proof.IGoalChooser#init(de.uka.ilkd.key.proof.Proof,
-     * de.uka.ilkd.key.proof.IList<Goal>)
+    /**
+     * {@inheritDoc}
      */
     public void init(@Nullable Proof p_proof, @Nullable ImmutableList<Goal> p_goals) {
         if (p_proof == null && !(p_goals == null || p_goals.isEmpty())) {
@@ -351,6 +348,5 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
     protected boolean isSatisfiableSubtree(@NonNull Node p_root) {
         return !p_root.isClosed();
     }
-
 
 }
