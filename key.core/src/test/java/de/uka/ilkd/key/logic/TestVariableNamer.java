@@ -27,7 +27,6 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.*;
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.junit.jupiter.api.Test;
@@ -125,14 +124,14 @@ public class TestVariableNamer {
     private boolean inTacletApps(Goal goal, ProgramVariable containedVar) {
         RuleAppIndex ruleAppIndex = goal.ruleAppIndex();
         TacletIndex tacletIndex = ruleAppIndex.tacletIndex();
-        ImmutableList<NoPosTacletApp> noPosTacletApps = tacletIndex.getPartialInstantiatedApps();
+        var noPosTacletApps = tacletIndex.getPartialInstantiatedApps();
 
         for (NoPosTacletApp noPosTacletApp : noPosTacletApps) {
             SVInstantiations insts = noPosTacletApp.instantiations();
             for (var e : insts.getInstantiationMap()) {
                 Object inst = e.value().getInstantiation();
-                if (inst instanceof PostIncrement
-                        && ((PostIncrement) inst).getFirstElement() == containedVar) {
+                if (inst instanceof PostIncrement postIncrement
+                        && postIncrement.getFirstElement() == containedVar) {
                     return true;
                 }
             }
