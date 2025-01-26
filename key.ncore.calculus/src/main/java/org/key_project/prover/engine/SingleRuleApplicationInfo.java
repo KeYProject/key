@@ -6,6 +6,8 @@ package org.key_project.prover.engine;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Represents information about the result of a single rule application in the KeY verification
  * system.
@@ -95,7 +97,8 @@ public class SingleRuleApplicationInfo {
      * @param <G> the type of the proof goal.
      * @return the proof goal associated with this rule application.
      */
-    public <G extends ProofGoal<G>> G getGoal() {
+    public <G extends ProofGoal<@NonNull G>> G getGoal() {
+        // noinspection unchecked
         return (G) goal;
     }
 

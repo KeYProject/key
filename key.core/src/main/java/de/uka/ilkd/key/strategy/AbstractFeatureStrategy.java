@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.instantiator.ForEachCP;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
@@ -14,6 +13,7 @@ import de.uka.ilkd.key.strategy.feature.instantiator.SVInstantiationCP;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.prover.proof.rulefilter.IHTacletFilter;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
