@@ -1,12 +1,13 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.prover.impl;
-
-import de.uka.ilkd.key.proof.Goal;
+package org.key_project.prover.engine.impl;
 
 import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.engine.StopCondition;
+import org.key_project.prover.proof.ProofGoal;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -19,7 +20,8 @@ import org.key_project.prover.engine.StopCondition;
  *
  * @author Martin Hentschel
  */
-public final class AppliedRuleStopCondition implements StopCondition<Goal> {
+public final class AppliedRuleStopCondition<Goal extends ProofGoal<@NonNull Goal>>
+        implements StopCondition<Goal> {
     /**
      * {@inheritDoc}
      */

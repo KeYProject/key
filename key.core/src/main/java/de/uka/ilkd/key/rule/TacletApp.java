@@ -1131,14 +1131,6 @@ public abstract class TacletApp implements RuleApp {
                 + p_taclet.assumesSequent().succedent().size());
     }
 
-    /**
-     * @return true iff the Taclet may be applied for the given mode (interactive/non-interactive,
-     *         activated rule sets)
-     */
-    public boolean admissible(boolean interactive, ImmutableList<RuleSet> ruleSets) {
-        return taclet().admissible(interactive, ruleSets);
-    }
-
     public ProgramElement getProgramElement(String instantiation, ProgramSV sv,
             Services services) {
         Sort svSort = sv.sort();

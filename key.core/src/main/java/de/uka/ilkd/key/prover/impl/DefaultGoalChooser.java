@@ -294,7 +294,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      *
      * @return true iff a non-empty subtree was found
      */
-    protected boolean findMinimalSubtreeBelow(Node p_startNode) {
+    protected boolean findMinimalSubtreeBelow(@NonNull Node p_startNode) {
         Node node = p_startNode;
 
         while (node.childrenCount() == 1) {
@@ -337,7 +337,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      *
      * @param p_startNode the node from where to start the search
      */
-    protected void findMinimalSubtree(Node p_startNode) {
+    protected void findMinimalSubtree(@NonNull Node p_startNode) {
         while (!isSatisfiableSubtree(p_startNode)) {
             p_startNode = p_startNode.parent();
         }
@@ -348,7 +348,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
     }
 
 
-    protected boolean isSatisfiableSubtree(Node p_root) {
+    protected boolean isSatisfiableSubtree(@NonNull Node p_root) {
         return !p_root.isClosed();
     }
 

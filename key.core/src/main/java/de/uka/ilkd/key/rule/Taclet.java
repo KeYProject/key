@@ -276,31 +276,6 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         return svNameCorrespondences.get(p);
     }
 
-    /**
-     * @return true iff <code>this</code> taclet may be applied for the given mode
-     *         (interactive/non-interactive, activated rule sets)
-     */
-    public boolean admissible(boolean interactive, ImmutableList<RuleSet> p_ruleSets) {
-        if (interactive) {
-            return admissibleInteractive(p_ruleSets);
-        } else {
-            return admissibleAutomatic(p_ruleSets);
-        }
-    }
-
-    protected boolean admissibleInteractive(ImmutableList<RuleSet> notAdmissibleRuleSets) {
-        return true;
-    }
-
-    protected boolean admissibleAutomatic(ImmutableList<RuleSet> admissibleRuleSets) {
-        for (final RuleSet tacletRuleSet : getRuleSets()) {
-            if (admissibleRuleSets.contains(tacletRuleSet)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public Set<SchemaVariable> collectSchemaVars() {
 
         Set<SchemaVariable> result = new LinkedHashSet<>();

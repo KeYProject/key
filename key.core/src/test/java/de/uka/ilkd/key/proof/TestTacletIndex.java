@@ -10,12 +10,12 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.rulefilter.IHTacletFilter;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;

@@ -18,13 +18,13 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
-import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.rulefilter.IHTacletFilter;
 import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.DefaultImmutableSet;
