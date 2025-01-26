@@ -28,6 +28,7 @@ import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.ConditionalFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
@@ -136,8 +137,10 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
         // modalities which executes special loop terminations like return, exceptions or break.
         globalF =
             add(globalF,
-                ifZero(applyTF(FocusProjection.INSTANCE,
-                    hasLabel(SymbolicExecutionUtil.LOOP_BODY_LABEL)),
+                ifZero(add(
+                    (app, pos, goal, mState) -> pos != null ? cost(0) : TopRuleAppCost.INSTANCE,
+                    applyTF(FocusProjection.INSTANCE,
+                        hasLabel(SymbolicExecutionUtil.LOOP_BODY_LABEL))),
                     longConst(-2000)));
         globalF = add(globalF, querySideProofFeature());
         globalF = add(globalF, modalitySideProofFeature());
