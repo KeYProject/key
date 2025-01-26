@@ -25,7 +25,8 @@ public interface ProofGoal<G extends ProofGoal<G>> {
     ProofObject<G> proof();
 
     /**
-     * The sequent to which this goal points and that should be proven valid.
+     * The sequent to which this goal points and that should be
+     * proven valid.
      *
      * @return the sequent associated with this goal
      */
@@ -41,6 +42,12 @@ public interface ProofGoal<G extends ProofGoal<G>> {
     @Nullable
     ImmutableList<G> apply(@NonNull final RuleApp ruleApp);
 
-
+    /**
+     * returns the prover component responsible for providing the next
+     * rule application to be applied on this goal
+     *
+     * @return the RuleApplicationManager selecting the next rule
+     *         application to be applied on this goal
+     */
     RuleApplicationManager<G> getRuleAppManager();
 }
