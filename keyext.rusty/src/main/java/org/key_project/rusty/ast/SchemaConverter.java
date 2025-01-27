@@ -28,6 +28,7 @@ import org.key_project.rusty.logic.op.sv.OperatorSV;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.rusty.parsing.RustySchemaParser;
+import org.key_project.rusty.rule.metaconstruct.ExpandFnBody;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -233,6 +234,9 @@ public class SchemaConverter {
             return convertSchemaVarExpression(se);
         if (ctx instanceof RustySchemaParser.EmptyPanicContext p)
             return new EmptyPanic();
+        if (ctx instanceof RustySchemaParser.ExpandFnBodyContext e)
+            return new ExpandFnBody(
+                (ProgramSV) lookupSchemaVariable(e.schemaVariable().getText().substring(2)));
         throw new UnsupportedOperationException(
             "Unknown expr: " + ctx.getText() + " class: " + ctx.getClass());
     }

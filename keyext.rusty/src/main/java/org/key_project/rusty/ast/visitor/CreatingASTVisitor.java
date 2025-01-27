@@ -8,6 +8,7 @@ import java.util.Deque;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.Services;
+import org.key_project.rusty.ast.Label;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
@@ -198,6 +199,41 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
             @Override
             RustyProgramElement createNewElement(ExtList changeList) {
                 return new BinaryExpression(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    protected void performActionOnLoopInvariant(InfiniteLoopExpression old,
+            InfiniteLoopExpression newLoop) {
+
+    }
+
+    @Override
+    public void performActionOnInfiniteLoop(InfiniteLoopExpression x) {
+        ExtList changeList = stack.peek();
+        if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
+            changeList.removeFirst();
+            Label l = changeList.removeFirstOccurrence(Label.class);
+            Expr body = changeList.removeFirstOccurrence(Expr.class);
+
+            var nl = new InfiniteLoopExpression(l, body);
+            performActionOnLoopInvariant(x, nl);
+            addChild(nl);
+
+            changed();
+        } else {
+            doDefaultAction(x);
+            performActionOnLoopInvariant(x, x);
+        }
+    }
+
+    @Override
+    public void performActionOnCompoundAssignmentExpression(CompoundAssignmentExpression x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            RustyProgramElement createNewElement(ExtList changeList) {
+                return new CompoundAssignmentExpression(changeList);
             }
         };
         def.doAction(x);

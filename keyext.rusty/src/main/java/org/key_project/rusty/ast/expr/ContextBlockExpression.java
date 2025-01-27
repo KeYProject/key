@@ -126,8 +126,13 @@ public class ContextBlockExpression extends BlockExpression {
             prefix = null;
         }
 
-        // matching children
-        mc = matchChildren(newSource, mc, 0);
+        if (getChildCount() == 1 && getChild(0) instanceof ExpressionStatement es
+                && newSource.getSource() instanceof Expr e) {
+            mc = es.getExpression().match(newSource, mc);
+        } else {
+            // matching children
+            mc = matchChildren(newSource, mc, 0);
+        }
 
         if (mc == null) {
             return null;

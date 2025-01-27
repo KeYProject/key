@@ -15,9 +15,15 @@ import org.jspecify.annotations.NonNull;
 public class Context {
     public static final String TMP_FN_NAME = "__RUSTY_KEY_CTX_FN_NAME__";
     private final Namespace<@NonNull ProgramVariable> varNS;
+    private final Path rustPath;
 
     public Context(Namespace<@NonNull ProgramVariable> varNS) {
+        this(varNS, null);
+    }
+
+    public Context(Namespace<@NonNull ProgramVariable> varNS, Path rustPath) {
         this.varNS = varNS;
+        this.rustPath = rustPath;
     }
 
     public String buildFunction(String block, boolean withAttrs) {
@@ -45,5 +51,9 @@ public class Context {
 
     private String getType(ProgramVariable pv) {
         return pv.getKeYRustyType().getRustyType().toString();
+    }
+
+    public Path getRustPath() {
+        return rustPath;
     }
 }

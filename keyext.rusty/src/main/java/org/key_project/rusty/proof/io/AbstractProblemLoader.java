@@ -10,6 +10,7 @@ import java.nio.file.*;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,7 +21,8 @@ import org.key_project.rusty.proof.Node;
 import org.key_project.rusty.proof.Proof;
 import org.key_project.rusty.proof.ProofAggregate;
 import org.key_project.rusty.proof.init.*;
-import org.key_project.rusty.proof.io.ProblemLoaderControl.LoadedPOContainer;
+import org.key_project.rusty.proof.init.IPersistablePO.LoadedPOContainer;
+import org.key_project.rusty.proof.init.loader.ProofObligationLoader;
 import org.key_project.rusty.proof.io.consistency.FileRepo;
 import org.key_project.rusty.proof.io.consistency.SimpleFileRepo;
 import org.key_project.rusty.settings.Configuration;
@@ -128,7 +130,6 @@ public abstract class AbstractProblemLoader {
      *
      * @param callbackProofLoaded optional callback, called when the proof is loaded but not yet
      *        replayed
-     *
      * @throws ProofInputException Occurred Exception.
      * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
@@ -438,13 +439,13 @@ public abstract class AbstractProblemLoader {
             throw new IOException("Proof obligation class property \""
                 + "class" + "\" is not defined or empty.");
         }
-        // ServiceLoader<ProofObligationLoader> loader =
-        // ServiceLoader.load(ProofObligationLoader.class);
-        // for (ProofObligationLoader poloader : loader) {
-        // if (poloader.handles(poClass)) {
-        // return poloader.loadFrom(initConfig, proofObligation);
-        // }
-        // }
+        ServiceLoader<ProofObligationLoader> loader =
+            ServiceLoader.load(ProofObligationLoader.class);
+        for (ProofObligationLoader poloader : loader) {
+            if (poloader.handles(poClass)) {
+                return poloader.loadFrom(initConfig, proofObligation);
+            }
+        }
         throw new IllegalArgumentException(
             "There is no builder that can build the PO for the id " + poClass);
     }

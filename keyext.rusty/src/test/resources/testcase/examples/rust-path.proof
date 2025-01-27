@@ -1,5 +1,41 @@
 \programSource "./rustPath";
 
-\problem {
-    true
+\proofObligation
+{
+    "class": "org.key_project.rusty.proof.init.loader.FunctionOperationContractPOLoader",
+    "contract": "mul.normal specification case 0.0",
+    "name": "mul.normal specification case 0.0"
+}
+
+\proof {
+    (branch "dummy ID"
+        (rule "impRight" (formula "1"))
+        (rule "andLeft" (formula "1"))
+        (rule "andLeft" (formula "1"))
+        (rule "andLeft" (formula "1"))
+        (rule "andLeft" (formula "4"))
+        (rule "functionBodyExpand" (formula "6") (term "1"))
+        (rule "sequentialToParallel2" (formula "6"))
+        (rule "applyOnParallel" (formula "6") (term "1,0"))
+        (rule "simplifyUpdate3" (formula "6") (term "0,1,0"))
+        (rule "applyOnElementary" (formula "6") (term "0,1,0"))
+        (rule "applyOnPV" (formula "6") (term "0,0,1,0"))
+        (rule "simplifyUpdate3" (formula "6") (term "1,1,0"))
+        (rule "applyOnElementary" (formula "6") (term "1,1,0"))
+        (rule "applyOnPV" (formula "6") (term "0,1,1,0"))
+        (rule "letIdentPatAssignMut" (formula "6") (term "1"))
+        (rule "letIdentPatMut" (formula "6") (term "1"))
+        (rule "assignment" (formula "6") (term "1"))
+        (rule "letIdentPatAssign" (formula "6") (term "1,1"))
+        (rule "letIdentPat" (formula "6") (term "1,1"))
+        (rule "assignment" (formula "6") (term "1,1"))
+        (rule "sequentialToParallel2" (formula "6"))
+        (rule "simplifyUpdate2" (formula "6"))
+        (rule "simplifyUpdate3" (formula "6") (term "1,0"))
+        (rule "sequentialToParallel2" (formula "6"))
+        (rule "simplifyUpdate3" (formula "6") (term "1,0"))
+        (rule "applyOnElementary" (formula "6") (term "1,0"))
+        (rule "applyOnPV" (formula "6") (term "0,1,0"))
+        (rule "loopScopeInvDia" (formula "6") (term "1"))
+    )
 }

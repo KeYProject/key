@@ -20,6 +20,7 @@ import org.key_project.rusty.logic.sort.SortImpl;
 import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.rusty.rule.metaconstruct.CreateFrameCond;
 import org.key_project.rusty.rule.metaconstruct.CreateLocalAnonUpdate;
+import org.key_project.rusty.rule.metaconstruct.IntroAtPreDefs;
 import org.key_project.rusty.rule.metaconstruct.arith.*;
 
 /**
@@ -61,6 +62,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer CREATE_LOCAL_ANON_UPDATE =
         new CreateLocalAnonUpdate();
     public static final AbstractTermTransformer CREATE_FRAME_COND = new CreateFrameCond();
+
+    public static final AbstractTermTransformer INTRODUCE_AT_PRE_DEFINITIONS = new IntroAtPreDefs();
 
     protected AbstractTermTransformer(Name name, int arity, Sort sort) {
         super(name, createMetaSortArray(arity), sort, Modifier.NONE);

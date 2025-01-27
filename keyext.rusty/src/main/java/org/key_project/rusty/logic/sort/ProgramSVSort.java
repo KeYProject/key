@@ -57,6 +57,8 @@ public abstract class ProgramSVSort extends SortImpl {
 
     public static final ProgramSVSort LABEL = new LabelSort();
 
+    public static final ProgramSVSort NON_MODEL_FUNCTION_BODY = new NonModelFunctionBodySort();
+
     protected ProgramSVSort(Name name) {
         super(name, false, DefaultImmutableSet.nil());
         NAME2SORT.put(name, this);
@@ -333,6 +335,17 @@ public abstract class ProgramSVSort extends SortImpl {
         @Override
         public boolean canStandFor(RustyProgramElement check, Services services) {
             return check instanceof ConcreteLabel;
+        }
+    }
+
+    private static class NonModelFunctionBodySort extends ProgramSVSort {
+        protected NonModelFunctionBodySort() {
+            super(new Name("NonModelFunctionBody"));
+        }
+
+        @Override
+        public boolean canStandFor(RustyProgramElement check, Services services) {
+            return check instanceof FunctionBodyExpression;
         }
     }
 }

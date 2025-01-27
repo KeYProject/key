@@ -10,6 +10,7 @@ blockExpr
 
 expr
    : schemaVariable # SchemaVarExpression
+   | EXPAND_FN_BODY LPAREN schemaVariable RPAREN # ExpandFnBody
    | literalExpr # LiteralExpression
    | pathExpr # PathExpression
    | expr DOT pathExprSegment LPAREN callParams? RPAREN # MethodCallExpression
@@ -17,6 +18,7 @@ expr
    | expr DOT tupleIndex # TupleIndexingExpression
    | expr DOT KW_AWAIT # AwaitExpression
    | expr LPAREN callParams? RPAREN # CallExpression
+   | expr LPAREN callParams? RPAREN AT # FunctionBodyExpression
    | expr LSQUAREBRACKET expr RSQUAREBRACKET # IndexExpression
    | expr QUESTION # ErrorPropagationExpression
    | (AND | ANDAND) KW_MUT? expr # BorrowExpression

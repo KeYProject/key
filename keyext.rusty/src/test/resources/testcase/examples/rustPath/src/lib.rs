@@ -11,3 +11,19 @@ use rml_contracts::*;
 pub fn add(a: u32, b: u32) -> u32 {
     a + b
 }
+
+#[spec {
+    requires(a <= 1000 && b <= 1000),
+    ensures(result == a * b)
+    }]
+pub fn mul(a: u64, mut b: u64) -> u64 {
+    let mut n: u64 = 0;
+    let old_b: u64 = b;
+    #[invariant(n == a * (old_b - b))]
+    #[variant(n)]
+    loop {
+        if b == 0 { break n; }
+        n += a;
+        b -= 1;
+    }
+}

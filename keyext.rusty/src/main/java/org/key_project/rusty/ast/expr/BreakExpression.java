@@ -56,7 +56,6 @@ public record BreakExpression(@Nullable Label label, @Nullable Expr expr) implem
         if (expr != null) {
             sb.append(" ").append(expr);
         }
-        sb.append(";");
         return sb.toString();
     }
 

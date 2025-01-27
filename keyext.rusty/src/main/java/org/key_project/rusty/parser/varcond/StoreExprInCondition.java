@@ -8,6 +8,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.expr.BlockExpression;
+import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.rule.LightweightSyntacticalReplaceVisitor;
@@ -56,8 +57,8 @@ public class StoreExprInCondition implements VariableCondition {
 
         var mod = (Modality) instantiatedTerm.op();
         var be = (BlockExpression) mod.program().program();
-        assert be.getValue() != null;
+        var es = (ExpressionStatement) be.getChild(0);
 
-        return matchCond.setInstantiations(svInst.add(storeInSV, be.getValue(), services));
+        return matchCond.setInstantiations(svInst.add(storeInSV, es.getExpression(), services));
     }
 }

@@ -16,6 +16,8 @@ import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.ast.ty.TypeOf;
 import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.rule.metaconstruct.ProgramTransformer;
+import org.key_project.rusty.speclang.LoopSpecification;
 
 /**
  * This class is implemented by visitors/walkers. Each AST node implements a visit(Visitor) method
@@ -139,4 +141,14 @@ public interface Visitor {
     void performActionOnTypeOf(TypeOf x);
 
     void performActionOnProgramFunction(ProgramFunction x);
+
+    void performActionOnFunctionBodyExpression(FunctionBodyExpression x);
+
+    void performActionOnFunctionFrame(FunctionFrame x);
+
+    void performActionOnLoopInvariant(LoopSpecification x);
+
+    void performActionOnProgramMetaConstruct(ProgramTransformer x);
+
+    void performActionOnLoopScope(LoopScope x);
 }

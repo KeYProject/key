@@ -9,9 +9,13 @@ import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.abstraction.KeYRustyType;
 import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.ast.fn.Function;
+import org.key_project.rusty.ast.fn.FunctionParamPattern;
+import org.key_project.rusty.ast.pat.BindingPattern;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -71,5 +75,23 @@ public class ProgramFunction extends ObserverFunction implements RustyProgramEle
         } else {
             return null;
         }
+    }
+
+    public ImmutableList<ProgramVariable> collectParameters() {
+        return collectParameters(function);
+    }
+
+    public static ImmutableList<ProgramVariable> collectParameters(Function function) {
+        ImmutableList<ProgramVariable> params = ImmutableSLList.nil();
+        for (int i = function.params().size() - 1; i >= 0; --i) {
+            var param = function.params().get(i);
+            if (param instanceof FunctionParamPattern fp
+                    && fp.pattern() instanceof BindingPattern bp) {
+                params = params.prepend(bp.pv());
+            } else {
+                throw new RuntimeException("Expected PV param");
+            }
+        }
+        return params;
     }
 }

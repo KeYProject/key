@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.speclang;
 
+import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.expr.LoopExpression;
 import org.key_project.rusty.logic.op.ProgramFunction;
+import org.key_project.rusty.logic.op.ProgramVariable;
 
 /**
  * A loop invariant, consisting of an invariant formula, a set of loop predicates, a modifiable
@@ -37,10 +39,33 @@ public interface LoopSpecification extends SpecificationElement {
     Term getInvariant(Services services);
 
     /**
+     * Returns the invariant formula.
+     *
+     * @param services the Services object.
+     * @return The invariant formula as a term.
+     */
+    Term getInvariant(Map<ProgramVariable, Term> atPres, Services services);
+
+    /**
      * Returns the variant term.
      *
      * @param services the Services object.
      * @return The variant term.
      */
     Term getVariant(Services services);
+
+    /**
+     * Returns the variant term.
+     *
+     * @param services the Services object.
+     * @return The variant term.
+     */
+    Term getVariant(Map<ProgramVariable, Term> atPres, Services services);
+
+    /**
+     * Returns operators internally used for the pre-heap.
+     *
+     * @return The map storing the operators.
+     */
+    Map<ProgramVariable, Term> getInternalAtPres();
 }

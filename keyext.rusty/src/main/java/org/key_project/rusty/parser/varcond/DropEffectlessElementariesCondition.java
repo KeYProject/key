@@ -77,8 +77,6 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
                 : services.getTermBuilder().apply(simplifiedUpdate, target);
     }
 
-
-
     @Override
     public MatchConditions check(SchemaVariable var, SyntaxElement instCandidate,
             MatchConditions mc,

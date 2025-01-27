@@ -33,8 +33,8 @@ public abstract class Instruction<Op extends Operator> implements MatchInstructi
         return new MatchModalOperatorSVInstruction(sv);
     }
 
-    public static MatchModalityInstruction matchModalOperator(Modality mod) {
-        return new MatchModalityInstruction(mod);
+    public static MatchModalityKindInstruction matchModalOperator(Modality mod) {
+        return new MatchModalityKindInstruction(mod.kind());
     }
 
     public static MatchSchemaVariableInstruction<? extends org.key_project.logic.op.sv.SchemaVariable> matchFormulaSV(

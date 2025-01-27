@@ -9,10 +9,7 @@ import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.Path;
 import org.key_project.rusty.ast.PathSegment;
 import org.key_project.rusty.ast.ResDef;
-import org.key_project.rusty.ast.expr.AssignmentExpression;
-import org.key_project.rusty.ast.expr.BlockExpression;
-import org.key_project.rusty.ast.expr.CallExpression;
-import org.key_project.rusty.ast.expr.PathExpr;
+import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.logic.op.Modality;
 import org.key_project.rusty.logic.op.ProgramFunction;
@@ -100,7 +97,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             target.getType().getRustyType());
         return new BlockExpression(ImmutableList.of(
             new ExpressionStatement(
-                new AssignmentExpression(resultVar,
+                new FunctionBodyExpression(resultVar, target,
                     new CallExpression(callee, new ImmutableArray<>(formalParamVars.toList()))),
                 true)),
             null);

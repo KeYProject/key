@@ -16,6 +16,7 @@ import org.key_project.rusty.ast.ty.SchemaRustType;
 import org.key_project.rusty.ast.ty.TypeOf;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.rule.inst.SVInstantiations;
+import org.key_project.rusty.rule.metaconstruct.ProgramTransformer;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -168,6 +169,28 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
             throw new IllegalStateException("typeOf expects an expression");
         var ty = e.type(services);
         addChild(ty.toRustType(services));
+        changed();
+    }
+
+    @Override
+    public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
+        final ExtList changeList = stack.peek();
+
+        RustyProgramElement body = null;
+        for (Object element : changeList) {
+            if (element instanceof RustyProgramElement pe) {
+                body = pe;
+            }
+        }
+
+        assert body != null : "A program transformer without program to transform?";
+
+        final RustyProgramElement[] result = x.transform(body, services, svinsts);
+        if (result == null) {
+            addChild(null);
+        } else {
+            addChildren(new ImmutableArray<>(result));
+        }
         changed();
     }
 }

@@ -74,53 +74,63 @@ public class HirRustyReader {
                     throw new RuntimeException(e);
                 }
             }));
-            Files.copy(Path.of("./src/main/resources/rust-toolchain.toml"),
-                tmpDir.resolve("rust-toolchain.toml"));
-            Files.copy(Path.of("./src/main/resources/Cargo.toml"), tmpDir.resolve("Cargo.toml"));
-            Path src = tmpDir.resolve("src");
-            Files.createDirectory(src);
-            Path lib = Files.createFile(src.resolve("lib.rs"));
-            System.out.println(fn);
-            Files.writeString(lib, fn, StandardCharsets.UTF_8, StandardOpenOption.WRITE,
-                StandardOpenOption.TRUNCATE_EXISTING);
+            if (context.getRustPath() == null) {
+                Files.copy(Path.of("./src/main/resources/rust-toolchain.toml"),
+                    tmpDir.resolve("rust-toolchain.toml"));
+                Files.copy(Path.of("./src/main/resources/Cargo.toml"),
+                    tmpDir.resolve("Cargo.toml"));
+                Path src = tmpDir.resolve("src");
+                Files.createDirectory(src);
+                Path lib = Files.createFile(src.resolve("lib.rs"));
+                System.out.println(fn);
+                Files.writeString(lib, fn, StandardCharsets.UTF_8, StandardOpenOption.WRITE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
 
-            var wrapperOutput = getWrapperOutput(tmpDir);
-            var converter = new HirConverter(services, null);
-            var converted = converter.convertCrate(wrapperOutput.crate());
-            BlockExpression body = converted.getVerificationTarget().body();
-            var es = (ExpressionStatement) body.getStatements().get(0);
-            {
-                // TODO: remove
-                var myAdd = (Function) converted.getTopMod().getItems().stream()
-                        .filter(
-                            i -> i instanceof Function f && f.name().toString().equals("my_add"))
-                        .findFirst().orElse(null);
-                assert myAdd != null;
-                var target = services.getRustInfo().getFunction(myAdd);
-                if (services.getNamespaces().functions().lookup(target.name()) == null) {
-                    services.getNamespaces().functions().add(target);
-                    var factory = new ContractFactory(services);
-                    var tb = services.getTermBuilder();
-                    var a =
-                        ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(0)).pattern())
-                                .pv();
-                    var b =
-                        ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(1)).pattern())
-                                .pv();
-                    var result = new ProgramVariable(new Name("result"), a.getKeYRustyType());
-                    var pre = tb.geq(tb.var(a), tb.zero());
-                    var post = tb.equals(tb.var(result), tb.add(tb.var(a), tb.var(b)));
-                    var pvs = new ProgramVariableCollection(null, ImmutableList.of(a, b), result);
-                    FunctionalOperationContract contract = factory.func("my_contract",
-                        target, true, pre, null, post, null, pvs, true);
-                    services.getSpecificationRepository().addContract(contract);
-                    ContractPO proofObl = contract.createProofObl(new InitConfig(services));
-                    proofObl.readProblem();
-                    System.out.println(proofObl.getPO().getProof(0).getOpenGoals()
-                            .head().getNode().sequent());
+                var wrapperOutput = getWrapperOutput(tmpDir);
+                var converter = new HirConverter(services, null);
+                var converted = converter.convertCrate(wrapperOutput.crate());
+                BlockExpression body = converted.getVerificationTarget().body();
+                var es = (ExpressionStatement) body.getStatements().get(0);
+                {
+                    // TODO: remove
+                    var myAdd = (Function) converted.getTopMod().getItems().stream()
+                            .filter(
+                                i -> i instanceof Function f
+                                        && f.name().toString().equals("my_add"))
+                            .findFirst().orElse(null);
+                    assert myAdd != null;
+                    var target = services.getRustInfo().getFunction(myAdd);
+                    if (services.getNamespaces().functions().lookup(target.name()) == null) {
+                        services.getNamespaces().functions().add(target);
+                        var factory = new ContractFactory(services);
+                        var tb = services.getTermBuilder();
+                        var a =
+                            ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(0))
+                                    .pattern())
+                                    .pv();
+                        var b =
+                            ((BindingPattern) ((FunctionParamPattern) myAdd.params().get(1))
+                                    .pattern())
+                                    .pv();
+                        var result = new ProgramVariable(new Name("result"), a.getKeYRustyType());
+                        var pre = tb.geq(tb.var(a), tb.zero());
+                        var post = tb.equals(tb.var(result), tb.add(tb.var(a), tb.var(b)));
+                        var pvs =
+                            new ProgramVariableCollection(null, ImmutableList.of(a, b), result);
+                        FunctionalOperationContract contract = factory.func("my_contract",
+                            target, true, pre, null, post, null, pvs, true);
+                        services.getSpecificationRepository().addContract(contract);
+                        ContractPO proofObl = contract.createProofObl(new InitConfig(services));
+                        proofObl.readProblem();
+                        System.out.println(proofObl.getPO().getProof(0).getOpenGoals()
+                                .head().getNode().sequent());
+                    }
                 }
+                return new RustyBlock(es.getExpression());
+            } else {
+
+                return null;
             }
-            return new RustyBlock(es.getExpression());
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (ProofInputException e) {

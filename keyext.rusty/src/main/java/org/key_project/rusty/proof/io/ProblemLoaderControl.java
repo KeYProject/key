@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.proof.io;
 
-import java.util.Properties;
 
 import org.key_project.rusty.proof.ProofAggregate;
+import org.key_project.rusty.proof.init.IPersistablePO;
 import org.key_project.rusty.proof.init.InitConfig;
-import org.key_project.rusty.proof.init.ProofOblInput;
 import org.key_project.rusty.proof.io.AbstractProblemLoader.ReplayResult;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -33,7 +32,7 @@ public interface ProblemLoaderControl {
      * @param result The occurred {@link ReplayResult}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
+    void loadingFinished(AbstractProblemLoader loader, IPersistablePO.LoadedPOContainer poContainer,
             ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException;
 
     /**
@@ -51,65 +50,4 @@ public interface ProblemLoaderControl {
      * @param warnings The occurred warnings.
      */
     void reportWarnings(ImmutableSet<String> warnings);
-
-    /**
-     * The class stored in a {@link Properties} instance via key must provide the static method with
-     * the following signature:
-     * {@code public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException}
-     * This method is called by the {@link AbstractProblemLoader} to
-     * recreate a proof obligation. This class
-     * defines the result of this method which is the created proof obligation and its proof number.
-     *
-     * @author Martin Hentschel
-     */
-    class LoadedPOContainer {
-        /**
-         * The created {@link ProofOblInput}.
-         */
-        private final ProofOblInput proofOblInput;
-
-        /**
-         * The proof number which is {@code 0} by default.
-         */
-        private final int proofNum;
-
-        /**
-         * Constructor.
-         *
-         * @param proofOblInput The created {@link ProofOblInput}.
-         */
-        public LoadedPOContainer(ProofOblInput proofOblInput) {
-            this(proofOblInput, 0);
-        }
-
-        /**
-         * Constructor.
-         *
-         * @param proofOblInput The created {@link ProofOblInput}.
-         * @param proofNum The proof number which is {@code 0} by default.
-         */
-        public LoadedPOContainer(ProofOblInput proofOblInput, int proofNum) {
-            super();
-            this.proofOblInput = proofOblInput;
-            this.proofNum = proofNum;
-        }
-
-        /**
-         * Returns the created {@link ProofOblInput}.
-         *
-         * @return The created {@link ProofOblInput}.
-         */
-        public ProofOblInput getProofOblInput() {
-            return proofOblInput;
-        }
-
-        /**
-         * Returns the proof number which is {@code 0} by default.
-         *
-         * @return The proof number which is {@code 0} by default.
-         */
-        public int getProofNum() {
-            return proofNum;
-        }
-    }
 }

@@ -249,9 +249,43 @@ public class IntLDT extends LDT {
     }
 
     public Function getInBounds(Type ty) {
+        if (ty == PrimitiveType.U8) {
+            return inU8;
+        }
+        if (ty == PrimitiveType.U16) {
+            return inU16;
+        }
         if (ty == PrimitiveType.U32) {
             return inU32;
         }
+        if (ty == PrimitiveType.U64) {
+            return inU64;
+        }
+        if (ty == PrimitiveType.U128) {
+            return inU128;
+        }
+        if (ty == PrimitiveType.USIZE) {
+            return inUSize;
+        }
+        if (ty == PrimitiveType.I8) {
+            return inI8;
+        }
+        if (ty == PrimitiveType.I16) {
+            return inI16;
+        }
+        if (ty == PrimitiveType.I32) {
+            return inI32;
+        }
+        if (ty == PrimitiveType.I64) {
+            return inI64;
+        }
+        if (ty == PrimitiveType.I128) {
+            return inI128;
+        }
+        if (ty == PrimitiveType.ISIZE) {
+            return inISize;
+        }
+
         throw new IllegalArgumentException("inBounds for type " + ty + " missing");
     }
 }

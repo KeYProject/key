@@ -4,10 +4,14 @@
 package org.key_project.rusty.ast.visitor;
 
 import java.util.LinkedHashSet;
+import java.util.Map;
 
+import org.key_project.logic.Term;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.proof.TermProgramVariableCollector;
+import org.key_project.rusty.speclang.LoopSpecification;
 
 public class ProgramVariableCollector extends RustyASTVisitor {
     private final LinkedHashSet<ProgramVariable> result = new LinkedHashSet<>();
@@ -40,5 +44,26 @@ public class ProgramVariableCollector extends RustyASTVisitor {
     @Override
     public void performActionOnProgramVariable(ProgramVariable x) {
         result.add(x);
+    }
+
+    @Override
+    public void performActionOnLoopInvariant(LoopSpecification x) {
+        TermProgramVariableCollector tpvc = new TermProgramVariableCollector(services);
+
+        Map<ProgramVariable, Term> atPres = x.getInternalAtPres();
+
+        // invariant
+        Term inv = x.getInvariant(atPres, services);
+        if (inv != null) {
+            inv.execPostOrder(tpvc);
+        }
+
+        // variant
+        Term v = x.getVariant(atPres, services);
+        if (v != null) {
+            v.execPostOrder(tpvc);
+        }
+
+        result.addAll(tpvc.result());
     }
 }

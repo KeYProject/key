@@ -33,7 +33,7 @@ public class CreateLocalAnonUpdate extends AbstractTermTransformer {
         final Term target = term.sub(0);
 
         // the target term should have a program block
-        if (!(target instanceof Modality mod)) {
+        if (!(target.op() instanceof Modality mod)) {
             return null;
         }
 

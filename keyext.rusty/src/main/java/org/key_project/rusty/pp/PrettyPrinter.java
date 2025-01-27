@@ -22,6 +22,8 @@ import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
 import org.key_project.rusty.rule.inst.SVInstantiations;
+import org.key_project.rusty.rule.metaconstruct.ProgramTransformer;
+import org.key_project.rusty.speclang.LoopSpecification;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
@@ -640,5 +642,64 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnProgramFunction(ProgramFunction x) {
 
+    }
+
+    @Override
+    public void performActionOnFunctionBodyExpression(FunctionBodyExpression x) {
+        var result = x.resultVar();
+        if (result != null) {
+            result.visit(this);
+            layouter.brk(1, 0);
+            layouter.print("=");
+            layouter.brk(1, 0);
+        }
+        x.call().visit(this);
+        layouter.print("@");
+    }
+
+    @Override
+    public void performActionOnFunctionFrame(FunctionFrame x) {
+        layouter.keyWord("fn-frame");
+        layouter.print(" ");
+        beginMultilineParen();
+
+        ProgramVariable var = x.getResultVar();
+        var fn = x.getFunction();
+        if (var != null) {
+            layouter.beginRelativeC().print("result->");
+            var.visit(this);
+            if (fn != null) {
+                layouter.print(",");
+            }
+            layouter.end();
+            if (fn != null) {
+                layouter.brk();
+            }
+        }
+
+        if (fn != null) {
+            layouter.print(fn.getFunction().name().toString());
+        }
+
+        endMultilineParen();
+        layouter.print(" ");
+
+        if (x.getBody() != null) {
+            x.getBody().visit(this);
+        }
+    }
+
+    @Override
+    public void performActionOnLoopInvariant(LoopSpecification x) {
+
+    }
+
+    @Override
+    public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
+        layouter.print(x.name().toString());
+        layouter.print("(");
+        if (x.getChildCount() > 0)
+            ((RustyProgramElement) x.getChild(0)).visit(this);
+        layouter.print(")");
     }
 }

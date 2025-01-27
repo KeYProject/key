@@ -19,6 +19,8 @@ import org.key_project.rusty.ast.ty.TypeOf;
 import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
+import org.key_project.rusty.rule.metaconstruct.ProgramTransformer;
+import org.key_project.rusty.speclang.LoopSpecification;
 
 /**
  * Extends the RustyASTWalker to use the visitor mechanism. The methods inherited by the Visitor
@@ -37,6 +39,17 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
     protected RustyASTVisitor(RustyProgramElement root, Services services) {
         super(root);
         this.services = services;
+    }
+
+    @Override
+    protected void walk(RustyProgramElement node) {
+        super.walk(node);
+        if (node instanceof InfiniteLoopExpression le && services != null) {
+            var li = services.getSpecificationRepository().getLoopSpec(le);
+            if (li != null) {
+                performActionOnLoopInvariant(li);
+            }
+        }
     }
 
     /**
@@ -346,6 +359,26 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
 
     @Override
     public void performActionOnProgramFunction(ProgramFunction x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnFunctionBodyExpression(FunctionBodyExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnFunctionFrame(FunctionFrame x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnLoopInvariant(LoopSpecification x) {
+
+    }
+
+    @Override
+    public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
         doDefaultAction(x);
     }
 }

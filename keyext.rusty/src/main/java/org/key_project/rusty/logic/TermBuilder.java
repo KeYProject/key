@@ -690,4 +690,17 @@ public class TermBuilder {
     public Term measuredByEmpty() {
         return func(getMeasuredByEmpty());
     }
+
+    /**
+     * Creates a program variable for prestate variables. Take care to register it in the
+     * namespaces.
+     *
+     * @param baseName the base name to use
+     * @param krt the sort of the variable
+     * @param makeNameUnique whether to change the base name to be unique
+     * @return a location variable for the given name and type
+     */
+    public ProgramVariable atPreVar(String baseName, KeYRustyType krt, boolean makeNameUnique) {
+        return progVar(baseName + "_at_pre", krt, makeNameUnique);
+    }
 }

@@ -84,6 +84,8 @@ public class HirConverter {
     private final Map<LocalDefId, Function> localFns = new HashMap<>();
     private final Map<Function, FnSpec> fn2Spec = new HashMap<>();
 
+    private Function currentFn = null;
+
     /**
      * We first convert all functions except their bodies. Then we convert those later.
      */
@@ -99,12 +101,14 @@ public class HirConverter {
     }
 
     public Crate convertCrate(org.key_project.rusty.parser.hir.Crate crate) {
+        currentFn = null;
         Crate crate1 = new Crate(convertMod(crate.topMod()));
         for (var m : crate.types()) {
             var ty = convertTy(m.ty());
             types.put(m.hirId(), ty);
         }
         for (var fn : fnsToComplete.keySet()) {
+            currentFn = fn;
             var spec = fn2Spec.get(fn);
             var hirFn = fnsToComplete.get(fn);
             boolean isCtxFn = fn.name().toString().equals(Context.TMP_FN_NAME);
@@ -131,6 +135,7 @@ public class HirConverter {
                     services.getSpecificationRepository().addContract(contract);
                 }
             }
+            currentFn = null;
         }
         return crate1;
     }
@@ -273,7 +278,7 @@ public class HirConverter {
         var le = new InfiniteLoopExpression(null, body);
 
         if (loopSpecs != null && loopSpecs.containsKey(id)) {
-            var ls = loopSpecConverter.convert(loopSpecs.get(id), le, pvs);
+            var ls = loopSpecConverter.convert(loopSpecs.get(id), currentFn, le, pvs);
             services.getSpecificationRepository().addLoopSpec(ls);
         }
 

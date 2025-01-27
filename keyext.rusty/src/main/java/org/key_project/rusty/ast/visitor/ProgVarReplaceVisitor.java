@@ -3,12 +3,23 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.visitor;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.expr.InfiniteLoopExpression;
+import org.key_project.rusty.logic.TermBuilder;
+import org.key_project.rusty.logic.op.ElementaryUpdate;
 import org.key_project.rusty.logic.op.ProgramVariable;
+import org.key_project.rusty.speclang.LoopSpecImpl;
+import org.key_project.rusty.speclang.LoopSpecification;
+import org.key_project.rusty.util.MiscTools;
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Walks through a java AST in depth-left-first-order. This visitor replaces a number of program
@@ -76,6 +87,69 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             changed();
         } else {
             doDefaultAction(x);
+        }
+    }
+
+    @Override
+    protected void performActionOnLoopInvariant(InfiniteLoopExpression old,
+            InfiniteLoopExpression newLoop) {
+        final TermBuilder tb = services.getTermBuilder();
+        LoopSpecification inv = services.getSpecificationRepository().getLoopSpec(old);
+        if (inv == null)
+            return;
+
+        var atPres = inv.getInternalAtPres();
+
+        var newInv = replaceVariablesInTerm(inv.getInvariant(atPres, services));
+
+        var newVar = replaceVariablesInTerm(inv.getVariant(atPres, services));
+
+        Map<ProgramVariable, Term> saveCopy = new HashMap<>(atPres);
+        for (var e : saveCopy.entrySet()) {
+            var pv = e.getKey();
+            final var t = e.getValue();
+            if (t == null)
+                continue;
+            if (replaceMap.containsKey(pv)) {
+                atPres.remove(pv);
+                pv = replaceMap.get(pv);
+            }
+            atPres.put(pv, replaceVariablesInTerm(t));
+        }
+
+        var newLocalIns = tb.var(MiscTools.getLocalIns(newLoop, services));
+        var newLocalOuts = tb.var(MiscTools.getLocalOuts(newLoop, services));
+        var newSpec = new LoopSpecImpl(newLoop, newInv, newVar, newLocalIns, newLocalOuts, atPres);
+        services.getSpecificationRepository().addLoopSpec(newSpec);
+    }
+
+    private Term replaceVariablesInTerm(Term t) {
+        if (t == null)
+            return null;
+        if (t.op() instanceof ProgramVariable pv) {
+            if (replaceMap.containsKey(pv)) {
+                ProgramVariable replacement = replaceMap.get(pv);
+                return services.getTermFactory().createTerm(replacement);
+            } else {
+                return t;
+            }
+        } else {
+            boolean changed = false;
+            Term[] subTerms = new Term[t.arity()];
+            for (int i = 0, n = t.arity(); i < n; i++) {
+                subTerms[i] = replaceVariablesInTerm(t.sub(i));
+                changed = changed || subTerms[i] != t.sub(i);
+            }
+            Operator op = t.op();
+            if (op instanceof ElementaryUpdate eu) {
+                if (replaceMap.containsKey(eu.lhs())) {
+                    ProgramVariable replacement = replaceMap.get(eu.lhs());
+                    op = ElementaryUpdate.getInstance(replacement);
+                    changed = changed || eu != op;
+                }
+            }
+            return changed ? services.getTermFactory().createTerm(op, subTerms,
+                (ImmutableArray<QuantifiableVariable>) t.boundVars()) : t;
         }
     }
 }

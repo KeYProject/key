@@ -10,6 +10,7 @@ import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.BlockExpression;
 import org.key_project.rusty.ast.expr.ContextBlockExpression;
 import org.key_project.rusty.ast.expr.Expr;
+import org.key_project.rusty.ast.expr.FunctionFrame;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.logic.PosInProgram;
@@ -58,6 +59,8 @@ public class ProgramContextAdder {
                 return createBlockExprWrapper(be, body);
             } else if (context instanceof ExpressionStatement es) {
                 return createExpressionStatementWrapper(es, body);
+            } else if (context instanceof FunctionFrame ff) {
+                return createFunctionFrameWrapper(ff, (BlockExpression) body);
             } else {
                 throw new RuntimeException(
                     new UnexpectedException("Unexpected block type: " + context.getClass()));
@@ -140,5 +143,10 @@ public class ProgramContextAdder {
             replacement instanceof BlockExpression be && be.getChildCount() == 1
                     && be.getValue() != null ? be.getValue() : (Expr) replacement,
             wrapper.hasSemi());
+    }
+
+    private FunctionFrame createFunctionFrameWrapper(FunctionFrame wrapper,
+            BlockExpression replacement) {
+        return new FunctionFrame(wrapper.getResultVar(), wrapper.getFunction(), replacement);
     }
 }
