@@ -98,6 +98,10 @@ public class SpecificationRepository {
         return contractsByName.get(name);
     }
 
+    public void addLoopSpec(LoopSpecification spec) {
+        loopInvs.put(spec.getLoop(), spec);
+    }
+
     /**
      * Returns the registered loop invariant for the passed loop, or null.
      */

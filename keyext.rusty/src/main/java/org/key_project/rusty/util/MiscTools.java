@@ -6,6 +6,7 @@ package org.key_project.rusty.util;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.AssignmentExpression;
+import org.key_project.rusty.ast.expr.CompoundAssignmentExpression;
 import org.key_project.rusty.ast.pat.BindingPattern;
 import org.key_project.rusty.ast.visitor.RustyASTVisitor;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -103,6 +104,13 @@ public final class MiscTools {
         protected void doDefaultAction(RustyProgramElement node) {
             if (node instanceof AssignmentExpression ae) {
                 var lhs = ae.lhs();
+                if (lhs instanceof ProgramVariable pv) {
+                    if (!declaredPVs.contains(pv)) {
+                        writtenPVs = writtenPVs.add(pv);
+                    }
+                }
+            } else if (node instanceof CompoundAssignmentExpression cae) {
+                var lhs = cae.left();
                 if (lhs instanceof ProgramVariable pv) {
                     if (!declaredPVs.contains(pv)) {
                         writtenPVs = writtenPVs.add(pv);

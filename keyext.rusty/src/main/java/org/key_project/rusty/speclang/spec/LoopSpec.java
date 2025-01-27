@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.speclang.spec;
 
-import org.key_project.rusty.parser.hir.DefId;
 import org.key_project.rusty.parser.hir.HirId;
 
-public record SpecMap(Entry<DefId,FnSpec>[]fnSpecs,Entry<HirId,LoopSpec>[]loopSpecs){}
+import org.jspecify.annotations.Nullable;
+
+public record LoopSpec(HirId target,WithParams<Term>[]invariants,@Nullable WithParams<Term>variant){}

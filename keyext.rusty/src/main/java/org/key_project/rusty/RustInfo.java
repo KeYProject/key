@@ -58,6 +58,16 @@ public final class RustInfo {
             type2KRTCache.put(type, krt);
             return krt;
         }
+        if (type instanceof Never nt) {
+            var krt = new KeYRustyType(nt);
+            type2KRTCache.put(type, krt);
+            return krt;
+        }
+        if (type instanceof Closure ct) {
+            var krt = new KeYRustyType(ct);
+            type2KRTCache.put(type, krt);
+            return krt;
+        }
         throw new IllegalArgumentException("Unsupported type: " + type);
     }
 

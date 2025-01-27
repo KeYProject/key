@@ -38,8 +38,10 @@ import org.key_project.rusty.parser.hir.stmt.LetStmt;
 import org.key_project.rusty.parser.hir.stmt.Stmt;
 import org.key_project.rusty.parser.hir.stmt.StmtKind;
 import org.key_project.rusty.parser.hir.ty.Ty;
-import org.key_project.rusty.speclang.SpecConverter;
+import org.key_project.rusty.speclang.FnSpecConverter;
+import org.key_project.rusty.speclang.LoopSpecConverter;
 import org.key_project.rusty.speclang.spec.FnSpec;
+import org.key_project.rusty.speclang.spec.LoopSpec;
 import org.key_project.rusty.speclang.spec.SpecMap;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -48,19 +50,28 @@ import org.jspecify.annotations.Nullable;
 
 public class HirConverter {
     private final Services services;
+
     private final Map<DefId, FnSpec> fnSpecs;
-    private final SpecConverter specConverter;
+    private final Map<HirId, LoopSpec> loopSpecs;
+    private final FnSpecConverter fnSpecConverter;
+    private final LoopSpecConverter loopSpecConverter;
 
     public HirConverter(Services services, @Nullable SpecMap specs) {
         this.services = services;
-        specConverter = new SpecConverter(services);
+        fnSpecConverter = new FnSpecConverter(services);
+        loopSpecConverter = new LoopSpecConverter(services);
         if (specs != null) {
             fnSpecs = new HashMap<>(specs.fnSpecs().length);
+            loopSpecs = new HashMap<>(specs.loopSpecs().length);
             for (var e : specs.fnSpecs()) {
                 fnSpecs.put(e.id(), e.value());
             }
+            for (var e : specs.loopSpecs()) {
+                loopSpecs.put(e.id(), e.value());
+            }
         } else {
             fnSpecs = null;
+            loopSpecs = null;
         }
     }
 
@@ -115,8 +126,10 @@ public class HirConverter {
             services.getRustInfo().registerFunction(fn);
             if (spec != null) {
                 var contracts =
-                    specConverter.convert(spec, services.getRustInfo().getFunction(fn));
-                System.out.println(contracts);
+                    fnSpecConverter.convert(spec, services.getRustInfo().getFunction(fn));
+                for (var contract : contracts) {
+                    services.getSpecificationRepository().addContract(contract);
+                }
             }
         }
         return crate1;
@@ -190,9 +203,11 @@ public class HirConverter {
         case ExprKind.LitExpr(var e) -> convertLitExpr(e, ty);
         case ExprKind.Let(var l) -> convertLetExpr(l);
         case ExprKind.If e -> convertIfExpr(e, ty);
+        case ExprKind.Loop e -> convertLoopExpr(e, id, ty);
         case ExprKind.DropTemps(var e) -> convertExpr(e);
         case ExprKind.Path(var e) -> convertPathExpr(e, ty);
         case ExprKind.AddrOf e -> convertAddrOf(e);
+        case ExprKind.Break e -> convertBreakExpr(e);
         case ExprKind.Assign e -> convertAssign(e, ty);
         case ExprKind.AssignOp e -> convertAssignOp(e);
         case ExprKind.Binary e -> convertBinary(e);
@@ -253,6 +268,18 @@ public class HirConverter {
             i.els() == null ? null : (ElseBranch) convertExpr(i.els()), type);
     }
 
+    private LoopExpression convertLoopExpr(ExprKind.Loop l, HirId id, Type type) {
+        var body = convertBlockExpr(new ExprKind.BlockExpr(l.block()));
+        var le = new InfiniteLoopExpression(null, body);
+
+        if (loopSpecs != null && loopSpecs.containsKey(id)) {
+            var ls = loopSpecConverter.convert(loopSpecs.get(id), le, pvs);
+            services.getSpecificationRepository().addLoopSpec(ls);
+        }
+
+        return le;
+    }
+
     private Expr convertPathExpr(org.key_project.rusty.parser.hir.QPath path, Type ty) {
         if (path instanceof org.key_project.rusty.parser.hir.QPath.Resolved r
                 && r.path().segments().length == 1
@@ -268,6 +295,10 @@ public class HirConverter {
 
     private BorrowExpression convertAddrOf(ExprKind.AddrOf addrOf) {
         return new BorrowExpression(addrOf.mut(), convertExpr(addrOf.expr()));
+    }
+
+    private BreakExpression convertBreakExpr(ExprKind.Break b) {
+        return new BreakExpression(null, convertExpr(b.expr()));
     }
 
     private AssignmentExpression convertAssign(ExprKind.Assign assign, Type type) {
@@ -417,6 +448,6 @@ public class HirConverter {
     }
 
     private Type convertTy(Ty ty) {
-        Type type=switch(ty){case Ty.Bool ignored->PrimitiveType.BOOL;case Ty.Int(var i)->switch(i){case Isize->PrimitiveType.ISIZE;case I8->PrimitiveType.I8;case I16->PrimitiveType.I16;case I32->PrimitiveType.I32;case I64->PrimitiveType.I64;case I128->PrimitiveType.I128;};case Ty.Uint(var u)->switch(u){case Usize->PrimitiveType.USIZE;case U8->PrimitiveType.U8;case U16->PrimitiveType.U16;case U32->PrimitiveType.U32;case U64->PrimitiveType.U64;case U128->PrimitiveType.U128;};case Ty.Ref(var t,var m)->ReferenceType.get(convertTy(t),m);case Ty.FnDef(var id)->{assert id.krate()==0:"only local FnDef tys allowed";var fn=localFns.get(new LocalDefId(id.index()));yield new FnDefType(fn);}case Ty.Tuple(var ts)->TupleType.getInstance(Arrays.stream(ts).map(this::convertTy).toList());default->throw new IllegalArgumentException("Unknown ty: "+ty);};services.getRustInfo().registerType(type);return type;
+        Type type=switch(ty){case Ty.Bool ignored->PrimitiveType.BOOL;case Ty.Int(var i)->switch(i){case Isize->PrimitiveType.ISIZE;case I8->PrimitiveType.I8;case I16->PrimitiveType.I16;case I32->PrimitiveType.I32;case I64->PrimitiveType.I64;case I128->PrimitiveType.I128;};case Ty.Uint(var u)->switch(u){case Usize->PrimitiveType.USIZE;case U8->PrimitiveType.U8;case U16->PrimitiveType.U16;case U32->PrimitiveType.U32;case U64->PrimitiveType.U64;case U128->PrimitiveType.U128;};case Ty.Ref(var t,var m)->ReferenceType.get(convertTy(t),m);case Ty.FnDef(var id)->{assert id.krate()==0:"only local FnDef tys allowed";var fn=localFns.get(new LocalDefId(id.index()));yield new FnDefType(fn);}case Ty.Closure c->new Closure();case Ty.Never n->Never.INSTANCE;case Ty.Tuple(var ts)->TupleType.getInstance(Arrays.stream(ts).map(this::convertTy).toList());default->throw new IllegalArgumentException("Unknown ty: "+ty);};services.getRustInfo().registerType(type);return type;
     }
 }

@@ -26,18 +26,15 @@ import org.key_project.rusty.parser.hir.expr.LitKind;
 import org.key_project.rusty.parser.hir.expr.UnOp;
 import org.key_project.rusty.parser.hir.item.Param;
 import org.key_project.rusty.parser.hir.pat.PatKind;
-import org.key_project.rusty.speclang.spec.FnSpec;
-import org.key_project.rusty.speclang.spec.SpecCase;
-import org.key_project.rusty.speclang.spec.TermKind;
-import org.key_project.rusty.speclang.spec.WithParams;
+import org.key_project.rusty.speclang.spec.*;
 import org.key_project.util.collection.ImmutableList;
 
-public class SpecConverter {
+public class FnSpecConverter {
     private final Services services;
     private final TermBuilder tb;
     private final TermFactory tf;
 
-    public SpecConverter(Services services) {
+    public FnSpecConverter(Services services) {
         this.services = services;
         this.tb = services.getTermBuilder();
         this.tf = services.getTermFactory();
@@ -55,9 +52,9 @@ public class SpecConverter {
         var post = mapAndJoinTerms(specCase.post(), target, result);
         var variant = specCase.variant() == null ? null
                 : convert(specCase.variant().value(),
-                params2PVs(specCase.variant().params(), target, result), target);
+                    params2PVs(specCase.variant().params(), target, result), target);
         var diverges = convert(specCase.diverges().value(),
-                params2PVs(specCase.diverges().params(), target, result), target);
+            params2PVs(specCase.diverges().params(), target, result), target);
         var paramVars = ImmutableList.fromList(target.getFunction().params().stream().map(p -> {
             var fp = (FunctionParamPattern) p;
             var bp = (BindingPattern) fp.pattern();
@@ -65,26 +62,27 @@ public class SpecConverter {
         }).toList());
         if (diverges == tb.ff()) {
             return Stream.of(new FunctionalOperationContractImpl(name, name, target,
-                    Modality.RustyModalityKind.DIA, pre, variant, post, null, paramVars, result,
-                    null, 0, true, services));
+                Modality.RustyModalityKind.DIA, pre, variant, post, null, paramVars, result,
+                null, 0, true, services));
         }
         if (diverges == tb.tt()) {
             return Stream.of(new FunctionalOperationContractImpl(name, name, target,
-                    Modality.RustyModalityKind.BOX, pre, variant, post, null, paramVars, result,
-                    null, 0, true, services));
+                Modality.RustyModalityKind.BOX, pre, variant, post, null, paramVars, result,
+                null, 0, true, services));
         }
         // TODO
         return null;
     }
 
     private Term mapAndJoinTerms(WithParams<org.key_project.rusty.speclang.spec.Term>[] terms,
-                                 ProgramFunction target, ProgramVariable resultVar) {
+            ProgramFunction target, ProgramVariable resultVar) {
         return Arrays.stream(terms)
                 .map(wp -> convert(wp.value(), params2PVs(wp.params(), target, resultVar), target))
                 .reduce(tb.tt(), (a, b) -> tb.and(a, b));
     }
 
-    private Map<HirId, ProgramVariable> params2PVs(Param[] params, ProgramFunction target, ProgramVariable resultVar) {
+    private Map<HirId, ProgramVariable> params2PVs(Param[] params, ProgramFunction target,
+            ProgramVariable resultVar) {
         // TODO: Get same PVs as in target or create new ones? Ask RB!
         var map = new HashMap<HirId, ProgramVariable>();
         for (int i = 0; i < params.length; i++) {
@@ -94,7 +92,7 @@ public class SpecConverter {
                     map.put(bp.hirId(), resultVar);
                 } else {
                     map.put(bp.hirId(),
-                            new ProgramVariable(new Name(bp.ident().name()), target.getParamType(i)));
+                        new ProgramVariable(new Name(bp.ident().name()), target.getParamType(i)));
                 }
             }
         }
@@ -126,20 +124,21 @@ public class SpecConverter {
         // TODO: make this "proper"
         var intLDT = services.getLDTs().getIntLDT();
         var o = switch (op.node()) {
-            case BinOpKind.Add -> intLDT.getAdd();
-            case BinOpKind.Sub -> intLDT.getSub();
-            case BinOpKind.Mul -> intLDT.getMul();
-            case BinOpKind.Div -> intLDT.getDiv();
-            case BinOpKind.And -> Junctor.AND;
-            case BinOpKind.Or -> Junctor.OR;
-            case BinOpKind.Lt -> intLDT.getLessThan();
-            case BinOpKind.Le -> intLDT.getLessOrEquals();
-            case BinOpKind.Gt -> intLDT.getGreaterThan();
-            case BinOpKind.Ge -> intLDT.getGreaterOrEquals();
-            case BinOpKind.Eq -> left.sort() == RustyDLTheory.FORMULA ? Equality.EQV : Equality.EQUALS;
-            case BinOpKind.BitXor, BinOpKind.BitAnd, BinOpKind.BitOr, BinOpKind.Shl, BinOpKind.Rem,
-                 BinOpKind.Shr -> throw new RuntimeException("TODO");
-            case BinOpKind.Ne -> Junctor.NOT;
+        case BinOpKind.Add -> intLDT.getAdd();
+        case BinOpKind.Sub -> intLDT.getSub();
+        case BinOpKind.Mul -> intLDT.getMul();
+        case BinOpKind.Div -> intLDT.getDiv();
+        case BinOpKind.And -> Junctor.AND;
+        case BinOpKind.Or -> Junctor.OR;
+        case BinOpKind.Lt -> intLDT.getLessThan();
+        case BinOpKind.Le -> intLDT.getLessOrEquals();
+        case BinOpKind.Gt -> intLDT.getGreaterThan();
+        case BinOpKind.Ge -> intLDT.getGreaterOrEquals();
+        case BinOpKind.Eq -> left.sort() == RustyDLTheory.FORMULA ? Equality.EQV : Equality.EQUALS;
+        case BinOpKind.BitXor, BinOpKind.BitAnd, BinOpKind.BitOr, BinOpKind.Shl, BinOpKind.Rem,
+                BinOpKind.Shr ->
+            throw new RuntimeException("TODO");
+        case BinOpKind.Ne -> Junctor.NOT;
         };
         if (o == Junctor.NOT) {
             return tb.not(tb.equals(left, right));
@@ -151,10 +150,10 @@ public class SpecConverter {
         var intLDT = services.getLDTs().getIntLDT();
         var boolLDT = services.getLDTs().getBoolLDT();
         return switch (op) {
-            case Deref -> throw new RuntimeException("TODO");
-            case Not -> child.sort() == RustyDLTheory.FORMULA ? tb.not(child)
-                    : tb.equals(child, boolLDT.getFalseTerm());
-            case Neg -> tf.createTerm(intLDT.getNeg(), child);
+        case Deref -> throw new RuntimeException("TODO");
+        case Not -> child.sort() == RustyDLTheory.FORMULA ? tb.not(child)
+                : tb.equals(child, boolLDT.getFalseTerm());
+        case Neg -> tf.createTerm(intLDT.getNeg(), child);
         };
     }
 

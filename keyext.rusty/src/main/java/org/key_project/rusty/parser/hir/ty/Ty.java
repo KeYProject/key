@@ -21,6 +21,10 @@ public interface Ty {
 
     record FnDef(DefId defId) implements Ty {}
 
+    record Closure(DefId defId) implements Ty {}
+
+    record Never() implements Ty {}
+
     record Tuple(Ty[] tys) implements Ty {}
 
     record Adt() implements Ty {}
@@ -35,6 +39,8 @@ public interface Ty {
                 case "Uint" -> Uint.class;
                 case "Ref" -> Ref.class;
                 case "FnDef" -> FnDef.class;
+                case "Closure" -> Closure.class;
+                case "Never" -> Never.class;
                 case "Tuple" -> Tuple.class;
                 case "Adt" -> Adt.class;
                 default -> null;

@@ -4,6 +4,7 @@
 package org.key_project.rusty.parser.hir.expr;
 
 import org.key_project.rusty.parser.hir.HirAdapter;
+import org.key_project.rusty.parser.hir.Label;
 import org.key_project.rusty.parser.hir.QPath;
 import org.key_project.rusty.parser.hir.Span;
 
@@ -24,6 +25,8 @@ public interface ExprKind {
 
     record If(Expr cond, Expr then, @Nullable Expr els) implements ExprKind {}
 
+    record Loop(Block block, @Nullable Label label, Span span) implements ExprKind {}
+
     record BlockExpr(Block block) implements ExprKind {}
 
     record Assign(Expr left, Expr right, Span span) implements ExprKind {}
@@ -33,6 +36,8 @@ public interface ExprKind {
     record Path(QPath path) implements ExprKind {}
 
     record AddrOf(boolean raw, boolean mut, Expr expr) implements ExprKind {}
+
+    record Break(Destination dest, @Nullable Expr expr) implements ExprKind{}
 
     class Adapter extends HirAdapter<ExprKind> {
         @Override
@@ -45,11 +50,13 @@ public interface ExprKind {
                 case "DropTemps" -> DropTemps.class;
                 case "Let" -> Let.class;
                 case "If" -> If.class;
+                case "Loop" -> Loop.class;
                 case "Block" -> BlockExpr.class;
                 case "Assign" -> Assign.class;
                 case "AssignOp" -> AssignOp.class;
                 case "Path" -> Path.class;
                 case "AddrOf" -> AddrOf.class;
+                case "Break" -> Break.class;
                 default -> null;
             };
         }
