@@ -38,7 +38,7 @@ import org.key_project.rusty.parser.hir.stmt.LetStmt;
 import org.key_project.rusty.parser.hir.stmt.Stmt;
 import org.key_project.rusty.parser.hir.stmt.StmtKind;
 import org.key_project.rusty.parser.hir.ty.Ty;
-import org.key_project.rusty.speclang.FnSpecConverter;
+import org.key_project.rusty.speclang.SpecConverter;
 import org.key_project.rusty.speclang.spec.FnSpec;
 import org.key_project.rusty.speclang.spec.SpecMap;
 import org.key_project.util.collection.ImmutableArray;
@@ -49,11 +49,11 @@ import org.jspecify.annotations.Nullable;
 public class HirConverter {
     private final Services services;
     private final Map<DefId, FnSpec> fnSpecs;
-    private final FnSpecConverter fnSpecConverter;
+    private final SpecConverter specConverter;
 
     public HirConverter(Services services, @Nullable SpecMap specs) {
         this.services = services;
-        fnSpecConverter = new FnSpecConverter(services);
+        specConverter = new SpecConverter(services);
         if (specs != null) {
             fnSpecs = new HashMap<>(specs.fnSpecs().length);
             for (var e : specs.fnSpecs()) {
@@ -115,7 +115,7 @@ public class HirConverter {
             services.getRustInfo().registerFunction(fn);
             if (spec != null) {
                 var contracts =
-                    fnSpecConverter.convert(spec, services.getRustInfo().getFunction(fn));
+                    specConverter.convert(spec, services.getRustInfo().getFunction(fn));
                 System.out.println(contracts);
             }
         }
