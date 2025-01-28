@@ -52,4 +52,9 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
     public Term replaceWith() {
         return replacewith;
     }
+
+    @Override
+    public Object replaceWithExpressionAsObject() {
+        return replacewith;
+    }
 }
