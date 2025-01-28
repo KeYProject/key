@@ -10,10 +10,7 @@ import org.key_project.rusty.ast.pat.*;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
-import org.key_project.rusty.ast.ty.PrimitiveRustType;
-import org.key_project.rusty.ast.ty.ReferenceRustType;
-import org.key_project.rusty.ast.ty.SchemaRustType;
-import org.key_project.rusty.ast.ty.TypeOf;
+import org.key_project.rusty.ast.ty.*;
 import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.rule.metaconstruct.ProgramTransformer;
@@ -151,4 +148,6 @@ public interface Visitor {
     void performActionOnProgramMetaConstruct(ProgramTransformer x);
 
     void performActionOnLoopScope(LoopScope x);
+
+    void performActionOnSortRustType(SortRustType x);
 }

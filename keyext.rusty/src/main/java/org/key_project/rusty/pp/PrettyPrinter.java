@@ -13,10 +13,7 @@ import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
-import org.key_project.rusty.ast.ty.PrimitiveRustType;
-import org.key_project.rusty.ast.ty.ReferenceRustType;
-import org.key_project.rusty.ast.ty.SchemaRustType;
-import org.key_project.rusty.ast.ty.TypeOf;
+import org.key_project.rusty.ast.ty.*;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
@@ -701,5 +698,23 @@ public class PrettyPrinter implements Visitor {
         if (x.getChildCount() > 0)
             ((RustyProgramElement) x.getChild(0)).visit(this);
         layouter.print(")");
+    }
+
+    @Override
+    public void performActionOnLoopScope(LoopScope x) {
+        layouter.keyWord("loop_scope!");
+        beginMultilineParen();
+        if (x.getIndex() != null) {
+            x.getIndex().visit(this);
+            layouter.print(", ");
+        }
+
+        x.getBlock().visit(this);
+        endMultilineParen();
+    }
+
+    @Override
+    public void performActionOnSortRustType(SortRustType x) {
+        layouter.print(x.getSort(services).name().toString());
     }
 }

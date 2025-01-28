@@ -10,18 +10,27 @@ import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.PosInProgram;
 import org.key_project.rusty.logic.PossibleProgramPrefix;
-import org.key_project.rusty.logic.op.sv.ProgramSV;
+import org.key_project.rusty.logic.op.IProgramVariable;
+import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 public class LoopScope implements LoopExpression, PossibleProgramPrefix {
-    private final ProgramSV index;
+    private final IProgramVariable index;
     private final BlockExpression block;
     private final FunctionFrame functionFrame;
     private final int prefixLength;
 
-    public LoopScope(ProgramSV index, BlockExpression block) {
+    public LoopScope(IProgramVariable index, BlockExpression block) {
         this.index = index;
         this.block = block;
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.length();
+        functionFrame = info.innermostFunctionFrame();
+    }
+
+    public LoopScope(ExtList list) {
+        index = list.get(IProgramVariable.class);
+        block = list.get(BlockExpression.class);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.length();
         functionFrame = info.innermostFunctionFrame();
@@ -35,6 +44,14 @@ public class LoopScope implements LoopExpression, PossibleProgramPrefix {
     @Override
     public void visit(Visitor v) {
         v.performActionOnLoopScope(this);
+    }
+
+    public IProgramVariable getIndex() {
+        return index;
+    }
+
+    public BlockExpression getBlock() {
+        return block;
     }
 
     @Override
@@ -90,5 +107,10 @@ public class LoopScope implements LoopExpression, PossibleProgramPrefix {
     @Override
     public int getPrefixLength() {
         return prefixLength;
+    }
+
+    @Override
+    public String toString() {
+        return "loop_scope!(" + index + ", " + block + ")";
     }
 }

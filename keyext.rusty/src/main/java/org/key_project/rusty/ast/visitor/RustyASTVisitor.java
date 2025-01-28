@@ -12,10 +12,7 @@ import org.key_project.rusty.ast.pat.*;
 import org.key_project.rusty.ast.stmt.EmptyStatement;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.LetStatement;
-import org.key_project.rusty.ast.ty.PrimitiveRustType;
-import org.key_project.rusty.ast.ty.ReferenceRustType;
-import org.key_project.rusty.ast.ty.SchemaRustType;
-import org.key_project.rusty.ast.ty.TypeOf;
+import org.key_project.rusty.ast.ty.*;
 import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -379,6 +376,16 @@ public abstract class RustyASTVisitor extends RustyASTWalker implements Visitor 
 
     @Override
     public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnLoopScope(LoopScope x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnSortRustType(SortRustType x) {
         doDefaultAction(x);
     }
 }

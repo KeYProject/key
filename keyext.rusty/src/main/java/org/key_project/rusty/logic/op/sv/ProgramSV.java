@@ -13,6 +13,7 @@ import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.ProgramConstruct;
+import org.key_project.rusty.logic.op.IProgramVariable;
 import org.key_project.rusty.logic.sort.ProgramSVSort;
 import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.rusty.rule.inst.ProgramList;
@@ -22,7 +23,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.jspecify.annotations.NonNull;
 
 public final class ProgramSV extends OperatorSV
-        implements UpdateableOperator, ProgramConstruct {
+        implements UpdateableOperator, ProgramConstruct, IProgramVariable {
     private final boolean isListSV;
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION =

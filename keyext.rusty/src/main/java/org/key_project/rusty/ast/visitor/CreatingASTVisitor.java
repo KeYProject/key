@@ -239,6 +239,17 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
         def.doAction(x);
     }
 
+    @Override
+    public void performActionOnLoopScope(LoopScope x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            RustyProgramElement createNewElement(ExtList changeList) {
+                return new LoopScope(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
     protected void changed() {
         ExtList list = stack.peek();
         if (list.isEmpty() || list.getFirst() != CHANGED) {

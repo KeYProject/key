@@ -37,5 +37,11 @@
         (rule "applyOnElementary" (formula "6") (term "1,0"))
         (rule "applyOnPV" (formula "6") (term "0,1,0"))
         (rule "loopScopeInvDia" (formula "6") (term "1"))
+        (branch "Initially"
+            (rule "applyOnPV" (formula "6") (term "0,1,0"))
+        )
+        (branch "Use & preserve"
+            (rule "applyOnElementary" (formula "6") (term "0,1,0"))
+        )
     )
 }

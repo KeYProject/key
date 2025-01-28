@@ -13,6 +13,7 @@ import org.key_project.rusty.ast.pat.Pattern;
 import org.key_project.rusty.ast.pat.SchemaVarPattern;
 import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.ty.SchemaRustType;
+import org.key_project.rusty.ast.ty.SortRustType;
 import org.key_project.rusty.ast.ty.TypeOf;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.rule.inst.SVInstantiations;
@@ -168,7 +169,10 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
         if (!(inst instanceof Expr e))
             throw new IllegalStateException("typeOf expects an expression");
         var ty = e.type(services);
-        addChild(ty.toRustType(services));
+        if (ty == null && e instanceof ProgramVariable pv)
+            addChild(new SortRustType(pv.getKeYRustyType()));
+        else
+            addChild(ty.toRustType(services));
         changed();
     }
 

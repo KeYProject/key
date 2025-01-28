@@ -9,6 +9,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.ty.RustType;
+import org.key_project.rusty.ast.ty.SortRustType;
 
 import org.jspecify.annotations.NonNull;
 
@@ -78,7 +79,9 @@ public class KeYRustyType implements Type {
 
     @Override
     public RustType toRustType(Services services) {
-        assert rustyType != null;
+        if (rustyType == null) {
+            return new SortRustType(this);
+        }
         return rustyType.toRustType(services);
     }
 }

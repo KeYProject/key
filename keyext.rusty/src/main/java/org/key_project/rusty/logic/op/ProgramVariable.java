@@ -21,7 +21,7 @@ import org.key_project.rusty.rule.MatchConditions;
 import org.jspecify.annotations.NonNull;
 
 public class ProgramVariable extends AbstractSortedOperator
-        implements Expr, UpdateableOperator, Res {
+        implements Expr, UpdateableOperator, Res, IProgramVariable {
     private final KeYRustyType type;
 
     public ProgramVariable(Name name, Sort s, KeYRustyType type) {

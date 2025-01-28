@@ -56,7 +56,6 @@ public record ContinueExpression(@Nullable Label label, @Nullable Expr expr) imp
         if (expr != null) {
             sb.append(" ").append(expr);
         }
-        sb.append(";");
         return sb.toString();
     }
 
