@@ -61,12 +61,12 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitString_literal(String_literalContext ctx) {
+    public String visitString_literal(String_literalContext ctx) {
         return trim(ctx.getText(), '"');
     }
 
     @Override
-    public Object visitSeq(SeqContext ctx) {
+    public Sequent visitSeq(SeqContext ctx) {
         var expressionBuilder =
             new ExpressionBuilder(state.getProof().getServices(), state.getCurrentNamespaces());
         expressionBuilder.setAbbrevMap(state.getAbbreviations());
@@ -79,7 +79,7 @@ class ExprEvaluator extends KeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitTerm(KeYParser.TermContext ctx) {
+    public Term visitTerm(KeYParser.TermContext ctx) {
         var expressionBuilder =
             new ExpressionBuilder(state.getProof().getServices(), state.getCurrentNamespaces());
         expressionBuilder.setAbbrevMap(state.getAbbreviations());

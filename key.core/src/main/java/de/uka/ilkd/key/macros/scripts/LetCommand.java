@@ -9,6 +9,7 @@ import java.util.Map;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
+import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
 /// The *let* command lets you introduce entries to the abbreviation table.
@@ -59,7 +60,9 @@ public class LetCommand implements ProofScriptCommand<Map<String, Object>> {
                 throw new ScriptException(key + " is already fixed in this script");
             }
             try {
-                abbrMap.put((Term) entry.getValue(), key, true);
+                final var termCtx = (KeYParser.ProofScriptExpressionContext) entry.getValue();
+                final var term = stateMap.getEvaluator().visitTerm(termCtx.term());
+                abbrMap.put(term, key, true);
             } catch (Exception e) {
                 throw new ScriptException(e);
             }
