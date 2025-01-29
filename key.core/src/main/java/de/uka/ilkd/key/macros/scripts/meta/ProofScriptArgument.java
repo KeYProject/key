@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.util.Objects;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -74,7 +75,7 @@ public class ProofScriptArgument<T> {
     }
 
     @Override
-    public boolean equals(@org.jspecify.annotations.Nullable Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }
