@@ -11,7 +11,6 @@ import javax.script.ScriptEngineManager;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.proof.Proof;
@@ -45,9 +44,9 @@ public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Paramet
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
             throws Exception {
-        return ValueInjector.injection(this, new Parameters(), arguments);
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override

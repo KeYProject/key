@@ -32,13 +32,22 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+    public String getDocumentation() {
+        return """
+                CutCommand has as script command name "cut"
+
+                As parameters:
+                * a formula with the id "#2""";
+    }
+
+    @Override
+    public Parameters evaluateArguments(EngineState state,
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     /**
-     *
      * @param uiControl
      * @param args
      * @param state

@@ -41,7 +41,7 @@ problem
   | CHOOSECONTRACT (chooseContract=string_value SEMI)?
   | PROOFOBLIGATION  (proofObligation=cvalue)? SEMI?
   )
-  proofScript?
+  proofScriptEntry?
 ;
 
 
@@ -851,10 +851,32 @@ preferences
 	            |  c=cvalue ) // LBRACE, RBRACE included in cvalue#table
 ;
 
-proofScript
+proofScriptEntry
 :
-  PROOFSCRIPT ps = STRING_LITERAL
+  PROOFSCRIPT
+    ( STRING_LITERAL
+    | LBRACE proofScript RBRACE
+    )
 ;
+proofScriptEOF: proofScript EOF;
+proofScript: proofScriptCommand+;
+proofScriptCommand: AT? cmd=IDENT proofScriptParameters?
+	( LBRACE sub=proofScript RBRACE SEMI?
+	| SEMI);
+
+proofScriptParameters: proofScriptParameter+;
+proofScriptParameter :  ((pname=proofScriptParameterName EQUALS)? expr=proofScriptExpression);
+proofScriptParameterName: AT? IDENT; // someone thought, that the let-command parameters should have a leading "@"
+proofScriptExpression:
+    boolean_literal
+  | char_literal
+  | integer
+  | floatnum
+  | string_literal
+  | BACKTICK (term | seq) BACKTICK
+  | term
+  | seq;
+
 
 // PROOF
 proof: PROOF EOF;

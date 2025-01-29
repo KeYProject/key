@@ -25,7 +25,8 @@ public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParamete
     }
 
     @Override
-    public FormulaParameter evaluateArguments(EngineState state, Map<String, String> arguments)
+    public FormulaParameter evaluateArguments(EngineState state,
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new FormulaParameter(), arguments);
     }
@@ -33,6 +34,15 @@ public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParamete
     @Override
     public String getName() {
         return "assume";
+    }
+
+    @Override
+    public String getDocumentation() {
+        return """
+                The assume command is an unsound taclet rule and takes one argument:
+
+                The command adds the formula passed as argument to the antecedent
+                a formula #2 to which the command is applied""";
     }
 
     @Override

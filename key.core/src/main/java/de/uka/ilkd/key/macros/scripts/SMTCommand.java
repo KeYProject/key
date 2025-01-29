@@ -6,7 +6,6 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.*;
 
 import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
@@ -42,9 +41,10 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
     }
 
     @Override
-    public SMTCommandArguments evaluateArguments(EngineState state, Map<String, String> arguments)
+    public SMTCommandArguments evaluateArguments(EngineState state,
+            Map<String, Object> arguments)
             throws Exception {
-        return ValueInjector.injection(this, new SMTCommandArguments(), arguments);
+        return state.getValueInjector().inject(this, new SMTCommandArguments(), arguments);
     }
 
     @Override

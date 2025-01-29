@@ -391,6 +391,7 @@ IMPLICIT_IDENT: '<' (LETTER)+ '>' ('$lmtd')? -> type(IDENT);
 
 EQV:	'<->' | '\u2194';
 PRIMES:	('\'')+;
+BACKTICK: '`';
 CHAR_LITERAL
 : '\''
                 ((' '..'&') |
@@ -480,6 +481,7 @@ MODAILITYGENERIC:
       -> more, pushMode(modGeneric);
 */
 //BACKSLASH:  '\\';
+ERROR_UKNOWN_ESCAPE: '\\' IDENT;
 ERROR_CHAR: .;
 
 mode modDiamond;

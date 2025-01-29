@@ -7,7 +7,10 @@ import java.util.*;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.macros.scripts.meta.Varargs;
@@ -50,8 +53,25 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
-            throws Exception {
+    public String getDocumentation() {
+        return """
+                Command that applies a calculus rule.
+                All parameters are passed as strings and converted by the command.
+
+                The parameters are:
+                <ol>
+                    <li>#2 = <String>rule name</String></li>
+                    <li>on= key.core.logic.Term on which the rule should be applied to as String (find part of the rule) </li>
+                    <li>formula= toplevel formula in which term appears in</li>
+                    <li>occ = occurrence number</li>
+                    <li>inst_= instantiation</li>
+                </ol>
+                """;
+    }
+
+    @Override
+    public Parameters evaluateArguments(EngineState state,
+            Map<String, Object> arguments) throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 

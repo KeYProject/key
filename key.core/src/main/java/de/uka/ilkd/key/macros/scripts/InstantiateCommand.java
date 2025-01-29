@@ -41,7 +41,8 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+    public Parameters evaluateArguments(EngineState state,
+            Map<String, Object> arguments)
             throws Exception {
         return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
@@ -216,6 +217,15 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
     @Override
     public String getName() {
         return "instantiate";
+    }
+
+    @Override
+    public String getDocumentation() {
+        return """
+                instantiate var=a occ=2 with="a_8" hide
+                  <p>
+                  instantiate formula="\\forall int a; phi(a)" with="a_8\"
+                """;
     }
 
     /**

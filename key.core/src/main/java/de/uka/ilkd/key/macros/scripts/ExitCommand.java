@@ -18,4 +18,9 @@ public class ExitCommand extends NoArgumentCommand {
     public String getName() {
         return "exit";
     }
+
+    @Override
+    public String getDocumentation() {
+        return "Kills the script execution.";
+    }
 }

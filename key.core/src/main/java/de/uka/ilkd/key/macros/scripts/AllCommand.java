@@ -3,93 +3,59 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
+import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 
-public class AllCommand extends AbstractCommand<Map<String, String>> {
+public class AllCommand implements ProofScriptCommand<Map<String, Object>> {
+    private String documentation;
 
-    public AllCommand() {
-        super(null);
+    @Override
+    public List<ProofScriptArgument<Map<String, Object>>> getArguments() {
+        return List.of();
     }
 
     @Override
-    public Map<String, String> evaluateArguments(EngineState state, Map<String, String> arguments) {
+    public Map<String, Object> evaluateArguments(EngineState state, Map<String, Object> arguments) {
         return arguments;
     }
+
+    @Override
+    public void execute(AbstractUserInterfaceControl uiControl, Map<String, Object> args,
+            EngineState stateMap) throws ScriptException, InterruptedException {
+        var block = (KeYParser.ProofScriptContext) args.get(ProofScriptEngine.KEY_SUB_SCRIPT);
+
+        if (block == null) {
+            throw new ScriptException("Missing command to apply onAll to");
+        }
+
+        var proof = stateMap.getProof();
+        // Node selectedNode = state.getSelectedNode();
+        for (Goal g : proof.openGoals()) {
+            // if (isBelow(g, selectedNode)) {
+            stateMap.setGoal(g);
+            stateMap.getEngine().execute(uiControl, block.proofScriptCommand());
+            // }
+        }
+        // state.setGoal(selectedNode);
+    }
+
 
     @Override
     public String getName() {
         return "onAll";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void execute(Map<String, String> args) throws ScriptException, InterruptedException {
-        String wrappedCmdname = args.get("#2");
-        if (wrappedCmdname == null) {
-            throw new ScriptException("Missing command to apply onAll to");
-        }
-
-        ProofScriptCommand<?> command = ProofScriptEngine.getCommand(wrappedCmdname);
-        if (command == null) {
-            throw new ScriptException("Unknown command: " + wrappedCmdname);
-        }
-
-        HashMap<String, String> newArgs = rearrangeArgs(args);
-
-        try {
-            executeWrappedCommand(command, newArgs);
-        } catch (Exception e) {
-            throw new ScriptException(e);
-        }
-
-    }
-
-    private HashMap<String, String> rearrangeArgs(Map<String, String> args) {
-        HashMap<String, String> newArgs = new HashMap<>();
-        for (Entry<String, String> en : args.entrySet()) {
-            if (en.getKey().matches("#[0-9]+")) {
-                int no = Integer.parseInt(en.getKey().substring(1));
-                if (no != 1) {
-                    newArgs.put("#" + (no - 1), en.getValue());
-                }
-            } else {
-                newArgs.put(en.getKey(), en.getValue());
-            }
-        }
-        return newArgs;
-    }
-
-    private <A> void executeWrappedCommand(ProofScriptCommand<A> command,
-            HashMap<String, String> newArgs) throws Exception {
-        A params = command.evaluateArguments(state, newArgs);
-
-        // Node selectedNode = state.getSelectedNode();
-        for (Goal g : proof.openGoals()) {
-            // if (isBelow(g, selectedNode)) {
-            state.setGoal(g);
-            command.execute(uiControl, params, state);
-            // }
-        }
-        // state.setGoal(selectedNode);
-    }
-
-    private boolean isBelow(Goal g, Node above) {
-        if (above == null) {
-            return true;
-        }
-
-        Node node = g.node();
-        while (node != null) {
-            if (node == above) {
-                return true;
-            }
-            node = node.parent();
-        }
-
-        return false;
+    public String getDocumentation() {
+        return """
+                Applies the given command to all the open goals.""";
     }
 }

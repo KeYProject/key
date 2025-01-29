@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.api;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -31,17 +30,6 @@ public class ProofApi {
     public ProofApi(Proof proof, KeYEnvironment<?> currentEnv) {
         this.proof = proof;
         this.env = currentEnv;
-    }
-
-    public ScriptApi getScriptApi() {
-        return new ScriptApi(this);
-    }
-
-    /**
-     * Save current Proof-> ProofApi
-     */
-    public void saveProof() throws IOException {
-        // TODO
     }
 
     public KeYEnvironment<?> getEnv() {

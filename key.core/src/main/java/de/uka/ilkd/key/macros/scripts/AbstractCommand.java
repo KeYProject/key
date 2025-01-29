@@ -10,28 +10,35 @@ import java.util.Map;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.scripts.meta.ArgumentsLifter;
-import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 import de.uka.ilkd.key.proof.Proof;
 
-/**
- * <p>
- * <b>Inheritance:</b>
- * </p>
- *
- * @param <T>
- * @author Alexander Weigl
- */
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+/// A base class for {@link ProofScriptCommand}s.
+/// This class brings automatically analyzes and meta-data of the given parameter class using
+/// reflection and
+/// decorators.
+///
+/// To implement your own command, you need to define two classes a POJO carrying the parameters,
+/// and child class of
+/// {@link AbstractCommand}. You need to override [AbstractCommand#execute(Object)] to implement the
+/// command logic.
+///
+/// @param <T> the expected parameter class
+/// @author Alexander Weigl
+@NullMarked
 public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
-    protected Proof proof;
-    protected Services service;
-    protected EngineState state;
-    protected AbstractUserInterfaceControl uiControl;
+    protected @Nullable Proof proof;
+    protected @Nullable Services service;
+    protected @Nullable EngineState state;
+    protected @Nullable AbstractUserInterfaceControl uiControl;
 
     /**
      * Documentation of this command.
      */
-    protected String documentation = null;
+    protected @Nullable String documentation = null;
 
     /**
      * ...
@@ -51,7 +58,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
 
 
     @Override
-    public T evaluateArguments(EngineState state, Map<String, String> arguments) throws Exception {
+    public T evaluateArguments(EngineState state, Map<String, Object> arguments) throws Exception {
         if (parameterClazz != null) {
             T obj = parameterClazz.getDeclaredConstructor().newInstance();
             return state.getValueInjector().inject(this, obj, arguments);
@@ -77,23 +84,16 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
         }
     }
 
-    /**
-     * @param args
-     * @throws ScriptException
-     * @throws InterruptedException
-     */
+    /// Executes the command logic with the given parameters `args`.
+    ///
+    /// @param args an instance of the parameters
+    /// @throws ScriptException if something happened during execution
+    /// @throws InterruptedException if thread was interrupted during execution
     protected void execute(T args) throws ScriptException, InterruptedException {
-
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getDocumentation() {
-        if (documentation == null) {
-            documentation = DescriptionFacade.getDocumentation(this);
-        }
-        return documentation;
+        return "";
     }
 }

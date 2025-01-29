@@ -15,6 +15,7 @@ import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -39,7 +40,6 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 
 import org.antlr.runtime.MismatchedTokenException;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -661,16 +661,25 @@ public abstract class AbstractProblemLoader {
     /**
      * Returns a {@link ProofScriptEntry} if {@code \proofscript} is given with the problem.
      */
-    public @Nullable ProofScriptEntry getProofScript() {
-        if (!hasProofScript()) {
-            return null;
-        }
+    public KeyAst.ProofScript readProofScript() throws ProofInputException {
+        assert envInput instanceof KeYUserProblemFile;
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
         return kupf.readProofScript();
     }
 
+    public KeyAst.ProofScript getProofScript() throws ProblemLoaderException {
+        if (hasProofScript()) {
+            try {
+                return readProofScript();
+            } catch (ProofInputException e) {
+                throw new ProblemLoaderException(this, e);
+            }
+        } else {
+            return null;
+        }
+    }
+
     private ReplayResult replayProof(Proof proof) {
-        LOGGER.info("Replaying proof {}", proof.name());
         String status = "";
         List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();

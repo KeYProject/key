@@ -10,8 +10,7 @@ import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
+import de.uka.ilkd.key.macros.scripts.meta.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverCore;
@@ -40,10 +39,16 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
-            throws Exception {
+    public String getDocumentation() {
+        return "The AutoCommand invokes the automatic strategy \"Auto\"";
+    }
+
+    @Override
+    public Parameters evaluateArguments(EngineState state, Map<String, Object> arguments)
+            throws ConversionException, ArgumentRequiredException, InjectionReflectionException,
+            NoSpecifiedConverterException {
         Parameters args = new Parameters();
-        ValueInjector.getInstance().inject(this, args, arguments);
+        state.getValueInjector().inject(this, args, arguments);
         return args;
     }
 
@@ -104,9 +109,10 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
      *
      * @param maybeMatchesRegEx The RegEx which should match on the sequent formula to focus.
      * @param breakpointArg An optional breakpoint argument.
-     * @param goal The {@link Goal} to apply the strategy on, needed for the rule application
-     *        manager.
-     * @param proverCore The {@link ProverCore}, needed for resetting the strategy afterward.
+     * @param goal The {@link Goal} to apply the strategy on, needed for the rule
+     *        application* manager.
+     * @param proverCore The {@link ProverCore}, needed for resetting the strategy
+     *        afterward.
      * @param services The {@link Services} object.
      * @throws ScriptException
      */
@@ -137,11 +143,15 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         @Option(value = "steps", required = false)
         public int maxSteps = -1;
 
-        /** Run on formula matching the given regex */
+        /**
+         * Run on formula matching the given regex
+         */
         @Option(value = "matches", required = false)
         public String matches = null;
 
-        /** Run on formula matching the given regex */
+        /**
+         * Run on formula matching the given regex
+         */
         @Option(value = "breakpoint", required = false)
         public String breakpoint = null;
 
