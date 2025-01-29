@@ -136,7 +136,7 @@ subprojects {
         systemProperty "testcases", "src/test/resources/testcase"
         systemProperty "TACLET_PROOFS", "tacletProofs"
         systemProperty "EXAMPLES_DIR", file("$rootProject/key.ui/examples")
-        systemProperty "RUNALLPROOFS_DIR", layout.buildDirectory.dir("report/runallproves")
+        systemProperty "RUNALLPROOFS_DIR", layout.buildDirectory.dir("report/runallproves").get()
 
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
