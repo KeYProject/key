@@ -110,3 +110,4 @@ jobs:
             **/build/test-results/*/*.xml
             key.core/build/reports/runallproofs/*
             **/build/reports/
+      - run: "python .github/junit2annotations.py"
