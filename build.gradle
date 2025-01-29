@@ -66,10 +66,14 @@ subprojects {
     apply plugin: "com.diffplug.spotless"
     apply plugin: "checkstyle"
     apply plugin: "pmd"
+    apply plugin: 'jacoco'
     apply plugin: "org.checkerframework"
 
     group = rootProject.group
     version = rootProject.version
+
+    //conditionally enable jacoco coverage when `-DjacocoEnabled=true` is given on CLI.
+    def jacocoEnabled = System.properties.getProperty("jacocoEnabled") ?: "false"
 
     java {
         sourceCompatibility = 21
@@ -182,6 +186,10 @@ subprojects {
             outputs.upToDateWhen { false }
             showStandardStreams = true
         }
+
+        jacoco {
+            enabled = jacocoEnabled
+        }
     }
 
     tasks.register('testFast', Test) {
@@ -204,6 +212,10 @@ subprojects {
             // remove standard output/error logging from --info builds
             // by assigning only 'failed' and 'skipped' events
             info.events = ["failed", "skipped"]
+        }
+
+        jacoco {
+            enabled = jacocoEnabled
         }
     }
 
@@ -316,6 +328,23 @@ subprojects {
             }
         }
     }
+
+    jacoco {
+        toolVersion = '0.8.12'
+    }
+
+    jacocoTestReport {
+        reports {
+            html.required = true
+            html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+            xml.required = true
+            csv.required = false
+        }
+    }
+
+    test.finalizedBy jacocoTestReport
+    testFast.finalizedBy jacocoTestReport
+
 
     spotless {
         // see https://github.com/diffplug/spotless/tree/main/plugin-gradle
@@ -573,13 +602,6 @@ tasks.register('alldocJar', Zip){
     from alldoc
     archiveFileName = "key-api-doc-${project.version}.zip"
     destinationDirectory = layout.buildDirectory.dir("distribution").getOrNull()
-}
-
-//conditionally enable jacoco coverage when `-DjacocoEnabled=true` is given on CLI.
-def jacocoEnabled = System.properties.getProperty("jacocoEnabled") ?: "false"
-if (jacocoEnabled.toBoolean()) {
-    project.logger.lifecycle("Jacoco enabled. Test performance will be slower.")
-    apply from: rootProject.file("scripts/jacocokey.gradle")
 }
 
 
