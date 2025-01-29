@@ -1,0 +1,374 @@
+ex2:
+  contains:
+    - |-
+      ; --- Sequent
+      (assert (not (exists ((var_x Int))
+             (= (i2u var_x) (i2u 42)))))
+  expected: VALID
+  keySrc: |-
+    \programVariables { int p; }
+
+    \problem {
+       \exists int x; (x = 42)
+    }
+seqDef1:
+  contains:
+    - "(assert (not (= (cast (k_seqGet seqDef1 (i2u 2)) sort_int) (i2u 9))))"
+    - "(assert (instanceof seqDef1 sort_Seq))"
+    - |-
+      (assert (forall ((var_i Int))
+          (=> (and (<= 0 var_i) (< var_i (- 10 1)))
+              (= (k_seqGet seqDef1 (i2u var_i))
+                (let ((var_i (+ var_i 1))) (i2u (* var_i var_i)))))))
+    - "(assert (= (k_seqLen seqDef1) (ite (>= (- 10 1) 0) (i2u (- 10 1)) (i2u 0))))"
+  expected: VALID
+  state: IGNORE
+  
+  keySrc: |-
+    \problem {
+       int::seqGet(seqDef{int i;}(1, 10, i*i), 2) = 9
+    }
+heap1:
+  contains:
+    - "(assert (not (=> (not (= u_FF |field_java.lang.Object::<created>|)) (= (k_select\
+    \ (k_store u_heap u_o u_FF (i2u 42)) u_o u_FF) (i2u 42)))))"
+  expected: VALID
+  state: EXTENDED
+  
+  keySrc: |-
+    \functions { Field FF; java.lang.Object o; }
+
+    \problem { FF != java.lang.Object::<created> -> any::select(store(heap, o, FF, 42), o, FF) = 42 }
+unknownQuantified:
+  contains:
+    - "(declare-fun unknown_0 (U) U)"
+  expected: FAIL
+  keySrc: |-
+    \functions {
+      Seq s1;
+      int maxx;
+    }
+
+    \problem {
+      \forall Seq s; (s = (seqDef{int u;}(0, s.length, any::seqGet(s, u))))
+      & seqLen(seqSub(s1, 0, maxx - 1)) = maxx - 1
+     ->
+      s1.length = maxx - 1
+    }
+bool3:
+  contains:
+    - |-
+      (assert (= (ite (< 2 1) (b2u true) (b2u false))
+                 (ite (> 2 1) (b2u true) (b2u false))))
+  expected: VALID
+  keySrc: |-
+    \predicates { p; }
+    \functions { boolean b; }
+
+    \problem { \if(2<1)\then(TRUE)\else(FALSE) != \if(2>1)\then(TRUE)\else(FALSE) }
+float.sqrt1:
+  contains:
+    - "(assert (not (= (d2u (fp #b0 #b10000000000 #b0000000000000000000000000000000000000000000000000000))\
+    \ (d2u (fp.sqrt RNE (fp #b0 #b10000000001 #b0000000000000000000000000000000000000000000000000000))))))"
+  smtSettings:
+    '[NewSMT]sqrtSMTTranslation': "SMT"
+  expected: VALID
+  keySrc: "\\problem { 2.0d = sqrtDouble(4.0d) }"
+float.sinDouble:
+  contains:
+    - "(assert (not (fp.lt (fp.neg (fp #b0 #b10000000000 #b0000000000000000000000000000000000000000000000000000))\
+    \ (sinDouble (fp #b0 #b10000000001 #b0000000000000000000000000000000000000000000000000000)))))"
+  expected: VALID
+  keySrc: "\\problem { -2d < sinDouble(4.0d) }"
+upd1:
+  contains:
+    - "(assert (not (let ((u_p (i2u 0))) (let ((u_p (i2u (let ((u_p (i2u (+ (u2i u_p)\
+    \ 1)))) (+ (u2i u_p) 1))))) (= u_p (i2u 2))))))"
+  expected: VALID
+  keySrc: |-
+    \programVariables { int p; }
+
+    \problem {
+       {p:=0} { p := { p:= p+1 } (p + 1) } (p = 2)
+    }
+cast3:
+  contains:
+    - "(assert (not (= (cast (i2u 42) sort_any) (i2u 42))))"
+  expected: VALID
+  state: EXTENDED
+  
+  keySrc: "\\problem { (any)42 = 42 }"
+seqDef4:
+  contains:
+    - |-
+      ;--- Sequent
+      (assert (not (forall ((var_c U))
+        (=> (instanceof var_c sort_C)
+          (=> (not (= var_c k_null))
+            (= (cast (k_seqGet (seqDef1 u_heap var_c) (i2u 2)) sort_int)
+               (cast (k_select u_heap var_c |field_C::$f|) sort_int)))))))
+    - |-
+      (assert (forall ((var_0 U) (var_1 U))
+         (! (instanceof (seqDef1 var_0 var_1) sort_Seq) :pattern ((seqDef1 var_0 var_1)))))
+    - |-
+      (assert (forall ((var_x U) (var_i U))
+        (=> (and (instanceof var_x sort_int)
+                 (<= 0 (u2i var_i)) (< (u2i var_i) (- (u2i var_x) 1)))
+            (= (k_seqGet (seqDef1 var_x) var_i)
+               (let ((var_i (i2u (+ (u2i var_i) 1)))) (i2u (* (u2i var_i) (u2i var_i))))))))
+    - "(assert (forall ((var_x U)) (= (k_seqLen (seqDef1 var_x)) (ite (>= (- (u2i var_x)\
+    \ 1) 0) (i2u (- (u2i var_x) 1)) (i2u 0)))))"
+  expected: VALID
+  state: IGNORE
+  javaSrc: "class C { int f; }"
+  keySrc: |-
+    \javaSource "/tmp/SMT_key_seqDef43141027791603143510";
+
+    \problem {
+       \forall C c; (c != null -> int::seqGet(seqDef{int i;}(1, 100, c.f), 2) = c.f)
+    }
+seqDef3:
+  contains:
+    - |-
+      ; --- Sequent
+      (assert (not (forall ((var_x Int))
+          (= (cast (k_seqGet (seqDef1 u_p) (i2u var_x)) sort_int)
+             (cast (k_seqGet (seqDef1 u_p) (i2u (* var_x 1))) sort_int)))))
+    - |-
+      (assert (forall ((var_p Int)) (= (k_seqLen (seqDef1 (i2u var_p)))
+          (let ((u_p var_p)) (ite (>= (- u_p 1) 0) (i2u (- u_p 1)) (i2u 0))))))
+    - |-
+      (assert (forall ((var_p U) (var_i U))
+          (=> (and (instanceof var_p sort_int) (<= 0 (u2i var_i))
+              (< (u2i var_i) (- (u2i u_p) 1)))
+              (= (k_seqGet (seqDef1 var_p) var_i) (let ((var_i (i2u (+ (u2i var_i) 1))))
+              (i2u (* (u2i var_i) (u2i var_i))))))))
+  expected: VALID
+  state: IGNORE
+  
+  keySrc: |-
+    \programVariables { int p; }
+
+    \problem {
+       \forall int x;
+         ( int::seqGet(seqDef{int i;}(1, p, i*i), x) =
+           int::seqGet(seqDef{int i;}(1, p, i*i), x*1) )
+    }
+types1:
+  contains:
+    - "(assert (not (= (b2u (instanceof (i2u 42) sort_any)) (b2u true))))"
+  expected: VALID
+  keySrc: |-
+    \problem {
+       any::instance(42) = TRUE
+    }
+float1:
+  contains:
+    - "(assert (not (= (f2u (fp #b0 #b01111111 #b00000000000000000000000)) (f2u (fp\
+    \ #b0 #b10000000 #b00000000000000000000000)))))"
+  expected: IRRELEVANT
+  keySrc: "\\problem { 1.0f = 2.0f }"
+quant2:
+  contains:
+    - |-
+      (assert
+       (not
+        (forall ((var_o U))
+                (=> (instanceof var_o sort_java.lang.Object)
+                    (=> (= (b2u (instanceof var_o sort_java.lang.String))
+                           (b2u true))
+                        (= (cast var_o sort_java.lang.String) var_o))))))
+  expected: VALID
+  keySrc: |-
+    \problem {
+      \forall Object o; (String::instance(o) = TRUE -> (String)o = o)
+    }
+int1:
+  contains:
+    - "(assert (not (> (* 42 23) 0)))"
+  expected: VALID
+  keySrc: "\\problem { 42 * 23 > 0 }"
+ex1:
+  contains:
+    - |-
+      ; --- Sequent
+      (assert (not (exists ((var_x Int))
+             (= (i2u (* 3 var_x)) (i2u 42)))))
+  expected: VALID
+  keySrc: |-
+    \programVariables { int p; }
+
+    \problem {
+       \exists int x; (3*x = 42)
+    }
+uninterpreted1:
+  contains:
+    - |-
+      (declare-fun u_f (U) U)
+      (declare-fun u_c () U)
+    - |-
+      (assert (forall ((var_0 U)) (! (instanceof (u_f var_0) sort_int) :pattern ((u_f var_0)))))
+      (assert (instanceof u_c sort_int))
+    - |-
+      ; --- Sequent
+      
+      (assert (not (= (u_f (i2u (* 2 (u2i u_c)))) (u_f (i2u (+ (u2i u_c) (u2i u_c)))))))
+  expected: VALID
+  keySrc: |-
+    \functions { int f(int); int c; }
+
+    \problem { f(2*c) = f(c+c) }
+heap2:
+  contains:
+    - "(declare-const sort_Field T)"
+    - "(declare-fun fieldIdentifier (U) Int)"
+  expected: VALID
+  keySrc: |-
+    \functions { int[][] n; long[] i_arr_2; int j_0; int a_0; int i_0; int start; }
+
+    \problem {
+     (j_0 = a_0 &
+     a_0 >= 0 &
+     a_0 < n.length &
+     n[i_0][j_0] >= 0 &
+     i_arr_2[i_0] >= 1 &
+     i_0 < n.length &
+     i_0 >= 0 &
+     (\forall int i;
+       (   i < n.length & i >= 0
+        -> \forall int j; (j < n.length & j >= 0 -> (n[i][j] = 0 <-> j = i)))))
+    ->
+     !(n[i_0][j_0] = -1 &
+     j_0 = i_0 &
+       (!n[i_0][a_0] = -1
+     & (   !a_0 = start
+        -> i_arr_2[i_0] < i_arr_2[i_0] + n[i_0][j_0])
+     & !i_arr_2[i_0] + n[i_0][j_0] = -1))
+    }
+upd2:
+  contains:
+    - |-
+      (assert (not (= (i2u (let ((u_p u_q) (u_q u_p)) (- (u2i u_p) (u2i u_q))))
+                      (i2u (- (u2i u_q) (u2i u_p))))))
+  expected: VALID
+  keySrc: |-
+    \programVariables { int p; int q; }
+
+    \problem {
+       { p:=q || q:=p } (p-q) = q-p
+    }
+float.sqrt2:
+  contains:
+    - "(assert (not (= (d2u (fp #b0 #b10000000000 #b0000000000000000000000000000000000000000000000000000))\
+    \ (d2u (sqrtDouble (fp #b0 #b10000000001 #b0000000000000000000000000000000000000000000000000000))))))"
+  smtSettings:
+    '[NewSMT]sqrtSMTTranslation': "AXIOMS"
+  expected: FAIL
+  keySrc: "\\problem { 2.0d = sqrtDouble(4.0d) }"
+types2:
+  contains:
+    - "(assert (not (= (b2u (instanceof (b2u false) sort_any)) (b2u true))))"
+  expected: VALID
+  keySrc: |-
+    \problem {
+       any::instance(FALSE) = TRUE
+    }
+bool2:
+  contains:
+    - |-
+      (declare-fun u_p () Bool)
+      (declare-fun u_b () U)
+    - "(assert (not (=> (= u_p (= u_b (b2u true))) (= (not u_p) (= u_b (b2u false))))))"
+  expected: VALID
+  keySrc: |-
+    \predicates { p; }
+    \functions { boolean b; }
+
+    \problem { (p <-> b=TRUE) -> (!p <-> b=FALSE) }
+
+cast1:
+  contains:
+    - |-
+      (assert (forall ((x U) (t T)) (! (subtype (typeof (cast x t)) t) :pattern ((cast x t)))))
+      (assert (forall ((x U) (t T)) (! (=> (subtype (typeof x) t) (= (cast x t) x)) :pattern ((cast x t)))))
+    - "(assert (not (= (cast (i2u 42) sort_int) (i2u 42))))"
+  expected: VALID
+  keySrc: "\\problem { (int)42 = 42 }"
+
+float2:
+  contains:
+    - "(assert (not (= (f2u (fp #b0 #b00000000 #b00000000000000000000000)) (f2u (fp.sub\
+    \ RNE (fp #b0 #b01111111 #b00000000000000000000000) (fp #b0 #b01111111 #b00000000000000000000000))))))"
+  expected: VALID
+  keySrc: "\\problem { 0.0f = subFloat(1.0f, 1.0f) }"
+
+ite1:
+  contains:
+    - "(assert (not (u2b (ite (< 2 1) (b2u (< 3 1)) (b2u (< 4 1))))))"
+  expected: IRRELEVANT
+  keySrc: "\\problem { \\if(2<1)\\then(3<1)\\else(4<1) }"
+
+quant1:
+  contains:
+    - "(assert (not (forall ((var_i Int)) (=> (>= var_i 0) (>= (* 2 var_i) var_i)))))"
+  expected: VALID
+  keySrc: |-
+    \problem {
+      \forall int i; (i >= 0 -> 2*i >= i)
+    }
+
+cast2:
+  contains:
+    - "(assert (not (= (cast (k_select u_heap u_o u_FF) sort_int) (cast (k_seqGet u_s\
+    \ (i2u 42)) sort_int))))"
+  expected: IRRELEVANT
+  keySrc: |-
+    \functions { Field FF; Seq s; java.lang.Object o; }
+
+    \problem { int::select(heap, o, FF) = int::seqGet(s, 42) }
+
+bool1:
+  contains:
+    - "(assert (not (=> (or (and u_b u_b) u_b) (= (not u_b) (and true false)))))"
+  expected: VALID
+  keySrc: |-
+    \predicates { b; }
+
+    \problem { b&b | b -> (!b <-> true & false) }
+
+seqDef2:
+  contains:
+    - |-
+      (assert (not (forall ((var_x Int))
+        (=> (> var_x 3)
+          (= (cast (k_seqGet (seqDef1 (i2u var_x)) (i2u 2)) sort_int)
+             (i2u 9))))))
+    - "(assert (forall ((var_0 U)) (! (instanceof (seqDef1 var_0) sort_Seq) :pattern\
+    \ ((seqDef1 var_0)))))"
+    - |-
+      (assert (forall ((var_x Int) (var_i Int))
+        (=> (and
+              (<= 0 var_i) (< var_i (- var_x 1)))
+            (= (k_seqGet (seqDef1 (i2u var_x)) (i2u var_i))
+               (let ((var_i (+ var_i 1))) (i2u (* var_i var_i)))))))
+    - |-
+      (assert (forall ((var_x Int))
+         (= (k_seqLen (seqDef1 (i2u var_x)))
+            (ite (>= (- var_x 1) 0)
+                 (i2u (- var_x 1))
+                 (i2u 0)))))
+  expected: VALID
+  state: IGNORE
+  keySrc: |-
+    \problem {
+       \forall int x; (x > 3 -> int::seqGet(seqDef{int i;}(1, x, i*i), 2) = 9)
+    }
+
+float.eq:
+  contains:
+    - "(assert (not (= (fp.isNaN (u2d u_doubleNaN)) (not (fp.eq (u2d u_doubleNaN) (u2d\
+    \ u_doubleNaN))))))"
+  expected: VALID
+  keySrc: |-
+    \programVariables { double doubleNaN; }
+    \problem { doubleIsNaN(doubleNaN) <-> !eqDouble(doubleNaN, doubleNaN) }
