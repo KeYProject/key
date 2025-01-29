@@ -7,10 +7,7 @@ import java.rmi.UnexpectedException;
 
 import org.key_project.logic.IntIterator;
 import org.key_project.rusty.ast.RustyProgramElement;
-import org.key_project.rusty.ast.expr.BlockExpression;
-import org.key_project.rusty.ast.expr.ContextBlockExpression;
-import org.key_project.rusty.ast.expr.Expr;
-import org.key_project.rusty.ast.expr.FunctionFrame;
+import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.logic.PosInProgram;
@@ -61,6 +58,8 @@ public class ProgramContextAdder {
                 return createExpressionStatementWrapper(es, body);
             } else if (context instanceof FunctionFrame ff) {
                 return createFunctionFrameWrapper(ff, (BlockExpression) body);
+            } else if (context instanceof LoopScope ls) {
+                return createLoopScopeWrapper(ls, (BlockExpression) body);
             } else {
                 throw new RuntimeException(
                     new UnexpectedException("Unexpected block type: " + context.getClass()));
@@ -80,8 +79,12 @@ public class ProgramContextAdder {
     private RustyProgramElement createBlockExprWrapper(BlockExpression wrapper,
             RustyProgramElement replacement) {
         int childCount = wrapper.getChildCount();
-        if (childCount <= 1 && replacement instanceof BlockExpression be)
-            return be;
+        if (childCount <= 1) {
+            if (replacement instanceof BlockExpression be)
+                return be;
+            if (replacement instanceof Expr e)
+                return new BlockExpression(ImmutableSLList.nil(), e);
+        }
         var body = wrapper.getStatements().tail();
         body = body.prepend((Statement) replacement);
         return new BlockExpression(body, wrapper.getValue());
@@ -110,6 +113,7 @@ public class ProgramContextAdder {
             ContextBlockExpression putIn, PosInProgram suffix) {
         final int putInLength = putIn.getChildCount();
 
+        // TODO DD: Make this nicer
         // ATTENTION: may be -1
         final int lastChild = suffix.last();
 
@@ -121,7 +125,15 @@ public class ProgramContextAdder {
             --childrenToAdd;
 
         if (childLeft == 0 || lastChild == -1) {
-            return new BlockExpression(putIn.getStatements(), putIn.getValue());
+            if (wrapper instanceof BlockExpression be && be.getValue() != null
+                    && putIn.getChild(putInLength - 1) instanceof ExpressionStatement es) {
+                ImmutableList<Statement> body = ImmutableSLList.nil();
+                for (int i = 0; i < putInLength - 1; ++i) {
+                    body = body.append((Statement) putIn.getChild(i));
+                }
+                return new BlockExpression(body, es.getExpression());
+            }
+            return new BlockExpression(putIn.getStatements(), null);
         }
 
         ImmutableList<Statement> body = ImmutableSLList.nil();
@@ -148,5 +160,9 @@ public class ProgramContextAdder {
     private FunctionFrame createFunctionFrameWrapper(FunctionFrame wrapper,
             BlockExpression replacement) {
         return new FunctionFrame(wrapper.getResultVar(), wrapper.getFunction(), replacement);
+    }
+
+    private LoopScope createLoopScopeWrapper(LoopScope old, BlockExpression body) {
+        return new LoopScope(old.getIndex(), body);
     }
 }

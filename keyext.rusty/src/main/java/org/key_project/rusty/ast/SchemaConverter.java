@@ -460,6 +460,10 @@ public class SchemaConverter {
     private BreakExpression convertBreakExpression(
             org.key_project.rusty.parsing.RustySchemaParser.BreakExpressionContext ctx) {
         var label = ctx.label() != null ? convertLabel(ctx.label()) : null;
+        if (label != null && label instanceof SchemaLabel sl
+                && sl.sv().sort() != ProgramSVSort.LABEL) {
+            return new BreakExpression(null, sl.sv());
+        }
         var expr = ctx.expr() != null ? convertExpr(ctx.expr()) : null;
         return new BreakExpression(label, expr);
     }
@@ -714,8 +718,8 @@ public class SchemaConverter {
 
     private Statement convertLetStmt(
             org.key_project.rusty.parsing.RustySchemaParser.LetStmtContext ctx) {
-        RustType type = convertRustType(ctx.type_());
-        declaredType = new KeYRustyType(type.getSort(services));
+        RustType type = ctx.type_() == null ? null : convertRustType(ctx.type_());
+        declaredType = type == null ? null : new KeYRustyType(type.getSort(services));
         inDeclarationMode = true;
         Pattern pat = convertPatternNoTopAlt(ctx.patternNoTopAlt());
         inDeclarationMode = false;

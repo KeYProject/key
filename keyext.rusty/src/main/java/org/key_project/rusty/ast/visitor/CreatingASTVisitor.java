@@ -229,6 +229,19 @@ public abstract class CreatingASTVisitor extends RustyASTVisitor {
     }
 
     @Override
+    public void performActionOnBreakExpression(BreakExpression x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            RustyProgramElement createNewElement(ExtList changeList) {
+                var label = changeList.get(Label.class);
+                var expr = changeList.get(Expr.class);
+                return new BreakExpression(label, expr);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
     public void performActionOnCompoundAssignmentExpression(CompoundAssignmentExpression x) {
         DefaultAction def = new DefaultAction(x) {
             @Override

@@ -24,7 +24,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.jspecify.annotations.NonNull;
 
 public class ContextBlockExpression extends BlockExpression {
-
     /**
      * length of this progran prefix
      */
@@ -101,7 +100,6 @@ public class ContextBlockExpression extends BlockExpression {
             }
 
             pos = srcPrefixLength - patternPrefixLength;
-
             PossibleProgramPrefix firstActiveStatement = getPrefixElementAt(prefix, pos);
 
             relPos = firstActiveStatement.getFirstActiveChildPos();

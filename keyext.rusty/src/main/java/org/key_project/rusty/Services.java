@@ -77,8 +77,8 @@ public class Services implements LogicServices {
     public Services(Services services) {
         this.namespaces = services.namespaces;
         this.ldts = services.ldts;
-        this.tf = services.tf;
-        this.tb = services.tb;
+        this.tf = new TermFactory();
+        this.tb = new TermBuilder(tf, this);
         this.proof = services.proof;
         this.profile = services.profile;
         this.counters = services.counters;
