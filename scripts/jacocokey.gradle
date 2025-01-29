@@ -23,7 +23,7 @@ subprojects {
     testFast {
         finalizedBy jacocoTestReport
         jacoco {
-            destinationFile = layout.buildDirectory.file("jacoco/test.exec")
+            destinationFile = layout.buildDirectory.file("jacoco/test.exec").get()
         }
     }
 }
