@@ -3,15 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.rusty.ast.expr;
 
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.key_project.logic.IntIterator;
-import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.SourceData;
-import org.key_project.rusty.ast.stmt.ExpressionStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.PosInProgram;
@@ -21,7 +17,6 @@ import org.key_project.rusty.rule.inst.SVInstantiations;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
 
 public class ContextBlockExpression extends BlockExpression {
     /**
@@ -29,34 +24,14 @@ public class ContextBlockExpression extends BlockExpression {
      */
     private final int patternPrefixLength;
 
-    public ContextBlockExpression(ImmutableList<Statement> statements) {
-        super(statements, null);
+    public ContextBlockExpression(ImmutableList<Statement> statements, Expr expr) {
+        super(statements, expr);
         patternPrefixLength = this.getPrefixLength();
     }
 
     public ContextBlockExpression(ExtList children) {
-        super(convertExtList(children), null);
+        super(ImmutableList.of(children.collect(Statement.class)), children.get(Expr.class));
         patternPrefixLength = this.getPrefixLength();
-    }
-
-    private static ImmutableList<Statement> convertExtList(ExtList children) {
-        var stmts = ImmutableList.of(children.collect(Statement.class));
-        var expr = children.get(Expr.class);
-        if (expr instanceof BlockExpression || expr instanceof IfExpression
-                || expr instanceof MatchExpression) {
-            stmts = stmts.append(new ExpressionStatement(expr, false));
-        }
-        return stmts;
-    }
-
-    @Override
-    public int getChildCount() {
-        return statements.size();
-    }
-
-    @Override
-    public @NonNull SyntaxElement getChild(int n) {
-        return Objects.requireNonNull(statements.get(n));
     }
 
     @Override
@@ -66,9 +41,18 @@ public class ContextBlockExpression extends BlockExpression {
 
     @Override
     public String toString() {
-        return "{c#\n"
-            + statements.stream().map(s -> "\t" + s.toString()).collect(Collectors.joining("\n"))
-            + "\n#c}";
+        var sb = new StringBuilder();
+        sb.append("{c#\n");
+        for (int i = 0; i < statements.size(); i++) {
+            if (i > 0) {
+                sb.append("\n");
+            }
+            sb.append('\t').append(statements.get(i));
+        }
+        if (getValue() != null) {
+            sb.append('\n').append('\t').append(getValue());
+        }
+        return sb.append("\n#c}").toString();
     }
 
     /**
@@ -82,6 +66,7 @@ public class ContextBlockExpression extends BlockExpression {
 
     @Override
     public MatchConditions match(SourceData source, MatchConditions mc) {
+        // TODO: 2nd use of blockBreakValue has wrong ctx!
         SourceData newSource = source;
 
         final RustyProgramElement src = newSource.getSource();
@@ -124,13 +109,8 @@ public class ContextBlockExpression extends BlockExpression {
             prefix = null;
         }
 
-        if (getChildCount() == 1 && getChild(0) instanceof ExpressionStatement es
-                && newSource.getSource() instanceof Expr e) {
-            mc = es.getExpression().match(newSource, mc);
-        } else {
-            // matching children
-            mc = matchChildren(newSource, mc, 0);
-        }
+        // matching children
+        mc = matchChildren(newSource, mc, 0);
 
         if (mc == null) {
             return null;

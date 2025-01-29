@@ -54,8 +54,7 @@ public class ExpressionStatement implements Statement, PossibleProgramPrefix {
 
     @Override
     public boolean isPrefix() {
-        return getChildCount() != 0 && expression instanceof PossibleProgramPrefix pre
-                && pre.isPrefix();
+        return true;
     }
 
     @Override

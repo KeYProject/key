@@ -119,7 +119,7 @@
                 (rule "assignment" (formula "8") (term "1"))
             )
             (branch "_b_0 false"
-                (rule "applyOnPV" (formula "7") (term "0,0"))
+                (rule "applyOnPV" (formula "8") (term "0,0"))
             )
         )
     )

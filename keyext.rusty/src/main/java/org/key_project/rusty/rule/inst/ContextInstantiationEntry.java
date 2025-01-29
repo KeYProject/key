@@ -8,8 +8,7 @@ import org.key_project.rusty.logic.PosInProgram;
 
 /**
  * This class is used to store the information about a matched context of a dl formula. (the pi and
- * omega part) TODO: Check if there is a need for ContextStatementBlockInstantiation or if it could
- * be unified with this class
+ * omega part)
  */
 public class ContextInstantiationEntry
         extends InstantiationEntry<ContextBlockExpressionInstantiation> {

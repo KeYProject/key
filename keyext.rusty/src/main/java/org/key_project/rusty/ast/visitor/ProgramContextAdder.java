@@ -6,6 +6,7 @@ package org.key_project.rusty.ast.visitor;
 import java.rmi.UnexpectedException;
 
 import org.key_project.logic.IntIterator;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.ast.RustyProgramElement;
 import org.key_project.rusty.ast.expr.*;
 import org.key_project.rusty.ast.stmt.ExpressionStatement;
@@ -86,7 +87,7 @@ public class ProgramContextAdder {
                 return new BlockExpression(ImmutableSLList.nil(), e);
         }
         var body = wrapper.getStatements().tail();
-        body = body.prepend((Statement) replacement);
+        body = body.prepend(wrapExprIfNecessary(replacement));
         return new BlockExpression(body, wrapper.getValue());
     }
 
@@ -113,7 +114,6 @@ public class ProgramContextAdder {
             ContextBlockExpression putIn, PosInProgram suffix) {
         final int putInLength = putIn.getChildCount();
 
-        // TODO DD: Make this nicer
         // ATTENTION: may be -1
         final int lastChild = suffix.last();
 
@@ -125,28 +125,33 @@ public class ProgramContextAdder {
             --childrenToAdd;
 
         if (childLeft == 0 || lastChild == -1) {
-            if (wrapper instanceof BlockExpression be && be.getValue() != null
-                    && putIn.getChild(putInLength - 1) instanceof ExpressionStatement es) {
-                ImmutableList<Statement> body = ImmutableSLList.nil();
-                for (int i = 0; i < putInLength - 1; ++i) {
-                    body = body.append((Statement) putIn.getChild(i));
-                }
-                return new BlockExpression(body, es.getExpression());
-            }
-            return new BlockExpression(putIn.getStatements(), null);
+            return new BlockExpression(putIn.getStatements(), putIn.getValue());
         }
 
         ImmutableList<Statement> body = ImmutableSLList.nil();
 
         for (int i = 0; i < childrenToAdd; i++) {
             if (i < putInLength) {
-                body = body.append((Statement) putIn.getChild(i));
+                body = body.append(wrapExprIfNecessary(putIn.getChild(i)));
             } else {
                 body = body.append((Statement) wrapper.getChild(lastChild + (i - putInLength)));
             }
         }
 
-        return new BlockExpression(body, ((BlockExpression) wrapper).getValue());
+        Expr value = ((BlockExpression) wrapper).getValue();
+        if (putIn.getValue() != null && childrenToAdd < putInLength) {
+            value = putIn.getValue();
+        }
+
+        return new BlockExpression(body, value);
+    }
+
+    private Statement wrapExprIfNecessary(SyntaxElement se) {
+        if (se instanceof Expr e)
+            return new ExpressionStatement(e, true);
+        if (se instanceof Statement s)
+            return s;
+        throw new IllegalArgumentException("Unexpected syntax element: " + se);
     }
 
     private ExpressionStatement createExpressionStatementWrapper(ExpressionStatement wrapper,

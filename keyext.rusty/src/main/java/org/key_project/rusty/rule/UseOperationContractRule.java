@@ -366,10 +366,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         // create "Post" branch
         final ContextBlockExpression resultAssign;
         if (inst.actualResult == null) {
-            resultAssign = new ContextBlockExpression(ImmutableList.of());
+            resultAssign = new ContextBlockExpression(ImmutableList.of(), null);
         } else {
             resultAssign = new ContextBlockExpression(ImmutableList.of(new ExpressionStatement(
-                new AssignmentExpression(inst.actualResult, resultVar), true)));
+                new AssignmentExpression(inst.actualResult, resultVar), true)), null);
         }
         final BlockExpression postBE = replaceBlock(rb, resultAssign);
         final RustyBlock postRustyBlock = new RustyBlock(postBE);
