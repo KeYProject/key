@@ -134,7 +134,7 @@ tasks.register('testProveRules', Test) {
     description = 'Proves KeY taclet rules tagged as lemma'
     group = "verification"
     filter { includeTestsMatching "ProveRulesTest" }
-    //useJUnitPlatform() {includeTags "testProveRules"    }
+    jacoco { enabled = false }
 }
 
 tasks.register('testRunAllFunProofs', Test) {
@@ -143,6 +143,7 @@ tasks.register('testRunAllFunProofs', Test) {
     filter {
         includeTestsMatching "RunAllProofsFunctional"
     }
+    jacoco { enabled = false }
 }
 
 tasks.register('testRunAllInfProofs', Test) {
@@ -151,6 +152,7 @@ tasks.register('testRunAllInfProofs', Test) {
     filter {
         includeTestsMatching "RunAllProofsInfFlow"
     }
+    jacoco { enabled = false }
 }
 
 
@@ -160,6 +162,7 @@ tasks.register('testProveSMTLemmas', Test) {
     filter {
         includeTestsMatching "ProveSMTLemmasTest"
     }
+    jacoco { enabled = false }
 }
 
 // Run the tests for the new smt translation in strict mode
@@ -171,6 +174,7 @@ tasks.register('testStrictSMT', Test) {
     filter {
         includeTestsMatching "MasterHandlerTest"
     }
+    jacoco { enabled = false }
 }
 
 //Generation of the three version files within the resources by executing `git'.
