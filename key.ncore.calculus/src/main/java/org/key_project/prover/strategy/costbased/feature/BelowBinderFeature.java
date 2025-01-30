@@ -17,18 +17,18 @@ import org.jspecify.annotations.NonNull;
  * Returns zero iff the position of a rule application is not below any operators that bind
  * variables
  */
-public class BelowBinderFeature<Goal extends ProofGoal<@NonNull Goal>> extends BinaryFeature<Goal> {
+public class BelowBinderFeature extends BinaryFeature {
 
-    private static final Feature<?> INSTANCE = new BelowBinderFeature<>();
+    private static final Feature INSTANCE = new BelowBinderFeature();
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> getInstance() {
-        // noinspection unchecked
-        return (Feature<Goal>) INSTANCE;
+    public static Feature getInstance() {
+        return INSTANCE;
     }
 
     private BelowBinderFeature() {}
 
-    public boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app, PosInOccurrence pos,
+            Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         return belowBinder(pos);

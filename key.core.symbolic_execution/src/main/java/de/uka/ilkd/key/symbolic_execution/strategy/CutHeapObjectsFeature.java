@@ -12,12 +12,15 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * <p>
@@ -32,14 +35,16 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
  *
  * @author Martin Hentschel
  */
-public class CutHeapObjectsFeature extends BinaryFeature<Goal> {
+public class CutHeapObjectsFeature extends BinaryFeature {
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
         Term cutFormula =
-            SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal,
+            SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos,
+                (de.uka.ilkd.key.proof.Goal) goal,
                 mState);
         if (cutFormula != null) {
             if (cutFormula.op() == Junctor.NOT) {

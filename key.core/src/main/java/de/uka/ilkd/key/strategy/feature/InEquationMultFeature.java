@@ -34,7 +34,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
      * @param targetCandidate the left side of the inequation that is supposed to bound the other
      *        two inequations
      */
-    public static Feature<Goal> partiallyBounded(ProjectionToTerm<Goal> mult1Candidate,
+    public static Feature partiallyBounded(ProjectionToTerm<Goal> mult1Candidate,
             ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
@@ -47,7 +47,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     /**
      * Return zero iff the product of mult1 and mult2 is a factor of target
      */
-    public static Feature<Goal> totallyBounded(ProjectionToTerm<Goal> mult1Candidate,
+    public static Feature totallyBounded(ProjectionToTerm<Goal> mult1Candidate,
             ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
@@ -59,7 +59,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     /**
      * Return zero iff the product of mult1 and mult2 is target
      */
-    public static Feature<Goal> exactlyBounded(ProjectionToTerm<Goal> mult1Candidate,
+    public static Feature exactlyBounded(ProjectionToTerm<Goal> mult1Candidate,
             ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {

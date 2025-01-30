@@ -3,21 +3,24 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.logic.Named;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NonNull;
+
+
 /**
  * Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy
  */
-public interface Strategy extends Named, Feature<Goal> {
+public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, Feature {
     /**
      * Evaluate the cost of a <code>RuleApp</code>. Starts a new independent computation.
      *
@@ -29,8 +32,7 @@ public interface Strategy extends Named, Feature<Goal> {
      *         indicates that the rule shall not be applied at all (it is discarded by
      *         the strategy).
      */
-    default RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
-            Goal goal) {
+    default RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         return computeCost(app, pos, goal, new MutableState());
     }
 
@@ -47,8 +49,7 @@ public interface Strategy extends Named, Feature<Goal> {
      *
      * @return true iff the rule should be applied, false otherwise
      */
-    boolean isApprovedApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
-            Goal goal);
+    boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal);
 
     /**
      * Instantiate an incomplete <code>RuleApp</code>. This method is called when the

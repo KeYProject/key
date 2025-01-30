@@ -18,7 +18,7 @@ import org.key_project.util.collection.ImmutableList;
  */
 public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
 
-    public static final Feature<Goal> INSTANCE = new NoSelfApplicationFeature();
+    public static final Feature INSTANCE = new NoSelfApplicationFeature();
 
     private NoSelfApplicationFeature() {}
 

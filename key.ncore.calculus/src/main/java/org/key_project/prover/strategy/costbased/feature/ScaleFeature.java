@@ -17,12 +17,12 @@ import org.jspecify.annotations.NonNull;
  * A feature that applies an affine transformation to the result of a given feature. As a special
  * case, it can be used to scale the given feature.
  */
-public abstract class ScaleFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature<Goal> {
+public abstract class ScaleFeature implements Feature {
 
     /** the base feature */
-    private final Feature<Goal> feature;
+    private final Feature feature;
 
-    protected ScaleFeature(Feature<Goal> p_feature) {
+    protected ScaleFeature(Feature p_feature) {
         feature = p_feature;
     }
 
@@ -32,8 +32,8 @@ public abstract class ScaleFeature<Goal extends ProofGoal<@NonNull Goal>> implem
      * @param f the base feature
      * @param coeff the coefficient to be applied to the result of <code>f</code>
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createScaled(
-            Feature<Goal> f, double coeff) {
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature createScaled(
+            Feature f, double coeff) {
         return createAffine(f, coeff, 0);
     }
 
@@ -46,9 +46,9 @@ public abstract class ScaleFeature<Goal extends ProofGoal<@NonNull Goal>> implem
      * @param offset the offset to be added to the result of <code>f</code> (after multiplication
      *        with <code>coeff</code>)
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createAffine(
-            Feature<Goal> f, double coeff, long offset) {
-        return new MultFeature<>(f, coeff, offset);
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature createAffine(
+            Feature f, double coeff, long offset) {
+        return new MultFeature(f, coeff, offset);
     }
 
     /**
@@ -61,8 +61,8 @@ public abstract class ScaleFeature<Goal extends ProofGoal<@NonNull Goal>> implem
      * @param img0 point 0 in the image
      * @param img1 point 1 in the image
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createAffine(
-            Feature<Goal> f, RuleAppCost dom0, RuleAppCost dom1,
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature createAffine(
+            Feature f, RuleAppCost dom0, RuleAppCost dom1,
             RuleAppCost img0, RuleAppCost img1) {
         assert !dom0.equals(dom1)
                 : "Two different points are needed to define the affine transformation";
@@ -94,8 +94,8 @@ public abstract class ScaleFeature<Goal extends ProofGoal<@NonNull Goal>> implem
         }
     }
 
-    private static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> firstDomInfty(
-            Feature<Goal> f, RuleAppCost dom1, RuleAppCost img0,
+    private static <Goal extends ProofGoal<@NonNull Goal>> Feature firstDomInfty(
+            Feature f, RuleAppCost dom1, RuleAppCost img0,
             RuleAppCost img1) {
         if (img0 instanceof TopRuleAppCost) {
             final long img1Val = getValue(img1);
@@ -111,13 +111,13 @@ public abstract class ScaleFeature<Goal extends ProofGoal<@NonNull Goal>> implem
         }
     }
 
-    private static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> firstImgInfty(
-            Feature<Goal> f, RuleAppCost dom0, RuleAppCost dom1,
+    private static <Goal extends ProofGoal<@NonNull Goal>> Feature firstImgInfty(
+            Feature f, RuleAppCost dom0, RuleAppCost dom1,
             RuleAppCost img1) {
         return ShannonFeature.createConditional(f, dom1, img1, TopRuleAppCost.INSTANCE);
     }
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> realAffine(Feature<Goal> f,
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature realAffine(Feature f,
             RuleAppCost dom0, RuleAppCost dom1,
             RuleAppCost img0, RuleAppCost img1) {
         final double img0Val = getValue(img0);
@@ -147,7 +147,7 @@ public abstract class ScaleFeature<Goal extends ProofGoal<@NonNull Goal>> implem
         assert false : "Don't know what to do with cost class " + cost.getClass();
     }
 
-    protected Feature<Goal> getFeature() {
+    protected Feature getFeature() {
         return feature;
     }
 
@@ -155,21 +155,22 @@ public abstract class ScaleFeature<Goal extends ProofGoal<@NonNull Goal>> implem
         return Math.abs(p) < 0.0000001;
     }
 
-    private static class MultFeature<Goal extends ProofGoal<@NonNull Goal>>
-            extends ScaleFeature<Goal> {
+    private static class MultFeature
+            extends ScaleFeature {
         /** the coefficient */
         private final double coeff;
         /** the offset */
         private final long offset;
 
-        private MultFeature(Feature<Goal> f, double p_coeff, long p_offset) {
+        private MultFeature(Feature f, double p_coeff, long p_offset) {
             super(f);
             coeff = p_coeff;
             offset = p_offset;
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+                PosInOccurrence pos, Goal goal,
                 MutableState mState) {
             final RuleAppCost cost = getFeature().computeCost(app, pos, goal, mState);
             long costVal;

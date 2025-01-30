@@ -18,10 +18,11 @@ import org.jspecify.annotations.NonNull;
 /**
  * A feature that computes the sum of a given list (vector) of features
  */
-public class SumFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature<Goal> {
+public class SumFeature implements Feature {
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal,
             MutableState mState) {
         // We require that there is at least one feature (in method
         // <code>createSum</code>)
@@ -34,14 +35,14 @@ public class SumFeature<Goal extends ProofGoal<@NonNull Goal>> implements Featur
         return res;
     }
 
-    private SumFeature(Feature<Goal>[] p_features) {
+    private SumFeature(Feature[] p_features) {
         features = p_features;
     }
 
-    static <Goal extends ProofGoal<@NonNull Goal>> void flatten(Feature<Goal>[] sumF,
-            LinkedHashSet<Feature<Goal>> p_features) {
-        for (Feature<Goal> f : sumF) {
-            if (f instanceof SumFeature<Goal> sumFeature) {
+    static <Goal extends ProofGoal<@NonNull Goal>> void flatten(Feature[] sumF,
+            LinkedHashSet<Feature> p_features) {
+        for (Feature f : sumF) {
+            if (f instanceof SumFeature sumFeature) {
                 flatten(sumFeature.features, p_features);
             } else {
                 p_features.add(f);
@@ -50,21 +51,21 @@ public class SumFeature<Goal extends ProofGoal<@NonNull Goal>> implements Featur
     }
 
     @SafeVarargs
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createSum(
-            Feature<Goal>... fs) {
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature createSum(
+            Feature... fs) {
         assert fs.length != 0 : "Cannot compute the sum of zero features";
 
         if (fs.length == 1) {
             return fs[0];
         }
-        LinkedHashSet<Feature<Goal>> featureSet = new LinkedHashSet<>();
+        LinkedHashSet<Feature> featureSet = new LinkedHashSet<>();
         flatten(fs, featureSet);
 
         // noinspection unchecked
-        return new SumFeature<Goal>(featureSet.<Feature<Goal>>toArray(new Feature[0]));
+        return new SumFeature(featureSet.<Feature>toArray(new Feature[0]));
     }
 
-    private final Feature<Goal>[] features;
+    private final Feature[] features;
 
     @Override
     public String toString() {

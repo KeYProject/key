@@ -10,20 +10,19 @@ import org.key_project.prover.strategy.costbased.MutableState;
 
 import org.jspecify.annotations.NonNull;
 
-public class FocusInAntecFeature<Goal extends ProofGoal<@NonNull Goal>>
-        extends BinaryFeature<Goal> {
+public class FocusInAntecFeature extends BinaryFeature {
 
-    private static final Feature<?> INSTANCE = new FocusInAntecFeature<>();
-
+    private static final Feature INSTANCE = new FocusInAntecFeature();
 
     private FocusInAntecFeature() {}
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> getInstance() {
-        // noinspection unchecked
-        return (Feature<Goal>) INSTANCE;
+    public static Feature getInstance() {
+        return INSTANCE;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    @Override
+    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
         return pos.isInAntec();
     }

@@ -4,9 +4,9 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.util.TermHelper;
-import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -14,7 +14,9 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-public class ImplicitCastNecessary extends BinaryFeature<Goal> {
+import org.jspecify.annotations.NonNull;
+
+public class ImplicitCastNecessary<Goal extends ProofGoal<@NonNull Goal>> extends BinaryFeature {
 
     private final ProjectionToTerm<Goal> projection;
 
@@ -22,17 +24,19 @@ public class ImplicitCastNecessary extends BinaryFeature<Goal> {
         this.projection = projection;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app, PosInOccurrence pos,
+            G goal, MutableState mState) {
         assert pos != null && pos.depth() >= 1;
 
         int subPos = pos.getIndex();
 
         final Sort maxSort = TermHelper.getMaxSort(pos.up().subTerm(), subPos);
-        return projection.toTerm(app, pos, goal, mState).sort().extendsTrans(maxSort);
+        return projection.toTerm(app, pos, (Goal) goal, mState).sort().extendsTrans(maxSort);
     }
 
-    public static Feature<Goal> create(ProjectionToTerm<Goal> s1) {
-        return new ImplicitCastNecessary(s1);
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
+            ProjectionToTerm<Goal> s1) {
+        return new ImplicitCastNecessary<>(s1);
     }
 
 }

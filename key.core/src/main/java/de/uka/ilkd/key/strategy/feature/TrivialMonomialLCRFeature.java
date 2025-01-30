@@ -28,7 +28,7 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
         this.b = b;
     }
 
-    public static Feature<Goal> create(ProjectionToTerm<Goal> a, ProjectionToTerm<Goal> b) {
+    public static Feature create(ProjectionToTerm<Goal> a, ProjectionToTerm<Goal> b) {
         return new TrivialMonomialLCRFeature(a, b);
     }
 

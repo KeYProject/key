@@ -55,7 +55,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
                     OperatorTF.create(numbers.getNumberSymbol()) }));
     }
 
-    public static Feature<Goal> create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         return new MonomialsSmallerThanFeature(left, right, numbers);
     }

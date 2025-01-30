@@ -13,7 +13,9 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.*;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.Rule;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -21,6 +23,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+
+import org.jspecify.annotations.NonNull;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final Set<String> ADMITTED_RULES =
@@ -67,7 +71,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         return false;
     }
 
-    private static class AutoPilotStrategy implements Strategy {
+    private static class AutoPilotStrategy implements Strategy<Goal> {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
         private final Strategy delegate;
@@ -84,8 +88,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
-                Goal goal) {
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
             return computeCost(app, pio, goal, new MutableState()) != TopRuleAppCost.INSTANCE &&
             // Assumptions are normally not considered by the cost
             // computation, because they are normally not yet
@@ -101,10 +104,11 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app,
-                PosInOccurrence pio, Goal goal,
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+                PosInOccurrence pio, Goal p_goal,
                 MutableState mState) {
 
+            final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
             Rule rule = app.rule();
             if (FinishSymbolicExecutionMacro.isForbiddenRule(rule)) {
                 return TopRuleAppCost.INSTANCE;
@@ -133,7 +137,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public void instantiateApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
+        public void instantiateApp(RuleApp app, PosInOccurrence pio,
                 Goal goal,
                 RuleAppCostCollector collector) {
             delegate.instantiateApp(app, pio, goal, collector);

@@ -22,7 +22,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  */
 public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
-    public static final Feature<Goal> INSTANCE = new CheckApplyEqFeature();
+    public static final Feature INSTANCE = new CheckApplyEqFeature();
 
     private CheckApplyEqFeature() {}
 

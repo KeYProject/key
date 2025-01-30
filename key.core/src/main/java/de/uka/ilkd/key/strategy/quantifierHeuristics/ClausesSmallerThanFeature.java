@@ -36,7 +36,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
             (LiteralsSmallerThanFeature) LiteralsSmallerThanFeature.create(left, right, numbers);
     }
 
-    public static Feature<Goal> create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         return new ClausesSmallerThanFeature(left, right, numbers);
     }

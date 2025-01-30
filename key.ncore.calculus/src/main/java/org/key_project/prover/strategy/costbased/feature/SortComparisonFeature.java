@@ -13,11 +13,11 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 import org.jspecify.annotations.NonNull;
 
 public class SortComparisonFeature<Goal extends ProofGoal<@NonNull Goal>>
-        extends BinaryFeature<Goal> {
+        extends BinaryFeature {
 
     public final static int SUBSORT = 0;
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> create(
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
             ProjectionToTerm<Goal> s1, ProjectionToTerm<Goal> s2, int cmp) {
         return new SortComparisonFeature<>(s1, s2, cmp);
     }
@@ -36,9 +36,11 @@ public class SortComparisonFeature<Goal extends ProofGoal<@NonNull Goal>>
         this.comparator = comparator;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        final Sort sort1 = s1.toTerm(app, pos, goal, mState).sort();
-        final Sort sort2 = s2.toTerm(app, pos, goal, mState).sort();
+    @Override
+    protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app, PosInOccurrence pos,
+            G goal, MutableState mState) {
+        final Sort sort1 = s1.toTerm(app, pos, (Goal) goal, mState).sort();
+        final Sort sort2 = s2.toTerm(app, pos, (Goal) goal, mState).sort();
 
         return compare(sort1, sort2);
     }

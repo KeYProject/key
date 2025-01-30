@@ -22,10 +22,11 @@ import org.key_project.util.collection.ImmutableList;
 public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
 
     /** the single instance of this feature */
-    public static final Feature<Goal> INSTANCE = new DiffFindAndIfFeature();
+    public static final Feature INSTANCE = new DiffFindAndIfFeature();
 
     private DiffFindAndIfFeature() {}
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
