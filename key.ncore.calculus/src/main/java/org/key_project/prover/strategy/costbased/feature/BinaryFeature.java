@@ -16,8 +16,8 @@ import org.jspecify.annotations.NonNull;
 /**
  * Abstract superclass for features that have either zero cost or top cost.
  */
-public abstract class BinaryFeature<Goal extends ProofGoal<@NonNull Goal>>
-        implements Feature<Goal> {
+public abstract class BinaryFeature
+        implements Feature {
 
     protected BinaryFeature() {}
 
@@ -27,7 +27,8 @@ public abstract class BinaryFeature<Goal extends ProofGoal<@NonNull Goal>>
     public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos,
             Goal goal, MutableState mState) {
         return filter(app, pos, goal, mState) ? ZERO_COST : TOP_COST;
     }
@@ -42,7 +43,8 @@ public abstract class BinaryFeature<Goal extends ProofGoal<@NonNull Goal>>
      * @param mState mutable state needed for feature computation
      * @return true iff the result of the feature is supposed to be zero.
      */
-    protected abstract boolean filter(RuleApp app, PosInOccurrence pos, Goal goal,
+    protected abstract <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos, Goal goal,
             MutableState mState);
 
 }

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.List;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -13,19 +14,22 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.jspecify.annotations.NonNull;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
-public final class DependencyContractFeature extends BinaryFeature<Goal> {
+public final class DependencyContractFeature extends BinaryFeature {
 
     private void removePreviouslyUsedSteps(Term focus, Goal goal,
             List<PosInOccurrence> steps) {
-        for (org.key_project.prover.rules.RuleApp app : goal.appliedRuleApps()) {
+        for (RuleApp app : goal.appliedRuleApps()) {
             Term term = (Term) app.posInOccurrence().subTerm();
             if (app.rule() instanceof UseDependencyContractRule
                     && RENAMING_TERM_PROPERTY.equalsModThisProperty(term, focus)) {
@@ -38,19 +42,20 @@ public final class DependencyContractFeature extends BinaryFeature<Goal> {
     }
 
     @Override
-    protected boolean filter(RuleApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos,
+            Goal p_goal, MutableState mState) {
         IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
         final Term focus = (Term) pos.subTerm();
 
         // determine possible steps
-
+        final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
+        final Services services = goal.proof().getServices();
         List<LocationVariable> heapContext = bapp.getHeapContext() != null ? bapp.getHeapContext()
-                : HeapContext.getModifiableHeaps(goal.proof().getServices(), false);
+                : HeapContext.getModifiableHeaps(services, false);
 
         final List<PosInOccurrence> steps =
-            UseDependencyContractRule.getSteps(heapContext, pos,
-                goal.sequent(), goal.proof().getServices());
+            UseDependencyContractRule.getSteps(heapContext, pos, goal.sequent(), services);
         if (steps.isEmpty()) {
             return false;
         }

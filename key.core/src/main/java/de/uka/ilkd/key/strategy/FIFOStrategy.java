@@ -8,17 +8,20 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
  * cost of a RuleApp.
  */
-public class FIFOStrategy implements Strategy {
+public class FIFOStrategy implements Strategy<Goal> {
 
     private static final Name NAME = new Name("FIFO");
 
@@ -33,10 +36,11 @@ public class FIFOStrategy implements Strategy {
      *         all (it is discarded by the strategy).
      */
     @Override
-    public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
-        return NumberRuleAppCost.create(goal.getTime());
+        return NumberRuleAppCost.create(((de.uka.ilkd.key.proof.Goal) goal).getTime());
     }
 
     /**
@@ -45,7 +49,7 @@ public class FIFOStrategy implements Strategy {
      *
      * @return true iff the rule should be applied, false otherwise
      */
-    public boolean isApprovedApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
+    public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return true;
     }

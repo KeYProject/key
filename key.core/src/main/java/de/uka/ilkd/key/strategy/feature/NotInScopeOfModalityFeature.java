@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -14,19 +15,23 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Returns zero iff the position of a rule application is not in the scope of a modal operator (a
  * program block or an update). Note that terms and formulas within (but not behind) updates are not
  * in the scope of the update
  */
-public class NotInScopeOfModalityFeature extends BinaryFeature<Goal> {
+public class NotInScopeOfModalityFeature extends BinaryFeature {
 
-    public static final Feature<Goal> INSTANCE = new NotInScopeOfModalityFeature();
+    public static final Feature INSTANCE = new NotInScopeOfModalityFeature();
 
     private NotInScopeOfModalityFeature() {}
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    @Override
+    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         return !inScopeOfModality(pos);

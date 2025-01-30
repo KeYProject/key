@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -16,23 +17,26 @@ import org.key_project.prover.strategy.costbased.feature.instantiator.BackTracki
 import org.key_project.prover.strategy.costbased.feature.instantiator.CPBranch;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 
-public class OneOfCP implements Feature<Goal> {
+import org.jspecify.annotations.NonNull;
 
-    private final Feature<Goal>[] features;
+public class OneOfCP implements Feature {
+
+    private final Feature[] features;
 
     private int theChosenOne;
     private final ChoicePoint cp = new CP();
 
-    private OneOfCP(Feature<Goal>[] features) {
+    private OneOfCP(Feature[] features) {
         this.features = features;
     }
 
-    public static Feature<Goal> create(Feature<Goal>[] features) {
+    public static Feature create(Feature[] features) {
         return new OneOfCP(features);
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos,
             Goal goal,
             MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();

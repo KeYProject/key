@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -11,18 +12,21 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * This abstract class contains some auxiliary methods for the selection of beta rules that are
  * supposed to be applied. Used terminology is defined in Diss. by Martin Giese.
  */
-public abstract class AbstractBetaFeature implements Feature<Goal> {
+public abstract class AbstractBetaFeature implements Feature {
     /** helper for computing maxPosPath_* in TermInfo */
     private static final MaxPosPathHelper maxPosPathHelper = new MaxPosPathHelper();
 
@@ -329,13 +333,14 @@ public abstract class AbstractBetaFeature implements Feature<Goal> {
      * @return the cost of <code>app</code>
      */
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Term findTerm = (Term) pos.sequentFormula().formula();
 
-        return doComputation(pos, findTerm, goal.proof().getServices().getCaches());
+        return doComputation(pos, findTerm, ((Services) goal.proof().getServices()).getCaches());
     }
 
     protected abstract RuleAppCost doComputation(PosInOccurrence pos,

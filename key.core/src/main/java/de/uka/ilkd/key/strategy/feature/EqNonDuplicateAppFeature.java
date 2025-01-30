@@ -19,7 +19,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  */
 public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
-    public static final Feature<Goal> INSTANCE = new EqNonDuplicateAppFeature();
+    public static final Feature INSTANCE = new EqNonDuplicateAppFeature();
 
     private EqNonDuplicateAppFeature() {}
 

@@ -24,7 +24,7 @@ public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeatur
         this.for1 = for1;
     }
 
-    public static Feature<Goal> create(ProjectionToTerm for0, ProjectionToTerm for1) {
+    public static Feature create(ProjectionToTerm for0, ProjectionToTerm for1) {
         return new ExistentiallyConnectedFormulasFeature(for0, for1);
     }
 

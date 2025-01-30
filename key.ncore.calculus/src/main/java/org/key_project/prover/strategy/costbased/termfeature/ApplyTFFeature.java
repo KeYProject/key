@@ -18,7 +18,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * Feature for invoking a term feature on the instantiation of a schema variable
  */
-public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature<Goal> {
+public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
 
     private final ProjectionToTerm<Goal> proj;
     private final TermFeature termFeature;
@@ -41,21 +41,22 @@ public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
         this.demandInst = demandInst;
     }
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createNonStrict(
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature createNonStrict(
             ProjectionToTerm<Goal> proj,
             TermFeature tf, RuleAppCost noInstCost) {
         return new ApplyTFFeature<>(proj, tf, noInstCost, false);
     }
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> create(
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
             ProjectionToTerm<Goal> proj, TermFeature tf) {
         return new ApplyTFFeature<>(proj, tf, TopRuleAppCost.INSTANCE, true);
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, G goal,
             MutableState mState) {
-        final Term te = proj.toTerm(app, pos, goal, mState);
+        final Term te = proj.toTerm(app, pos, (Goal) goal, mState);
         if (te == null) {
             assert !demandInst : "ApplyTFFeature: got undefined argument (null)";
             return noInstCost;

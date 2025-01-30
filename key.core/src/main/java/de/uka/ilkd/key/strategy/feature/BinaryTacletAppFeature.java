@@ -6,15 +6,18 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Abstract superclass for features of TacletApps that have either zero or top cost.
  */
-public abstract class BinaryTacletAppFeature extends BinaryFeature<Goal> {
+public abstract class BinaryTacletAppFeature extends BinaryFeature {
 
     private final boolean nonTacletValue;
 
@@ -31,7 +34,8 @@ public abstract class BinaryTacletAppFeature extends BinaryFeature<Goal> {
     }
 
     @Override
-    final protected boolean filter(RuleApp app, PosInOccurrence pos,
+    final protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos,
             Goal goal, MutableState mState) {
         if (app instanceof TacletApp tacletApp) {
             return filter(tacletApp, pos, goal, mState);

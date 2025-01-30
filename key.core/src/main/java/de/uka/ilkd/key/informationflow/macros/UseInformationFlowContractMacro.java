@@ -18,6 +18,7 @@ import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFea
 import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -27,6 +28,8 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -101,9 +104,9 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      * @param goal context
      * @return true if rule may be applied
      */
-    protected boolean ruleApplicationInContextAllowed(org.key_project.prover.rules.RuleApp ruleApp,
+    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
             PosInOccurrence pio,
-            Goal goal) {
+            ProofGoal goal) {
         return true;
     }
 
@@ -153,7 +156,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
     private String getAppRuleName(Node parent) {
-        org.key_project.prover.rules.RuleApp parentRuleApp = parent.getAppliedRuleApp();
+        RuleApp parentRuleApp = parent.getAppliedRuleApp();
         String parentRuleName = parentRuleApp.rule().name().toString();
         return parentRuleName;
     }
@@ -163,7 +166,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      * This strategy accepts all rule apps for which the rule name starts with a string in the
      * admitted set and rejects everything else.
      */
-    protected class PropExpansionStrategy implements Strategy {
+    protected class PropExpansionStrategy implements Strategy<Goal> {
 
         private final Name NAME =
             new Name(UseInformationFlowContractMacro.PropExpansionStrategy.class.getSimpleName());
@@ -183,7 +186,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp ruleApp,
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
                 PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             // first try to apply
@@ -213,7 +216,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public boolean isApprovedApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
                 Goal goal) {
             // abort if
             // - the parent.parent rule application is an information

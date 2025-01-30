@@ -10,10 +10,13 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Modification of {@link JavaCardDLStrategy} so that profiling data gets collected during strategy
@@ -41,13 +44,14 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(
+            org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         long begin = System.nanoTime();
         RuleAppCost result = super.computeCost(app, pio, goal, mState);
         long end = System.nanoTime();
-        computeCostData.addDurationToData(app, goal, end - begin);
+        computeCostData.addDurationToData(app, (de.uka.ilkd.key.proof.Goal) goal, end - begin);
         return result;
     }
 

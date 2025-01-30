@@ -9,10 +9,13 @@ import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Apply a single proof step.
@@ -54,13 +57,13 @@ public class OneStepProofMacro extends StrategyProofMacro {
      *
      */
 
-    private static class OneStepStrategy implements Strategy {
+    private static class OneStepStrategy implements Strategy<Goal> {
 
         private static final Name NAME = new Name(OneStepStrategy.class.getSimpleName());
         private int counter;
-        public final Strategy delegate;
+        public final Strategy<Goal> delegate;
 
-        public OneStepStrategy(Strategy delegate) {
+        public OneStepStrategy(Strategy<Goal> delegate) {
             this.delegate = delegate;
             this.counter = 0;
         }
@@ -75,7 +78,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
          * can be applied.
          */
         @Override
-        public boolean isApprovedApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
                 Goal goal) {
             if (counter == 0 && delegate.isApprovedApp(app, pio, goal)) {
                 counter++;
@@ -86,7 +89,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app,
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
                 PosInOccurrence pio, Goal goal,
                 MutableState mState) {
             return delegate.computeCost(app, pio, goal, mState);

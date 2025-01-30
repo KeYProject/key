@@ -19,12 +19,12 @@ import org.jspecify.annotations.NonNull;
  * value of the whole expression is <code>f1</code> (if <code>c</code> returns zero, or more general
  * if <code>c</code> returns a distinguished value <code>trueCost</code>) or <code>f2</code>
  */
-public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature<Goal> {
+public class ShannonFeature implements Feature {
 
     /**
      * The filter that decides which sub-feature is to be evaluated
      */
-    private final Feature<Goal> cond;
+    private final Feature cond;
 
     /**
      * If the result of <code>cond</code> is this cost, then the condition is assumed to hold
@@ -34,16 +34,15 @@ public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
     /**
      * The feature for positive results of <code>filter</code>
      */
-    private final Feature<Goal> thenFeature;
+    private final Feature thenFeature;
 
     /**
      * The feature for negative results of <code>filter</code>
      */
-    private final Feature<Goal> elseFeature;
+    private final Feature elseFeature;
 
-    private ShannonFeature(Feature<Goal> p_cond, RuleAppCost p_trueCost,
-            Feature<Goal> p_thenFeature,
-            Feature<Goal> p_elseFeature) {
+    private ShannonFeature(Feature p_cond, RuleAppCost p_trueCost,
+            Feature p_thenFeature, Feature p_elseFeature) {
         cond = p_cond;
         trueCost = p_trueCost;
         thenFeature = p_thenFeature;
@@ -51,8 +50,8 @@ public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
         if (cond.computeCost(app, pos, goal, mState).equals(trueCost)) {
             return thenFeature.computeCost(app, pos, goal, mState);
         } else {
@@ -67,8 +66,7 @@ public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
      * @return <code>thenValue</code> if <code>cond</code> returns <code>trueCost</code>, zero
      *         otherwise
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditional(
-            Feature<Goal> cond, RuleAppCost trueCost,
+    public static Feature createConditional(Feature cond, RuleAppCost trueCost,
             RuleAppCost thenValue) {
         return createConditional(cond, trueCost, ConstFeature.createConst(thenValue));
     }
@@ -82,8 +80,7 @@ public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
      * @return <code>thenValue</code> if <code>cond</code> returns <code>trueCost</code>,
      *         <code>elseValue</code> otherwise
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditional(
-            Feature<Goal> cond, RuleAppCost trueCost,
+    public static Feature createConditional(Feature cond, RuleAppCost trueCost,
             RuleAppCost thenValue, RuleAppCost elseValue) {
         return createConditional(cond, trueCost, ConstFeature.createConst(thenValue),
             ConstFeature.createConst(elseValue));
@@ -97,9 +94,8 @@ public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns
      *         <code>trueCost</code>, zero otherwise
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditional(
-            Feature<Goal> cond, RuleAppCost trueCost,
-            Feature<Goal> thenFeature) {
+    public static Feature createConditional(Feature cond, RuleAppCost trueCost,
+            Feature thenFeature) {
         return createConditional(cond, trueCost, thenFeature, NumberRuleAppCost.getZeroCost());
     }
 
@@ -113,10 +109,8 @@ public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns
      *         <code>trueCost</code>, <code>elseValue</code> otherwise
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditional(
-            Feature<Goal> cond, RuleAppCost trueCost,
-            Feature<Goal> thenFeature,
-            RuleAppCost elseValue) {
+    public static Feature createConditional(Feature cond, RuleAppCost trueCost,
+            Feature thenFeature, RuleAppCost elseValue) {
         return createConditional(cond, trueCost, thenFeature, ConstFeature.createConst(elseValue));
     }
 
@@ -130,11 +124,9 @@ public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns
      *         <code>trueCost</code>, the value of <code>elseFeature</code> otherwise
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditional(
-            Feature<Goal> cond, RuleAppCost trueCost,
-            Feature<Goal> thenFeature,
-            Feature<Goal> elseFeature) {
-        return new ShannonFeature<>(cond, trueCost, thenFeature, elseFeature);
+    public static Feature createConditional(Feature cond, RuleAppCost trueCost,
+            Feature thenFeature, Feature elseFeature) {
+        return new ShannonFeature(cond, trueCost, thenFeature, elseFeature);
     }
 
     /**
@@ -143,8 +135,7 @@ public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, zero
      *         otherwise
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditionalBinary(
-            Feature<Goal> cond, RuleAppCost thenValue) {
+    public static Feature createConditionalBinary(Feature cond, RuleAppCost thenValue) {
         return createConditionalBinary(cond, ConstFeature.createConst(thenValue));
     }
 
@@ -155,9 +146,8 @@ public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
      * @return <code>thenValue</code> if <code>cond</code> returns zero, <code>elseValue</code>
      *         otherwise
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditionalBinary(
-            Feature<Goal> cond, RuleAppCost thenValue,
-            RuleAppCost elseValue) {
+    public static Feature createConditionalBinary(
+            Feature cond, RuleAppCost thenValue, RuleAppCost elseValue) {
         return createConditionalBinary(cond, ConstFeature.createConst(thenValue),
             ConstFeature.createConst(elseValue));
     }
@@ -169,10 +159,8 @@ public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero,
      *         <code>elseValue</code> otherwise
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditionalBinary(
-            Feature<Goal> cond,
-            Feature<Goal> thenFeature,
-            RuleAppCost elseValue) {
+    public static Feature createConditionalBinary(
+            Feature cond, Feature thenFeature, RuleAppCost elseValue) {
         return createConditionalBinary(cond, thenFeature, ConstFeature.createConst(elseValue));
     }
 
@@ -183,10 +171,8 @@ public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, the value of
      *         <code>elseFeature</code> otherwise
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditionalBinary(
-            Feature<Goal> cond,
-            Feature<Goal> thenFeature,
-            Feature<Goal> elseFeature) {
+    public static Feature createConditionalBinary(
+            Feature cond, Feature thenFeature, Feature elseFeature) {
         return createConditional(cond, BinaryFeature.ZERO_COST, thenFeature, elseFeature);
     }
 
@@ -196,9 +182,7 @@ public class ShannonFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
      * @return the value of <code>thenFeature</code> if <code>cond</code> returns zero, zero
      *         otherwise
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditionalBinary(
-            Feature<Goal> cond,
-            Feature<Goal> thenFeature) {
+    public static Feature createConditionalBinary(Feature cond, Feature thenFeature) {
         return createConditional(cond, BinaryFeature.ZERO_COST, thenFeature,
             NumberRuleAppCost.getZeroCost());
     }

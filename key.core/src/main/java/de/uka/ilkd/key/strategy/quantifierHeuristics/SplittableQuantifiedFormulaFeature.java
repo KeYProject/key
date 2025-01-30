@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -18,13 +19,17 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-public class SplittableQuantifiedFormulaFeature extends BinaryFeature<Goal> {
+import org.jspecify.annotations.NonNull;
+
+public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
 
     private SplittableQuantifiedFormulaFeature() {}
 
-    public static final Feature<Goal> INSTANCE = new SplittableQuantifiedFormulaFeature();
+    public static final Feature INSTANCE = new SplittableQuantifiedFormulaFeature();
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    @Override
+    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Analyser analyser = new Analyser();

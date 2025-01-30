@@ -6,9 +6,9 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.informationflow.rule.executor.InfFlowContractAppTacletExecutor;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -18,19 +18,21 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
 /**
  * Checks whether the focus of the ruleApp is contained in one of the formulas added by information
  * flow contract applications. The list of formulas added by information flow contract applications
- * is retrieved form the the strategy property INF_FLOW_CONTRACT_APPL_PROPERTY.
+ * is retrieved form the strategy property INF_FLOW_CONTRACT_APPL_PROPERTY.
  *
  * @author christoph
  */
-public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature<Goal> {
+public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
-    public static final Feature<Goal> INSTANCE = new FocusIsSubFormulaOfInfFlowContractAppFeature();
+    public static final Feature INSTANCE = new FocusIsSubFormulaOfInfFlowContractAppFeature();
 
 
     protected FocusIsSubFormulaOfInfFlowContractAppFeature() {
@@ -38,8 +40,8 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature<Goa
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
+            PosInOccurrence pos, Goal p_goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;
@@ -49,6 +51,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature<Goa
         }
 
         final Term focusFor = (Term) pos.sequentFormula().formula();
+        final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
         ImmutableList<Term> contractAppls =
             goal.getStrategyInfo(InfFlowContractAppTacletExecutor.INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (contractAppls == null) {

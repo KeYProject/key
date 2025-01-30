@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
@@ -18,7 +19,9 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
-public class SeqContainsExecutableCodeFeature extends BinaryFeature<Goal> {
+import org.jspecify.annotations.NonNull;
+
+public class SeqContainsExecutableCodeFeature extends BinaryFeature {
 
     private final TermFeature tf;
 
@@ -30,15 +33,16 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature<Goal> {
         }
     }
 
-    public final static Feature<Goal> PROGRAMS = new SeqContainsExecutableCodeFeature(false);
-    public final static Feature<Goal> PROGRAMS_OR_QUERIES =
+    public final static Feature PROGRAMS = new SeqContainsExecutableCodeFeature(false);
+    public final static Feature PROGRAMS_OR_QUERIES =
         new SeqContainsExecutableCodeFeature(true);
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return containsExec(goal.sequent().succedent().iterator(), mState,
-            goal.proof().getServices())
-                || containsExec(goal.sequent().antecedent().iterator(), mState,
-                    goal.proof().getServices());
+    @Override
+    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
+        final Services services = (Services) goal.proof().getServices();
+        return containsExec(goal.sequent().succedent().iterator(), mState, services)
+                || containsExec(goal.sequent().antecedent().iterator(), mState, services);
     }
 
     private boolean containsExec(Iterator<SequentFormula> it, MutableState mState,

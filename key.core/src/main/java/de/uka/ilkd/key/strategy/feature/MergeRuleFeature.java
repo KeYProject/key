@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -18,21 +19,24 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Costs for the {@link MergeRule}; cheap if the first statement in the chosen top-level formula is
  * a {@link MergePointStatement}, otherwise, infinitely expensive.
  *
  * @author Dominic Scheurer
  */
-public class MergeRuleFeature implements Feature<Goal> {
-    public static final Feature<Goal> INSTANCE = new MergeRuleFeature();
+public class MergeRuleFeature implements Feature {
+    public static final Feature INSTANCE = new MergeRuleFeature();
 
     private MergeRuleFeature() {
         // Singleton constructor
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal,
             MutableState mState) {
         final Term t = (Term) pos.subTerm();
         if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) {

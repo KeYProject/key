@@ -22,7 +22,7 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     private final Name schemaVar;
     private final ProjectionToTerm<Goal> term;
 
-    public static Feature<Goal> create(ProjectionToTerm<Goal> termWithTopLevelOpToCheck,
+    public static Feature create(ProjectionToTerm<Goal> termWithTopLevelOpToCheck,
             String ruleSetName,
             String schemaVar) {
         return new IntroducedSymbolBy(termWithTopLevelOpToCheck, new Name(ruleSetName),

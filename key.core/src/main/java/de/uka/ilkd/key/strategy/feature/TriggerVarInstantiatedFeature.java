@@ -13,7 +13,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 
 public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
 
-    public static final Feature<Goal> INSTANCE = new TriggerVarInstantiatedFeature();
+    public static final Feature INSTANCE = new TriggerVarInstantiatedFeature();
 
     private TriggerVarInstantiatedFeature() {
     }

@@ -37,8 +37,7 @@ import org.key_project.util.collection.ImmutableList;
  */
 public abstract class StrategyProofMacro extends AbstractProofMacro {
 
-    protected abstract Strategy createStrategy(Proof proof,
-            PosInOccurrence posInOcc);
+    protected abstract Strategy<Goal> createStrategy(Proof proof, PosInOccurrence posInOcc);
 
     /**
      * {@inheritDoc}

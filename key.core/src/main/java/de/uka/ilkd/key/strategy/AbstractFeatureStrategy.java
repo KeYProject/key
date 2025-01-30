@@ -32,7 +32,8 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
 
-public abstract class AbstractFeatureStrategy extends StaticFeatureCollection implements Strategy {
+public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
+        implements Strategy<Goal> {
 
     private final Proof proof;
 
@@ -53,17 +54,17 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
      * @return the conditional feature return true when the rule belongs to one of the given
      *         heuristics
      */
-    protected Feature<Goal> ifHeuristics(String[] heuristics, Feature<Goal> thenFeature) {
+    protected Feature ifHeuristics(String[] heuristics, Feature thenFeature) {
         return ConditionalFeature.createConditional(getFilterFor(heuristics), thenFeature);
     }
 
-    protected Feature<Goal> ifHeuristics(String[] heuristics, Feature<Goal> thenFeature,
-            Feature<Goal> elseFeature) {
+    protected Feature ifHeuristics(String[] heuristics, Feature thenFeature,
+            Feature elseFeature) {
         return ConditionalFeature.createConditional(getFilterFor(heuristics), thenFeature,
             elseFeature);
     }
 
-    protected Feature<Goal> ifHeuristics(String[] names, int priority) {
+    protected Feature ifHeuristics(String[] names, int priority) {
         return ConditionalFeature.createConditional(getFilterFor(names), cost(priority), cost(0));
     }
 
@@ -85,7 +86,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         return h;
     }
 
-    protected void bindRuleSet(RuleSetDispatchFeature d, RuleSet ruleSet, Feature<Goal> f) {
+    protected void bindRuleSet(RuleSetDispatchFeature d, RuleSet ruleSet, Feature f) {
         d.add(ruleSet, f);
     }
 
@@ -93,7 +94,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         bindRuleSet(d, ruleSet, longConst(cost));
     }
 
-    protected void bindRuleSet(RuleSetDispatchFeature d, String ruleSet, Feature<Goal> f) {
+    protected void bindRuleSet(RuleSetDispatchFeature d, String ruleSet, Feature f) {
         bindRuleSet(d, getHeuristic(ruleSet), f);
     }
 
@@ -132,15 +133,15 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     protected abstract RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             MutableState mState);
 
-    protected Feature<Goal> forEach(TermBuffer<Goal> x, TermGenerator gen, Feature<Goal> body) {
+    protected Feature forEach(TermBuffer<Goal> x, TermGenerator gen, Feature body) {
         return ForEachCP.create(x, gen, body);
     }
 
-    protected Feature<Goal> oneOf(Feature<Goal>[] features) {
+    protected Feature oneOf(Feature[] features) {
         return OneOfCP.create(features);
     }
 
-    protected Feature<Goal> oneOf(Feature<Goal> feature0, Feature<Goal> feature1) {
+    protected Feature oneOf(Feature feature0, Feature feature1) {
         // noinspection unchecked
         return oneOf(new Feature[] { feature0, feature1 });
     }
@@ -159,7 +160,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         instantiateActive = false;
     }
 
-    protected Feature<Goal> instantiate(Name sv, ProjectionToTerm<Goal> value) {
+    protected Feature instantiate(Name sv, ProjectionToTerm<Goal> value) {
         if (instantiateActive) {
             return SVInstantiationCP.create(sv, value);
         } else {
@@ -167,7 +168,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         }
     }
 
-    protected Feature<Goal> instantiateTriggeredVariable(ProjectionToTerm<Goal> value) {
+    protected Feature instantiateTriggeredVariable(ProjectionToTerm<Goal> value) {
         if (instantiateActive) {
             return SVInstantiationCP.createTriggeredVarCP(value);
         } else {
@@ -175,7 +176,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         }
     }
 
-    protected Feature<Goal> instantiate(String sv, ProjectionToTerm<Goal> value) {
+    protected Feature instantiate(String sv, ProjectionToTerm<Goal> value) {
         return instantiate(new Name(sv), value);
     }
 }

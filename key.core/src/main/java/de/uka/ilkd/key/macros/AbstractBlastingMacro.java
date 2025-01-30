@@ -32,6 +32,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
@@ -202,7 +203,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
     }
 
-    private class SemanticsBlastingStrategy implements Strategy {
+    private class SemanticsBlastingStrategy implements Strategy<Goal> {
 
         @Override
         public @NonNull Name name() {
@@ -210,7 +211,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app,
+        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
                 PosInOccurrence pio, Goal goal,
                 MutableState mState) {
 
@@ -238,7 +239,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public boolean isApprovedApp(org.key_project.prover.rules.RuleApp app, PosInOccurrence pio,
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
                 Goal goal) {
 
             if (app.rule() instanceof OneStepSimplifier) {

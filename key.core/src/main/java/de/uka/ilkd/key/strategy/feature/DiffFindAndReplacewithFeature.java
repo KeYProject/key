@@ -23,7 +23,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
 public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
 
     /** the single instance of this feature */
-    public static final Feature<Goal> INSTANCE = new DiffFindAndReplacewithFeature();
+    public static final Feature INSTANCE = new DiffFindAndReplacewithFeature();
 
     private DiffFindAndReplacewithFeature() {}
 

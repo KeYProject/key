@@ -33,8 +33,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
     }
 
 
-    public static Feature<Goal> create(ProjectionToTerm<Goal> left,
-            ProjectionToTerm<Goal> right,
+    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             IntegerLDT numbers) {
         return new AtomsSmallerThanFeature(left, right, numbers);
     }

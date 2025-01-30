@@ -14,7 +14,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 
 public class SVNeedsInstantiation extends InstantiatedSVFeature {
 
-    public static Feature<Goal> create(String svName) {
+    public static Feature create(String svName) {
         return new SVNeedsInstantiation(new Name(svName));
     }
 

@@ -21,7 +21,7 @@ public class InstantiatedSVFeature extends BinaryTacletAppFeature {
 
     private final ProjectionToTerm<Goal> instProj;
 
-    public static Feature<Goal> create(Name svName) {
+    public static Feature create(Name svName) {
         return new InstantiatedSVFeature(svName);
     }
 

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -25,6 +26,8 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Feature representing a <code>ChoicePoint</code> for instantiating a schema variable of a taclet
@@ -32,16 +35,16 @@ import org.key_project.util.collection.ImmutableSet;
  * particular combined with <code>ForEachCP</code>. Although the feature formally is a choice point,
  * it will always have exactly one branch
  */
-public class SVInstantiationCP implements Feature<Goal> {
+public class SVInstantiationCP implements Feature {
 
     private final Name svToInstantiate;
     private final ProjectionToTerm<Goal> value;
 
-    public static Feature<Goal> create(Name svToInstantiate, ProjectionToTerm<Goal> value) {
+    public static Feature create(Name svToInstantiate, ProjectionToTerm<Goal> value) {
         return new SVInstantiationCP(svToInstantiate, value);
     }
 
-    public static Feature<Goal> createTriggeredVarCP(ProjectionToTerm<Goal> value) {
+    public static Feature createTriggeredVarCP(ProjectionToTerm<Goal> value) {
         return new SVInstantiationCP(null, value);
     }
 
@@ -52,10 +55,11 @@ public class SVInstantiationCP implements Feature<Goal> {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos,
             Goal goal, MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
-        manager.passChoicePoint(new CP(app, pos, goal, mState), this);
+        manager.passChoicePoint(new CP(app, pos, (de.uka.ilkd.key.proof.Goal) goal, mState), this);
         return NumberRuleAppCost.getZeroCost();
     }
 

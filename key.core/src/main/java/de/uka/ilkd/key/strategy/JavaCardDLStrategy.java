@@ -40,6 +40,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -73,11 +74,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     protected final StrategyProperties strategyProperties;
 
     private final RuleSetDispatchFeature costComputationDispatcher;
-    private final Feature<Goal> costComputationF;
+    private final Feature costComputationF;
     private final RuleSetDispatchFeature approvalDispatcher;
-    private final Feature<Goal> approvalF;
+    private final Feature approvalF;
     private final RuleSetDispatchFeature instantiationDispatcher;
-    private final Feature<Goal> instantiationF;
+    private final Feature instantiationF;
 
     private final HeapLDT heapLDT;
 
@@ -115,10 +116,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return instantiationDispatcher;
     }
 
-    protected Feature<Goal> setupGlobalF(Feature<Goal> dispatcher) {
-        final Feature<Goal> ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
+    protected Feature setupGlobalF(Feature dispatcher) {
+        final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
 
-        final Feature<Goal> methodSpecF;
+        final Feature methodSpecF;
         final String methProp =
             strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
         switch (methProp) {
@@ -133,7 +134,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final String queryProp =
             strategyProperties.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
-        final Feature<Goal> queryF;
+        final Feature queryF;
         switch (queryProp) {
         case StrategyProperties.QUERY_ON -> queryF =
             querySpecFeature(new QueryExpandCost(200, 1, 1, false));
@@ -148,7 +149,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
         }
 
-        final Feature<Goal> depSpecF;
+        final Feature depSpecF;
         final String depProp = strategyProperties.getProperty(StrategyProperties.DEP_OPTIONS_KEY);
         final SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
@@ -161,7 +162,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // NOTE (DS, 2019-04-10): The new loop-scope based rules are realized
         // as taclets. The strategy settings for those are handled further
         // down in this class.
-        Feature<Goal> loopInvF;
+        Feature loopInvF;
         final String loopProp = strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY);
         if (loopProp.equals(StrategyProperties.LOOP_INVARIANT)) {
             loopInvF = loopInvFeature(longConst(0));
@@ -175,9 +176,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             loopInvF = loopInvFeature(inftyConst());
         }
 
-        final Feature<Goal> blockFeature;
-        final Feature<Goal> loopBlockFeature;
-        final Feature<Goal> loopBlockApplyHeadFeature;
+        final Feature blockFeature;
+        final Feature loopBlockFeature;
+        final Feature loopBlockApplyHeadFeature;
         final String blockProperty =
             strategyProperties.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
         if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_INTERNAL)) {
@@ -196,10 +197,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             loopBlockApplyHeadFeature = loopContractApplyHead(inftyConst());
         }
 
-        final Feature<Goal> oneStepSimplificationF =
+        final Feature oneStepSimplificationF =
             oneStepSimplificationFeature(longConst(-11000));
 
-        final Feature<Goal> mergeRuleF;
+        final Feature mergeRuleF;
         final String mpsProperty =
             strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY);
         if (mpsProperty.equals(StrategyProperties.MPS_MERGE)) {
@@ -220,7 +221,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             loopBlockApplyHeadFeature, ifMatchedF, dispatcher);
     }
 
-    private Feature<Goal> oneStepSimplificationFeature(Feature<Goal> cost) {
+    private Feature oneStepSimplificationFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
         return ConditionalFeature.createConditional(filter, cost);
@@ -249,7 +250,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "delta", -6000);
         bindRuleSet(d, "simplify_boolean", -200);
 
-        final Feature<Goal> findDepthFeature =
+        final Feature findDepthFeature =
             FindDepthFeature.getInstance();
 
         bindRuleSet(d, "concrete",
@@ -604,7 +605,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermFeature seqLiteral = rec(anyLiteral, or(op(seqLDT.getSeqConcat()),
             or(op(seqLDT.getSeqSingleton()), or(anyLiteral, inftyTermConst()))));
 
-        Feature<Goal> belowModOpPenality = ifZero(isBelow(ff.modalOperator), longConst(500));
+        Feature belowModOpPenality = ifZero(isBelow(ff.modalOperator), longConst(500));
 
         bindRuleSet(d, "defOpsSeqEquality",
             add(NonDuplicateAppModPositionFeature.INSTANCE,
@@ -665,7 +666,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private void setupReplaceKnown(RuleSetDispatchFeature d) {
-        final Feature<Goal> commonF =
+        final Feature commonF =
             add(ifZero(MatchedAssumesFeature.INSTANCE, DiffFindAndIfFeature.INSTANCE),
                 longConst(-5000),
                 add(DiffFindAndReplacewithFeature.INSTANCE,
@@ -730,7 +731,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     strategyProperties.getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY));
     }
 
-    private Feature<Goal> allowQuantifierSplitting() {
+    private Feature allowQuantifierSplitting() {
         if (StrategyProperties.QUANTIFIERS_INSTANTIATE.equals(
             strategyProperties.getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY))) {
             return longConst(0);
@@ -776,7 +777,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
          */
     }
 
-    private Feature<Goal> allowSplitting(ProjectionToTerm<Goal> focus) {
+    private Feature allowSplitting(ProjectionToTerm<Goal> focus) {
         if (normalSplitting()) {
             return longConst(0);
         }
@@ -804,7 +805,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupSplitting(RuleSetDispatchFeature d) {
         final TermBuffer subFor = new TermBuffer();
-        final Feature<Goal> noCutsAllowed =
+        final Feature noCutsAllowed =
             sum(subFor, AllowedCutPositionsGenerator.INSTANCE, not(applyTF(subFor, ff.cutAllowed)));
         bindRuleSet(d, "beta",
             SumFeature.createSum(noCutsAllowed,
@@ -828,7 +829,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ifZero(applyTF(FocusProjection.INSTANCE, ContainsExecutableCodeTermFeature.PROGRAMS),
                 longConst(-100), longConst(25))));
         ProjectionToTerm<Goal> cutFormula = instOf("cutFormula");
-        Feature<Goal> countOccurrencesInSeq =
+        Feature countOccurrencesInSeq =
             ScaleFeature.createAffine(countOccurrences(cutFormula), -10, 10);
         bindRuleSet(d, "cut_direct",
             SumFeature
@@ -864,10 +865,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "split_cond", allowSplitting(FocusProjection.INSTANCE));
 
         final TermBuffer subFor = new TermBuffer();
-        final Feature<Goal> compareCutAllowed = ifZero(applyTF(subFor, ff.cutAllowed),
+        final Feature compareCutAllowed = ifZero(applyTF(subFor, ff.cutAllowed),
             leq(applyTF("cutFormula", ff.cutPriority), applyTF(subFor, ff.cutPriority)));
 
-        final Feature<Goal> noBetterCut =
+        final Feature noBetterCut =
             sum(subFor, AllowedCutPositionsGenerator.INSTANCE, compareCutAllowed);
 
         bindRuleSet(d, "cut_direct", add(allowSplitting(FocusFormulaProjection.INSTANCE),
@@ -1013,11 +1014,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 longConst(-35)));
 
         final TermBuffer superFor = new TermBuffer();
-        final Feature<Goal> onlyBelowQuanAndOr =
+        final Feature onlyBelowQuanAndOr =
             sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
                 applyTF(superFor, or(ff.quantifiedFor, ff.andF, ff.orF)));
 
-        final Feature<Goal> belowUnskolemisableQuantifier =
+        final Feature belowUnskolemisableQuantifier =
             ifZero(FocusInAntecFeature.getInstance(),
                 not(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
                     not(applyTF(superFor, op(Quantifier.ALL))))),
@@ -1028,7 +1029,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             isBelow(OperatorClassTF.create(Quantifier.class)),
             onlyBelowQuanAndOr, belowUnskolemisableQuantifier));
 
-        final Feature<Goal> pullOutQuantifierAllowed =
+        final Feature pullOutQuantifierAllowed =
             add(isBelow(OperatorClassTF.create(Quantifier.class)), onlyBelowQuanAndOr, applyTF(
                 FocusProjection.create(0), sub(ff.quantifiedClauseSet, ff.quantifiedClauseSet)));
 
@@ -1041,7 +1042,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ifZero(FocusInAntecFeature.getInstance(), longConst(-40), longConst(-20))));
     }
 
-    private Feature<Goal> clausesSmallerThan(String smaller, String bigger, IntegerLDT numbers) {
+    private Feature clausesSmallerThan(String smaller, String bigger, IntegerLDT numbers) {
         return ClausesSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
     }
 
@@ -1056,7 +1057,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private void setupQuantifierInstantiation(RuleSetDispatchFeature d) {
         if (quantifierInstantiatedEnabled()) {
             final TermBuffer varInst = new TermBuffer();
-            final Feature<Goal> branchPrediction = InstantiationCostScalerFeature
+            final Feature branchPrediction = InstantiationCostScalerFeature
                     .create(InstantiationCost.create(varInst), allowQuantifierSplitting());
 
             bindRuleSet(d, "gamma",
@@ -1214,7 +1215,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermFeature atLeastTwoLCEquation =
             opSub(Equality.EQUALS, opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral), tf.intF);
 
-        final Feature<Goal> validEqApplication = add(not(eq(eqLeft, focus)),
+        final Feature validEqApplication = add(not(eq(eqLeft, focus)),
             // otherwise, the normal equation rules can and should
             // be used
             ifZero(applyTF(AssumptionProjection.create(0), atLeastTwoLCEquation),
@@ -1222,7 +1223,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     applyTF(FocusFormulaProjection.INSTANCE, atLeastTwoLCEquation))),
             ReducibleMonomialsFeature.createReducible(focus, eqLeft));
 
-        final Feature<Goal> eqMonomialFeature = add(not(directlyBelowSymbolAtIndex(tf.mul, -1)),
+        final Feature eqMonomialFeature = add(not(directlyBelowSymbolAtIndex(tf.mul, -1)),
             ifZero(MatchedAssumesFeature.INSTANCE, let(focus, FocusProjection.create(0),
                 let(eqLeft, sub(AssumptionProjection.create(0), 0), validEqApplication))));
 
@@ -1291,9 +1292,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupNewSymApproval(RuleSetDispatchFeature d, IntegerLDT numbers) {
         final TermBuffer antecFor = new TermBuffer();
-        final Feature<Goal> columnOpEq = applyTF(antecFor,
+        final Feature columnOpEq = applyTF(antecFor,
             opSub(tf.eq, opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral), tf.polynomial));
-        final Feature<Goal> biggerLeftSide =
+        final Feature biggerLeftSide =
             MonomialsSmallerThanFeature.create(instOf("newSymLeft"),
                 subAt(antecFor, PosInTerm.getTopLevel().down(0).down(0)), numbers);
         bindRuleSet(d, "polySimp_newSym", add(isInstantiated("newSymDef"), sum(antecFor,
@@ -1303,7 +1304,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet, boolean roundingUp) {
         final TermBuffer gcd = new TermBuffer();
 
-        final Feature<Goal> instantiateDivs;
+        final Feature instantiateDivs;
         if (roundingUp) {
             instantiateDivs = add(
                 instantiate("elimGcdLeftDiv",
@@ -1492,7 +1493,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     }
 
-    private void setupMultiplyInequations(RuleSetDispatchFeature d, Feature<Goal> notAllowedF) {
+    private void setupMultiplyInequations(RuleSetDispatchFeature d, Feature notAllowedF) {
         final TermBuffer intRel = new TermBuffer();
 
         /*
@@ -1501,11 +1502,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
          * instOf ( "multLeft" ), instOf ( "multFacLeft" ), sub ( intRel, 0 ) ) ) ) ) );
          */
 
-        final Feature<Goal> totallyBounded = not(sum(intRel, SequentFormulasGenerator.sequent(),
+        final Feature totallyBounded = not(sum(intRel, SequentFormulasGenerator.sequent(),
             not(add(applyTF(intRel, tf.intRelation), InEquationMultFeature
                     .totallyBounded(instOf("multLeft"), instOf("multFacLeft"), sub(intRel, 0))))));
 
-        final Feature<Goal> exactlyBounded = not(sum(intRel, SequentFormulasGenerator.sequent(),
+        final Feature exactlyBounded = not(sum(intRel, SequentFormulasGenerator.sequent(),
             not(add(applyTF(intRel, tf.intRelation), InEquationMultFeature
                     .exactlyBounded(instOf("multLeft"), instOf("multFacLeft"), sub(intRel, 0))))));
 
@@ -1628,9 +1629,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer product = new TermBuffer();
         final TermBuffer factor = new TermBuffer();
 
-        final Feature<Goal> productContainsSquare =
+        final Feature productContainsSquare =
             applyTF(sub(product, 0), or(eq(factor), opSub(tf.mul, any(), eq(factor))));
-        final Feature<Goal> productIsProduct = applyTF(product, opSub(tf.mul, any(), not(tf.mulF)));
+        final Feature productIsProduct = applyTF(product, opSub(tf.mul, any(), not(tf.mulF)));
 
         bindRuleSet(d, "inEqSimp_nonNegSquares",
             forEach(intRel, SequentFormulasGenerator.sequent(),
@@ -1645,7 +1646,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer atom = new TermBuffer();
         final TermBuffer rootInf = new TermBuffer();
 
-        final Feature<Goal> posNegSplitting = forEach(intRel, SequentFormulasGenerator.antecedent(),
+        final Feature posNegSplitting = forEach(intRel, SequentFormulasGenerator.antecedent(),
             add(applyTF(intRel, tf.intRelation),
                 forEach(atom, SubtermGenerator.leftTraverse(sub(intRel, 0), tf.mulF),
                     SumFeature.createSum(applyTF(atom, add(tf.atom, not(tf.literal))),
@@ -1658,7 +1659,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "inEqSimp_signCases", posNegSplitting);
 
-        final Feature<Goal> strengthening = forEach(intRel, SequentFormulasGenerator.antecedent(),
+        final Feature strengthening = forEach(intRel, SequentFormulasGenerator.antecedent(),
             SumFeature.createSum(
                 applyTF(intRel, add(or(tf.geqF, tf.leqF), sub(tf.atom, tf.literal))),
                 instantiate("cutFormula", opTerm(tf.eq, sub(intRel, 0), sub(intRel, 1))),
@@ -1668,7 +1669,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             // rec ( any (), longTermConst ( 5 ) ) )
             ));
 
-        final Feature<Goal> rootInferences = forEach(intRel, SequentFormulasGenerator.antecedent(),
+        final Feature rootInferences = forEach(intRel, SequentFormulasGenerator.antecedent(),
             add(isRootInferenceProducer(intRel),
                 forEach(rootInf, RootsGenerator.create(intRel, getServices()),
                     add(instantiate("cutFormula", rootInf),
@@ -1680,11 +1681,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "cut", oneOf(new Feature[] { strengthening, rootInferences }));
     }
 
-    private Feature<Goal> isRootInferenceProducer(TermBuffer intRel) {
+    private Feature isRootInferenceProducer(TermBuffer intRel) {
         return applyTF(intRel, add(tf.intRelation, sub(tf.nonCoeffMonomial, tf.literal)));
     }
 
-    private Feature<Goal> allowPosNegCaseDistinction(TermBuffer atom) {
+    private Feature allowPosNegCaseDistinction(TermBuffer atom) {
         final TermBuffer antecFor = new TermBuffer();
         final TermFeature eqAtom = eq(atom);
 
@@ -1694,7 +1695,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     opSub(tf.leq, eqAtom, tf.negLiteral), opSub(tf.geq, eqAtom, tf.posLiteral))))));
     }
 
-    private Feature<Goal> allowInEqStrengthening(TermBuffer atom, TermBuffer literal) {
+    private Feature allowInEqStrengthening(TermBuffer atom, TermBuffer literal) {
         final TermBuffer antecFor = new TermBuffer();
 
         return add(not(succIntEquationExists()),
@@ -1702,7 +1703,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 not(applyTF(antecFor, add(or(tf.leqF, tf.geqF), sub(eq(atom), eq(literal))))))));
     }
 
-    private Feature<Goal> succIntEquationExists() {
+    private Feature succIntEquationExists() {
         final TermBuffer succFor = new TermBuffer();
 
         return not(sum(succFor, SequentFormulasGenerator.succedent(),
@@ -1791,11 +1792,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private void setupDefOpsExpandMod(RuleSetDispatchFeature d) {
         final TermBuffer superTerm = new TermBuffer();
 
-        final Feature<Goal> subsumedModulus =
+        final Feature subsumedModulus =
             add(applyTF(superTerm, sub(opSub(tf.mod, any(), tf.literal), tf.zeroLiteral)),
                 PolynomialValuesCmpFeature.divides(instOf("divDenom"), sub(sub(superTerm, 0), 1)));
 
-        final Feature<Goal> exSubsumedModulus = add(applyTF("divDenom", tf.literal),
+        final Feature exSubsumedModulus = add(applyTF("divDenom", tf.literal),
             not(sum(superTerm,
                 SuperTermGenerator.upwardsWithIndex(sub(or(tf.addF, tf.mulF), any()),
                     getServices()),
@@ -1812,19 +1813,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     longConst(-3500))));
     }
 
-    protected final Feature<Goal> isBelow(TermFeature t) {
+    protected final Feature isBelow(TermFeature t) {
         final TermBuffer superTerm = new TermBuffer();
         return not(sum(superTerm, SuperTermGenerator.upwards(any(), getServices()),
             not(applyTF(superTerm, t))));
     }
 
-    protected final Feature<Goal> onlyInScopeOfQuantifiers() {
+    protected final Feature onlyInScopeOfQuantifiers() {
         final TermBuffer buf = new TermBuffer();
         return sum(buf, SuperTermGenerator.upwards(any(), getServices()),
             applyTF(buf, ff.quantifiedFor));
     }
 
-    protected Feature<Goal> notBelowQuantifier() {
+    protected Feature notBelowQuantifier() {
         final TermBuffer superFor = new TermBuffer();
         return or(TopLevelFindFeature.ANTEC_OR_SUCC,
             sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
@@ -1839,22 +1840,22 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         // exact polynomial division
 
-        final Feature<Goal> checkNumTerm = ifZero(
+        final Feature checkNumTerm = ifZero(
             add(not(applyTF(numTerm, tf.addF)),
                 ReducibleMonomialsFeature.createReducible(numTerm, denomLC)),
             add(instantiate("polyDivCoeff", ReduceMonomialsProjection.create(numTerm, denomLC)),
                 inftyConst()));
 
-        final Feature<Goal> isReduciblePoly =
+        final Feature isReduciblePoly =
             sum(numTerm, SubtermGenerator.rightTraverse(instOf("divNum"), tf.addF), checkNumTerm);
 
         // polynomial division modulo equations of the antecedent
 
-        final Feature<Goal> checkCoeffE = ifZero(contains(divCoeff, FocusProjection.create(0)),
+        final Feature checkCoeffE = ifZero(contains(divCoeff, FocusProjection.create(0)),
             // do not apply if the result contains the original term
             longConst(0), add(instantiate("polyDivCoeff", divCoeff), inftyConst()));
 
-        final Feature<Goal> isReduciblePolyE =
+        final Feature isReduciblePolyE =
             sum(numTerm, SubtermGenerator.rightTraverse(instOf("divNum"), tf.addF),
                 ifZero(applyTF(numTerm, tf.addF), longConst(0), sum(divCoeff,
                     MultiplesModEquationsGenerator.create(numTerm, denomLC), checkCoeffE)));
@@ -1882,8 +1883,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
-    protected Feature<Goal> setupApprovalF() {
-        final Feature<Goal> depSpecF;
+    protected Feature setupApprovalF() {
+        final Feature depSpecF;
         final String depProp = strategyProperties.getProperty(StrategyProperties.DEP_OPTIONS_KEY);
         final SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
@@ -1962,14 +1963,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // isInstantiated approves also when sv_heap does not occur
         if (classAxiomApplicationEnabled()) {
             TermBuffer tb = new TermBuffer();
-            final Feature<Goal> needsInstantiation = SVNeedsInstantiation.create("sv_heap");
+            final Feature needsInstantiation = SVNeedsInstantiation.create("sv_heap");
             /*
              * if 'sv_heap' is present and instantiated, allow application only if the heap used to
              * instantiate 'sv_heap' still occurs in the sequent. Otherwise, this was a rather
              * short-lived heap term which has been rewritten since. Hence, we discard it to avoid
              * too many most likely useless applications.
              */
-            final Feature<Goal> approveInst = ifZero(isInstantiated("sv_heap"),
+            final Feature approveInst = ifZero(isInstantiated("sv_heap"),
                 /*
                  * the sum expression is 0 if the heap does not occur and infinite if it does occur,
                  * the outer 'not' then ensures that the costs are infinite in the first and 0 in
@@ -2027,9 +2028,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private void setClassAxiomInstantiation(final RuleSetDispatchFeature d) {
         // class axioms
         final TermBuffer heapVar = new TermBuffer();
-        final Feature<Goal> needsInstantiation = SVNeedsInstantiation.create("sv_heap");
+        final Feature needsInstantiation = SVNeedsInstantiation.create("sv_heap");
 
-        final Feature<Goal> heapInstantiator = ifZero(needsInstantiation,
+        final Feature heapInstantiator = ifZero(needsInstantiation,
             forEach(heapVar, HeapGenerator.INSTANCE_EXCLUDE_UPDATES,
                 add(instantiate("sv_heap", heapVar),
                     // prefer simpler heap terms before more
@@ -2072,7 +2073,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         all (it is discarded by the strategy).
      */
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pio,
             Goal goal,
             MutableState mState) {
         var time = System.nanoTime();

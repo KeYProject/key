@@ -18,7 +18,7 @@ public class TermSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm<Goal> left, right;
 
-    public static Feature<Goal> create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
         return new TermSmallerThanFeature(left, right);
     }
 

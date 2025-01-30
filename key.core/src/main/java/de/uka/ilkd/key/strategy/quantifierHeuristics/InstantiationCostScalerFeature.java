@@ -14,28 +14,29 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
 
-public class InstantiationCostScalerFeature<Goal extends ProofGoal<@NonNull Goal>>
-        implements Feature<Goal> {
+public class InstantiationCostScalerFeature
+        implements Feature {
 
-    private final Feature<Goal> costFeature;
-    private final Feature<Goal> allowSplitting;
+    private final Feature costFeature;
+    private final Feature allowSplitting;
 
     private static final RuleAppCost ONE_COST = NumberRuleAppCost.create(1);
     private static final RuleAppCost MINUS_3000_COST = NumberRuleAppCost.create(-3000);
 
-    private InstantiationCostScalerFeature(Feature<Goal> costFeature,
-            Feature<Goal> allowSplitting) {
+    private InstantiationCostScalerFeature(Feature costFeature,
+            Feature allowSplitting) {
         this.costFeature = costFeature;
         this.allowSplitting = allowSplitting;
     }
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> create(
-            Feature<Goal> costFeature, Feature<Goal> allowSplitting) {
-        return new InstantiationCostScalerFeature<>(costFeature, allowSplitting);
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
+            Feature costFeature, Feature allowSplitting) {
+        return new InstantiationCostScalerFeature(costFeature, allowSplitting);
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal,
             MutableState mState) {
 
         final RuleAppCost cost = costFeature.computeCost(app, pos, goal, mState);

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.QueryExpand;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -23,6 +24,7 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +35,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  *
  * @author gladisch
  */
-public class QueryExpandCost implements Feature<Goal> {
+public class QueryExpandCost implements Feature {
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryExpandCost.class);
 
     /** Constant that represents the boolean value true */
@@ -77,9 +79,11 @@ public class QueryExpandCost implements Feature<Goal> {
     }
 
     @Override
-    public RuleAppCost computeCost(org.key_project.prover.rules.RuleApp app, PosInOccurrence pos,
-            Goal goal,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos,
+            Goal p_goal,
             MutableState mState) {
+        final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
         final Services services = goal.proof().getServices();
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         final Term t = (Term) pos.subTerm();
@@ -174,10 +178,10 @@ public class QueryExpandCost implements Feature<Goal> {
      * @param goal The goal.
      * @return The number of repetitive rule applications.
      */
-    protected int queryExpandAlreadyAppliedAtPos(org.key_project.prover.rules.RuleApp app,
+    protected int queryExpandAlreadyAppliedAtPos(RuleApp app,
             PosInOccurrence pos, Goal goal) {
         int count = 0;
-        ImmutableList<org.key_project.prover.rules.RuleApp> appliedRuleApps =
+        ImmutableList<RuleApp> appliedRuleApps =
             goal.appliedRuleApps();
         if (appliedRuleApps != null && !appliedRuleApps.isEmpty()) {
             for (RuleApp appliedRuleApp : appliedRuleApps) {

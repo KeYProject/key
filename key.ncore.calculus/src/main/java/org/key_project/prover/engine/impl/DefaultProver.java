@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * </p>
  *
  * @param <Proof> the type of {@link ProofObject} that the prover constructs
- * @param <Goal>  the type of {@link ProofGoal} instances manipulated by this prover
+ * @param <Goal> the type of {@link ProofGoal} instances manipulated by this prover
  */
 public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Goal extends ProofGoal<@NonNull Goal>>
         extends AbstractProverCore<Proof, Goal> {
@@ -91,7 +91,7 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
      * Executes the proof strategy by applying rules to goals until no further rules
      * can be applied, a stop condition is met, or the thread is interrupted.
      *
-     * @param goalChooser  the {@link GoalChooser} that determines the next goal to process
+     * @param goalChooser the {@link GoalChooser} that determines the next goal to process
      * @param stopCondition the {@link StopCondition} that dictates when the prover should stop
      * @return an {@link ApplyStrategyInfo} instance containing details about the proof process
      */
@@ -149,11 +149,12 @@ public abstract class DefaultProver<Proof extends ProofObject<@NonNull Goal>, Go
     /**
      * Applies rules to goals using the active strategy until a stopping condition is met.
      *
-     * @param goalChooser             the {@link GoalChooser} for selecting the next goal
-     * @param stopCondition           the {@link StopCondition} to evaluate during processing
-     * @param startTime               the start time of the current proof process, in milliseconds
+     * @param goalChooser the {@link GoalChooser} for selecting the next goal
+     * @param stopCondition the {@link StopCondition} to evaluate during processing
+     * @param startTime the start time of the current proof process, in milliseconds
      * @param stopAtFirstNonClosableGoal whether to stop if a non-closable goal is detected
-     * @return a {@link SingleRuleApplicationInfo} instance containing the result of the rule application
+     * @return a {@link SingleRuleApplicationInfo} instance containing the result of the rule
+     *         application
      */
     protected final synchronized SingleRuleApplicationInfo applyAutomaticRule(
             final GoalChooser<Proof, Goal> goalChooser,

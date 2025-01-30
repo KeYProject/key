@@ -16,7 +16,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  */
 public final class MatchedAssumesFeature extends BinaryTacletAppFeature {
 
-    public static final Feature<Goal> INSTANCE = new MatchedAssumesFeature();
+    public static final Feature INSTANCE = new MatchedAssumesFeature();
 
     private MatchedAssumesFeature() {}
 

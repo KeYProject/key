@@ -7,6 +7,7 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.Visitor;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -16,6 +17,8 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NonNull;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
@@ -23,7 +26,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * Feature for checking if the term of the first projection contains the term of the second
  * projection.
  */
-public class ContainsTermFeature implements Feature<Goal> {
+public class ContainsTermFeature implements Feature {
 
     /** Constant that represents the boolean value true */
     public static final RuleAppCost ZERO_COST = NumberRuleAppCost.getZeroCost();
@@ -50,13 +53,14 @@ public class ContainsTermFeature implements Feature<Goal> {
     }
 
 
-    public static Feature<Goal> create(ProjectionToTerm proj1, ProjectionToTerm proj2) {
+    public static Feature create(ProjectionToTerm proj1, ProjectionToTerm proj2) {
         return new ContainsTermFeature(proj1, proj2);
     }
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal,
             MutableState mState) {
         final Term t1 = proj1.toTerm(app, pos, goal, mState);
         final Term t2 = proj2.toTerm(app, pos, goal, mState);

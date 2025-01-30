@@ -20,15 +20,18 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-public class ThrownExceptionFeature extends BinaryFeature<Goal> {
+import org.jspecify.annotations.NonNull;
 
-    public static Feature<Goal> create(String[] blockedExceptions, Services services) {
+public class ThrownExceptionFeature extends BinaryFeature {
+
+    public static Feature create(String[] blockedExceptions, Services services) {
         return new ThrownExceptionFeature(blockedExceptions, services);
     }
 
@@ -64,9 +67,11 @@ public class ThrownExceptionFeature extends BinaryFeature<Goal> {
         return false;
     }
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return app instanceof TacletApp && filter((Term) pos.subTerm(), goal.proof().getServices(),
-            ((TacletApp) app).instantiations().getExecutionContext());
+    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
+        return app instanceof TacletApp tacletApp
+                && filter((Term) pos.subTerm(), (Services) goal.proof().getServices(),
+                    tacletApp.instantiations().getExecutionContext());
     }
 
     protected boolean filter(Term term, Services services, ExecutionContext ec) {

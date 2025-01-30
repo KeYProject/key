@@ -19,20 +19,19 @@ import org.jspecify.annotations.NonNull;
  * <p>
  * TODO: eliminate this class and use term features instead
  */
-public class FindDepthFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature<Goal> {
+public class FindDepthFeature implements Feature {
 
-    private static final Feature<?> INSTANCE = new FindDepthFeature<>();
+    private static final Feature INSTANCE = new FindDepthFeature();
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> getInstance() {
-        // noinspection unchecked
-        return (Feature<Goal>) INSTANCE;
+    public static Feature getInstance() {
+        return INSTANCE;
     }
 
     private FindDepthFeature() {}
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
         // assert pos != null : "Feature is only applicable to rules with find";
         return NumberRuleAppCost.create(pos == null ? 0 : pos.depth());
     }

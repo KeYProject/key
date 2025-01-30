@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -13,13 +14,15 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Feature that returns the number of branches for a given taclet application Size of "assumes"
  * sequents is currently not considered
  */
-public class CountBranchFeature implements Feature<Goal> {
+public class CountBranchFeature implements Feature {
 
-    public static final Feature<Goal> INSTANCE = new CountBranchFeature();
+    public static final Feature INSTANCE = new CountBranchFeature();
 
     private CountBranchFeature() {
     }
@@ -34,7 +37,8 @@ public class CountBranchFeature implements Feature<Goal> {
      * @return the cost of <code>app</code>
      */
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal,
             MutableState mState) {
         if (app.rule() instanceof Taclet tac) {
             final long branches = tac.goalTemplates().size();

@@ -53,7 +53,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
     }
 
     private int introductionTimeHelp(Operator op, Goal goal) {
-        ImmutableList<org.key_project.prover.rules.RuleApp> appliedRules = goal.appliedRuleApps();
+        ImmutableList<RuleApp> appliedRules = goal.appliedRuleApps();
         while (!appliedRules.isEmpty()) {
             final RuleApp app = appliedRules.head();
             appliedRules = appliedRules.tail();

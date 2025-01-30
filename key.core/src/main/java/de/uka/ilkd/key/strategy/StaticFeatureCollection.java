@@ -55,7 +55,7 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
  */
 public abstract class StaticFeatureCollection {
 
-    protected static Feature<Goal> loopInvFeature(Feature<Goal> costStdInv) {
+    protected static Feature loopInvFeature(Feature costStdInv) {
         // NOTE (DS, 2019-04-10): This feature also deactivates the built-in loop
         // scope invariant rule (always!) since we use the taclets now.
         final SetRuleFilter filterLoopInv = new SetRuleFilter();
@@ -71,7 +71,7 @@ public abstract class StaticFeatureCollection {
      * @param cost The specified cost.
      * @return a feature for {@link BlockContractInternalRule} with the specified cost.
      */
-    protected static Feature<Goal> blockContractInternalFeature(Feature<Goal> cost) {
+    protected static Feature blockContractInternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(BlockContractInternalRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
@@ -81,7 +81,7 @@ public abstract class StaticFeatureCollection {
      * @param cost The specified cost.
      * @return a feature for {@link BlockContractExternalRule} with the specified cost.
      */
-    protected static Feature<Goal> blockContractExternalFeature(Feature<Goal> cost) {
+    protected static Feature blockContractExternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(BlockContractExternalRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
@@ -91,7 +91,7 @@ public abstract class StaticFeatureCollection {
      * @param cost The specified cost.
      * @return a feature for {@link LoopContractInternalRule} with the specified cost.
      */
-    protected static Feature<Goal> loopContractInternalFeature(Feature<Goal> cost) {
+    protected static Feature loopContractInternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(LoopContractInternalRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
@@ -101,7 +101,7 @@ public abstract class StaticFeatureCollection {
      * @param cost The specified cost.
      * @return a feature for {@link LoopContractExternalRule} with the specified cost.
      */
-    protected static Feature<Goal> loopContractExternalFeature(Feature<Goal> cost) {
+    protected static Feature loopContractExternalFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(LoopContractExternalRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
@@ -111,36 +111,36 @@ public abstract class StaticFeatureCollection {
      * @param cost The specified cost.
      * @return a feature for {@link LoopApplyHeadRule} with the specified cost.
      */
-    protected static Feature<Goal> loopContractApplyHead(Feature<Goal> cost) {
+    protected static Feature loopContractApplyHead(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(LoopApplyHeadRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 
-    protected static Feature<Goal> methodSpecFeature(Feature<Goal> cost) {
+    protected static Feature methodSpecFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(UseOperationContractRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 
-    protected static Feature<Goal> querySpecFeature(Feature<Goal> cost) {
+    protected static Feature querySpecFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(QueryExpand.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 
-    protected static Feature<Goal> mergeRuleFeature(Feature<Goal> cost) {
+    protected static Feature mergeRuleFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(MergeRule.INSTANCE);
         return ConditionalFeature.createConditional(filter,
             SumFeature.createSum(cost, MergeRuleFeature.INSTANCE));
     }
 
-    protected static Feature<Goal> sequentContainsNoPrograms() {
+    protected static Feature sequentContainsNoPrograms() {
         return not(SeqContainsExecutableCodeFeature.PROGRAMS);
     }
 
-    protected static Feature<Goal> countOccurrences(ProjectionToTerm<Goal> cutFormula) {
+    protected static Feature countOccurrences(ProjectionToTerm<Goal> cutFormula) {
         final TermBuffer sf = new TermBuffer();
         final TermBuffer sub = new TermBuffer();
 
@@ -151,30 +151,30 @@ public abstract class StaticFeatureCollection {
                 ifZero(applyTF(cutFormula, eq(sub)), longConst(1), longConst(0))));
     }
 
-    protected static Feature<Goal> termSmallerThan(String smaller, String bigger) {
+    protected static Feature termSmallerThan(String smaller, String bigger) {
         return TermSmallerThanFeature.create(instOf(smaller), instOf(bigger));
     }
 
-    protected static Feature<Goal> monSmallerThan(String smaller, String bigger,
+    protected static Feature monSmallerThan(String smaller, String bigger,
             IntegerLDT numbers) {
         return MonomialsSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
     }
 
-    protected static Feature<Goal> atomSmallerThan(String smaller, String bigger,
+    protected static Feature atomSmallerThan(String smaller, String bigger,
             IntegerLDT numbers) {
         return AtomsSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
     }
 
-    protected static Feature<Goal> literalsSmallerThan(String smaller, String bigger,
+    protected static Feature literalsSmallerThan(String smaller, String bigger,
             IntegerLDT numbers) {
         return LiteralsSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
     }
 
-    protected static Feature<Goal> longConst(long a) {
+    protected static Feature longConst(long a) {
         return ConstFeature.createConst(cost(a));
     }
 
-    protected static Feature<Goal> inftyConst() {
+    protected static Feature inftyConst() {
         return ConstFeature.createConst(infty());
     }
 
@@ -190,16 +190,16 @@ public abstract class StaticFeatureCollection {
         return ConstTermFeature.createConst(infty());
     }
 
-    protected static Feature<Goal> add(Feature<Goal> a, Feature<Goal> b) {
+    protected static Feature add(Feature a, Feature b) {
         return SumFeature.createSum(a, b);
     }
 
-    protected static Feature<Goal> add(Feature<Goal> a, Feature<Goal> b, Feature<Goal> c) {
+    protected static Feature add(Feature a, Feature b, Feature c) {
         return SumFeature.createSum(a, b, c);
     }
 
     @SafeVarargs
-    protected static Feature<Goal> add(Feature<Goal>... features) {
+    protected static Feature add(Feature... features) {
         return SumFeature.createSum(features);
     }
 
@@ -228,29 +228,29 @@ public abstract class StaticFeatureCollection {
         return orFeature;
     }
 
-    protected static Feature<Goal> or(Feature<Goal> a, Feature<Goal> b) {
+    protected static Feature or(Feature a, Feature b) {
         return ifZero(a, longConst(0), b);
     }
 
-    protected static Feature<Goal> or(Feature<Goal> a, Feature<Goal> b, Feature<Goal> c) {
+    protected static Feature or(Feature a, Feature b, Feature c) {
         return or(a, or(b, c));
     }
 
     @SafeVarargs
-    protected static Feature<Goal> or(Feature<Goal>... features) {
-        Feature<Goal> orFeature = inftyConst();
-        for (Feature<Goal> f : features) {
+    protected static Feature or(Feature... features) {
+        Feature orFeature = inftyConst();
+        for (Feature f : features) {
             orFeature = or(orFeature, f);
         }
         return orFeature;
     }
 
-    protected static Feature<Goal> ifZero(Feature<Goal> cond, Feature<Goal> thenFeature) {
+    protected static Feature ifZero(Feature cond, Feature thenFeature) {
         return ShannonFeature.createConditionalBinary(cond, thenFeature);
     }
 
-    protected static Feature<Goal> ifZero(Feature<Goal> cond, Feature<Goal> thenFeature,
-            Feature<Goal> elseFeature) {
+    protected static Feature ifZero(Feature cond, Feature thenFeature,
+            Feature elseFeature) {
         return ShannonFeature.createConditionalBinary(cond, thenFeature, elseFeature);
     }
 
@@ -263,7 +263,7 @@ public abstract class StaticFeatureCollection {
         return ShannonTermFeature.createConditionalBinary(cond, thenFeature, elseFeature);
     }
 
-    protected static Feature<Goal> not(Feature<Goal> f) {
+    protected static Feature not(Feature f) {
         return ifZero(f, inftyConst(), longConst(0));
     }
 
@@ -271,15 +271,15 @@ public abstract class StaticFeatureCollection {
         return ifZero(f, ConstTermFeature.createConst(TopRuleAppCost.INSTANCE), longTermConst(0));
     }
 
-    protected static Feature<Goal> eq(Feature<Goal> a, Feature<Goal> b) {
+    protected static Feature eq(Feature a, Feature b) {
         return CompareCostsFeature.eq(a, b);
     }
 
-    protected static Feature<Goal> less(Feature<Goal> a, Feature<Goal> b) {
+    protected static Feature less(Feature a, Feature b) {
         return CompareCostsFeature.less(a, b);
     }
 
-    protected static Feature<Goal> leq(Feature<Goal> a, Feature<Goal> b) {
+    protected static Feature leq(Feature a, Feature b) {
         return CompareCostsFeature.leq(a, b);
     }
 
@@ -352,11 +352,11 @@ public abstract class StaticFeatureCollection {
         return opTerm(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
     }
 
-    protected static Feature<Goal> isInstantiated(String schemaVar) {
+    protected static Feature isInstantiated(String schemaVar) {
         return InstantiatedSVFeature.create(new Name(schemaVar));
     }
 
-    protected static Feature<Goal> isTriggerVariableInstantiated() {
+    protected static Feature isTriggerVariableInstantiated() {
         return TriggerVarInstantiatedFeature.INSTANCE;
     }
 
@@ -388,17 +388,17 @@ public abstract class StaticFeatureCollection {
         return EqTermFeature.create(t);
     }
 
-    protected static Feature<Goal> eq(ProjectionToTerm<Goal> t1, ProjectionToTerm<Goal> t2) {
+    protected static Feature eq(ProjectionToTerm<Goal> t1, ProjectionToTerm<Goal> t2) {
         final TermBuffer buf = new TermBuffer();
         return let(buf, t1, applyTF(t2, eq(buf)));
     }
 
 
-    protected static Feature<Goal> directlyBelowSymbolAtIndex(Operator symbol, int index) {
+    protected static Feature directlyBelowSymbolAtIndex(Operator symbol, int index) {
         return directlyBelowSymbolAtIndex(op(symbol), index);
     }
 
-    protected static Feature<Goal> directlyBelowSymbolAtIndex(TermFeature symbolTF, int index) {
+    protected static Feature directlyBelowSymbolAtIndex(TermFeature symbolTF, int index) {
         final var oneUp = FocusProjection.create(1);
         if (index == -1) {
             return add(not(TopLevelFindFeature.ANTEC_OR_SUCC), applyTF(oneUp, symbolTF));
@@ -408,13 +408,13 @@ public abstract class StaticFeatureCollection {
                 inftyConst()));
     }
 
-    protected static Feature<Goal> contains(ProjectionToTerm<Goal> bigTerm,
+    protected static Feature contains(ProjectionToTerm<Goal> bigTerm,
             ProjectionToTerm<Goal> searchedTerm) {
         final TermBuffer buf = new TermBuffer();
         return let(buf, searchedTerm, applyTF(bigTerm, not(rec(any(), not(eq(buf))))));
     }
 
-    protected static Feature<Goal> println(ProjectionToTerm<Goal> t) {
+    protected static Feature println(ProjectionToTerm<Goal> t) {
         return applyTF(t, PrintTermFeature.INSTANCE);
     }
 
@@ -431,7 +431,7 @@ public abstract class StaticFeatureCollection {
      * @param tf term feature
      * @return feature
      */
-    protected static Feature<Goal> applyTF(String schemaVar, TermFeature tf) {
+    protected static Feature applyTF(String schemaVar, TermFeature tf) {
         return applyTF(instOf(schemaVar), tf);
     }
 
@@ -444,7 +444,7 @@ public abstract class StaticFeatureCollection {
      * @param tf term feature
      * @return feature
      */
-    protected static Feature<Goal> applyTFNonStrict(String schemaVar, TermFeature tf) {
+    protected static Feature applyTFNonStrict(String schemaVar, TermFeature tf) {
         return applyTFNonStrict(instOfNonStrict(schemaVar), tf);
     }
 
@@ -457,7 +457,7 @@ public abstract class StaticFeatureCollection {
      * @param tf term feature
      * @return feature
      */
-    protected static Feature<Goal> applyTF(ProjectionToTerm<Goal> term, TermFeature tf) {
+    protected static Feature applyTF(ProjectionToTerm<Goal> term, TermFeature tf) {
         return ApplyTFFeature.create(term, tf);
     }
 
@@ -470,31 +470,31 @@ public abstract class StaticFeatureCollection {
      * @param tf term feature
      * @return feature
      */
-    protected static Feature<Goal> applyTFNonStrict(ProjectionToTerm<Goal> term, TermFeature tf) {
+    protected static Feature applyTFNonStrict(ProjectionToTerm<Goal> term, TermFeature tf) {
         return ApplyTFFeature.createNonStrict(term, tf, NumberRuleAppCost.getZeroCost());
     }
 
-    protected static Feature<Goal> sum(TermBuffer x, TermGenerator<Goal> gen, Feature<Goal> body) {
+    protected static Feature sum(TermBuffer x, TermGenerator<Goal> gen, Feature body) {
         return ComprehendedSumFeature.create(x, gen, body);
     }
 
-    protected static Feature<Goal> let(TermBuffer x, ProjectionToTerm<Goal> value,
-            Feature<Goal> body) {
+    protected static Feature let(TermBuffer x, ProjectionToTerm<Goal> value,
+            Feature body) {
         return LetFeature.create(x, value, body);
     }
 
-    protected static Feature<Goal> isSubSortFeature(ProjectionToTerm<Goal> s1,
+    protected static Feature isSubSortFeature(ProjectionToTerm<Goal> s1,
             ProjectionToTerm<Goal> s2) {
         return SortComparisonFeature.create(s1, s2, SortComparisonFeature.SUBSORT);
     }
 
     // Specific features
 
-    protected static Feature<Goal> implicitCastNecessary(ProjectionToTerm<Goal> s1) {
+    protected static Feature implicitCastNecessary(ProjectionToTerm<Goal> s1) {
         return ImplicitCastNecessary.create(s1);
     }
 
-    protected static Feature<Goal> isSelectSkolemConstantTerm(String svName) {
+    protected static Feature isSelectSkolemConstantTerm(String svName) {
         return applyTF(svName, selectSkolemConstantTermFeature());
     }
 

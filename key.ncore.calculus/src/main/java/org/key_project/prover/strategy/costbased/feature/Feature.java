@@ -16,7 +16,7 @@ import org.jspecify.annotations.NonNull;
  * A {@link Feature} is a class that is able to compute the cost of a {@link RuleApp}.
  */
 @FunctionalInterface
-public interface Feature<Goal extends ProofGoal<@NonNull Goal>> {
+public interface Feature {
 
     /**
      * Evaluate the cost of a {@link RuleApp}.
@@ -30,6 +30,7 @@ public interface Feature<Goal extends ProofGoal<@NonNull Goal>> {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
      *         all (it is discarded by the strategy).
      */
-    RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
+    <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos,
             Goal goal, MutableState mState);
 }

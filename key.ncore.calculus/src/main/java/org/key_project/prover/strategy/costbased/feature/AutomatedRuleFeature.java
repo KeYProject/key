@@ -16,20 +16,20 @@ import org.jspecify.annotations.NonNull;
  * This feature checks if a rule may be applied automatically. Currently, this does not apply to
  * rules which are not member of any rule set.
  */
-public class AutomatedRuleFeature<Goal extends ProofGoal<@NonNull Goal>>
-        extends BinaryFeature<Goal> {
+public class AutomatedRuleFeature
+        extends BinaryFeature {
 
-    private static final Feature<?> INSTANCE = new AutomatedRuleFeature<>();
+    private static final Feature INSTANCE = new AutomatedRuleFeature();
 
     private AutomatedRuleFeature() {}
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> getInstance() {
-        // noinspection unchecked
-        return (Feature<Goal>) INSTANCE;
+    public static Feature getInstance() {
+        return INSTANCE;
     }
 
     @Override
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
         return !(app.rule() instanceof Taclet)
                 || AnyRuleSetTacletFilter.INSTANCE.filter(app.rule());
     }

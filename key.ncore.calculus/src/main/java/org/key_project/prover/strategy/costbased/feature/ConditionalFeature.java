@@ -17,18 +17,18 @@ import org.jspecify.annotations.NonNull;
  * A feature that evaluates one of two given features, depending on the result of a
  * <code>RuleFilter</code>
  */
-public class ConditionalFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature<Goal> {
+public class ConditionalFeature implements Feature {
 
-    private ConditionalFeature(RuleFilter p_cond, Feature<Goal> p_thenFeature,
-            Feature<Goal> p_elseFeature) {
+    private ConditionalFeature(RuleFilter p_cond, Feature p_thenFeature,
+            Feature p_elseFeature) {
         cond = p_cond;
         thenFeature = p_thenFeature;
         elseFeature = p_elseFeature;
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
         if (cond.filter(app.rule())) {
             return thenFeature.computeCost(app, pos, goal, mState);
         } else {
@@ -40,9 +40,8 @@ public class ConditionalFeature<Goal extends ProofGoal<@NonNull Goal>> implement
      * @param cond the filter that decides which value is to be returned
      * @param thenValue the value of the feature, if <code>filter</code> returns true
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditional(
-            RuleFilter cond, RuleAppCost thenValue) {
-        return createConditional(cond, ConstFeature.<Goal>createConst(thenValue));
+    public static Feature createConditional(RuleFilter cond, RuleAppCost thenValue) {
+        return createConditional(cond, ConstFeature.createConst(thenValue));
     }
 
     /**
@@ -50,10 +49,9 @@ public class ConditionalFeature<Goal extends ProofGoal<@NonNull Goal>> implement
      * @param thenValue the value of the feature, if <code>filter</code> returns true
      * @param elseValue the value of the feature, if <code>filter</code> returns false
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditional(
-            RuleFilter cond, RuleAppCost thenValue,
+    public static Feature createConditional(RuleFilter cond, RuleAppCost thenValue,
             RuleAppCost elseValue) {
-        return createConditional(cond, ConstFeature.<Goal>createConst(thenValue),
+        return createConditional(cond, ConstFeature.createConst(thenValue),
             ConstFeature.createConst(elseValue));
     }
 
@@ -62,8 +60,8 @@ public class ConditionalFeature<Goal extends ProofGoal<@NonNull Goal>> implement
      * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true returns
      *        false
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditional(
-            RuleFilter cond, Feature<Goal> thenFeature) {
+    public static Feature createConditional(
+            RuleFilter cond, Feature thenFeature) {
         return createConditional(cond, thenFeature, NumberRuleAppCost.getZeroCost());
     }
 
@@ -72,8 +70,8 @@ public class ConditionalFeature<Goal extends ProofGoal<@NonNull Goal>> implement
      * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true
      * @param elseValue the value of the feature, if <code>filter</code> returns false
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditional(
-            RuleFilter cond, Feature<Goal> thenFeature,
+    public static Feature createConditional(
+            RuleFilter cond, Feature thenFeature,
             RuleAppCost elseValue) {
         return createConditional(cond, thenFeature, ConstFeature.createConst(elseValue));
     }
@@ -83,9 +81,9 @@ public class ConditionalFeature<Goal extends ProofGoal<@NonNull Goal>> implement
      * @param thenFeature the feature that is evaluted, if <code>filter</code> returns true
      * @param elseFeature the feature that is evaluted, if <code>filter</code> returns false
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature<Goal> createConditional(
-            RuleFilter cond, Feature<Goal> thenFeature, Feature<Goal> elseFeature) {
-        return new ConditionalFeature<>(cond, thenFeature, elseFeature);
+    public static Feature createConditional(RuleFilter cond, Feature thenFeature,
+            Feature elseFeature) {
+        return new ConditionalFeature(cond, thenFeature, elseFeature);
     }
 
     /**
@@ -96,10 +94,10 @@ public class ConditionalFeature<Goal extends ProofGoal<@NonNull Goal>> implement
     /**
      * The feature for positive results of <code>filter</code>
      */
-    private final Feature<Goal> thenFeature;
+    private final Feature thenFeature;
 
     /**
      * The feature for negative results of <code>filter</code>
      */
-    private final Feature<Goal> elseFeature;
+    private final Feature elseFeature;
 }

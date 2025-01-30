@@ -9,6 +9,7 @@ import java.util.Map;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -20,6 +21,8 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Feature for relating rule sets with feature terms. Given a taclet application, this feature will
@@ -27,12 +30,13 @@ import org.key_project.util.collection.ImmutableList;
  * feature term (if existing) is evaluated. The result of the feature is the sum of the results of
  * the different rule set features.
  */
-public class RuleSetDispatchFeature implements Feature<Goal> {
+public class RuleSetDispatchFeature implements Feature {
 
-    private final Map<RuleSet, Feature<Goal>> rulesetToFeature = new LinkedHashMap<>();
+    private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<>();
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal,
             MutableState mState) {
         if (!(app instanceof TacletApp)) {
             return NumberRuleAppCost.getZeroCost();
@@ -48,7 +52,7 @@ public class RuleSetDispatchFeature implements Feature<Goal> {
             final RuleSet rs = ruleSetsOfAppliedTaclet.head();
             ruleSetsOfAppliedTaclet = ruleSetsOfAppliedTaclet.tail();
 
-            final Feature<Goal> partialF = rulesetToFeature.get(rs);
+            final Feature partialF = rulesetToFeature.get(rs);
             if (partialF != null) {
                 res = res.add(partialF.computeCost(app, pos, goal, mState));
                 if (res instanceof TopRuleAppCost) {
@@ -64,8 +68,8 @@ public class RuleSetDispatchFeature implements Feature<Goal> {
      * Bind feature <code>f</code> to the rule set <code>ruleSet</code>. If this method is called
      * more than once for the same rule set, the given features are added to each other.
      */
-    public void add(RuleSet ruleSet, Feature<Goal> f) {
-        Feature<Goal> combinedF = rulesetToFeature.get(ruleSet);
+    public void add(RuleSet ruleSet, Feature f) {
+        Feature combinedF = rulesetToFeature.get(ruleSet);
         if (combinedF == null) {
             combinedF = f;
         } else {
@@ -89,7 +93,7 @@ public class RuleSetDispatchFeature implements Feature<Goal> {
      * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not
      *         available.
      */
-    public Feature<Goal> get(RuleSet ruleSet) {
+    public Feature get(RuleSet ruleSet) {
         return rulesetToFeature.get(ruleSet);
     }
 }

@@ -8,6 +8,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -20,17 +21,19 @@ import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoin
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
+import org.jspecify.annotations.NonNull;
+
 
 /**
  * Feature representing a <code>ChoicePoint</code> that iterates over the terms returned by a
  * <code>TermGenerator</code>. The terms are stored in a <code>TermBuffer</code> one after the other
  * and can subsequently be used to instantiate a rule application
  */
-public class ForEachCP implements Feature<Goal> {
+public class ForEachCP implements Feature {
 
     private final TermBuffer var;
     private final TermGenerator generator;
-    private final Feature<Goal> body;
+    private final Feature body;
 
     /**
      * @param var <code>TermBuffer</code> in which the terms are going to be stored
@@ -38,26 +41,26 @@ public class ForEachCP implements Feature<Goal> {
      * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
      *        <code>var</code>
      */
-    public static Feature<Goal> create(TermBuffer var, TermGenerator generator,
-            Feature<Goal> body) {
+    public static Feature create(TermBuffer var, TermGenerator generator,
+            Feature body) {
         return new ForEachCP(var, generator, body);
     }
 
-    private ForEachCP(TermBuffer var, TermGenerator generator, Feature<Goal> body) {
+    private ForEachCP(TermBuffer var, TermGenerator generator, Feature body) {
         this.var = var;
         this.generator = generator;
         this.body = body;
     }
 
     @Override
-    public RuleAppCost computeCost(final RuleApp app,
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(final RuleApp app,
             final PosInOccurrence pos, final Goal goal,
             MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
         var.setContent(null, mState);
 
         final BackTrackingManager manager = mState.getBacktrackingManager();
-        manager.passChoicePoint(new CP(app, pos, goal, mState), this);
+        manager.passChoicePoint(new CP(app, pos, (de.uka.ilkd.key.proof.Goal) goal, mState), this);
 
         final RuleAppCost res;
         if (var.getContent(mState) != null) {
