@@ -95,7 +95,7 @@ public final class WhileInvariantTransformer {
 
     /** calculates the resulting term. */
     public Term transform(TermLabelState termLabelState, Rule rule,
-            org.key_project.prover.rules.RuleApp ruleApp, Goal goal,
+            RuleApp ruleApp, Goal goal,
             Sequent applicationSequent,
             PosInOccurrence applicationPos, Term initialPost,
             Term invariantFramingTermination, SVInstantiations svInst, Services services) {
@@ -242,7 +242,7 @@ public final class WhileInvariantTransformer {
      */
     private ImmutableArray<TermLabel> computeLoopBodyModalityLabels(TermLabelState termLabelState,
             Services services, PosInOccurrence applicationPos,
-            Rule rule, org.key_project.prover.rules.RuleApp ruleApp,
+            Rule rule, RuleApp ruleApp,
             Goal goal, Operator loopBodyModality, Term result, JavaBlock mainJavaBlock,
             Sequent applicationSequent, ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
@@ -328,7 +328,7 @@ public final class WhileInvariantTransformer {
 
     private Term returnCase(TermLabelState termLabelState, ProgramVariable returnFlag,
             KeYJavaType returnType, ProgramVariable returnExpression, Term post, Rule rule,
-            org.key_project.prover.rules.RuleApp ruleApp, Goal goal,
+            RuleApp ruleApp, Goal goal,
             PosInOccurrence applicationPos, Services services) {
         JavaBlock returnJavaBlock =
             addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
@@ -355,7 +355,7 @@ public final class WhileInvariantTransformer {
     }
 
     private Term breakCase(TermLabelState termLabelState, ProgramVariable breakFlag, Term post,
-            ArrayList<If> breakIfCascade, Rule rule, org.key_project.prover.rules.RuleApp ruleApp,
+            ArrayList<If> breakIfCascade, Rule rule, RuleApp ruleApp,
             Goal goal,
             PosInOccurrence applicationPos, Services services) {
         JavaBlock executeJavaBlock = addContext(root,
@@ -373,7 +373,7 @@ public final class WhileInvariantTransformer {
 
     private Term normalCaseAndContinue(TermLabelState termLabelState, Services services,
             PosInOccurrence applicationPos, Rule rule,
-            org.key_project.prover.rules.RuleApp ruleApp, Goal goal,
+            RuleApp ruleApp, Goal goal,
             Sequent applicationSequent, Term contFlagTerm, Term returnFlagTerm, Term breakFlagTerm,
             Term excFlagTerm, Term inv) {
 
@@ -433,7 +433,7 @@ public final class WhileInvariantTransformer {
      */
     private ImmutableArray<TermLabel> computeLoopBodyImplicatonLabels(TermLabelState termLabelState,
             Services services, PosInOccurrence applicationPos,
-            Rule rule, org.key_project.prover.rules.RuleApp ruleApp,
+            Rule rule, RuleApp ruleApp,
             Goal goal, Operator operator, ImmutableArray<Term> subs, Sequent applicationSequent) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
             ruleApp, goal, "LoopBodyImplication", null,

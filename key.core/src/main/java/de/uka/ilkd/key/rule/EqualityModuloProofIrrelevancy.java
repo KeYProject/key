@@ -422,9 +422,9 @@ public class EqualityModuloProofIrrelevancy {
                 || (_this.assumesSequent() != null && that.assumesSequent() == null)) {
             return false;
         } else {
-            ImmutableList<org.key_project.prover.sequent.SequentFormula> if1 =
+            ImmutableList<SequentFormula> if1 =
                 _this.assumesSequent().asList();
-            ImmutableList<org.key_project.prover.sequent.SequentFormula> if2 =
+            ImmutableList<SequentFormula> if2 =
                 that.assumesSequent().asList();
             while (!if1.isEmpty() && !if2.isEmpty()
                     && equalsModProofIrrelevancy(if1.head(), if2.head())) {

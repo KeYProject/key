@@ -35,7 +35,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         return isResponsible(op, (Term) null, services, ec);
     }

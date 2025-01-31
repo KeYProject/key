@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
@@ -53,7 +54,7 @@ public class NoFindTacletExecutor extends TacletExecutor {
      * @param goal the goal that the rule application should refer to.
      * @param ruleApp the taclet application that is executed
      */
-    public ImmutableList<Goal> apply(Goal goal, org.key_project.prover.rules.RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
 
         // Number without the if-goal eventually needed

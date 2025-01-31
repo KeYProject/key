@@ -196,7 +196,7 @@ public class PosInProgram {
      *
      * @return an iterator over the list defining the position in a term.
      */
-    public org.key_project.logic.IntIterator iterator() {
+    public IntIterator iterator() {
         return new PosArrayIntIterator(this);
     }
 

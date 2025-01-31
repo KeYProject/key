@@ -132,7 +132,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      *
      * @see #makeIterableForLoop(EnhancedFor, TransformationData, Services)
      *
-     * @see ProgramTransformer#transform(de.uka.ilkd.key.java.ProgramElement, Services,
+     * @see ProgramTransformer#transform(ProgramElement, Services,
      *      SVInstantiations)
      */
     @Override

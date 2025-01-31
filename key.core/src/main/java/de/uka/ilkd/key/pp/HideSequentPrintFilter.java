@@ -32,7 +32,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 
     @Override
     protected void filterSequent() {
-        Iterator<org.key_project.prover.sequent.SequentFormula> it;
+        Iterator<SequentFormula> it;
 
         if (antec != null) {
             // Result has already been computed. No need to recompute.

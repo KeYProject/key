@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -118,7 +119,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
@@ -129,7 +130,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
         if (left != null && left.sort().extendsTrans(targetSort()) && right != null
                 && right.sort().extendsTrans(targetSort())) {
@@ -139,7 +140,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
         if (sub != null && sub.sort().extendsTrans(targetSort())) {
             return op instanceof Negative;
@@ -184,7 +185,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
         if (op instanceof Negative) {

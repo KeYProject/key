@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic.op;
 
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.sort.Sort;
@@ -45,7 +46,7 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
     }
 
     @Override
-    public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
+    public void visit(Visitor v) {
         v.performActionOnLocationVariable(this);
     }
 

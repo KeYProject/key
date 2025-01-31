@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableList;
 public class NullNewRuleListener implements NewRuleListener {
 
     @Override
-    public void ruleAdded(org.key_project.prover.rules.RuleApp rule, PosInOccurrence pos) {
+    public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
     }
 
     @Override

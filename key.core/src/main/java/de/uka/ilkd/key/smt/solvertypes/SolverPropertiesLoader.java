@@ -89,7 +89,7 @@ public class SolverPropertiesLoader {
         "de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator";
     /**
      * The default {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}, if none is given
-     * in the .props file: {@link de.uka.ilkd.key.smt.communication.Z3Socket}.
+     * in the .props file: {@link Z3Socket}.
      */
     private static final String DEFAULT_SOLVER_SOCKET =
         "de.uka.ilkd.key.smt.communication.Z3Socket";
@@ -142,7 +142,7 @@ public class SolverPropertiesLoader {
     /**
      * The .props key for the solver's
      * {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}. Default socket is
-     * {@link de.uka.ilkd.key.smt.communication.Z3Socket}.
+     * {@link Z3Socket}.
      */
     private static final String SOLVER_SOCKET_CLASS = "socketClass";
     /**

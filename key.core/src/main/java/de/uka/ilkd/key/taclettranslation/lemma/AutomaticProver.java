@@ -99,7 +99,7 @@ public class AutomaticProver {
                 int ruleCounter = 0;
                 while (!openGoals.isEmpty() && ruleCounter < maxNumberOfRules) {
                     Goal goal = openGoals.getFirst();
-                    org.key_project.prover.rules.RuleApp app = getNextApp(goal);
+                    RuleApp app = getNextApp(goal);
                     if (app == null) {
                         openGoals.removeFirst();
                     } else {
@@ -128,7 +128,7 @@ public class AutomaticProver {
             }
         }
 
-        private org.key_project.prover.rules.RuleApp getNextApp(Goal goal) {
+        private RuleApp getNextApp(Goal goal) {
             RuleApp app = goal.getRuleAppManager().next();
             if (app == null) {
                 goal.ruleAppIndex().scanBuiltInRules(goal);

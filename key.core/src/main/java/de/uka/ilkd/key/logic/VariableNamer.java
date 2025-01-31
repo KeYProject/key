@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposer;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -437,14 +438,14 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         // determine a suitable base name
         String basename = null;
-        de.uka.ilkd.key.rule.NewVarcond nv =
-            (de.uka.ilkd.key.rule.NewVarcond) app.taclet().varDeclaredNew(var);
+        NewVarcond nv =
+            (NewVarcond) app.taclet().varDeclaredNew(var);
         if (nv != null) {
             Type type = nv.getType();
             if (type != null) {
                 basename = getBaseNameProposal(type);
             } else {
-                org.key_project.logic.op.sv.SchemaVariable psv = nv.getPeerSchemaVariable();
+                SchemaVariable psv = nv.getPeerSchemaVariable();
                 Object inst = app.instantiations().getInstantiation(psv);
                 if (inst instanceof Expression) {
                     final ExecutionContext ec = app.instantiations().getExecutionContext();

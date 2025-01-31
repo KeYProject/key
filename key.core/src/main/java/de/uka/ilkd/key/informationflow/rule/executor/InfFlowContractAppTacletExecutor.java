@@ -18,6 +18,7 @@ import org.key_project.prover.rules.instantiation.MatchConditions;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -71,7 +72,7 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
             @NonNull TacletApp tacletApp,
             LogicServices services, Object... instantiationInfo) {
 
-        final ImmutableList<org.key_project.prover.sequent.SequentFormula> replacements =
+        final ImmutableList<SequentFormula> replacements =
             instantiateSemisequent(semi, pos, matchCond, goal, tacletApp, goal.getOverlayServices(),
                 instantiationInfo);
         assert replacements.size() == 1

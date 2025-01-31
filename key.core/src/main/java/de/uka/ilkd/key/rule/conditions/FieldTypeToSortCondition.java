@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
@@ -52,8 +53,8 @@ public final class FieldTypeToSortCondition implements VariableCondition {
             return matchCond;
         }
 
-        final de.uka.ilkd.key.rule.inst.SVInstantiations inst =
-            (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
+        final SVInstantiations inst =
+            (SVInstantiations) matchCond.getInstantiations();
 
         if (svSubst instanceof Term) {
             Operator op = ((Term) svSubst).op();

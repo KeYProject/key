@@ -69,8 +69,8 @@ import static java.lang.String.format;
 public class JMLSpecFactory {
 
     public static final String AT_PRE = "AtPre";
-    protected final de.uka.ilkd.key.logic.TermBuilder tb;
-    protected final de.uka.ilkd.key.java.Services services;
+    protected final TermBuilder tb;
+    protected final Services services;
     protected final ContractFactory cf;
 
     /**

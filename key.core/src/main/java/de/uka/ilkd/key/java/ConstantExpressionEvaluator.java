@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import recoder.ParserException;
+import recoder.abstraction.Type;
 import recoder.java.JavaProgramFactory;
 import recoder.service.ConstantEvaluator;
 import recoder.service.DefaultConstantEvaluator;
@@ -45,7 +47,7 @@ public class ConstantExpressionEvaluator {
 
 
     public KeYJavaType getCompileTimeConstantType(Expression expr) {
-        recoder.abstraction.Type javaType =
+        Type javaType =
             getRecoderConstantEvaluator().getCompileTimeConstantType(parseExpression(expr));
         return services.getJavaInfo().getKeYJavaType(javaType.getFullName());
     }
@@ -65,7 +67,7 @@ public class ConstantExpressionEvaluator {
         recoder.java.Expression recExpr = null;
         try {
             recExpr = JavaProgramFactory.getInstance().parseExpression(expr.toString());
-        } catch (recoder.ParserException exc) {
+        } catch (ParserException exc) {
             LOGGER.error("Failed to parse {} as Java expression!", expr);
         }
         return recExpr;

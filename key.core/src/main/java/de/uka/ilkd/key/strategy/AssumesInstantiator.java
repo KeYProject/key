@@ -203,7 +203,7 @@ public class AssumesInstantiator {
      *        formula that has been modified recently
      */
     private void findIfFormulaInstantiationsHelp(
-            ImmutableList<org.key_project.prover.sequent.SequentFormula> p_ifSeqTail,
+            ImmutableList<SequentFormula> p_ifSeqTail,
             ImmutableList<SequentFormula> p_ifSeqTail2nd,
             ImmutableList<AssumesFormulaInstantiation> p_alreadyMatched,
             MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {

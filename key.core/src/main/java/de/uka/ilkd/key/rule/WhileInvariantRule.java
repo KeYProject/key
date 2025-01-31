@@ -520,7 +520,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     private Term bodyTerm(TermLabelState termLabelState, Services services,
-            org.key_project.prover.rules.RuleApp ruleApp,
+            RuleApp ruleApp,
             final Sequent applicationSequent, Instantiation inst, final Term invTerm,
             Term frameCondition, final Term variantPO, Goal bodyGoal, final JavaBlock guardJb,
             final Term guardTrueTerm) {
@@ -553,7 +553,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     private Term useCaseFormula(TermLabelState termLabelState, Services services,
-            org.key_project.prover.rules.RuleApp ruleApp,
+            RuleApp ruleApp,
             Instantiation inst, Goal useGoal, final JavaBlock guardJb, final Term guardFalseTerm) {
         final TermBuilder tb = services.getTermBuilder();
         JavaBlock useJavaBlock =
@@ -603,7 +603,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     private record Guard(JavaBlock javaBlock, Term trueTerm, Term falseTerm) {}
 
     private void prepareInvInitiallyValidBranch(TermLabelState termLabelState, Services services,
-            org.key_project.prover.rules.RuleApp ruleApp, Instantiation inst, final Term invTerm,
+            RuleApp ruleApp, Instantiation inst, final Term invTerm,
             Term reachableState,
             Goal initGoal) {
         initGoal.setBranchLabel("Invariant Initially Valid");
@@ -616,7 +616,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     private void prepareBodyPreservesBranch(TermLabelState termLabelState, Services services,
-            org.key_project.prover.rules.RuleApp ruleApp, final Sequent applicationSequent,
+            RuleApp ruleApp, final Sequent applicationSequent,
             Instantiation inst,
             final Term invTerm, Term wellFormedAnon, Term frameCondition, final Term variantPO,
             Goal bodyGoal, final JavaBlock guardJb, final Term guardTrueTerm,
@@ -637,7 +637,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 
     private void prepareUseCaseBranch(TermLabelState termLabelState, Services services,
-            org.key_project.prover.rules.RuleApp ruleApp, Instantiation inst, Term wellFormedAnon,
+            RuleApp ruleApp, Instantiation inst, Term wellFormedAnon,
             Goal useGoal,
             final JavaBlock guardJb, final Term guardFalseTerm, final Term[] uAnon,
             final Term uAnonInv) {

@@ -168,7 +168,7 @@ public final class JavaInfo {
     // ------------------- common services ----------------------
 
     /**
-     * returns the full name of a given {@link de.uka.ilkd.key.java.abstraction.KeYJavaType}.
+     * returns the full name of a given {@link KeYJavaType}.
      *
      * @param t the KeYJavaType including the package prefix
      * @return the full name

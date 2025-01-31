@@ -204,7 +204,7 @@ public abstract class TacletExecutor
     }
 
     @Override
-    protected void applyAddProgVars(ImmutableSet<org.key_project.logic.op.sv.SchemaVariable> pvs,
+    protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
             SequentChangeInfo currentSequent,
             Goal goal,
             PosInOccurrence posOfFind,

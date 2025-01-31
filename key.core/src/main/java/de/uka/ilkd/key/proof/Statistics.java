@@ -318,7 +318,7 @@ public class Statistics {
 
             final org.key_project.prover.rules.RuleApp ruleApp = node.getAppliedRuleApp();
             if (ruleApp != null) {
-                if (ruleApp instanceof de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) {
+                if (ruleApp instanceof OneStepSimplifierRuleApp) {
                     oss++;
                     ossCaptured += tmpOssCaptured(ruleApp);
                 } else if (ruleApp instanceof SMTRuleApp) {
@@ -398,7 +398,7 @@ public class Statistics {
         private int tmpOssCaptured(final org.key_project.prover.rules.RuleApp ruleApp) {
             int tmpOssCaptured = 0;
             final Protocol protocol =
-                ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
+                ((OneStepSimplifierRuleApp) ruleApp).getProtocol();
             if (protocol != null) {
                 tmpOssCaptured = protocol.size() - 1;
             }

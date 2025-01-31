@@ -58,7 +58,7 @@ public class NodeReplacement {
 
     private void addNodeChange(
             SequentChangeInfo p_sci) {
-        Iterator<org.key_project.prover.sequent.SequentFormula> it;
+        Iterator<SequentFormula> it;
         Iterator<FormulaChangeInfo> it2;
 
         // ---

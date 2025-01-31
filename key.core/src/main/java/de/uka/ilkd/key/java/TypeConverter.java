@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
@@ -127,7 +128,7 @@ public final class TypeConverter {
         return LDTs.values();
     }
 
-    private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op,
+    private Term translateOperator(Operator op,
             ExecutionContext ec) {
 
         final Term[] subs = new Term[op.getArity()];
@@ -336,8 +337,8 @@ public final class TypeConverter {
             return convertToLogicElement(((ParenthesizedExpression) pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {
             return convertToInstanceofTerm((Instanceof) pe, ec);
-        } else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
-            return translateOperator((de.uka.ilkd.key.java.expression.Operator) pe, ec);
+        } else if (pe instanceof Operator) {
+            return translateOperator((Operator) pe, ec);
         } else if (pe instanceof recoder.abstraction.PrimitiveType) {
             throw new IllegalArgumentException(
                 "TypeConverter could not handle" + " this primitive type");
@@ -370,7 +371,7 @@ public final class TypeConverter {
         }
     }
 
-    public static boolean isArithmeticOperator(de.uka.ilkd.key.java.expression.Operator op) {
+    public static boolean isArithmeticOperator(Operator op) {
         return op instanceof Divide || op instanceof Times || op instanceof Plus
                 || op instanceof Minus
                 || op instanceof Modulo || op instanceof ShiftLeft || op instanceof ShiftRight
@@ -962,7 +963,7 @@ public final class TypeConverter {
         return TC;
     }
 
-    private LDT getResponsibleLDT(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    private LDT getResponsibleLDT(Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         for (LDT ldt : LDTs.values()) {
             if (ldt.isResponsible(op, subs, services, ec)) {

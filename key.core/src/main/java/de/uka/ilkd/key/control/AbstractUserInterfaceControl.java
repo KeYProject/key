@@ -28,6 +28,7 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractUserInterfaceControl
         implements UserInterfaceControl, ProblemLoaderControl, ProverTaskListener {
-    private static final org.slf4j.Logger LOGGER =
+    private static final Logger LOGGER =
         LoggerFactory.getLogger(AbstractUserInterfaceControl.class);
     protected AtomicInteger numOfInvokedMacros = new AtomicInteger(0);
 

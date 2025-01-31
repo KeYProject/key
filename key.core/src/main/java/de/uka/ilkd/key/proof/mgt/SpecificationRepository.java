@@ -712,7 +712,7 @@ public final class SpecificationRepository {
      *
      * @param op an operator.
      * @param services services.
-     * @see SpecificationElement#map(java.util.function.UnaryOperator, Services)
+     * @see SpecificationElement#map(UnaryOperator, Services)
      */
     public void map(UnaryOperator<Term> op, Services services) {
         mapValueSets(contracts, op, services);

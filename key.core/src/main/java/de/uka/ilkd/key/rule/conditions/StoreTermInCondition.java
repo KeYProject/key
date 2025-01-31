@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.LightweightSyntacticalReplaceVisitor;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
@@ -32,7 +33,7 @@ public class StoreTermInCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
             MatchConditions matchCond, LogicServices services) {
         final var svInst =
-            (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
+            (SVInstantiations) matchCond.getInstantiations();
 
         if (svInst.getInstantiation(storeInSV) != null) {
             return matchCond;

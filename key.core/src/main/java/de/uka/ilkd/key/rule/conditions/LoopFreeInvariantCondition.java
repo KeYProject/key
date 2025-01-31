@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -48,7 +49,7 @@ public class LoopFreeInvariantCondition implements VariableCondition {
             MatchConditions matchCond, LogicServices p_services) {
         final Services services = (Services) p_services;
         final var svInst =
-            (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
+            (SVInstantiations) matchCond.getInstantiations();
         final TermBuilder tb = services.getTermBuilder();
 
         if (svInst.getInstantiation(invSV) != null) {

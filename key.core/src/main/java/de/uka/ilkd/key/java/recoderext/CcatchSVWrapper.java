@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.op.OperatorSV;
 import recoder.java.Identifier;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
+import recoder.java.Statement;
 
 public class CcatchSVWrapper extends Ccatch implements KeYRecoderExtension, SVWrapper {
     private static final long serialVersionUID = -1;
@@ -46,12 +47,12 @@ public class CcatchSVWrapper extends Ccatch implements KeYRecoderExtension, SVWr
     }
 
     @Override
-    public int getChildPositionCode(recoder.java.ProgramElement pe) {
+    public int getChildPositionCode(ProgramElement pe) {
         throw new ArrayIndexOutOfBoundsException();
     }
 
     @Override
-    public boolean replaceChild(recoder.java.ProgramElement p1, recoder.java.ProgramElement p2) {
+    public boolean replaceChild(ProgramElement p1, ProgramElement p2) {
         return false;
     }
 
@@ -61,7 +62,7 @@ public class CcatchSVWrapper extends Ccatch implements KeYRecoderExtension, SVWr
     }
 
     @Override
-    public recoder.java.Statement getStatementAt(int s) {
+    public Statement getStatementAt(int s) {
         throw new ArrayIndexOutOfBoundsException();
     }
 

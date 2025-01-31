@@ -25,14 +25,14 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     /**
      * The stored rule app
      */
-    private final org.key_project.prover.rules.RuleApp ruleApp;
+    private final RuleApp ruleApp;
 
     /**
      * The costs of the stored rule app
      */
     private final RuleAppCost cost;
 
-    protected RuleAppContainer(org.key_project.prover.rules.RuleApp p_app, RuleAppCost p_cost) {
+    protected RuleAppContainer(RuleApp p_app, RuleAppCost p_cost) {
         ruleApp = p_app;
         cost = p_cost;
     }
@@ -50,9 +50,9 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     /**
      * Create a <code>RuleApp</code> that is suitable to be applied or <code>null</code>.
      */
-    public abstract org.key_project.prover.rules.RuleApp completeRuleApp(Goal p_goal);
+    public abstract RuleApp completeRuleApp(Goal p_goal);
 
-    protected final org.key_project.prover.rules.RuleApp getRuleApp() {
+    protected final RuleApp getRuleApp() {
         return ruleApp;
     }
 
@@ -68,7 +68,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      *         <code>TopRuleAppCost</code>.
      */
     public static @NonNull RuleAppContainer createAppContainer(
-            org.key_project.prover.rules.RuleApp p_app,
+            RuleApp p_app,
             PosInOccurrence p_pio,
             Goal p_goal) {
 
@@ -93,7 +93,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      *         of <code>TopRuleAppCost</code>.
      */
     public static ImmutableList<RuleAppContainer> createAppContainers(
-            ImmutableList<? extends org.key_project.prover.rules.RuleApp> rules,
+            ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos, Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 

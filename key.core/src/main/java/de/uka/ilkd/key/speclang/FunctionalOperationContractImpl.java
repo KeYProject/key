@@ -119,7 +119,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     /**
      * Creates an operation contract. Using this constructor is discouraged: it may change in the
-     * future. Please use the factory methods in {@link de.uka.ilkd.key.speclang.ContractFactory}.
+     * future. Please use the factory methods in {@link ContractFactory}.
      *
      * @param baseName base name of the contract (does not have to be unique)
      * @param name name of the contract (should be unique)
