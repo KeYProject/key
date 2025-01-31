@@ -46,6 +46,7 @@ public class VariableNameProposer implements InstantiationProposer {
      * Returns an instantiation proposal for the schema variable var. Currently supports names for
      * skolemterm SVs, variable SVs, and labels.
      */
+    @Override
     public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
         if (var instanceof SkolemTermSV) {

@@ -207,6 +207,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
     private class ProofListener implements RuleAppListener {
 
         /** invoked when a rule has been applied */
+        @Override
         public void ruleApplied(ProofEvent e) {
             if (!isAutoModeActive()) {
                 return;

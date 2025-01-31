@@ -28,6 +28,7 @@ public class DependencyContractPOLoader implements ProofObligationLoader {
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
      */
+    @Override
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
             Configuration properties) {
         String contractName = Objects.requireNonNull(properties.getString("contract"));

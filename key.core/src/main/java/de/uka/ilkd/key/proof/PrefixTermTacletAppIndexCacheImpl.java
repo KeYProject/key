@@ -34,6 +34,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         this.cache = cache;
     }
 
+    @Override
     public TermTacletAppIndex getIndexForTerm(Term t) {
         return cache.get(getQueryKey(t));
     }
@@ -53,6 +54,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
         }
     }
 
+    @Override
     public void putIndexForTerm(Term t, TermTacletAppIndex index) {
         cache.put(getNewKey(t), index);
     }

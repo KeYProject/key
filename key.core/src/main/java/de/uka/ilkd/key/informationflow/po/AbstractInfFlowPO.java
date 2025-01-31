@@ -22,6 +22,7 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
         super(initConfig, name);
     }
 
+    @Override
     public Proof createProof(String proofName, Term poTerm, InitConfig proofConfig) {
         final Proof proof = super.createProof(proofName, poTerm, proofConfig);
         StrategyInfoUndoMethod undo =
@@ -32,6 +33,7 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
         return proof;
     }
 
+    @Override
     public InfFlowProof createProofObject(String proofName, String proofHeader, Term poTerm,
             InitConfig proofConfig) {
         final InfFlowProof proof = new InfFlowProof(proofName, poTerm, proofHeader, proofConfig);

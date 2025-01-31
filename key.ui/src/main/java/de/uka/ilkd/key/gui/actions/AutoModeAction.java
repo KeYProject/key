@@ -41,18 +41,21 @@ public final class AutoModeAction extends MainWindowAction {
 
     private final ProofTreeListener ptl = new ProofTreeAdapter() {
 
+        @Override
         public void proofStructureChanged(ProofTreeEvent e) {
             if (e.getSource() == associatedProof) {
                 enable();
             }
         }
 
+        @Override
         public void proofClosed(ProofTreeEvent e) {
             if (e.getSource() == associatedProof) {
                 enable();
             }
         }
 
+        @Override
         public void proofGoalsAdded(ProofTreeEvent e) {
             Proof p = e.getSource();
             ImmutableList<Goal> newGoals = e.getGoals();

@@ -19,6 +19,7 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
      * The node mentioned in the ProofTreeEvent has changed, and/or there are new descendants of
      * that node. Any nodes that are not descendants of that node are unaffected.
      */
+    @Override
     public void proofExpanded(ProofTreeEvent e) {
         proofStructureChanged(e);
     }
@@ -29,6 +30,7 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
      * traversed (e.g. in order to free the nodes in caches). The method proofPruned is called, when
      * the nodes are disconnect from node.
      */
+    @Override
     public void proofIsBeingPruned(ProofTreeEvent e) {
 
     }
@@ -38,6 +40,7 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
      * words, that node should no longer have any children now. Any nodes that were not descendants
      * of that node are unaffected.
      */
+    @Override
     public void proofPruned(ProofTreeEvent e) {
         proofStructureChanged(e);
     }
@@ -46,6 +49,7 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
      * The structure of the proof has changed radically. Any client should rescan the whole proof
      * tree.
      */
+    @Override
     public void proofStructureChanged(ProofTreeEvent e) {
         // empty
     }
@@ -53,6 +57,7 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
     /**
      * The proof trees has been closed (the list of goals is empty).
      */
+    @Override
     public void proofClosed(ProofTreeEvent e) {
         proofStructureChanged(e);
     }
@@ -60,6 +65,7 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
     /**
      * The goal mentioned in the ProofTreeEvent has been removed from the list of goals.
      */
+    @Override
     public void proofGoalRemoved(ProofTreeEvent e) {
         proofStructureChanged(e);
     }
@@ -68,6 +74,7 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
      * The goals mentiones in the list of added goals in the proof event have been added to the
      * proof
      */
+    @Override
     public void proofGoalsAdded(ProofTreeEvent e) {
         proofStructureChanged(e);
     }
@@ -76,6 +83,7 @@ public abstract class ProofTreeAdapter implements ProofTreeListener {
      * The goals mentiones in the list of added goals in the proof event have been added to the
      * proof
      */
+    @Override
     public void proofGoalsChanged(ProofTreeEvent e) {
         proofStructureChanged(e);
     }

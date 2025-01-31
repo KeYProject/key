@@ -47,6 +47,7 @@ public class TacletAppIntermediate extends AppIntermediate {
         this.newNames = newNames;
     }
 
+    @Override
     public String getRuleName() {
         return tacletName;
     }

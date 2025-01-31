@@ -88,6 +88,7 @@ public abstract class AbstractProfile implements Profile {
      */
     protected abstract ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration();
 
+    @Override
     public RuleCollection getStandardRules() {
         return standardRules;
     }
@@ -101,14 +102,17 @@ public abstract class AbstractProfile implements Profile {
     }
 
 
+    @Override
     public ImmutableSet<StrategyFactory> supportedStrategies() {
         return strategies;
     }
 
+    @Override
     public boolean supportsStrategyFactory(Name strategy) {
         return getStrategyFactory(strategy) != null;
     }
 
+    @Override
     public StrategyFactory getStrategyFactory(Name n) {
         for (StrategyFactory sf : getStrategyFactories()) {
             if (sf.name().equals(n)) {
@@ -121,6 +125,7 @@ public abstract class AbstractProfile implements Profile {
     /**
      * returns the names of the supported goal chooser builders
      */
+    @Override
     public ImmutableSet<String> supportedGoalChoosers() {
         return supportedGC;
     }
@@ -140,6 +145,7 @@ public abstract class AbstractProfile implements Profile {
      *
      * @throws IllegalArgumentException if a goal chooser of the given name is not supported
      */
+    @Override
     public void setSelectedGoalChooserBuilder(String name) {
 
         this.prototype = lookupGC(name);

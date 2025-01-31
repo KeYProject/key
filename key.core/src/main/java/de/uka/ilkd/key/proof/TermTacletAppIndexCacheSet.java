@@ -53,14 +53,17 @@ public class TermTacletAppIndexCacheSet {
      * dummy cache that is not caching at all, and from which no other cache is reachable
      */
     private final static ITermTacletAppIndexCache noCache = new ITermTacletAppIndexCache() {
+        @Override
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             return this;
         }
 
+        @Override
         public TermTacletAppIndex getIndexForTerm(Term t) {
             return null;
         }
 
+        @Override
         public void putIndexForTerm(Term t, TermTacletAppIndex index) {}
     };
 
@@ -223,6 +226,7 @@ public class TermTacletAppIndexCacheSet {
             super(prefix, cache);
         }
 
+        @Override
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             if (isUpdateTargetPos(t, subtermIndex)) {
                 return getBelowUpdateCache(getExtendedPrefix(t, subtermIndex));
@@ -240,6 +244,7 @@ public class TermTacletAppIndexCacheSet {
             return noCache;
         }
 
+        @Override
         protected String name() {
             return "TopLevelCache" + getPrefix();
         }
@@ -252,6 +257,7 @@ public class TermTacletAppIndexCacheSet {
             super(prefix);
         }
 
+        @Override
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             final Operator op = t.op();
             if (op instanceof Modality) {
@@ -265,10 +271,12 @@ public class TermTacletAppIndexCacheSet {
             return noCache;
         }
 
+        @Override
         public TermTacletAppIndex getIndexForTerm(Term t) {
             return null;
         }
 
+        @Override
         public void putIndexForTerm(Term t, TermTacletAppIndex index) {}
     }
 
@@ -280,6 +288,7 @@ public class TermTacletAppIndexCacheSet {
             super(prefix, cache);
         }
 
+        @Override
         public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             if (isAcceptedOperator(t.op())) {
                 return getBelowProgCache(getExtendedPrefix(t, subtermIndex));
@@ -288,6 +297,7 @@ public class TermTacletAppIndexCacheSet {
             return noCache;
         }
 
+        @Override
         protected String name() {
             return "BelowProgCache" + getPrefix();
         }
