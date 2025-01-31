@@ -53,7 +53,7 @@ public class InitArrayCreation extends InitArray {
 
     /**
      * trying to create an array of negative length causes a
-     * {@link java.lang.NegativeArraySizeException} to be thrown. The if statement implementing this
+     * {@link NegativeArraySizeException} to be thrown. The if statement implementing this
      * behaviour is created by this method.
      *
      * @param cond the Expression representing the guard checking if the given length is negative or

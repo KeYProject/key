@@ -78,7 +78,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         Set<Sort> sorts = sortCollector.getSorts();
         sorts.remove(nullSort);
-        List<org.key_project.prover.sequent.SequentFormula> formulae =
+        List<SequentFormula> formulae =
             createFormulae(goal.proof().getServices(), sorts);
         for (SequentFormula sf : formulae) {
             Sequent s = goal.sequent();
@@ -104,9 +104,9 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return false;
     }
 
-    private List<org.key_project.prover.sequent.SequentFormula> createFormulae(Services services,
+    private List<SequentFormula> createFormulae(Services services,
             Set<Sort> sorts) {
-        List<org.key_project.prover.sequent.SequentFormula> result = new LinkedList<>();
+        List<SequentFormula> result = new LinkedList<>();
 
         JavaInfo info = services.getJavaInfo();
         SpecificationRepository spec = services.getSpecificationRepository();
@@ -139,7 +139,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return result;
     }
 
-    private static void addFormulas(List<org.key_project.prover.sequent.SequentFormula> result,
+    private static void addFormulas(List<SequentFormula> result,
             KeYJavaType kjt, ClassAxiom c,
             LogicVariable o, LogicVariable h, Services services) {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);

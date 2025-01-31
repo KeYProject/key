@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Name;
@@ -316,7 +317,7 @@ public abstract class TacletIndex {
         ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
         final Operator op = term.op();
 
-        assert !(op instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable)
+        assert !(op instanceof Metavariable)
                 : "metavariables are disabled";
 
         if (!term.javaBlock().isEmpty()) {

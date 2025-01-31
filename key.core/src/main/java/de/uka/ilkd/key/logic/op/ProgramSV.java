@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.logic.op;
 
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
@@ -288,8 +290,8 @@ public final class ProgramSV extends OperatorSV
 
         final ExecutionContext ec = instantiations.getExecutionContext();
 
-        final java.util.ArrayList<ProgramElement> matchedElements =
-            new java.util.ArrayList<>();
+        final ArrayList<ProgramElement> matchedElements =
+            new ArrayList<>();
 
         while (src != null) {
             if (!check(src, ec, services)) {

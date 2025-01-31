@@ -21,6 +21,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
@@ -62,7 +63,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
             throws ScriptException, InterruptedException {
-        org.key_project.prover.rules.RuleApp theApp = makeRuleApp(args, state);
+        RuleApp theApp = makeRuleApp(args, state);
         Goal g = state.getFirstOpenAutomaticGoal();
 
         if (theApp instanceof TacletApp tacletApp) {
@@ -78,7 +79,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 }
             }
 
-            org.key_project.prover.rules.RuleApp completeApp =
+            RuleApp completeApp =
                 tacletApp.tryToInstantiate(g.proof().getServices());
             theApp = completeApp == null ? theApp : completeApp;
         }
@@ -87,7 +88,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         g.apply(theApp);
     }
 
-    private org.key_project.prover.rules.RuleApp makeRuleApp(Parameters p, EngineState state)
+    private RuleApp makeRuleApp(Parameters p, EngineState state)
             throws ScriptException {
 
         final Proof proof = state.getProof();
@@ -371,7 +372,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                     p.on == null || RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.on);
 
                 for (var entry : pta.instantiations().getInstantiationMap()) {
-                    final org.key_project.logic.op.sv.SchemaVariable sv = entry.key();
+                    final SchemaVariable sv = entry.key();
                     Term userInst = p.instantiations.get(sv.name().toString());
                     Object ptaInst =
                         pta.instantiations().getInstantiationEntry(sv).getInstantiation();

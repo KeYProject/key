@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.Goal;
@@ -506,7 +507,7 @@ public abstract class StaticFeatureCollection {
 
     public static TermFeature hasLabel(TermLabel label) {
         return TermPredicateTermFeature.create(
-            (t -> t instanceof de.uka.ilkd.key.logic.Term jTerm &&
+            (t -> t instanceof Term jTerm &&
                     jTerm.containsLabel(label)));
     }
 

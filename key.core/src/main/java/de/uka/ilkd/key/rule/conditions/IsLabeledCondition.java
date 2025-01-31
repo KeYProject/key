@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
@@ -36,7 +37,7 @@ public class IsLabeledCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable sv, SyntaxElement instCandidate,
             MatchConditions matchCond, LogicServices services) {
         final var svInst =
-            (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
+            (SVInstantiations) matchCond.getInstantiations();
 
         final JavaStatement stmt = (JavaStatement) svInst.getInstantiation(stmtSV);
 

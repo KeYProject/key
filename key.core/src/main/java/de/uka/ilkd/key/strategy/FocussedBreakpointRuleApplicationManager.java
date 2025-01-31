@@ -8,6 +8,7 @@ import java.util.Optional;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.Taclet;
@@ -105,7 +106,7 @@ public class FocussedBreakpointRuleApplicationManager
 
         if ((!(rule instanceof Taclet) || NodeInfo.isSymbolicExecution((Taclet) rule.rule()))
                 && isJavaPIO(pos)) {
-            var term = (de.uka.ilkd.key.logic.Term) pos.subTerm();
+            var term = (Term) pos.subTerm();
             final SourceElement activeStmt = //
                 JavaTools.getActiveStatement(term.javaBlock());
             final String currStmtString = activeStmt.toString();
@@ -122,7 +123,7 @@ public class FocussedBreakpointRuleApplicationManager
     private static boolean isJavaPIO(PosInOccurrence pio) {
         if (pio == null)
             return false;
-        var term = (de.uka.ilkd.key.logic.Term) pio.subTerm();
+        var term = (Term) pio.subTerm();
         return term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
     }
 

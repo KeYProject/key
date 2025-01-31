@@ -25,7 +25,7 @@ public class LocationVariableTracker implements RuleAppListener {
      * The "origin" of the variables. Used to indicate which
      * {@link de.uka.ilkd.key.rule.TacletApp} created a new program variable.
      */
-    private final Map<LocationVariable, org.key_project.prover.rules.RuleApp> createdBy =
+    private final Map<LocationVariable, RuleApp> createdBy =
         new WeakHashMap<>();
 
     /**

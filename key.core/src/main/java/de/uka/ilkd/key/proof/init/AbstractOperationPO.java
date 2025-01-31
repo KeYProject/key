@@ -937,10 +937,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     /**
-     * Returns the {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} to use as termination
+     * Returns the {@link Modality.JavaModalityKind} to use as termination
      * marker.
      *
-     * @return The {@link de.uka.ilkd.key.logic.op.Modality.JavaModalityKind} to use as termination
+     * @return The {@link Modality.JavaModalityKind} to use as termination
      *         marker.
      */
     protected abstract Modality.JavaModalityKind getTerminationMarker();

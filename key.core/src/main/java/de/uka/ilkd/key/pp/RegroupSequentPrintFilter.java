@@ -33,7 +33,7 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
     @Override
     protected void filterSequent() {
 
-        Iterator<org.key_project.prover.sequent.SequentFormula> it;
+        Iterator<SequentFormula> it;
 
         if (searchString == null || searchString.length() < 3) {
             filterIdentity();

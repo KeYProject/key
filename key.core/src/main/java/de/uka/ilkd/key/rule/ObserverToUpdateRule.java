@@ -151,7 +151,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
     @Override
     public @NonNull ImmutableList<Goal> apply(Goal goal,
-            org.key_project.prover.rules.RuleApp ruleApp) {
+            RuleApp ruleApp) {
         final var services = goal.getOverlayServices();
         Union<Instantiation, ModelFieldInstantiation> inst =
             instantiate((Term) ruleApp.posInOccurrence().subTerm(), services);
@@ -172,7 +172,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
      * {U}{ x := modelField(heap, obj) }[...]post.
      */
     private ImmutableList<Goal> applyForModelFields(Goal goal, ModelFieldInstantiation inst,
-            Services services, org.key_project.prover.rules.RuleApp ruleApp) {
+            Services services, RuleApp ruleApp) {
         final TermBuilder tb = services.getTermBuilder();
         final TermLabelState termLabelState = new TermLabelState();
         // split goal into branches

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -91,7 +92,7 @@ public class ServiceCaches {
     private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
         new LRUCache<>(1000);
 
-    private final LRUCache<org.key_project.logic.op.Operator, Integer> introductionTimeCache =
+    private final LRUCache<Operator, Integer> introductionTimeCache =
         new LRUCache<>(10000);
 
     private final LRUCache<org.key_project.logic.Term, Monomial> monomialCache =
@@ -172,7 +173,7 @@ public class ServiceCaches {
         return ifThenElseMalusCache;
     }
 
-    public final LRUCache<org.key_project.logic.op.Operator, Integer> getIntroductionTimeCache() {
+    public final LRUCache<Operator, Integer> getIntroductionTimeCache() {
         return introductionTimeCache;
     }
 

@@ -27,7 +27,7 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
      * The task that has finished. This can be one of several possible sources:
      * <ul>
      * <li>{@link de.uka.ilkd.key.macros.ProofMacro}</li>
-     * <li>{@link de.uka.ilkd.key.prover.impl.ApplyStrategy}</li>
+     * <li>{@link ApplyStrategy}</li>
      * <li>{@code de.uka.ilkd.key.core.KeYMediator} (when pruning)</li>
      * <li>{@code de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem}
      * (when applying a merge rule)</li>

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.*;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletAnnotation;
@@ -122,7 +123,7 @@ public abstract class FindTaclet extends Taclet {
     /**
      * returns the variables that occur bound in the find part
      */
-    protected ImmutableSet<org.key_project.logic.op.QuantifiableVariable> getBoundVariablesHelper() {
+    protected ImmutableSet<QuantifiableVariable> getBoundVariablesHelper() {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(find());
         return bvv.getBoundVariables();

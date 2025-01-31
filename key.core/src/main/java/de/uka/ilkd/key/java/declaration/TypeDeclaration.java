@@ -5,6 +5,7 @@ package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.abstraction.Package;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -174,7 +175,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     /**
      * TO BE IMPLEMENTED
      */
-    public de.uka.ilkd.key.java.abstraction.Package getPackage(Services s) {
+    public Package getPackage(Services s) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }

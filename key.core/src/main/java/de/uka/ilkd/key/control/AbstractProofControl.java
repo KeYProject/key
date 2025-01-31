@@ -20,6 +20,7 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -109,7 +110,7 @@ public abstract class AbstractProofControl implements ProofControl {
     public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos) {
         ImmutableList<BuiltInRule> rules = ImmutableSLList.nil();
 
-        for (org.key_project.prover.rules.RuleApp ruleApp : focusedGoal.ruleAppIndex()
+        for (RuleApp ruleApp : focusedGoal.ruleAppIndex()
                 .getBuiltInRules(focusedGoal, pos)) {
             BuiltInRule r = (BuiltInRule) ruleApp.rule();
             if (!rules.contains(r)) {
@@ -229,7 +230,7 @@ public abstract class AbstractProofControl implements ProofControl {
                 applyInteractive(firstApp, goal);
             }
         } else if (applics.size() > 1) {
-            java.util.List<TacletApp> appList = new java.util.LinkedList<>();
+            List<TacletApp> appList = new LinkedList<>();
 
             for (int i = 0; i < applics.size(); i++) {
                 TacletApp rapp = it.next();
@@ -251,7 +252,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
 
     @Override
-    public void applyInteractive(org.key_project.prover.rules.RuleApp app, Goal goal) {
+    public void applyInteractive(RuleApp app, Goal goal) {
         final Node node = goal.node();
         node.getNodeInfo().setInteractiveRuleApplication(true);
         goal.apply(app);
@@ -287,7 +288,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     protected void emitInteractiveRuleApplication(Node node,
-            org.key_project.prover.rules.RuleApp app) {
+            RuleApp app) {
         interactionListeners.forEach((l) -> l.runRule(node, app));
     }
 
@@ -340,7 +341,7 @@ public abstract class AbstractProofControl implements ProofControl {
         return result;
     }
 
-    public TacletInstantiationModel[] completeAndApplyApp(java.util.List<TacletApp> apps,
+    public TacletInstantiationModel[] completeAndApplyApp(List<TacletApp> apps,
             Goal goal) {
         TacletInstantiationModel[] origInstModels = new TacletInstantiationModel[apps.size()];
         LinkedList<TacletInstantiationModel> recentInstModels = new LinkedList<>();

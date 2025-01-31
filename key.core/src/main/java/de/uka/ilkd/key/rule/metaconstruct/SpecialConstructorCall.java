@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.SpecialConstructorReference;
 import de.uka.ilkd.key.java.reference.ThisConstructorReference;
@@ -26,8 +27,8 @@ public class SpecialConstructorCall extends ProgramTransformer {
      * The normal form identifier {@link ProgramElementName}.
      */
     private static final ProgramElementName NORMALFORM_IDENTIFIER =
-        new ProgramElementName(de.uka.ilkd.key.java.recoderext.//
-                ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
+        new ProgramElementName(//
+            ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
 
     /**
      * @param consRef The constructor reference.

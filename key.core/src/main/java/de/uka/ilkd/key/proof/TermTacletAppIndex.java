@@ -472,7 +472,7 @@ public class TermTacletAppIndex {
     }
 
     private ImmutableList<TacletApp> convert(
-            ImmutableList<? extends org.key_project.prover.rules.RuleApp> rules,
+            ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos, RuleFilter filter,
             ImmutableList<TacletApp> convertedApps,
             Services services) {

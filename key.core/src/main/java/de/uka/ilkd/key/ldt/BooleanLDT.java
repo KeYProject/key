@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
@@ -80,7 +81,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+    public boolean isResponsible(Operator op, Term[] subs,
             Services services, ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
@@ -92,7 +93,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right,
+    public boolean isResponsible(Operator op, Term left, Term right,
             Services services, ExecutionContext ec) {
         return false;
 
@@ -100,7 +101,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term sub,
+    public boolean isResponsible(Operator op, Term sub,
             TermServices services, ExecutionContext ec) {
         return false;
     }
@@ -117,7 +118,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
+    public Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
         assert false;

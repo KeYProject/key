@@ -26,7 +26,7 @@ public class SemisequentTacletAppIndex {
     public static final AtomicLong PERF_ADD = new AtomicLong();
     public static final AtomicLong PERF_REMOVE = new AtomicLong();
 
-    private ImmutableMap<org.key_project.prover.sequent.SequentFormula, TermTacletAppIndex> termIndices =
+    private ImmutableMap<SequentFormula, TermTacletAppIndex> termIndices =
         DefaultImmutableMap.nilMap();
 
     private TermTacletAppIndexCacheSet indexCaches;
@@ -40,7 +40,7 @@ public class SemisequentTacletAppIndex {
      * Add indices for the given formulas to the map <code>termIndices</code>. Existing entries are
      * replaced with the new indices. Note: destructive, use only when constructing new index
      */
-    private void addTermIndices(ImmutableList<org.key_project.prover.sequent.SequentFormula> cfmas,
+    private void addTermIndices(ImmutableList<SequentFormula> cfmas,
             Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
         while (!cfmas.isEmpty()) {
@@ -86,7 +86,7 @@ public class SemisequentTacletAppIndex {
      * destructive, use only when constructing new index
      */
     private void removeTermIndices(
-            ImmutableList<org.key_project.prover.sequent.SequentFormula> cfmas) {
+            ImmutableList<SequentFormula> cfmas) {
         for (SequentFormula cfma : cfmas) {
             removeTermIndex(cfma);
         }
@@ -259,7 +259,7 @@ public class SemisequentTacletAppIndex {
     public SemisequentTacletAppIndex addTaclets(RuleFilter filter, Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
         final SemisequentTacletAppIndex result = copy();
-        final Iterator<org.key_project.prover.sequent.SequentFormula> it =
+        final Iterator<SequentFormula> it =
             termIndices.keyIterator();
 
         while (it.hasNext()) {
@@ -274,7 +274,7 @@ public class SemisequentTacletAppIndex {
      * taclet app.
      */
     void reportRuleApps(NewRuleListener l) {
-        for (final ImmutableMapEntry<org.key_project.prover.sequent.SequentFormula, TermTacletAppIndex> entry : termIndices) {
+        for (final ImmutableMapEntry<SequentFormula, TermTacletAppIndex> entry : termIndices) {
             final SequentFormula cfma = entry.key();
             final TermTacletAppIndex index = entry.value();
             final PosInOccurrence pio =

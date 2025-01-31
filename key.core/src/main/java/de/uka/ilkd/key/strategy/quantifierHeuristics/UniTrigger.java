@@ -135,8 +135,8 @@ class UniTrigger implements Trigger {
      * Code copied from logic.EqualityConstraint
      */
     private static boolean containsLoop(
-            ImmutableMap<org.key_project.logic.op.QuantifiableVariable, Term> varMap,
-            org.key_project.logic.op.QuantifiableVariable var) {
+            ImmutableMap<QuantifiableVariable, Term> varMap,
+            QuantifiableVariable var) {
         ImmutableList<QuantifiableVariable> body = ImmutableSLList.nil();
         ImmutableList<Term> fringe = ImmutableSLList.nil();
         Term checkForCycle = varMap.get(var);

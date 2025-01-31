@@ -38,6 +38,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 import org.key_project.logic.Namespace;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.SequentFormula;
@@ -339,7 +340,7 @@ public final class ProblemInitializer {
         }
     }
 
-    private void populateNamespaces(org.key_project.logic.Term term, NamespaceSet namespaces,
+    private void populateNamespaces(Term term, NamespaceSet namespaces,
             Goal rootGoal) {
         for (int i = 0; i < term.arity(); i++) {
             populateNamespaces(term.sub(i), namespaces, rootGoal);

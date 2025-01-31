@@ -34,7 +34,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- * visitor for method {@link de.uka.ilkd.key.logic.Term#execPostOrder(Visitor)}. Called with that
+ * visitor for method {@link Term#execPostOrder(Visitor)}. Called with that
  * method
  * on a term, the visitor builds a new term replacing SchemaVariables with their instantiations that
  * are given as a SVInstantiations object.

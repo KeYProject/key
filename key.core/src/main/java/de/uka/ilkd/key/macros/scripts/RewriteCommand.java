@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 
+import org.key_project.logic.IntIterator;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
@@ -121,7 +122,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         for (SequentFormula sf : g.node().sequent().antecedent()) {
 
             if (p.formula != null) {
-                org.key_project.logic.Term term = sf.formula();
+                Term term = sf.formula();
                 if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula)) {
                     continue;
                 }
@@ -133,7 +134,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         // filter taclets that are applicable on the given formula in the succedent
         for (SequentFormula sf : g.node().sequent().succedent()) {
             if (p.formula != null) {
-                org.key_project.logic.Term term = sf.formula();
+                Term term = sf.formula();
                 if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula)) {
                     continue;
                 }
@@ -237,7 +238,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
      * @param pit
      * @return subterm
      */
-    private Term getSubTerm(Term t, org.key_project.logic.IntIterator pit) {
+    private Term getSubTerm(Term t, IntIterator pit) {
         if (pit.hasNext()) {
             int i = pit.next();
             return getSubTerm(t.sub(i), pit);

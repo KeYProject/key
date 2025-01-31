@@ -49,12 +49,12 @@ public final class RuleAppIndex {
     private boolean autoMode;
 
     private final NewRuleListener newRuleListener = new NewRuleListener() {
-        public void ruleAdded(org.key_project.prover.rules.RuleApp taclet, PosInOccurrence pos) {
+        public void ruleAdded(RuleApp taclet, PosInOccurrence pos) {
             informNewRuleListener(taclet, pos);
         }
 
         @Override
-        public void rulesAdded(ImmutableList<? extends org.key_project.prover.rules.RuleApp> rules,
+        public void rulesAdded(ImmutableList<? extends RuleApp> rules,
                 PosInOccurrence pos) {
             informNewRuleListener(rules, pos);
         }
@@ -359,7 +359,7 @@ public final class RuleAppIndex {
     /**
      * informs all observers, if a formula has been added, changed or removed
      */
-    private void informNewRuleListener(org.key_project.prover.rules.RuleApp p_app,
+    private void informNewRuleListener(RuleApp p_app,
             PosInOccurrence p_pos) {
         if (ruleListener != null) {
             ruleListener.ruleAdded(p_app, p_pos);

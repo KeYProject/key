@@ -95,8 +95,8 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         }
 
         ImmutableList<Term> keepSucc =
-            toKeep.succedent().asList().map(org.key_project.prover.sequent.SequentFormula::formula);
-        ImmutableList<org.key_project.prover.sequent.SequentFormula> succ =
+            toKeep.succedent().asList().map(SequentFormula::formula);
+        ImmutableList<SequentFormula> succ =
             goal.sequent().succedent().asList();
         for (SequentFormula seqFormula : succ) {
             if (!keepSucc.exists(

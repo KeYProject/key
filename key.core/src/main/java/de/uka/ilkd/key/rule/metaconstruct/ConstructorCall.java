@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -40,8 +41,8 @@ public class ConstructorCall extends ProgramTransformer {
      * The normal form identifier.
      */
     private static final String NORMALFORM_IDENTIFIER = //
-        de.uka.ilkd.key.java.recoderext. //
-                ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
+        //
+        ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
 
     // @ invariant (newObjectSV == null) != (newObjectVar == null);
     private final SchemaVariable newObjectSV;

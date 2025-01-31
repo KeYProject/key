@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.logic.LogicServices;
@@ -74,7 +75,7 @@ public final class SameObserverCondition implements VariableCondition {
             MatchConditions mc,
             LogicServices p_services) {
         final Services services = (Services) p_services;
-        var svInst = (de.uka.ilkd.key.rule.inst.SVInstantiations) mc.getInstantiations();
+        var svInst = (SVInstantiations) mc.getInstantiations();
         final Term term1 = (Term) svInst.getInstantiation(schema1);
         final Term term2 = (Term) svInst.getInstantiation(schema2);
 

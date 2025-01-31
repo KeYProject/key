@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 
 import org.slf4j.Logger;
@@ -123,7 +124,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     /**
      * @return String representing a logical integer literal in decimal representation
      */
-    public static String convertToDecimalString(org.key_project.logic.Term term,
+    public static String convertToDecimalString(Term term,
             Services services) {
         StringBuilder result = new StringBuilder();
         boolean neg = false;

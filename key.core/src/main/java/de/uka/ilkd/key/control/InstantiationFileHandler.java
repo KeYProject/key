@@ -33,7 +33,7 @@ public class InstantiationFileHandler {
         return hm.containsKey(taclet.name().toString());
     }
 
-    public static java.util.List<List<String>> getInstantiationListsFor(Taclet taclet) {
+    public static List<List<String>> getInstantiationListsFor(Taclet taclet) {
         if (hasInstantiationListsFor(taclet)) {
             if (hm.get(taclet.name().toString()) == null) {
                 createListFor(taclet);
@@ -61,8 +61,8 @@ public class InstantiationFileHandler {
     }
 
     private static void createListFor(Taclet taclet) {
-        java.util.List<List<String>> instList = new LinkedList<>();
-        java.util.List<String> instantiations = new LinkedList<>();
+        List<List<String>> instList = new LinkedList<>();
+        List<String> instantiations = new LinkedList<>();
         try (BufferedReader br = new BufferedReader(
             new FileReader(INSTANTIATION_DIR + File.separator + taclet.name(),
                 StandardCharsets.UTF_8))) {
@@ -106,7 +106,7 @@ public class InstantiationFileHandler {
         Taclet taclet = model.taclet();
         TacletFindModel tableModel = model.tableModel();
         int start = model.tacletApp().instantiations().size();
-        java.util.List<List<String>> instList = getInstantiationListsFor(taclet);
+        List<List<String>> instList = getInstantiationListsFor(taclet);
         try (BufferedWriter bw = new BufferedWriter(
             new FileWriter(INSTANTIATION_DIR + File.separator + taclet.name(),
                 StandardCharsets.UTF_8))) {

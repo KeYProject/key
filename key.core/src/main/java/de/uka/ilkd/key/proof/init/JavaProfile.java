@@ -22,6 +22,7 @@ import de.uka.ilkd.key.smt.newsmt2.DefinedSymbolsHandler;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -246,7 +247,7 @@ public class JavaProfile extends AbstractProfile {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSpecificationInvolvedInRuleApp(org.key_project.prover.rules.RuleApp app) {
+    public boolean isSpecificationInvolvedInRuleApp(RuleApp app) {
         return app instanceof LoopInvariantBuiltInRuleApp || app instanceof AbstractContractRuleApp
                 || app instanceof AbstractAuxiliaryContractBuiltInRuleApp;
     }

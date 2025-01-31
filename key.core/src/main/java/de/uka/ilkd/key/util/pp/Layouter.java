@@ -35,7 +35,7 @@ import org.jspecify.annotations.NonNull;
  * encapsulates the concept of backend. Apart from handling the output, the backend is also asked
  * for the available line width and for the amount of space needed to print a string. This makes it
  * possible to include e.g. HTML markup in the output which does not take up any space. There is
- * a convenience implementation {@link StringBackend}, which writes to a {@link java.lang.String}.
+ * a convenience implementation {@link StringBackend}, which writes to a {@link String}.
  *
  * <P>
  * The layouter internally keeps track of a current <em>indentation level</em>. Think of nicely

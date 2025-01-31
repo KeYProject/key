@@ -151,7 +151,7 @@ public class BuiltInRuleAppIndex {
     private void scanAddedFormulas(Goal goal, boolean antec,
             SequentChangeInfo sci,
             NewRuleListener listener) {
-        ImmutableList<org.key_project.prover.sequent.SequentFormula> cfmas =
+        ImmutableList<SequentFormula> cfmas =
             sci.addedFormulas(antec);
         while (!cfmas.isEmpty()) {
             final SequentFormula cfma = cfmas.head();

@@ -48,7 +48,7 @@ public class TacletFindModel extends AbstractTableModel {
      */
     private static final long serialVersionUID = 5285420522875326156L;
     /** the instantiations entries */
-    private final ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> entries;
+    private final ArrayList<Pair<SchemaVariable, String>> entries;
     /** the related rule application */
     private final TacletApp originalApp;
     /** the integer defines the row until which no editing is possible */
@@ -102,9 +102,9 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * creates a Vector with the row entries of the table
      */
-    private ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> createEntryArray(
+    private ArrayList<Pair<SchemaVariable, String>> createEntryArray(
             TacletApp tacletApp) {
-        ArrayList<Pair<org.key_project.logic.op.sv.SchemaVariable, String>> rowVec =
+        ArrayList<Pair<SchemaVariable, String>> rowVec =
             new ArrayList<>();
         int count = 0;
 
@@ -125,7 +125,7 @@ public class TacletFindModel extends AbstractTableModel {
                 String proposal = instantiationProposers.getProposal(tacletApp, var, services,
                     goal.node(), proposals);
 
-                Pair<org.key_project.logic.op.sv.SchemaVariable, String> pair =
+                Pair<SchemaVariable, String> pair =
                     new Pair<>(var, proposal);
 
                 if (proposal != null) {

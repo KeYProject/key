@@ -17,8 +17,10 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -49,7 +51,7 @@ import org.jspecify.annotations.Nullable;
  * The find part of a taclet is used to attached the rule to a term in the sequent of the current
  * goal. Therefore the term of the sequent has to match the schema as found in the taclet's find
  * part. The taclet is then attached to this term, more precise not the taclet itself, but an
- * application object of this taclet (see {@link de.uka.ilkd.key.rule.TacletApp TacletApp}. When
+ * application object of this taclet (see {@link TacletApp TacletApp}. When
  * this attached taclet application object is applied, the new goals are constructed as described by
  * the goal descriptions. For example <br>
  * </br>
@@ -71,7 +73,7 @@ import org.jspecify.annotations.Nullable;
  * looking where it can be applied, these tasks have to be done in advance. For example by one of
  * the following classes {@link de.uka.ilkd.key.proof.RuleAppIndex RuleAppIndex} or
  * {@link de.uka.ilkd.key.proof.TacletAppIndex TacletAppIndex} or
- * {@link de.uka.ilkd.key.rule.TacletApp TacletApp}
+ * {@link TacletApp TacletApp}
  * </p>
  */
 public abstract class Taclet extends org.key_project.prover.rules.Taclet implements Rule {
@@ -99,7 +101,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
             ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
@@ -122,7 +124,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      *        or recursive use of the Taclet.
      */
     protected Taclet(Name name, TacletApplPart applPart,
-            ImmutableList<org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate> goalTemplates,
+            ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
             ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
@@ -152,12 +154,12 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      *
      * @return all variables occuring bound in the taclet
      */
-    public ImmutableSet<org.key_project.logic.op.QuantifiableVariable> getBoundVariables() {
+    public ImmutableSet<QuantifiableVariable> getBoundVariables() {
         if (boundVariables == null) {
-            ImmutableSet<org.key_project.logic.op.QuantifiableVariable> result =
+            ImmutableSet<QuantifiableVariable> result =
                 DefaultImmutableSet.nil();
 
-            for (final org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate tgt : goalTemplates()) {
+            for (final TacletGoalTemplate tgt : goalTemplates()) {
                 result = result.union(tgt.getBoundVariables());
             }
 
@@ -176,7 +178,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      *
      * @return set of variables that occur bound in taclet entities others than goal templates
      */
-    protected abstract ImmutableSet<org.key_project.logic.op.QuantifiableVariable> getBoundVariablesHelper();
+    protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper();
 
     public ChoiceExpr getChoices() {
         return choices;

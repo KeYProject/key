@@ -99,7 +99,7 @@ class Instantiation {
     }
 
     private void addArbitraryInstance(Services services) {
-        ImmutableMap<org.key_project.logic.op.QuantifiableVariable, Term> varMap =
+        ImmutableMap<QuantifiableVariable, Term> varMap =
             DefaultImmutableMap.nilMap();
 
         for (QuantifiableVariable v : triggersSet.getUniQuantifiedVariables()) {

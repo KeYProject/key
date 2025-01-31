@@ -182,8 +182,8 @@ public class LexPathOrdering implements TermOrdering {
      * @return a number negative, zero or a number positive if <code>p_a</code> is less than, equal,
      *         or greater than <code>p_b</code>
      */
-    private int compare(org.key_project.logic.op.Operator aOp, Sort aSort,
-            ImmutableArray<TermLabel> aLabels, org.key_project.logic.op.Operator bOp,
+    private int compare(Operator aOp, Sort aSort,
+            ImmutableArray<TermLabel> aLabels, Operator bOp,
             Sort bSort, ImmutableArray<TermLabel> bLabels) {
         if (aOp == bOp) {
             return 0;

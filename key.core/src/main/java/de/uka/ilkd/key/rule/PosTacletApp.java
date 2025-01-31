@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
  * the sequent the taclet is attached. The position information has been determined by matching the
  * find-part of the corresponding taclet against the term described by the position information. If
  * such a match has not been performed or a taclet is a no find taclet, a no position taclet object
- * ({@link de.uka.ilkd.key.rule.NoPosTacletApp}) is used to keep track of the (partial)
+ * ({@link NoPosTacletApp}) is used to keep track of the (partial)
  * instantiation information.
  */
 public class PosTacletApp extends TacletApp {

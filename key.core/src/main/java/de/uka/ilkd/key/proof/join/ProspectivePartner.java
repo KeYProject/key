@@ -17,8 +17,8 @@ import org.key_project.prover.sequent.SequentFormula;
 public class ProspectivePartner {
     private final Term[] updates = new Term[2];
     private final Term commonFormula;
-    private final org.key_project.prover.sequent.SequentFormula[] formula =
-        new org.key_project.prover.sequent.SequentFormula[2];
+    private final SequentFormula[] formula =
+        new SequentFormula[2];
     private final Node[] nodes = new Node[2];
     private Term commonPredicate = null;
     private Node commonParent = null;

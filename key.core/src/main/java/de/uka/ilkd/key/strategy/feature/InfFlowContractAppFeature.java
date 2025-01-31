@@ -12,6 +12,7 @@ import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -175,7 +176,7 @@ public class InfFlowContractAppFeature implements Feature {
             return true;
         }
 
-        Node node = ((de.uka.ilkd.key.proof.Goal) goal).node();
+        Node node = ((Goal) goal).node();
 
         int i = 0;
         while (!node.root()) {

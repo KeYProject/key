@@ -8,6 +8,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
@@ -72,7 +73,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
             MatchConditions mc,
             LogicServices p_services) {
         final Services services = (Services) p_services;
-        var svInst = (de.uka.ilkd.key.rule.inst.SVInstantiations) mc.getInstantiations();
+        var svInst = (SVInstantiations) mc.getInstantiations();
         Term hInst = svInst.getInstantiation(h);
         Term oInst = svInst.getInstantiation(o);
         Term fInst = svInst.getInstantiation(f);

@@ -90,7 +90,7 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp {
 
         /**
          * Create a new goal (to be closed in
-         * {@link Goal#apply(org.key_project.prover.rules.RuleApp)} directly afterwards)
+         * {@link Goal#apply(RuleApp)} directly afterwards)
          * with the same sequent as the given one.
          *
          * @param goal the Goal on which to apply <tt>ruleApp</tt>

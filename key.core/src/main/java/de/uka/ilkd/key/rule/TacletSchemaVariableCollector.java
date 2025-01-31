@@ -33,7 +33,7 @@ import org.jspecify.annotations.NonNull;
  * Duplicates are not removed because the use of persistent datastructure and up to now we just have
  * a SetAsList-implementaion causing to have O(sqr(n)) if it would used.
  *
- * For example, {@link de.uka.ilkd.key.rule.TacletApp} uses this class to determine all
+ * For example, {@link TacletApp} uses this class to determine all
  * uninstantiated schemavariables.
  */
 public class TacletSchemaVariableCollector implements DefaultVisitor {
@@ -153,7 +153,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
 
 
     /** @return true iff term contains the given variable */
-    public boolean contains(org.key_project.logic.op.sv.SchemaVariable var) {
+    public boolean contains(SchemaVariable var) {
         return varList.contains(var);
     }
 

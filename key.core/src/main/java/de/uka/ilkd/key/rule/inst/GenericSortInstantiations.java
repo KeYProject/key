@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.sv.OperatorSV;
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.util.collection.DefaultImmutableMap;
@@ -54,7 +55,7 @@ public final class GenericSortInstantiations {
      * @throws GenericSortException iff the conditions could not be solved
      */
     public static GenericSortInstantiations create(
-            Iterator<ImmutableMapEntry<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>>> p_instantiations,
+            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> p_instantiations,
             ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
 
         ImmutableList<GenericSort> sorts = ImmutableSLList.nil();
@@ -70,7 +71,7 @@ public final class GenericSortInstantiations {
         }
 
         while (p_instantiations.hasNext()) {
-            final ImmutableMapEntry<org.key_project.logic.op.sv.SchemaVariable, InstantiationEntry<?>> entry =
+            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry =
                 p_instantiations.next();
             c = GenericSortCondition.createCondition(entry.key(), entry.value());
             if (c != null) {
