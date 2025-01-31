@@ -29,6 +29,7 @@ public class InstantiatedSVFeature extends BinaryTacletAppFeature {
         instProj = SVInstantiationProjection.create(svName, false);
     }
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return instProj.toTerm(app, pos, goal, mState) != null;
     }

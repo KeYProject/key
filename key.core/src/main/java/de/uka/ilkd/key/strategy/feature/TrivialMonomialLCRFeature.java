@@ -32,6 +32,7 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
         return new TrivialMonomialLCRFeature(a, b);
     }
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
         final Monomial aMon = Monomial.create(a.toTerm(app, pos, goal, mState), services);

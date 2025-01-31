@@ -99,6 +99,7 @@ public class SVInstantiationCP implements Feature {
             this.mState = mState;
         }
 
+        @Override
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
             if (!(oldApp instanceof final TacletApp tapp)) {
                 Debug.fail("Instantiation feature is only applicable to " + "taclet apps, but got ",
@@ -115,8 +116,10 @@ public class SVInstantiationCP implements Feature {
                     goal.proof().getServices(), true);
 
             final CPBranch branch = new CPBranch() {
+                @Override
                 public void choose() {}
 
+                @Override
                 public RuleApp getRuleAppForBranch() { return newApp; }
             };
 

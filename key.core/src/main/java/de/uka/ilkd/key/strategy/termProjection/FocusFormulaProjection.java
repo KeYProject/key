@@ -17,6 +17,7 @@ public class FocusFormulaProjection implements ProjectionToTerm<Goal> {
 
     private FocusFormulaProjection() {}
 
+    @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
         assert pos != null : "Projection is only applicable to rules with find";
 

@@ -23,6 +23,7 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     private EqNonDuplicateAppFeature() {}
 
+    @Override
     public boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
@@ -34,6 +35,7 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
         return noDuplicateFindTaclet(app, pos, goal);
     }
 
+    @Override
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
             PosInOccurrence newPio,
             PosInOccurrence oldPio) {

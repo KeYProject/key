@@ -37,6 +37,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     public static Feature partiallyBounded(ProjectionToTerm<Goal> mult1Candidate,
             ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
+            @Override
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
                 return !mult2M.reduce(targetM).variablesDisjoint(mult1M)
                         && !mult1M.reduce(targetM).variablesDisjoint(mult2M);
@@ -50,6 +51,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     public static Feature totallyBounded(ProjectionToTerm<Goal> mult1Candidate,
             ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
+            @Override
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
                 return targetM.variablesSubsume(mult1M.multiply(mult2M));
             }
@@ -62,6 +64,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     public static Feature exactlyBounded(ProjectionToTerm<Goal> mult1Candidate,
             ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
         return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
+            @Override
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
                 return targetM.variablesEqual(mult1M.multiply(mult2M));
             }
@@ -75,6 +78,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
         this.targetCandidate = targetCandidate;
     }
 
+    @Override
     protected final boolean filter(TacletApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         final Services services = goal.proof().getServices();

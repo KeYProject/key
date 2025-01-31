@@ -71,10 +71,12 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
             }
         }
 
+        @Override
         public boolean hasNext() {
             return nextInst != null;
         }
 
+        @Override
         public Term next() {
             final Term res = nextInst;
             nextInst = null;
@@ -82,6 +84,7 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
             return res;
         }
 
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }

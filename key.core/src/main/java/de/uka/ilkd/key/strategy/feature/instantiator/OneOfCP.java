@@ -53,17 +53,21 @@ public class OneOfCP implements Feature {
                 this.oldApp = oldApp;
             }
 
+            @Override
             public boolean hasNext() {
                 return num < features.length;
             }
 
+            @Override
             public CPBranch next() {
                 final int chosen = num++;
                 return new CPBranch() {
+                    @Override
                     public void choose() {
                         theChosenOne = chosen;
                     }
 
+                    @Override
                     public RuleApp getRuleAppForBranch() {
                         return oldApp;
                     }
@@ -73,11 +77,13 @@ public class OneOfCP implements Feature {
             /**
              * throws an unsupported operation exception
              */
+            @Override
             public void remove() {
                 throw new UnsupportedOperationException();
             }
         }
 
+        @Override
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
             return new BranchIterator(oldApp);
         }

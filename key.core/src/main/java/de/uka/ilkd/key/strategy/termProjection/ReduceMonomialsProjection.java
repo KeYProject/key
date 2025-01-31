@@ -31,6 +31,7 @@ public class ReduceMonomialsProjection implements ProjectionToTerm<Goal> {
         return new ReduceMonomialsProjection(dividend, divisor);
     }
 
+    @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Term dividendT = dividend.toTerm(app, pos, goal, mState);
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);

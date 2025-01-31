@@ -111,6 +111,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
     }
 
 
+    @Override
     public void instantiateApp(RuleApp app, PosInOccurrence pio,
             Goal goal,
             RuleAppCostCollector collector) {

@@ -41,6 +41,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         return new ClausesSmallerThanFeature(left, right, numbers);
     }
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);

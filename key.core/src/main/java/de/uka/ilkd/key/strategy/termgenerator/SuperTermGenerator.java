@@ -54,6 +54,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
         };
     }
 
+    @Override
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos,
             Goal goal,
             MutableState mState) {
@@ -97,6 +98,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
             return createIterator(pos, mState);
         }
 
+        @Override
         protected Term generateOneTerm(Term superterm, int child) {
             final var index = services.getTermBuilder().zTerm(String.valueOf(child));
             return services.getTermBuilder().tf().createTerm(binFunc,
@@ -113,30 +115,37 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
                 NAME = new Name("SuperTermGenerated");
             }
 
+            @Override
             public Name name() {
                 return NAME;
             }
 
+            @Override
             public int arity() {
                 return 2;
             }
 
+            @Override
             public Sort sort(Sort[] sorts) {
                 return JavaDLTheory.ANY;
             }
 
+            @Override
             public Sort sort() {
                 return JavaDLTheory.ANY;
             }
 
+            @Override
             public Sort argSort(int i) {
                 return JavaDLTheory.ANY;
             }
 
+            @Override
             public ImmutableArray<Sort> argSorts() {
                 return null;
             }
 
+            @Override
             public boolean bindVarsAt(int n) {
                 return false;
             }
@@ -146,6 +155,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
                 return Modifier.RIGID;
             }
 
+            @Override
             public boolean isRigid() {
                 return true;
             }

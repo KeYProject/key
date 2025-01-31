@@ -25,6 +25,7 @@ public class MonomialColumnOp extends AbstractDividePolynomialsProjection {
         return new MonomialColumnOp(leftCoefficient, polynomial);
     }
 
+    @Override
     protected Term divide(Monomial numerator, BigInteger denominator, Services services) {
         final BigInteger newRightCoeff =
             LexPathOrdering.divide(numerator.getCoefficient(), denominator);

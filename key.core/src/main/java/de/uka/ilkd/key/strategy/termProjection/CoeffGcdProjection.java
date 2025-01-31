@@ -37,6 +37,7 @@ public class CoeffGcdProjection implements ProjectionToTerm<Goal> {
         return new CoeffGcdProjection(monomialLeft, polynomialRight);
     }
 
+    @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
 

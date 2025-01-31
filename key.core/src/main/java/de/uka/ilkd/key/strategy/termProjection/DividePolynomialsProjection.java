@@ -22,6 +22,7 @@ public abstract class DividePolynomialsProjection extends AbstractDividePolynomi
     public static ProjectionToTerm<Goal> createRoundingDown(ProjectionToTerm<Goal> leftCoefficient,
             ProjectionToTerm<Goal> polynomial) {
         return new DividePolynomialsProjection(leftCoefficient, polynomial) {
+            @Override
             protected Term divide(Monomial numerator, BigInteger denominator, Services services) {
                 final BigInteger newRightCoeff = divide(numerator.getCoefficient(), denominator);
                 return numerator.setCoefficient(newRightCoeff).toTerm(services);
@@ -33,6 +34,7 @@ public abstract class DividePolynomialsProjection extends AbstractDividePolynomi
     public static ProjectionToTerm<Goal> createRoundingUp(ProjectionToTerm<Goal> leftCoefficient,
             ProjectionToTerm<Goal> polynomial) {
         return new DividePolynomialsProjection(leftCoefficient, polynomial) {
+            @Override
             protected Term divide(Monomial numerator, BigInteger denominator,
                     Services services) {
                 final BigInteger newRightCoeff =

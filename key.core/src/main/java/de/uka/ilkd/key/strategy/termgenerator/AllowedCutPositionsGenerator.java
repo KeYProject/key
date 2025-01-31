@@ -25,6 +25,7 @@ public class AllowedCutPositionsGenerator implements TermGenerator<Goal> {
 
     public final static TermGenerator<Goal> INSTANCE = new AllowedCutPositionsGenerator();
 
+    @Override
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         return new ACPIterator(pos.sequentFormula().formula(), pos.isInAntec());
@@ -42,10 +43,12 @@ public class AllowedCutPositionsGenerator implements TermGenerator<Goal> {
             termStack.push(negated);
         }
 
+        @Override
         public boolean hasNext() {
             return !termStack.isEmpty();
         }
 
+        @Override
         public Term next() {
             final boolean negated = (Boolean) termStack.pop();
             final Term res = (Term) termStack.pop();
@@ -64,6 +67,7 @@ public class AllowedCutPositionsGenerator implements TermGenerator<Goal> {
             return res;
         }
 
+        @Override
         public void remove() {
             throw new UnsupportedOperationException("Remove not supported");
         }

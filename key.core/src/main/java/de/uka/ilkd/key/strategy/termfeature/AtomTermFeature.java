@@ -20,6 +20,7 @@ public class AtomTermFeature extends BinaryTermFeature {
 
     private AtomTermFeature() {}
 
+    @Override
     protected boolean filter(Term term, MutableState mState, LogicServices services) {
         final var op = term.op();
         return !(op instanceof Junctor || op == Equality.EQV || op instanceof IfThenElse

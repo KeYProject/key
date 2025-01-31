@@ -38,6 +38,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
         return new AtomsSmallerThanFeature(left, right, numbers);
     }
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         return lessThan(collectAtoms(left.toTerm(app, pos, goal, mState)),

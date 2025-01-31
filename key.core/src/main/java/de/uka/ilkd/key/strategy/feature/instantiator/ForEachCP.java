@@ -87,23 +87,28 @@ public class ForEachCP implements Feature {
                 this.mState = mState;
             }
 
+            @Override
             public boolean hasNext() {
                 return terms.hasNext();
             }
 
+            @Override
             public CPBranch next() {
                 final Term generatedTerm = terms.next();
                 return new CPBranch() {
+                    @Override
                     public void choose() {
                         var.setContent(generatedTerm, mState);
                     }
 
+                    @Override
                     public RuleApp getRuleAppForBranch() {
                         return oldApp;
                     }
                 };
             }
 
+            @Override
             public void remove() {
                 throw new UnsupportedOperationException();
             }
@@ -122,6 +127,7 @@ public class ForEachCP implements Feature {
             this.mState = mState;
         }
 
+        @Override
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
             return new BranchIterator(generator.generate(app, pos, goal, mState), oldApp, mState);
         }

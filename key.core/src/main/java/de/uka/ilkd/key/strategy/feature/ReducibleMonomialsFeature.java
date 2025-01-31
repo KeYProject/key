@@ -31,6 +31,7 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
     public static Feature createReducible(ProjectionToTerm<Goal> dividend,
             ProjectionToTerm<Goal> divisor) {
         return new ReducibleMonomialsFeature(dividend, divisor) {
+            @Override
             protected boolean checkReducibility(Monomial mDividend, Monomial mDivisor) {
                 return mDivisor.reducible(mDividend);
             }
@@ -40,12 +41,14 @@ public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
     public static Feature createDivides(ProjectionToTerm<Goal> dividend,
             ProjectionToTerm<Goal> divisor) {
         return new ReducibleMonomialsFeature(dividend, divisor) {
+            @Override
             protected boolean checkReducibility(Monomial mDividend, Monomial mDivisor) {
                 return mDivisor.divides(mDividend);
             }
         };
     }
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Term dividendT = dividend.toTerm(app, pos, goal, mState);
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);

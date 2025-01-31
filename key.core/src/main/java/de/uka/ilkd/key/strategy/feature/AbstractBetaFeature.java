@@ -98,6 +98,7 @@ public abstract class AbstractBetaFeature implements Feature {
     }
 
     private static class MaxPosPathHelper extends MaxPathHelper {
+        @Override
         protected int computeDefault(Term p_t, boolean p_positive) {
             if (alwaysReplace(p_t)) {
                 return 1;
@@ -108,6 +109,7 @@ public abstract class AbstractBetaFeature implements Feature {
     }
 
     private static class MaxDPathHelper extends MaxPathHelper {
+        @Override
         protected int computeDefault(Term p_t, boolean p_positive) {
             return 1;
         }

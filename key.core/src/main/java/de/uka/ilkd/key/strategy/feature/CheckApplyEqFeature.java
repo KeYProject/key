@@ -26,6 +26,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     private CheckApplyEqFeature() {}
 
+    @Override
     protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Need to know the position of " + "the application of the taclet";
 
