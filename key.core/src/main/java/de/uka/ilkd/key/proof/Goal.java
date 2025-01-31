@@ -175,6 +175,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
         ruleAppManager.clearCache();
     }
 
+    @Override
     public RuleApplicationManager<Goal> getRuleAppManager() {
         return ruleAppManager;
     }
@@ -314,6 +315,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      *
      * @return the Proof the goal belongs to
      */
+    @Override
     public Proof proof() {
         return node().proof();
     }
@@ -323,6 +325,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      *
      * @return the Sequent to be proved
      */
+    @Override
     public @NonNull Sequent sequent() {
         return node().sequent();
     }
@@ -609,6 +612,7 @@ public final class Goal implements ProofGoal<@NonNull Goal> {
      * @param ruleApp the rule app
      * @return new goal(s)
      */
+    @Override
     public ImmutableList<Goal> apply(@NonNull final RuleApp ruleApp) {
         final Proof proof = proof();
 

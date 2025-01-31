@@ -18,6 +18,7 @@ public record RuleJustificationByAddRules(Node node, boolean isAxiom) implements
         assert node != null;
     }
 
+    @Override
     public boolean isAxiomJustification() {
         return isAxiom;
     }

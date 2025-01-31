@@ -271,6 +271,7 @@ public final class ProofCorrectnessMgt {
     // -------------------------------------------------------------------------
 
     private class DefaultMgtProofListener implements RuleAppListener {
+        @Override
         public void ruleApplied(ProofEvent e) {
             ProofCorrectnessMgt.this.ruleApplied(e.getRuleAppInfo().getRuleApp());
         }

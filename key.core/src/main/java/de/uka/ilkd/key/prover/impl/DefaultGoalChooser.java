@@ -103,6 +103,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
          * words, that node should no longer have any children now. Any nodes that were not
          * descendants of that node are unaffected.
          */
+        @Override
         public void proofPruned(ProofTreeEvent e) {
             currentSubtreeRoot = e.getNode();
             setupGoals(proof.getSubtreeGoals(proof.root()));

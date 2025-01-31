@@ -80,6 +80,7 @@ public class NodeChangeJournal implements GoalListener {
     /**
      * informs the listener about a change that occured to the sequent of goal
      */
+    @Override
     public void sequentChanged(Goal source, SequentChangeInfo sci) {
         NodeChangesHolder nc = getChangeObj(source.node());
 
@@ -95,6 +96,7 @@ public class NodeChangeJournal implements GoalListener {
      * <code>newGoals</code>). The nodes of <code>newGoals</code> are children of the node
      * <code>parent</code>
      */
+    @Override
     public void goalReplaced(Goal source, Node parent, ImmutableList<Goal> newGoals) {
         NodeChangesHolder nc = removeChangeObj(parent);
 

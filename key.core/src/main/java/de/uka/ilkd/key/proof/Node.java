@@ -760,6 +760,7 @@ public class Node implements Iterable<Node> {
      *
      * @return iterator over children.
      */
+    @Override
     public Iterator<@NonNull Node> iterator() {
         return childrenIterator();
     }

@@ -16,11 +16,13 @@ public class ComplexRuleJustificationBySpec implements ComplexRuleJustification 
         new LinkedHashMap<>();
 
 
+    @Override
     public boolean isAxiomJustification() {
         return false;
     }
 
 
+    @Override
     public RuleJustification getSpecificJustification(RuleApp app, LogicServices services) {
         RuleJustification result = app2Just.get(app);
         return result == null ? this : result;

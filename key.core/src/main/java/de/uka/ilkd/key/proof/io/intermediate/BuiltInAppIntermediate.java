@@ -33,6 +33,7 @@ public class BuiltInAppIntermediate extends AppIntermediate {
         this.newNames = newNames;
     }
 
+    @Override
     public String getRuleName() {
         return ruleName;
     }

@@ -91,10 +91,12 @@ public class TestTermTacletAppIndex {
 
     private TermTacletAppIndexCacheSet noCache =
         new TermTacletAppIndexCacheSet(termTacletAppIndexCache) {
+            @Override
             public ITermTacletAppIndexCache getAntecCache() {
                 return getNoCache();
             }
 
+            @Override
             public ITermTacletAppIndexCache getSuccCache() {
                 return getNoCache();
             }
