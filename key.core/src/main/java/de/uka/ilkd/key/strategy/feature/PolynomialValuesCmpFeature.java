@@ -41,6 +41,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
     public static Feature lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
+            @Override
             protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
                 return leftPoly.valueLess(rightPoly);
             }
@@ -54,6 +55,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
     public static Feature leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
+            @Override
             protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
                 return leftPoly.valueLeq(rightPoly);
             }
@@ -67,6 +69,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
     public static Feature eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
+            @Override
             protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
                 return leftPoly.valueEq(rightPoly);
             }
@@ -80,6 +83,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
     public static Feature divides(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
             ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff) {
+            @Override
             protected boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
                 // we currently only support constant polynomials
                 assert leftPoly.getParts().isEmpty();
@@ -96,6 +100,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
         };
     }
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         return compare(getPolynomial(left, leftCoeff, app, pos, goal, mState),

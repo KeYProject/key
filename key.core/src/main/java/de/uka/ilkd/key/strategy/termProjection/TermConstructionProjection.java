@@ -37,6 +37,7 @@ public class TermConstructionProjection implements ProjectionToTerm<Goal> {
         return new TermConstructionProjection(op, subTerms);
     }
 
+    @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Term[] subs = new Term[subTerms.length];
         for (int i = 0; i != subTerms.length; ++i) {

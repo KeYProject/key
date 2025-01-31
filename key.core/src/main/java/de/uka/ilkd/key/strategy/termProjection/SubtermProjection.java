@@ -31,6 +31,7 @@ public class SubtermProjection implements ProjectionToTerm<Goal> {
         this.pit = pit;
     }
 
+    @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return (Term) pit.getSubTerm(completeTerm.toTerm(app, pos, goal, mState));
     }

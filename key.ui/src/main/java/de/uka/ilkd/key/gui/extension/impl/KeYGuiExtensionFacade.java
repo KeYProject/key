@@ -309,7 +309,7 @@ public final class KeYGuiExtensionFacade {
             return false;
         }
         String sys = System.getProperty(a.getName());
-        return sys == null || !sys.equalsIgnoreCase("false");
+        return !"false".equalsIgnoreCase(sys);
     }
     // endregion
 

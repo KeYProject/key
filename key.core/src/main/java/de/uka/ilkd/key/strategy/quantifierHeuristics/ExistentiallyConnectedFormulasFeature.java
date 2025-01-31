@@ -28,6 +28,7 @@ public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeatur
         return new ExistentiallyConnectedFormulasFeature(for0, for1);
     }
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 

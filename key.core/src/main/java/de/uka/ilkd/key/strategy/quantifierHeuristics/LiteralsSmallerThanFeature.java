@@ -40,6 +40,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         return new LiteralsSmallerThanFeature(left, right, numbers);
     }
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
@@ -210,10 +211,12 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
             }
         }
 
+        @Override
         public boolean hasNext() {
             return nextMonomial != null;
         }
 
+        @Override
         public Term next() {
             final Term res = nextMonomial;
             nextMonomial = null;
@@ -224,6 +227,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         /**
          * throw an unsupported operation exception
          */
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }

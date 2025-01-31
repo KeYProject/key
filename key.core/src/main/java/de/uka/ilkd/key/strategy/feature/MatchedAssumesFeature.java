@@ -20,6 +20,7 @@ public final class MatchedAssumesFeature extends BinaryTacletAppFeature {
 
     private MatchedAssumesFeature() {}
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return app.assumesInstantionsComplete();
     }

@@ -67,6 +67,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
         return false;
     }
 
+    @Override
     protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
             PosInOccurrence pos, Goal goal, MutableState mState) {
         return app instanceof TacletApp tacletApp

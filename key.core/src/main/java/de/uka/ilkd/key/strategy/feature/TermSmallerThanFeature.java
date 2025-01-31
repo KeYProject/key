@@ -27,6 +27,7 @@ public class TermSmallerThanFeature extends SmallerThanFeature {
         this.right = right;
     }
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return lessThan(left.toTerm(app, pos, goal, mState),
             right.toTerm(app, pos, goal, mState),

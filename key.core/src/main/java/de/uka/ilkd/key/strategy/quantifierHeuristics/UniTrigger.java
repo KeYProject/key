@@ -39,6 +39,7 @@ class UniTrigger implements Trigger {
         this.triggerSetThisBelongsTo = triggerSetThisBelongsTo;
     }
 
+    @Override
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm,
             Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
@@ -68,6 +69,7 @@ class UniTrigger implements Trigger {
     }
 
 
+    @Override
     public Term getTriggerTerm() {
         return trigger;
     }

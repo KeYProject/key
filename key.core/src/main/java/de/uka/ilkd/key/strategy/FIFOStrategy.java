@@ -49,14 +49,17 @@ public class FIFOStrategy implements Strategy<Goal> {
      *
      * @return true iff the rule should be applied, false otherwise
      */
+    @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return true;
     }
 
+    @Override
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             RuleAppCostCollector collector) {}
 
+    @Override
     public Name name() {
         return NAME;
     }
@@ -64,10 +67,12 @@ public class FIFOStrategy implements Strategy<Goal> {
     public static final Strategy INSTANCE = new FIFOStrategy();
 
     public static class Factory implements StrategyFactory {
+        @Override
         public Name name() {
             return NAME;
         }
 
+        @Override
         public Strategy create(Proof proof, StrategyProperties properties) {
             return INSTANCE;
         }

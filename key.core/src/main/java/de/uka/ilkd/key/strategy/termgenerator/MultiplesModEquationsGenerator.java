@@ -55,6 +55,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator<Goal> {
         return new MultiplesModEquationsGenerator(source, target);
     }
 
+    @Override
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         final Services services = goal.proof().getServices();

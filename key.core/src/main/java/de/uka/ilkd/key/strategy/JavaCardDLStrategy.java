@@ -1442,12 +1442,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final Term tOne = getServices().getTermBuilder().zTerm("1");
         final TermBuffer one = new TermBuffer() {
+            @Override
             public void setContent(org.key_project.logic.Term term, MutableState mState) {}
 
+            @Override
             public Term getContent(MutableState mState) {
                 return tOne;
             }
 
+            @Override
             public Term toTerm(RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tOne;
@@ -1456,12 +1459,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final Term tTwo = getServices().getTermBuilder().zTerm("2");
         final TermBuffer two = new TermBuffer() {
+            @Override
             public void setContent(org.key_project.logic.Term term, MutableState mState) {}
 
+            @Override
             public Term getContent(MutableState mState) {
                 return tTwo;
             }
 
+            @Override
             public Term toTerm(RuleApp app, PosInOccurrence pos,
                     Goal goal, MutableState mState) {
                 return tTwo;

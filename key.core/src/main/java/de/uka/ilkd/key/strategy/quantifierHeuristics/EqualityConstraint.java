@@ -94,6 +94,7 @@ public class EqualityConstraint implements Constraint {
         return metaVars;
     }
 
+    @Override
     protected synchronized Object clone() {
         EqualityConstraint res = new EqualityConstraint((HashMap<Metavariable, Term>) map.clone());
         res.instantiationCache = instantiationCache == null ? null
@@ -106,6 +107,7 @@ public class EqualityConstraint implements Constraint {
      *
      * @return true if Bottom
      */
+    @Override
     final public boolean isBottom() {
         return map.isEmpty();
     }
@@ -117,6 +119,7 @@ public class EqualityConstraint implements Constraint {
      *
      * @return true always
      */
+    @Override
     final public boolean isSatisfiable() {
         return true;
     }
@@ -148,6 +151,7 @@ public class EqualityConstraint implements Constraint {
      * @param services the Services
      * @return a term the given metavariable can be instantiated with
      */
+    @Override
     public synchronized Term getInstantiation(Metavariable p_mv, Services services) {
         Term t = null;
         if (instantiationCache == null) {
@@ -203,6 +207,7 @@ public class EqualityConstraint implements Constraint {
      *        introducing intersection sorts)
      * @return TOP if not possible, else a new constraint with after unification of t1 and t2
      */
+    @Override
     public Constraint unify(Term t1, Term t2, Services services) {
         return unify(t1, t2, services, CONSTRAINTBOOLEANCONTAINER);
     }
@@ -218,6 +223,7 @@ public class EqualityConstraint implements Constraint {
      * @return TOP if not possible, else a new constraint unifying t1 and t2 ( == this iff this
      *         subsumes the unification )
      */
+    @Override
     public Constraint unify(Term t1, Term t2, Services services, BooleanContainer unchanged) {
         final Constraint newConstraint = unifyHelp(t1, t2, false, services);
 
@@ -597,6 +603,7 @@ public class EqualityConstraint implements Constraint {
      * @return true iff this constraint is as strong as "co", i.e. every instantiation satisfying
      *         "this" also satisfies "co".
      */
+    @Override
     public boolean isAsStrongAs(Constraint co) {
         if (this == co) {
             return true;
@@ -615,6 +622,7 @@ public class EqualityConstraint implements Constraint {
      * @return true iff this constraint is as weak as "co", i.e. every instantiation satisfying "co"
      *         also satisfies "this".
      */
+    @Override
     public boolean isAsWeakAs(Constraint co) {
         if (this == co) {
             return true;
@@ -635,6 +643,7 @@ public class EqualityConstraint implements Constraint {
      * @param co Constraint to be joined with this one
      * @return the joined constraint
      */
+    @Override
     public Constraint join(Constraint co, Services services) {
         return join(co, services, CONSTRAINTBOOLEANCONTAINER);
     }
@@ -650,6 +659,7 @@ public class EqualityConstraint implements Constraint {
      * @param unchanged the BooleanContainers value set true, if this constraint is as strong as co
      * @return the joined constraint
      */
+    @Override
     public synchronized Constraint join(Constraint co, Services services,
             BooleanContainer unchanged) {
         if (co.isBottom() || co == this) {

@@ -40,6 +40,7 @@ public class SimpleFilteredStrategy implements Strategy<Goal> {
         ruleFilter = p_ruleFilter;
     }
 
+    @Override
     public Name name() {
         return NAME;
     }
@@ -79,6 +80,7 @@ public class SimpleFilteredStrategy implements Strategy<Goal> {
      *
      * @return true iff the rule should be applied, false otherwise
      */
+    @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         // do not apply a rule twice
@@ -86,6 +88,7 @@ public class SimpleFilteredStrategy implements Strategy<Goal> {
             goal, new MutableState()) != TopRuleAppCost.INSTANCE;
     }
 
+    @Override
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             RuleAppCostCollector collector) {}
 

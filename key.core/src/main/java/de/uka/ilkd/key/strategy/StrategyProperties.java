@@ -395,6 +395,7 @@ public final class StrategyProperties extends Properties {
     }
 
 
+    @Override
     public String getProperty(String key) {
         String val = super.getProperty(key);
         if (val != null) {
@@ -436,6 +437,7 @@ public final class StrategyProperties extends Properties {
     }
 
 
+    @Override
     public synchronized Object clone() {
         final Properties p = (Properties) super.clone();
         final StrategyProperties sp = new StrategyProperties();

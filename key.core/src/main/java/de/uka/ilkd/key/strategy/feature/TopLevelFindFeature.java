@@ -21,6 +21,7 @@ public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
     private static abstract class TopLevelWithoutUpdate extends TopLevelFindFeature {
         protected abstract boolean matches(PosInOccurrence pos);
 
+        @Override
         protected boolean checkPosition(PosInOccurrence pos) {
             return pos.isTopLevel() && matches(pos);
         }
@@ -29,6 +30,7 @@ public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
     private static abstract class TopLevelWithUpdate extends TopLevelFindFeature {
         protected abstract boolean matches(PosInOccurrence pos);
 
+        @Override
         protected boolean checkPosition(PosInOccurrence pos) {
             if (!pos.isTopLevel()) {
                 final PIOPathIterator it = pos.iterator();
@@ -44,41 +46,48 @@ public abstract class TopLevelFindFeature extends BinaryTacletAppFeature {
     }
 
     public final static Feature ANTEC_OR_SUCC = new TopLevelWithoutUpdate() {
+        @Override
         protected boolean matches(PosInOccurrence pos) {
             return true;
         }
     };
 
     public final static Feature ANTEC = new TopLevelWithoutUpdate() {
+        @Override
         protected boolean matches(PosInOccurrence pos) {
             return pos.isInAntec();
         }
     };
 
     public final static Feature SUCC = new TopLevelWithoutUpdate() {
+        @Override
         protected boolean matches(PosInOccurrence pos) {
             return !pos.isInAntec();
         }
     };
 
     public final static Feature ANTEC_OR_SUCC_WITH_UPDATE = new TopLevelWithUpdate() {
+        @Override
         protected boolean matches(PosInOccurrence pos) {
             return true;
         }
     };
 
     public final static Feature ANTEC_WITH_UPDATE = new TopLevelWithUpdate() {
+        @Override
         protected boolean matches(PosInOccurrence pos) {
             return pos.isInAntec();
         }
     };
 
     public final static Feature SUCC_WITH_UPDATE = new TopLevelWithUpdate() {
+        @Override
         protected boolean matches(PosInOccurrence pos) {
             return !pos.isInAntec();
         }
     };
 
+    @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
         return checkPosition(pos);

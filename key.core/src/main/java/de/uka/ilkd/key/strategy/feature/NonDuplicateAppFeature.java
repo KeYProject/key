@@ -18,6 +18,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppFeature();
 
+    @Override
     public boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         if (!app.assumesInstantionsComplete()) {
@@ -27,6 +28,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
         return noDuplicateFindTaclet(app, pos, goal);
     }
 
+    @Override
     protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
             PosInOccurrence newPio,
             PosInOccurrence oldPio) {
