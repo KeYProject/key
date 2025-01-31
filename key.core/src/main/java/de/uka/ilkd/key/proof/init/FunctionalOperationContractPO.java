@@ -30,12 +30,12 @@ import de.uka.ilkd.key.rule.metaconstruct.PostWork;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
-import org.jspecify.annotations.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
 
@@ -230,8 +230,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     protected @Nullable Term buildFrameClause(List<LocationVariable> modifiableHeaps,
-                                              Map<Term, Term> heapToAtPre, LocationVariable selfVar,
-                                              ImmutableList<LocationVariable> paramVars, Services services) {
+            Map<Term, Term> heapToAtPre, LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services) {
         Term frameTerm = null;
         for (LocationVariable heap : modifiableHeaps) {
             final Term ft;
