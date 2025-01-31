@@ -789,7 +789,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Builds the frame clause including the modifiable clause.
      *
-     * @param modifiableHeaps The heaps.
+     * @param modifiableHeaps a non-empty list of heaps variables
      * @param heapToAtPre The previous heap before execution.
      * @param selfVar The self variable.
      * @param paramVars The parameters {@link ProgramVariable}s.
@@ -1083,6 +1083,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
         if (isAddUninterpretedPredicate()) {
             postTerm = tb.and(postTerm, ensureUninterpretedPredicateExists(paramVars,
                 formalParamVars, exceptionVar, getUninterpretedPredicateName(), proofServices));
+        }
+
+        if(heaps.isEmpty()) {
+            // happens in cases of `no_state` model methods, than no heap can be modified.
+            return postTerm;
         }
 
         Term frameTerm = buildFrameClause(heaps, heapToBefore, selfVar, paramVars, proofServices);

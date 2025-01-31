@@ -45,31 +45,7 @@ public class ProofManagementApi {
      *         exception here)
      */
     public List<Contract> getProofContracts() {
-        if (proofContracts.isEmpty()) {
-            buildContracts();
-        }
-        return proofContracts;
-    }
-
-    /**
-     * constructs the possible proof contracts from the java info in the environment.
-     */
-    private void buildContracts() {
-        proofContracts.clear();
-        Set<KeYJavaType> kjts = currentEnv.getJavaInfo().getAllKeYJavaTypes();
-        for (KeYJavaType type : kjts) {
-            if (!KeYTypeUtil.isLibraryClass(type)) {
-                ImmutableSet<IObserverFunction> targets =
-                    currentEnv.getSpecificationRepository().getContractTargets(type);
-                for (IObserverFunction target : targets) {
-                    ImmutableSet<Contract> contracts =
-                        currentEnv.getSpecificationRepository().getContracts(type, target);
-                    for (Contract contract : contracts) {
-                        proofContracts.add(contract);
-                    }
-                }
-            }
-        }
+        return currentEnv.getProofContracts();
     }
 
     /**
