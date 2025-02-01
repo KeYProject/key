@@ -24,7 +24,7 @@ public final class AbandonTaskAction extends MainWindowAction {
         setIcon(IconFactory.abandon(16));
         setTooltip("Drop current proof.");
 
-        getMediator().enableWhenProofLoaded(this);
+        enabledOnAnActiveProof();
 
         this.proof = proof;
     }

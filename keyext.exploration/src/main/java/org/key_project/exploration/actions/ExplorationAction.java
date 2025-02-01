@@ -25,6 +25,7 @@ public abstract class ExplorationAction extends MainWindowAction {
 
     protected ExplorationAction(MainWindow mw) {
         super(mw);
+        enabledWhenNotInAutoMode();
     }
 
     @Override

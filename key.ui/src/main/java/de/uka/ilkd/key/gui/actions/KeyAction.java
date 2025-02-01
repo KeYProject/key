@@ -9,19 +9,27 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
+import java.util.function.Supplier;
+
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
 
-/**
- * Common class for all "actions" (menu entries / toolbar buttons) the user can trigger.
- * If you want the keyboard shortcuts ({@link #setAcceleratorKey(KeyStroke)} to work, the action
- * needs to be inserted into the main menu.
- *
- * @author Alexander Weigl
- * @version 1 (13.02.19)
- */
+/// Common class for all "actions" (menu entries / toolbar buttons) the user can trigger.
+/// If you want the keyboard shortcuts ([#setAcceleratorKey(KeyStroke)] to work, the action
+/// needs to be inserted into the main menu.
+///
+/// ## Note for implementors
+///
+/// ### Handling of of the enabledness of an KeY action can be controlled by the predicate variable
+/// [#enabledWhen]. This predicate is ask whether the action is enabled in the current state inside
+/// the method [#updateEnabledness()]. This machinary requires, that the enabledness of an action
+/// is defined as follows in a sub-class:
+/// 1. You need to set this variable using [#setEnabledWhen(Supplier<Boolean>)].
+/// 2. You also need to add the method [#updateEnabledness()] in the listener,
+/// e.g., {@link java.beans.PropertyChangeListener}, s.t. the action is notified on a state change.
+///
+/// @author Alexander Weigl
+/// @version 1 (13.02.19)
 public abstract class KeyAction extends AbstractAction {
-    private static final long serialVersionUID = -3939943174392925224L;
-
     /**
      * SHORTCUT_FOCUSED_CONDITION
      */
@@ -39,13 +47,13 @@ public abstract class KeyAction extends AbstractAction {
      * <p>
      * The path should be a dot-separated string, i.e. "Heatmap.Options" would inject an action into
      * a sub-sub Menu Options below Heatmap.
-     *
+     * <p>
      * (see {@code KeYGuiExtensionFacade.findMenu(JMenu, Iterator)})
      */
     public static final String PATH = "PATH";
 
     /**
-     * Boolean property set to true if the this action should be displayed with a checkbox.
+     * Boolean property set to true if this action should be displayed with a checkbox.
      */
     public static final String CHECKBOX = "CHECKBOX";
 
@@ -57,6 +65,38 @@ public abstract class KeyAction extends AbstractAction {
      * The stored values are {@link KeyStroke}.
      */
     public static final String LOCAL_ACCELERATOR = "LOCAL_ACCELERATOR";
+
+
+    /// Key of the property, [#enabledWhen]
+    public static final String PROPERTY_ENABLED_WHEN = "enabledWhen";
+
+    private Pred enabledWhen = () -> true;
+
+    /// Sets the predicate to control the enabledness of this action.
+    /// This predicate is requested when [#updateEnabledness()] is called, which is also
+    /// by this method, when [#enabledWhen] is updated to a different value.
+    ///
+    /// @param enabledWhen a supplier of a boolean regarding the enabledness of this action.
+    public void setEnabledWhen(Pred enabledWhen) {
+        var oldValue = this.enabledWhen;
+        this.enabledWhen = enabledWhen;
+        firePropertyChange(PROPERTY_ENABLED_WHEN, oldValue, enabledWhen);
+        if (oldValue != enabledWhen) {
+            updateEnabledness();
+        }
+    }
+
+    /// @see [#setEnabledWhen(Pred)]
+    public Pred getEnabledWhen() {
+        return enabledWhen;
+    }
+
+    /**
+     * Use this method for updating the enabledness using [{@link #enabledWhen}] predicate.
+     */
+    protected void updateEnabledness() {
+        setEnabled(enabledWhen.test());
+    }
 
     public String getName() {
         return (String) getValue(NAME);
@@ -154,5 +194,24 @@ public abstract class KeyAction extends AbstractAction {
      */
     protected void setPriority(int priority) {
         putValue(PRIORITY, priority);
+    }
+
+    /// A stupid interface which is like [#java.util.function.Predicate] but without an argument.
+    /// The JDK alternative [#java.util.function.BooleanSupplier] does not provide combinatorial functions.
+    /// @author weigl
+    interface Pred {
+        boolean test();
+
+        default Pred not() {
+            return () -> !test();
+        }
+
+        default Pred and(Pred other) {
+            return () -> test() && other.test();
+        }
+
+        default Pred or(Pred other) {
+            return () -> test() || other.test();
+        }
     }
 }

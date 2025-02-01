@@ -27,7 +27,7 @@ public class SearchModeChangeAction extends MainWindowAction {
 
         setIcon(mode.icon);
         setTooltip("Find the next occurence of current search term in sequent.");
-        getMediator().enableWhenProofLoaded(this);
+        enabledOnAnActiveProof();
         if (mode == SequentViewSearchBar.SearchMode.HIGHLIGHT) {
             setAcceleratorLetter(KeyEvent.VK_H);
         } else if (mode == SequentViewSearchBar.SearchMode.HIDE) {

@@ -33,7 +33,7 @@ public class ShowKnownTypesAction extends MainWindowAction {
         super(mainWindow);
         setName("Show Known Types");
 
-        getMediator().enableWhenProofLoaded(this);
+        enabledOnAnActiveProof();
 
         this.proof = proof;
     }

@@ -24,7 +24,7 @@ public final class SaveFileAction extends MainWindowAction {
         setName("Save...");
         setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Save current proof.");
-        mainWindow.getMediator().enableWhenProofLoaded(this);
+        enabledOnAnActiveProof();
     }
 
     public void actionPerformed(ActionEvent e) {

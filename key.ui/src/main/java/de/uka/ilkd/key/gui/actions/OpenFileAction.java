@@ -14,18 +14,14 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 public class OpenFileAction extends MainWindowAction {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -8548805965130100236L;
-
     public OpenFileAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Load...");
         setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Browse and load problem or proof files.");
+        enabledWhenNotInAutoMode();
     }
+
 
     public void actionPerformed(ActionEvent e) {
         KeYFileChooser fc = KeYFileChooser.getFileChooser("Select file to load proof or problem");

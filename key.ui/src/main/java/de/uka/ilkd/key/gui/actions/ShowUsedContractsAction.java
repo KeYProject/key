@@ -23,9 +23,11 @@ public class ShowUsedContractsAction extends MainWindowAction {
         super(mainWindow);
         setName("Show Used Contracts");
 
-        getMediator().enableWhenProofLoaded(this);
+        enabledOnAnActiveProof();
 
         this.proof = proof;
+
+        enabledWhenNotInAutoMode();
     }
 
     @Override
