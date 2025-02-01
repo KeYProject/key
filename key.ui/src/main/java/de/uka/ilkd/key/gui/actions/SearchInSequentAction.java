@@ -25,7 +25,7 @@ public class SearchInSequentAction extends MainWindowAction {
         setName("Search in Sequent View");
         setIcon(IconFactory.search(16));
         setTooltip("Search for strings in the current sequent.");
-        getMediator().enableWhenProofLoaded(this);
+        enabledOnAnActiveProof();
     }
 
     @Override

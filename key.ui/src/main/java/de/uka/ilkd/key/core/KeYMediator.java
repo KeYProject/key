@@ -16,6 +16,7 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.UserActionListener;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
@@ -704,13 +705,19 @@ public class KeYMediator {
         }
     }
 
-    /*
-     * Disable certain actions until a proof is loaded.
-     */
+    /// Disable certain actions until a proof is loaded.
+    ///
+    /// ### DEPRECATION
+    /// You should rather use the [MainWindowAction] class
+    /// with the [MainWindowAction#updateEnablednessOnSelectionChange()] method.
+    ///
+    /// This provides more flexibility, as the enabledness can define in cases of a
+    /// combination of predicates.
+    ///
+    @Deprecated(forRemoval = true)
     public void enableWhenProofLoaded(final Action a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
-
             @Override
             public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 a.setEnabled(e.getSource().getSelectedProof() != null);
@@ -722,7 +729,7 @@ public class KeYMediator {
      * Disable certain actions until a proof is loaded. This is a workaround for a broken proof
      * macro menu in the GUI. Remove this method as soon as another solution can be found.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {

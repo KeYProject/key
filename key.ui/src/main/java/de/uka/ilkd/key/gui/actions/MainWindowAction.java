@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -23,11 +21,6 @@ import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MAS
  * {@link KeyStrokeManager}.
  */
 public abstract class MainWindowAction extends KeyAction {
-    private static final long serialVersionUID = -6611537258325987383L;
-
-    private static final MainWindowActionSelectionListener LISTENER =
-        new MainWindowActionSelectionListener();
-
     protected final MainWindow mainWindow;
 
     protected MainWindowAction(MainWindow mainWindow) {
@@ -40,9 +33,63 @@ public abstract class MainWindowAction extends KeyAction {
     protected MainWindowAction(MainWindow mainWindow, boolean onlyActiveWhenProofAvailable) {
         this(mainWindow);
         if (onlyActiveWhenProofAvailable) {
-            LISTENER.addAction(this);
-            this.setEnabled(getMediator().getSelectionModel().getSelectedProof() != null);
+            enabledOnAnActiveProof();
         }
+    }
+
+    protected final void enabledOnAnActiveProof() {
+        updateEnablednessOnSelectionChange();
+        this.setEnabledWhen(this.getEnabledWhen().and(this::isProofSelected));
+    }
+
+    protected final void enabledWhenNotInAutoMode() {
+        updateEnablednessOnAutoModeChange();
+        Pred isMainWindowAutoMode = this::isMainWindowAutoMode;
+        this.setEnabledWhen(this.getEnabledWhen().and(isMainWindowAutoMode.not()));
+    }
+
+
+    /// Method returns true iff a proof is currently selected.
+    /// Useful as a predicate for [#setEnabledWhen].
+    /// ```java
+    /// setEnabledWhen(this::isProofSelected);
+    ///```
+    protected final boolean isProofSelected() {
+        return getMediator().getSelectionModel().getSelectedProof() != null;
+    }
+
+    /// Method returns true iff the auto-mode or any other macro application is running.
+    /// Useful as a predicate for [#setEnabledWhen].
+    /// ```java
+    /// setEnabledWhen(not(this::isMainWindowAutoMode));
+    ///```
+    protected final boolean isMainWindowAutoMode() {
+        return mainWindow.isInAutoMode();
+    }
+
+    /**
+     * This method adds a selection to the main window, s.t., the enabledness is updated when
+     * the selection of proof or node is changed.
+     */
+    protected final void updateEnablednessOnSelectionChange() {
+        getMediator().addKeYSelectionListener(new KeYSelectionListener() {
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
+                updateEnabledness();
+            }
+
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
+                updateEnabledness();
+            }
+        });
+    }
+
+    /// This methods places a {@link #java.beans.PropertyChangeListener}, s.t.,
+    /// the enabledness is updated when the auto-mode/macro is executed or finished in side the [#mainWindow].
+    protected final void updateEnablednessOnAutoModeChange() {
+        mainWindow.addPropertyChangeListener(MainWindow.PROPERTY_IN_AUTO_MODE,
+                p -> updateEnabledness());
     }
 
     @Override
@@ -62,16 +109,7 @@ public abstract class MainWindowAction extends KeyAction {
     protected KeYMediator getMediator() {
         return mainWindow.getMediator();
     }
-
-    private static final class MainWindowActionSelectionListener implements KeYSelectionListener {
-        private final Collection<MainWindowAction> actions = new ArrayList<>();
-
-        private void addAction(MainWindowAction action) {
-            if (actions.isEmpty()) {
-                action.getMediator().addKeYSelectionListener(this);
-            }
-            actions.add(action);
-        }
+}
 
         @Override
         public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
