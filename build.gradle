@@ -348,7 +348,7 @@ subprojects {
             // that must be used instead.
             toggleOffOn()
 
-            removeUnusedImports()
+            removeUnusedImports("cleanthat-javaparser-unnecessaryimport")
 
             /* When new options are added in new versions of the Eclipse formatter, the easiest way is to export the new
              * style file from the Eclipse GUI and then use the CodeStyleMerger tool in
