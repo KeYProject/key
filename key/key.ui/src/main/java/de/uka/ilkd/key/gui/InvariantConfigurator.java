@@ -38,8 +38,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.*;
 
-import static de.uka.ilkd.key.gui.nodeviews.LoopInvGenMenuItem.findIndexes;
-import static de.uka.ilkd.key.loopinvgen.analyzer.WhileStatementAnalyzer.findPossibleIndexes;
+import static de.uka.ilkd.key.loopinvgen.analyzer.WhileStatementAnalyzer.*;
 import static java.lang.String.format;
 
 /**
@@ -713,13 +712,15 @@ public class InvariantConfigurator {
             public void generateActionPerformed(ActionEvent ae) {
                 List<Set<ProgramVariable>> possibleIndexes = findPossibleIndexes(PosInSequent.createCfmaPos(posInOccurrence), services);
                 List<ProgramVariable> indexes = findIndexes(possibleIndexes);
-
+                System.out.println("Calculating number of arrays...");
+                int nrArrays = findNumberOfArrays(PosInSequent.createCfmaPos(posInOccurrence), services);
+                System.out.println(nrArrays);
                 if (indexes.size() == 1) {
-                    final LIGNew loopInvGenerator = new LIGNew(goal.sequent(), services, indexes.get(0));
+                    final LIGNew loopInvGenerator = new LIGNew(goal.sequent(), services, indexes.get(0), nrArrays);
                     LoopInvariantGenerationResult result = loopInvGenerator.generate();
                     getTextAreaInInvariantTab().setText(result.conjunctsToString());
                 } else if (indexes.size() == 2) {
-                    final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(goal.sequent(), services, indexes);
+                    final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(goal.sequent(), services, indexes, nrArrays);
                     LoopInvariantGenerationResult result = loopInvGenerator.generate();
                     getTextAreaInInvariantTab().setText(result.conjunctsToString());
                 } else {

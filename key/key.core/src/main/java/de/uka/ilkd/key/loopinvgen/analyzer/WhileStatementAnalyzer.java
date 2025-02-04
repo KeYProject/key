@@ -17,6 +17,11 @@ import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -55,6 +60,14 @@ public class WhileStatementAnalyzer {
     }
 
     public static List<Set<ProgramVariable>> findPossibleIndexes(PosInSequent posInSequent, Services services) {
+        While whileStatement = posInSequentToWhile(posInSequent);
+
+        IndexCollector indexCollector = new IndexCollector(whileStatement, services);
+        indexCollector.start();
+        return indexCollector.getIndexes();
+    }
+
+    private static While posInSequentToWhile(PosInSequent posInSequent) {
         PosInOccurrence pos = posInSequent.getPosInOccurrence();
 
         Term loopFormula = pos.subTerm();
@@ -62,11 +75,14 @@ public class WhileStatementAnalyzer {
         JavaProgramElement statement = loopFormulaWithoutUpdates.javaBlock().program();
         StatementBlock statementBlock = (StatementBlock) statement;
 
-        While whileStatement = (While) statementBlock.getStatementAt(0);
+        return (While) statementBlock.getStatementAt(0);
+    }
 
-        IndexCollector indexCollector = new IndexCollector(whileStatement, services);
-        indexCollector.start();
-        return indexCollector.getIndexes();
+    public static int findNumberOfArrays(PosInSequent posInSequent, Services services) {
+        While whileStatement = posInSequentToWhile(posInSequent);
+        ArrayCounter arrayCounter = new ArrayCounter(whileStatement, services);
+        arrayCounter.start();
+        return arrayCounter.getNumberOfArrays();
     }
 
     public static Term determineInitialIndex(Sequent sequent, Term index, Services services) {
@@ -120,5 +136,61 @@ public class WhileStatementAnalyzer {
             }
         }
         return null;
+    }
+
+    public static List<ProgramVariable> findIndexes(List<Set<ProgramVariable>> possibleIndexes) {
+        List<ProgramVariable> result = new LinkedList<ProgramVariable>();
+        for (int i = 0; i < possibleIndexes.size(); i++) {
+            if (possibleIndexes.get(i).isEmpty()) {
+                result.add(null);
+            } else if (possibleIndexes.get(i).size() == 1) {
+                result.add(possibleIndexes.get(i).iterator().next());
+            } else {
+                String loopDefinition = "";
+                if (possibleIndexes.size() > 1) {
+                    if (i == possibleIndexes.size() - 1) {
+                        loopDefinition = "innermost ";
+                    } else {
+                        loopDefinition = (i + 1) + "-outermost ";
+                    }
+                }
+                result.add(selectIndex(possibleIndexes.get(i), loopDefinition));
+            }
+        }
+        return result;
+    }
+
+    private static ProgramVariable selectIndex(Set<ProgramVariable> indexes, String loopDefinition) {
+
+        JDialog dialog = new JDialog((Frame) null, "Select the " + loopDefinition + "loop's index", true);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setLayout(new BorderLayout());
+
+        dialog.setPreferredSize(new Dimension(300, 100));
+
+        JComboBox<ProgramVariable> comboBox = new JComboBox<>(indexes.toArray(new ProgramVariable[0]));
+        dialog.add(comboBox, BorderLayout.CENTER);
+
+        JButton okButton = new JButton("OK");
+
+        final ProgramVariable[] selectedIndex = new ProgramVariable[1];
+
+        okButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectedIndex[0] = (ProgramVariable) comboBox.getSelectedItem();
+                dialog.dispose();
+            }
+        });
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(okButton);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+
+        return selectedIndex[0];
     }
 }

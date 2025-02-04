@@ -20,8 +20,8 @@ public class LIGNewInner extends AbstractLoopInvariantGenerator {
         this.allCompPreds = innerCompPreds;
     }
 
-    public LIGNewInner(Sequent sequent, Services services, Set<Term> innerDepPreds, Set<Term> innerCompPreds, Term outerIndex, Term innerIndex) {
-        super(sequent, services, innerIndex);
+    public LIGNewInner(Sequent sequent, Services services, Set<Term> innerDepPreds, Set<Term> innerCompPreds, Term outerIndex, Term innerIndex, int nrArrays) {
+        super(sequent, services, innerIndex, nrArrays);
         this.allDepPreds = innerDepPreds;
         this.allCompPreds = innerCompPreds;
         this.outerIndex = outerIndex;

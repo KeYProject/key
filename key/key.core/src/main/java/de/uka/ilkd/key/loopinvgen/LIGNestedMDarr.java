@@ -29,8 +29,8 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
 //		heapLDT = services.getTypeConverter().getHeapLDT();
     }
 
-    public LIGNestedMDarr(Sequent sequent, Services services, List<ProgramVariable> indexes) {
-        super(sequent, services, indexes);
+    public LIGNestedMDarr(Sequent sequent, Services services, List<ProgramVariable> indexes, int nrArrays) {
+        super(sequent, services, indexes, nrArrays);
     }
 
     public LoopInvariantGenerationResult generate() {
@@ -271,7 +271,7 @@ public class LIGNestedMDarr extends AbstractLoopInvariantGenerator {
         Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(), succSemi);
 
 
-        LIGNewInner innerLIG = new LIGNewInner(newSeq, services, innerDepPreds, innerCompPreds, indexOuter, indexInner);
+        LIGNewInner innerLIG = new LIGNewInner(newSeq, services, innerDepPreds, innerCompPreds, indexOuter, indexInner, arrays.length);
 
         return innerLIG.generate();
     }

@@ -17,8 +17,8 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 
     Term outerIndex;
 
-    public LIGNew(Sequent sequent, Services services, ProgramVariable index) {
-        super(sequent, services, index);
+    public LIGNew(Sequent sequent, Services services, ProgramVariable index, int nrArrays) {
+        super(sequent, services, services.getTypeConverter().convertToLogicElement(index), nrArrays);
     }
 
     public LIGNew(Sequent sequent, Services services) {

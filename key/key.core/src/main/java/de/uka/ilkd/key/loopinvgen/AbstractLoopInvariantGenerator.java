@@ -32,7 +32,7 @@ public abstract class AbstractLoopInvariantGenerator {
     protected Term indexOuter;
     protected Term indexInner;
     protected Term guard;
-    protected Term[] arrays = new Term[1];//2 when two arrays and 1 when one array.
+    protected Term[] arrays;
     protected int arraysIndex = 0;
     protected Set<Term> oldDepPreds = new HashSet<>();
     protected Set<Term> oldInnerDepPreds = new HashSet<>();
@@ -48,25 +48,17 @@ public abstract class AbstractLoopInvariantGenerator {
     protected Set<Term> outerCompPreds = new HashSet<>();
     protected Set<Term> innerCompPreds = new HashSet<>();
 
-    public AbstractLoopInvariantGenerator(Sequent sequent, Services s, ProgramVariable index) {
-        seq = sequent;
-        ruleApp = new RuleApplication(s, seq);
-        services = ruleApp.services;
-        tb = services.getTermBuilder();
-        intLDT = services.getTypeConverter().getIntegerLDT();
-        this.index = expr2term(index);
-    }
-
-    public AbstractLoopInvariantGenerator(Sequent sequent, Services s, Term index) {
+    public AbstractLoopInvariantGenerator(Sequent sequent, Services s, Term index, int nrArrays) {
         seq = sequent;
         ruleApp = new RuleApplication(s, seq);
         services = ruleApp.services;
         tb = services.getTermBuilder();
         intLDT = services.getTypeConverter().getIntegerLDT();
         this.index = index;
+        this.arrays = new Term[nrArrays];
     }
 
-    public AbstractLoopInvariantGenerator(Sequent sequent, Services s, List<ProgramVariable> indexes) {
+    public AbstractLoopInvariantGenerator(Sequent sequent, Services s, List<ProgramVariable> indexes, int nrArrays) {
         seq = sequent;
         ruleApp = new RuleApplication(s, seq);
         services = ruleApp.services;
@@ -74,6 +66,7 @@ public abstract class AbstractLoopInvariantGenerator {
         intLDT = services.getTypeConverter().getIntegerLDT();
         this.indexOuter = expr2term(indexes.get(0));
         this.indexInner = expr2term(indexes.get(1));
+        this.arrays = new Term[nrArrays];
     }
 
     public AbstractLoopInvariantGenerator(Sequent sequent, Services s) {
@@ -83,6 +76,7 @@ public abstract class AbstractLoopInvariantGenerator {
         tb = services.getTermBuilder();
         intLDT = services.getTypeConverter().getIntegerLDT();
         getIndex(sequent);
+        this.arrays = new Term[2]; //TODO: unhardcode here. Where is this constructor used?
     }
 
     protected void abstractGoal(Goal currentGoal, Set<Term> compPredsSet, Set<Term> depPredsSet) {
