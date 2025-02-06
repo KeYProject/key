@@ -8,7 +8,7 @@ class A {
       @ }
       @*/
 
-    /*@ public normal_behaviour
+    /*@ public model_behaviour
       @   requires n >= 0;
       @   ensures \result.length == n;
       @   accessible \nothing;
@@ -17,4 +17,19 @@ class A {
       @   return n == 0 ? \seq_empty : \seq_concat(c(n-1), \seq(0));
       @ }
       @*/
+
+    /*@ public static no_state model int obs() {
+      @   return A.someHeapField;
+      @ }
+      @*/
+
+    static int someHeapField;
+
+    //@ ensures true;
+    void m() {
+        //@ ghost \seq x = c(5);
+        someHeapField = 42;
+        //@ assert x == c(5);
+    }
+
 }
