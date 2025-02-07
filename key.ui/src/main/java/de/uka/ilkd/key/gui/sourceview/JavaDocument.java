@@ -11,8 +11,7 @@ import java.util.regex.Pattern;
 import javax.swing.text.*;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
-
-import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
+import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
 
 /**
  * This document performs syntax highlighting when strings are inserted. However, only inserting the
@@ -321,8 +320,10 @@ public class JavaDocument extends DefaultStyledDocument {
                 || state == CommentState.JML_ANNOTATION_LINE) {
             boolean lineComment = state == CommentState.JML_ANNOTATION_LINE;
             state = CommentState.NO;
-            String features = token.substring(2); // cut-off '//' or '/*'
-            if (isJmlCommentStarter(features)) {
+            String features = token.substring(2, token.length() - 1); // cut-off '//' or '/*' and
+                                                                      // '@'
+            var jmlMarkerDecision = new JmlMarkerDecision(null);
+            if (jmlMarkerDecision.isActiveJmlSpec(features)) {
                 mode = lineComment ? Mode.LINE_JML : Mode.JML;
             } else {
                 mode = lineComment ? Mode.LINE_COMMENT : Mode.COMMENT;
