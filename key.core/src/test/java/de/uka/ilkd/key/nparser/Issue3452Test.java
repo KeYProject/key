@@ -50,7 +50,7 @@ public class Issue3452Test {
             System.err.println("Unexpected load success");
         });
 
-        if(!exception.getMessage().startsWith("Heap used in a `no_state` method.")) {
+        if (!exception.getMessage().startsWith("Heap used in a `no_state` method.")) {
             fail("Unexpected exception message: " + exception.getMessage());
         }
     }
