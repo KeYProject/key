@@ -2368,7 +2368,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression apply = lookupIdentifier(ctx.IDENT().getText(), null, params, ctx);
 
         var forbiddenHeapVar = services.getTypeConverter().getHeapLDT().getHeap();
-        boolean applyContainsHeap = TermUtil.contains(body.getTerm(), forbiddenHeapVar);
+        boolean applyContainsHeap = TermUtil.contains(apply.getTerm(), forbiddenHeapVar);
         boolean bodyContainsHeap = TermUtil.contains(body.getTerm(), forbiddenHeapVar);
 
 
