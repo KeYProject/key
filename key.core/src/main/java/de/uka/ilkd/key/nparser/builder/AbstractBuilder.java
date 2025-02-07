@@ -3,17 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.nparser.builder;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
-
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import java.util.*;
 
 /**
  * This class brings some nice features to the visitors of key's ast.
@@ -28,24 +25,23 @@ import org.jspecify.annotations.Nullable;
  * @author Alexander Weigl
  */
 @SuppressWarnings("unchecked")
-abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
-
-    private @Nullable List<BuildingIssue> buildingIssues = null;
-    private @Nullable Stack<Object> parameters = null;
+abstract class AbstractBuilder<T extends @Nullable Object> extends KeYParserBaseVisitor<T> {
+    private final List<BuildingIssue> buildingIssues = new ArrayList<>(1);
+    private Stack<Object> parameters = new Stack<>();
 
     /**
      * Helper function for avoiding cast.
      *
      * @param ctx
-     * @param <T>
+     * @param <R>
      * @return
      */
-    public <T> @Nullable T accept(@Nullable RuleContext ctx) {
+    public <R extends T> R accept(@Nullable RuleContext ctx) {
         if (ctx == null) {
             return null;
         }
         try {
-            return (T) ctx.accept(this);
+            return (R) ctx.accept(this);
         } catch (Exception e) {
             if (!(e instanceof BuildingException) && ctx instanceof ParserRuleContext) {
                 throw new BuildingException((ParserRuleContext) ctx, e);
@@ -64,43 +60,34 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     /**
-     * @param <T>
+     * @param <R>
      * @return
      */
-    protected <T> @Nullable T peek() {
-        return (T) (parameters.isEmpty() ? null : parameters.peek());
+    protected <R extends @Nullable Object> R peek() {
+        return (R) (parameters.isEmpty() ? null : parameters.peek());
     }
 
-    protected <T> T acceptFirst(Collection<? extends RuleContext> seq) {
+    protected <R extends T> R acceptFirst(Collection<? extends RuleContext> seq) {
         if (seq.isEmpty()) {
             return null;
         }
         return accept(seq.iterator().next());
     }
 
-    protected <T> T pop() {
-        if (parameters == null) {
-            throw new IllegalStateException("Stack is empty");
-        }
-        return (T) parameters.pop();
+    protected <R> R pop() {
+        return (R) parameters.pop();
     }
 
     protected void push(Object... obj) {
-        if (parameters == null) {
-            parameters = new Stack<>();
-        }
         for (Object a : obj) {
             parameters.push(a);
         }
     }
 
-    protected <T> @Nullable T accept(@Nullable RuleContext ctx, Object... args) {
-        if (parameters == null) {
-            parameters = new Stack<>();
-        }
+    protected <R extends T> R accept(@Nullable RuleContext ctx, Object... args) {
         int stackSize = parameters.size();
         push(args);
-        T t = accept(ctx);
+        R t = accept(ctx);
         // Stack hygiene
         while (parameters.size() > stackSize) {
             parameters.pop();
@@ -108,17 +95,19 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
         return t;
     }
 
-    protected <T> T oneOf(ParserRuleContext... ctxs) {
+    protected <R extends T> R oneOf(@Nullable ParserRuleContext... ctxs) {
         for (ParserRuleContext ctx : ctxs) {
             if (ctx != null) {
-                return (T) ctx.accept(this);
+                return (R) ctx.accept(this);
             }
         }
         return null;
     }
 
-    protected <T> List<T> mapOf(Collection<? extends ParserRuleContext> argument) {
-        return argument.stream().map(it -> (T) it.accept(this)).collect(Collectors.toList());
+    protected <R extends T> List<R> mapOf(Collection<? extends ParserRuleContext> argument) {
+        return argument.stream()
+                .map(it -> (R) it.accept(this))
+                .toList();
     }
 
     protected void each(RuleContext... ctx) {
@@ -134,15 +123,12 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
     // endregion
 
-    protected <T2> List<T2> mapMapOf(List<? extends RuleContext>... ctxss) {
+    protected <T2 extends T> List<T2> mapMapOf(List<? extends RuleContext>... ctxss) {
         return Arrays.stream(ctxss).flatMap(it -> it.stream().map(a -> (T2) accept(a)))
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    public @NonNull List<BuildingIssue> getBuildingIssues() {
-        if (buildingIssues == null) {
-            buildingIssues = new LinkedList<>();
-        }
+    public List<BuildingIssue> getBuildingIssues() {
         return buildingIssues;
     }
 

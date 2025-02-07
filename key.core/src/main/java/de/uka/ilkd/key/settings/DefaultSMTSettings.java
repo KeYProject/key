@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The default implementation of {@link SMTSettings}.
@@ -21,14 +22,14 @@ import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 public class DefaultSMTSettings implements SMTSettings {
     private final ProofDependentSMTSettings pdSettings;
     private final ProofIndependentSMTSettings piSettings;
-    private final Proof proof;
-    private LinkedList<Taclet> taclets = null;
+    private final @Nullable Proof proof;
+    private @Nullable LinkedList<Taclet> taclets = null;
     private final NewSMTTranslationSettings newTranslationSettings;
 
 
     public DefaultSMTSettings(ProofDependentSMTSettings pdSettings,
             ProofIndependentSMTSettings piSettings, NewSMTTranslationSettings newTransSettings,
-            Proof proof) {
+                              @Nullable Proof proof) {
         super();
         this.pdSettings = pdSettings;
         this.piSettings = piSettings;
@@ -52,7 +53,7 @@ public class DefaultSMTSettings implements SMTSettings {
         return piSettings;
     }
 
-    public Proof getProof() {
+    public @Nullable Proof getProof() {
         return proof;
     }
 

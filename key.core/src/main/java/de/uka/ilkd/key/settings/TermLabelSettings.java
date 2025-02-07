@@ -25,8 +25,7 @@ public class TermLabelSettings extends AbstractSettings {
 
     private boolean useOriginLabels = true;
 
-    @Override
-    public void readSettings(Properties props) {
+    private void readSettings(Properties props) {
         String str = props.getProperty("[" + CATEGORY + "]" + USE_ORIGIN_LABELS);
 
         if (str != null && (str.equals("true") || str.equals("false"))) {
@@ -36,8 +35,7 @@ public class TermLabelSettings extends AbstractSettings {
         }
     }
 
-    @Override
-    public void writeSettings(Properties props) {
+    private void writeSettings(Properties props) {
         props.setProperty("[" + CATEGORY + "]" + USE_ORIGIN_LABELS,
             Boolean.toString(useOriginLabels));
     }

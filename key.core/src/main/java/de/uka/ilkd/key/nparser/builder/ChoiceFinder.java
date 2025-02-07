@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.nparser.KeYParser;
 
+import org.jspecify.annotations.Nullable;
 import org.key_project.logic.Name;
 
 import org.jspecify.annotations.NonNull;
@@ -22,9 +23,9 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (28.10.19)
  * @see ChoiceInformation
  */
-public class ChoiceFinder extends AbstractBuilder<Object> {
+public class ChoiceFinder extends AbstractBuilder<@Nullable Object> {
 
-    private final @NonNull ChoiceInformation choiceInformation;
+    private final ChoiceInformation choiceInformation;
 
     public ChoiceFinder() {
         choiceInformation = new ChoiceInformation();
@@ -39,14 +40,14 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public Object visitDecls(KeYParser.DeclsContext ctx) {
+    public @Nullable Object visitDecls(KeYParser.DeclsContext ctx) {
         ctx.option_decls().forEach(this::accept);
         ctx.options_choice().forEach(this::accept);
         return null;
     }
 
     @Override
-    public Object visitChoice(KeYParser.ChoiceContext ctx) {
+    public @Nullable Object visitChoice(KeYParser.ChoiceContext ctx) {
         String category = ctx.category.getText();
         List<String> options = new ArrayList<>(ctx.optionDecl().size());
         ctx.optionDecl().forEach(it -> options.add(it.IDENT.getText()));
@@ -62,7 +63,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
     }
 
     @Override
-    public Choice visitActivated_choice(KeYParser.Activated_choiceContext ctx) {
+    public @Nullable Choice visitActivated_choice(KeYParser.Activated_choiceContext ctx) {
         String cat = ctx.cat.getText();
         String ch = ctx.choice_.getText();
         if (activatedChoicesCategories().contains(cat)) {
@@ -82,7 +83,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         return c;
     }
 
-    public @NonNull ChoiceInformation getChoiceInformation() {
+    public ChoiceInformation getChoiceInformation() {
         return choiceInformation;
     }
 

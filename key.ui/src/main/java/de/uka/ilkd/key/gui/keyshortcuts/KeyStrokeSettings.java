@@ -182,8 +182,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         return INSTANCE;
     }
 
-    @Override
-    public void readSettings(Properties props) {
+    private void readSettings(Properties props) {
         props.forEach((k, v) -> this.properties.put(k.toString(), v));
     }
 

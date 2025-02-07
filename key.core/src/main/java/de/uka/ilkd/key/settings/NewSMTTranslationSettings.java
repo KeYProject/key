@@ -58,7 +58,6 @@ public class NewSMTTranslationSettings extends AbstractSettings {
         return new NewSMTTranslationSettings(this);
     }
 
-    @Override
     public void readSettings(Properties props) {
         for (Object k : props.keySet()) {
             String key = k.toString();
@@ -68,8 +67,7 @@ public class NewSMTTranslationSettings extends AbstractSettings {
         }
     }
 
-    @Override
-    public void writeSettings(Properties props) {
+    private void writeSettings(Properties props) {
         for (Entry<String, String> en : map.entrySet()) {
             props.put(PREFIX + en.getKey(), en.getValue());
         }

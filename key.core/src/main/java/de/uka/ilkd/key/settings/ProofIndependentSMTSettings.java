@@ -346,7 +346,7 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
         return new ProofIndependentSMTSettings(this);
     }
 
-    public void readSettings(Properties props) {
+    private void readSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
 
         timeout = SettingsConverter.read(props, prefix + KEY_TIMEOUT, timeout);
@@ -384,7 +384,7 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
         }
     }
 
-    public void writeSettings(Properties props) {
+    private void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         SettingsConverter.store(props, prefix + KEY_TIMEOUT, timeout);
         SettingsConverter.store(props, prefix + SHOW_SMT_RES_DIA, showResultsAfterExecution);
