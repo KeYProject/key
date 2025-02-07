@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Alexander Weigl
  * @version 1 (31.01.25)
  */
-public class Issue3452 {
+public class Issue3452Test {
 
 
     @Test
@@ -50,6 +50,8 @@ public class Issue3452 {
             System.err.println("Unexpected load success");
         });
 
-        assertTrue(exception.getMessage().startsWith("Heap used in a `no_state` method."));
+        if(!exception.getMessage().startsWith("Heap used in a `no_state` method.")) {
+            fail("Unexpected exception message: " + exception.getMessage());
+        }
     }
 }
