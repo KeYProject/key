@@ -935,7 +935,8 @@ public final class SourceView extends JComponent {
         /**
          * The JavaDocument shown in this tab.
          */
-        private final SourceHighlightDocument doc = new SourceHighlightDocument(new JavaJMLEditorLexer());
+        private final SourceHighlightDocument doc =
+            new SourceHighlightDocument(new JavaJMLEditorLexer());
 
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
