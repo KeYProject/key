@@ -98,8 +98,7 @@ public class FeatureSettings extends AbstractSettings {
         };
     }
 
-    @Override
-    public void readSettings(Properties props) {
+    private void readSettings(Properties props) {
         activatedFeatures.clear();
         var prefix = "[" + CATEGORY + "]";
         for (Map.Entry<Object, Object> entries : props.entrySet()) {
@@ -112,8 +111,7 @@ public class FeatureSettings extends AbstractSettings {
         }
     }
 
-    @Override
-    public void writeSettings(Properties props) {
+    private void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         for (String activatedFeature : activatedFeatures) {
             props.put(prefix + activatedFeature, "true");

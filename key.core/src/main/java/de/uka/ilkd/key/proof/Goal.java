@@ -451,8 +451,9 @@ public final class Goal {
             addNoPosTacletApp(tacletApp);
             if (proof().getInitConfig() != null) { // do not break everything
                 // because of ProofMgt
+                var parent = node.parent();
                 proof().getInitConfig().registerRuleIntroducedAtNode(tacletApp,
-                    node.parent() != null ? node.parent() : node, isAxiom);
+                    parent != null ? parent : node, isAxiom);
             }
         }
     }
