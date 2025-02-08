@@ -409,7 +409,7 @@ public abstract class AbstractProblemLoader {
                             .map(e -> Paths.get(e.getName())).toList();
                     if (!proofs.isEmpty()) {
                         // load first proof found in file
-                        proofFilename = proofs.get(0);
+                        proofFilename = proofs.getFirst();
                     } else {
                         // no proof found in bundle!
                         throw new IOException("The bundle contains no proof to load!");
