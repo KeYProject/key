@@ -1,0 +1,35 @@
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention").version("1.0.0")
+    id("com.gradle.develocity").version("4.1")
+}
+
+include("key.util")
+include("recoder")
+
+include("key.ncore")
+include("key.ncore.calculus")
+include("key.core")
+
+include("key.core.rifl")
+include("key.core.symbolic_execution")
+
+include("key.core.testgen")
+include("key.removegenerics")
+include("key.core.proof_references")
+include("key.core.example")
+include("key.core.symbolic_execution.example")
+
+
+include("key.ui")
+
+include("keyext.ui.testgen")
+include("keyext.proofmanagement")
+include("keyext.exploration")
+include("keyext.slicing")
+include("keyext.caching")
+include("keyext.isabelletranslation")
+
+// ENABLE NULLNESS here or on the CLI
+// This flag is activated to enable the checker framework.
+// System.setProperty("ENABLE_NULLNESS", "true")
+
