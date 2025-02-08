@@ -32,15 +32,10 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 
-import org.antlr.runtime.MismatchedTokenException;
-import org.antlr.runtime.MissingTokenException;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -351,51 +346,6 @@ public abstract class AbstractProblemLoader {
     }
 
     /**
-     * Find first 'non-wrapper' exception type in cause chain.
-     */
-    private Throwable unwrap(Throwable e) {
-        while (e instanceof ExceptionHandlerException || e instanceof ProblemLoaderException) {
-            e = e.getCause();
-        }
-        return e;
-    }
-
-    /**
-     * Tries to recover parser errors and make them human-readable, rewrap them into
-     * ProblemLoaderExceptions.
-     */
-    protected ProblemLoaderException recoverParserErrorMessage(Exception e) {
-        // try to resolve error message
-        final Throwable c0 = unwrap(e);
-        if (c0 instanceof RecognitionException re) {
-            final Token occurrence = re.token; // may be null
-            if (c0 instanceof MismatchedTokenException) {
-                if (c0 instanceof MissingTokenException mte) {
-                    // TODO: other commonly missed tokens
-                    final String readable = missedErrors.get(mte.expecting);
-                    final String token = readable == null ? "token id " + mte.expecting : readable;
-                    final String msg = "Syntax error: missing " + token
-                        + (occurrence == null ? "" : " at " + occurrence.getText()) + " statement ("
-                        + mte.input.getSourceName() + ":" + mte.line + ")";
-                    return new ProblemLoaderException(this, msg, mte);
-                    // TODO other ANTLR exceptions
-                } else {
-                    final MismatchedTokenException mte =
-                        (MismatchedTokenException) c0;
-                    final String genericMsg = "expected " + mte.expecting + ", but found " + mte.c;
-                    final String readable =
-                        mismatchErrors.get(new Pair<>(mte.expecting, mte.c));
-                    final String msg = "Syntax error: " + (readable == null ? genericMsg : readable)
-                        + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
-                    return new ProblemLoaderException(this, msg, mte);
-                }
-            }
-        }
-        // default
-        return new ProblemLoaderException(this, "Loading proof input failed", e);
-    }
-
-    /**
      * Creates a new FileRepo (with or without consistency) based on the settings.
      *
      * @return a FileRepo that can be used for proof bundle saving
@@ -459,7 +409,7 @@ public abstract class AbstractProblemLoader {
                             .map(e -> Paths.get(e.getName())).toList();
                     if (!proofs.isEmpty()) {
                         // load first proof found in file
-                        proofFilename = proofs.get(0);
+                        proofFilename = proofs.getFirst();
                     } else {
                         // no proof found in bundle!
                         throw new IOException("The bundle contains no proof to load!");
