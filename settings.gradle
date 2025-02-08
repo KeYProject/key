@@ -1,3 +1,5 @@
+// https://docs.gradle.org/current/userguide/version_catalogs.html#sec:importing-catalog-from-file
+
 include "key.util"
 include "key.ui"
 include "key.ncore"

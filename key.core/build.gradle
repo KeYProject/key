@@ -12,16 +12,11 @@ dependencies {
     api project(':key.ncore')
     //api group: group, name: 'recoderkey', version: '1.0'
     api project(':recoder')
-    implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    implementation group: 'org.antlr', name: 'antlr-runtime', version: '3.5.3'
-    implementation group: 'antlr', name: 'antlr', version: '2.7.7'
 
-    javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    antlr group: 'org.antlr', name: 'antlr', version: '3.5.3'   // use ANTLR version 3
-
-    antlr4 "org.antlr:antlr4:4.13.2"
-    api "org.antlr:antlr4-runtime:4.13.2"
-    //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+    implementation(libs.javacc)
+    javacc(libs.javacc)
+    antlr4(libs.antlr)
+    api(libs.antlrRuntime)
 }
 
 // The target directory for JavaCC (parser generation)

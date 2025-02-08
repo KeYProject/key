@@ -1,16 +1,17 @@
 plugins {
 }
 
-description "Generic data strutures for terms and formulas without dependencies to a specific target programming language"
+description "Generic data structures for terms and formulas without " +
+        "dependencies to a specific target programming language"
 
 configurations { }
 
 dependencies {
     api project(':key.util')
-    implementation 'org.jspecify:jspecify:1.0.0'
+    implementation(libs.jspecify)
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     enableAssertions = true
 }
 
