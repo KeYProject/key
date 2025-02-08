@@ -12,17 +12,17 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandlerTest;
 
 import org.key_project.util.collection.ImmutableList;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -30,7 +30,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.assertj.core.api.Assumptions.assumeThat;
 
 
 /**
@@ -38,7 +37,7 @@ import static org.assertj.core.api.Assumptions.assumeThat;
  */
 public class TestProofScriptCommand {
     public record TestInstance(String name, String key, String script, String exception,
-                               String[] goals, Integer selectedGoal) {
+            String[] goals, Integer selectedGoal) {
     }
 
 
@@ -65,8 +64,7 @@ public class TestProofScriptCommand {
 
         Proof proof = env.getLoadedProof();
 
-        var script = ParsingFacade.parseScript(data.script());
-        ProofScriptEngine pse = new ProofScriptEngine(script);
+        ProofScriptEngine pse = new ProofScriptEngine(data.script(), Location.UNDEFINED);
 
         boolean hasException = data.exception() != null;
         try {
@@ -74,14 +72,14 @@ public class TestProofScriptCommand {
         } catch (Exception ex) {
             ex.printStackTrace();
             assertTrue(hasException,
-                    "An exception was not expected, but got " + ex.getClass());
-            assertThat(ex.getMessage().trim().replace("\r\n","\n"))
+                "An exception was not expected, but got " + ex.getClass());
+            assertThat(ex.getMessage().trim().replace("\r\n", "\n"))
                     .startsWithIgnoringCase(data.exception().trim());
             return;
         }
 
         Assertions.assertFalse(hasException,
-                "exception would have been expected");
+            "exception would have been expected");
 
         if (data.goals() != null) {
             ImmutableList<Goal> goals = proof.openGoals();

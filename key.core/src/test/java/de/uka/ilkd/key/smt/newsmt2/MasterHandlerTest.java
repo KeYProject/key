@@ -3,9 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.smt.newsmt2;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.Sequent;
@@ -17,22 +22,19 @@ import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+
+import org.key_project.util.Streams;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.key_project.util.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
@@ -168,7 +170,7 @@ public class MasterHandlerTest {
     void testZ3(LoadedTestData data) throws Exception {
         Assumptions.assumeTrue(Z3_SOLVER != null);
         Assumptions.assumeTrue(Z3_SOLVER.isInstalled(false),
-                "Z3 is not installed, this testcase is ignored.");
+            "Z3 is not installed, this testcase is ignored.");
 
         var expectation = data.data.expected;
         Assumptions.assumeTrue(expectation != null, "No Z3 expectation.");
@@ -185,9 +187,9 @@ public class MasterHandlerTest {
 
         try {
             String lookFor = switch (expectation) {
-                case VALID -> "unsat";
-                case FAIL -> "(sat|timeout)";
-                case IRRELEVANT -> null;
+            case VALID -> "unsat";
+            case FAIL -> "(sat|timeout)";
+            case IRRELEVANT -> null;
             };
 
             if (lookFor != null) {
@@ -203,7 +205,7 @@ public class MasterHandlerTest {
 
             if (!STRICT_TEST) {
                 assumeFalse(data.data.state == TestDataState.EXTENDED,
-                        "This is an extended test (will be run only in strict mode)");
+                    "This is an extended test (will be run only in strict mode)");
             }
 
             if (lookFor != null) {
