@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
@@ -33,12 +32,10 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 
-import org.antlr.runtime.MismatchedTokenException;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -349,51 +346,6 @@ public abstract class AbstractProblemLoader {
     }
 
     /**
-     * Find first 'non-wrapper' exception type in cause chain.
-     */
-    private Throwable unwrap(Throwable e) {
-        while (e instanceof ExceptionHandlerException || e instanceof ProblemLoaderException) {
-            e = e.getCause();
-        }
-        return e;
-    }
-
-    /**
-     * Tries to recover parser errors and make them human-readable, rewrap them into
-     * ProblemLoaderExceptions.
-     */
-    protected ProblemLoaderException recoverParserErrorMessage(Exception e) {
-        // try to resolve error message
-        final Throwable c0 = unwrap(e);
-        if (c0 instanceof org.antlr.runtime.RecognitionException re) {
-            final org.antlr.runtime.Token occurrence = re.token; // may be null
-            if (c0 instanceof org.antlr.runtime.MismatchedTokenException) {
-                if (c0 instanceof org.antlr.runtime.MissingTokenException mte) {
-                    // TODO: other commonly missed tokens
-                    final String readable = missedErrors.get(mte.expecting);
-                    final String token = readable == null ? "token id " + mte.expecting : readable;
-                    final String msg = "Syntax error: missing " + token
-                        + (occurrence == null ? "" : " at " + occurrence.getText()) + " statement ("
-                        + mte.input.getSourceName() + ":" + mte.line + ")";
-                    return new ProblemLoaderException(this, msg, mte);
-                    // TODO other ANTLR exceptions
-                } else {
-                    final org.antlr.runtime.MismatchedTokenException mte =
-                        (MismatchedTokenException) c0;
-                    final String genericMsg = "expected " + mte.expecting + ", but found " + mte.c;
-                    final String readable =
-                        mismatchErrors.get(new Pair<>(mte.expecting, mte.c));
-                    final String msg = "Syntax error: " + (readable == null ? genericMsg : readable)
-                        + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
-                    return new ProblemLoaderException(this, msg, mte);
-                }
-            }
-        }
-        // default
-        return new ProblemLoaderException(this, "Loading proof input failed", e);
-    }
-
-    /**
      * Creates a new FileRepo (with or without consistency) based on the settings.
      *
      * @return a FileRepo that can be used for proof bundle saving
@@ -428,7 +380,7 @@ public abstract class AbstractProblemLoader {
 
         if (filename.endsWith(".java")) {
             // java file, probably enriched by specifications
-            SLEnvInput ret = null;
+            SLEnvInput ret;
             if (file.getParentFile() == null) {
                 ret = new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
             } else {
@@ -453,11 +405,11 @@ public abstract class AbstractProblemLoader {
                 try (ZipFile bundle = new ZipFile(file)) {
                     proofs = bundle.stream().filter(e -> !e.isDirectory())
                             .filter(e -> e.getName().endsWith(".proof"))
-                            .map(e -> Paths.get(e.getName())).collect(Collectors.toList());
+                            .map(e -> Paths.get(e.getName())).toList();
                 }
                 if (!proofs.isEmpty()) {
                     // load first proof found in file
-                    proofFilename = proofs.get(0).toFile();
+                    proofFilename = proofs.getFirst().toFile();
                 } else {
                     // no proof found in bundle!
                     throw new IOException("The bundle contains no proof to load!");
