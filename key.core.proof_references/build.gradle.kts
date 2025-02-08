@@ -1,5 +1,9 @@
+plugins {
+    id("java-convention")
+}
+
 description = "API for using KeY for maintaining references between objects in proofs"
 
 dependencies {
-    implementation project(":key.core")
+    implementation(project(":key.core"))
 }
