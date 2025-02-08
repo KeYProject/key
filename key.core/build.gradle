@@ -1,4 +1,5 @@
 plugins {
+    id "java-convention"
     id 'ca.coglinc.javacc' version '2.4.0'
     id 'antlr'
 }

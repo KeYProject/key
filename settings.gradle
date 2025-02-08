@@ -1,5 +1,5 @@
 // https://docs.gradle.org/current/userguide/version_catalogs.html#sec:importing-catalog-from-file
-
+/*
 include "key.util"
 include "key.ui"
 include "key.ncore"
@@ -17,7 +17,7 @@ include 'keyext.proofmanagement'
 include 'keyext.exploration'
 include 'keyext.slicing'
 include 'keyext.caching'
-
+*/
 // ENABLE NULLNESS here or on the CLI
 // This flag is activated to enable the checker framework.
 // System.setProperty("ENABLE_NULLNESS", "true")
