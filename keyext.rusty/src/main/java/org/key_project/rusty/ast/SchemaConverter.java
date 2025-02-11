@@ -237,6 +237,11 @@ public class SchemaConverter {
         if (ctx instanceof RustySchemaParser.ExpandFnBodyContext e)
             return new ExpandFnBody(
                 (ProgramSV) lookupSchemaVariable(e.schemaVariable().getText().substring(2)));
+        if (ctx instanceof RustySchemaParser.FnFrameContext ff) {
+            var resultVar =
+                (ProgramSV) lookupSchemaVariable(ff.schemaVariable().getText().substring(2));
+            return new FunctionFrame(resultVar, null, convertBlockExpr(ff.blockExpr()));
+        }
         throw new UnsupportedOperationException(
             "Unknown expr: " + ctx.getText() + " class: " + ctx.getClass());
     }

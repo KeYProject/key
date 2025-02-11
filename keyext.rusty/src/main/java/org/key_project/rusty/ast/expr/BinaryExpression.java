@@ -8,9 +8,11 @@ import java.util.Objects;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.rusty.Services;
 import org.key_project.rusty.ast.RustyProgramElement;
+import org.key_project.rusty.ast.SourceData;
 import org.key_project.rusty.ast.abstraction.PrimitiveType;
 import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
+import org.key_project.rusty.rule.MatchConditions;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NonNull;
@@ -140,6 +142,22 @@ public final class BinaryExpression implements Expr {
         @Override
         public int getChildCount() {
             return 0;
+        }
+
+        @Override
+        public MatchConditions match(SourceData sourceData, MatchConditions mc) {
+            final var src = sourceData.getSource();
+
+            if (src == null)
+                return null;
+
+            if (src.getClass() != this.getClass()) {
+                return null;
+            }
+            if (this != src)
+                return null;
+            sourceData.next();
+            return mc;
         }
     }
 }

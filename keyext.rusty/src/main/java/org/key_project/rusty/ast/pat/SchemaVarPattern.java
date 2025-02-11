@@ -75,5 +75,16 @@ public record SchemaVarPattern(boolean reference, boolean mut, OperatorSV operat
     public void visit(Visitor v) {
         v.performActionOnSchemaVarPattern(this);
     }
+
+    @Override
+    public String toString() {
+        var sb = new StringBuilder();
+        if (reference) {
+            sb.append("&");
+        }
+        if (mut) sb.append("mut ");
+        sb.append(operatorSV);
+        return sb.toString();
+    }
 }
 //spotless:on

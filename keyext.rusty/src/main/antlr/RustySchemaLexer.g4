@@ -24,3 +24,5 @@ PANIC
     ;
 
  LOOP_SCOPE: 'loop_scope!';
+
+ FN_FRAME: 'fn_frame!';

@@ -11,6 +11,7 @@ blockExpr
 expr
    : schemaVariable # SchemaVarExpression
    | EXPAND_FN_BODY LPAREN schemaVariable RPAREN # ExpandFnBody
+   | FN_FRAME LPAREN schemaVariable COMMA blockExpr RPAREN # FnFrame
    | literalExpr # LiteralExpression
    | pathExpr # PathExpression
    | expr DOT pathExprSegment LPAREN callParams? RPAREN # MethodCallExpression

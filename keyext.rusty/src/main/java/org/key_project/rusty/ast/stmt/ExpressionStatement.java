@@ -17,6 +17,7 @@ public class ExpressionStatement implements Statement, PossibleProgramPrefix {
     private final boolean semi;
 
     public ExpressionStatement(Expr expression, boolean semi) {
+        assert expression != null;
         this.expression = expression;
         this.semi = semi;
     }

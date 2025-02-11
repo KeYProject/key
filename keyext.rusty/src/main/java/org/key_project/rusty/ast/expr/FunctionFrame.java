@@ -11,14 +11,14 @@ import org.key_project.rusty.ast.abstraction.Type;
 import org.key_project.rusty.ast.visitor.Visitor;
 import org.key_project.rusty.logic.PosInProgram;
 import org.key_project.rusty.logic.PossibleProgramPrefix;
+import org.key_project.rusty.logic.op.IProgramVariable;
 import org.key_project.rusty.logic.op.ProgramFunction;
-import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
 
 public class FunctionFrame implements Expr, PossibleProgramPrefix {
-    private final @Nullable ProgramVariable resultVar;
+    private final @Nullable IProgramVariable resultVar;
     private final BlockExpression body;
 
     private final PosInProgram firstActiveChildPos;
@@ -27,7 +27,7 @@ public class FunctionFrame implements Expr, PossibleProgramPrefix {
 
     private final ProgramFunction function;
 
-    public FunctionFrame(@Nullable ProgramVariable resultVar, ProgramFunction function,
+    public FunctionFrame(@Nullable IProgramVariable resultVar, ProgramFunction function,
             BlockExpression body) {
         this.resultVar = resultVar;
         this.body = body;
@@ -41,7 +41,7 @@ public class FunctionFrame implements Expr, PossibleProgramPrefix {
         this.function = function;
     }
 
-    public @Nullable ProgramVariable getResultVar() {
+    public @Nullable IProgramVariable getResultVar() {
         return resultVar;
     }
 

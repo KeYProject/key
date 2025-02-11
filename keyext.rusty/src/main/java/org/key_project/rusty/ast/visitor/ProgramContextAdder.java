@@ -110,40 +110,50 @@ public class ProgramContextAdder {
      *         the other braces including the <code>moreStmnts;</code> part has to be done
      *         elsewhere.
      */
-    private BlockExpression createWrapperBody(RustyProgramElement wrapper,
+    private RustyProgramElement createWrapperBody(RustyProgramElement wrapper,
             ContextBlockExpression putIn, PosInProgram suffix) {
-        final int putInLength = putIn.getChildCount();
+        if (wrapper instanceof BlockExpression) {
+            final int putInLength = putIn.getChildCount();
 
-        // ATTENTION: may be -1
-        final int lastChild = suffix.last();
+            // ATTENTION: may be -1
+            final int lastChild = suffix.last();
 
-        final int childLeft = wrapper.getChildCount() - lastChild;
+            final int childLeft = wrapper.getChildCount() - lastChild;
 
-        int childrenToAdd = putInLength + childLeft;
+            int childrenToAdd = putInLength + childLeft;
 
-        if (wrapper instanceof BlockExpression be && be.getValue() != null)
-            --childrenToAdd;
+            if (wrapper instanceof BlockExpression be && be.getValue() != null)
+                --childrenToAdd;
 
-        if (childLeft == 0 || lastChild == -1) {
-            return new BlockExpression(putIn.getStatements(), putIn.getValue());
-        }
-
-        ImmutableList<Statement> body = ImmutableSLList.nil();
-
-        for (int i = 0; i < childrenToAdd; i++) {
-            if (i < putInLength) {
-                body = body.append(wrapExprIfNecessary(putIn.getChild(i)));
-            } else {
-                body = body.append((Statement) wrapper.getChild(lastChild + (i - putInLength)));
+            if (childLeft == 0 || lastChild == -1) {
+                return new BlockExpression(putIn.getStatements(), putIn.getValue());
             }
-        }
 
-        Expr value = ((BlockExpression) wrapper).getValue();
-        if (putIn.getValue() != null && childrenToAdd < putInLength) {
-            value = putIn.getValue();
-        }
+            ImmutableList<Statement> body = ImmutableSLList.nil();
 
-        return new BlockExpression(body, value);
+            for (int i = 0; i < childrenToAdd; i++) {
+                if (i < putInLength) {
+                    body = body.append(wrapExprIfNecessary(putIn.getChild(i)));
+                } else {
+                    body = body.append((Statement) wrapper.getChild(lastChild + (i - putInLength)));
+                }
+            }
+
+            Expr value = ((BlockExpression) wrapper).getValue();
+            if (putIn.getValue() != null && childrenToAdd < putInLength) {
+                value = putIn.getValue();
+            }
+
+            return new BlockExpression(body, value);
+        } else if (wrapper instanceof ExpressionStatement es) {
+            assert putIn.getStatements().isEmpty();
+            if (putIn.getValue() == null) {
+                assert putIn.getValue() != null;
+            }
+            return new ExpressionStatement(putIn.getValue(), es.hasSemi());
+        } else {
+            throw new RuntimeException("Unexpected context : " + wrapper);
+        }
     }
 
     private Statement wrapExprIfNecessary(SyntaxElement se) {

@@ -15,6 +15,7 @@ import org.key_project.rusty.ast.stmt.LetStatement;
 import org.key_project.rusty.ast.stmt.Statement;
 import org.key_project.rusty.ast.ty.*;
 import org.key_project.rusty.ast.visitor.Visitor;
+import org.key_project.rusty.logic.op.IProgramVariable;
 import org.key_project.rusty.logic.op.ProgramFunction;
 import org.key_project.rusty.logic.op.ProgramVariable;
 import org.key_project.rusty.logic.op.sv.ProgramSV;
@@ -660,7 +661,7 @@ public class PrettyPrinter implements Visitor {
         layouter.print(" ");
         beginMultilineParen();
 
-        ProgramVariable var = x.getResultVar();
+        IProgramVariable var = x.getResultVar();
         var fn = x.getFunction();
         if (var != null) {
             layouter.beginRelativeC().print("result->");

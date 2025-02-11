@@ -39,10 +39,16 @@ public class LoopInvariantCondition implements VariableCondition {
         final var tb = services.getTermBuilder();
 
         final var loop = (InfiniteLoopExpression) svInst.getInstantiation(loopExprSV);
-        final LoopSpecification loopSpec = services.getSpecificationRepository().getLoopSpec(loop);
+        LoopSpecification loopSpec = services.getSpecificationRepository().getLoopSpec(loop);
 
         if (loopSpec == null) {
             return null;
+        }
+
+        if (services.getProof().getInitConfig().getActivatedChoices().stream()
+                .filter(c -> c.name().toString().equals("intRules:rustSemantics")).findFirst()
+                .isPresent()) {
+            loopSpec = loopSpec.withInRangePredicates(services);
         }
 
         final var rb = new RustyBlock(svInst.getContextInstantiation().contextProgram());

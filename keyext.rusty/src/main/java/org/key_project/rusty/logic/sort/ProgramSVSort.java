@@ -157,6 +157,9 @@ public abstract class ProgramSVSort extends SortImpl {
             if (pe instanceof LiteralExpression)
                 return true;
 
+            if (pe instanceof TupleExpression te && te.isUnit())
+                return true;
+
             return VARIABLE.canStandFor(pe, services);
         }
     }

@@ -100,6 +100,16 @@ public final class LoopSpecImpl implements LoopSpecification {
         return or.replace(originalVariant);
     }
 
+    public LoopSpecification withInRangePredicates(Services services) {
+        var inv = originalInvariant;
+        final var tb = services.getTermBuilder();
+        for (Term localOut : localOuts) {
+            if (localOut.op() instanceof ProgramVariable pv)
+                inv = tb.and(inv, tb.reachableValue(pv));
+        }
+        return new LoopSpecImpl(loop, inv, originalVariant, localIns, localOuts, originalAtPres);
+    }
+
     private Map<Term, Term> getReplaceMap(Map<ProgramVariable, Term> atPres) {
         final Map<Term, Term> result = new LinkedHashMap<>();
 
