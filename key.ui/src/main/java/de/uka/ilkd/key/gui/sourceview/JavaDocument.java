@@ -11,8 +11,7 @@ import java.util.regex.Pattern;
 import javax.swing.text.*;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
-
-import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
+import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
 
 /**
  * This document performs syntax highlighting when strings are inserted. However, only inserting the
@@ -163,8 +162,7 @@ public class JavaDocument extends DefaultStyledDocument {
         "spec_safe_math", "static", "strictfp", "strictly_pure", "synchronized", "transient",
         "two_state", "uninitialized", "volatile",
 
-        "no_state", "modifies", "erases", "modifiable", "returns", "break_behavior",
-        "continue_behavior", "return_behavior",
+        "no_state", "erases", "returns", "break_behavior", "continue_behavior", "return_behavior",
         // special JML expressions:
         "\\constraint_for", "\\created", "\\disjoint", "\\duration", "\\everything", "\\exception",
         "\\exists", "\\forall", "\\fresh", "\\index", "\\invariant_for", "\\is_initialized",
@@ -176,11 +174,24 @@ public class JavaDocument extends DefaultStyledDocument {
         "\\static_invariant_for", "\\strictly_nothing", "\\subset", "\\sum", "\\type", "\\typeof",
         "\\working_space", "\\values", "\\inv",
         // clause keywords:
-        "accessible", "accessible_redundantly", "assert", "assert_redundantly", "assignable",
-        "assignable_free", "assignable_redundantly", "assume", "assume_redudantly", "breaks",
-        "breaks_redundantly", "\\by", "callable", "callable_redundantly", "captures",
+        "accessible", "accessible_redundantly", "assert", "assert_redundantly",
+        "assignable", "assignable_free", "assignable_redundantly", "assigns", "assigns_free",
+        "assigns_redundantly", "assigning", "assigning_free", "assigning_redundantly",
+        "modifiable", "modifiable_free", "modifiable_redundantly", "modifies", "modifies_free",
+        "modifies_redundantly", "modifying", "modifying_free", "modifying_redundantly",
+        "loop_assignable", "loop_assignable_free", "loop_assignable_redundantly", "loop_assigns",
+        "loop_assigns_free", "loop_assigns_redundantly", "loop_assigning", "loop_assigning_free",
+        "loop_assigning_redundantly", "loop_modifiable", "loop_modifiable_free",
+        "loop_modifiable_redundantly", "loop_modifies", "loop_modifies_free",
+        "loop_modifies_redundantly", "loop_modifying", "loop_modifying_free",
+        "loop_modifying_redundantly", "loop_writable", "loop_writable_free",
+        "loop_writable_redundantly", "loop_writes", "loop_writes_free", "loop_writes_redundantly",
+        "loop_writing", "loop_writing_free", "loop_writing_redundantly",
+        "assume", "assume_redudantly", "breaks", "breaks_redundantly", "\\by",
+        "callable", "callable_redundantly", "captures",
         "captures_redundantly", "continues", "continues_redundantly", "debug", "\\declassifies",
-        "decreases", "decreases_redundantly", "decreasing", "decreasing_redundantly", "diverges",
+        "decreases", "decreases_redundantly", "decreasing", "decreasing_redundantly",
+        "loop_variant", "loop_variant_redundantly", "diverges",
         "determines", "diverges_redundantly", "duration", "duration_redundantly", "ensures",
         "ensures_free", "ensures_redundantly", "\\erases", "forall", "for_example", "hence_by",
         "implies_that", "in", "in_redundantly", "\\into", "loop_invariant", "loop_invariant_free",
@@ -192,7 +203,7 @@ public class JavaDocument extends DefaultStyledDocument {
         "abrupt_behavior", "abrupt_behaviour", "also", "axiom", "behavior", "behaviour",
         "constraint", "exceptional_behavior", "exceptional_behaviour", "initially", "invariant",
         "invariant_free", "model_behavior", "model_behaviour", "monitors_for", "normal_behavior",
-        "normal_behaviour", "readable", "writable",
+        "normal_behaviour", "readable", "writable", "writes", "writing",
         // ADT functions:
         "\\seq_empty", "\\seq_def", "\\seq_singleton", "\\seq_get", "\\seq_upd", "\\seq_upd",
         "\\seq_reverse", "\\seq_sub",
@@ -309,8 +320,10 @@ public class JavaDocument extends DefaultStyledDocument {
                 || state == CommentState.JML_ANNOTATION_LINE) {
             boolean lineComment = state == CommentState.JML_ANNOTATION_LINE;
             state = CommentState.NO;
-            String features = token.substring(2); // cut-off '//' or '/*'
-            if (isJmlCommentStarter(features)) {
+            String features = token.substring(2, token.length() - 1); // cut-off '//' or '/*' and
+                                                                      // '@'
+            var jmlMarkerDecision = new JmlMarkerDecision(null);
+            if (jmlMarkerDecision.isActiveJmlSpec(features)) {
                 mode = lineComment ? Mode.LINE_JML : Mode.JML;
             } else {
                 mode = lineComment ? Mode.LINE_COMMENT : Mode.COMMENT;
@@ -457,7 +470,8 @@ public class JavaDocument extends DefaultStyledDocument {
 
         // case '*':
         // case '/':
-        case '(', ')', '[', ']', '{', '}', '%', '!', '^', '~', '&', '|', '.', ':', ';', '?', '<', '>', '=', '\'' ->
+        case '(', ')', '[', ']', '{', '}', '%', '!', '^', '~', '&', '|', '.', ':', ';', '?', '<',
+                '>', '=', '\'' ->
             // case ' ':
             // case '"':
             // case '\'':

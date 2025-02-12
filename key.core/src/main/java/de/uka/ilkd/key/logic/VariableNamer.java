@@ -16,10 +16,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposer;
@@ -83,9 +80,9 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     protected final Services services;
 
-    protected final HashMap<ProgramVariable, ProgramVariable> map =
+    protected final HashMap<LocationVariable, LocationVariable> map =
         new LinkedHashMap<>();
-    protected HashMap<ProgramVariable, ProgramVariable> renamingHistory =
+    protected HashMap<LocationVariable, LocationVariable> renamingHistory =
         new LinkedHashMap<>();
 
     // -------------------------------------------------------------------------
@@ -126,7 +123,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     }
 
 
-    public HashMap<ProgramVariable, ProgramVariable> getRenamingMap() {
+    public HashMap<LocationVariable, LocationVariable> getRenamingMap() {
         return renamingHistory;
     }
 
@@ -306,7 +303,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @param posOfFind the PosInOccurrence of the currently executed program
      * @return the renamed version of the var parameter
      */
-    public abstract ProgramVariable rename(ProgramVariable var, Goal goal,
+    public abstract LocationVariable rename(LocationVariable var, Goal goal,
             PosInOccurrence posOfFind);
 
 
@@ -357,6 +354,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         if (sv instanceof ProgramSV psv) {
             Sort svSort = psv.sort();
+
             if (svSort == ProgramSVSort.VARIABLE) {
                 if (basename == null || basename.isEmpty()) {
                     basename = DEFAULT_BASENAME;
@@ -389,7 +387,6 @@ public abstract class VariableNamer implements InstantiationProposer {
                 }
             }
         }
-
 
         return result;
     }
@@ -482,7 +479,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * @param posOfDeclaration the PosInProgram where the name will be declared
      * @return true if the name is unique or if its uniqueness cannot be checked, else false
      */
-    public boolean isUniqueNameForSchemaVariable(String name, SchemaVariable sv,
+    public boolean isUniqueNameForSchemaVariable(String name, ProgramSV sv,
             PosInOccurrence posOfFind, PosInProgram posOfDeclaration) {
         boolean result = true;
 

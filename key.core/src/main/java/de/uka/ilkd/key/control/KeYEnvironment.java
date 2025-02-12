@@ -4,13 +4,17 @@
 package de.uka.ilkd.key.control;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.nparser.ProofScriptEntry;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -20,8 +24,12 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.KeYTypeUtil;
 
-import org.key_project.util.collection.Pair;
+import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Instances of this class are used to collect and access all relevant information for verification
@@ -48,7 +56,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     /**
      * An optional field denoting a script contained in the proof file.
      */
-    private final Pair<String, Location> proofScript;
+    private final @Nullable ProofScriptEntry proofScript;
 
     /**
      * Indicates that this {@link KeYEnvironment} is disposed.
@@ -77,7 +85,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param initConfig The loaded project.
      */
     public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof,
-            Pair<String, Location> proofScript, ReplayResult replayResult) {
+            @Nullable ProofScriptEntry proofScript, ReplayResult replayResult) {
         this.ui = ui;
         this.initConfig = initConfig;
         this.loadedProof = loadedProof;
@@ -317,7 +325,29 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
         return disposed;
     }
 
-    public Pair<String, Location> getProofScript() {
+    public @Nullable ProofScriptEntry getProofScript() {
         return proofScript;
+    }
+
+    /**
+     * constructs the possible proof contracts from the java info in the environment.
+     */
+    public List<Contract> getProofContracts() {
+        var proofContracts = new ArrayList<Contract>();
+        Set<KeYJavaType> kjts = getJavaInfo().getAllKeYJavaTypes();
+        for (KeYJavaType type : kjts) {
+            if (!KeYTypeUtil.isLibraryClass(type)) {
+                ImmutableSet<IObserverFunction> targets =
+                    getSpecificationRepository().getContractTargets(type);
+                for (IObserverFunction target : targets) {
+                    ImmutableSet<Contract> contracts =
+                        getSpecificationRepository().getContracts(type, target);
+                    for (Contract contract : contracts) {
+                        proofContracts.add(contract);
+                    }
+                }
+            }
+        }
+        return proofContracts;
     }
 }

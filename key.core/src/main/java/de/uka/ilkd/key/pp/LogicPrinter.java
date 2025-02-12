@@ -816,11 +816,11 @@ public class LogicPrinter {
                 afterFirst = true;
             }
             layouter.print(l.name().toString());
-            if (l.getChildCount() > 0) {
+            if (l.getTLChildCount() > 0) {
                 layouter.print("(").beginC();
-                for (int i = 0; i < l.getChildCount(); i++) {
-                    layouter.print("\"" + l.getChild(i).toString() + "\"");
-                    if (i < l.getChildCount() - 1) {
+                for (int i = 0; i < l.getTLChildCount(); i++) {
+                    layouter.print("\"" + l.getTLChild(i).toString() + "\"");
+                    if (i < l.getTLChildCount() - 1) {
                         layouter.print(",").ind(1, 2);
                     }
                 }
@@ -1658,9 +1658,9 @@ public class LogicPrinter {
     public void printModalityTerm(String left, JavaBlock jb, String right, Term phi, int ass) {
         assert jb != null;
         assert jb.program() != null;
-        if ((phi.op() instanceof Modality mod) && mod.kind() instanceof ModalOperatorSV) {
+        if (phi.op() instanceof Modality mod && mod.kind() instanceof ModalOperatorSV) {
             Object o = getInstantiations().getInstantiation(mod.kind());
-            if (o != null) {
+            if (o instanceof Modality.JavaModalityKind kind) {
                 if (notationInfo.getAbbrevMap().isEnabled(phi)) {
                     layouter.startTerm(0);
                     layouter.print(notationInfo.getAbbrevMap().getAbbrev(phi));
@@ -1676,7 +1676,6 @@ public class LogicPrinter {
                     notationInfo.getNotation(m).print(term, this);
                     return;
                 }
-
             }
         }
 

@@ -129,11 +129,6 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     }
 
 
-    public SVInstantiations add(ModalOperatorSV sv, Operator op, Services services) {
-        return add(sv, new OperatorInstantiation(op), services);
-    }
-
-
     public SVInstantiations addInteresting(SchemaVariable sv, Term subst, Services services) {
         return addInteresting(sv, new TermInstantiation(sv, subst), services);
     }
@@ -221,15 +216,17 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
 
     private SVInstantiations checkSorts(SchemaVariable p_sv, InstantiationEntry<?> p_entry,
             boolean p_forceRebuild, Services services) {
-        Boolean b = getGenericSortInstantiations().checkSorts(p_sv, p_entry);
+        if (p_sv instanceof OperatorSV asv) {
+            Boolean b = getGenericSortInstantiations().checkSorts(asv, p_entry);
 
-        if (b == null) {
-            return rebuildSorts(services);
-        } else if (!b) {
-            throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
-        }
-        if (p_forceRebuild) {
-            return rebuildSorts(services);
+            if (b == null) {
+                return rebuildSorts(services);
+            } else if (!b) {
+                throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
+            }
+            if (p_forceRebuild) {
+                return rebuildSorts(services);
+            }
         }
         return this;
     }
@@ -273,7 +270,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             Services services) {
         return new SVInstantiations(map.put(sv, entry), interesting().put(sv, entry),
             getUpdateContext(), getGenericSortInstantiations(), getGenericSortConditions())
-                    .checkSorts(sv, entry, false, services);
+                .checkSorts(sv, entry, false, services);
     }
 
 
@@ -656,7 +653,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     public SVInstantiations add(GenericSortCondition p_c, Services services) throws SortException {
         return new SVInstantiations(map, interesting(), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions().prepend(p_c))
-                    .checkCondition(p_c, false, services);
+                .checkCondition(p_c, false, services);
     }
 
     public ExecutionContext getExecutionContext() {

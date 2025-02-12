@@ -15,6 +15,8 @@ import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import org.key_project.logic.ParsableVariable;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 
@@ -204,18 +206,6 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         return null;
     }
 
-
-    /**
-     * equals modulo renaming is described in the corresponding comment in class SourceElement. In
-     * this case two programvariables are considered to be equal if they are assigned to the same
-     * abstract name or if they are the same object.
-     */
-    @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        return nat.sameAbstractName(this, se);
-    }
-
-
     @Override
     public Expression convertToProgram(Term t, ExtList l) {
         if (isStatic()) {
@@ -254,5 +244,16 @@ public abstract class ProgramVariable extends AbstractSortedOperator
         } else {
             return null;
         }
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
+    }
+
+    @Override
+    public SyntaxElement getChild(int n) {
+        throw new IndexOutOfBoundsException(
+            "Program variable " + name() + " does not have children");
     }
 }

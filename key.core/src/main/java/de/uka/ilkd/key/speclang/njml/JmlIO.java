@@ -12,14 +12,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 
 import org.key_project.util.collection.ImmutableList;
@@ -54,11 +52,11 @@ public class JmlIO {
     private final Services services;
 
     private @Nullable KeYJavaType specInClass;
-    private @Nullable ProgramVariable selfVar;
+    private @Nullable LocationVariable selfVar;
     private @Nullable SpecMathMode specMathMode;
-    private @Nullable ImmutableList<ProgramVariable> paramVars;
-    private @Nullable ProgramVariable resultVar;
-    private @Nullable ProgramVariable excVar;
+    private @Nullable ImmutableList<LocationVariable> paramVars;
+    private @Nullable LocationVariable resultVar;
+    private @Nullable LocationVariable excVar;
     private @Nullable Map<LocationVariable, Term> atPres;
     private @Nullable Map<LocationVariable, Term> atBefores;
 
@@ -84,8 +82,8 @@ public class JmlIO {
      * @param atBefores i do not know
      */
     public JmlIO(Services services, @Nullable KeYJavaType specInClass,
-            @Nullable ProgramVariable selfVar, @Nullable ImmutableList<ProgramVariable> paramVars,
-            @Nullable ProgramVariable resultVar, @Nullable ProgramVariable excVar,
+            @Nullable LocationVariable selfVar, @Nullable ImmutableList<LocationVariable> paramVars,
+            @Nullable LocationVariable resultVar, @Nullable LocationVariable excVar,
             @Nullable Map<LocationVariable, Term> atPres,
             @Nullable Map<LocationVariable, Term> atBefores) {
         this.services = services;
@@ -296,9 +294,8 @@ public class JmlIO {
      * @throws ClassCastException if the {@code ctx} is not suitable
      */
     @SuppressWarnings("unchecked")
-    public Triple<IObserverFunction, Term, Term> translateDependencyContract(
-            ParserRuleContext ctx) {
-        return (Triple<IObserverFunction, Term, Term>) interpret(ctx);
+    public TranslatedDependencyContract translateDependencyContract(ParserRuleContext ctx) {
+        return (TranslatedDependencyContract) interpret(ctx);
     }
 
     /**
@@ -306,10 +303,11 @@ public class JmlIO {
      * <p>
      * Note (weigl): No label is currently attached.
      *
+     * @param ctx a context
+     * @return {@link #translateDependencyContract(ParserRuleContext)}
      * @throws ClassCastException if the {@code ctx} is not suitable
      */
-    public Triple<IObserverFunction, Term, Term> translateDependencyContract(
-            LabeledParserRuleContext ctx) {
+    public TranslatedDependencyContract translateDependencyContract(LabeledParserRuleContext ctx) {
         return translateDependencyContract(ctx.first);
     }
     // endregion
@@ -319,7 +317,7 @@ public class JmlIO {
     /**
      * Sets the variable representing the {@code this} reference.
      */
-    public JmlIO selfVar(@Nullable ProgramVariable selfVar) {
+    public JmlIO selfVar(@Nullable LocationVariable selfVar) {
         this.selfVar = selfVar;
         return this;
     }
@@ -335,7 +333,7 @@ public class JmlIO {
     /**
      * Sets the current list of known parameter. Can also be used to give additionally variables.
      */
-    public JmlIO parameters(ImmutableList<ProgramVariable> params) {
+    public JmlIO parameters(ImmutableList<LocationVariable> params) {
         this.paramVars = params;
         return this;
     }
@@ -343,7 +341,7 @@ public class JmlIO {
     /**
      * Sets the variable that is used to store exceptions.
      */
-    public JmlIO exceptionVariable(@Nullable ProgramVariable excVar) {
+    public JmlIO exceptionVariable(@Nullable LocationVariable excVar) {
         this.excVar = excVar;
         return this;
     }
@@ -356,7 +354,7 @@ public class JmlIO {
     /**
      * Sets the variable representing {@code \result}.
      */
-    public JmlIO resultVariable(@Nullable ProgramVariable resultVar) {
+    public JmlIO resultVariable(@Nullable LocationVariable resultVar) {
         this.resultVar = resultVar;
         return this;
     }

@@ -688,6 +688,7 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | NEW
   | NEW_TYPE_OF
   | NEW_DEPENDING_ON
+  | NEW_LOCAL_VARS
   | HAS_ELEMENTARY_SORT
   | SAME
   | ISSUBTYPE
@@ -804,7 +805,7 @@ one_contract
 :
    contractName = simple_ident LBRACE
    (prog_var_decls)?
-   fma=term MODIFIES modifiesClause=term
+   fma=term MODIFIABLE modifiableClause=term
    RBRACE SEMI
 ;
 
