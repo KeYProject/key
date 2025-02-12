@@ -12,6 +12,7 @@ pub fn add(a: u32, b: u32) -> u32 {
     a + b
 }
 
+// First verified function
 #[spec {
     requires(a <= 1000 && b <= 1000),
     ensures(result == a * b)
