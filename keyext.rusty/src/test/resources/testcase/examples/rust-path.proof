@@ -440,7 +440,16 @@
                             (rule "andRight" (formula "8"))
                             (branch "0 <= _b_0 - 1"
                                 (rule "leq_diff1_eq" (formula "8"))
-                                (rule "closeTrue" (formula "8"))
+                                (rule "andLeft" (formula "1"))
+                                (rule "andLeft" (formula "1"))
+                                (rule "expand_in_u64" (formula "2"))
+                                (rule "andLeft" (formula "2"))
+                                (rule "replace_u64_MIN" (formula "2") (term "0"))
+                                (rule "leq_to_gt_alt" (formula "2"))
+                                (rule "eqSymm" (formula "10"))
+                                (rule "replace_known_right" (formula "2") (term "1"))
+                                (rule "concrete_or_4" (formula "2"))
+                                (rule "close" (formula "11"))
                             )
                             (branch "_b_0 - 1 < _b_0"
                                 (rule "less_add_one" (formula "8"))
