@@ -118,9 +118,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     @Override
     public void abort() {
         // If solver already completed, the interrupt should be ignored
-        if (setFinalResult(IsabelleResult.getInterruptedResult())) {
-            handleInterrupt(new InterruptedException());
-        }
+        handleInterrupt(new InterruptedException());
     }
 
     /**
@@ -332,7 +330,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
                         .default_params thy
                                         [("timeout",\"""" + (double) timeout
                     + """
-                            "),("verbose","true"),("provers", "cvc4 verit z3 e spass vampire zipperposition")];
+                            "),("verbose","true"),("provers", "cvc4 verit z3 spass vampire zipperposition")];
                             val results =\s"""
                     + sledgehammer + """
                             .run_sledgehammer params\s""" + Sledgehammer_Prover + """
