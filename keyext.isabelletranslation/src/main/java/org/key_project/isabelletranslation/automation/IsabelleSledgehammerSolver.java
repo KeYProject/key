@@ -118,9 +118,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     @Override
     public void abort() {
         // If solver already completed, the interrupt should be ignored
-        if (setFinalResult(IsabelleResult.getInterruptedResult())) {
-            handleInterrupt(new InterruptedException());
-        }
+        handleInterrupt(new InterruptedException());
     }
 
     /**
