@@ -20,6 +20,7 @@
 \proof {
     (branch "dummy ID"
         (rule "assignment" (formula "1"))
+        (rule "simpleExprStmt" (formula "1") (term "1"))
         (rule "ifElseSplit" (formula "1"))
         (branch
            (rule "applyOnRigidFormula" (formula "1"))
@@ -31,6 +32,7 @@
         (branch
            (rule "emptyBlockValue" (formula "2") (term "1"))
            (rule "assignment" (formula "2") (term "1"))
+           (rule "simpleExprStmt" (formula "2") (term "1,1"))
            (rule "emptyModalityValue" (formula "2") (term "1,1"))
            (rule "simplifyUpdate2" (formula "2"))
            (rule "applyOnRigidFormula" (formula "2"))

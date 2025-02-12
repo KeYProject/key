@@ -17,8 +17,11 @@
 \proof {
     (branch "dummy ID"
         (rule "assignment" (formula "1"))
+        (rule "simpleExprStmt" (formula "1") (term "1"))
         (rule "assignment" (formula "1") (term "1"))
+        (rule "simpleExprStmt" (formula "1") (term "1,1"))
         (rule "assignmentSubtractionU32" (formula "1") (term "1,1"))
+        (rule "simpleExprStmt" (formula "1") (term "1,1,1"))
         (rule "emptyModality" (formula "1") (term "1,1,1"))
         (rule "sequentialToParallel2" (formula "1"))
         (rule "simplifyUpdate3" (formula "1") (term "1,0"))
