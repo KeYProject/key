@@ -65,10 +65,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Expr actualResult;
         final Call call;
 
-        final RustyProgramElement activeStatement = RustTools.getActiveStatement(rb);
-        // active statement must be function call, method call or assignment with
+        final RustyProgramElement activeExpr = RustTools.getActiveExpr(rb);
+        // active expr must be function call, method call or assignment with
         // function/method call
-        switch (activeStatement) {
+        switch (activeExpr) {
         case CallExpression ce -> {
             actualResult = null;
             call = ce;
@@ -366,10 +366,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         // create "Post" branch
         final ContextBlockExpression resultAssign;
         if (inst.actualResult == null) {
-            resultAssign = new ContextBlockExpression(ImmutableList.of(), null);
+            resultAssign = new ContextBlockExpression(ImmutableList.of(), TupleExpression.UNIT);
         } else {
-            resultAssign = new ContextBlockExpression(ImmutableList.of(new ExpressionStatement(
-                new AssignmentExpression(inst.actualResult, resultVar), true)), null);
+            resultAssign = new ContextBlockExpression(ImmutableList.of(), new AssignmentExpression(inst.actualResult, resultVar));
         }
         final BlockExpression postBE = replaceBlock(rb, resultAssign);
         final RustyBlock postRustyBlock = new RustyBlock(postBE);

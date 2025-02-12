@@ -13,9 +13,9 @@ import org.key_project.rusty.logic.RustyBlock;
 
 public class RustTools {
     /**
-     * Returns the active statement of the passed a rust block.
+     * Returns the active expr of the passed a rust block.
      */
-    public static RustyProgramElement getActiveStatement(RustyBlock rb) {
+    public static RustyProgramElement getActiveExpr(RustyBlock rb) {
         assert rb.program() != null;
 
         RustyProgramElement result = (RustyProgramElement) rb.program().getChild(0);
