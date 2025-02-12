@@ -10,14 +10,10 @@ import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.util.KeYTypeUtil;
 
-import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This class serves as a facade to all functionalities that are needed for proof management, i.e.,
@@ -45,31 +41,7 @@ public class ProofManagementApi {
      *         exception here)
      */
     public List<Contract> getProofContracts() {
-        if (proofContracts.isEmpty()) {
-            buildContracts();
-        }
-        return proofContracts;
-    }
-
-    /**
-     * constructs the possible proof contracts from the java info in the environment.
-     */
-    private void buildContracts() {
-        proofContracts.clear();
-        Set<KeYJavaType> kjts = currentEnv.getJavaInfo().getAllKeYJavaTypes();
-        for (KeYJavaType type : kjts) {
-            if (!KeYTypeUtil.isLibraryClass(type)) {
-                ImmutableSet<IObserverFunction> targets =
-                    currentEnv.getSpecificationRepository().getContractTargets(type);
-                for (IObserverFunction target : targets) {
-                    ImmutableSet<Contract> contracts =
-                        currentEnv.getSpecificationRepository().getContracts(type, target);
-                    for (Contract contract : contracts) {
-                        proofContracts.add(contract);
-                    }
-                }
-            }
-        }
+        return currentEnv.getProofContracts();
     }
 
     /**
