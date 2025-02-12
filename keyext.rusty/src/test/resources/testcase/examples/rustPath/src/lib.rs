@@ -19,8 +19,8 @@ pub fn add(a: u32, b: u32) -> u32 {
 pub fn mul(a: u64, mut b: u64) -> u64 {
     let mut n: u64 = 0;
     let old_b: u64 = b;
-    #[invariant(n == a * (old_b - b))]
-    #[variant(n)]
+    #[invariant(n == a * (old_b - b) && b <= old_b)]
+    #[variant(b)]
     loop {
         if b == 0 { break n; }
         n += a;
