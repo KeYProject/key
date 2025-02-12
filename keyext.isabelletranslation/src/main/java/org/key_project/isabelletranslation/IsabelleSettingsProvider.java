@@ -3,7 +3,13 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation;
 
+import java.io.IOException;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.List;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -18,7 +24,7 @@ import de.uka.ilkd.key.settings.Configuration;
 public class IsabelleSettingsProvider extends SettingsPanel implements SettingsProvider {
     private static final String INFO_TIMEOUT_FIELD =
         """
-                Timeout for the external solvers in seconds. Fractions of a second are allowed. Example: 6.5
+                Timeout for the external solvers in seconds.
                 """;
     private static final String infoTranslationPathPanel =
         """
@@ -27,7 +33,10 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
     private static final String infoIsabellePathPanel =
         """
                 Specify the absolute path of the Isabelle folder.
+                Currently supports Isabelle2024-RC1.
                 """;
+
+    private static final Collection<String> SUPPORTED_VERSIONS_TEXT = List.of("Isabelle2024-RC1");
 
     /**
      * Panel for inputting the path to where translations are stored
@@ -45,6 +54,11 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
     private final JSpinner timeoutField;
 
     /**
+     * Supported version info for user
+     */
+    private final JTextField versionSupported;
+
+    /**
      * The current settings object
      */
     private final IsabelleTranslationSettings settings;
@@ -58,12 +72,15 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         translationPathPanel = createTranslationPathPanel();
         isabellePathPanel = createIsabellePathPanel();
         timeoutField = createTimeoutField();
+
+        createCheckSupportButton();
+        this.versionSupported = createSolverSupported();
         this.settings = IsabelleTranslationSettings.getInstance();
     }
 
     @Override
     public String getDescription() {
-        return "Isabelle translation";
+        return "Isabelle Translation";
     }
 
     @Override
@@ -77,13 +94,13 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
     }
 
     private JTextField createTranslationPathPanel() {
-        return addFileChooserPanel("Store translation to file:", "", infoTranslationPathPanel,
+        return addFileChooserPanel("Location for translation files:", "", infoTranslationPathPanel,
             true, e -> {
             });
     }
 
     private JTextField createIsabellePathPanel() {
-        return addFileChooserPanel("Isabelle folder:", "", infoIsabellePathPanel,
+        return addFileChooserPanel("Isabelle installation folder:", "", infoIsabellePathPanel,
             true, e -> {
             });
     }
@@ -101,6 +118,47 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
         timeoutSpinner.setEditor(editor);
         return timeoutSpinner;
     }
+
+    protected JButton createCheckSupportButton() {
+        JButton checkForSupportButton = new JButton("Check for support");
+        checkForSupportButton.setEnabled(true);
+        checkForSupportButton
+                .addActionListener(arg0 -> versionSupported.setText(getSolverSupportText()));
+        addRowWithHelp(null, new JLabel(), checkForSupportButton);
+        return checkForSupportButton;
+    }
+
+    private boolean checkForSupport() {
+        String isabelleVersion;
+        Path isabelleIdentifierPath =
+            Paths.get(isabellePathPanel.getText(), "/etc/ISABELLE_IDENTIFIER");
+        try {
+            isabelleVersion = Files.readAllLines(isabelleIdentifierPath).getFirst();
+        } catch (IOException e) {
+            return false;
+        }
+        return SUPPORTED_VERSIONS_TEXT.contains(isabelleVersion);
+    }
+
+    protected JTextField createSolverSupported() {
+        JTextField txt = addTextField("Support", getSolverSupportText(),
+            createSupportedVersionText(),
+            emptyValidator());
+        txt.setEditable(false);
+        return txt;
+    }
+
+    private String createSupportedVersionText() {
+        String supportText = "Supports these Isabelle versions: ";
+        supportText = supportText + String.join(", ", SUPPORTED_VERSIONS_TEXT);
+        return supportText;
+    }
+
+    private String getSolverSupportText() {
+        return checkForSupport() ? "Version of Isabelle is supported."
+                : "Version of Isabelle may not be supported.";
+    }
+
 
     @Override
     public void applySettings(MainWindow window) throws InvalidSettingsInputException {

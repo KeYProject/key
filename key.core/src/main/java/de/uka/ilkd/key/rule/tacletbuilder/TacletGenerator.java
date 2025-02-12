@@ -419,9 +419,13 @@ public class TacletGenerator {
             for (SchemaVariable paramSV : paramSVs) {
                 tacletBuilder.addVarsNotFreeIn(targetSV, paramSV);
             }
-            axiomSatisfiable =
-                TB.ex(targetSV, TB.and(targetSVReachable, OpReplacer.replace(targetTerm,
-                    TB.var(targetSV), schemaRepresents.term, services.getTermFactory())));
+            final var replaced = OpReplacer.replace(targetTerm,
+                TB.var(targetSV), schemaRepresents.term, services.getTermFactory());
+            if (targetSVReachable == null) { // no heaps are given e.g. no_state method
+                axiomSatisfiable = TB.ex(targetSV, replaced);
+            } else {
+                axiomSatisfiable = TB.ex(targetSV, TB.and(targetSVReachable, replaced));
+            }
         }
         return axiomSatisfiable;
     }

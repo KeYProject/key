@@ -34,6 +34,7 @@ import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLParameters;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.util.TermUtil;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
@@ -2365,6 +2366,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression body = accept(ctx.method_body().expression());
         SLParameters params = visitParameters(ctx.param_list());
         SLExpression apply = lookupIdentifier(ctx.IDENT().getText(), null, params, ctx);
+
+        var forbiddenHeapVar = services.getTypeConverter().getHeapLDT().getHeap();
+        boolean applyContainsHeap = TermUtil.contains(apply.getTerm(), forbiddenHeapVar);
+        boolean bodyContainsHeap = TermUtil.contains(body.getTerm(), forbiddenHeapVar);
+
+
+        if (!applyContainsHeap && bodyContainsHeap) {
+            // NOT (no heap in applies --> no heap in body)
+            raiseError(ctx, "Heap used in a `no_state` method.");
+        }
 
         return termFactory.eq(apply, body);
     }

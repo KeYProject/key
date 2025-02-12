@@ -3,16 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.isabelletranslation.automation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NonNull;
 
 public class IsabelleRuleApp extends AbstractExternalSolverRuleApp {
     public static final IsabelleRule RULE = new IsabelleRule();
@@ -33,44 +36,62 @@ public class IsabelleRuleApp extends AbstractExternalSolverRuleApp {
         super(rule, pio, ifInsts, successfulSolverName, title);
     }
 
-
-
     @Override
-    public AbstractExternalSolverRuleApp setTitle(String title) {
+    public IsabelleRuleApp setTitle(String title) {
         return new IsabelleRuleApp(RULE, pio, ifInsts, successfulSolverName, title);
     }
 
     @Override
-    public AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
+    public IsabelleRuleApp replacePos(PosInOccurrence newPos) {
         return new IsabelleRuleApp(RULE, newPos, successfulSolverName, title);
+    }
+
+    @Override
+    public IsabelleRuleApp tryToInstantiate(Goal goal) {
+        IsabelleRuleApp app = RULE.createApp(pio, goal.proof().getServices());
+        Sequent seq = goal.sequent();
+        List<PosInOccurrence> ifInsts = new ArrayList<>();
+        for (SequentFormula ante : seq.antecedent()) {
+            ifInsts.add(new PosInOccurrence(ante, PosInTerm.getTopLevel(), true));
+        }
+        for (SequentFormula succ : seq.succedent()) {
+            ifInsts.add(new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
+        }
+        return app.setIfInsts(ImmutableList.fromList(ifInsts));
+    }
+
+    @Override
+    public IsabelleRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+        setMutable(ifInsts);
+        return this;
+    }
+
+    @Override
+    public IsabelleRule rule() {
+        return RULE;
     }
 
     public static class IsabelleRule implements ExternalSolverRule {
         Name name = new Name("IsabelleRule");
 
-        @Override
-        public ExternalSolverRule newRule() {
-            return new IsabelleRule();
-        }
-
-        public AbstractExternalSolverRuleApp createApp(String successfulSolverName,
+        public IsabelleRuleApp createApp(String successfulSolverName,
                 String successfulTactic) {
             return new IsabelleRuleApp(this, null, successfulSolverName, successfulTactic);
         }
 
         @Override
-        public AbstractExternalSolverRuleApp createApp(String successfulSolverName) {
+        public IsabelleRuleApp createApp(String successfulSolverName) {
             return new IsabelleRuleApp(this, null, successfulSolverName, "");
         }
 
         @Override
-        public AbstractExternalSolverRuleApp createApp(String successfulSolverName,
+        public IsabelleRuleApp createApp(String successfulSolverName,
                 ImmutableList<PosInOccurrence> unsatCore) {
             return new IsabelleRuleApp(this, null, unsatCore, successfulSolverName);
         }
 
         @Override
-        public AbstractExternalSolverRuleApp createApp(PosInOccurrence pos, TermServices services) {
+        public IsabelleRuleApp createApp(PosInOccurrence pos, TermServices services) {
             return new IsabelleRuleApp(this, null, "", "");
         }
 
@@ -84,6 +105,7 @@ public class IsabelleRuleApp extends AbstractExternalSolverRuleApp {
          * @return a list with an identical goal as the given <tt>goal</tt>
          */
         @Override
+        @NonNull
         public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) {
             if (goal.proof().getInitConfig().getJustifInfo().getJustification(RULE) == null) {
                 goal.proof().getInitConfig().registerRule(RULE, () -> false);
