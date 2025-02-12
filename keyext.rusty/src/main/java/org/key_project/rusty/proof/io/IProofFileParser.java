@@ -8,7 +8,7 @@ import java.util.List;
 public interface IProofFileParser {
     enum ProofElementID {
         BRANCH("branch"), RULE("rule"), TERM("term"), FORMULA("formula"), INSTANTIATION("inst"),
-        ASSUMES_FORMULA_IN_SEQUENT("ifseqformula"), ASSUMES_FORMULA_DIRECT("ifdirectformula"),
+        ASSUMES_FORMULA_IN_SEQUENT("assumesSeqFormula"), ASSUMES_FORMULA_DIRECT("ifdirectformula"),
         RULESET("heur"), BUILT_IN_RULE("builtin"), CONTRACT("contract"),
         ASSUMES_INST_BUILT_IN("ifInst"), MERGE_ABSTRACTION_PREDICATES("abstractionPredicates"),
         MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE("latticeType"), MERGE_PROCEDURE("mergeProc"),

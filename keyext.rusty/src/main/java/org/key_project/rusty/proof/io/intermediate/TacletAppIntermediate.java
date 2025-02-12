@@ -20,7 +20,7 @@ public class TacletAppIntermediate extends AppIntermediate {
     private String tacletName = null;
     private Pair<Integer, PosInTerm> posInfo = null;
     private LinkedList<String> insts = null;
-    private ImmutableList<String> ifSeqFormulaList = null;
+    private ImmutableList<String> assumesSeqFormulaList = null;
     private ImmutableList<String> ifDirectFormulaList = null;
     private ImmutableList<Name> newNames = null;
 
@@ -31,18 +31,18 @@ public class TacletAppIntermediate extends AppIntermediate {
      * @param posInfo Position information (Integer representing position of the target formula,
      *        PosInTerm for relevant term inside the formula).
      * @param insts Schema variable instantiations.
-     * @param ifSeqFormulaList
+     * @param assumesSeqFormulaList
      * @param ifDirectFormulaList
      * @param newNames New names registered during taclet application.
      */
     public TacletAppIntermediate(String tacletName, Pair<Integer, PosInTerm> posInfo,
-            LinkedList<String> insts, ImmutableList<String> ifSeqFormulaList,
+            LinkedList<String> insts, ImmutableList<String> assumesSeqFormulaList,
             ImmutableList<String> ifDirectFormulaList, ImmutableList<Name> newNames) {
         // Taclet names are internalized later, so we don't waste memory
         this.tacletName = tacletName.intern();
         this.posInfo = posInfo;
         this.insts = insts;
-        this.ifSeqFormulaList = ifSeqFormulaList;
+        this.assumesSeqFormulaList = assumesSeqFormulaList;
         this.ifDirectFormulaList = ifDirectFormulaList;
         this.newNames = newNames;
     }
@@ -59,8 +59,8 @@ public class TacletAppIntermediate extends AppIntermediate {
         return insts;
     }
 
-    public ImmutableList<String> getIfSeqFormulaList() {
-        return ifSeqFormulaList;
+    public ImmutableList<String> getAssumesSeqFormulaList() {
+        return assumesSeqFormulaList;
     }
 
     public ImmutableList<String> getIfDirectFormulaList() {

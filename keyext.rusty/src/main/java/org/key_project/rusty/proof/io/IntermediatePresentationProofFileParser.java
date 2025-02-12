@@ -88,10 +88,10 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         }
         case RULESET -> {
         } // heuristics
-        case ASSUMES_FORMULA_IN_SEQUENT -> // ifseqformula
+        case ASSUMES_FORMULA_IN_SEQUENT -> // assumesSeqFormula
         {
             TacletInformation tacletInfo = (TacletInformation) ruleInfo;
-            tacletInfo.ifSeqFormulaList = tacletInfo.ifSeqFormulaList.append(str);
+            tacletInfo.assumesSeqFormulaList = tacletInfo.assumesSeqFormulaList.append(str);
         }
         case ASSUMES_FORMULA_DIRECT -> // ifdirectformula
         {
@@ -238,7 +238,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         TacletInformation tacletInfo = (TacletInformation) ruleInfo;
         return new TacletAppIntermediate(tacletInfo.currRuleName,
             new Pair<>(tacletInfo.currFormula, tacletInfo.currPosInTerm),
-            tacletInfo.loadedInsts, tacletInfo.ifSeqFormulaList, tacletInfo.ifDirectFormulaList,
+            tacletInfo.loadedInsts, tacletInfo.assumesSeqFormulaList,
+            tacletInfo.ifDirectFormulaList,
             tacletInfo.currNewNames);
     }
 
@@ -300,7 +301,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private static class TacletInformation extends RuleInformation {
         /* + Taclet Information */
         protected LinkedList<String> loadedInsts = null;
-        protected ImmutableList<String> ifSeqFormulaList = ImmutableSLList.nil();
+        protected ImmutableList<String> assumesSeqFormulaList = ImmutableSLList.nil();
         protected ImmutableList<String> ifDirectFormulaList = ImmutableSLList.nil();
 
         public TacletInformation(String ruleName) {

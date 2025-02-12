@@ -312,12 +312,13 @@ public class IntermediateProofReplayer {
 
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(), services);
 
-        ImmutableList<AssumesFormulaInstantiation> ifFormulaList =
+        ImmutableList<AssumesFormulaInstantiation> assumesFormulaList =
             ImmutableSLList.nil();
-        for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
-            ifFormulaList =
-                ifFormulaList
-                        .append(new AssumesFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
+        for (String assumesFormulaStr : currInterm.getAssumesSeqFormulaList()) {
+            assumesFormulaList =
+                assumesFormulaList
+                        .append(
+                            new AssumesFormulaInstSeq(seq, Integer.parseInt(assumesFormulaStr)));
         }
         for (String ifFormulaStr : currInterm.getIfDirectFormulaList()) {
             // MU 2019: #1487. We have to use the right namespaces to not
@@ -325,11 +326,11 @@ public class IntermediateProofReplayer {
             NamespaceSet nss = currGoal.getLocalNamespaces();
             Term term = parseTerm(ifFormulaStr, proof, nss.variables(), nss.programVariables(),
                 nss.functions());
-            ifFormulaList =
-                ifFormulaList.append(new AssumesFormulaInstDirect(new SequentFormula(term)));
+            assumesFormulaList =
+                assumesFormulaList.append(new AssumesFormulaInstDirect(new SequentFormula(term)));
         }
 
-        if (!ourApp.ifInstsCorrectSize(ifFormulaList)) {
+        if (!ourApp.ifInstsCorrectSize(assumesFormulaList)) {
             // LOGGER.warn("Proof contains wrong number of \\assumes instatiations for {}",
             // tacletName);
             // try to find instantiations automatically
@@ -342,13 +343,13 @@ public class IntermediateProofReplayer {
             }
 
             TacletApp newApp = instApps.head();
-            ifFormulaList = newApp.assumesFormulaInstantiations();
+            assumesFormulaList = newApp.assumesFormulaInstantiations();
         }
 
         // TODO: In certain cases, the below method call returns null and
         // induces follow-up NullPointerExceptions. This was encountered
         // in a proof of the TimSort method binarySort with several joins.
-        ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList, services);
+        ourApp = ourApp.setIfFormulaInstantiations(assumesFormulaList, services);
 
         if (!ourApp.complete()) {
             ourApp = ourApp.tryToInstantiate(currGoal.getOverlayServices());
