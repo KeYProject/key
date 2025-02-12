@@ -83,7 +83,7 @@ public class ProofReplayer {
                      * throw new LocatableException("Unknown proof element: " + idToken.getText(),
                      * loc);
                      */
-                    throw new RuntimeException("Unknown proof element");
+                    throw new RuntimeException("Unknown proof element at line " + (idToken.getLine() + startLine - 1) + ": " + idToken.getText());
                 }
                 stream.consume();
                 String arg = null;
