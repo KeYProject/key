@@ -11,9 +11,11 @@ import java.util.Properties;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
+@NullMarked
 public final class ProofIndependentSMTSettings extends AbstractSettings {
     private static final String CATEGORY = "SMTSettings";
     public static final String ACTIVE_SOLVER = "ActiveSolver";
@@ -315,7 +317,7 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
     }
 
     public static ProofIndependentSMTSettings getDefaultSettingsData() {
-        return DEFAULT_DATA.clone();
+        return DEFAULT_DATA.copy();
     }
 
     public boolean containsSolver(SolverType type) {
@@ -342,7 +344,7 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
         type.setSolverParameters(parameters);
     }
 
-    public ProofIndependentSMTSettings clone() {
+    public ProofIndependentSMTSettings copy() {
         return new ProofIndependentSMTSettings(this);
     }
 

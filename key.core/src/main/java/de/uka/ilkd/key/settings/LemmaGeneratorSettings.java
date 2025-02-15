@@ -36,22 +36,6 @@ public class LemmaGeneratorSettings extends AbstractSettings {
     }
 
     @Override
-    public void readSettings(Properties props) {
-        setShowDialogAddingAxioms(SettingsConverter.read(props,
-            "[" + CATEGORY + "]" + SHOW_DIALOG_ADDING_AXIOMS, true));
-        setShowDialogUsingAxioms(SettingsConverter.read(props,
-            "[" + CATEGORY + "]" + SHOW_DIALOG_USING_AXIOMS, true));
-    }
-
-    @Override
-    public void writeSettings(Properties props) {
-        SettingsConverter.store(props, "[" + CATEGORY + "]" + SHOW_DIALOG_ADDING_AXIOMS,
-            showDialogAddingAxioms);
-        SettingsConverter.store(props, "[" + CATEGORY + "]" + SHOW_DIALOG_USING_AXIOMS,
-            showDialogUsingAxioms);
-    }
-
-    @Override
     public void readSettings(Configuration props) {
         var cat = props.getSection(CATEGORY);
         if (cat == null)

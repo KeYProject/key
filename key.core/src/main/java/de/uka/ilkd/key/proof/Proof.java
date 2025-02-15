@@ -115,17 +115,18 @@ public class Proof implements Named {
      * settings valid independent of a proof
      */
     private final ProofIndependentSettings pis;
+
     /**
      * when different users load and save a proof this vector fills up with Strings containing the
      * usernames.
      */
-    public List<String> userLog;
+    public List<String> userLog = new ArrayList<>();
 
     /**
      * when load and save a proof with different versions of key this vector fills up with Strings
      * containing the GIT versions.
      */
-    public List<String> keyVersionLog;
+    public List<String> keyVersionLog = new ArrayList<>();
 
     private long autoModeTime = 0;
 
@@ -167,8 +168,7 @@ public class Proof implements Named {
      */
     private Proof(Name name, InitConfig initConfig) {
         this.name = name;
-        assert initConfig != null : "Tried to create proof without valid services.";
-        this.initConfig = initConfig;
+        this.initConfig = Objects.requireNonNull(initConfig, "Tried to create proof without valid services.");
 
         if (initConfig.getSettings() == null) {
             // if no settings have been assigned yet, take default settings

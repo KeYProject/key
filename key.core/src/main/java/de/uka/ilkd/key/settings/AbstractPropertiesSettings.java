@@ -4,18 +4,20 @@
 package de.uka.ilkd.key.settings;
 
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /**
  * A base class for own settings based on properties.
  *
  * @author weigl
  */
+@NullMarked
 public abstract class AbstractPropertiesSettings extends AbstractSettings {
 
     private static final String SET_DELIMITER = ",";
@@ -23,12 +25,6 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     private static final Function<String, Float> parseFloat = Float::parseFloat;
     private static final Function<String, Boolean> parseBoolean = Boolean::parseBoolean;
     private static final Function<String, Double> parseDouble = Double::parseDouble;
-
-    /**
-     * Properties stored in this settings object.
-     * Updated by each {@link PropertyEntry} when a new non-null value is set.
-     */
-    protected Map<String, Object> properties = new TreeMap<>();
 
     /**
      * category of this settings w/o brackets, e.g, "View" for "[View]".
@@ -83,89 +79,74 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
                 .collect(Collectors.joining(SET_DELIMITER));
     }
 
-    public boolean isInitialized() {
-        return properties != null;
-    }
-
-    @Override
-    public void readSettings(Properties props) {
-        propertyEntries.forEach(it -> {
-            String value = props.getProperty(it.getKey());
-            if (value != null) {
-                it.parseFrom(value);
-            }
-        });
-    }
-
-    @Override
-    public void writeSettings(Properties props) {
-        for (PropertyEntry<?> entry : propertyEntries) {
-            props.setProperty("[" + category + "]" + entry.getKey(), entry.value());
-        }
-    }
-
-
     @Override
     public void readSettings(Configuration props) {
         var cat = props.getSection(category);
         if (cat == null)
             return;
-        propertyEntries.forEach(it -> {
-            final var value = it.fromObject(cat.get(it.getKey()));
-            if (value != null) {
-                properties.put(it.getKey(), value);
-            }
-        });
+
+        for (PropertyEntry<?> it : propertyEntries) {
+            it.setValue(cat.get(it.getKey()));
+        }
     }
 
     @Override
     public void writeSettings(Configuration props) {
         var cat = props.getOrCreateSection(category);
-        propertyEntries.forEach(it -> {
+        for (PropertyEntry<?> it : propertyEntries) {
             cat.set(it.getKey(), it.get());
-        });
+        }
     }
 
     protected PropertyEntry<Double> createDoubleProperty(String key, double defValue) {
-        PropertyEntry<Double> pe =
-            new DefaultPropertyEntry<>(key, defValue, parseDouble, (it) -> (double) it);
+        PropertyEntry<Double> pe = new DirectPropertyEntry<>(key, defValue);
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<Integer> createIntegerProperty(String key, int defValue) {
-        PropertyEntry<Integer> pe = new DefaultPropertyEntry<>(key, defValue, parseInt,
-            (it) -> Math.toIntExact((Long) it));
+        PropertyEntry<Integer> pe = new DirectPropertyEntry<>(key, defValue) {
+            @Override
+            public void setValue(@Nullable Object value) {
+                if (value instanceof Integer i) {
+                    set(i);
+                }
+                if (value instanceof Long i) {
+                    set(i.intValue());
+                }
+            }
+        };
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<Float> createFloatProperty(String key, float defValue) {
-        PropertyEntry<Float> pe =
-            new DefaultPropertyEntry<>(key, defValue, parseFloat, (it) -> (float) (double) it);
+        PropertyEntry<Float> pe = new DirectPropertyEntry<>(key, defValue);
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<String> createStringProperty(String key, String defValue) {
-        PropertyEntry<String> pe =
-            new DefaultPropertyEntry<>(key, defValue, id -> id, Object::toString);
+        PropertyEntry<String> pe = new DirectPropertyEntry<>(key, defValue);
         propertyEntries.add(pe);
         return pe;
     }
 
     protected PropertyEntry<Boolean> createBooleanProperty(String key, boolean defValue) {
-        PropertyEntry<Boolean> pe =
-            new DefaultPropertyEntry<>(key, defValue, parseBoolean, (it) -> (Boolean) it);
+        PropertyEntry<Boolean> pe = new DirectPropertyEntry<>(key, defValue);
         propertyEntries.add(pe);
         return pe;
     }
 
-    protected PropertyEntry<Set<String>> createStringSetProperty(String key, String defValue) {
-        PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key, parseStringSet(defValue),
-            AbstractPropertiesSettings::parseStringSet,
-            AbstractPropertiesSettings::stringSetToString,
-            (it) -> new LinkedHashSet<>((Collection<String>) it));
+    protected PropertyEntry<Set<String>> createStringSetProperty(String key, Set<String> defValue) {
+        PropertyEntry<Set<String>> pe = new DirectPropertyEntry<>(key, defValue) {
+            @Override
+            public void setValue(@Nullable Object value) {
+                if (value instanceof List<?> seq) {
+                    set(new TreeSet<>((Collection<String>) seq));
+                }
+            }
+        };
         propertyEntries.add(pe);
         return pe;
     }
@@ -173,59 +154,75 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     /**
      * Creates a string list property.
      *
-     * @param key the key value of this property inside {@link Properties} instance
+     * @param key      the key value of this property inside {@link Properties} instance
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
     protected PropertyEntry<List<String>> createStringListProperty(@NonNull String key,
-            @Nullable String defValue) {
-        PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key, parseStringList(defValue),
-            AbstractPropertiesSettings::parseStringList,
-            AbstractPropertiesSettings::stringListToString, it -> (List<String>) it);
+                                                                   @Nullable List<String> defValue) {
+        PropertyEntry<List<String>> pe = new DirectPropertyEntry<>(key, defValue);
         propertyEntries.add(pe);
         return pe;
     }
 
 
-    public interface PropertyEntry<T> {
+    /// This interface describes properties or options in an [AbstractPropertiesSettings] class.
+    /// A [PropertyEntry] is parameterize in a type its value holds, additionally it has name (to store and read it
+    /// from configuration files), often a default.
+    ///
+    /// @param <T>
+    public interface PropertyEntry<T extends @Nullable Object> {
+        /**
+         * The name (or key) to find this value inside a configuration file. It should also be the key
+         * in {@link java.beans.PropertyChangeEvent}s.
+         */
         String getKey();
 
-        void parseFrom(String value);
-
+        /**
+         * Sets this value of this property. Should trigger {@link java.beans.PropertyChangeEvent} if necessary.
+         *
+         * @param value the new configuration value
+         */
         void set(T value);
 
+        /**
+         * Returns the current configuration value.
+         */
         T get();
 
-        default void update() {
-            set(get());
-        }
 
-        String value();
+        /// This method allows to set the property using an arbitray object which is allowed in
+        /// the configuration hierarchy. This methods may throw an exception on unexpected value types.
+        ///
+        /// Especially, the following should not result into change of the value for a property:
+        /// ```java
+        /// setValue(value())
+        ///```
+        ///
+        /// @param value an object of the [Configuration] hierarchy
+        void setValue(@Nullable Object value);
 
-        T fromObject(@Nullable Object o);
+        /**
+         * Returns the representation of this configuration value to store it inside a {@link Configuration}
+         * object.
+         *
+         * @return an object compatible with {@link #setValue(Object)}
+         */
+        Object value();
+
+        ///  returns true if the property is set.
+        boolean isSet();
     }
 
-
-    class DefaultPropertyEntry<T> implements PropertyEntry<T> {
+    /// @param <T>
+    public abstract class SimplePropertyEntry<T extends @Nullable Object> implements PropertyEntry<T> {
         private final String key;
         private final T defaultValue;
-        private final Function<String, T> convert;
-        private final Function<T, String> toString;
+        private T currentValue;
 
-        private final Function<Object, T> fromObject;
-
-        private DefaultPropertyEntry(String key, T defaultValue, Function<String, T> convert,
-                Function<Object, T> fromObject) {
-            this(key, defaultValue, convert, Objects::toString, fromObject);
-        }
-
-        private DefaultPropertyEntry(String key, T defaultValue, Function<String, T> convert,
-                Function<T, String> toString, Function<Object, T> fromObject) {
+        SimplePropertyEntry(String key, T defaultValue) {
             this.key = key;
             this.defaultValue = defaultValue;
-            this.convert = convert;
-            this.toString = toString;
-            this.fromObject = fromObject;
         }
 
         @Override
@@ -234,43 +231,84 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         }
 
         @Override
-        public void parseFrom(String value) {
-            set(convert.apply(value));
-        }
-
-        @Override
         public void set(T value) {
-            T old = get();
-            // only store non-null values
-            if (value != null) {
-                properties.put(key, value);
-                firePropertyChange(key, old, value);
-            }
+            var old = currentValue;
+            currentValue = value;
+            firePropertyChange(getKey(), old, value);
         }
 
         @Override
         public T get() {
-            var v = properties.getOrDefault(key, defaultValue);
-            if (v == null) {
-                return defaultValue;
-            } else {
-                return (T) v;
+            return currentValue != null ? currentValue : defaultValue;
+        }
+
+        @Override
+        public boolean isSet() {
+            return currentValue != null;
+        }
+    }
+
+    /**
+     * A base class for any configuration properties which is directly supported by the configuration.
+     *
+     * @param <T> type of the value, supported by {@link Configuration}
+     * @see Configuration#allowedValueType(Object)
+     */
+    public class DirectPropertyEntry<T extends @Nullable Object> extends SimplePropertyEntry<T> {
+        DirectPropertyEntry(String key, T defaultValue) {
+            super(key, defaultValue);
+        }
+
+        @Override
+        public void setValue(@Nullable Object value) {
+            set((T) value);
+        }
+
+        @Override
+        public Object value() {
+            return get();
+        }
+    }
+
+    /**
+     * A base class for any configuration properties which are stored into a string representation.
+     *
+     * @param <T> the value of the property
+     */
+    public class DefaultPropertyEntry<T extends @Nullable Object> extends SimplePropertyEntry<T> {
+        private final Function<String, T> convert;
+        private final Function<T, String> toString;
+
+        public DefaultPropertyEntry(String key, T defaultValue,
+                                    Function<String, T> convert, Function<T, String> toString) {
+            super(key, defaultValue);
+            this.convert = convert;
+            this.toString = toString;
+        }
+
+        @Override
+        public void setValue(@Nullable Object value) {
+            if (value == null) {
+                set(null);
+                return;
             }
+
+            if (value instanceof String s) {
+                set(convert.apply(s));
+                return;
+            }
+
+            throw new IllegalArgumentException("Type %s is not supported for option %s".formatted(value.getClass(), getKey()));
         }
 
         @Override
         public String value() {
             var v = get();
             if (v == null) {
-                return toString.apply(defaultValue);
+                return null;
             } else {
                 return toString.apply(v);
             }
-        }
-
-        @Override
-        public T fromObject(@Nullable Object o) {
-            return fromObject.apply(o);
         }
     }
 }
