@@ -170,7 +170,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     @Override
     public JPanel getPanel(MainWindow window) {
-        setSmtSettings(SettingsManager.getSmtPdSettings(window).clone());
+        setSmtSettings(SettingsManager.getSmtPdSettings(window).copy());
         return this;
     }
 

@@ -51,7 +51,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
     public void showAndFocusTacletOptions() {
         ViewSettingsDialog dialog = showDialog();
         SettingsTreeModel model = (SettingsTreeModel) dialog.optionTree.getModel();
-        OptionContentNode item = model.getTacletOptionsItem();
+        var item = model.getTacletOptionsItem();
         dialog.getOptionTree().setSelectionPath(new TreePath(item.getPath()));
     }
 

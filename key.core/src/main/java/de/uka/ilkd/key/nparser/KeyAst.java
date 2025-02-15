@@ -87,9 +87,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
 
             if (ctx.preferences() != null && ctx.preferences().s != null) {
-                String text = StringUtil.trim(ctx.preferences().s.getText(), '"')
-                        .replace("\\\\:", ":");
-                settings.loadSettingsFromPropertyString(text);
+                throw new IllegalStateException("You try to load a KeY file in an deprecated format. " +
+                        "The settings are not a string of properties anymore. Please rewrite to the JSON-like format.");
             } else if (ctx.preferences() != null && ctx.preferences().c != null) {
                 var cb = new ConfigurationBuilder();
                 var c = (Configuration) ctx.preferences().c.accept(cb);

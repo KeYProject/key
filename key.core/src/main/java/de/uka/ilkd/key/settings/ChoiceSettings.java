@@ -151,23 +151,6 @@ public class ChoiceSettings extends AbstractSettings {
     }
 
 
-    /**
-     * implements the method required by the Settings interface. The settings are written to the
-     * given Properties object. Only entries of
-     * the form &lt; key &gt; = &lt; value &gt; (,&lt;
-     * value &gt;)* are allowed.
-     * <p>
-     * * @param props the Properties object where to write the
-     * settings as (key, value) pair
-     */
-    @Override
-    public void writeSettings(Properties props) {
-        var choiceSequence = category2Default.entrySet().stream()
-                .map(entry -> entry.getKey() + "-" + entry.getValue())
-                .collect(Collectors.joining(" , "));
-        props.setProperty("[" + CATEGORY + "]" + KEY_DEFAULT_CHOICES, choiceSequence);
-    }
-
     @Override
     public void readSettings(Configuration props) {
         var category = props.getSection(CATEGORY);

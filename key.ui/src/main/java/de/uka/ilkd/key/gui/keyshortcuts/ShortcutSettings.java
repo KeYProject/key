@@ -3,20 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.keyshortcuts;
 
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
+import de.uka.ilkd.key.settings.Configuration;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableRowSorter;
-
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
 /**
  * UI for configuring the {@link KeyStroke}s inside KeY.
@@ -46,18 +45,19 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
     @Override
     public JPanel getPanel(MainWindow window) {
         KeyStrokeSettings settings = KeyStrokeManager.getSettings();
-        Properties p = new Properties();
-        settings.writeSettings(p);
 
-        List<String> actionNames =
-            p.keySet().stream().sorted().map(Object::toString).collect(Collectors.toList());
+        var config = new Configuration();
+        settings.writeSettings(config);
+
+        List<String> actionNames = config.getKeys().stream().sorted().toList();
 
         // for the view, we hide "pressed" to increase readability
-        List<String> shortcuts = actionNames.stream().map(p::getProperty)
-                .map(s -> s.replace("pressed ", "")).collect(Collectors.toList());
+        List<String> shortcuts = actionNames.stream()
+                .map(config::getString)
+                .map(s -> s.replace("pressed ", ""))
+                .toList();
 
-        List<Action> actions =
-            actionNames.stream().map(KeyStrokeManager::findAction).collect(Collectors.toList());
+        List<Action> actions = actionNames.stream().map(KeyStrokeManager::findAction).toList();
 
         modelShortcuts = new ShortcutsTableModel(actionNames, shortcuts, actions);
         tblShortcuts.setModel(modelShortcuts);

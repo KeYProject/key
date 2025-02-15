@@ -4,14 +4,9 @@
 package de.uka.ilkd.key.gui.settings;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -98,18 +93,6 @@ public class SettingsManager {
          * window.getMediator().getSelectedProof().getSettings().getChoiceSettings(); } else {
          * return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings(); }
          */
-    }
-
-    public static Properties loadProperties(File settingsFile) {
-        Properties props = new Properties();
-        if (settingsFile.exists()) {
-            try (FileReader reader = new FileReader(settingsFile, StandardCharsets.UTF_8)) {
-                props.load(reader);
-            } catch (IOException e) {
-                LOGGER.warn("Failed to load settings", e);
-            }
-        }
-        return props;
     }
 
     public void showSettingsDialog(MainWindow mainWindow) {

@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui.settings;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -27,9 +28,9 @@ import com.formdev.flatlaf.themes.FlatMacLightLaf;
  */
 public class StandardUISettings extends SettingsPanel implements SettingsProvider {
     private static final String INFO_CLUTTER_RULESET =
-        "Comma separated list of rule set names, containing clutter rules.";
+            "Comma separated list of rule set names, containing clutter rules.";
     private static final String INFO_CLUTTER_RULE = "Comma separated listof clutter rules, \n"
-        + "which are rules with less priority in the taclet menu";
+            + "which are rules with less priority in the taclet menu";
     private static final String LOOK_AND_FEEL_INFO = """
             Look and feel used by KeY.
             'System' tries to mimic the default looks, 'Metal' is the Java default.
@@ -88,11 +89,11 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         addTitledComponent("Look and feel", lookAndFeel, LOOK_AND_FEEL_INFO);
 
         spFontSizeGlobal =
-            createNumberTextField(new SpinnerNumberModel(1, 0.1, 5, 0.1), emptyValidator());
+                createNumberTextField(new SpinnerNumberModel(1, 0.1, 5, 0.1), emptyValidator());
         addTitledComponent("Global font factor", spFontSizeGlobal, "");
 
         String[] sizes =
-            Arrays.stream(Config.SIZES).boxed().map(it -> it + " pt").toArray(String[]::new);
+                Arrays.stream(Config.SIZES).boxed().map(it -> it + " pt").toArray(String[]::new);
         spFontSizeTreeSequent = this.createSelection(sizes, emptyValidator());
         addTitledComponent("Tree and sequent font size", spFontSizeTreeSequent, "");
 
@@ -103,46 +104,46 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
                 In case of longer tooltips the instantiation will be suppressed.
                 """;
         txtMaxTooltipLines =
-            addNumberField("Maximum line number for tooltips", 1, 100, 5, info, emptyValidator());
+                addNumberField("Maximum line number for tooltips", 1, 100, 5, info, emptyValidator());
 
 
         chkShowLoadExamplesDialog =
-            addCheckBox("Show load examples dialog on startup", "", true, emptyValidator());
+                addCheckBox("Show load examples dialog on startup", "", true, emptyValidator());
 
         chkConfirmExit = addCheckBox("Confirm program exit", "", false, emptyValidator());
 
         spAutoSaveProof =
-            addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
+                addNumberField("Auto save proof", 0, 10000000, 1000, "", emptyValidator());
         notificationAfterMacro = addComboBox("Notification after macro finished", "", 1,
-            emptyValidator(), ViewSettings.NOTIFICATION_ALWAYS, ViewSettings.NOTIFICATION_UNFOCUSED,
-            ViewSettings.NOTIFICATION_NEVER);
+                emptyValidator(), ViewSettings.NOTIFICATION_ALWAYS, ViewSettings.NOTIFICATION_UNFOCUSED,
+                ViewSettings.NOTIFICATION_NEVER);
 
         addSeparator("Sequent View");
         chkPrettyPrint = addCheckBox("Pretty print terms", "", false, emptyValidator());
         chkUseUnicode = addCheckBox("Use unicode", "", false, emptyValidator());
         chkSyntaxHighlightning =
-            addCheckBox("Use syntax highlighting", "", false, emptyValidator());
+                addCheckBox("Use syntax highlighting", "", false, emptyValidator());
         chkHidePackagePrefix = addCheckBox("Hide package prefix", "", false, emptyValidator());
         chkRightClickMacros =
-            addCheckBox("Right click for proof macros", "", false, emptyValidator());
+                addCheckBox("Right click for proof macros", "", false, emptyValidator());
 
         addSeparator("Interaction");
         chkShowWholeTacletCB = addCheckBox("Show whole taclet",
-            "Pretty-print whole Taclet including 'name', 'find', 'varCond' and 'heuristics'\n(applies to tooltips in context menu)",
-            false, emptyValidator());
+                "Pretty-print whole Taclet including 'name', 'find', 'varCond' and 'heuristics'\n(applies to tooltips in context menu)",
+                false, emptyValidator());
 
         chkShowUninstantiatedTaclet = addCheckBox("Show uninstantiated taclet",
-            "recommended for unexperienced users", false, emptyValidator());
+                "recommended for unexperienced users", false, emptyValidator());
 
         txtClutterRules = addTextArea("Clutter rules", "", INFO_CLUTTER_RULE, emptyValidator());
 
         txtClutterRuleSets =
-            addTextArea("Clutter Rulesets", "", INFO_CLUTTER_RULESET, emptyValidator());
+                addTextArea("Clutter Rulesets", "", INFO_CLUTTER_RULESET, emptyValidator());
 
         chkMinimizeInteraction = addCheckBox("Minimise interactions", MinimizeInteraction.TOOL_TIP,
-            false, emptyValidator());
+                false, emptyValidator());
         chkEnsureSourceConsistency =
-            addCheckBox("Ensure source consistency", "", true, emptyValidator());
+                addCheckBox("Ensure source consistency", "", true, emptyValidator());
     }
 
 
@@ -155,11 +156,11 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     public JPanel getPanel(MainWindow window) {
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         GeneralSettings generalSettings =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
 
-        txtClutterRules.setText(vs.clutterRules().value().replace(',', '\n'));
-        txtClutterRuleSets.setText(vs.clutterRuleSets().value().replace(',', '\n'));
+        txtClutterRules.setText(String.join("\n", vs.clutterRules().get()));
+        txtClutterRuleSets.setText(String.join("\n", vs.clutterRuleSets().get()));
 
         for (int i = 0; i < LAF_CLASSES.size(); i++) {
             if (LAF_CLASSES.get(i).equals(vs.getLookAndFeel())) {
@@ -201,8 +202,10 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         vs.setUIFontSizeFactor((Double) spFontSizeGlobal.getValue());
         vs.setMaxTooltipLines((Integer) txtMaxTooltipLines.getValue());
 
-        vs.clutterRules().parseFrom(txtClutterRules.getText().replace('\n', ','));
-        vs.clutterRuleSets().parseFrom(txtClutterRuleSets.getText().replace('\n', ','));
+        vs.clutterRules().set(
+                Arrays.stream(txtClutterRules.getText().split("\n")).collect(Collectors.toSet()));
+        vs.clutterRuleSets().set(
+                Arrays.stream(txtClutterRuleSets.getText().split("\n")).collect(Collectors.toSet()));
 
         vs.setShowLoadExamplesDialog(chkShowLoadExamplesDialog.isSelected());
         vs.setShowWholeTaclet(chkShowWholeTacletCB.isSelected());
