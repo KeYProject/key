@@ -130,6 +130,7 @@ public class InvariantConfigurator {
             private final Map<LocationVariable, Term> freeInvariantTerm = new LinkedHashMap<>();
 
 
+            private JCheckBox relaxedCheckBox;
             private final JButton generateButton = new JButton("Generate");
             private final JButton applyButton = new JButton("Apply");
             private final JButton cancelButton = new JButton("Cancel");
@@ -208,11 +209,14 @@ public class InvariantConfigurator {
             private void initButtonPanel(JPanel buttonPanel) {
                 buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
+                relaxedCheckBox = new JCheckBox("Relaxed");
+
                 generateButton.addActionListener(this::generateActionPerformed);
                 applyButton.addActionListener(this::applyActionPerformed);
                 cancelButton.addActionListener(this::cancelActionPerformed);
                 storeButton.addActionListener(this::storeActionPerformed);
 
+                buttonPanel.add(relaxedCheckBox);
                 buttonPanel.add(generateButton);
                 buttonPanel.add(applyButton);
                 buttonPanel.add(storeButton);
@@ -710,13 +714,14 @@ public class InvariantConfigurator {
             }
 
             public void generateActionPerformed(ActionEvent ae) {
+                boolean relaxed = relaxedCheckBox.isSelected();
                 List<Set<ProgramVariable>> possibleIndexes = findPossibleIndexes(PosInSequent.createCfmaPos(posInOccurrence), services);
                 List<ProgramVariable> indexes = findIndexes(possibleIndexes);
                 System.out.println("Calculating number of arrays...");
                 int nrArrays = findNumberOfArrays(PosInSequent.createCfmaPos(posInOccurrence), services);
                 System.out.println(nrArrays);
                 if (indexes.size() == 1) {
-                    final LIGNew loopInvGenerator = new LIGNew(goal.sequent(), services, indexes.get(0), nrArrays);
+                    final LIGNew loopInvGenerator = new LIGNew(goal.sequent(), services, indexes.get(0), nrArrays, relaxed);
                     LoopInvariantGenerationResult result = loopInvGenerator.generate();
                     getTextAreaInInvariantTab().setText(result.conjunctsToString());
                 } else if (indexes.size() == 2) {

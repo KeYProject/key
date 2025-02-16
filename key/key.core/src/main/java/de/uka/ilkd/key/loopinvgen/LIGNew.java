@@ -16,14 +16,21 @@ import java.util.Set;
 public class LIGNew extends AbstractLoopInvariantGenerator {
 
     Term outerIndex;
+    final boolean relaxed;
 
     public LIGNew(Sequent sequent, Services services, ProgramVariable index, int nrArrays) {
         super(sequent, services, services.getTypeConverter().convertToLogicElement(index), nrArrays);
+        relaxed = false;
     }
 
-    public LIGNew(Sequent sequent, Services services) {
+    public LIGNew(Sequent sequent, Services services, ProgramVariable index, int nrArrays, boolean relaxed) {
+        super(sequent, services, services.getTypeConverter().convertToLogicElement(index), nrArrays);
+        this.relaxed = relaxed;
+    }
 
+    public LIGNew(Sequent sequent, Services services, boolean relaxed) {
         super(sequent, services);
+        this.relaxed = relaxed;
     }
 
     /*public LIGNew(Sequent sequent, Services services, Term outerIndex) {
@@ -70,10 +77,7 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
         //Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
         allCompPreds.add(tb.geq(index, low));
         allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));
-        for (Term arr : arrays) {
-            allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
-            allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
-        }
+        initializeAbstractDomain();
 
 
 //		System.out.println("Initial comp Predicate Set: " + allCompPreds);
@@ -106,17 +110,20 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 //			System.out.println(goalsAfterShift);
 //			System.out.println("Goals Before Unwind:" + goalsAfterShift);
 
-            ImmutableList<Goal> goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
-//			System.out.println("AFTER UNWIND");
-//			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
-//			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
-//			System.out.println(goalsAfterUnwind);
-            goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-//			System.out.println("SHIFT");
-//			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
-//			System.out.println("Goals After Shift:" + goalsAfterShift);
+            ImmutableList<Goal> goalsAfterUnwind;
+            if (!relaxed) {
+                goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
+            } else {
+                goalsAfterUnwind = ruleApp.applyLoopScopeUnwindRule(goalsAfterShift);
+            }
 
-            currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
+            goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
+
+            if (!relaxed) {
+                currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
+            } else {
+                currentGoal = ruleApp.findLoopScopeLoopUnwindTacletGoal(goalsAfterShift);
+            }
 
 //			System.out.println("Current Goal: " + currentGoal);
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
@@ -145,8 +152,23 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
         return result;
     }
 
-    private void setInitialIndexValue() {
+    protected void setInitialIndexValue() {
         this.low = WhileStatementAnalyzer.determineInitialIndex(seq, index, services);
+    }
+
+    protected void initializeAbstractDomain() {
+        if (!relaxed) {
+            for (Term arr : arrays) {
+                allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
+                allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
+            }
+        } else {
+            for (Term arr : arrays) {
+                allDepPreds.add(tb.relaxedNoR(tb.arrayRange(arr, low, high)));
+                allDepPreds.add(tb.relaxedNoW(tb.arrayRange(arr, low, high)));
+            }
+        }
+
     }
 
 }

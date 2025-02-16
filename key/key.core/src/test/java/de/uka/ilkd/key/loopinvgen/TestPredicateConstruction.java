@@ -29,11 +29,7 @@ public class TestPredicateConstruction {
     }
 
     private LoopInvariantGenerationResult generateResult(Sequent seq, boolean relaxed) {
-        if (!relaxed) {
-            final LIGNew loopInvGenerator = new LIGNew(seq, services);
-            return loopInvGenerator.generate();
-        }
-        final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
+        final LIGNew loopInvGenerator = new LIGNew(seq, services, relaxed);
         return loopInvGenerator.generate();
     }
 
