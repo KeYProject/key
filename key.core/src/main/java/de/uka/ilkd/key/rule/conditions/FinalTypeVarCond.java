@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -42,14 +43,14 @@ public final class FinalTypeVarCond extends VariableConditionAdapter {
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
-        final Sort sort = resolver.resolveSort(var, instCandidate, instMap, services);
-        Type type = services.getJavaInfo().getKeYJavaType(sort).getJavaType();
-
-        while (type instanceof ArrayType arrayType) {
-            type = arrayType.getBaseType().getKeYJavaType().getJavaType();
+        Sort sort = resolver.resolveSort(var, instCandidate, instMap, services);
+        while(sort instanceof ArraySort arraySort) {
+            sort = arraySort.elementSort();
         }
 
-        final boolean isFinal;
+        Type type = services.getJavaInfo().getKeYJavaType(sort).getJavaType();
+
+        boolean isFinal;
         if (type instanceof PrimitiveType) {
             isFinal = true;
         } else if (type instanceof ClassType classType) {
