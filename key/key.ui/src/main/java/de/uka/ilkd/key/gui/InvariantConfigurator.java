@@ -720,7 +720,8 @@ public class InvariantConfigurator {
                 System.out.println("Calculating number of arrays...");
                 int nrArrays = findNumberOfArrays(PosInSequent.createCfmaPos(posInOccurrence), services);
                 System.out.println(nrArrays);
-                if (indexes.size() == 1) {
+                //TODO: change back to indexes.size() == 1
+                if (true) {
                     final LIGNew loopInvGenerator = new LIGNew(goal.sequent(), services, indexes.get(0), nrArrays, relaxed);
                     LoopInvariantGenerationResult result = loopInvGenerator.generate();
                     getTextAreaInInvariantTab().setText(result.conjunctsToString());
