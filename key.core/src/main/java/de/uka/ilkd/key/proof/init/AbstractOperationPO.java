@@ -37,6 +37,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * This abstract implementation of {@link ProofOblInput} extends the functionality of
@@ -353,26 +355,29 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return pre;
     }
 
-    private static Term createProgPost(final IObserverFunction target,
-            final LocationVariable selfVar, final ImmutableList<LocationVariable> paramVars,
-            final LocationVariable resultVar, final List<LocationVariable> modifiableHeaps,
-            final Map<LocationVariable, LocationVariable> atPreVars, final Term saveBeforeHeaps,
-            final Term representsFromContract, final Term post, final TermBuilder tb) {
-        final Term progPost;
+    private static Term createProgPost(IObserverFunction target,
+            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+            LocationVariable resultVar, List<LocationVariable> modifiableHeaps,
+            Map<LocationVariable, LocationVariable> atPreVars, Term saveBeforeHeaps,
+            @Nullable Term representsFromContract, Term post, TermBuilder tb) {
         if (representsFromContract == null) {
             final Term[] updateSubs =
                 createUpdateSubs(target, selfVar, paramVars, modifiableHeaps, atPreVars, tb);
-            progPost = tb.apply(saveBeforeHeaps,
-                tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), post));
+            var term =
+                tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), post);
+            if (saveBeforeHeaps == null) { // null on no_state methods
+                return term;
+            } else {
+                return tb.apply(saveBeforeHeaps, term);
+            }
         } else {
             final Term body = representsFromContract;
             assert body.op() == Equality.EQUALS
                     : "Only fully functional represents clauses for model"
                         + " methods are supported!";
-            progPost = tb.apply(saveBeforeHeaps,
+            return tb.apply(saveBeforeHeaps,
                 tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), post));
         }
-        return progPost;
     }
 
     /**
@@ -789,7 +794,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Builds the frame clause including the modifiable clause.
      *
-     * @param modifiableHeaps The heaps.
+     * @param modifiableHeaps a non-empty list of heaps variables
      * @param heapToAtPre The previous heap before execution.
      * @param selfVar The self variable.
      * @param paramVars The parameters {@link ProgramVariable}s.
@@ -1026,13 +1031,19 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return lookupContracts;
     }
 
-    private Term getRepresentsFromContract(final IProgramMethod pm, final LocationVariable selfVar,
+    private @Nullable Term getRepresentsFromContract(final IProgramMethod pm,
+            final LocationVariable selfVar,
             final ImmutableList<LocationVariable> paramVars, final LocationVariable resultVar,
             final List<LocationVariable> heaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
         ImmutableList<FunctionalOperationContract> lookupContracts =
             collectLookupContracts(pm, proofServices);
         Term representsFromContract = null;
+
+        if (heaps.isEmpty()) {
+            return null; // represents not possible on `no_state` model methods.
+        }
+
         for (FunctionalOperationContract fop : lookupContracts) {
             representsFromContract = fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars,
                 resultVar, atPreVars, proofServices);
@@ -1083,6 +1094,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
         if (isAddUninterpretedPredicate()) {
             postTerm = tb.and(postTerm, ensureUninterpretedPredicateExists(paramVars,
                 formalParamVars, exceptionVar, getUninterpretedPredicateName(), proofServices));
+        }
+
+        if (heaps.isEmpty()) {
+            // happens in cases of `no_state` model methods, than no heap can be modified.
+            return postTerm;
         }
 
         Term frameTerm = buildFrameClause(heaps, heapToBefore, selfVar, paramVars, proofServices);
