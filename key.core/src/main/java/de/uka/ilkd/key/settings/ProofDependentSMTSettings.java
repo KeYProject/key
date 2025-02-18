@@ -79,7 +79,8 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     }
 
 
-    private void readSettings(Properties props) {
+    @Override
+    public void readSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         setUseExplicitTypeHierarchy(
             SettingsConverter.read(props, prefix + EXPLICIT_TYPE_HIERARCHY,
@@ -106,7 +107,8 @@ public class ProofDependentSMTSettings extends AbstractSettings {
             supportedTaclets.getNamesOfSelectedTaclets()));
     }
 
-    private void writeSettings(Properties props) {
+    @Override
+    public void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         SettingsConverter.store(props, prefix + EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy);
         SettingsConverter.store(props, prefix + INSTANTIATE_NULL_PREDICATES, useNullInstantiation);
