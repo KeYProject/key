@@ -207,6 +207,12 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         getProblemLoader(file, null, null, null, mediator).runSynchronously();
     }
 
+    @Override
+    public void loadProblemWithSameEnv(File file, InitConfig initConfig) {
+        // TODO: DD: Do we handle projects in console differently?
+        loadProblem(file);
+    }
+
     /**
      * loads the problem or proof from the given file
      *

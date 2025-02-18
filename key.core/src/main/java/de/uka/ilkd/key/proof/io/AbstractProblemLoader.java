@@ -294,6 +294,10 @@ public abstract class AbstractProblemLoader {
      * @see AbstractProblemLoader#load()
      */
     protected void loadEnvironment() throws ProofInputException, IOException {
+        if (envInput != null && problemInitializer != null && initConfig != null) {
+            // Already set environment
+            return;
+        }
         FileRepo fileRepo = createFileRepo();
 
         var timeBeforeEnv = System.nanoTime();
@@ -311,6 +315,21 @@ public abstract class AbstractProblemLoader {
         if (!problemInitializer.getWarnings().isEmpty() && !ignoreWarnings) {
             control.reportWarnings(problemInitializer.getWarnings());
         }
+    }
+
+    /**
+     * Sets {@code envInput}, {@code problemInitializer}, and {@code initConfig}. Used when loading
+     * a stored proof in a project, because we must reuse the existing environment.
+     *
+     * @param initConfig The config to reuse
+     * @throws IOException possible exception caused by creating the env input.
+     */
+    public void setEnvironment(InitConfig initConfig) throws IOException {
+        FileRepo fileRepo = initConfig.getFileRepo();
+        envInput = createEnvInput(fileRepo);
+        envInput.setInitConfig(initConfig);
+        problemInitializer = createProblemInitializer(fileRepo);
+        this.initConfig = initConfig;
     }
 
     /**

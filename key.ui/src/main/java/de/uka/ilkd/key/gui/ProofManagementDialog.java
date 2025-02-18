@@ -471,8 +471,7 @@ public final class ProofManagementDialog extends JDialog {
             @Nullable
             Path storedProof = project.findStoredProof(contract);
             if (storedProof != null) {
-                // TODO: DD: this does not do exactly what we want. Replace w/ better method
-                ui.loadProblem(storedProof.toFile());
+                ui.loadProblemWithSameEnv(storedProof.toFile(), initConfig);
             } else {
                 ProblemInitializer pi = new ProblemInitializer(ui, initConfig.getServices(), ui);
 

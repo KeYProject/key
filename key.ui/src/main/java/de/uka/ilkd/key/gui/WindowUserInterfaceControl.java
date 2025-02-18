@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +20,7 @@ import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion;
+import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -111,6 +113,18 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void loadProblem(File file) {
         loadProblem(file, null, null, null);
+    }
+
+    @Override
+    public void loadProblemWithSameEnv(File file, InitConfig initConfig) {
+        try {
+            ProblemLoader problemLoader = getProblemLoaderWithEnv(file, initConfig, getMediator());
+            problemLoader.runAsynchronously();
+        } catch (IOException e) {
+            final String errorMessage = "Failed to load " + file.getName();
+            getMediator().notify(new ExceptionFailureEvent(errorMessage, e));
+            getMediator().getUI().reportStatus(this, errorMessage);
+        }
     }
 
     @Override

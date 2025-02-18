@@ -106,6 +106,14 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     public abstract void loadProblem(File file);
 
     /**
+     * loads the problem or proof from the given file, reusing the {@code initConfig}. Used when
+     * loading a stored proof in a project.
+     *
+     * @param file the File with the problem description or the proof
+     */
+    public abstract void loadProblemWithSameEnv(File file, InitConfig initConfig);
+
+    /**
      * Loads the proof with the given filename from the proof bundle with the given path.
      *
      * @param proofBundle the File with the problem description or the proof
@@ -117,6 +125,21 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             List<File> includes, KeYMediator mediator) {
         final ProblemLoader pl = new ProblemLoader(file, classPath, bootClassPath, includes,
             AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
+        return pl;
+    }
+
+    /**
+     * Creates a problem loader with an existing init config. Used when loading a stored proof in a
+     * project, because we must reuse the existing environment.
+     *
+     * @param initConfig The config to reuse
+     * @throws IOException possible exception caused by creating the env input.
+     */
+    public ProblemLoader getProblemLoaderWithEnv(File file, InitConfig initConfig,
+            KeYMediator mediator) throws IOException {
+        final var pl = new ProblemLoader(file, null, null, null,
+            AbstractProfile.getDefaultProfile(), false, mediator, false, null, this);
+        pl.setEnvironment(initConfig);
         return pl;
     }
 
