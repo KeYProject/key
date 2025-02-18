@@ -84,6 +84,28 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
                 .collect(Collectors.joining(SET_DELIMITER));
     }
 
+    public boolean isInitialized() {
+        return properties != null;
+    }
+
+    @Override
+    public void readSettings(Properties props) {
+        propertyEntries.forEach(it -> {
+            String value = props.getProperty(it.getKey());
+            if (value != null) {
+                it.parseFrom(value);
+            }
+        });
+    }
+
+    @Override
+    public void writeSettings(Properties props) {
+        for (PropertyEntry<?> entry : propertyEntries) {
+            props.setProperty("[" + category + "]" + entry.getKey(), entry.value());
+        }
+    }
+
+
     @Override
     public void readSettings(Configuration props) {
         var cat = props.getSection(category);
@@ -100,7 +122,9 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     @Override
     public void writeSettings(Configuration props) {
         var cat = props.getOrCreateSection(category);
-        propertyEntries.forEach(it -> cat.set(it.getKey(), it.get()));
+        propertyEntries.forEach(it -> {
+            cat.set(it.getKey(), it.get());
+        });
     }
 
     protected PropertyEntry<Double> createDoubleProperty(
@@ -164,7 +188,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
-    protected PropertyEntry<List<String>> createStringListProperty(String key, String defValue) {
+    protected PropertyEntry<List<String>> createStringListProperty(@NonNull String key,
+            @Nullable String defValue) {
         PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key, parseStringList(defValue),
             AbstractPropertiesSettings::parseStringList,
             AbstractPropertiesSettings::stringListToString, it -> (List<String>) it);

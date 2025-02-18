@@ -118,7 +118,8 @@ public class TestGenerationSettings extends AbstractSettings {
         return includePostCondition;
     }
 
-    private void readSettings(Properties props) {
+    @Override
+    public void readSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         setApplySymbolicExecution(SettingsConverter.read(props,
             prefix + PROP_APPLY_SYMBOLIC_EXECUTION, DEFAULT_APPLYSYMBOLICEX));
@@ -226,7 +227,8 @@ public class TestGenerationSettings extends AbstractSettings {
     }
 
 
-    private void writeSettings(Properties props) {
+    @Override
+    public void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         SettingsConverter.store(props, prefix + PROP_APPLY_SYMBOLIC_EXECUTION,
             applySymbolicExecution);

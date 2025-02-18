@@ -6,9 +6,4 @@
  * @version 1 (21.04.17)
  * @see de.uka.ilkd.key.api.KeYApi
  */
-@NullMarked
-@SuppressWarnings("")
-@Deprecated
 package de.uka.ilkd.key.api;
-
-import org.jspecify.annotations.NullMarked;

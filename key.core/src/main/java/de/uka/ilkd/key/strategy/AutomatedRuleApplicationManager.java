@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.NewRuleListener;
 import de.uka.ilkd.key.rule.RuleApp;
-import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -35,7 +34,7 @@ public interface AutomatedRuleApplicationManager extends NewRuleListener {
     /**
      * Set the goal <code>this</code> is the rule app manager for
      */
-    void setGoal(@Nullable Goal goal);
+    void setGoal(Goal goal);
 
     AutomatedRuleApplicationManager copy();
 
