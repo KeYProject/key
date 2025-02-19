@@ -30,6 +30,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
@@ -67,7 +68,7 @@ public class Proof implements Named {
     /**
      * the root of the proof
      */
-    private @Nullable Node root;
+    private Node root;
 
     /**
      * list with prooftree listeners of this proof attention: firing events makes use of array
@@ -78,39 +79,39 @@ public class Proof implements Named {
     /**
      * list with the open goals of the proof
      */
-    private @Nullable ImmutableList<Goal> openGoals = ImmutableSLList.nil();
+    private ImmutableList<Goal> openGoals = ImmutableSLList.nil();
 
     /**
      * list with the closed goals of the proof, needed to make pruning in closed branches possible.
      * If the list needs too much memory, pruning can be disabled via the command line option
      * "--no-pruning-closed". In this case the list will not be filled.
      */
-    private @Nullable ImmutableList<Goal> closedGoals = ImmutableSLList.nil();
+    private ImmutableList<Goal> closedGoals = ImmutableSLList.nil();
 
     /**
      * declarations &c, read from a problem file or otherwise
      */
-    private @Nullable String problemHeader = "";
+    private String problemHeader = "";
 
     /**
      * the proof environment (optional)
      */
-    private @Nullable ProofEnvironment env;
+    private ProofEnvironment env;
 
     /**
      * maps the Abbreviations valid for this proof to their corresponding terms.
      */
-    private @Nullable AbbrevMap abbreviations = new AbbrevMap();
+    private AbbrevMap abbreviations = new AbbrevMap();
 
     /**
      * the logic configuration for this proof, i.e., logic signature, rules etc.
      */
-    private @Nullable InitConfig initConfig;
+    private InitConfig initConfig;
 
     /**
      * the environment of the proof with specs and java model
      */
-    private @Nullable ProofCorrectnessMgt localMgt;
+    private ProofCorrectnessMgt localMgt;
 
     /**
      * settings valid independent of a proof
@@ -120,19 +121,19 @@ public class Proof implements Named {
      * when different users load and save a proof this vector fills up with Strings containing the
      * usernames.
      */
-    public @Nullable List<String> userLog;
+    public List<String> userLog;
 
     /**
      * when load and save a proof with different versions of key this vector fills up with Strings
      * containing the GIT versions.
      */
-    public @Nullable List<String> keyVersionLog;
+    public List<String> keyVersionLog;
 
     private long autoModeTime = 0;
 
-    private @Nullable Strategy activeStrategy;
+    private Strategy activeStrategy;
 
-    private @Nullable PropertyChangeListener settingsListener;
+    private PropertyChangeListener settingsListener;
 
     /**
      * Set to true if the proof has been abandoned and the dispose method has been called on this
@@ -154,9 +155,9 @@ public class Proof implements Named {
      * The {@link File} under which this {@link Proof} was saved the last time if available or
      * {@code null} otherwise.
      */
-    private @Nullable File proofFile;
+    private @MonotonicNonNull File proofFile;
 
-    private @Nullable Lookup userData;
+    private Lookup userData;
 
     /**
      * Whether closing the proof should emit a {@link ProofEvent}.
@@ -260,6 +261,7 @@ public class Proof implements Named {
      * Cut off all reference such that it does not lead to a big memory leak if someone still holds
      * a reference to this proof object.
      */
+    @SuppressWarnings("nullness") // uninitialize everything
     public void dispose() {
         if (isDisposed() || initConfig == null) {
             return;
@@ -765,6 +767,8 @@ public class Proof implements Named {
         queue.add(root());
         while (!queue.isEmpty()) {
             Node cur = queue.poll();
+            // queue is not empty
+            assert cur != null;
             if (pred.test(cur)) {
                 return cur;
             }
@@ -778,10 +782,11 @@ public class Proof implements Named {
 
 
     public void traverseFromChildToParent(Node child, Node parent, ProofVisitor visitor) {
+        @Nullable Node cur = child;
         do {
-            visitor.visit(this, child);
-            child = child.parent();
-        } while (child != parent);
+            visitor.visit(this, cur);
+            cur = cur.parent();
+        } while (cur != null && cur != parent);
     }
 
     /**
@@ -1339,7 +1344,8 @@ public class Proof implements Named {
         }
         for (Goal g : todo) {
             reOpenGoal(g);
-            ClosedBy c = g.node().lookup(ClosedBy.class);
+            @SuppressWarnings("nullness") // Node lookup always contains ClosedBy datum
+            @NonNull ClosedBy c = g.node().lookup(ClosedBy.class);
             g.node().deregister(c, ClosedBy.class);
             try {
                 new CopyingProofReplayer(c.proof(), this).copy(c.node(), g, c.nodesToSkip());
