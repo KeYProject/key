@@ -141,7 +141,7 @@ public class EngineState {
         return currNode;
     }
 
-    private @Nullable Goal findGoalFromRoot(@Nullable final Node rootNode, boolean checkAutomatic) {
+    private @Nullable Goal findGoalFromRoot(final @Nullable Node rootNode, boolean checkAutomatic) {
         final Deque<Node> choices = new LinkedList<>();
 
         Goal result = null;
@@ -198,7 +198,7 @@ public class EngineState {
 
     private @NonNull KeyIO getKeyIO() throws ScriptException {
         Services services = proof.getServices();
-        KeyIO io = new KeyIO(services, getFirstOpenAutomaticGoal().getLocalNamespaces());
+        KeyIO io = new KeyIO(services, Objects.requireNonNull(getFirstOpenAutomaticGoal()).getLocalNamespaces());
         io.setAbbrevMap(abbrevMap);
         return io;
     }

@@ -63,7 +63,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(Node node, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Node node, @Nullable PosInOccurrence posInOcc) {
         return canApplyTo(node.proof(), getGoals(node), posInOcc);
     }
 

@@ -163,7 +163,7 @@ public interface ProofMacro {
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
-    boolean canApplyTo(Node node, PosInOccurrence posInOcc);
+    boolean canApplyTo(Node node, @Nullable PosInOccurrence posInOcc);
 
     /**
      * Apply this macro on the given goals.
@@ -230,13 +230,13 @@ public interface ProofMacro {
         private final int numberSteps;
         private int completedGoals;
 
-        ProgressBarListener(String name, int numberGoals, int numberSteps, ProverTaskListener l) {
+        ProgressBarListener(String name, int numberGoals, int numberSteps, @Nullable ProverTaskListener l) {
             super(name, l);
             this.numberGoals = numberGoals;
             this.numberSteps = numberSteps;
         }
 
-        public ProgressBarListener(int size, int numberSteps, ProverTaskListener listener) {
+        public ProgressBarListener(int size, int numberSteps, @Nullable ProverTaskListener listener) {
             this("", size, numberSteps, listener);
         }
 

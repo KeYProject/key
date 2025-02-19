@@ -12,7 +12,7 @@ public class ScriptException extends Exception implements HasLocation {
 
     private static final long serialVersionUID = -1200219771837971833L;
 
-    private final Location location;
+    private final @Nullable Location location;
 
     public ScriptException() {
         super();

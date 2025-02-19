@@ -50,7 +50,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      * there is no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc) {
         final List<ProofMacro> macros = getProofMacros();
         for (ProofMacro macro : macros) {
             if (macro.canApplyTo(proof, goals, posInOcc)) {

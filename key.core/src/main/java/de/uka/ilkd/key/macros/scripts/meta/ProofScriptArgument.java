@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.util.Objects;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -16,7 +17,7 @@ import org.jspecify.annotations.Nullable;
 public class ProofScriptArgument<T> {
     private ProofScriptCommand<T> command;
     private String name;
-    private Class<?> type;
+    private Class<@NonNull ?> type;
     private boolean required;
     private boolean flag;
     private Field field;
@@ -47,11 +48,11 @@ public class ProofScriptArgument<T> {
         return this;
     }
 
-    public Class<?> getType() {
+    public Class<@NonNull ?> getType() {
         return type;
     }
 
-    public ProofScriptArgument<T> setType(Class<?> type) {
+    public ProofScriptArgument<T> setType(Class<@NonNull ?> type) {
         this.type = type;
         return this;
     }

@@ -30,6 +30,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
@@ -193,6 +194,7 @@ public class Proof implements Named {
     /**
      * initialises the strategies
      */
+    @EnsuresNonNull("activeStrategy")
     private void initStrategy() {
         StrategyProperties activeStrategyProperties =
             initConfig.getSettings().getStrategySettings().getActiveStrategyProperties();
@@ -386,7 +388,7 @@ public class Proof implements Named {
     }
 
 
-    public @Nullable Strategy getActiveStrategy() {
+    public Strategy getActiveStrategy() {
         if (activeStrategy == null) {
             initStrategy();
         }
