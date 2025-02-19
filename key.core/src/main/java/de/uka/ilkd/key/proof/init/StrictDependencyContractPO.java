@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -55,8 +56,7 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
             KeYJavaType selfKJT, ImmutableList<LocationVariable> paramVars, Term wellFormedHeaps,
             Services services) throws ProofInputException {
         // "self != null"
-        final Term selfNotNull =
-            selfVar == null ? tb.tt() : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
+        final Term selfNotNull = selfVar == null ? tb.tt() : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
 
         // "self.<created> = TRUE" for all heaps
 
@@ -75,8 +75,7 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
         }
 
         // "MyClass::exactInstance(self) = TRUE"
-        final Term selfExactType =
-            selfVar == null ? tb.tt() : tb.exactInstance(selfKJT.getSort(), tb.var(selfVar));
+        final Term selfExactType = selfVar == null ? tb.tt() : tb.exactInstance(selfKJT.getSort(), tb.var(selfVar));
 
         // conjunction of...
         // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
@@ -103,7 +102,7 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
         }
 
         return tb.and(wellFormedHeaps, selfNotNull, selfCreated, selfExactType, paramsOK,
-            mbyAtPreDef);
+                mbyAtPreDef);
     }
 
     // -------------------------------------------------------------------------
@@ -134,8 +133,7 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
         final Services proofServices = postInit();
 
         // prepare variables
-        final LocationVariable selfVar =
-            !contract.getTarget().isStatic() ? tb.selfVar(contract.getKJT(), true) : null;
+        final LocationVariable selfVar = !contract.getTarget().isStatic() ? tb.selfVar(contract.getKJT(), true) : null;
         final ImmutableList<LocationVariable> paramVars = tb.paramVars(target, true);
 
         final boolean twoState = (contract.getTarget().getStateCount() == 2);
@@ -150,8 +148,7 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
                 break;
             }
             heaps.add(h);
-            LocationVariable preVar =
-                twoState ? tb.atPreVar(h.name().toString(), h.sort(), true) : null;
+            LocationVariable preVar = twoState ? tb.atPreVar(h.name().toString(), h.sort(), true) : null;
             if (preVar != null) {
                 register(preVar, proofServices);
                 heaps.add(preVar);
@@ -192,8 +189,7 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
             final Name anonHeapName = new Name(tb.newName("anon_" + h.toString()));
             final JFunction anonHeapFunc = new JFunction(anonHeapName, heapLDT.targetSort());
             register(anonHeapFunc, proofServices);
-            final Term anonHeap =
-                tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
+            final Term anonHeap = tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
             final Term wellFormedAnonHeap = tb.wellFormed(anonHeap);
             if (wellFormedHeaps == null) {
                 wellFormedHeaps = wellFormedAnonHeap;
@@ -203,7 +199,7 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
             // prepare update
             final boolean atPre = preHeapVars.containsValue(h);
             final Term dep = getContract().getDep(atPre ? preHeapVarsReverse.get(h) : h, atPre,
-                selfVar, paramVars, preHeapVars, proofServices);
+                    selfVar, paramVars, preHeapVars, proofServices);
             final Term changedHeap = tb.anon(tb.var(h), tb.setMinus(tb.allLocs(), dep), anonHeap);
             final Term u = tb.elementary(h, changedHeap);
             if (update == null) {
@@ -215,27 +211,24 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
 
         // translate contract
         final Term pre = tb.and(
-            buildFreePre(heaps, selfVar, contract.getKJT(), paramVars, wellFormedHeaps,
-                proofServices),
-            permsFor,
-            contract.getPre(heapLDT.getHeap(), selfVar, paramVars, preHeapVars, proofServices));
+                buildFreePre(heaps, selfVar, contract.getKJT(), paramVars, wellFormedHeaps,
+                        proofServices),
+                permsFor,
+                contract.getPre(heapLDT.getHeap(), selfVar, paramVars, preHeapVars, proofServices));
 
         assert heaps.size() == heapCount * contract.getTarget().getStateCount();
 
         LocationVariable heapVar = (LocationVariable) tb.getBaseHeap().op();
-        final Term dep =
-            contract.getDep(heapVar, false, selfVar, paramVars, preHeapVars, proofServices);
+        final Term dep = contract.getDep(heapVar, false, selfVar, paramVars, preHeapVars, proofServices);
         final Term assignable = tb.empty(); // TODO: contract.getModifiable(heapVar);
 
         final Sort heapSort = proofServices.getTypeConverter().getHeapLDT().targetSort();
-        final var heapVar1 = new LocationVariable(new ProgramElementName(tb.newName(heapSort)),
-            new KeYJavaType(heapSort), false);
+        final var heapVar1 = new JFunction(new Name(tb.newName(heapSort)), heapSort);
         register(heapVar1, proofServices);
-        final var heapVar2 = new LocationVariable(new ProgramElementName(tb.newName(heapSort)),
-            new KeYJavaType(heapSort), false);
+        final var heapVar2 = new JFunction(new Name(tb.newName(heapSort)), heapSort);
         register(heapVar2, proofServices);
-        final var heapTerm1 = tb.var(heapVar1);
-        final var heapTerm2 = tb.var(heapVar2);
+        final var heapTerm1 = tb.func(heapVar1);
+        final var heapTerm2 = tb.func(heapVar2);
 
         // Effects on heap is the same
         final Sort objectSort = proofServices.getJavaInfo().objectSort();
@@ -245,31 +238,34 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
         Term objectTerm = tb.var(objectVar);
         Term fieldTerm = tb.var(fieldVar);
         final Term heapCheck = tb.all(objectVar,
-            tb.all(fieldVar,
-                tb.equals(tb.select(JavaDLTheory.ANY, heapTerm1, objectTerm, fieldTerm),
-                    tb.select(JavaDLTheory.ANY, heapTerm2, objectTerm, fieldTerm))));
+                tb.all(fieldVar,
+                        tb.equals(tb.select(JavaDLTheory.ANY, heapTerm1, objectTerm, fieldTerm),
+                                tb.select(JavaDLTheory.ANY, heapTerm2, objectTerm, fieldTerm))));
 
         // Result is the same
         final Sort resultSort = target.sort();
         final LocationVariable resultVar1 = isVoid ? null
                 : new LocationVariable(new ProgramElementName(tb.newName(resultSort)),
-                    new KeYJavaType(resultSort));
+                        new KeYJavaType(resultSort));
         register(resultVar1, proofServices);
+        final JFunction resultConst1 = new JFunction(new Name(tb.newName(resultSort)), resultSort);
+        register(resultConst1, proofServices);
         final LocationVariable resultVar2 = isVoid ? null
                 : new LocationVariable(new ProgramElementName(tb.newName(resultSort)),
-                    new KeYJavaType(resultSort));
+                        new KeYJavaType(resultSort));
         register(resultVar2, proofServices);
-        final Term resultCheck =
-            isVoid ? tb.tt() : tb.equals(tb.var(resultVar1), tb.var(resultVar2));
+        final JFunction resultConst2 = new JFunction(new Name(tb.newName(resultSort)), resultSort);
+        register(resultConst2, proofServices);
+        final Term resultCheck = isVoid ? tb.tt() : tb.equals(tb.func(resultConst1), tb.func(resultConst2));
 
         // Method call modalities
-        final Term normalCall = buildModality(target, isVoid, paramVars, resultVar1, heapVar1);
-        final Term anonCall =
-            tb.apply(update, buildModality(target, isVoid, paramVars, resultVar2, heapVar2));
+        final Term normalCall = buildModality(target, selfVar, paramVars, resultVar1, resultConst1, heapVar1);
+        final Term anonCall = tb.apply(update,
+                buildModality(target, selfVar, paramVars, resultVar2, resultConst2, heapVar2));
 
         // build po
         final Term po = tb.imp(tb.and(pre, normalCall, anonCall),
-            tb.and(tb.subset(assignable, dep), resultCheck, heapCheck));
+                tb.and(tb.subset(assignable, dep), resultCheck, heapCheck));
 
         // save in field
         assignPOTerms(po);
@@ -278,27 +274,21 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
         collectClassAxioms(contract.getKJT(), proofConfig);
     }
 
-    private Term buildModality(IObserverFunction target, boolean isVoid,
-            ImmutableList<LocationVariable> params, LocationVariable result,
-            LocationVariable heap) {
-        var jb = buildMethodCall(target, isVoid, params, result);
-        return tb.dia(jb, tb.equals(tb.var(heap), tb.getBaseHeap()));
+    private Term buildModality(IObserverFunction target, LocationVariable selfVar,
+            ImmutableList<LocationVariable> params, LocationVariable resultVar, JFunction resultConst,
+            JFunction heap) {
+        var jb = buildMethodCall(target, selfVar, params, resultVar);
+        return tb.dia(jb,
+                tb.and(tb.equals(tb.func(heap), tb.getBaseHeap()), tb.equals(tb.func(resultConst), tb.var(resultVar))));
     }
 
-    private JavaBlock buildMethodCall(IObserverFunction target, boolean isVoid,
+    private JavaBlock buildMethodCall(IObserverFunction target, LocationVariable selfVar,
             ImmutableList<LocationVariable> params, LocationVariable result) {
         if (!(target instanceof IProgramMethod m)) {
             throw new IllegalArgumentException("Expected target to be a method");
         }
-        MethodName name = m.getProgramElementName();
-        final var mc = new MethodReference(
-            new ImmutableArray<>(params.toArray(LocationVariable.class)), name, null);
-        Statement callStmt;
-        if (isVoid) {
-            callStmt = mc;
-        } else {
-            callStmt = new CopyAssignment(result, mc);
-        }
+        Statement callStmt = new MethodBodyStatement(m, selfVar, result,
+                new ImmutableArray<>(params.toArray(LocationVariable.class)));
         return JavaBlock.createJavaBlock(new StatementBlock(callStmt));
     }
 
