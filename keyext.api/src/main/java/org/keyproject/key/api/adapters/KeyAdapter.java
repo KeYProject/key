@@ -13,6 +13,7 @@ import org.key_project.logic.op.Function;
 
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import org.keyproject.key.api.data.MacroDescription;
 
@@ -62,6 +63,11 @@ public class KeyAdapter {
 
         @Override
         public File read(JsonReader in) throws IOException {
+            var tokenType = in.peek();
+            if (tokenType == JsonToken.NULL) {
+                in.nextNull();
+                return null;
+            }
             return new File(in.nextString());
         }
     }
