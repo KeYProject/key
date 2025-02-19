@@ -172,6 +172,7 @@ public final class Goal {
         return ruleAppManager;
     }
 
+    @SuppressWarnings("nullness") // TODO: Why do we temporarily set fields to null??
     public void setRuleAppManager(@Nullable AutomatedRuleApplicationManager manager) {
         if (ruleAppManager != null) {
             ruleAppManager.setGoal(null);
@@ -357,7 +358,7 @@ public final class Goal {
      *
      * @param linkedGoal The goal that this goal is linked to.
      */
-    public void setLinkedGoal(@Nullable final Goal linkedGoal) {
+    public void setLinkedGoal(final @Nullable Goal linkedGoal) {
         this.linkedGoal = linkedGoal;
     }
 

@@ -776,11 +776,11 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * Retrieves a user-defined data.
+     * Retrieves a user-defined datum.
      *
-     * @param service the class for which the data were registered
+     * @param service the class for which the datum were registered
      * @param <T> any class
-     * @return null or the previous data
+     * @return null or the previous datum
      * @see #register(Object, Class)
      */
     public <T> @Nullable T lookup(Class<T> service) {
