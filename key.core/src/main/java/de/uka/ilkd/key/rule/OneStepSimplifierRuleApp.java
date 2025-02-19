@@ -23,7 +23,15 @@ public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
      * @return the protocol, may be <code>null</code>
      */
     public OneStepSimplifier.Protocol getProtocol() {
-        return protocol;
+        if (protocol != null && !protocol.isEmpty() && protocol.get(0) != null) {
+            return protocol;
+        } else {
+            return null;
+        }
+    }
+
+    public int getProtocolLength() {
+        return protocol != null ? protocol.size() : 0;
     }
 
     /**
