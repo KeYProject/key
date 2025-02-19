@@ -3,11 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import de.uka.ilkd.key.util.KeYResourceManager;
-import org.antlr.v4.runtime.CharStreams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.URL;
@@ -15,6 +10,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+
+import de.uka.ilkd.key.util.KeYResourceManager;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// This class is used to load and save settings for proofs such as which data type models are used
 /// to represent the java types.
@@ -140,7 +141,7 @@ public class ProofSettings {
         try {
             if (PROVER_CONFIG_FILE.getParentFile().mkdirs()) {
                 try (Writer out = new BufferedWriter(
-                        new FileWriter(PROVER_CONFIG_FILE, StandardCharsets.UTF_8))) {
+                    new FileWriter(PROVER_CONFIG_FILE, StandardCharsets.UTF_8))) {
                     settingsToStream(out);
                 }
             }

@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -29,9 +28,9 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
-import org.antlr.v4.runtime.CharStreams;
 import org.key_project.util.Streams;
 
+import org.antlr.v4.runtime.CharStreams;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.assertj.core.api.Assertions;
@@ -168,7 +167,7 @@ public class MasterHandlerTest {
 
             String updates = props.get("smt-settings");
             if (updates != null) {
-                    var map = ParsingFacade.readConfigurationFile(CharStreams.fromString(updates));
+                var map = ParsingFacade.readConfigurationFile(CharStreams.fromString(updates));
                 settings.getNewSettings().readSettings(map);
             }
 
