@@ -6,7 +6,6 @@ package de.uka.ilkd.key.gui;
 import java.util.*;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.ProofScriptFromFileAction;
 import de.uka.ilkd.key.gui.actions.ProofScriptInputAction;
 import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
@@ -15,6 +14,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.FeatureSettings;
+import de.uka.ilkd.key.ui.core.KeYMediator;
 
 import org.key_project.util.reflection.ClassLoaderUtil;
 

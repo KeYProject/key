@@ -10,8 +10,7 @@ import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
-
-import org.key_project.util.java.SwingUtil;
+import de.uka.ilkd.key.ui.util.SwingUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
