@@ -109,8 +109,15 @@ class JsonRpcEndpoint(object):
 
 
 def object_decoder(obj):
-    if '$type' in obj:
-        return KEY_DATA_CLASSES[obj["$type"]](**obj)
+    if type(obj) is list:
+        return [object_decoder(item) for item in obj]
+    if type(obj) is dict:
+        for k,v in obj.items():
+            obj[k] = object_decoder(v)
+        if '$class' in obj:
+            class_name = obj["$class"]
+            del obj["$class"]
+            return KEY_DATA_CLASSES[class_name](**obj)
     return obj
 
 
