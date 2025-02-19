@@ -127,7 +127,9 @@ public class InformationWindow extends JDialog {
     private Component newTab(Information information) {
         final JTextArea lines = new JTextArea("1");
         final JTextArea content = new JTextArea();
-        content.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
+        Font font = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
+        content.setFont(font);
+        lines.setFont(new Font(Font.MONOSPACED, Font.PLAIN, font.getSize()));
         lines.setBackground(Color.LIGHT_GRAY);
         lines.setEditable(false);
         content.setEditable(false);
