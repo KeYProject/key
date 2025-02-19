@@ -5,6 +5,7 @@ package de.uka.ilkd.key.settings;
 
 
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
+
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked

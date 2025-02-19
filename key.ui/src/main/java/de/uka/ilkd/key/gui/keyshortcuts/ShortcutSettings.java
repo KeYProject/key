@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.keyshortcuts;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
-import de.uka.ilkd.key.settings.Configuration;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableRowSorter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableRowSorter;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
+import de.uka.ilkd.key.settings.Configuration;
 
 /**
  * UI for configuring the {@link KeyStroke}s inside KeY.

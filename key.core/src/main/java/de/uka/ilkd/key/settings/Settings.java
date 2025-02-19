@@ -5,9 +5,7 @@ package de.uka.ilkd.key.settings;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Properties;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -24,7 +22,7 @@ public interface Settings {
      * <p>
      *
      * @param props a non-null references to a configuration object. The state of this object
-     *              shall not be changed by the implementations.
+     *        shall not be changed by the implementations.
      */
     void readSettings(Configuration props);
 
@@ -36,8 +34,8 @@ public interface Settings {
      * The internal state shall not be changed by the implementations.
      *
      * @param props a non-null reference to a configration object, which state is modified
-     *              accordingly to the local
-     *              internal state.
+     *        accordingly to the local
+     *        internal state.
      */
     void writeSettings(Configuration props);
 
@@ -62,17 +60,17 @@ public interface Settings {
      * Register a new listener which is triggered for changes on the specified property.
      *
      * @param propertyName the name for identification of the property
-     * @param listener     the listener to be added
+     * @param listener the listener to be added
      * @see PropertyChangeSupport#addPropertyChangeListener(String, PropertyChangeListener)
      */
     void addPropertyChangeListener(String propertyName,
-                                   PropertyChangeListener listener);
+            PropertyChangeListener listener);
 
     /**
      * Removes the given listener from being triggered by changes of the specified property.
      *
      * @param propertyName the name for identification of the property
-     * @param listener     the listener to be removed
+     * @param listener the listener to be removed
      * @see PropertyChangeSupport#removePropertyChangeListener(String, PropertyChangeListener)
      */
     void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);

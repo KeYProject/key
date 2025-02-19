@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
@@ -32,6 +33,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.util.LineProperties;
 
+import org.antlr.v4.runtime.CharStreams;
 import org.key_project.util.Streams;
 
 import org.jspecify.annotations.Nullable;
@@ -146,8 +148,7 @@ public class MasterHandlerTest {
 
             String updates = props.get("smt-settings");
             if (updates != null) {
-                Properties map = new Properties();
-                map.load(new StringReader(updates));
+                    var map = ParsingFacade.readConfigurationFile(CharStreams.fromString(updates));
                 settings.getNewSettings().readSettings(map);
             }
 

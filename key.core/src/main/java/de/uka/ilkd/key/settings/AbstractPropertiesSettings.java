@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.settings;
 
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A base class for own settings based on properties.
@@ -154,12 +154,12 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     /**
      * Creates a string list property.
      *
-     * @param key      the key value of this property inside {@link Properties} instance
+     * @param key the key value of this property inside {@link Properties} instance
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
     protected PropertyEntry<List<String>> createStringListProperty(@NonNull String key,
-                                                                   @Nullable List<String> defValue) {
+            @Nullable List<String> defValue) {
         PropertyEntry<List<String>> pe = new DirectPropertyEntry<>(key, defValue);
         propertyEntries.add(pe);
         return pe;
@@ -167,19 +167,22 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
 
 
     /// This interface describes properties or options in an [AbstractPropertiesSettings] class.
-    /// A [PropertyEntry] is parameterize in a type its value holds, additionally it has name (to store and read it
+    /// A [PropertyEntry] is parameterize in a type its value holds, additionally it has name (to
+    /// store and read it
     /// from configuration files), often a default.
     ///
     /// @param <T>
     public interface PropertyEntry<T extends @Nullable Object> {
         /**
-         * The name (or key) to find this value inside a configuration file. It should also be the key
+         * The name (or key) to find this value inside a configuration file. It should also be the
+         * key
          * in {@link java.beans.PropertyChangeEvent}s.
          */
         String getKey();
 
         /**
-         * Sets this value of this property. Should trigger {@link java.beans.PropertyChangeEvent} if necessary.
+         * Sets this value of this property. Should trigger {@link java.beans.PropertyChangeEvent}
+         * if necessary.
          *
          * @param value the new configuration value
          */
@@ -192,30 +195,33 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
 
 
         /// This method allows to set the property using an arbitray object which is allowed in
-        /// the configuration hierarchy. This methods may throw an exception on unexpected value types.
+        /// the configuration hierarchy. This methods may throw an exception on unexpected value
+        /// types.
         ///
         /// Especially, the following should not result into change of the value for a property:
         /// ```java
         /// setValue(value())
-        ///```
+        /// ```
         ///
         /// @param value an object of the [Configuration] hierarchy
         void setValue(@Nullable Object value);
 
         /**
-         * Returns the representation of this configuration value to store it inside a {@link Configuration}
+         * Returns the representation of this configuration value to store it inside a
+         * {@link Configuration}
          * object.
          *
          * @return an object compatible with {@link #setValue(Object)}
          */
         Object value();
 
-        ///  returns true if the property is set.
+        /// returns true if the property is set.
         boolean isSet();
     }
 
     /// @param <T>
-    public abstract class SimplePropertyEntry<T extends @Nullable Object> implements PropertyEntry<T> {
+    public abstract class SimplePropertyEntry<T extends @Nullable Object>
+            implements PropertyEntry<T> {
         private final String key;
         private final T defaultValue;
         private T currentValue;
@@ -249,7 +255,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
     }
 
     /**
-     * A base class for any configuration properties which is directly supported by the configuration.
+     * A base class for any configuration properties which is directly supported by the
+     * configuration.
      *
      * @param <T> type of the value, supported by {@link Configuration}
      * @see Configuration#allowedValueType(Object)
@@ -280,7 +287,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         private final Function<T, String> toString;
 
         public DefaultPropertyEntry(String key, T defaultValue,
-                                    Function<String, T> convert, Function<T, String> toString) {
+                Function<String, T> convert, Function<T, String> toString) {
             super(key, defaultValue);
             this.convert = convert;
             this.toString = toString;
@@ -298,7 +305,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
                 return;
             }
 
-            throw new IllegalArgumentException("Type %s is not supported for option %s".formatted(value.getClass(), getKey()));
+            throw new IllegalArgumentException(
+                "Type %s is not supported for option %s".formatted(value.getClass(), getKey()));
         }
 
         @Override

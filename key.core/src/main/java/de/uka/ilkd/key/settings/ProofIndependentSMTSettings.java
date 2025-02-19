@@ -11,6 +11,7 @@ import java.util.Properties;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+
 import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;

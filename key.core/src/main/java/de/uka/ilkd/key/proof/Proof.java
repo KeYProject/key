@@ -168,7 +168,8 @@ public class Proof implements Named {
      */
     private Proof(Name name, InitConfig initConfig) {
         this.name = name;
-        this.initConfig = Objects.requireNonNull(initConfig, "Tried to create proof without valid services.");
+        this.initConfig =
+            Objects.requireNonNull(initConfig, "Tried to create proof without valid services.");
 
         if (initConfig.getSettings() == null) {
             // if no settings have been assigned yet, take default settings
