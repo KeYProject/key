@@ -238,6 +238,7 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Override
     public Term getModifiable(LocationVariable heap) {
+        // TODO(DD): implement
         throw new UnsupportedOperationException("Not applicable for dependency contracts.");
     }
 

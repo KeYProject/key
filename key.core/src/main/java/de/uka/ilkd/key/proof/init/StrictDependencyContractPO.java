@@ -1,32 +1,34 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.proof.init;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.MethodCallStatement;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
-import de.uka.ilkd.key.settings.Configuration;
-import de.uka.ilkd.key.smt.model.Location;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.HeapContext;
-import org.key_project.logic.Name;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.reference.MethodName;
+import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.speclang.DependencyContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.HeapContext;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 public class StrictDependencyContractPO extends AbstractPO implements ContractPO {
     private Term mbyAtPre;
@@ -53,7 +55,8 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
             KeYJavaType selfKJT, ImmutableList<LocationVariable> paramVars, Term wellFormedHeaps,
             Services services) throws ProofInputException {
         // "self != null"
-        final Term selfNotNull = selfVar == null ? tb.tt() : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
+        final Term selfNotNull =
+            selfVar == null ? tb.tt() : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
 
         // "self.<created> = TRUE" for all heaps
 
@@ -72,7 +75,8 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
         }
 
         // "MyClass::exactInstance(self) = TRUE"
-        final Term selfExactType = selfVar == null ? tb.tt() : tb.exactInstance(selfKJT.getSort(), tb.var(selfVar));
+        final Term selfExactType =
+            selfVar == null ? tb.tt() : tb.exactInstance(selfKJT.getSort(), tb.var(selfVar));
 
         // conjunction of...
         // - "p_i = null | p_i.<created> = TRUE" for object parameters, and
@@ -99,7 +103,7 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
         }
 
         return tb.and(wellFormedHeaps, selfNotNull, selfCreated, selfExactType, paramsOK,
-                mbyAtPreDef);
+            mbyAtPreDef);
     }
 
     // -------------------------------------------------------------------------
@@ -130,7 +134,8 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
         final Services proofServices = postInit();
 
         // prepare variables
-        final LocationVariable selfVar = !contract.getTarget().isStatic() ? tb.selfVar(contract.getKJT(), true) : null;
+        final LocationVariable selfVar =
+            !contract.getTarget().isStatic() ? tb.selfVar(contract.getKJT(), true) : null;
         final ImmutableList<LocationVariable> paramVars = tb.paramVars(target, true);
 
         final boolean twoState = (contract.getTarget().getStateCount() == 2);
@@ -145,7 +150,8 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
                 break;
             }
             heaps.add(h);
-            LocationVariable preVar = twoState ? tb.atPreVar(h.name().toString(), h.sort(), true) : null;
+            LocationVariable preVar =
+                twoState ? tb.atPreVar(h.name().toString(), h.sort(), true) : null;
             if (preVar != null) {
                 register(preVar, proofServices);
                 heaps.add(preVar);
@@ -186,7 +192,8 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
             final Name anonHeapName = new Name(tb.newName("anon_" + h.toString()));
             final JFunction anonHeapFunc = new JFunction(anonHeapName, heapLDT.targetSort());
             register(anonHeapFunc, proofServices);
-            final Term anonHeap = tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
+            final Term anonHeap =
+                tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
             final Term wellFormedAnonHeap = tb.wellFormed(anonHeap);
             if (wellFormedHeaps == null) {
                 wellFormedHeaps = wellFormedAnonHeap;
@@ -196,7 +203,7 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
             // prepare update
             final boolean atPre = preHeapVars.containsValue(h);
             final Term dep = getContract().getDep(atPre ? preHeapVarsReverse.get(h) : h, atPre,
-                    selfVar, paramVars, preHeapVars, proofServices);
+                selfVar, paramVars, preHeapVars, proofServices);
             final Term changedHeap = tb.anon(tb.var(h), tb.setMinus(tb.allLocs(), dep), anonHeap);
             final Term u = tb.elementary(h, changedHeap);
             if (update == null) {
@@ -208,28 +215,61 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
 
         // translate contract
         final Term pre = tb.and(
-                buildFreePre(heaps, selfVar, contract.getKJT(), paramVars, wellFormedHeaps,
-                        proofServices),
-                permsFor,
-                contract.getPre(heapLDT.getHeap(), selfVar, paramVars, preHeapVars, proofServices));
+            buildFreePre(heaps, selfVar, contract.getKJT(), paramVars, wellFormedHeaps,
+                proofServices),
+            permsFor,
+            contract.getPre(heapLDT.getHeap(), selfVar, paramVars, preHeapVars, proofServices));
 
         assert heaps.size() == heapCount * contract.getTarget().getStateCount();
-        // prepare target term
-        final Term[] subs = new Term[paramVars.size() + heaps.size() + (target.isStatic() ? 0 : 1)];
-        int offset = 0;
-        for (LocationVariable heap : heaps) {
-            subs[offset++] = tb.var(heap);
-        }
-        if (!target.isStatic()) {
-            subs[offset++] = tb.var(selfVar);
-        }
-        for (ProgramVariable paramVar : paramVars) {
-            subs[offset++] = tb.var(paramVar);
-        }
-        final Term targetTerm = tb.func(target, subs);
+
+        LocationVariable heapVar = (LocationVariable) tb.getBaseHeap().op();
+        final Term dep =
+            contract.getDep(heapVar, false, selfVar, paramVars, preHeapVars, proofServices);
+        final Term assignable = tb.empty(); // TODO: contract.getModifiable(heapVar);
+
+        final Sort heapSort = proofServices.getTypeConverter().getHeapLDT().targetSort();
+        final var heapVar1 = new LocationVariable(new ProgramElementName(tb.newName(heapSort)),
+            new KeYJavaType(heapSort), false);
+        register(heapVar1, proofServices);
+        final var heapVar2 = new LocationVariable(new ProgramElementName(tb.newName(heapSort)),
+            new KeYJavaType(heapSort), false);
+        register(heapVar2, proofServices);
+        final var heapTerm1 = tb.var(heapVar1);
+        final var heapTerm2 = tb.var(heapVar2);
+
+        // Effects on heap is the same
+        final Sort objectSort = proofServices.getJavaInfo().objectSort();
+        final Sort fieldSort = proofServices.getTypeConverter().getHeapLDT().getFieldSort();
+        final var objectVar = new LogicVariable(new Name(tb.newName(objectSort)), objectSort);
+        final var fieldVar = new LogicVariable(new Name(tb.newName(fieldSort)), fieldSort);
+        Term objectTerm = tb.var(objectVar);
+        Term fieldTerm = tb.var(fieldVar);
+        final Term heapCheck = tb.all(objectVar,
+            tb.all(fieldVar,
+                tb.equals(tb.select(JavaDLTheory.ANY, heapTerm1, objectTerm, fieldTerm),
+                    tb.select(JavaDLTheory.ANY, heapTerm2, objectTerm, fieldTerm))));
+
+        // Result is the same
+        final Sort resultSort = target.sort();
+        final LocationVariable resultVar1 = isVoid ? null
+                : new LocationVariable(new ProgramElementName(tb.newName(resultSort)),
+                    new KeYJavaType(resultSort));
+        register(resultVar1, proofServices);
+        final LocationVariable resultVar2 = isVoid ? null
+                : new LocationVariable(new ProgramElementName(tb.newName(resultSort)),
+                    new KeYJavaType(resultSort));
+        register(resultVar2, proofServices);
+        final Term resultCheck =
+            isVoid ? tb.tt() : tb.equals(tb.var(resultVar1), tb.var(resultVar2));
+
+        // Method call modalities
+        final Term normalCall = buildModality(target, isVoid, paramVars, resultVar1, heapVar1);
+        final Term anonCall =
+            tb.apply(update, buildModality(target, isVoid, paramVars, resultVar2, heapVar2));
 
         // build po
-        final Term po = tb.imp(pre, tb.equals(targetTerm, tb.apply(update, targetTerm, null)));
+        final Term po = tb.imp(tb.and(pre, normalCall, anonCall),
+            tb.and(tb.subset(assignable, dep), resultCheck, heapCheck));
 
         // save in field
         assignPOTerms(po);
@@ -238,19 +278,28 @@ public class StrictDependencyContractPO extends AbstractPO implements ContractPO
         collectClassAxioms(contract.getKJT(), proofConfig);
     }
 
-    private JavaProgramElement buildMethodCall(IObserverFunction target, boolean isVoid, List<LocationVariable> heaps,
-        LocationVariable self, ImmutableList<LocationVariable> params) {
-        if (!(target instanceof IProgramMethod m)) 
-        {
-            throw new Exception();
-        }
-        MethodName name = target instanceof IProgramMethod
-                ? ((IProgramMethod) target).getProgramElementName()
-                : new ProgramElementName("<anon>");
-        final var mc = new MethodReference(new ImmutableArray<>(params.toArray(LocationVariable.class)), name, null);
-        if (!isVoid) {
+    private Term buildModality(IObserverFunction target, boolean isVoid,
+            ImmutableList<LocationVariable> params, LocationVariable result,
+            LocationVariable heap) {
+        var jb = buildMethodCall(target, isVoid, params, result);
+        return tb.dia(jb, tb.equals(tb.var(heap), tb.getBaseHeap()));
+    }
 
+    private JavaBlock buildMethodCall(IObserverFunction target, boolean isVoid,
+            ImmutableList<LocationVariable> params, LocationVariable result) {
+        if (!(target instanceof IProgramMethod m)) {
+            throw new IllegalArgumentException("Expected target to be a method");
         }
+        MethodName name = m.getProgramElementName();
+        final var mc = new MethodReference(
+            new ImmutableArray<>(params.toArray(LocationVariable.class)), name, null);
+        Statement callStmt;
+        if (isVoid) {
+            callStmt = mc;
+        } else {
+            callStmt = new CopyAssignment(result, mc);
+        }
+        return JavaBlock.createJavaBlock(new StatementBlock(callStmt));
     }
 
     private Services postInit() {
