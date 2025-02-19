@@ -4,13 +4,13 @@
 package de.uka.ilkd.key.settings;
 
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * A collection of settings for the new (= 2021) SMT translation.
@@ -68,11 +68,12 @@ public class NewSMTTranslationSettings extends AbstractSettings {
 
         for (var entry : newSmt.getEntries()) {
             final var value = entry.getValue();
-            if( value instanceof String s) {
+            if (value instanceof String s) {
                 map.put(entry.getKey(), s);
-            }else{
-                LOGGER.warn("Settings {} with value {} ignored. Value of type string expected.", entry.getKey(),
-                        entry.getValue());
+            } else {
+                LOGGER.warn("Settings {} with value {} ignored. Value of type string expected.",
+                    entry.getKey(),
+                    entry.getValue());
             }
         }
     }

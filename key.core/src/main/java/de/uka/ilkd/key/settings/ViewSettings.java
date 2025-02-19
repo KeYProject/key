@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.swing.*;
 
 /**
  * This class encapsulates information about: 1) relative font size in the prover view 2) the
@@ -24,19 +24,28 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String CLUTTER_RULES = "clutterRules";
 
-    private static final Set<String> CLUTTER_RULES_DEFAULT = new TreeSet<>(Set.of("cut_direct_r", "cut_direct_l",
-            "case_distinction_r", "case_distinction_l", "local_cut", "commute_and_2", "commute_or_2", "boxToDiamond",
+    private static final Set<String> CLUTTER_RULES_DEFAULT =
+        new TreeSet<>(Set.of("cut_direct_r", "cut_direct_l",
+            "case_distinction_r", "case_distinction_l", "local_cut", "commute_and_2",
+            "commute_or_2", "boxToDiamond",
             "pullOut", "typeStatic", "less_is_total", "less_zero_is_total", "apply_eq_monomials" +
-                    "eqTermCut", "instAll", "instEx", "divIncreasingPos", "divIncreasingNeg", "jmodUnique1", "jmodeUnique2",
-            "jmodjmod", "jmodDivisble", "jdivAddMultDenom", "jmodAltZero", "add_non_neq_square", "divide_geq",
-            "add_greatereq", "geq_add_one", "leq_add_one", "polySimp_addOrder", "polySimp_expand", "add_lesseq",
+                "eqTermCut",
+            "instAll", "instEx", "divIncreasingPos", "divIncreasingNeg", "jmodUnique1",
+            "jmodeUnique2",
+            "jmodjmod", "jmodDivisble", "jdivAddMultDenom", "jmodAltZero", "add_non_neq_square",
+            "divide_geq",
+            "add_greatereq", "geq_add_one", "leq_add_one", "polySimp_addOrder", "polySimp_expand",
+            "add_lesseq",
             "divide_equation", "equal_add_one", "add_eq"));
 
     private static final String CLUTTER_RULESSETS = "clutterRuleSets";
 
-    private static final Set<String> CLUTTER_RULESETS_DEFAULT = new TreeSet<>(Set.of("notHumanReadable", "obsolete",
-            "pullOutQuantifierAll", "inEqSimp_commute", "inEqSimp_expand", "pullOutQuantifierEx", "inEqSimp_nonLin_divide",
-            "inEqSimp_special_nonLin", "inEqSimp_nonLin", "polySimp_normalise", "polySimp_directEquations"));
+    private static final Set<String> CLUTTER_RULESETS_DEFAULT =
+        new TreeSet<>(Set.of("notHumanReadable", "obsolete",
+            "pullOutQuantifierAll", "inEqSimp_commute", "inEqSimp_expand", "pullOutQuantifierEx",
+            "inEqSimp_nonLin_divide",
+            "inEqSimp_special_nonLin", "inEqSimp_nonLin", "polySimp_normalise",
+            "polySimp_directEquations"));
 
     /**
      * default max number of displayed tooltip lines is 40
@@ -175,64 +184,64 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * Show Taclet uninstantiated in tooltip -- for learning
      */
     private final PropertyEntry<Boolean> showUninstantiatedTaclet =
-            createBooleanProperty(SHOW_UNINSTANTIATED_TACLET, true);
+        createBooleanProperty(SHOW_UNINSTANTIATED_TACLET, true);
     private final PropertyEntry<Boolean> showHeatmap = createBooleanProperty(HEATMAP_SHOW, false);
     private final PropertyEntry<Boolean> heatmapSF = createBooleanProperty(HEATMAP_SF, true);
     /**
      * Highlight most recent formulas/terms (true) or all formulas/terms below specified age (false)
      */
     private final PropertyEntry<Boolean> heatmapNewest =
-            createBooleanProperty(HEATMAP_NEWEST, true);
+        createBooleanProperty(HEATMAP_NEWEST, true);
     /**
      * Maximum age/number of newest terms/formulas for heatmap highlighting
      */
     private final PropertyEntry<Integer> maxAgeForHeatmap =
-            createIntegerProperty(HEATMAP_MAXAGE, 5);
+        createIntegerProperty(HEATMAP_MAXAGE, 5);
     private final PropertyEntry<Double> uiFontSizeFactor =
-            createDoubleProperty(FONT_SIZE_FACTOR, 1.0);
+        createDoubleProperty(FONT_SIZE_FACTOR, 1.0);
     private final PropertyEntry<Integer> maxTooltipLines =
-            createIntegerProperty(MAX_TOOLTIP_LINES_KEY, 40);
+        createIntegerProperty(MAX_TOOLTIP_LINES_KEY, 40);
     private final PropertyEntry<Boolean> hideIntermediateProofsteps =
-            createBooleanProperty(HIDE_INTERMEDIATE_PROOFSTEPS, false);
+        createBooleanProperty(HIDE_INTERMEDIATE_PROOFSTEPS, false);
     private final PropertyEntry<Boolean> hideAutomodeProofsteps =
-            createBooleanProperty(HIDE_AUTOMODE_PROOFSTEPS, false);
+        createBooleanProperty(HIDE_AUTOMODE_PROOFSTEPS, false);
     private final PropertyEntry<Boolean> hideClosedSubtrees =
-            createBooleanProperty(HIDE_CLOSED_SUBTREES, false);
+        createBooleanProperty(HIDE_CLOSED_SUBTREES, false);
     private final PropertyEntry<Boolean> notifyLoadBehaviour =
-            createBooleanProperty(NOTIFY_LOAD_BEHAVIOUR, false);
+        createBooleanProperty(NOTIFY_LOAD_BEHAVIOUR, false);
     private final PropertyEntry<Boolean> usePretty = createBooleanProperty(PRETTY_SYNTAX, true);
     private final PropertyEntry<Boolean> useUnicode = createBooleanProperty(USE_UNICODE, false);
     private final PropertyEntry<Boolean> useSyntaxHighlighting =
-            createBooleanProperty(SYNTAX_HIGHLIGHTING, true);
+        createBooleanProperty(SYNTAX_HIGHLIGHTING, true);
     private final PropertyEntry<Boolean> hidePackagePrefix =
-            createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
+        createBooleanProperty(HIDE_PACKAGE_PREFIX, false);
     private final PropertyEntry<Boolean> confirmExit = createBooleanProperty(CONFIRM_EXIT, true);
     private final PropertyEntry<Boolean> showLoadExamplesDialog =
-            createBooleanProperty(SHOW_LOAD_EXAMPLES_DIALOG, true);
+        createBooleanProperty(SHOW_LOAD_EXAMPLES_DIALOG, true);
     private final PropertyEntry<Boolean> showWholeTaclet =
-            createBooleanProperty(SHOW_WHOLE_TACLET, false);
+        createBooleanProperty(SHOW_WHOLE_TACLET, false);
     private final PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
     private final PropertyEntry<String> lookAndFeel =
         createStringProperty(PROP_LOOK_AND_FEEL, LOOK_AND_FEEL_DEFAULT);
     private final PropertyEntry<Boolean> showSequentViewTooltips =
-            createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
+        createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
     private final PropertyEntry<Boolean> showSourceViewTooltips =
-            createBooleanProperty(SOURCE_VIEW_TOOLTIP, true);
+        createBooleanProperty(SOURCE_VIEW_TOOLTIP, true);
     private final PropertyEntry<Boolean> showProofTreeTooltips =
-            createBooleanProperty(PROOF_TREE_TOOLTIP, true);
+        createBooleanProperty(PROOF_TREE_TOOLTIP, true);
     private final PropertyEntry<Boolean> highlightOrigin =
-            createBooleanProperty(HIGHLIGHT_ORIGIN, true);
+        createBooleanProperty(HIGHLIGHT_ORIGIN, true);
     private final PropertyEntry<Set<String>> clutterRules =
-            createStringSetProperty(CLUTTER_RULES, CLUTTER_RULES_DEFAULT);
+        createStringSetProperty(CLUTTER_RULES, CLUTTER_RULES_DEFAULT);
 
     private final PropertyEntry<Set<String>> clutterRuleSets =
-            createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);
+        createStringSetProperty(CLUTTER_RULESSETS, CLUTTER_RULESETS_DEFAULT);
 
     private final PropertyEntry<Boolean> hideInteractiveGoals =
-            createBooleanProperty(HIDE_INTERACTIVE_GOALS, false);
+        createBooleanProperty(HIDE_INTERACTIVE_GOALS, false);
 
     private final PropertyEntry<String> notificationAfterMacro =
-            createStringProperty(NOTIFICATION_AFTER_MACRO, NOTIFICATION_UNFOCUSED);
+        createStringProperty(NOTIFICATION_AFTER_MACRO, NOTIFICATION_UNFOCUSED);
 
     /**
      * User-definable folder bookmarks.
@@ -241,8 +250,8 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * @see #setFolderBookmarks(List)
      */
     private final PropertyEntry<List<String>> folderBookmarks =
-            createStringListProperty(USER_FOLDER_BOOKMARKS,
-                    List.of(System.getProperty("user.home")));
+        createStringListProperty(USER_FOLDER_BOOKMARKS,
+            List.of(System.getProperty("user.home")));
 
     //
     private boolean isDarkMode;
@@ -321,7 +330,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * Sets whether the "Load Examples" dialog window should be shown on startup
      *
      * @param b indicates whether the "Load Examples" dialog window should be shown on startup or
-     *          not
+     *        not
      */
     public void setShowLoadExamplesDialog(boolean b) {
         showLoadExamplesDialog.set(b);
@@ -342,7 +351,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * instantiations of schema-variables or not
      *
      * @param b indicates whether the Find and VarCond part of Taclets should be pretty-printed with
-     *          instantiations of schema-variables or not
+     *        instantiations of schema-variables or not
      */
     public void setShowWholeTaclet(boolean b) {
         showWholeTaclet.set(b);
@@ -536,14 +545,14 @@ public class ViewSettings extends AbstractPropertiesSettings {
      * Updates heatmap settings (all of the at the same time, so that fireSettingsChanged is called
      * only once.
      *
-     * @param showHeatmap      true if heatmap on
-     * @param heatmapSF        true for sequent formulas, false for terms
-     * @param heatmapNewest    true if newest, false for "up to age"
+     * @param showHeatmap true if heatmap on
+     * @param heatmapSF true for sequent formulas, false for terms
+     * @param heatmapNewest true if newest, false for "up to age"
      * @param maxAgeForHeatmap the maximum age for term or sequent formulas, concerning heatmap
-     *                         highlighting
+     *        highlighting
      */
     public void setHeatmapOptions(boolean showHeatmap, boolean heatmapSF, boolean heatmapNewest,
-                                  int maxAgeForHeatmap) {
+            int maxAgeForHeatmap) {
         this.showHeatmap.set(showHeatmap);
         this.heatmapSF.set(heatmapSF);
         this.heatmapNewest.set(heatmapNewest);

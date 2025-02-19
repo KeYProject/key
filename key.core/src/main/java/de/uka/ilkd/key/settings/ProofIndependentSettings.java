@@ -38,7 +38,7 @@ public class ProofIndependentSettings {
     }
 
     private final ProofIndependentSMTSettings smtSettings =
-            ProofIndependentSMTSettings.getDefaultSettingsData();
+        ProofIndependentSMTSettings.getDefaultSettingsData();
 
     private final LemmaGeneratorSettings lemmaGeneratorSettings = new LemmaGeneratorSettings();
     private final GeneralSettings generalSettings = new GeneralSettings();
@@ -83,7 +83,7 @@ public class ProofIndependentSettings {
             if (filename.exists()) {
                 if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
                     LOGGER.warn("The settings in {} are *not* read due to flag '{}'", filename,
-                            PathConfig.DISREGARD_SETTINGS_PROPERTY);
+                        PathConfig.DISREGARD_SETTINGS_PROPERTY);
                 } else {
                     load(filename);
                 }
@@ -107,7 +107,7 @@ public class ProofIndependentSettings {
         }
 
         try (var out =
-                     new BufferedWriter(new FileWriter(filename.toString().replace(".props", ".json")))) {
+            new BufferedWriter(new FileWriter(filename.toString().replace(".props", ".json")))) {
             config.save(out, "Proof-Independent-Settings-File. Generated " + new Date());
         } catch (IOException e) {
             LOGGER.error("Could not store settings to {}", filename, e);
@@ -159,7 +159,7 @@ public class ProofIndependentSettings {
      * Defines if pretty printing is enabled or not.
      *
      * @param usePrettyPrinting {@code true} pretty printing is enabled, {@code false} pretty
-     *                          printing is disabled.
+     *        printing is disabled.
      */
     public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
         DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);

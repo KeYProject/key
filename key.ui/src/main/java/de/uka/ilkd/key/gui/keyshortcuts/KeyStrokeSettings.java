@@ -38,7 +38,7 @@ import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MAS
  */
 public class KeyStrokeSettings extends AbstractPropertiesSettings {
     public static final File SETTINGS_FILE =
-            new File(PathConfig.getKeyConfigDir(), "keystrokes.json");
+        new File(PathConfig.getKeyConfigDir(), "keystrokes.json");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyStrokeSettings.class);
 
@@ -106,9 +106,9 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         defineDefault(SearchNextAction.class, KeyEvent.VK_F3, 0);
         defineDefault(SearchPreviousAction.class, KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK);
         defineDefault(SelectionBackAction.class, KeyEvent.VK_LEFT,
-                SHORTCUT_KEY_MASK | InputEvent.ALT_DOWN_MASK);
+            SHORTCUT_KEY_MASK | InputEvent.ALT_DOWN_MASK);
         defineDefault(SelectionForwardAction.class, KeyEvent.VK_RIGHT,
-                SHORTCUT_KEY_MASK | InputEvent.ALT_DOWN_MASK);
+            SHORTCUT_KEY_MASK | InputEvent.ALT_DOWN_MASK);
 
         /*
          * Do not use this! It produces strange behavior, as the constructor there calls

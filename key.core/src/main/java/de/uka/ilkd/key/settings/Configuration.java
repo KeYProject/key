@@ -366,7 +366,7 @@ public class Configuration {
     }
 
     public Object set(String name, Object obj) {
-        if(!allowedValueType(obj)) {
+        if (!allowedValueType(obj)) {
             throw new RuntimeException("Unallowed value type used: " + obj.getClass());
         }
         return data.put(name, obj);
@@ -425,6 +425,7 @@ public class Configuration {
     /**
      * Predicte for allowed value objects inside the configuration hierarchy and
      * can be printed.
+     *
      * @param value an arbitrary {@link Object}
      * @return true if the value is allowed in the hierarchy.
      */

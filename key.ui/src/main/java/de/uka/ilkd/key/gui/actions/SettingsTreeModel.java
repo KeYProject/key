@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.smt.OptionContentNode;
-import de.uka.ilkd.key.settings.*;
-
+import java.util.Collection;
+import java.util.Map;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
-import java.util.Collection;
-import java.util.Map;
+
+import de.uka.ilkd.key.gui.smt.OptionContentNode;
+import de.uka.ilkd.key.settings.*;
 
 import org.key_project.logic.Choice;
 
@@ -27,7 +27,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
     private DefaultMutableTreeNode tacletOptionsItem;
 
     public SettingsTreeModel(ProofSettings proofSettings,
-                             ProofIndependentSettings independentSettings) {
+            ProofIndependentSettings independentSettings) {
         super(new DefaultMutableTreeNode("All Settings"));
 
         this.proofSettings = proofSettings;
@@ -41,19 +41,19 @@ public class SettingsTreeModel extends DefaultTreeModel {
 
         if (proofSettings == null) {
             OptionContentNode proofSettingsNode =
-                    generateOptionContentNode("Proof Settings", "There is currently no proof loaded!");
+                generateOptionContentNode("Proof Settings", "There is currently no proof loaded!");
             root.add(proofSettingsNode);
         } else {
             OptionContentNode proofSettingsNode =
-                    generateOptionContentNode("Proof Settings",
-                            "These are the proof dependent settings.");
+                generateOptionContentNode("Proof Settings",
+                    "These are the proof dependent settings.");
             root.add(proofSettingsNode);
 
             configurationTable(proofSettingsNode, proofSettings.asConfiguration());
         }
 
         var independentSettingsNode = generateOptionContentNode(
-                "Proof-Independent Settings", "These are the proof independent settings.");
+            "Proof-Independent Settings", "These are the proof independent settings.");
         root.add(independentSettingsNode);
         configurationTable(independentSettingsNode, independentSettings.asConfiguration());
 

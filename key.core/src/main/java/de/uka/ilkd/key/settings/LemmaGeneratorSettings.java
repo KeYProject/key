@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.settings;
 
-import java.util.Properties;
 
 public class LemmaGeneratorSettings extends AbstractSettings {
     public static final String CATEGORY = "LemmaGenerator";
