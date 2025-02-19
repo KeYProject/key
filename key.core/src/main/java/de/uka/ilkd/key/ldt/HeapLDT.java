@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
@@ -379,6 +380,12 @@ public final class HeapLDT extends LDT {
     public JFunction getFieldSymbolForPV(LocationVariable fieldPV, Services services) {
         assert fieldPV.isMember();
         assert fieldPV != services.getJavaInfo().getArrayLength();
+        // container type of a field program variable can never be null
+        assert fieldPV.getContainerType() != null;
+        KeYJavaType containerType = fieldPV.getContainerType();
+        // sort of a field program variable can never be null
+        assert fieldPV.sort() != null;
+        Sort sort = fieldPV.sort();
 
         final Name name = new Name(getFieldSymbolName(fieldPV));
         JFunction result = services.getNamespaces().functions().lookup(name);
@@ -390,7 +397,9 @@ public final class HeapLDT extends LDT {
             SortDependingFunction firstInstance =
                 SortDependingFunction.getFirstInstance(kind, services);
             if (firstInstance != null) {
-                Sort sortDependingOn = fieldPV.getContainerType().getSort();
+                Sort sortDependingOn = containerType.getSort();
+                // container sort must be initialized here
+                assert sortDependingOn != null;
                 result = firstInstance.getInstanceFor(sortDependingOn, services);
             } else {
                 if (fieldPV.isModel()) {
@@ -402,7 +411,7 @@ public final class HeapLDT extends LDT {
                         heapCount++;
                     }
                     result = new ObserverFunction(kind.toString(), fieldPV.sort(),
-                        fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
+                        fieldPV.getKeYJavaType(), targetSort(), containerType,
                         fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
                 } else {
                     result = new JFunction(name, fieldSort, new Sort[0], null, true);
