@@ -129,6 +129,15 @@ public class JmlMarkerDecision {
         return false;
     }
 
+    /**
+     * Given a string of conditions of a JML comment, that method decides whether the conditions are
+     * met.
+     *
+     * @param foundKeys a string of conditions, e.g., {@code "+key+esc-float"}. Should not contain
+     *        whitespaces.
+     * @return true whether the given conditions are met and the comment should be considered as
+     *         active.
+     */
     public boolean isActiveJmlSpec(String foundKeys) {
         if (foundKeys.isEmpty()) {
             // a JML annotation with no keys is always included,
