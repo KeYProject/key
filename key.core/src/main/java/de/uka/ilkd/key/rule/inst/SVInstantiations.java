@@ -270,7 +270,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
             Services services) {
         return new SVInstantiations(map.put(sv, entry), interesting().put(sv, entry),
             getUpdateContext(), getGenericSortInstantiations(), getGenericSortConditions())
-                .checkSorts(sv, entry, false, services);
+                    .checkSorts(sv, entry, false, services);
     }
 
 
@@ -653,7 +653,7 @@ public class SVInstantiations implements EqualsModProofIrrelevancy {
     public SVInstantiations add(GenericSortCondition p_c, Services services) throws SortException {
         return new SVInstantiations(map, interesting(), getUpdateContext(),
             getGenericSortInstantiations(), getGenericSortConditions().prepend(p_c))
-                .checkCondition(p_c, false, services);
+                    .checkCondition(p_c, false, services);
     }
 
     public ExecutionContext getExecutionContext() {

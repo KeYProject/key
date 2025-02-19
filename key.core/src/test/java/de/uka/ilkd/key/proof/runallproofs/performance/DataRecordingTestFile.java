@@ -50,7 +50,7 @@ class DataRecordingTestFile extends TestFile {
         proof.setActiveStrategy(strategy);
         return new ApplyStrategy(
             proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create())
-                .start(proof, proof.openGoals().head());
+                    .start(proof, proof.openGoals().head());
     }
 
     public final ProfilingDirectories getProfileDirectories() {

@@ -294,7 +294,7 @@ public class TestSemisequent {
         // [exp.: p,q,a,b,c,r]
         Semisequent expected = extract(extract(
             extract(extract(origin.insertLast(con[4])).insertLast(con[5])).insertLast(con[6]))
-                .insertLast(con[2]));
+                    .insertLast(con[2]));
         // insert:[a,b,c,r,r,q,p]
         ImmutableList<SequentFormula> insertionList =
             ImmutableSLList.<SequentFormula>nil().prepend(con[0]).prepend(con[1]).prepend(con[2])
