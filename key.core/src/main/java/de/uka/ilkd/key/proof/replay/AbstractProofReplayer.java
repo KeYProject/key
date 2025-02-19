@@ -226,8 +226,8 @@ public abstract class AbstractProofReplayer {
 
         final String tacletName = originalStep.getAppliedRuleApp().rule().name().toString();
         TacletApp originalTacletApp = null;
-        if (originalStep.getAppliedRuleApp() instanceof TacletApp) {
-            originalTacletApp = (TacletApp) originalStep.getAppliedRuleApp();
+        if (originalStep.getAppliedRuleApp() instanceof TacletApp tacletApp) {
+            originalTacletApp = tacletApp;
         }
 
         TacletApp ourApp = null;
@@ -238,7 +238,7 @@ public abstract class AbstractProofReplayer {
         if (t == null) {
             // find the correct taclet
             for (NoPosTacletApp partialApp : currGoal.indexOfTaclets()
-                    .getPartialInstantiatedApps()) {
+                    .allNoPosTacletApps()) {
                 if (partialApp.equalsModProofIrrelevancy(originalTacletApp)) {
                     ourApp = partialApp;
                     break;
@@ -249,7 +249,8 @@ public abstract class AbstractProofReplayer {
             }
             if (ourApp == null) {
                 throw new IllegalStateException(
-                    "proof replayer failed to find dynamically added taclet");
+                    "proof replayer failed to find dynamically added taclet at original node "
+                        + originalStep.serialNr());
             }
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
