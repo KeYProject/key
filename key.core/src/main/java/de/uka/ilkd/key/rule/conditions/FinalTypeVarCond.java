@@ -44,7 +44,7 @@ public final class FinalTypeVarCond extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
         Sort sort = resolver.resolveSort(var, instCandidate, instMap, services);
-        while(sort instanceof ArraySort arraySort) {
+        while (sort instanceof ArraySort arraySort) {
             sort = arraySort.elementSort();
         }
 
