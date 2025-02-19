@@ -5,6 +5,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -64,17 +66,17 @@ public class TestProofScriptCommand {
 
         Proof proof = env.getLoadedProof();
 
-        ProofScriptEngine pse = new ProofScriptEngine(data.script(), Location.UNDEFINED);
+        ProofScriptEngine pse = new ProofScriptEngine(data.script(),
+                new Location(URI.create("file:/"+data.name), Position.newOneBased(1, 1)));
 
         boolean hasException = data.exception() != null;
         try {
             pse.execute(env.getUi(), proof);
         } catch (Exception ex) {
-            ex.printStackTrace();
             assertTrue(hasException,
                 "An exception was not expected, but got " + ex.getClass());
-            assertThat(ex.getMessage().trim().replace("\r\n", "\n"))
-                    .startsWithIgnoringCase(data.exception().trim());
+            assertThat(data.exception.trim())
+                    .startsWithIgnoringCase(ex.getMessage().trim().replace("\r\n", "\n"));
             return;
         }
 
