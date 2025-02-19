@@ -102,7 +102,7 @@ public class KeyIdentifications {
      * @author Alexander Weigl
      * @version 1 (28.10.23)
      */
-    public record ContractId(EnvironmentId envId, int contractId) {
+    public record ContractId(EnvironmentId envId, String contractId) {
     }
 
     /**

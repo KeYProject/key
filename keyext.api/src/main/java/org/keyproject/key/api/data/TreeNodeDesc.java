@@ -3,9 +3,16 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.keyproject.key.api.data;
 
+import de.uka.ilkd.key.proof.Node;
+
+import javax.swing.tree.TreeNode;
+
 /**
  * @author Alexander Weigl
  * @version 1 (13.10.23)
  */
-public class TreeNodeDesc {
+public record TreeNodeDesc(KeyIdentifications.NodeId id, String name) {
+    public static TreeNodeDesc from(KeyIdentifications.ProofId proofId, Node root) {
+        return new TreeNodeDesc(new KeyIdentifications.NodeId(proofId, root.serialNr()), root.name());
+    }
 }

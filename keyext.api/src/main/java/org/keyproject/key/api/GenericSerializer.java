@@ -14,7 +14,7 @@ import com.google.gson.*;
  */
 public class GenericSerializer implements JsonSerializer<Object> /* , JsonDeserializer<Object> */ {
 
-    private static final String CLASS_PROPERTY_NAME = "$type";
+    private static final String CLASS_PROPERTY_NAME = "$class";
     private final Gson gson;
 
     public GenericSerializer() {
@@ -53,7 +53,7 @@ public class GenericSerializer implements JsonSerializer<Object> /* , JsonDeseri
             JsonSerializationContext context) {
         JsonElement retValue = gson.toJsonTree(src);
         if (retValue.isJsonObject()) {
-            retValue.getAsJsonObject().addProperty(CLASS_PROPERTY_NAME, src.getClass().getName());
+            retValue.getAsJsonObject().addProperty(CLASS_PROPERTY_NAME, src.getClass().getSimpleName());
         }
         return retValue;
     }

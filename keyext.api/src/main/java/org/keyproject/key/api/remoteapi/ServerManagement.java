@@ -4,6 +4,7 @@
 package org.keyproject.key.api.remoteapi;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;

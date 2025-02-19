@@ -8,7 +8,10 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 import com.google.gson.GsonBuilder;
@@ -64,8 +67,17 @@ public class StartServer implements Runnable {
         new CommandLine(new StartServer()).execute(args);
     }
 
+    @Nullable
     private InputStream in;
+
+    @Nullable
     private OutputStream out;
+
+    @Nullable
+    private Socket socket;
+
+    @Nullable
+    private Future<Void> listenerFuture;
 
     private void establishStreams() throws IOException {
         in = System.in;
@@ -76,7 +88,7 @@ public class StartServer implements Runnable {
         }
 
         if (clientPort != null) {
-            var socket = new Socket(InetAddress.getLocalHost(), clientPort);
+            socket = new Socket(InetAddress.getLocalHost(), clientPort);
             socket.setKeepAlive(true);
             socket.setTcpNoDelay(true);
             in = socket.getInputStream();
@@ -87,7 +99,7 @@ public class StartServer implements Runnable {
         if (serverPort != null) {
             var server = new ServerSocket(serverPort);
             LOGGER.info("Waiting on port {}", serverPort);
-            var socket = server.accept();
+            socket = server.accept();
             LOGGER.info("Connection to client established: {}", socket.getRemoteSocketAddress());
             socket.setKeepAlive(true);
             socket.setTcpNoDelay(true);
@@ -95,7 +107,6 @@ public class StartServer implements Runnable {
             out = socket.getOutputStream();
             return;
         }
-
 
         if (inFile != null) {
             in = new FileInputStream(inFile);
@@ -108,6 +119,32 @@ public class StartServer implements Runnable {
         if (out == null || in == null) {
             throw new IllegalStateException("Could not initialize the streams");
         }
+    }
+
+    private boolean shutdownHandler() {
+        LOGGER.info("Shutting down...");
+        try {
+            LOGGER.info("Closing Listener");
+            if (listenerFuture != null) {
+                listenerFuture.cancel(true);
+            }
+            LOGGER.info("Closing In Stream");
+            if (in != null) {
+                in.close();
+            }
+            LOGGER.info("Closing Out Stream");
+            if (out != null) {
+                out.close();
+            }
+            LOGGER.info("Closing Socket");
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while closing streams", e);
+            return false;
+        }
+        return true;
     }
 
 
@@ -139,7 +176,19 @@ public class StartServer implements Runnable {
                     var listener = launch(lout, lin, keyApi);
                     LOGGER.info("JSON-RPC is listening for requests");
                     keyApi.setClientApi(listener.getRemoteProxy());
-                    listener.startListening().get();
+                    keyApi.setExitHandler(new Function<Void, Boolean>() {
+                        @Override
+                        public Boolean apply(Void unused) {
+                            return StartServer.this.shutdownHandler();
+                        }
+                    });
+                    //listener.startListening().get();
+                    listenerFuture = listener.startListening();
+                    try {
+                        listenerFuture.get();
+                    } catch (CancellationException e) {
+                        LOGGER.info("Listener was cancelled; shutting down...");
+                    }
                 }
             }
         } catch (IOException | InterruptedException | ExecutionException e) {
@@ -149,9 +198,9 @@ public class StartServer implements Runnable {
 
 
     public static void configureJson(GsonBuilder gsonBuilder) {
-        //gsonBuilder.registerTypeHierarchyAdapter(Object.class, new GenericSerializer());
         gsonBuilder.registerTypeAdapter(File.class, new KeyAdapter.FileTypeAdapter());
         gsonBuilder.registerTypeAdapter(Throwable.class, new KeyAdapter.ThrowableAdapter());
+        gsonBuilder.registerTypeHierarchyAdapter(Object.class, new GenericSerializer());
     }
 
     public static Launcher<ClientApi> launch(OutputStream out, InputStream in, KeyApiImpl keyApi) {

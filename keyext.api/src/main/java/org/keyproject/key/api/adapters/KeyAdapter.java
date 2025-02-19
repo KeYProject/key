@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
+import com.google.gson.stream.JsonToken;
 import de.uka.ilkd.key.macros.ProofMacro;
 
 import org.key_project.logic.op.Function;
@@ -62,6 +63,11 @@ public class KeyAdapter {
 
         @Override
         public File read(JsonReader in) throws IOException {
+            var tokenType = in.peek();
+            if (tokenType == JsonToken.NULL) {
+                in.nextNull();
+                return null;
+            }
             return new File(in.nextString());
         }
     }

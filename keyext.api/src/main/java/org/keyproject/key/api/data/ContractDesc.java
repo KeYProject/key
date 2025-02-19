@@ -13,7 +13,7 @@ import de.uka.ilkd.key.speclang.Contract;
 public record ContractDesc(KeyIdentifications.ContractId contractId, String name, String displayName,
                            String typeName, String htmlText, String plainText) {
     public static ContractDesc from(KeyIdentifications.EnvironmentId envId, Services services, Contract it) {
-        return new ContractDesc(new KeyIdentifications.ContractId(envId, it.id()),
+        return new ContractDesc(new KeyIdentifications.ContractId(envId, it.getName()),
                 it.getName(), it.getDisplayName(), it.getTypeName(),
                 it.getHTMLText(services), it.getPlainText(services));
     }

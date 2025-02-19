@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
@@ -54,6 +55,8 @@ import org.keyproject.key.api.remoteclient.ClientApi;
 public final class KeyApiImpl implements KeyApi {
     private final KeyIdentifications data = new KeyIdentifications();
 
+    private Function<Void, Boolean> exitHandler;
+
     private ClientApi clientApi;
     private final ProverTaskListener clientListener = new ProverTaskListener() {
         @Override
@@ -91,6 +94,11 @@ public final class KeyApiImpl implements KeyApi {
 
     @Override
     public void exit() {
+        this.exitHandler.apply(null);
+    }
+
+    public void setExitHandler(Function<Void, Boolean> exitHandler) {
+        this.exitHandler = exitHandler;
     }
 
     @Override
@@ -255,7 +263,9 @@ public final class KeyApiImpl implements KeyApi {
 
     @Override
     public CompletableFuture<TreeNodeDesc> treeRoot(ProofId proof) {
-        return null;
+        return CompletableFuture.completedFuture(
+                TreeNodeDesc.from(proof, data.find(proof).root())
+        );
     }
 
     @Override
@@ -302,7 +312,7 @@ public final class KeyApiImpl implements KeyApi {
             var env = data.find(contractId.envId());
             var contracts = env.getAvailableContracts();
             var contract =
-                contracts.stream().filter(it -> it.id() == contractId.contractId()).findFirst();
+                contracts.stream().filter(it -> Objects.equals(it.getName(),contractId.contractId())).findFirst();
             if (contract.isPresent()) {
                 try {
                     var proof = env.createProof(contract.get().createProofObl(env.getInitConfig()));
@@ -459,7 +469,7 @@ public final class KeyApiImpl implements KeyApi {
             KeYEnvironment<?> env;
             try {
                 var loader = control.load(JavaProfile.getDefaultProfile(),
-                    params.keyFile(),
+                    params.problemFile(),
                     params.classPath(),
                     params.bootClassPath(),
                     params.includes(),
