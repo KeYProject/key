@@ -5,6 +5,7 @@ package de.uka.ilkd.key.gui.plugins.javac;
 
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.gui.fonticons.MaterialDesignRegular;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +160,7 @@ public class JavacExtension
             try {
                 task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
                     lblStatus.setText("Javac finished");
-                    data.issues = it;
+                    data.issues.addAll(it);
                     updateLabel(data);
                 })).get();
             } catch (InterruptedException | ExecutionException ex) {
@@ -239,7 +241,8 @@ class JavacData {
     /**
      * The diagnostics emitted by the compiler.
      */
-    List<PositionedIssueString> issues = null;
+    @NonNull
+    final List<PositionedIssueString> issues = new ArrayList<>(0);
     /**
      * True if there was no Java source file to compile.
      */

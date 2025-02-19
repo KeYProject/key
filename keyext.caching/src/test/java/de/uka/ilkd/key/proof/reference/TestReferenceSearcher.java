@@ -12,7 +12,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.helper.FindResources;
@@ -26,7 +26,7 @@ class TestReferenceSearcher {
 
     @Test
     void testFindsReferenceInSameProof() throws Exception {
-        GeneralSettings.noPruningClosed = false;
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(false);
         // test scenario:
         // 1. Load a proof.
         // 2. Use the reference searcher to search for a matching node,
@@ -105,7 +105,7 @@ class TestReferenceSearcher {
 
     @Test
     void checksUserLemmas() throws Exception {
-        GeneralSettings.noPruningClosed = false;
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(false);
         // Test scenario:
         // Proof 1 uses a user-defined lemma.
         // Proof 2 does not.
@@ -141,7 +141,7 @@ class TestReferenceSearcher {
         assertEquals(0, c.node().serialNr());
         assertEquals(p, c.proof());
 
-        GeneralSettings.noPruningClosed = true;
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setNoPruningClosed(true);
         p.dispose();
         p2.dispose();
         p3.dispose();

@@ -34,7 +34,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTRuleApp;
 
 import org.key_project.slicing.DependencyNodeData;
@@ -179,7 +179,7 @@ public final class DependencyAnalyzer {
      * @return analysis results
      */
     public AnalysisResults analyze() {
-        if (GeneralSettings.noPruningClosed) {
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isNoPruningClosed()) {
             throw new IllegalStateException("cannot analyze proof with no (recorded) closed goals, "
                 + "try disabling GeneralSettings.noPruningClosed");
         }
