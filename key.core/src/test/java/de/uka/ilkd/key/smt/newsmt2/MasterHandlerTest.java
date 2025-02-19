@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -33,9 +31,9 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.util.LineProperties;
 
-import org.antlr.v4.runtime.CharStreams;
 import org.key_project.util.Streams;
 
+import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
@@ -148,7 +146,7 @@ public class MasterHandlerTest {
 
             String updates = props.get("smt-settings");
             if (updates != null) {
-                    var map = ParsingFacade.readConfigurationFile(CharStreams.fromString(updates));
+                var map = ParsingFacade.readConfigurationFile(CharStreams.fromString(updates));
                 settings.getNewSettings().readSettings(map);
             }
 
