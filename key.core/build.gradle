@@ -276,7 +276,8 @@ checkerFramework {
         extraJavacArgs = [
                 ///home/weigl/work/key/key.core/src/main/java/de/uka/ilkd/key/nparser/varexp
                 //"-AonlyDefs=^de\\.uka\\.ilkd\\.key\\.(nparser\\.varexp|ldt|util|proof|control|macros|settings)(\\.*)?",
-                "-AassumeInitialized",
+                "-AassumeAssertionsAreEnabled",
+                //"-AassumeInitialized",
                 "-Xmaxerrs", "10000",
                 "-Astubs=$rootDir/key.util/src/main/checkerframework${File.pathSeparatorChar}permit-nullness-assertion-exception.astub",
                 "-AstubNoWarnIfNotFound",
