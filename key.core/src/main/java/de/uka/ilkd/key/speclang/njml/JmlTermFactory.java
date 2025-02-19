@@ -917,6 +917,11 @@ public final class JmlTermFactory {
                         final Term fieldTerm = t.sub(2);
                         t = tb.singleton(objTerm, fieldTerm);
                         singletons = singletons.append(t);
+                    } else if (heapLDT.isFinalOp(t.op())) {
+                        final Term objTerm = t.sub(0);
+                        final Term fieldTerm = t.sub(1);
+                        t = tb.singleton(objTerm, fieldTerm);
+                        singletons = singletons.append(t);
                     } else if (t.op() instanceof ProgramVariable) {
                         // this case may happen with local variables
                         exc.addIgnoreWarning("local variable in assignable clause");
