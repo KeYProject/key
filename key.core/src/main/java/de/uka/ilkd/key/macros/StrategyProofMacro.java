@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.macros;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -39,7 +40,7 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class StrategyProofMacro extends AbstractProofMacro {
 
-    protected abstract Strategy createStrategy(Proof proof, PosInOccurrence posInOcc);
+    protected abstract Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc);
 
     /**
      * {@inheritDoc}
@@ -50,7 +51,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      *
      */
     @Override
-    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
@@ -77,7 +78,8 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         if (goals == null || goals.isEmpty()) {
             // should not happen, because in this case canApplyTo returns
             // false
-            return null;
+            throw new AssertionError();
+            //return null;
         }
         List<Node> nodes = goals.stream().map(Goal::node).collect(Collectors.toList());
 
@@ -97,7 +99,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             FocussedRuleApplicationManager manager;
             for (Goal goal : goals) {
                 realManager = goal.getRuleAppManager();
-                realManager.clearCache();
+                Objects.requireNonNull(realManager).clearCache();
                 manager = new FocussedRuleApplicationManager(realManager, goal, posInOcc);
                 goal.setRuleAppManager(manager);
             }

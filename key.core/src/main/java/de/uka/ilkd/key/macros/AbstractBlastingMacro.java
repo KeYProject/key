@@ -88,11 +88,11 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
         return new SemanticsBlastingStrategy();
     }
 
-    private boolean containsSubTypes(Sort s, Set<Sort> sorts) {
+    private boolean containsSubTypes(@Nullable Sort s, Set<Sort> sorts) {
         for (Sort st : sorts) {
             if (st.extendsTrans(s)) {
                 return true;
