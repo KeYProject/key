@@ -4,20 +4,18 @@ import abc
 import typing
 from abc import abstractmethod, ABCMeta
 
-
 class ExampleDesc:
     """"""
 
-    name: str
+    name : str
     """"""
 
-    description: str
+    description : str
     """"""
 
     def __init__(self, name, description):
         self.name = name
         self.description = description
-
 
 class ProofScriptCommandDesc:
     """"""
@@ -29,16 +27,16 @@ class ProofScriptCommandDesc:
 class ProofMacroDesc:
     """"""
 
-    name: str
+    name : str
     """"""
 
-    category: str
+    category : str
     """"""
 
-    description: str
+    description : str
     """"""
 
-    scriptCommandName: str
+    scriptCommandName : str
     """"""
 
     def __init__(self, name, category, description, scriptCommandName):
@@ -47,7 +45,6 @@ class ProofMacroDesc:
         self.description = description
         self.scriptCommandName = scriptCommandName
 
-
 class TraceValue(enum.Enum):
     """"""
 
@@ -55,88 +52,88 @@ class TraceValue(enum.Enum):
     Message = None
     All = None
 
-
 class SetTraceParams:
     """"""
 
-    value: TraceValue
+    value : TraceValue
     """"""
 
     def __init__(self, value):
         self.value = value
 
-
 class EnvironmentId:
     """"""
 
-    envId: str
+    envId : str
     """"""
 
     def __init__(self, envId):
         self.envId = envId
 
-
 class ProofId:
     """"""
 
-    env: EnvironmentId
+    env : EnvironmentId
     """"""
 
-    proofId: str
+    proofId : str
     """"""
 
     def __init__(self, env, proofId):
         self.env = env
         self.proofId = proofId
 
-
-class TreeNodeDesc:
-    """"""
-
-    def __init__(self, ):
-        pass
-
-
-class TreeNodeId:
-    """"""
-
-    id: str
-    """"""
-
-    def __init__(self, id):
-        self.id = id
-
-
 class NodeId:
     """"""
 
-    proofId: ProofId
+    proofId : ProofId
     """"""
 
-    nodeId: int
+    nodeId : int
     """"""
 
     def __init__(self, proofId, nodeId):
         self.proofId = proofId
         self.nodeId = nodeId
 
+class TreeNodeDesc:
+    """"""
+
+    id : NodeId
+    """"""
+
+    name : str
+    """"""
+
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+
+class TreeNodeId:
+    """"""
+
+    id : str
+    """"""
+
+    def __init__(self, id):
+        self.id = id
 
 class PrintOptions:
     """"""
 
-    unicode: bool
+    unicode : bool
     """"""
 
-    width: int
+    width : int
     """"""
 
-    indentation: int
+    indentation : int
     """"""
 
-    pure: bool
+    pure : bool
     """"""
 
-    termLabels: bool
+    termLabels : bool
     """"""
 
     def __init__(self, unicode, width, indentation, pure, termLabels):
@@ -146,52 +143,48 @@ class PrintOptions:
         self.pure = pure
         self.termLabels = termLabels
 
-
 class NodeTextId:
     """"""
 
-    nodeId: NodeId
+    nodeId : NodeId
     """"""
 
-    nodeTextId: int
+    nodeTextId : int
     """"""
 
     def __init__(self, nodeId, nodeTextId):
         self.nodeId = nodeId
         self.nodeTextId = nodeTextId
 
-
 class NodeTextDesc:
     """"""
 
-    id: NodeTextId
+    id : NodeTextId
     """"""
 
-    result: str
+    result : str
     """"""
 
     def __init__(self, id, result):
         self.id = id
         self.result = result
 
-
 class TermActionId:
     """"""
 
-    nodeId: NodeId
+    nodeId : NodeId
     """"""
 
-    pio: str
+    pio : str
     """"""
 
-    id: str
+    id : str
     """"""
 
     def __init__(self, nodeId, pio, id):
         self.nodeId = nodeId
         self.pio = pio
         self.id = id
-
 
 class TermActionKind(enum.Enum):
     """"""
@@ -201,23 +194,22 @@ class TermActionKind(enum.Enum):
     Macro = None
     Taclet = None
 
-
 class TermActionDesc:
     """"""
 
-    commandId: TermActionId
+    commandId : TermActionId
     """"""
 
-    displayName: str
+    displayName : str
     """"""
 
-    description: str
+    description : str
     """"""
 
-    category: str
+    category : str
     """"""
 
-    kind: TermActionKind
+    kind : TermActionKind
     """"""
 
     def __init__(self, commandId, displayName, description, category, kind):
@@ -226,7 +218,6 @@ class TermActionDesc:
         self.description = description
         self.category = category
         self.kind = kind
-
 
 class List:
     """"""
@@ -238,19 +229,19 @@ class List:
 class SortDesc:
     """"""
 
-    string: str
+    string : str
     """"""
 
-    documentation: str
+    documentation : str
     """"""
 
-    extendsSorts: List
+    extendsSorts : List
     """"""
 
-    anAbstract: bool
+    anAbstract : bool
     """"""
 
-    s: str
+    s : str
     """"""
 
     def __init__(self, string, documentation, extendsSorts, anAbstract, s):
@@ -260,29 +251,28 @@ class SortDesc:
         self.anAbstract = anAbstract
         self.s = s
 
-
 class FunctionDesc:
     """"""
 
-    name: str
+    name : str
     """"""
 
-    sort: str
+    sort : str
     """"""
 
-    retSort: SortDesc
+    retSort : SortDesc
     """"""
 
-    argSorts: List
+    argSorts : List
     """"""
 
-    rigid: bool
+    rigid : bool
     """"""
 
-    unique: bool
+    unique : bool
     """"""
 
-    skolemConstant: bool
+    skolemConstant : bool
     """"""
 
     def __init__(self, name, sort, retSort, argSorts, rigid, unique, skolemConstant):
@@ -294,40 +284,38 @@ class FunctionDesc:
         self.unique = unique
         self.skolemConstant = skolemConstant
 
-
 class ContractId:
     """"""
 
-    envId: EnvironmentId
+    envId : EnvironmentId
     """"""
 
-    contractId: int
+    contractId : str
     """"""
 
     def __init__(self, envId, contractId):
         self.envId = envId
         self.contractId = contractId
 
-
 class ContractDesc:
     """"""
 
-    contractId: ContractId
+    contractId : ContractId
     """"""
 
-    name: str
+    name : str
     """"""
 
-    displayName: str
+    displayName : str
     """"""
 
-    typeName: str
+    typeName : str
     """"""
 
-    htmlText: str
+    htmlText : str
     """"""
 
-    plainText: str
+    plainText : str
     """"""
 
     def __init__(self, contractId, name, displayName, typeName, htmlText, plainText):
@@ -338,50 +326,43 @@ class ContractDesc:
         self.htmlText = htmlText
         self.plainText = plainText
 
-
 class LoadParams:
     """"""
 
-    keyFile: str
+    problemFile : str
     """"""
 
-    javaFile: str
+    classPath : List
     """"""
 
-    classPath: List
+    bootClassPath : str
     """"""
 
-    bootClassPath: str
+    includes : List
     """"""
 
-    includes: List
-    """"""
-
-    def __init__(self, keyFile, javaFile, classPath, bootClassPath, includes):
-        self.keyFile = keyFile
-        self.javaFile = javaFile
+    def __init__(self, problemFile, classPath, bootClassPath, includes):
+        self.problemFile = problemFile
         self.classPath = classPath
         self.bootClassPath = bootClassPath
         self.includes = includes
 
-
-
 class ProblemDefinition:
     """"""
 
-    sorts: List
+    sorts : List
     """"""
 
-    functions: List
+    functions : List
     """"""
 
-    predicates: List
+    predicates : List
     """"""
 
-    antecTerms: List
+    antecTerms : List
     """"""
 
-    succTerms: List
+    succTerms : List
     """"""
 
     def __init__(self, sorts, functions, predicates, antecTerms, succTerms):
@@ -391,20 +372,18 @@ class ProblemDefinition:
         self.antecTerms = antecTerms
         self.succTerms = succTerms
 
-
 class LogTraceParams:
     """"""
 
-    messag: str
+    messag : str
     """"""
 
-    verbose: str
+    verbose : str
     """"""
 
     def __init__(self, messag, verbose):
         self.messag = messag
         self.verbose = verbose
-
 
 class MessageType(enum.Enum):
     """"""
@@ -416,31 +395,29 @@ class MessageType(enum.Enum):
     Log = None
     Debug = None
 
-
 class ShowMessageParams:
     """"""
 
-    type: MessageType
+    type : MessageType
     """"""
 
-    message: str
+    message : str
     """"""
 
     def __init__(self, type, message):
         self.type = type
         self.message = message
 
-
 class ShowMessageRequestParams:
     """"""
 
-    type: MessageType
+    type : MessageType
     """"""
 
-    message: str
+    message : str
     """"""
 
-    actions: List
+    actions : List
     """"""
 
     def __init__(self, type, message, actions):
@@ -448,44 +425,41 @@ class ShowMessageRequestParams:
         self.message = message
         self.actions = actions
 
-
 class MessageActionItem:
     """"""
 
-    title: str
+    title : str
     """"""
 
     def __init__(self, title):
         self.title = title
 
-
 class Range:
     """"""
 
-    start: int
+    start : int
     """"""
 
-    end: int
+    end : int
     """"""
 
     def __init__(self, start, end):
         self.start = start
         self.end = end
 
-
 class ShowDocumentParams:
     """"""
 
-    uri: str
+    uri : str
     """"""
 
-    external: bool
+    external : bool
     """"""
 
-    takeFocus: bool
+    takeFocus : bool
     """"""
 
-    selection: Range
+    selection : Range
     """"""
 
     def __init__(self, uri, external, takeFocus, selection):
@@ -494,16 +468,14 @@ class ShowDocumentParams:
         self.takeFocus = takeFocus
         self.selection = selection
 
-
 class ShowDocumentResult:
     """"""
 
-    success: bool
+    success : bool
     """"""
 
     def __init__(self, success):
         self.success = success
-
 
 class TaskFinishedInfo:
     """"""
@@ -519,15 +491,5 @@ class TaskStartedInfo:
         pass
 
 
-KEY_DATA_CLASSES = {"ExampleDesc": ExampleDesc, "ProofScriptCommandDesc": ProofScriptCommandDesc,
-                    "ProofMacroDesc": ProofMacroDesc, "TraceValue": TraceValue, "SetTraceParams": SetTraceParams,
-                    "EnvironmentId": EnvironmentId, "ProofId": ProofId, "TreeNodeDesc": TreeNodeDesc,
-                    "TreeNodeId": TreeNodeId, "NodeId": NodeId, "PrintOptions": PrintOptions, "NodeTextId": NodeTextId,
-                    "NodeTextDesc": NodeTextDesc, "TermActionId": TermActionId, "TermActionKind": TermActionKind,
-                    "TermActionDesc": TermActionDesc, "List": List, "SortDesc": SortDesc, "FunctionDesc": FunctionDesc,
-                    "ContractId": ContractId, "ContractDesc": ContractDesc, "LoadParams": LoadParams,
-                    "ProblemDefinition": ProblemDefinition, "LogTraceParams": LogTraceParams,
-                    "MessageType": MessageType, "ShowMessageParams": ShowMessageParams,
-                    "ShowMessageRequestParams": ShowMessageRequestParams, "MessageActionItem": MessageActionItem,
-                    "Range": Range, "ShowDocumentParams": ShowDocumentParams, "ShowDocumentResult": ShowDocumentResult,
-                    "TaskFinishedInfo": TaskFinishedInfo, "TaskStartedInfo": TaskStartedInfo}
+KEY_DATA_CLASSES = { "ExampleDesc": ExampleDesc,"ProofScriptCommandDesc": ProofScriptCommandDesc,"ProofMacroDesc": ProofMacroDesc,"TraceValue": TraceValue,"SetTraceParams": SetTraceParams,"EnvironmentId": EnvironmentId,"ProofId": ProofId,"NodeId": NodeId,"TreeNodeDesc": TreeNodeDesc,"TreeNodeId": TreeNodeId,"PrintOptions": PrintOptions,"NodeTextId": NodeTextId,"NodeTextDesc": NodeTextDesc,"TermActionId": TermActionId,"TermActionKind": TermActionKind,"TermActionDesc": TermActionDesc,"List": List,"SortDesc": SortDesc,"FunctionDesc": FunctionDesc,"ContractId": ContractId,"ContractDesc": ContractDesc,"LoadParams": LoadParams,"ProblemDefinition": ProblemDefinition,"LogTraceParams": LogTraceParams,"MessageType": MessageType,"ShowMessageParams": ShowMessageParams,"ShowMessageRequestParams": ShowMessageRequestParams,"MessageActionItem": MessageActionItem,"Range": Range,"ShowDocumentParams": ShowDocumentParams,"ShowDocumentResult": ShowDocumentResult,"TaskFinishedInfo": TaskFinishedInfo,"TaskStartedInfo": TaskStartedInfo }
+
