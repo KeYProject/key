@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.gui.sourceview;
 
-import java.awt.Color;
+import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.io.Serial;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javax.swing.text.*;
 
@@ -14,16 +18,14 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
 
 /**
- * This document performs syntax highlighting when strings are inserted. However, only inserting the
- * whole String at once is supported, otherwise the syntax highlighting will be faulty.
+ * This lexer splits a text into tokens with coloured attributes.
  * <p>
- * Note that tab characters have to be replaced by spaces before inserting into the document.
- * <p>
- * The document currently only works when newlines are represented by "\n"!
+ * It is based on the mechanisms in class {@link JavaDocument}.
  *
- * @author Wolfram Pfeifer
+ * @see JavaDocument
+ * @author Wolfram Pfeifer, Mattias Ulbrich
  */
-public class JavaDocument extends DefaultStyledDocument {
+public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
 
     @Serial
     private static final long serialVersionUID = -1856296532743892931L;
@@ -259,31 +261,57 @@ public class JavaDocument extends DefaultStyledDocument {
     /**
      * Stores the mode in which the parser currently is.
      */
-    private JavaDocument.Mode mode = Mode.NORMAL;
+    private JavaJMLEditorLexer.Mode mode = Mode.NORMAL;
 
     /**
      * Stores the current comment state of the parser to recognize comments/comment ends.
      */
-    private JavaDocument.CommentState state = CommentState.NO;
+    private JavaJMLEditorLexer.CommentState state = CommentState.NO;
 
     /**
      * The settings listener of this document (registered in the static listener list).
      */
     private final transient PropertyChangeListener listener = e -> updateStyles();
 
+    private final List<SourceHighlightDocument.Token> result = new ArrayList<>();
+
     /**
      * Creates a new JavaDocument and sets the syntax highlighting styles (as in eclipse default
      * settings).
      */
-    public JavaDocument() {
+    public JavaJMLEditorLexer() {
         updateStyles();
         ColorSettings.getInstance().addPropertyChangeListener(listener);
-        // workaround for #1641: typing "enter" key shall insert only "\n", even on Windows
-        putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
         // fill the keyword hash sets
         keywords.addAll(Arrays.asList(KEYWORDS));
         jmlkeywords.addAll(Arrays.asList(JMLKEYWORDS));
+    }
+
+    /**
+     * Use the own parsing infrastructure to apply syntax highlighting to the given text.
+     *
+     * @param text non-null text to parse
+     * @return list of tokens with their respective styles
+     */
+    @Override
+    public List<SourceHighlightDocument.Token> applyTo(String text) {
+        result.clear();
+        currentPos = 0;
+        tokenStart = 0;
+        token = "";
+        state = CommentState.NO;
+        mode = Mode.NORMAL;
+        var chars = text.toCharArray();
+        for (char aChar : chars) {
+            try {
+                processChar(aChar);
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        return result;
     }
 
     /**
@@ -330,7 +358,6 @@ public class JavaDocument extends DefaultStyledDocument {
             }
         }
     }
-
 
     private void checkSpaceTab(char c) {
         token += c;
@@ -482,72 +509,37 @@ public class JavaDocument extends DefaultStyledDocument {
     }
 
     private void insertCommentString(String str, int pos) throws BadLocationException {
-        // remove the old word and formatting
-        this.remove(pos, str.length());
-        super.insertString(pos, str, comment);
+        result.add(new SourceHighlightDocument.Token(str.length(), comment));
     }
 
     private void insertAnnotation(String str, int pos) throws BadLocationException {
-        // remove the old word and formatting
-        this.remove(pos, str.length());
-        super.insertString(pos, str, annotation);
+        result.add(new SourceHighlightDocument.Token(str.length(), annotation));
     }
 
     private void insertJavadocString(String str, int pos) throws BadLocationException {
-        // remove the old word and formatting
-        this.remove(pos, str.length());
-        super.insertString(pos, str, javadoc);
+        result.add(new SourceHighlightDocument.Token(str.length(), javadoc));
     }
 
     private void insertJMLString(String str, int pos) throws BadLocationException {
-        // remove the old word and formatting
-        this.remove(pos, str.length());
-        int offset = 0;
         String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
         for (String t : tokens) {
             if (jmlkeywords.contains(t)) {
-                super.insertString(pos + offset, t, jmlkeyword);
+                result.add(new SourceHighlightDocument.Token(t.length(), jmlkeyword));
             } else {
-                super.insertString(pos + offset, t, jml);
+                result.add(new SourceHighlightDocument.Token(t.length(), jml));
             }
-            offset += t.length();
         }
     }
 
     private void insertNormalString(String str, int pos) throws BadLocationException {
-        // remove the old word and formatting
-        this.remove(pos, str.length());
-        int offset = 0;
         String[] tokens = str.split("((?<=" + DELIM + ")|(?=" + DELIM + "))");
         for (String t : tokens) {
             if (keywords.contains(t)) {
-                super.insertString(pos + offset, t, keyword);
+                result.add(new SourceHighlightDocument.Token(t.length(), keyword));
             } else {
-                super.insertString(pos + offset, t, normal);
+                result.add(new SourceHighlightDocument.Token(t.length(), normal));
             }
-            offset += t.length();
         }
     }
 
-    @Override
-    public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
-        // insert the unformatted string as a placeholder
-        super.insertString(offs, str, normal);
-        int strLen = str.length();
-        int endpos = offs + strLen;
-        int strpos;
-        // process char by char
-        for (int i = offs; i < endpos; i++) {
-            currentPos = i;
-            strpos = i - offs;
-            processChar(str.charAt(strpos));
-        }
-        // place the internal "cursor" of the document after the inserted String, reset internal
-        // state to defaults (fixes problems when editing a document)
-        currentPos = endpos;
-        tokenStart = endpos;
-        token = "";
-        mode = Mode.NORMAL;
-        state = CommentState.NO;
-    }
 }
